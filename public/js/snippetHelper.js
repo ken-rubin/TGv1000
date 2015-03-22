@@ -5,7 +5,7 @@
 // Return singleton instance.
 //
 
-define(function () {
+define(["errorHelper"], function (errorHelper) {
 	
 	try {
 
@@ -52,7 +52,7 @@ define(function () {
 								}
 							} catch (e) {
 
-								alert(e.message);
+								errorHelper.show(e.message);
 							}
 						})
 
@@ -64,13 +64,13 @@ define(function () {
 				};
 			} catch (e) {
 
-				alert(e.message);
+				errorHelper.show(e.message);
 			}
 		}
 
 		return new functionSnippetHelper();
 	} catch (e) {
 
-		alert(e.message);
+		errorHelper.show(e.message);
 	}
 });

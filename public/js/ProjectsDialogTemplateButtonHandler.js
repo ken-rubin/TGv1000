@@ -5,7 +5,7 @@
 //
 
 // Define an AMD module.
-define(function () {
+define(["errorHelper"], function (errorHelper) {
 
 	try {
 
@@ -34,7 +34,7 @@ define(function () {
 					$(".templateItem").on("click", m_functionTemplateItemClick);
 				} catch (e) {
 
-					alert(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -53,7 +53,7 @@ define(function () {
 			    	BootstrapDialog.alert("Generate " + strTemplateId + " project....");
 				} catch (e) {
 
-					m_functionErrorHandler(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -67,6 +67,6 @@ define(function () {
 		return functionProjectsDialogTemplateButtonHandler;
 	} catch (e) {
 
-		alert(e.message);
+		errorHelper.show(e.message);
 	}
 });

@@ -5,7 +5,7 @@
 //
 
 // Define an AMD module.
-define(["snippetHelper"], function (snippetHelper) {
+define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 	try {
 
@@ -28,11 +28,10 @@ define(["snippetHelper"], function (snippetHelper) {
 
 					// Wire up the search button.
 					$("#InnerSearchButton").off("click");
-					$("#InnerSearchButton").on("click",
-						m_functionInnerSearchButtonClick);
+					$("#InnerSearchButton").on("click", m_functionInnerSearchButtonClick);
 				} catch (e) {
 
-					alert(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -54,7 +53,7 @@ define(["snippetHelper"], function (snippetHelper) {
 					}
 				} catch (e) {
 
-					m_functionErrorHandler(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -82,10 +81,10 @@ define(["snippetHelper"], function (snippetHelper) {
 						dataType: "HTML",
 						method: "POST",
 						url: "/renderJadeSnippet"
-					}).done(m_functionInnerSearchSnippetResponse).error(m_functionErrorHandler);
+					}).done(m_functionInnerSearchSnippetResponse).error(errorHelper.show);
 				} catch (e) {
 
-					m_functionErrorHandler(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -99,6 +98,6 @@ define(["snippetHelper"], function (snippetHelper) {
 		return functionHandler;
 	} catch (e) {
 
-		alert(e.message);
+		errorHelper.show(e.message);
 	}
 });

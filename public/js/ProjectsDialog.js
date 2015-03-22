@@ -5,7 +5,7 @@
 //
 
 // Define the module.
-define(["snippetHelper"], function (snippetHelper) {
+define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 	try {
 
@@ -57,28 +57,6 @@ define(["snippetHelper"], function (snippetHelper) {
 				//////////////////////////////////
 				// Private functions.
 
-				// General error handler.
-				var m_functionErrorHandler = function (strError) {
-
-					try {
-
-						// Possibly convert from various objects to string.
-						if (strError.responseText) {
-
-							strError = strError.responseText;
-						} else if (strError.message) {
-
-							strError = strError.message;
-						}
-
-						// Show error.
-						alert(strError);
-					} catch (e) {
-
-						alert(e.message);
-					}
-				};
-
 				// Invoked when the new button is clicked.
 				var m_functionNewButtonClick = function () {
 
@@ -88,7 +66,7 @@ define(["snippetHelper"], function (snippetHelper) {
 	                	BootstrapDialog.alert("Generate new project....");
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -107,7 +85,7 @@ define(["snippetHelper"], function (snippetHelper) {
 						}
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -133,10 +111,10 @@ define(["snippetHelper"], function (snippetHelper) {
 							dataType: "HTML",
 							method: "POST",
 							url: "/renderJadeSnippet"
-						}).done(m_functionOpenSnippetResponse).error(m_functionErrorHandler);
+						}).done(m_functionOpenSnippetResponse).error(errorHelper.show);
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -156,7 +134,7 @@ define(["snippetHelper"], function (snippetHelper) {
 						}
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -181,10 +159,10 @@ define(["snippetHelper"], function (snippetHelper) {
 							dataType: "HTML",
 							method: "POST",
 							url: "/renderJadeSnippet"
-						}).done(m_functionTemplatesSnippetResponse).error(m_functionErrorHandler);
+						}).done(m_functionTemplatesSnippetResponse).error(errorHelper.show);
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -205,7 +183,7 @@ define(["snippetHelper"], function (snippetHelper) {
 						}
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -225,10 +203,10 @@ define(["snippetHelper"], function (snippetHelper) {
 							dataType: "HTML",
 							method: "POST",
 							url: "/renderJadeSnippet"
-						}).done(m_functionSearchSnippetResponse).error(m_functionErrorHandler);
+						}).done(m_functionSearchSnippetResponse).error(errorHelper.show);
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 
@@ -247,12 +225,12 @@ define(["snippetHelper"], function (snippetHelper) {
 						$("#SearchButton").click(m_functionSearchButtonClick);
 					} catch (e) {
 
-						m_functionErrorHandler(e.message);
+						errorHelper.show(e.message);
 					}
 				};
 			} catch (e) {
 
-				m_functionErrorHandler(e.message);
+				errorHelper.show(e.message);
 			}
 
 			/////////////////////////////////
@@ -268,6 +246,6 @@ define(["snippetHelper"], function (snippetHelper) {
 		return functionProjectsDialog;
 	} catch (e) {
 
-		alert(e.message);
+		errorHelper.show(e.message);
 	}
 });

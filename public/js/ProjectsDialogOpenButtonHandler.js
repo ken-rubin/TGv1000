@@ -5,7 +5,7 @@
 //
 
 // Define an AMD module.
-define(function () {
+define(["errorHelper"], function (errorHelper) {
 
 	try {
 
@@ -22,6 +22,8 @@ define(function () {
 
 				try {
 
+					throw { message: "this is a test" };
+
 					// Save context state.  This is known to be a dialog because this module
 					// is always loaded as the result of a button click in a popup dialog.
 					m_dialogContext = objectContext;
@@ -34,7 +36,7 @@ define(function () {
 					$(".projectItem").on("click", m_functionProjectItemClick);
 				} catch (e) {
 
-					alert(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -53,7 +55,7 @@ define(function () {
 			    	BootstrapDialog.alert("Open " + strProjectId + " project....");
 				} catch (e) {
 
-					m_functionErrorHandler(e.message);
+					errorHelper.show(e.message);
 				}
 			};
 
@@ -67,6 +69,6 @@ define(function () {
 		return functionProjectsDialogOpenButtonHandler;
 	} catch (e) {
 
-		alert(e.message);
+		errorHelper.show(e.message);
 	}
 });
