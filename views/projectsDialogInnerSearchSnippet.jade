@@ -1,0 +1,12 @@
+.snippetcontext#ProjectsDialogInnerSearchSnippet(data-module="ProjectsDialogInnerSearchButtonHandler")
+| These are the files that we found given your search criteria.  Either refine your search or choose from one of the projects below to open or clone.
+br
+br
+.collectionContainer
+  each project in projects
+    button.btn-info.btn.projectItem(id="#{project.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{project.description}")
+      br
+      | #{project.name}
+      br
+      br
+      img.projectItemImage(src="#{project.imageUrl}")

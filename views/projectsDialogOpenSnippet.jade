@@ -1,0 +1,12 @@
+.snippetcontext#ProjectsDialogOpenSnippet(data-module="ProjectsDialogOpenButtonHandler")
+| We've selected all of your projects from the database.  Please select one to open now.
+br
+br
+.collectionContainer
+  each project in projects
+    button.btn-info.btn.projectItem(id="#{project.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{project.description}")
+      br
+      | #{project.name}
+      br
+      br
+      img.projectItemImage(src="#{project.imageUrl}")

@@ -1,0 +1,16 @@
+{
+  "name": "TGv1000",
+  "version": "10000.0.1",
+  "private": "true",
+  "dependencies": {
+    "body-parser": "^1.12.2",
+    "express": "*",
+    "jade": "*",
+    "less-middleware": "^2.0.1",
+    "morgan": "^1.5.1"
+  },
+  "scripts": {
+
+    "start": "node-dev --debug app development"
+  }
+}
