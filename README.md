@@ -1,6 +1,6 @@
 Prerequisites:
 
-Of course, the project depends on Node and NPM both being installed in a global capacity and the standard, expected rights and privledges for the user running the client and server.  (The computer must be plugged in, a keyboard is helpful, a monitor and perhaps a mouse.... :-)
+Of course, the project depends on Node and NPM both being installed in a global capacity and the standard, expected rights and privledges for the user running the client and server.  (Don't forget to plug-in your computer too.... :-)
 
 The project also depends on the "node-dev" npm package to handle automatic server restarts and the "node-inspector" npm package for server debugging.  
 Please install these resources globally for full integration.
