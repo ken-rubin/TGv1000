@@ -10,7 +10,7 @@ define(["errorHelper"], function (errorHelper) {
 	try {
 
 		// Define the function constructor returned as "this" module.
-		var functionProjectsDialogOpenButtonHandler = function () {
+		var functionHandler = function () {
 
 			var self = this;
 
@@ -21,8 +21,6 @@ define(["errorHelper"], function (errorHelper) {
 			self.create = function (objectContext) {
 
 				try {
-
-					throw { message: "this is a test" };
 
 					// Save context state.  This is known to be a dialog because this module
 					// is always loaded as the result of a button click in a popup dialog.
@@ -66,7 +64,7 @@ define(["errorHelper"], function (errorHelper) {
 			var m_dialogContext = null;
 		};
 
-		return functionProjectsDialogOpenButtonHandler;
+		return functionHandler;
 	} catch (e) {
 
 		errorHelper.show(e.message);

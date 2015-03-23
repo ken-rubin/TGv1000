@@ -10,7 +10,7 @@ define(["errorHelper"], function (errorHelper) {
 	try {
 
 		// Define the function constructor returned as "this" module.
-		var functionProjectsDialogTemplateButtonHandler = function () {
+		var functionHandler = function () {
 
 			var self = this;
 
@@ -64,7 +64,7 @@ define(["errorHelper"], function (errorHelper) {
 			var m_dialogContext = null;
 		};
 
-		return functionProjectsDialogTemplateButtonHandler;
+		return functionHandler;
 	} catch (e) {
 
 		errorHelper.show(e.message);
