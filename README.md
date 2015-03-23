@@ -7,10 +7,17 @@ Please install these resources globally for full integration.
 Initialization:
 
 Execute: "git clone https://github.com/ken-rubin/TGv1000.git", to get the code.
+Note that the above command creates a subdirectory from the current, active user directory.
+
 Then execute: "npm install", from the root project folder to install all required local npm package dependencies.
 
 
 Execution:
 
 Execute: "(sudo) npm start", to run the server.  Sudo is a Unix command to give administrative priviliges to the subsequent command.  This is necessary because the server listens on port 80 by default and this is a restricted port on most systems.  Windows users may require similar measures.
+
+Then open a browser and navigate to: "localhost".  You should see the main page of the application.  Explore at your own risk.
+
+
+Architecture:
 
