@@ -36,10 +36,13 @@ The jade documents themselves form the second class of object-hierarchies detail
 
 
 Business objects:
+...
 
 Jade documents:
+...
 
 Client side event handlers:
+...
 
 
 Take care,
