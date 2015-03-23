@@ -18,6 +18,13 @@ Execute: "(sudo) npm start", to run the server.  Sudo is a Unix command to give 
 
 Then open a browser and navigate to: "localhost".  You should see the main page of the application.  Explore at your own risk/enjoyment.
 
+
+Debugging:
+
+To debug the server-side of the project, an additional command window must be opened after starting the server application above.  The command: "node-inspector &", is run, and instructions should be followed thereafter, additionally, refer to the "node-inspector" help documents for further information.
+
+To debug the client-side, simply activate the chosen brower's debug facility while navigating the project site.  Debugging proceeds normally for a web-site.  Perhaps refer to the browser's debugging documentation for further information.
+
 Architecture:
 
 This sample amouts to an exploration of dynamic content injection and its structured resolution.
