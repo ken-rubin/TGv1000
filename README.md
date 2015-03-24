@@ -160,6 +160,12 @@ The jade document takes the context object and merges it with its DOM rendering 
 	      img.projectItemImage(src="#{project.imageUrl}")
 
 
+Note:
+
+1) Properties of the ajax data object (the context object) are referred to directly in the jade template (e.g. "projects").
+
+2) The critical element is the ".snippetcontext" element.  It is given a known id, which will be referenced on the client and it specifies the name of the client side event handler module, which is required later on the client.
+
 
 
 Client side event handlers:
