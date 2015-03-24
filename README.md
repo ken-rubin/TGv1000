@@ -164,9 +164,68 @@ Note:
 
 1) Properties of the ajax data object (the context object) are referred to directly in the jade template (e.g. "projects").
 
-2) The critical element is the ".snippetcontext" element.  It is given a known id, which will be referenced on the client and it specifies the name of the client side event handler module, which is required later on the client.
+2) The critical element is the ".snippetcontext" element.  It is given a known id, which will be referenced on the client and it specifies the name of the client side event handler module, which is required later on the client--the core wiring code is wrapped in the client side module snippetHelper as will be seen.
 
 
+When the initial ajax request returns to the client, the client-specified "done" handler is invoked.  This function just accesses the snippetHelper module to do the client injection and require the client side event handler.
+
+
+
+
+				var m_functionSearchSnippetResponse = function (htmlData) {
+
+					try {
+
+						// Inject result.
+						var exceptionRet = snippetHelper.process(m_dialog,
+							htmlData,
+							"#TypeWell",
+							"#ProjectsDialogSearchSnippet");
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
+					} catch (e) {
+
+						errorHelper.show(e.message);
+					}
+				};
+
+
+The snippetHelper module injects the htmlSnippet into the DOM and then inspects it for the aforementioned snippetcontext:
+
+
+						var jModuleDefinition = $(strModuleDefinitionElementSelector);
+						if (jModuleDefinition.length > 0) {
+
+							// Extract the value of the attribute.
+							var strModule = jModuleDefinition.attr("data-module");
+
+							// If the node is found and has a value.
+							if (strModule) {
+
+								// Require the specified module, and...
+								require([strModule], function (module) {
+
+									try {
+
+										// ...allocate and create.
+										var moduleInstance = new module();
+										var exceptionRet = moduleInstance.create(objectContext);
+										if (exceptionRet) {
+
+											throw exceptionRet;
+										}
+									} catch (e) {
+
+										errorHelper.show(e.message);
+									}
+								})
+							}
+						}
+
+
+If the 
 
 Client side event handlers:
 ...
