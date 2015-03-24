@@ -108,26 +108,21 @@ Notice that the request body object is the data object passed from the ajax call
 
 If a business object is specified, it is required, allocated, cached and invoked:
 
-			// Get the cached business object instance, or...
-			var instance = objectInstantiatedModules[objectBusinessObject.module];
-			if (!instance) {
+	var instance = objectInstantiatedModules[objectBusinessObject.module];
+	if (!instance) {
 
-				// ...require module, and...
-				var module = require("./modules/" + objectBusinessObject.module);
+		var module = require("./modules/" + objectBusinessObject.module);
 
-				// ...allocate type.
-				instance = new module();
+		instance = new module();
 
-				// Cache.
-				objectInstantiatedModules[objectBusinessObject.module] = instance;
-			}
+		objectInstantiatedModules[objectBusinessObject.module] = instance;
+	}
 
-			// Invoke method to augment the body property.
-			var exceptionRet = instance[objectBusinessObject.method](req.body);
-			if (exceptionRet) {
+	var exceptionRet = instance[objectBusinessObject.method](req.body);
+	if (exceptionRet) {
 
-				throw exceptionRet;
-			}
+		throw exceptionRet;
+	}
 
 Notice that the request body is passed into the invoked business object method.  This is a critical parameter.  The business object exists merely to augment this parameter.  This same parameter, thusly augmented, is passed on to the jade template file.  
 
@@ -141,185 +136,109 @@ A sample business object follows:
 		};
 	};
 
-All business objects follow this interface.  They take an objectBody and the purpose is to augment this parameter by adding addition properties for the jade file to consume.
+All business objects follow this interface.  They take an "objectBody" and their purpose is to augment this parameter by adding addition properties for the jade file to consume.
 
 After the business object augments the context object, it is passed into the jade render call (this is the second and last operation the route handler performs):
 
-		res.render(req.body.templateFile, 
-			req.body);
+	res.render(req.body.templateFile, 
+		req.body);
+
 
 
 Jade documents:
+
+
 
 The jade document takes the context object and merges it with its DOM rendering structure to produce an HTML-snippet which is streamed back to the client.
 
 
 	.snippetcontext#ProjectsDialogInnerSearchSnippet(data-module="ProjectsDialogInnerSearchButtonHandler")
-	| These are the files that we found given your search criteria.  Either refine your search or choose from one of the projects below to open or clone.
+		| These are the files that we found given your search criteria.  Either refine your search or choose from one of the projects below to open or clone.
 	br
 	br
 	.collectionContainer
-	  each project in projects
-	    button.btn-info.btn.projectItem(id="#{project.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{project.description}")
-	      br
-	      | #{project.name}
-	      br
-	      br
-	      img.projectItemImage(src="#{project.imageUrl}")
+		each project in projects
+			button.btn-info.btn.projectItem(id="#{project.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{project.description}")
+			br
+			| #{project.name}
+			br
+			br
+			img.projectItemImage(src="#{project.imageUrl}")
 
 
 Note:
 
 1) Properties of the ajax data object (the context object) are referred to directly in the jade template (e.g. "projects").
 
-2) The critical element is the ".snippetcontext" element.  It is given a known id, which will be referenced on the client and it specifies the name of the client side event handler module, which is required later on the client--the core wiring code is wrapped in the client side module snippetHelper as will be seen.
+2) The critical element is the ".snippetcontext" element.  It is given a known id, which will be referenced on the client and it specifies the name of the client side event handler module, which is required later on in the client--the core wiring code is wrapped in the client side module "snippetHelper" as will be seen.
 
 
 When the initial ajax request returns to the client, the client-specified "done" handler is invoked.  This function just accesses the snippetHelper module to do the client injection and require the client side event handler.
 
 
 
+	var m_functionSearchSnippetResponse = function (htmlData) {
 
-				var m_functionSearchSnippetResponse = function (htmlData) {
+		try {
 
-					try {
+			var exceptionRet = snippetHelper.process(m_dialog,
+				htmlData,
+				"#TypeWell",
+				"#ProjectsDialogSearchSnippet");
+			if (exceptionRet) {
 
-						// Inject result.
-						var exceptionRet = snippetHelper.process(m_dialog,
-							htmlData,
-							"#TypeWell",
-							"#ProjectsDialogSearchSnippet");
-						if (exceptionRet) {
+				throw exceptionRet;
+			}
+		} catch (e) {
 
-							throw exceptionRet;
-						}
-					} catch (e) {
+			errorHelper.show(e.message);
+		}
+	};
 
-						errorHelper.show(e.message);
+
+Note: see the snippet module translation unit for a detailed description of the "process" method parameters.
+
+
+The "snippetHelper" module injects the "htmlSnippet" parameter into the DOM and then inspects it for the aforementioned "snippetcontext":
+
+
+	var jModuleDefinition = $(strModuleDefinitionElementSelector);
+	if (jModuleDefinition.length > 0) {
+
+		// Extract the value of the attribute.
+		var strModule = jModuleDefinition.attr("data-module");
+
+		// If the node is found and has a value.
+		if (strModule) {
+
+			// Require the specified module, and...
+			require([strModule], function (module) {
+
+				try {
+
+					// ...allocate and create.
+					var moduleInstance = new module();
+					var exceptionRet = moduleInstance.create(objectContext);
+					if (exceptionRet) {
+
+						throw exceptionRet;
 					}
-				};
+				} catch (e) {
 
-
-Note: see the snippet module js file for a detailed description of the process method parameters.
-
-
-The snippetHelper module injects the htmlSnippet into the DOM and then inspects it for the aforementioned snippetcontext:
-
-
-						var jModuleDefinition = $(strModuleDefinitionElementSelector);
-						if (jModuleDefinition.length > 0) {
-
-							// Extract the value of the attribute.
-							var strModule = jModuleDefinition.attr("data-module");
-
-							// If the node is found and has a value.
-							if (strModule) {
-
-								// Require the specified module, and...
-								require([strModule], function (module) {
-
-									try {
-
-										// ...allocate and create.
-										var moduleInstance = new module();
-										var exceptionRet = moduleInstance.create(objectContext);
-										if (exceptionRet) {
-
-											throw exceptionRet;
-										}
-									} catch (e) {
-
-										errorHelper.show(e.message);
-									}
-								})
-							}
-						}
+					errorHelper.show(e.message);
+				}
+			})
+		}
+	}
 
 
 If the element is found and if the attribute is specified, then the module is required, allocated and created.
 
 
-Notice: objectContext is passed to the create method of the client side event handler module.  This is important for carrying over the context from the calling module.
+Notice: "objectContext" is passed to the "create" method of the client side event handler module.  This is important for carrying over the context from the calling module.  For instance, in this case, the context object is the root dialog object.
 
 
-The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a fairly variable component so an example handler module is listed for your enjoyment and perusal but it is not explained in this document per se.
-
-Client side event handlers:
-
-
-	//////////////////////////////////////////
-	// ProjectsDialog open button handler. 
-	//
-	// Return constructor function.
-	//
-	
-	// Define an AMD module.
-	define(["errorHelper"], function (errorHelper) {
-	
-		try {
-	
-			// Define the function constructor returned as "this" module.
-			var functionHandler = function () {
-	
-				var self = this;
-	
-				//////////////////////////////////////
-				// Public methods.
-	
-				// Initialize this object.
-				self.create = function (objectContext) {
-	
-					try {
-	
-						// Save context state.  This is known to be a dialog because this module
-						// is always loaded as the result of a button click in a popup dialog.
-						m_dialogContext = objectContext;
-	
-						// Activate tooltips.
-						$("[data-toggle='tooltip']").tooltip();
-	
-						// Wire buttons.
-						$(".projectItem").off("click");
-						$(".projectItem").on("click", m_functionProjectItemClick);
-					} catch (e) {
-	
-						errorHelper.show(e.message);
-					}
-				};
-	
-				//////////////////////////////////////
-				// Private methods.
-	
-				// Invoked when a project item is clicked.
-				var m_functionProjectItemClick = function () {
-	
-					try {
-	
-						// Get the project id from this (i.e. what was clicked).
-						var strProjectId = $(this).attr("id");
-	
-				        m_dialogContext.close();
-				    	BootstrapDialog.alert("Open " + strProjectId + " project....");
-					} catch (e) {
-	
-						errorHelper.show(e.message);
-					}
-				};
-	
-				//////////////////////////////////////
-				// Private fields.
-	
-				// The owning dialog.
-				var m_dialogContext = null;
-			};
-	
-			return functionHandler;
-		} catch (e) {
-	
-			errorHelper.show(e.message);
-		}
-	});
-
+The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a highly variable component so an example is not listed here.  Please see the project code for an example of a handler instance.
 
 
 That's the whole cross-sectional path through the proposed dynamic injection system.  Simple.  Clean.  Elegant.  Rubbish?
