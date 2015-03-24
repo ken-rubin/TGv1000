@@ -10,9 +10,9 @@ Initialization:
 
 
 Execute: "git clone https://github.com/ken-rubin/TGv1000.git", to get the code.
-Note that the above command creates a subdirectory from the current, active user directory.
+Note that the above command creates a subdirectory from the current, active user directory.  So there is no need to create a TGv1000 folder explicitly.
 
-Then execute: "npm install", from the root project folder to install all required local npm package dependencies.
+Navigate to the TGv1000 folder then execute: "npm install", from this root project folder to install all required local npm package dependencies.
 
 
 Running the project:
@@ -26,18 +26,18 @@ Then open a browser and navigate to: "localhost".  You should see the main page 
 Debugging:
 
 
-To debug the server-side of the project, an additional command window must be opened after starting the server application above.  The command: "node-inspector &", is run, and console-presented instructions should be followed thereafter; additionally, refer to the "node-inspector" help documents for more information.
+To debug the server-side of the project, an additional command window must be opened after starting the server application above.  The command: "node-inspector &", is to be executed, and console-presented instructions should be followed thereafter; additionally, refer to the "node-inspector" help documents for more information.
 
-To debug the client-side, simply activate the chosen browser's debug facility while navigating the project site.  Debugging proceeds normally for a browser-hosted web-site.  if necessary, perhaps refer to the browser's debugging documentation for further information?
+To debug the client-side, simply activate the chosen browser's debug facility while navigating the project site.  Debugging proceeds normally for a browser-hosted web-site.  If necessary, perhaps refer to the browser's debugging documentation for further information?
 
 
 Architecture:
 
 
 This sample amouts to an exploration of dynamic content injection and its structured resolution.
-The theoretical scenario of a projects dialog forms the basis for this exploration.  The dialog is presented to the user and all content is dynamically loaded into the DOM on-demand.  Two routes form the basis of this framework.  One is fully implemented and the other is, at the moment, just a prototype.  "/renderJadeSnippet" is fully implemented and will be exlplored in this document.  The "/projectsDialog" route is not yet complete.  It will be morphed into a corresponding route, filling the role of a URL-encoded GET request whereas the "/renderJadeSnippet" is a POST route.
+The theoretical scenario of a projects dialog forms the basis for this exploration.  The dialog is presented to the user and all content is dynamically loaded into the DOM on-demand.  Two routes form the basis of this framework (in addition to the standard "index" route, which serves up the static page).  One route is fully implemented and the other is, at the moment, just a prototype.  "/renderJadeSnippet" is fully implemented and will be exlplored in this document.  The "/projectsDialog" route is not yet complete.  It will be morphed into a corresponding route, filling the role of a URL-encoded GET request whereas the "/renderJadeSnippet" is a POST route.
 
-The purpose of the "/renderJadeSnippet" route is to serve up HTML-snippets to the client by processing a jade document.  The client can specify information which is consumed by the jade document.  In addition, a business object may be specified (also by the client, but run on the sever).  It should augment the client-specified data with additional server data.  The business object is a node module.  It can perform any action necessary to augment the context object (eventually) passed to the jade compiler.  These buisiness objects form the first class of object-hierarchies, named: "Business objects", detailed below.  Typically, the jade document is a snippet, that is, it does not generate a complete web-page but instead  forms a subset which is injected into a complete document on the client.  The snippet typically consumes context data (both server and client in origin) to build its rendered structure.  Ultimately, however, it is only limited by the templative nature of jade.
+The purpose of the "/renderJadeSnippet" route is to serve up HTML-snippets to the client by processing a jade document.  The client can specify information which is consumed by the jade document.  In addition, a business object may be specified (also by the client, but run on the sever).  It should augment the client-specified data with additional server data.  The business object is a node module.  It can perform any action necessary to augment the context object (eventually) passed to the jade compiler.  These buisiness objects form the first class of object-hierarchies, named: "Business objects", and detailed below.  Typically, the jade document is a snippet, that is, it does not generate a complete web-page but instead  forms a subset which is injected into a stand-alone document on the client.  The snippet typically consumes context data (both server and client in origin) to build its rendered structure.  Ultimately, however, this process is only limited by the templative nature of jade.
 
 The jade documents themselves form the second class of object-hierarchies detailed (named: "jade documents").  The jade documents reference a special class of client side AMD-modules, which are intended to be dynamically required on the client and form the third class of object-hierarchies detailed (named: "Client side event handlers").
 
@@ -48,7 +48,6 @@ Code:
 The client invokes the route via an ajax call:
 
 
-	// Get the user's projects.
 	$.ajax({
 
 		cache: false,
@@ -72,15 +71,15 @@ Notice several things, here:
 
 1) The "data" property of the ajax call forms a context object passed to the server.  The server code, as shall be seen shortly via the magic of the BodyParser middleware, sees this object as "req.body".
 
-2) The request is not cached.  
+2) The request is not cached as is specified in the "cache" property of the ajax request.  
 
-3) The data-type is "HTML"--this indicates that the result is an HTML-snippet.
+3) The data-type is "HTML" (as is specified via the ajax property "dataType")--this indicates that the result is an HTML-snippet.
 
-4) The method is "POST".
+4) The method is "POST" (...).
 
 5) The route is invoked via the "url" parameter.
 
-6) The "userId" property of the data object is an example of client-specified data.  Utimately this will be passed into the Business object and on to the jade template files.
+6) The "userId" property of the data object is an example of client-specified data.  Utimately this will be passed into the Business object and on to the jade template files (unless overridden via the business object layer).
 
 7) The business object module and method are explicitly specified in the "businessObject" property.  This is a standard property which is looked for explicitly by the server code.
 
@@ -124,7 +123,7 @@ If a business object is specified, it is required, allocated, cached and invoked
 		throw exceptionRet;
 	}
 
-Notice that the request body is passed into the invoked business object method.  This is a critical parameter.  The business object exists merely to augment this parameter.  This same parameter, thusly augmented, is passed on to the jade template file.  
+Notice that the request body is passed into the invoked business object method.  This is a critical parameter.  The business object exists merely to augment this parameter.  This same parameter--thusly augmented--is passed on to the jade template file.  
 
 A sample business object follows:
 
@@ -136,7 +135,7 @@ A sample business object follows:
 		};
 	};
 
-All business objects follow this interface.  They take an "objectBody" and their purpose is to augment this parameter by adding addition properties for the jade file to consume.
+All business objects follow this interface.  They take an "objectBody" and their purpose is to augment this parameter by adding additional properties thereto for the jade file to consume.
 
 After the business object augments the context object, it is passed into the jade render call (this is the second and last operation the route handler performs):
 
@@ -170,7 +169,7 @@ Note:
 
 1) Properties of the ajax data object (the context object) are referred to directly in the jade template (e.g. "projects").
 
-2) The critical element is the ".snippetcontext" element.  It is given a known id, which will be referenced on the client and it specifies the name of the client side event handler module, which is required later on in the client--the core wiring code is wrapped in the client side module "snippetHelper" as will be seen.
+2) The critical element is the ".snippetcontext" element.  It is given a client-known "id", which will be referenced on the client and specifies the name of the client side event handler module, which is required later on in the client code--the core wiring code is wrapped in the client side module "snippetHelper" as will be seen.
 
 
 When the initial ajax request returns to the client, the client-specified "done" handler is invoked.  This function just accesses the snippetHelper module to do the client injection and require the client side event handler.
@@ -232,10 +231,10 @@ The "snippetHelper" module injects the "htmlSnippet" parameter into the DOM and 
 	}
 
 
-If the element is found and if the attribute is specified, then the module is required, allocated and created.
+If the element is found and if the attribute is specified, then the module is required, allocated and created (as above in code!).
 
 
-Notice: "objectContext" is passed to the "create" method of the client side event handler module.  This is important for carrying over the context from the calling module.  For instance, in this case, the context object is the root dialog object.
+Notice: "objectContext" is passed to the "create" method of the client side event handler module.  This is important for carrying over the context from the calling module.  For instance, in this case, the context object is the root dialog object which may ultimately be closed by the client side event handler processing as is natural given the generic nature of the event handlers.  The calling code understand the context and necessary parameters to pass and the invoked handler understand how to use this code by virtual of it instantiation in vitro.
 
 
 The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a highly variable component so an example is not listed here.  Please see the project code for an example of a handler instance.
