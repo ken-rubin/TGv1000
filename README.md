@@ -65,7 +65,7 @@ The client invokes the route via an ajax call:
 
 Notice several things, here:
 
-1) The "data" property of the ajax call forms a context object passed to the server.  In the server code, as shall be seen shortly, via the magic of the BodyParser middleware, sees this object as "req.body".
+1) The "data" property of the ajax call forms a context object passed to the server.  The server code, as shall be seen shortly via the magic of the BodyParser middleware, sees this object as "req.body".
 
 2) The request is not cached.  
 
@@ -84,6 +84,7 @@ Notice several things, here:
 9) The business object module is upper-case in keeping with Crockford's convention for function constructors.  This implies that the business objects must be allocated in the route handler.
 
 
+
 Business objects:
 
 The "/renderJadeSnippet" route handler does two things.  First, it looks to see if there is a business object specified:
@@ -94,7 +95,8 @@ The "/renderJadeSnippet" route handler does two things.  First, it looks to see 
       			...
     		}
     
-Notice that the request body object is the data object pass
+Notice that the request body object is the data object passed from the ajax call.
+
 If a business object is specified, it is required, allocated, cached and invoked:
 
 			// Get the cached business object instance, or...
@@ -118,7 +120,19 @@ If a business object is specified, it is required, allocated, cached and invoked
 				throw exceptionRet;
 			}
 
-Notice that the request body is passed into the invoked method.
+Notice that the request body is passed into the invoked business object method.  This is a critical parameter.  The business object exists merely to augment this parameter.  This same parameter, thusly augmented, is passed on to the jade template file.  
+
+A sample business object follows:
+
+module.exports = function Templates() {
+	
+	this.process = function (objectBody) {
+
+		objectBody.projects = [...];
+	};
+};
+
+All business objects follow this interface.  They take an objectBody and the purpose is to augment this parameter by adding addition properties for the jade file to consume.
 
 
 Jade documents:
