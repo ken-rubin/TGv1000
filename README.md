@@ -192,6 +192,9 @@ When the initial ajax request returns to the client, the client-specified "done"
 				};
 
 
+Note: see the snippet module js file for a detailed description of the process method parameters.
+
+
 The snippetHelper module injects the htmlSnippet into the DOM and then inspects it for the aforementioned snippetcontext:
 
 
@@ -225,10 +228,91 @@ The snippetHelper module injects the htmlSnippet into the DOM and then inspects 
 						}
 
 
-If the 
+If the element is found and if the attribute is specified, then the module is required, allocated and created.
+
+
+Notice: objectContext is passed to the create method of the client side event handler module.  This is important for carrying over the context from the calling module.
+
+
+The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a fairly variable component so an example handler module is listed for your enjoyment and perusal but it is not explained in this document per se.
 
 Client side event handlers:
-...
+
+
+//////////////////////////////////////////
+// ProjectsDialog open button handler. 
+//
+// Return constructor function.
+//
+
+// Define an AMD module.
+define(["errorHelper"], function (errorHelper) {
+
+	try {
+
+		// Define the function constructor returned as "this" module.
+		var functionHandler = function () {
+
+			var self = this;
+
+			//////////////////////////////////////
+			// Public methods.
+
+			// Initialize this object.
+			self.create = function (objectContext) {
+
+				try {
+
+					// Save context state.  This is known to be a dialog because this module
+					// is always loaded as the result of a button click in a popup dialog.
+					m_dialogContext = objectContext;
+
+					// Activate tooltips.
+					$("[data-toggle='tooltip']").tooltip();
+
+					// Wire buttons.
+					$(".projectItem").off("click");
+					$(".projectItem").on("click", m_functionProjectItemClick);
+				} catch (e) {
+
+					errorHelper.show(e.message);
+				}
+			};
+
+			//////////////////////////////////////
+			// Private methods.
+
+			// Invoked when a project item is clicked.
+			var m_functionProjectItemClick = function () {
+
+				try {
+
+					// Get the project id from this (i.e. what was clicked).
+					var strProjectId = $(this).attr("id");
+
+			        m_dialogContext.close();
+			    	BootstrapDialog.alert("Open " + strProjectId + " project....");
+				} catch (e) {
+
+					errorHelper.show(e.message);
+				}
+			};
+
+			//////////////////////////////////////
+			// Private fields.
+
+			// The owning dialog.
+			var m_dialogContext = null;
+		};
+
+		return functionHandler;
+	} catch (e) {
+
+		errorHelper.show(e.message);
+	}
+});
+
+
 
 
 Take care,
