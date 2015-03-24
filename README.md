@@ -1,6 +1,6 @@
 Prerequisites:
 
-Of course, the project depends on Node and NPM both being installed in a global capacity and the standard, expected rights and privledges for the user running the client and server.  (Don't forget to plug-in your computer too.... :-)
+Of course, the project depends on Node and NPM both being installed in a global capacity and the standard, expected rights and privledges for the users running the client and server.  (Don't forget to plug-in your computer too.... :-)
 
 The project also depends on the "node-dev" npm package to handle automatic server restarts and the "node-inspector" npm package for server debugging.  
 Please install these resources globally for full integration.
@@ -36,9 +36,65 @@ The purpose of the "/renderJadeSnippet" route is to serve up HTML-snippets to th
 
 The jade documents themselves form the second class of object-hierarchies detailed (named: "jade documents").  The jade documents reference a special class of client side AMD-modules, which are intended to be dynamically required on the client and form the third class of object-hierarchies detailed (named: "Client side event handlers").
 
+The client invokes the route via an ajax call:
+
+
+						// Get the user's projects.
+						$.ajax({
+
+							cache: false,
+							data: { 
+
+								userId: m_iUserId,
+								templateFile: "projectsDialogOpenSnippet",
+								businessObject: {
+
+									module: "ProjectsDialogOpenSnippet",
+									method: "process"
+								}
+							}, 
+							dataType: "HTML",
+							method: "POST",
+							url: "/renderJadeSnippet"
+						}).done(m_functionOpenSnippetResponse).error(errorHelper.show);
+
 
 Business objects:
-...
+
+The "/renderJadeSnippet" route handler does two things.  First, it looks to see if there is a business object specified:
+
+		var objectBusinessObject = req.body.businessObject;
+		if (objectBusinessObject) {
+
+      ...
+    }
+    
+Notice that the request body object is the data object pass
+If a business object is specified, it is required, allocated, cached and invoked:
+
+			// Get the cached business object instance, or...
+			var instance = objectInstantiatedModules[objectBusinessObject.module];
+			if (!instance) {
+
+				// ...require module, and...
+				var module = require("./modules/" + objectBusinessObject.module);
+
+				// ...allocate type.
+				instance = new module();
+
+				// Cache.
+				objectInstantiatedModules[objectBusinessObject.module] = instance;
+			}
+
+			// Invoke method to augment the body property.
+			var exceptionRet = instance[objectBusinessObject.method](req.body);
+			if (exceptionRet) {
+
+				throw exceptionRet;
+			}
+
+Notice that the request body is passed into the invoked method.
+
 
 Jade documents:
 ...
