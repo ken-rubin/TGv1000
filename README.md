@@ -10,7 +10,7 @@ Initialization:
 
 
 Execute: "git clone https://github.com/ken-rubin/TGv1000.git", to get the code.
-Note that the above command creates a subdirectory from the current, active user directory.  So there is no need to create a TGv1000 folder explicitly.
+Note that the above command creates a subdirectory relative to the current active user directory.  So there is no need to create a TGv1000 folder explicitly.
 
 Navigate to the TGv1000 folder then execute: "npm install", from this root project folder to install all required local npm package dependencies.
 
