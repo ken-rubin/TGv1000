@@ -239,6 +239,9 @@ Notice: "objectContext" is passed to the "create" method of the client side even
 The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a highly variable component so an example is not listed here.  Please see the project code for an example of a handler instance.
 
 
+# Conclusion:
+
+
 That's the whole cross-sectional path through the proposed dynamic injection system.  Simple.  Clean.  Elegant.  Rubbish?
 
 
