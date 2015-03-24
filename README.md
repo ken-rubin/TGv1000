@@ -66,13 +66,21 @@ The client invokes the route via an ajax call:
 Notice several things, here:
 
 1) The "data" property of the ajax call forms a context object passed to the server.  In the server code, as shall be seen shortly, via the magic of the BodyParser middleware, sees this object as "req.body".
+
 2) The request is not cached.  
+
 3) The data-type is "HTML"--this indicates that the result is an HTML-snippet.
+
 4) The method is post.
+
 5) The route is invoked via the url parameter.
+
 6) The "userId" property of the data object is an example of client-specified data.  Utimately this will be passed into the Business object and the jade template files.
+
 7) The business object module and method are explicitly specified.
+
 8) The jade template file is specified via the "templateFile" property and it is lower-case, in keeping with standard JavaScript convention.
+
 9) The business object module is upper-case in keeping with Crockford's convention for function constructors.  This implies that the business objects must be allocated in the route handler.
 
 
