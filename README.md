@@ -36,6 +36,10 @@ The purpose of the "/renderJadeSnippet" route is to serve up HTML-snippets to th
 
 The jade documents themselves form the second class of object-hierarchies detailed (named: "jade documents").  The jade documents reference a special class of client side AMD-modules, which are intended to be dynamically required on the client and form the third class of object-hierarchies detailed (named: "Client side event handlers").
 
+
+Code:
+
+
 The client invokes the route via an ajax call:
 
 
@@ -66,8 +70,8 @@ The "/renderJadeSnippet" route handler does two things.  First, it looks to see 
 		var objectBusinessObject = req.body.businessObject;
 		if (objectBusinessObject) {
 
-      ...
-    }
+      			...
+    		}
     
 Notice that the request body object is the data object pass
 If a business object is specified, it is required, allocated, cached and invoked:
