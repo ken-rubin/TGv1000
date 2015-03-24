@@ -125,13 +125,13 @@ Notice that the request body is passed into the invoked business object method. 
 
 A sample business object follows:
 
-module.exports = function Templates() {
+	module.exports = function Templates() {
 	
-	this.process = function (objectBody) {
+		this.process = function (objectBody) {
 
-		objectBody.projects = [...];
+			objectBody.projects = [...];
+		};
 	};
-};
 
 All business objects follow this interface.  They take an objectBody and the purpose is to augment this parameter by adding addition properties for the jade file to consume.
 
