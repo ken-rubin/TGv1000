@@ -135,9 +135,32 @@ A sample business object follows:
 
 All business objects follow this interface.  They take an objectBody and the purpose is to augment this parameter by adding addition properties for the jade file to consume.
 
+After the business object augments the context object, it is passed into the jade render call (this is the second and last operation the route handler performs):
+
+		res.render(req.body.templateFile, 
+			req.body);
+
 
 Jade documents:
-...
+
+The jade document takes the context object and merges it with its DOM rendering structure to produce an HTML-snippet which is streamed back to the client.
+
+
+	.snippetcontext#ProjectsDialogInnerSearchSnippet(data-module="ProjectsDialogInnerSearchButtonHandler")
+	| These are the files that we found given your search criteria.  Either refine your search or choose from one of the projects below to open or clone.
+	br
+	br
+	.collectionContainer
+	  each project in projects
+	    button.btn-info.btn.projectItem(id="#{project.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{project.description}")
+	      br
+	      | #{project.name}
+	      br
+	      br
+	      img.projectItemImage(src="#{project.imageUrl}")
+
+
+
 
 Client side event handlers:
 ...
