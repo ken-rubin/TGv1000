@@ -90,7 +90,7 @@ Notice several things, here:
 
 
 
-Business objects:
+### Business objects:
 
 
 
@@ -144,7 +144,7 @@ After the business object augments the context object, it is passed into the jad
 
 
 
-Jade documents:
+### Jade documents:
 
 
 
