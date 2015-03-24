@@ -314,5 +314,9 @@ Client side event handlers:
 
 
 
+That's the whole cross-sectional path through the proposed dynamic injection system.  Simple.  Clean.  Elegant.  Rubbish?
+
+
+
 Take care,
 Ken.
