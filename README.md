@@ -1,4 +1,4 @@
-## Prerequisites:
+## Prerequisites
 
 Of course, the project depends on Node and NPM both being installed in a global capacity and the standard, expected rights and privledges for the users running the client and server.  (Don't forget to plug-in your computer too.... :-)
 
@@ -6,7 +6,7 @@ For full node-goodness, the project also depends on the "node-dev" npm package t
 Please install these resources globally for full integration.
 
 
-## Initialization:
+## Initialization
 
 
 Execute: "git clone https://github.com/ken-rubin/TGv1000.git", to get the code.
@@ -15,7 +15,7 @@ Note that the above command creates a subdirectory relative to the current activ
 Navigate to the TGv1000 folder then execute: "npm install", from this root project folder to install all required local npm package dependencies.
 
 
-## Running the project:
+## Running the project
 
 
 Execute: "(sudo) npm start", to run the server.  "Start" is a script specified in the package.json file included with the project.  Sudo is a Unix command to give administrative priviliges to the subsequent command(s).  This is necessary because the server listens on port 80 by default and this is a restricted port on most systems.  Windows users may require similar measures akin to "running as administrator".
@@ -23,7 +23,7 @@ Execute: "(sudo) npm start", to run the server.  "Start" is a script specified i
 Then open a browser and navigate to: "localhost".  You should see the main page of the application.  Explore at your own risk/enjoyment.
 
 
-## Debugging:
+## Debugging
 
 
 To debug the server-side of the project, an additional command window must be opened after starting the server application above.  The command: "node-inspector &", is to be executed, and console-presented instructions should be followed thereafter; additionally, refer to the "node-inspector" help documents for more information.
@@ -31,7 +31,7 @@ To debug the server-side of the project, an additional command window must be op
 To debug the client-side, simply activate the chosen browser's debug facility while navigating the project site.  Debugging proceeds normally for a browser-hosted web-site.  If necessary, perhaps refer to the browser's debugging documentation for further information?
 
 
-## Architecture:
+## Architecture
 
 
 This sample amouts to an exploration of dynamic content injection and its structured resolution.
@@ -42,7 +42,7 @@ The purpose of the "/renderJadeSnippet" route is to serve up HTML-snippets to th
 The jade documents themselves form the second class of object-hierarchies detailed (named: "jade documents").  The jade documents reference a special class of client side AMD-modules, which are intended to be dynamically required on the client and form the third class of object-hierarchies detailed (named: "Client side event handlers").
 
 
-## Code:
+## Code
 
 
 The client invokes the route via an ajax call:
@@ -90,7 +90,7 @@ Notice several things, here:
 
 
 
-#### Business objects:
+#### Business objects
 
 
 
@@ -144,7 +144,7 @@ After the business object augments the context object, it is passed into the jad
 
 
 
-#### Jade documents:
+#### Jade documents
 
 
 
@@ -233,13 +233,13 @@ If the element is found and if the attribute is specified, then the module is re
 Notice: "objectContext" is passed to the "create" method of the client side event handler module.  This is important for carrying over the context from the calling module.  For instance, in this case, the context object is the root dialog object which may ultimately be closed by the client side event handler processing as is natural given the generic nature of the event handlers.  The calling code understand the context and necessary parameters to pass and the invoked handler understand how to use this code by virtual of it instantiation in vitro.
 
 
-#### Client side event handlers:
+#### Client side event handlers
 
 
 The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a highly variable component so an example is not listed here.  Please see the project code for an example of a handler instance.
 
 
-# Conclusion:
+# Conclusion
 
 
 That's the whole cross-sectional path through the proposed dynamic injection system.  Simple.  Clean.  Elegant.  Rubbish?
