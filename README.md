@@ -18,7 +18,7 @@ Navigate to the TGv1000 folder then execute: "npm install", from this root proje
 Running the project:
 
 
-Execute: "(sudo) npm start", to run the server.  Start is a script specified in the package.json file included with the project.  Sudo is a Unix command to give administrative priviliges to the subsequent command(s).  This is necessary because the server listens on port 80 by default and this is a restricted port on most systems.  Windows users may require similar measures akin to "running as administrator".
+Execute: "(sudo) npm start", to run the server.  "Start" is a script specified in the package.json file included with the project.  Sudo is a Unix command to give administrative priviliges to the subsequent command(s).  This is necessary because the server listens on port 80 by default and this is a restricted port on most systems.  Windows users may require similar measures akin to "running as administrator".
 
 Then open a browser and navigate to: "localhost".  You should see the main page of the application.  Explore at your own risk/enjoyment.
 
