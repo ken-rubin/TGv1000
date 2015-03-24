@@ -90,7 +90,7 @@ Notice several things, here:
 
 
 
-### Business objects:
+#### Business objects:
 
 
 
@@ -144,7 +144,7 @@ After the business object augments the context object, it is passed into the jad
 
 
 
-### Jade documents:
+#### Jade documents:
 
 
 
@@ -231,6 +231,9 @@ If the element is found and if the attribute is specified, then the module is re
 
 
 Notice: "objectContext" is passed to the "create" method of the client side event handler module.  This is important for carrying over the context from the calling module.  For instance, in this case, the context object is the root dialog object which may ultimately be closed by the client side event handler processing as is natural given the generic nature of the event handlers.  The calling code understand the context and necessary parameters to pass and the invoked handler understand how to use this code by virtual of it instantiation in vitro.
+
+
+#### Client side event handlers:
 
 
 The last component to be detailed, the client side event handler, is responsible for attaching handlers and conditioning the HTML-snippet.  It is a highly variable component so an example is not listed here.  Please see the project code for an example of a handler instance.
