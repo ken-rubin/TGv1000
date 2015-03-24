@@ -212,7 +212,6 @@ The "snippetHelper" module injects the "htmlSnippet" parameter into the DOM and 
 
 				try {
 
-					// ...allocate and create.
 					var moduleInstance = new module();
 					var exceptionRet = moduleInstance.create(objectContext);
 					if (exceptionRet) {
@@ -223,7 +222,7 @@ The "snippetHelper" module injects the "htmlSnippet" parameter into the DOM and 
 
 					errorHelper.show(e.message);
 				}
-			})
+			});
 		}
 	}
 
