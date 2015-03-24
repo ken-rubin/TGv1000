@@ -99,9 +99,10 @@ The "/renderJadeSnippet" route handler does two things.  First, it looks to see 
 
 	var objectBusinessObject = req.body.businessObject;
 	if (objectBusinessObject) {
-
-      		...
-    	}
+	
+		...
+	}
+    	
     
 Notice that the request body object is the data object passed from the ajax call.
 
