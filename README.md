@@ -204,13 +204,10 @@ The "snippetHelper" module injects the "htmlSnippet" parameter into the DOM and 
 	var jModuleDefinition = $(strModuleDefinitionElementSelector);
 	if (jModuleDefinition.length > 0) {
 
-		// Extract the value of the attribute.
 		var strModule = jModuleDefinition.attr("data-module");
 
-		// If the node is found and has a value.
 		if (strModule) {
 
-			// Require the specified module, and...
 			require([strModule], function (module) {
 
 				try {
