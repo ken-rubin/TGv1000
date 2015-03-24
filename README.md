@@ -76,13 +76,13 @@ Notice several things, here:
 
 3) The data-type is "HTML"--this indicates that the result is an HTML-snippet.
 
-4) The method is post.
+4) The method is "POST".
 
-5) The route is invoked via the url parameter.
+5) The route is invoked via the "url" parameter.
 
-6) The "userId" property of the data object is an example of client-specified data.  Utimately this will be passed into the Business object and the jade template files.
+6) The "userId" property of the data object is an example of client-specified data.  Utimately this will be passed into the Business object and on to the jade template files.
 
-7) The business object module and method are explicitly specified.
+7) The business object module and method are explicitly specified in the "businessObject" property.  This is a standard property which is looked for explicitly by the server code.
 
 8) The jade template file is specified via the "templateFile" property and it is lower-case, in keeping with standard JavaScript convention.
 
@@ -93,10 +93,12 @@ Notice several things, here:
 
 Business objects:
 
+
+
 The "/renderJadeSnippet" route handler does two things.  First, it looks to see if there is a business object specified:
 
-		var objectBusinessObject = req.body.businessObject;
-		if (objectBusinessObject) {
+	var objectBusinessObject = req.body.businessObject;
+	if (objectBusinessObject) {
 
       		...
     	}
