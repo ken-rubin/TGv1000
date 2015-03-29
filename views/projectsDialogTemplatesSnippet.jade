@@ -4,9 +4,9 @@ br
 br
 .collectionContainer
   each template in templates
-    button.btn-info.btn.templateItem(id="#{template.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{template.description}")
+    button.btn-info.btn.projectItem(id="#{template.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{template.description}")
       br
       | #{template.name}
       br
       br
-      img.templateItemImage(src="#{template.imageUrl}")
+      img.projectItemImage(src="#{template.imageUrl}")

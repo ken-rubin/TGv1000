@@ -6,10 +6,10 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="css/bootstrap.min.css")
     link(rel="stylesheet", href="css/bootstrap-dialog.min.css")
-    link(rel="stylesheet", href="css/tg.css")
+    link#ThemeStyle(rel="stylesheet", href="css/tg.css")
   body
     nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
-      .container
+      .container-fluid
         .navbar-header
           button.navbar-toggle(type="button",data-toggle="collapse",data-target="#navbarCollapse")
             span.sr-only Toggle navigation
@@ -20,12 +20,23 @@ html
         .collapse.navbar-collapse#navbarCollapse
           ul.nav.navbar-nav
             li.active
-              a(href="/", target="_blank") Home
-    .container
+              a(href="#") Home
+            li.active
+              a#ProjectsButton Projects
+            li.active.dropdown
+              a.dropdown-toggle(href="#", data-toggle="dropdown")
+                |  Themes 
+                b.caret
+                ul.dropdown-menu
+                  li
+                    a#UnicornButton(href="#") Unicorn
+                  li
+                    a#TechButton(href="#") Tech
+    .container-fluid
       block content
     .container
       footer
-         .well.text-info Powered by: Node, Express, Body-parser, Jade, Morgan, Less-middleware; jQuery, Require, Bootstrap and Bootstrap-dialog.
+        .well.text-info Powered by: Node, Express, Body-parser, Jade, Morgan, Less-middleware; jQuery, Require, Bootstrap and Bootstrap-dialog.
     script(src="http://code.jquery.com/jquery.min.js")
     script(src="js/bootstrap.min.js")
     script(src="js/bootstrap-dialog.min.js")

@@ -30,8 +30,8 @@ define(["errorHelper"], function (errorHelper) {
 					$("[data-toggle='tooltip']").tooltip();
 
 					// Wire buttons.
-					$(".templateItem").off("click");
-					$(".templateItem").on("click", m_functionTemplateItemClick);
+					$(".projectItem").off("click");
+					$(".projectItem").on("click", m_functionTemplateItemClick);
 				} catch (e) {
 
 					errorHelper.show(e.message);
