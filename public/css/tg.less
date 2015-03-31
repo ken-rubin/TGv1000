@@ -1,4 +1,4 @@
-@base: #111;
+@base: #000;
 
 @NewColor: #aa0;
 @OpenColor: #a0a;
@@ -196,14 +196,48 @@ body
 #designer
 {
 	margin-top:148px;
-	background:rgba(0,0,155,0.75);
-	img
-	{
-		cursor:crosshair;
+	background:rgba(0,0,155,0.5);
+}
 
-		width:800px;
-		height:600px;
+#designsurfacewrapperwrapper
+{
+	width:100%;
+	max-width:1024px;
+	padding-left:20px;
+	padding-right:20px;
+}
+
+#designsurfacewrapper
+{
+	width:100%;
+	display: inline-block;
+	position: relative;
+
+	&:after
+	{
+		padding-top:75%;
+		display: block;
+	    content: '';
 	}
+}
+
+#designsurface
+{
+	border:1px solid black;
+	position:absolute;
+	left:0px;
+	top:0px;
+	right:0px;
+	bottom:0px;
+
+	cursor:crosshair;
+}
+
+#surfacecanvas
+{
+	background:cyan;
+	width:100%;
+	height:100%;
 }
 
 #BlocklyIFrame
