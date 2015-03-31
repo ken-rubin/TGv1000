@@ -1,42 +1,9 @@
 extend layout
 block content
 
-  .row.gzsection#project
-    h3 project details
-    .form-horizontal
-      .form-group
-        label.control-label.col-xs-1(for="inputName") Name
-        .col-xs-5
-          input.form-control#inputName(type="text",placeholder="[name]")
-      .form-group
-        label.control-label.col-xs-1(for="inputDescription") Description
-        .col-xs-7
-          textarea.form-control#inputDescription(type="text",placeholder="[description]",rows="10")
-      .form-group
-        label.control-label.col-xs-1(for="inputTags") Tags
-        .col-xs-9
-          input.form-control#inputTags(type="text",placeholder="[tags]")
-
-  .row.gzsection#commic
-    h3 class objectives
-    .col-xs-1
-      .leftcontroller(data-targetselector="#commicstrip")
-    .col-xs-10
-      #commicstrip
-        - for (var i = 0; i < 8; ++i) {
-          .commicitem(id="frame" + i, style="left:" + (i * 200 + 5).toString() + "px;")
-            img.commicframe(src="./media/images/" + (i % 8) + ".png")
-            h6 objective #{i}
-            h4 this is a test of the emergency broadcast system.
-            h4 if this had been an actual emergency....
-            h5 if this had been an actual emergency....
-        - }
-    .col-xs-1
-      .rightcontroller(data-targetselector="#commicstrip")
-
   .row.gzsection#designer
-    h3 designer
-    img(src="./media/images/UV_Grid_HD.jpg")
+    .row
+      img.center-block(src="./media/images/UV_Grid_HD.jpg")
     br
     br
     .row
@@ -51,7 +18,9 @@ block content
         .rightcontroller(data-targetselector="#toolstrip")
 
   .row.gzsection#code
-    h3 code
+    .row
+      .col-xs-12
+        iframe#BlocklyIFrame(src='./blockly/blocklyframe.html')
     .row
       .col-xs-1
         .leftcontroller(data-targetselector="#projectitemsstrip")
@@ -96,6 +65,3 @@ block content
           .projectitemsitem#additemprojectitem(style="left:" + (5 * 200 + 5).toString() + "px;")
       .col-xs-1
         .rightcontroller(data-targetselector="#projectitemsstrip")
-    .row
-      .col-xs-12
-        iframe#BlocklyIFrame(src='./blockly/blocklyframe.html')

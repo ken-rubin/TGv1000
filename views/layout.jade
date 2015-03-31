@@ -32,6 +32,18 @@ html
                     a#UnicornButton(href="#") Unicorn
                   li
                     a#TechButton(href="#") Tech
+        .collapse.navbar-collapse
+          .col-xs-1
+            .leftcontroller(data-targetselector="#commicstrip")
+          .col-xs-10
+            #commicstrip
+              - for (var i = 0; i < 88; ++i) {
+                img.commicframe(id="frame" + i, style="left:" + (i * 64 + 5).toString() + "px;",src="./media/images/" + (i % 8) + ".png")
+              - }
+          .col-xs-1
+            .rightcontroller(data-targetselector="#commicstrip")
+    .rotatelabel#designertext Designer
+    .rotatelabel#codetext Code
     .container-fluid
       block content
     .container
