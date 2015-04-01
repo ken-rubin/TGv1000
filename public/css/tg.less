@@ -21,20 +21,57 @@ body
 	border-radius:10px;
 	padding:10px;
 }
+#commicstriprow
+{
+	height:80px;
+	overflow:hidden;
+}
+
+#projectitemsstriprow
+{
+	height:200px;
+	overflow:hidden;
+}
+
+#toolstriprow
+{
+	height:80px;
+	overflow:hidden;
+}
 
 #toolstrip
 {
 	height:80px;
-	position:relative;
+	position:absolute;
+	left:60px;
+	top:0px;
+	right:60px;
+	bottom:0px;
+	overflow:hidden;
+	overflow-x:scroll;
+	display:inline-block;
+}
+#projectitemsstrip
+{
+	height:210px;
+	position:absolute;
+	left:60px;
+	top:0px;
+	right:60px;
+	bottom:0px;
 	overflow:hidden;
 	overflow-x:scroll;
 }
 
 .leftcontroller
 {
-	position:relative;
+	position:absolute;
+	display:inline-block;
 
-	height:80px;
+	left:0px;
+	top:0px;
+	bottom:0px;
+	width:60px;
 
 	background-image:url("../media/images/left.png");
 	background-size:40px 60px;
@@ -50,9 +87,13 @@ body
 
 .rightcontroller
 {
-	position:relative;
+	position:absolute;
+	display:inline-block;
 
-	height:80px;
+	right:0px;
+	top:0px;
+	bottom:0px;
+	width:60px;
 
 	background-image:url("../media/images/right.png");
 	background-size:40px 60px;
@@ -69,7 +110,12 @@ body
 #commicstrip
 {
 	height:80px;
-	position:relative;
+	position:absolute;
+	top:0px;
+	bottom:0px;
+	left:60px;
+	right:60px;
+
 	overflow:hidden;
 	overflow-x:scroll;
 }
@@ -97,13 +143,6 @@ body
 
 
 
-#projectitemsstrip
-{
-	height:210px;
-	position:relative;
-	overflow:hidden;
-	overflow-x:scroll;
-}
 .projectitemsitem
 {
 	position:absolute;
