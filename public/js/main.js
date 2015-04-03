@@ -1,134 +1,113 @@
 ////////////////////////////////////
 // Main
 //
+// Return null--no module object.
+//
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
 	
 	try {
 
-		// canvas.
-		var canvas = document.getElementById("surfacecanvas");
-		var context = canvas.getContext("2d");
-		context.fillStyle = "rgba(0,0,0,1)";
-		context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-
-		context.fillStyle = "#333";
-		for (var iX = 0; iX < context.canvas.width; iX+=(1024/16)) {
-
-			context.fillRect(iX, 0, 1, context.canvas.height);
-		}
-		for (var iY = 0; iY < context.canvas.height; iY+=(768/16)) {
-
-			context.fillRect(0, iY, context.canvas.width, 1);
-		}
-		context.fillStyle = "#ccc";
-		for (var i = 0; i < 9; i++) {
-
-			var iDivisor = Math.pow(2, i);
-			var iXStep = context.canvas.width / iDivisor;
-			var iYStep = context.canvas.height / iDivisor;
-
-			for (var iX = 0; iX < context.canvas.width; iX+=iXStep) {
-
-				context.fillRect(iX, 0, 1, iYStep);
-				context.fillRect(context.canvas.width - iX, context.canvas.height, 1, -iYStep);
-			}
-			for (var iY = 0; iY < context.canvas.height; iY+=iYStep) {
-
-				context.fillRect(0, iY, iXStep, 1);
-				context.fillRect(context.canvas.width, context.canvas.height - iY, -iXStep, 1);
-			}
-		}
-		context.fillRect(context.canvas.width, context.canvas.height, -1, -context.canvas.height);
-		context.fillRect(context.canvas.width, context.canvas.height, -context.canvas.width, -1);
-
-		$(".paletteitem").click(function () {
-
-			$(".paletteitem").removeClass("projectsitembuttonhighlight");
-			$(this).addClass("projectsitembuttonhighlight");
-		});
-
-		// Wire project item buttons.
-		$(".projectsitembutton").click(function () {
-
-			$(".projectsitembutton").removeClass("projectsitembuttonhighlight");
-			$(this).addClass("projectsitembuttonhighlight");
-		});
-
-		// Wire project item buttons.
-		$(".projectsitembutton").click(function () {
-
-			$(".projectsitembutton").removeClass("projectsitembuttonhighlight");
-			$(this).addClass("projectsitembuttonhighlight");
-		});
-
-		// Wire strip controllers.
-		var leftCookie = null;
-		$(".leftcontroller").on("mouseenter", function () {
-
-			var strTargetSelector = $(this).attr("data-targetselector");
-			leftCookie = setInterval(function () {
-
-				var jStrip = $(strTargetSelector);
-				jStrip.scrollLeft(jStrip.scrollLeft() - 1);
-			}, 1);
-		});
-		$(".leftcontroller").on("mouseleave", function () {
-
-			clearInterval(leftCookie);
-		});
-		var rightCookie = null;
-		$(".rightcontroller").on("mouseenter", function () {
-
-			var strTargetSelector = $(this).attr("data-targetselector");
-			rightCookie = setInterval(function () {
-
-				var jStrip = $(strTargetSelector);
-				jStrip.scrollLeft(jStrip.scrollLeft() + 1);
-			}, 1);
-		});
-		$(".rightcontroller").on("mouseleave", function () {
-
-			clearInterval(rightCookie);
-		});
-
-		// Wire theme buttons:
-		$("#UnicornButton").click(function () {
-
-			$("body").css("background-image", "url('../media/images/ru.jpg')");
-		});
-		$("#TechButton").click(function () {
-
-			$("body").css("background-image", "url('../media/images/t.png')");
-		});
-
-		// Wire button click.
-		$("#ProjectsButton").click(function () {
+		// Require the error handler for all functions.
+		require(["errorHelper"], function (errorHelper) {
 
 			try {
 
-				// Require the ProjectsDialog module.
-				require(["ProjectsDialog"], 
-					function (ProjectsDialog) {
+				// Require a designer and attach to DOM.
+				require(["Designer"], function (Designer) {
 
-						try {
+					try {
 
-							// Allocate and create (and show) the projects dialog.
-							var pd = new ProjectsDialog();
-							var exceptionRet = pd.create();
-							if (exceptionRet) {
+						// Allocate and attach the designer.
+						var designer = new Designer();
+						var exceptionRet = designer.attach("surfacecanvas");
+						if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
-
-							alert(e.message);
+							throw exceptionRet;
 						}
-					});
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
+				});
+
+				// Require scroll region and attach to DOM in three places.
+				require(["ScrollRegion"], function (ScrollRegion) {
+
+					try {
+
+						// Allocate and attach the designers.
+						var srProjectItems = new ScrollRegion();
+						var exceptionRet = srProjectItems.attach("projectitemsstriprow",
+							"projectsitembutton");
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
+
+						var srPaletteItems = new ScrollRegion();
+						exceptionRet = srProjectItems.attach("toolstriprow",
+							"paletteitem");
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
+
+						var srPaletteItems = new ScrollRegion();
+						exceptionRet = srProjectItems.attach("commicstriprow",
+							"commicframe");
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
+				});
+
+				// Wire theme buttons:
+				$("#UnicornButton").click(function () {
+
+					$("body").css("background-image", "url('../media/images/ru.jpg')");
+				});
+				$("#TechButton").click(function () {
+
+					$("body").css("background-image", "url('../media/images/t.png')");
+				});
+
+				// Wire projects button click.
+				$("#ProjectsButton").click(function () {
+
+					try {
+
+						// Require the ProjectsDialog module.
+						require(["ProjectsDialog"], 
+							function (ProjectsDialog) {
+
+								try {
+
+									// Allocate and create (and show) the projects dialog.
+									var pd = new ProjectsDialog();
+									var exceptionRet = pd.create();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
+				});
 			} catch (e) {
 
-				alert(e.message);
+				errorHelper.show(e);
 			}
 		});
 	} catch (e) {

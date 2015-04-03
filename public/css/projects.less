@@ -1,3 +1,7 @@
+/////////////////////////////////
+// Projects dialog css.
+//
+
 @base: #000;
 
 @NewColor: #aa0;
@@ -7,74 +11,85 @@
 
 @HoverAdditive: #222;
 
+// Turn the cursor to pointer when over the projects button on the navbar.
 #ProjectsButton
 {
 	cursor:pointer;
 }
 
+// The new button on the dialog.
 .NewButton
 {
 	height:200px;
+
 	background-color:@NewColor;
 	white-space: normal !important;
+
 	&:hover 
 	{
 		background-color:@NewColor + @HoverAdditive;
 	}
 }
 
+// The open button on the dialog.
 .OpenButton
 {
 	height:200px;
+
 	background-color:@OpenColor;
 	white-space: normal !important;
+
 	&:hover 
 	{
 		background-color:@OpenColor + @HoverAdditive;
 	}
 }
 
+// The templates/clone button on the dialog.
 .TemplatesButton
 {
 	height:200px;
+
 	background-color:@TemplatesColor;
 	white-space: normal !important;
+
 	&:hover 
 	{
 		background-color:@TemplatesColor + @HoverAdditive;
 	}
 }
 
+// The search button on the dialog.
 .SearchButton
 {
 	height:200px;
+
 	background-color:@SearchColor;
 	white-space: normal !important;
+
 	&:hover 
 	{
 		background-color:@SearchColor + @HoverAdditive;
 	}
 }
 
+// Collection of projects.
 .collectionContainer
 {
 	max-height: 300px;
 	overflow-y: scroll;	
 }
 
+// Individual project item.
 .projectItem
 {
 	margin:10px;
 }
 
+// The image part of the project item.
 .projectItemImage
 {
 	width:100px;
 	height:100px;
-}
-
-.SnippetContext
-{
-	display:hidden;
 }
 

@@ -6,7 +6,7 @@
 // Defines the style for the scrollable solution explorer including controls.
 #projectitemsstriprow
 {
-	height:220px;	// Should be room for the projectitemstrip and scroll-bar (hopefully).
+	height:210px;	// Should be room for the projectitemstrip and scroll-bar (hopefully).
 	overflow:hidden;
 }
 
@@ -18,7 +18,7 @@
 	left:60px;	// Leave room for the left controller.
 	top:0px;
 	right:60px;	// Leave room for the right.
-	height:220px;
+	bottom:0px;
 
 	overflow:hidden;
 	overflow-x:scroll;
@@ -30,6 +30,8 @@
 .projectitemsitem
 {
 	position:absolute;
+
+	// Total height: 200px;
 	top:5px;
 	width:190px;	// Just smaller than container.
 	height:190px;

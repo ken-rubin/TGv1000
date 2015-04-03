@@ -8,6 +8,7 @@ define(function () {
 	
 	try {
 
+		// Define module to allocate upon return.
 		var functionErrorHelper = function ErrorHelper() {
 
 			try {
@@ -57,6 +58,7 @@ define(function () {
 			}
 		}
 
+		// Allocate and return singleton.
 		return new functionErrorHelper();
 	} catch (e) {
 
