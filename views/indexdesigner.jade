@@ -1,0 +1,39 @@
+//- Designer section.
+//- 
+//- Contains a designer surface and tool scrollable palette.
+//-
+
+//- Designer section is a gzsection.
+.row.gzsection#designer
+
+  //- First row is the designer.
+  .row
+
+    //- Center the designer surface and wrap in a convoluted way to maintain a constant aspect ratio.
+    .center-block#designsurfacewrapperwrapper
+      #designsurfacewrapper
+        #designsurface
+
+          //- Ultimatly the designer surface is a canvas.
+          canvas#surfacecanvas(width="1024",height="768")
+
+  //- Second row is the tool-strip row.
+  .row
+
+    //- Define a scrollable row.
+    .col-xs-12#toolstriprow
+
+      //- Left controller.
+      .leftcontroller(data-targetselector="#toolstrip")
+
+      //- Scrollable region.
+      #toolstrip
+
+        // Loop and add some demo items.
+        - for (var i = 0; i < 27; ++i) {
+          .paletteitem(style="left:" + (i * 55 + 5).toString() + "px;")
+        - }
+
+      //- Right controller.
+      .rightcontroller(data-targetselector="#toolstrip")
+

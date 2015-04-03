@@ -1,0 +1,104 @@
+// Designer less file.
+//
+// Styles for the designer region.
+//
+
+// Define the row to be 20 px taller than the items--to leave room for a scroll bar, perhaps.
+#toolstriprow
+{
+	height:100px;
+	overflow:hidden;
+}
+
+// This is the scrollable part of the tool-strip.
+#toolstrip
+{
+	position:absolute;
+	display:inline-block;
+
+	left:60px;	// Leave room for the controller.
+	top:0px;
+	height:100px;
+	right:60px;	// Leave room for the controller.
+
+	overflow:hidden;
+	overflow-x:scroll;
+}
+
+// The palette item is a single, draggable tool.
+.paletteitem
+{
+	position:absolute;
+
+	// Total height of 80.  Plus 20 for the scroll bar gives the 100's above.
+	top:15px;
+	height:50px;
+	width:50px;
+
+	border:1px solid white;
+	border-radius:5px;
+	background:rgba(155,0,0,0.5);
+
+	&:hover
+	{
+		background:rgba(255,255,100,0.5);
+	}
+}
+
+// The designer is the main region for the designer on the page.
+// Leave some space for the navbar at the top.
+#designer
+{
+	margin-top:148px;
+	background:rgba(0,0,155,0.5);
+}
+
+// Layer scales width up to 1024px.
+#designsurfacewrapperwrapper
+{
+	width:100%;
+	max-width:1024px;
+	padding-left:20px;
+	padding-right:20px;
+}
+
+// Layer maintains 75% aspect ratio.
+#designsurfacewrapper
+{
+	position: relative;
+	display: inline-block;
+
+	width:100%;
+
+	&:after
+	{
+		padding-top:75%;
+		display: block;
+	    content: '';
+	}
+}
+
+// Canvas wrapper to fill the whole aspect-preserved area.
+#designsurface
+{
+	position:absolute;
+
+	left:0px;
+	top:0px;
+	right:0px;
+	bottom:0px;
+
+	border:1px solid black;
+
+	cursor:crosshair;
+}
+
+// The actual designer canvas element.
+#surfacecanvas
+{
+	width:100%;
+	height:100%;
+
+	background:cyan;
+}
+

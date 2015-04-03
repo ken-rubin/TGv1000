@@ -1,3 +1,8 @@
+// Main style file.
+//
+// Defines site-wide styles.
+//
+
 @base: #000;
 
 @NewColor: #aa0;
@@ -12,57 +17,23 @@ body
 	background-color:@base;
 }
 
+// The gzsections are the code and designer regions.
+// These are the main visible section of the application.
+// Perhaps replace this with bootstrap panel?
 .gzsection
 {
-	color:white;
 	margin:40px;
+	padding:10px;
+
 	overflow:hidden;
+
 	border:1px solid #ddd;
 	border-radius:10px;
-	padding:10px;
-}
-#commicstriprow
-{
-	height:80px;
-	overflow:hidden;
+
+	color:white;
 }
 
-#projectitemsstriprow
-{
-	height:200px;
-	overflow:hidden;
-}
-
-#toolstriprow
-{
-	height:80px;
-	overflow:hidden;
-}
-
-#toolstrip
-{
-	height:80px;
-	position:absolute;
-	left:60px;
-	top:0px;
-	right:60px;
-	bottom:0px;
-	overflow:hidden;
-	overflow-x:scroll;
-	display:inline-block;
-}
-#projectitemsstrip
-{
-	height:210px;
-	position:absolute;
-	left:60px;
-	top:0px;
-	right:60px;
-	bottom:0px;
-	overflow:hidden;
-	overflow-x:scroll;
-}
-
+// The scrollable controller on the left size.
 .leftcontroller
 {
 	position:absolute;
@@ -71,7 +42,7 @@ body
 	left:0px;
 	top:0px;
 	bottom:0px;
-	width:60px;
+	width:60px;	// Note, fits in with the scrollable region.
 
 	background-image:url("../media/images/left.png");
 	background-size:40px 60px;
@@ -85,6 +56,7 @@ body
 	}
 }
 
+// The scrollable controller on the right size.
 .rightcontroller
 {
 	position:absolute;
@@ -93,7 +65,7 @@ body
 	right:0px;
 	top:0px;
 	bottom:0px;
-	width:60px;
+	width:60px;	// Note, fits in with the scrollable region.
 
 	background-image:url("../media/images/right.png");
 	background-size:40px 60px;
@@ -101,106 +73,6 @@ body
 	background-position:center;
 
 	overflow:hidden;
-	&:hover
-	{
-		box-shadow: 0px 0px 50px #fff;
-	}
-}
-
-#commicstrip
-{
-	height:80px;
-	position:absolute;
-	top:0px;
-	bottom:0px;
-	left:60px;
-	right:60px;
-
-	overflow:hidden;
-	overflow-x:scroll;
-}
-.commicframe
-{
-	position:absolute;
-	top:8px;
-	width:64px;
-	height:64px;
-
-	background:#666;
-	border:1px solid black;
-	border-radius:10px;
-
-	overflow:hidden;
-	overflow-y:scroll;
-
-	&:hover
-	{
-		background:rgba(255,255,100,0.5);
-	}
-}
-
-
-
-
-
-.projectitemsitem
-{
-	position:absolute;
-	width:190px;
-	height:190px;
-
-	padding:2px;
-	border:1px solid white;
-	border-radius:5px;
-	background:rgba(0,155,0,0.5);
-
-	overflow:hidden;
-	overflow-y:scroll;
-
-	&:hover
-	{
-		background:rgba(255,255,255,0.5);
-	}
-}
-.projectsitembutton
-{
-	border:1px solid #333;
-	border-radius:4px;
-	background:rgba(10,0,0,0.5);
-
-	margin:4px;
-	padding:4px;
-
-	overflow:hidden;
-
-	&:hover
-	{
-		background:rgba(100,100,100,0.5);
-	}
-}
-.projectsitembuttonhighlight
-{
-	background:rgba(210,150,0,0.5);
-}
-#additemprojectitem
-{
-	position:absolute;
-	top:5px;
-	width:190px;
-	height:190px;
-
-	background-image:url("../media/images/plus.png");
-	background-size:100%;
-	background-repeat:no-repeat;
-	background-position:center;
-	&:hover
-	{
-		box-shadow: 0px 0px 50px #fff;
-	}
-}
-.addprojectitemitembutton
-{
-	height:32px;
 
 	&:hover
 	{
@@ -208,181 +80,35 @@ body
 	}
 }
 
-
-
-.paletteitem
-{
-	position:absolute;
-	top:15px;
-	height:50px;
-	width:50px;
-
-	border:1px solid white;
-	border-radius:5px;
-	background:rgba(155,0,0,0.5);
-
-	&:hover
-	{
-		background:rgba(255,255,100,0.5);
-	}
-}
-
-.selectedCI
-{
-	background:rgb(100,200,100);
-}
-
-#designer
-{
-	margin-top:148px;
-	background:rgba(0,0,155,0.5);
-}
-
-#designsurfacewrapperwrapper
-{
-	width:100%;
-	max-width:1024px;
-	padding-left:20px;
-	padding-right:20px;
-}
-
-#designsurfacewrapper
-{
-	width:100%;
-	display: inline-block;
-	position: relative;
-
-	&:after
-	{
-		padding-top:75%;
-		display: block;
-	    content: '';
-	}
-}
-
-#designsurface
-{
-	border:1px solid black;
-	position:absolute;
-	left:0px;
-	top:0px;
-	right:0px;
-	bottom:0px;
-
-	cursor:crosshair;
-}
-
-#surfacecanvas
-{
-	background:cyan;
-	width:100%;
-	height:100%;
-}
-
-#BlocklyIFrame
-{
-	width:100%;
-	height:640px;	
-}
-
-#code
-{
-	background:rgba(155,0,155,0.5);
-}
-
-#ProjectsButton
-{
-	cursor:pointer;
-}
-
-.NewButton
-{
-	height:200px;
-	background-color:@NewColor;
-	white-space: normal !important;
-	&:hover 
-	{
-		background-color:@NewColor + @HoverAdditive;
-	}
-}
-
-.OpenButton
-{
-	height:200px;
-	background-color:@OpenColor;
-	white-space: normal !important;
-	&:hover 
-	{
-		background-color:@OpenColor + @HoverAdditive;
-	}
-}
-
-.TemplatesButton
-{
-	height:200px;
-	background-color:@TemplatesColor;
-	white-space: normal !important;
-	&:hover 
-	{
-		background-color:@TemplatesColor + @HoverAdditive;
-	}
-}
-
-.SearchButton
-{
-	height:200px;
-	background-color:@SearchColor;
-	white-space: normal !important;
-	&:hover 
-	{
-		background-color:@SearchColor + @HoverAdditive;
-	}
-}
-
-.collectionContainer
-{
-	max-height: 300px;
-	overflow-y: scroll;	
-}
-
-.projectItem
-{
-	margin:10px;
-}
-
-.projectItemImage
-{
-	width:100px;
-	height:100px;
-}
-
-.SnippetContext
-{
-	display:hidden;
-}
-
+// To rotate the designer and code labels.
 .rotatelabel
 {
-	transform: scale(1,3) rotate(90deg);
+	width:200px;
+	text-align:center;
+	transform: translate(-100px) rotate(90deg) scale(3, 1);
 }
 
+// Should be positioned next to the designer section.
+// Not sure how to best center this on the region.
 #designertext
 {
 	color:white;
 	position:absolute;
-	left:-20px;
-	top:450px;
+	left:27px;
+	top:510px;
 	padding:10px;
 
 	font:italic 20px Tahoma;
 }
 
+// Should be positioned next to the code section.
+// Not sure how to best center this on the region.
 #codetext
 {
 	color:white;
 	position:absolute;
-	left:-5px;
-	top:1260px;
+	left:27px;
+	top:1380px;
 	padding:10px;
 
 	font:italic 20px arial;

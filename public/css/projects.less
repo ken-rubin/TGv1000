@@ -1,0 +1,80 @@
+@base: #000;
+
+@NewColor: #aa0;
+@OpenColor: #a0a;
+@TemplatesColor: #0aa;
+@SearchColor: #a66;
+
+@HoverAdditive: #222;
+
+#ProjectsButton
+{
+	cursor:pointer;
+}
+
+.NewButton
+{
+	height:200px;
+	background-color:@NewColor;
+	white-space: normal !important;
+	&:hover 
+	{
+		background-color:@NewColor + @HoverAdditive;
+	}
+}
+
+.OpenButton
+{
+	height:200px;
+	background-color:@OpenColor;
+	white-space: normal !important;
+	&:hover 
+	{
+		background-color:@OpenColor + @HoverAdditive;
+	}
+}
+
+.TemplatesButton
+{
+	height:200px;
+	background-color:@TemplatesColor;
+	white-space: normal !important;
+	&:hover 
+	{
+		background-color:@TemplatesColor + @HoverAdditive;
+	}
+}
+
+.SearchButton
+{
+	height:200px;
+	background-color:@SearchColor;
+	white-space: normal !important;
+	&:hover 
+	{
+		background-color:@SearchColor + @HoverAdditive;
+	}
+}
+
+.collectionContainer
+{
+	max-height: 300px;
+	overflow-y: scroll;	
+}
+
+.projectItem
+{
+	margin:10px;
+}
+
+.projectItemImage
+{
+	width:100px;
+	height:100px;
+}
+
+.SnippetContext
+{
+	display:hidden;
+}
+

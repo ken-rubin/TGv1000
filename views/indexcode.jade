@@ -1,0 +1,61 @@
+//- Code section.
+//- 
+//- Contains blockly frame and solution explorer.
+//-
+
+//- Code section is a gzsection.
+.row.gzsection#code
+
+  //- First the Blockly frame.
+  .row
+    .col-xs-12
+      iframe#BlocklyIFrame(src='./blockly/blocklyframe.html')
+
+  //- Next the solution explorer.
+  .row
+
+    //- Define a scrollable strip.
+    .col-xs-12#projectitemsstriprow
+
+      //- The left controller.
+      .leftcontroller(data-targetselector="#projectitemsstrip")
+
+      //- The scrolling region.
+      #projectitemsstrip
+
+        //- Loop and add some project items.
+        - for (var i = 0; i < 5; ++i) {
+          .projectitemsitem(id="item" + i, style="left:" + (i * 200 + 5).toString() + "px;")
+            h4
+              | object #{i}
+            hr(width="60%")
+            | Events
+            .projectsitembutton(id="onclickitem" + i)
+              | OnClick
+            .projectsitembutton 
+              | OnTick
+            .projectsitembutton 
+              | OnKeyPress
+            .projectsitembutton
+              img.addprojectitemitembutton(id="addeventbutton" + i, src="./media/images/plus.png")
+            br
+            | Functions
+            .projectsitembutton 
+              | CreateShip
+            .projectsitembutton 
+              | Fire
+            .projectsitembutton 
+              img.addprojectitemitembutton(id="addfunctionbutton" + i, src="./media/images/plus.png")
+            br
+            | Properties
+            .projectsitembutton 
+              | Ship
+            .projectsitembutton 
+              img.addprojectitemitembutton(id="addpropertybutton" + i, src="./media/images/plus.png")
+        - }
+
+        //- Add the add item project object.
+        .projectitemsitem#additemprojectitem(style="left:" + (5 * 200 + 5).toString() + "px;")
+
+      //- The right controller.
+      .rightcontroller(data-targetselector="#projectitemsstrip")
