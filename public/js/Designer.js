@@ -25,43 +25,57 @@ define(["errorHelper"],
 						// Ensure there is some value for selector.
 						strId = strId || "surfacecanvas";
 
-						// Get canvas and context.
-						var canvas = document.getElementById(strId);
-						var context = canvas.getContext("2d");
+						$(window).resize(function () {
 
-						// Draw out the background and grid lines.
-						context.fillStyle = "rgba(0,0,0,1)";
-						context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+							try {
 
-						context.fillStyle = "#333";
-						for (var iX = 0; iX < context.canvas.width; iX+=(1024/16)) {
+								var dWidth = $("#" + strId).width();
+								var dHeight = $("#" + strId).height();
+								$("#" + strId).attr("width",
+									dWidth);
+								$("#" + strId).attr("height",
+									dHeight);
 
-							context.fillRect(iX, 0, 1, context.canvas.height);
-						}
-						for (var iY = 0; iY < context.canvas.height; iY+=(768/16)) {
+								// Get canvas and context.
+								var canvas = document.getElementById(strId);
+								var context = canvas.getContext("2d");
 
-							context.fillRect(0, iY, context.canvas.width, 1);
-						}
-						context.fillStyle = "#ccc";
-						for (var i = 0; i < 9; i++) {
+								context.transform(1, 0, 0, -1, dWidth / 2, dHeight / 2);
 
-							var iDivisor = Math.pow(2, i);
-							var iXStep = context.canvas.width / iDivisor;
-							var iYStep = context.canvas.height / iDivisor;
+								// Draw out the background and grid lines.
+								context.fillStyle = "rgba(0,0,0,1)";
+								context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-							for (var iX = 0; iX < context.canvas.width; iX+=iXStep) {
+								context.fillStyle = "#333";
+								var iX = 0;
+								var iY = 0;
+								while (iX < dWidth / 2) {
 
-								context.fillRect(iX, 0, 1, iYStep);
-								context.fillRect(context.canvas.width - iX, context.canvas.height, 1, -iYStep);
+									context.fillRect(iX, -dHeight / 2, 1, dHeight);
+									context.fillRect(-iX, -dHeight / 2, 1, dHeight);
+
+									iX += 50;
+								}
+								while (iY < dHeight / 2) {
+
+									context.fillRect(-dWidth / 2, iY, dWidth, 1);
+									context.fillRect(-dWidth / 2, -iY, dWidth, 1);
+
+									iY += 50;
+								}
+								context.strokeStyle = "#ccc";
+								context.strokeRect(-dWidth / 2, 0, dWidth, 1);
+								context.strokeRect(0, -dHeight / 2, 1, dHeight);
+								context.strokeRect(-dWidth / 2, -dHeight / 2, dWidth, dHeight);
+
+							} catch (e) {
+
+								errorHelper.show(e);
 							}
-							for (var iY = 0; iY < context.canvas.height; iY+=iYStep) {
+						});
 
-								context.fillRect(0, iY, iXStep, 1);
-								context.fillRect(context.canvas.width, context.canvas.height - iY, -iXStep, 1);
-							}
-						}
-						context.fillRect(context.canvas.width, context.canvas.height, -1, -context.canvas.height);
-						context.fillRect(context.canvas.width, context.canvas.height, -context.canvas.width, -1);
+						// Cause immediate paint.
+						$(window).resize();
 
 						return null;
 					} catch (e) {

@@ -1,3 +1,4 @@
+//- ////////////////////////////////////
 //- Index--main application markup file.
 //- 
 
@@ -16,9 +17,6 @@ html
     //- Include nav bar DOM--including commic strip.
     include ./indexnavbar.jade
 
-    .rotatelabel#designertext Designer
-    .rotatelabel#codetext Code
-
     .container-fluid
 
       //- Include the designer element DOM.
@@ -26,10 +24,6 @@ html
 
       //- Include the code element DOM.
       include ./indexcode.jade
-
-    .container
-      footer
-        .well.text-info Powered by: Node, Express, Body-parser, Jade, Morgan, Less-middleware; jQuery, Require, Bootstrap and Bootstrap-dialog.
 
     //- Inlcude the list of scripts.
     include ./indexscripts.jade

@@ -14,6 +14,50 @@ $(document).ready(function () {
 
 			try {
 
+				// Resize code based on window height.
+				$(window).resize(function () {
+
+					try {
+
+						var iViewportHeight = $(window).height();
+
+						var iProjectItemHeight = $("#projectitemsstriprow").height();
+						var iNavbarHeight = $(".navbar").height();
+						var iBordersAndSpacingPadding = 48;
+
+						$("#BlocklyIFrame").height(iViewportHeight - 
+							iProjectItemHeight -
+							iNavbarHeight -
+							iBordersAndSpacingPadding);
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
+				});
+
+				// Resize code based on window height.
+				$(window).resize(function () {
+
+					try {
+
+						var iViewportHeight = $(window).height();
+
+						var iToolStripHeight = $("#toolstriprow").height();
+						var iNavbarHeight = $(".navbar").height();
+						var iBordersAndSpacingPadding = 48;
+
+						$("#surfacecanvas").height(iViewportHeight - 
+							iToolStripHeight -
+							iNavbarHeight -
+							iBordersAndSpacingPadding);
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
+				});
+
+				$(window).resize();
+
 				// Require a designer and attach to DOM.
 				require(["Designer"], function (Designer) {
 

@@ -19,8 +19,8 @@ define(["errorHelper"],
 					/////////////////////////////
 					// Public properties.
 
-					// Collection of project objects.
-					self.projectObjects = [];
+					// Collection of project types.
+					self.types = [];
 
 					// Collection of commic-frames.
 					self.commicFrames = [];
@@ -33,6 +33,9 @@ define(["errorHelper"],
 
 					// Description of project.
 					self.description = "this is a test of the emergency broadcast system....";
+
+					// Image resource id.
+					self.imageResourceId = 1;
 				} catch (e) {
 
 					errorHelper.show(e);
