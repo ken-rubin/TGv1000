@@ -24,7 +24,8 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 					// Save context state.  This is known to be a dialog because this module
 					// is always loaded as the result of a button click in a popup dialog.
-					m_dialogContext = objectContext;
+					m_dialogContext = objectContext.dialog;
+					m_pdParent = objectContext.parent;
 
 					// Wire up the search button.
 					$("#InnerSearchButton").off("click");
@@ -43,7 +44,7 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 				try {
 
-					var exceptionRet = snippetHelper.process(m_dialogContext,
+					var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:m_pdParent },
 						htmlData,
 						"#SearchWell",
 						"#ProjectsDialogInnerSearchSnippet");
@@ -93,6 +94,8 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 			// The owning dialog.
 			var m_dialogContext = null;
+			// The ProjectsDialog object which owns the "owning dialog".
+			var m_pdParent = null;
 		};
 
 		return functionHandler;

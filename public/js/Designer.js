@@ -29,6 +29,17 @@ define(["errorHelper"],
 
 							try {
 
+								var iViewportHeight = $(window).height();
+
+								var iToolStripHeight = $("#toolstriprow").height();
+								var iNavbarHeight = $(".navbar").height();
+								var iBordersAndSpacingPadding = 48;
+
+								$("#" + strId).height(iViewportHeight - 
+									iToolStripHeight -
+									iNavbarHeight -
+									iBordersAndSpacingPadding);
+
 								var dWidth = $("#" + strId).width();
 								var dHeight = $("#" + strId).height();
 								$("#" + strId).attr("width",
@@ -73,9 +84,6 @@ define(["errorHelper"],
 								errorHelper.show(e);
 							}
 						});
-
-						// Cause immediate paint.
-						$(window).resize();
 
 						return null;
 					} catch (e) {

@@ -20,12 +20,22 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 				// Public methods.
 
 				// Create and show Bootstrap dialog.
-				self.create = function(iUserId) {
+				// Pass user id,
+				// New callback -- void.
+				// Open callback -- takes strId.
+				// Clone callback -- takes strId.
+				self.create = function(iUserId,
+					callbackNew,
+					callbackOpen,
+					callbackClone) {
 
 					try {
 
 						// Save user id in private field.
 						m_iUserId = iUserId;
+						m_callbackNew = callbackNew;
+						m_callbackOpen = callbackOpen;
+						m_callbackClone = callbackClone;
 
 						// Show the dialog--load the content from 
 						// the projectsDialog jade HTML-snippet.
@@ -54,6 +64,71 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 					}
 				};
 
+				// Expose new event.
+				self.new = function () {
+
+					try {
+
+
+						// Dismiss the dialog.
+				        m_dialog.close();
+
+				        // Call the callback.
+				        if ($.isFunction(m_callbackNew)) {
+
+				        	return m_callbackNew();
+				        }
+
+				    	return null;
+					} catch (e) {
+
+						return e;
+					}
+				}
+
+				// Expose open event.
+				// Takes the id of the project to open.
+				self.open = function (strId) {
+
+					try {
+
+						// Dismiss the dialog.
+				        m_dialog.close();
+
+				        // Call the callback.
+				        if ($.isFunction(m_callbackOpen)) {
+
+				        	return m_callbackOpen(strId);
+				        }
+				    	return null;
+					} catch (e) {
+
+						return e;
+					}
+				}
+
+				// Expose clone event.
+				// Takes the id of the project to clone.
+				self.clone = function (strId) {
+
+					try {
+
+						// Dismiss the dialog.
+				        m_dialog.close();
+
+				        // Call the callback.
+				        if ($.isFunction(m_callbackClone)) {
+
+				        	return m_callbackClone(strId);
+				        }
+
+				        return null;
+					} catch (e) {
+
+						return e;
+					}
+				}
+
 				//////////////////////////////////
 				// Private functions.
 
@@ -62,11 +137,15 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 					try {
 
-	                    m_dialog.close();
-	                	BootstrapDialog.alert("Generate new project....");
+				        // Call this object's new handler.
+				        var exceptionRet = self.new();
+				        if (exceptionRet) {
+
+				        	throw exceptionRet;
+				        }
 					} catch (e) {
 
-						errorHelper.show(e.message);
+						errorHelper.show(e);
 					}
 				};
 
@@ -75,7 +154,7 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 
 					try {
 
-						var exceptionRet = snippetHelper.process(m_dialog,
+						var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
 							htmlData,
 							"#TypeWell",
 							"#ProjectsDialogOpenSnippet");
@@ -124,7 +203,7 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 					try {
 
 						// Inject result.
-						var exceptionRet = snippetHelper.process(m_dialog,
+						var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
 							htmlData,
 							"#TypeWell",
 							"#ProjectsDialogTemplateSnippet");
@@ -173,7 +252,7 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 					try {
 
 						// Inject result.
-						var exceptionRet = snippetHelper.process(m_dialog,
+						var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
 							htmlData,
 							"#TypeWell",
 							"#ProjectsDialogSearchSnippet");
@@ -240,6 +319,12 @@ define(["snippetHelper", "errorHelper"], function (snippetHelper, errorHelper) {
 			var m_dialog = null;
 			// Signed-in user's UserId.
 			var m_iUserId = -1;
+			// Invoked when the dialog is dismissed for a new project.
+			var m_callbackNew = null;
+			// Invoked when the dialog is dismissed for a open project.
+			var m_callbackOpen = null;
+			// Invoked when the dialog is dismissed for a clone project.
+			var m_callbackClone = null;
 		};
 
 		// Return the constructor function as the module object.

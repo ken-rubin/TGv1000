@@ -10,145 +10,68 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["errorHelper"], function (errorHelper) {
+		require(["errorHelper", "Client", "Code", "Designer", "Navbar", "ScrollRegion"], 
+			function (errorHelper, Client, Code, Designer, Navbar, ScrollRegion) {
 
 			try {
 
-				// Resize code based on window height.
-				$(window).resize(function () {
+				// Allocate and initialize the client.
+				var client = new Client();
+				var exceptionRet = client.create(1/*iUserId*/);
+				if (exceptionRet) {
 
-					try {
+					throw exceptionRet;
+				}
 
-						var iViewportHeight = $(window).height();
+				// Allocate and attach the designer.
+				var designer = new Designer();
+				exceptionRet = designer.attach("surfacecanvas");
+				if (exceptionRet) {
 
-						var iProjectItemHeight = $("#projectitemsstriprow").height();
-						var iNavbarHeight = $(".navbar").height();
-						var iBordersAndSpacingPadding = 48;
+					throw exceptionRet;
+				}
 
-						$("#BlocklyIFrame").height(iViewportHeight - 
-							iProjectItemHeight -
-							iNavbarHeight -
-							iBordersAndSpacingPadding);
-					} catch (e) {
+				// Allocate and attach the code module.
+				var code = new Code();
+				exceptionRet = code.attach();
+				if (exceptionRet) {
 
-						errorHelper.show(e);
-					}
-				});
+					throw exceptionRet;
+				}
 
-				// Resize code based on window height.
-				$(window).resize(function () {
+				// Allocate and attach the navbar module.
+				var navbar = new Navbar();
+				exceptionRet = navbar.attach(client);
+				if (exceptionRet) {
 
-					try {
+					throw exceptionRet;
+				}
 
-						var iViewportHeight = $(window).height();
+				// Allocate and attach the designers.
+				var srProjectItems = new ScrollRegion();
+				var exceptionRet = srProjectItems.attach("projectitemsstriprow",
+					"projectsitembutton");
+				if (exceptionRet) {
 
-						var iToolStripHeight = $("#toolstriprow").height();
-						var iNavbarHeight = $(".navbar").height();
-						var iBordersAndSpacingPadding = 48;
+					throw exceptionRet;
+				}
+				var srPaletteItems = new ScrollRegion();
+				exceptionRet = srProjectItems.attach("toolstriprow",
+					"paletteitem");
+				if (exceptionRet) {
 
-						$("#surfacecanvas").height(iViewportHeight - 
-							iToolStripHeight -
-							iNavbarHeight -
-							iBordersAndSpacingPadding);
-					} catch (e) {
+					throw exceptionRet;
+				}
+				var srPaletteItems = new ScrollRegion();
+				exceptionRet = srProjectItems.attach("commicstriprow",
+					"commicframe");
+				if (exceptionRet) {
 
-						errorHelper.show(e);
-					}
-				});
+					throw exceptionRet;
+				}
 
+				// Cause the code and designer panels to size themselves.
 				$(window).resize();
-
-				// Require a designer and attach to DOM.
-				require(["Designer"], function (Designer) {
-
-					try {
-
-						// Allocate and attach the designer.
-						var designer = new Designer();
-						var exceptionRet = designer.attach("surfacecanvas");
-						if (exceptionRet) {
-
-							throw exceptionRet;
-						}
-					} catch (e) {
-
-						errorHelper.show(e);
-					}
-				});
-
-				// Require scroll region and attach to DOM in three places.
-				require(["ScrollRegion"], function (ScrollRegion) {
-
-					try {
-
-						// Allocate and attach the designers.
-						var srProjectItems = new ScrollRegion();
-						var exceptionRet = srProjectItems.attach("projectitemsstriprow",
-							"projectsitembutton");
-						if (exceptionRet) {
-
-							throw exceptionRet;
-						}
-
-						var srPaletteItems = new ScrollRegion();
-						exceptionRet = srProjectItems.attach("toolstriprow",
-							"paletteitem");
-						if (exceptionRet) {
-
-							throw exceptionRet;
-						}
-
-						var srPaletteItems = new ScrollRegion();
-						exceptionRet = srProjectItems.attach("commicstriprow",
-							"commicframe");
-						if (exceptionRet) {
-
-							throw exceptionRet;
-						}
-					} catch (e) {
-
-						errorHelper.show(e);
-					}
-				});
-
-				// Wire theme buttons:
-				$("#UnicornButton").click(function () {
-
-					$("body").css("background-image", "url('../media/images/ru.jpg')");
-				});
-				$("#TechButton").click(function () {
-
-					$("body").css("background-image", "url('../media/images/t.png')");
-				});
-
-				// Wire projects button click.
-				$("#ProjectsButton").click(function () {
-
-					try {
-
-						// Require the ProjectsDialog module.
-						require(["ProjectsDialog"], 
-							function (ProjectsDialog) {
-
-								try {
-
-									// Allocate and create (and show) the projects dialog.
-									var pd = new ProjectsDialog();
-									var exceptionRet = pd.create();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
-					} catch (e) {
-
-						errorHelper.show(e);
-					}
-				});
 			} catch (e) {
 
 				errorHelper.show(e);

@@ -17,10 +17,10 @@ define(["errorHelper"], function (errorHelper) {
 
 				// Expose method which wraps the necessary functionality to inject.
 				// Parameters:
-				// objectContext, which is an arbitrary object passed from the caller to the callee.
-				// htmlData, which is the snippet of HTML code.
-				// strWellSelector, which references the object into which the code snippet in injected.
-				// strModuleDefinitionElementSelector, which references the element that holds  
+				// objectContext, an arbitrary object passed from the caller to the callee.
+				// htmlData, the snippet of HTML code.
+				// strWellSelector, references the object into which the code snippet in injected.
+				// strModuleDefinitionElementSelector, references the element that holds  
 				//	the data-module attribute which specifies the name of the module to require.
 				self.process = function (objectContext, htmlData, strWellSelector, strModuleDefinitionElementSelector) {
 

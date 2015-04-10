@@ -24,7 +24,8 @@ define(["errorHelper"], function (errorHelper) {
 
 					// Save context state.  This is known to be a dialog because this module
 					// is always loaded as the result of a button click in a popup dialog.
-					m_dialogContext = objectContext;
+					m_dialogContext = objectContext.dialog;
+					m_pdParent = objectContext.parent;
 
 					// Activate tooltips.
 					$("[data-toggle='tooltip']").tooltip();
@@ -49,11 +50,15 @@ define(["errorHelper"], function (errorHelper) {
 					// Get the project id from this (i.e. what was clicked).
 					var strProjectId = $(this).attr("id");
 
-			        m_dialogContext.close();
-			    	BootstrapDialog.alert("Open " + strProjectId + " project....");
+			        // Call the ProjectsDialog's open handler.
+			        var exceptionRet = m_pdParent.open(strProjectId);
+			        if (exceptionRet) {
+
+			        	throw exceptionRet;
+			        }
 				} catch (e) {
 
-					errorHelper.show(e.message);
+					errorHelper.show(e);
 				}
 			};
 
@@ -62,6 +67,8 @@ define(["errorHelper"], function (errorHelper) {
 
 			// The owning dialog.
 			var m_dialogContext = null;
+			// The ProjectsDialog object which owns the "owning dialog".
+			var m_pdParent = null;
 		};
 
 		return functionHandler;

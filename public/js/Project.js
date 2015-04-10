@@ -19,15 +19,6 @@ define(["errorHelper"],
 					/////////////////////////////
 					// Public properties.
 
-					// Collection of project types.
-					self.types = [];
-
-					// Collection of commic-frames.
-					self.commicFrames = [];
-
-					// Collection of tools.
-					self.paletteTools = [];
-
 					// Name of the project.
 					self.name = "project1";
 
@@ -36,6 +27,63 @@ define(["errorHelper"],
 
 					// Image resource id.
 					self.imageResourceId = 1;
+
+					//////////////////////////////
+					// Public methods.
+
+					// Attach GUI wrappers.
+					self.create = function () {
+
+						try {
+
+							m_csComicStrip = new ComicStrip();
+							var exceptionRet = m_csComicStrip.create();
+							if (exceptionRet) {
+
+								return exceptionRet;
+							}
+							m_tsToolStrip = new ToolStrip();
+							var exceptionRet = m_tsToolStrip.create();
+							if (exceptionRet) {
+
+								return exceptionRet;
+							}
+							m_tsTypeStrip = new TypeStrip();
+							return m_tsTypeStrip.create();
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// initialize a new project.
+					self.initialize = function () {
+
+						try {
+
+							// Call general create method.
+							var exceptionRet = self.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					//////////////////////////////
+					// Private fields.
+
+					// The strip of comic frames.
+					var m_csComicStrip = null;
+					// The strip of tools.
+					var m_tsToolStrip = null;
+					// The strip of types.
+					var m_tsTypeStrip = null;
 				} catch (e) {
 
 					errorHelper.show(e);
