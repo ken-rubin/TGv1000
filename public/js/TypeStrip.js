@@ -52,7 +52,7 @@ define(["errorHelper", "Type"],
 							}
 
 							// Add 100 test items.
-							for (var i = 0; i < 3; i++) {
+							for (var i = 0; i < 0; i++) {
 
 								exceptionRet = self.addItem(new Type("type" + i,
 								"../media/images/Homer.png"));

@@ -36,9 +36,10 @@ define(["errorHelper", "Tool"],
 							m_jStrip = $(strSelector);
 
 							// Add 100 test items.
-							for (var i = 0; i < 100; i++) {
+							for (var i = 0; i < 1; i++) {
 
-								var exceptionRet = self.addItem(new Tool("tool" + i));
+								var exceptionRet = self.addItem(new Tool("tool" + i,
+									"../media/images/Chester.png"));
 								if (exceptionRet) {
 
 									throw exceptionRet;

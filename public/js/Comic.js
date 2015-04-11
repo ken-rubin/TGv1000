@@ -23,7 +23,7 @@ define(["errorHelper"],
 					// Id of matching element.
 					self.id = strId || "comic0";
 					// Image URL.
-					self.src = strSrc || "../media/images/Fred.png";
+					self.src = strSrc || "../media/images/0.png";
 
 					/////////////////////////////
 					// Public methods.
