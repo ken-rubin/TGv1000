@@ -4,8 +4,8 @@
 // Return constructor function.
 //
 
-define(["errorHelper"],
-	function (errorHelper) {
+define(["errorHelper", "ComicStrip", "ToolStrip", "TypeStrip"],
+	function (errorHelper, ComicStrip, ToolStrip, TypeStrip) {
 
 		try {
 
@@ -37,19 +37,19 @@ define(["errorHelper"],
 						try {
 
 							m_csComicStrip = new ComicStrip();
-							var exceptionRet = m_csComicStrip.create();
+							var exceptionRet = m_csComicStrip.create("#comicstrip");
 							if (exceptionRet) {
 
 								return exceptionRet;
 							}
 							m_tsToolStrip = new ToolStrip();
-							var exceptionRet = m_tsToolStrip.create();
+							var exceptionRet = m_tsToolStrip.create("#toolstrip");
 							if (exceptionRet) {
 
 								return exceptionRet;
 							}
 							m_tsTypeStrip = new TypeStrip();
-							return m_tsTypeStrip.create();
+							return m_tsTypeStrip.create("#typestrip");
 						} catch (e) {
 
 							return e;
@@ -88,7 +88,7 @@ define(["errorHelper"],
 
 					errorHelper.show(e);
 				}
-			});
+			};
 
 			return functionConstructor;
 		} catch (e) {

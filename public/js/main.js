@@ -48,23 +48,20 @@ $(document).ready(function () {
 				}
 
 				// Allocate and attach the designers.
-				var srProjectItems = new ScrollRegion();
-				var exceptionRet = srProjectItems.attach("projectitemsstriprow",
-					"projectsitembutton");
+				var srTypeStrip = new ScrollRegion();
+				var exceptionRet = srTypeStrip.attach("typestriprow");
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
-				var srPaletteItems = new ScrollRegion();
-				exceptionRet = srProjectItems.attach("toolstriprow",
-					"paletteitem");
+				var srToolStrop = new ScrollRegion();
+				exceptionRet = srToolStrop.attach("toolstriprow");
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
-				var srPaletteItems = new ScrollRegion();
-				exceptionRet = srProjectItems.attach("commicstriprow",
-					"commicframe");
+				var srComicStrip = new ScrollRegion();
+				exceptionRet = srComicStrip.attach("comicstriprow");
 				if (exceptionRet) {
 
 					throw exceptionRet;

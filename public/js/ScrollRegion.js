@@ -20,7 +20,7 @@ define(["errorHelper"],
 					// Public mehtods.
 
 					// Method attached this scroll region's instance to the DOM.
-					self.attach = function (strId, strButtonSelectorClass) {
+					self.attach = function (strId) {
 
 						try {
 
@@ -52,13 +52,6 @@ define(["errorHelper"],
 							$("#" + strId + " .rightcontroller").on("mouseleave", function () {
 
 								clearInterval(rightCookie);
-							});
-
-							// Wire project item buttons.
-							$("." + strButtonSelectorClass).click(function () {
-
-								$("." + strButtonSelectorClass).removeClass("projectsitembuttonhighlight");
-								$(this).addClass("projectsitembuttonhighlight");
 							});
 
 							return null;

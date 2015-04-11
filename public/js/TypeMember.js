@@ -1,5 +1,5 @@
 ///////////////////////////////
-// Type member.  A member of a type, property, method or event.
+// Type member.  A member of a type: property, method or event.
 //
 // Return constructor function.
 //
@@ -32,7 +32,7 @@ define(["errorHelper"],
 
 					errorHelper.show(e);
 				}
-			});
+			};
 
 			return functionConstructor;
 		} catch (e) {

@@ -28,7 +28,7 @@ define(["errorHelper"],
 
 								var iViewportHeight = $(window).height();
 
-								var iProjectItemHeight = $("#projectitemsstriprow").height();
+								var iProjectItemHeight = $("#typestriprow").height();
 								var iNavbarHeight = $(".navbar").height();
 								var iBordersAndSpacingPadding = 48;
 

@@ -41,22 +41,17 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
               li
                 a#TechButton(href="#") Tech
 
-    //- Commic strip.
+    //- Comic strip.
     .container
 
       //- Define a scrolling row.
-      .col-xs-12#commicstriprow
+      .col-xs-12#comicstriprow
 
         //- Left controller.
-        .leftcontroller(data-targetselector="#commicstrip")
+        .leftcontroller(data-targetselector="#comicstrip")
 
         //- Scrollable region.
-        #commicstrip
-
-          //- Just add some random items.
-          - for (var i = 0; i < 88; ++i) {
-              img.commicframe(id="frame" + i, style="left:" + (i * 64 + 5).toString() + "px;",src="./media/images/" + (i % 8) + ".png")
-          - }
+        #comicstrip
 
         //- Right controller.
-        .rightcontroller(data-targetselector="#commicstrip")
+        .rightcontroller(data-targetselector="#comicstrip")
