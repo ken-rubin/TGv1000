@@ -36,7 +36,7 @@ define(["errorHelper", "Comic"],
 							m_jStrip = $(strSelector);
 
 							// Add 100 test items.
-							for (var i = 0; i < 1; i++) {
+							for (var i = 0; i < 10; i++) {
 
 								var exceptionRet = self.addItem(new Comic("comic" + i));
 								if (exceptionRet) {

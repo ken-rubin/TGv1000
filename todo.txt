@@ -1,3 +1,6 @@
 jquery.min.map
 blockly-frameworks-scripts
 organization of files
+
+type controls and add new/clone/open dialog (similar to project)
+db-ize/bo-ize everything
