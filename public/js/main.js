@@ -10,7 +10,7 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["errorHelper", "Client", "Code", "Designer", "Navbar", "ScrollRegion"], 
+		require(["Core/errorHelper", "Core/Client", "Code/Code", "Designer/Designer", "Navbar/Navbar", "Core/ScrollRegion"], 
 			function (errorHelper, Client, Code, Designer, Navbar, ScrollRegion) {
 
 			try {

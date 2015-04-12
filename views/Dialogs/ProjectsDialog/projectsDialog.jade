@@ -1,0 +1,32 @@
+//- Jade DOM for the projects dialog. 
+//-
+//- Dialog displays 4 main buttons: new, open, clone and search.
+//-
+
+//- All in a well--should be panel?
+.well
+  .row
+    .col-xs-9
+      h4 Please specify whether you wish to start a new project or search for an existing project to open or clone.
+      br
+  .row
+
+    //- 4 buttons in a row => xs-3.
+    .col-xs-6
+      button.btn.NewButton#NewButton
+        h3
+          | New
+        h2
+          span.glyphicon.glyphicon-plus-sign
+        | Create new.  Select to create a new project from scratch.
+
+    .col-xs-6
+      button.btn.SearchButton#SearchButton
+        h3
+          | Search
+        h2
+          span.glyphicon.glyphicon-search
+        | Search.  Select to search for an existing public project.
+
+.well#TypeWell
+

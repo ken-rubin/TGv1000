@@ -57,7 +57,7 @@ app.get("/projectsDialog", function (req, res) {
 		};
 
 		// Render the jade file to the client.
-		res.render("projectsDialog", 
+		res.render("Dialogs/ProjectsDialog/projectsDialog", 
 			objectContext);
 	} catch (e) {
 
@@ -82,7 +82,8 @@ app.post("/renderJadeSnippet", function (req, res) {
 			if (!instance) {
 
 				// ...require module, and...
-				var module = require("./modules/" + objectBusinessObject.module);
+				var module = require("./modules/" + 
+					objectBusinessObject.module);
 
 				// ...allocate type.
 				instance = new module();
@@ -112,7 +113,7 @@ app.get("/", function (req, res) {
 	try {
 
 		// Render the jade file to the client.
-		res.render("index", { 
+		res.render("Index/index", { 
 
 			// Pass in jade context property just for the hell of it.
 	  		title : "TGv1000" 

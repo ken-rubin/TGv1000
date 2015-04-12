@@ -1,0 +1,27 @@
+//- Code section.
+//- 
+//- Contains blockly frame and solution explorer.
+//-
+
+//- Code section is a gzsection.
+.row.gzsection#code
+
+  //- First the Blockly frame.
+  .row
+    .col-xs-12
+      iframe#BlocklyIFrame(src='./frameworks/blockly/blocklyframe.html')
+
+  //- Next the solution explorer.
+  .row
+
+    //- Define a scrollable strip.
+    .col-xs-12#typestriprow
+
+      //- The left controller.
+      .leftcontroller(data-targetselector="#typestrip")
+
+      //- The scrolling region.  Contains projectitemsitem(s).
+      #typestrip
+
+      //- The right controller.
+      .rightcontroller(data-targetselector="#typestrip")
