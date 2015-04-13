@@ -4,8 +4,8 @@
 // Return constructor function.
 //
 
-define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Project"],
-	function (errorHelper, ProjectsDialog, Project) {
+define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/LoginDialog/LoginDialog", "Core/Project"],
+	function (errorHelper, ProjectsDialog, LoginDialog, Project) {
 
 		try {
 
@@ -27,19 +27,47 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Proje
 					// Public methods.
 
 					// Start off the client.
-					self.create = function (iUserId) {
+					// self.create = function (iUserId) {
+
+					// 	try {
+
+					// 		// Save.
+					// 		m_iUserId = iUserId;
+
+					// 		return self.showProjectsDialog();
+					// 	} catch (e) {
+
+					// 		return e;
+					// 	}
+					// };
+
+					self.create = function () {
 
 						try {
 
-							// Save.
-							m_iUserId = iUserId;
-
-							return self.showProjectsDialog();
+							return self.showLoginDialog();
 						} catch (e) {
 
 							return e;
 						}
 					};
+
+					self.showLoginDialog = function () {
+
+						try {
+
+							var ld = new LoginDialog();
+							var exceptionRet = ld.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					// Open popup--map callbacks to private functions.
 					self.showProjectsDialog = function () {

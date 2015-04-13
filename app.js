@@ -65,6 +65,28 @@ app.get("/projectsDialog", function (req, res) {
 	}
 });
 
+console.log("Map loginDialog route (projectsDialog.jade).");
+app.get("/loginDialog", function (req, res) {
+
+	try {
+
+		// Get some data/stuff from the DB, or 
+		// where-ever, and pass into jade render.
+		var objectContext = {
+
+			// This space intentionally left blank.
+			// But is could be used to customize....
+		};
+
+		// Render the jade file to the client.
+		res.render("Dialogs/LoginDialog/loginDialog", 
+			objectContext);
+	} catch (e) {
+
+		res.send(e.message);
+	}
+});
+
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");
 var objectInstantiatedModules = {};
