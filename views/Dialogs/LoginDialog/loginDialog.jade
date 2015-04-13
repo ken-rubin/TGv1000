@@ -3,18 +3,14 @@
 
 .well
     .row
-        form.form-signin
+        form#SigninForm.form-signin
           h2.form-signin-heading
             | Please sign in
-          label.sr-only(for="inputUsername")
-            | Email address
-          input#inputUsername.form-control(type="text" placeholder="Enter your user name" required autofocus)
+          input#inputUsername.form-control(type="text" name="userName" placeholder="Enter your user name" required autofocus)
           br
-          label.sr-only(for="inputPassword")
-            | Password
-          input#inputPassword.form-control(type="password" placeholder="Password" required)
+          input#inputPassword.form-control(type="password" name="password" placeholder="Password" required)
           br
-          button.btn.btn-lg.btn-primary.btn-block(type="submit")
+          button.btn.btn-lg.btn-primary.btn-block(onclick="handleSignInClick();")
             | Sign in
 
-
+.well#TypeWell

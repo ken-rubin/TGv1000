@@ -68,7 +68,7 @@ app.get("/projectsDialog", function (req, res) {
 	}
 });
 
-console.log("Map loginDialog route (projectsDialog.jade).");
+console.log("Map loginDialog route (loginDialog.jade).");
 app.get("/loginDialog", function (req, res) {
 
 	try {

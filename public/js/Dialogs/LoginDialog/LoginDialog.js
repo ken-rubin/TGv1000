@@ -38,6 +38,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				            draggable: true,
 				            onshown: m_functionOnShownDialog
 				        });
+
 						return null;
 					} catch (e) {
 
@@ -175,6 +176,30 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				// };
 
 				// Wire up event handlers to dialog controls.
+				var handleSignInClick = function() {
+
+					try {
+
+						var posting = $.post("/BOL/ValidateBO/UserAuthenticate", {userName:$("#inputUsername").val(), password:$("#inputPassword").val()}, 'json');
+				        posting.done(function(data){
+
+				            if (data.success) {
+
+				            	var userId = data.userId;
+				            	m_dialog.close();
+
+				            } else {
+
+				                // !data.success
+				                errorHelper.show(data.message);
+				            }
+				        });
+				    } catch(e) {
+
+				    	errorHelper.show(e.message);
+				    }
+				}
+
 				var m_functionOnShownDialog = function (dialogItself) {
 
 					try {

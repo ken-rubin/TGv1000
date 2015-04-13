@@ -31,6 +31,20 @@ begin
 		  UNIQUE KEY `id_UNIQUE` (id)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
+		CREATE TABLE `TGv1000`.`routes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `path` varchar(255) NOT NULL,
+		  `moduleName` varchar(255) NOT NULL,
+		  `route` varchar(255) NOT NULL,
+		  `verb` varchar(255) NOT NULL,
+		  `method` varchar(255) NOT NULL,
+		  `inuse` tinyint(1) NOT NULL DEFAULT '1',
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
+
+		INSERT INTO TGv1000.routes VALUES (1,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
+        
 		UPDATE `TGv1000`.`control` set dbstate=1.0 where id=1;
     
     end if;
