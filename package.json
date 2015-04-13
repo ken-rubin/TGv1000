@@ -8,6 +8,7 @@
     "jade": "*",
     "less-middleware": "^2.0.1",
     "morgan": "^1.5.1",
+    "mysql": "2.5.4",
     "bcrypt-nodejs": "0.0.3"
   },
   "scripts": {

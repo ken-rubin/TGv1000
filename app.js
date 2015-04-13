@@ -42,7 +42,10 @@ console.log("Map static request folder (public).");
 app.use(express.static(__dirname + "/public"));
 
 /////////////////////////////////////
-// TODO: Express 4 routes...
+app.set("dbname","TGv1000.");
+console.log("dbname is " +  app.get("dbname"));
+
+////////////////////////////////////////////
 console.log("Map projectsDialog route (projectsDialog.jade).");
 app.get("/projectsDialog", function (req, res) {
 
@@ -147,5 +150,95 @@ app.get("/", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Start the server (HTTP://80).");
-app.listen(80);
+console.log("Set up SQL module.");
+var SQL = require("./modules/SQL");
+var sql = new SQL(app);
+sql.setPool('root', '');
+
+////////////////////////////////////
+app.set("portnum",80);
+console.log('Server will be listening on port ' + app.get("portnum") + ".");
+
+/////////////////////////////////////
+console.log("Setting up routes from database.");
+var moduleInstances = {};
+sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
+    function(rows){
+
+        var moduleInstance = null;
+
+        for (var i = 0; i < rows.length; i++) {
+
+            var rowi = rows[i];
+            if (rowi.inuse) {
+
+                try {
+
+                    if (moduleInstances.hasOwnProperty(rowi.moduleName)) {
+
+                        moduleInstance = moduleInstances[rowi.moduleName];
+
+                    } else {
+
+                        var mod = require(rowi.path + rowi.moduleName);
+                        moduleInstance = new mod(app, sql);
+                        moduleInstances[rowi.moduleName] = moduleInstance;
+                    }
+
+                    var methodInstance = moduleInstance[rowi.method];
+                    app[rowi.verb](rowi.route, methodInstance);
+
+                } catch (e) {
+
+                    console.log(' ');
+                    console.log('*************** ERROR ****************');
+                    console.log('Error setting up route for ' + rowi.route + '; skipping it.');
+                    console.log('*************** ERROR ****************');
+                    console.log(' ');
+                }
+            }
+        }
+
+        console.log("Database routes handlers are allocated....");
+        console.log("Set up all special route handlers.");
+
+        // catch 404 and forward to error handler
+        app.use(function(req, res, next) {
+            var err = new Error('Not Found');
+            err.status = 404;
+            next(err);
+        });
+
+        // error handlers
+
+        // development error handler
+        // will print stacktrace
+        if (app.get('env') === 'development') {
+            app.use(function(err, req, res, next) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            });
+        }
+
+        // production error handler
+        // no stacktraces leaked to user
+        app.use(function(err, req, res, next) {
+            res.status(err.status || 500);
+            res.render('error', {
+                message: err.message,
+                error: {}
+            });
+        });
+
+        app.listen(app.get("portnum"));
+        console.log("Listening on port " + app.get("portnum") + ".");
+        //module.exports = app;    
+    },
+    function(strError){
+        console.log("Got this error reading routes: " + strError);
+        console.log("We in BIG trouble.");
+    }
+);
