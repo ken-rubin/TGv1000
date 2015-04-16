@@ -4,6 +4,7 @@
 // Return constructor function.
 //
 
+// 
 define(["Core/errorHelper", "Navbar/ComicStrip", "Designer/ToolStrip", "Code/TypeStrip"],
 	function (errorHelper, ComicStrip, ToolStrip, TypeStrip) {
 

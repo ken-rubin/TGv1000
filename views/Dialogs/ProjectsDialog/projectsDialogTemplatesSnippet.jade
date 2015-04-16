@@ -1,0 +1,15 @@
+//- Jade DOM for the projects dialog templates snippet. 
+//-
+
+.snippetcontext#ProjectsDialogTemplateSnippet(data-module="Dialogs/ProjectsDialog/ProjectsDialogTemplateButtonHandler")
+| The following templates have been selected for your perusal.  Please choose one.  We will clone it into your personal set of projects.
+br
+br
+.collectionContainer
+  each template in templates
+    button.btn-info.btn.projectItem(id="#{template.id}", data-toggle="tooltip", data-placement="top", data-original-title="#{template.description}")
+      br
+      | #{template.name}
+      br
+      br
+      img.projectItemImage(src="#{template.imageUrl}")

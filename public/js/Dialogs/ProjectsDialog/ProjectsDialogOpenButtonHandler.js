@@ -1,5 +1,5 @@
 //////////////////////////////////////////
-// ProjectsDialog inner search button handler. 
+// ProjectsDialog open button handler. 
 //
 // Return constructor function.
 //
@@ -59,7 +59,7 @@ define(["Core/errorHelper"],
 				        }
 					} catch (e) {
 
-						errorHelper.show(e.message);
+						errorHelper.show(e);
 					}
 				};
 
@@ -75,6 +75,6 @@ define(["Core/errorHelper"],
 			return functionHandler;
 		} catch (e) {
 
-			alert(e.message);
+			errorHelper.show(e.message);
 		}
 	});

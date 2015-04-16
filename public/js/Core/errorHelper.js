@@ -4,6 +4,7 @@
 // Return singleton instance.
 //
 
+// 
 define(function () {
 	
 	try {

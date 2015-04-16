@@ -1,5 +1,5 @@
 //////////////////////////////////////////
-// ProjectsDialog inner search button handler. 
+// ProjectsDialog template button handler. 
 //
 // Return constructor function.
 //
@@ -33,7 +33,7 @@ define(["Core/errorHelper"],
 
 						// Wire buttons.
 						$(".projectItem").off("click");
-						$(".projectItem").on("click", m_functionProjectItemClick);
+						$(".projectItem").on("click", m_functionTemplateItemClick);
 					} catch (e) {
 
 						errorHelper.show(e.message);
@@ -43,16 +43,16 @@ define(["Core/errorHelper"],
 				//////////////////////////////////////
 				// Private methods.
 
-				// Invoked when a project item is clicked.
-				var m_functionProjectItemClick = function () {
+				// Invoked when a template item is clicked.
+				var m_functionTemplateItemClick = function () {
 
 					try {
 
-						// Get the project id from this (i.e. what was clicked).
-						var strProjectId = $(this).attr("id");
+						// Get the template name from this (i.e. what was clicked).
+						var strTemplateId = $(this).attr("id");
 
-				        // Call the ProjectsDialog's open handler.
-				        var exceptionRet = m_pdParent.open(strProjectId);
+				        // Call the ProjectsDialog's clone handler.
+				        var exceptionRet = m_pdParent.clone(strTemplateId);
 				        if (exceptionRet) {
 
 				        	throw exceptionRet;
@@ -75,6 +75,6 @@ define(["Core/errorHelper"],
 			return functionHandler;
 		} catch (e) {
 
-			alert(e.message);
+			errorHelper.show(e.message);
 		}
 	});

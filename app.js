@@ -198,7 +198,7 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                 }
             }
         }
-
+/*
         console.log("Database routes handlers are allocated....");
         console.log("Set up all special route handlers.");
 
@@ -232,12 +232,13 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                 error: {}
             });
         });
-
+*/
         app.listen(app.get("portnum"));
         console.log("Listening on port " + app.get("portnum") + ".");
         //module.exports = app;    
     },
-    function(strError){
+    function(strError) {
+
         console.log("Got this error reading routes: " + strError);
         console.log("We in BIG trouble.");
     }

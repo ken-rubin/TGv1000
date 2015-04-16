@@ -5,73 +5,74 @@
 // Return singleton instance.
 //
 
+//
 define(["Core/errorHelper"], 
 	function (errorHelper) {
 	
-	try {
+		try {
 
-		var functionSnippetHelper = function SnippetHelper() {
+			var functionSnippetHelper = function SnippetHelper() {
 
-			try {
+				try {
 
-				var self = this;				// Uber closure.
+					var self = this;				// Uber closure.
 
-				// Expose method which wraps the necessary functionality to inject.
-				// Parameters:
-				// objectContext, an arbitrary object passed from the caller to the callee.
-				// htmlData, the snippet of HTML code.
-				// strWellSelector, references the object into which the code snippet in injected.
-				// strModuleDefinitionElementSelector, references the element that holds  
-				//	the data-module attribute which specifies the name of the module to require.
-				self.process = function (objectContext, htmlData, strWellSelector, strModuleDefinitionElementSelector) {
+					// Expose method which wraps the necessary functionality to inject.
+					// Parameters:
+					// objectContext, an arbitrary object passed from the caller to the callee.
+					// htmlData, the snippet of HTML code.
+					// strWellSelector, references the object into which the code snippet in injected.
+					// strModuleDefinitionElementSelector, references the element that holds  
+					//	the data-module attribute which specifies the name of the module to require.
+					self.process = function (objectContext, htmlData, strWellSelector, strModuleDefinitionElementSelector) {
 
-					try {
+						try {
 
-						// Clear out the TypeWell.
-						$(strWellSelector).empty();
+							// Clear out the TypeWell.
+							$(strWellSelector).empty();
 
-						// Add snippet into the well.
-						$(strWellSelector).append(htmlData);
+							// Add snippet into the well.
+							$(strWellSelector).append(htmlData);
 
-						// Extract out the data- attribute 
-						// which specifiesthe name of the 
-						// module to require to handle the 
-						// events and behavior for this snippet of code.
-						var strModule = $(strModuleDefinitionElementSelector).attr("data-module");
+							// Extract out the data- attribute 
+							// which specifiesthe name of the 
+							// module to require to handle the 
+							// events and behavior for this snippet of code.
+							var strModule = $(strModuleDefinitionElementSelector).attr("data-module");
 
-						// Require the specified module, and...
-						require([strModule], function (module) {
+							// Require the specified module, and...
+							require([strModule], function (module) {
 
-							try {
+								try {
 
-								// ...allocate and create.
-								var moduleInstance = new module();
-								var exceptionRet = moduleInstance.create(objectContext);
-								if (exceptionRet) {
+									// ...allocate and create.
+									var moduleInstance = new module();
+									var exceptionRet = moduleInstance.create(objectContext);
+									if (exceptionRet) {
 
-									throw exceptionRet;
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e.message);
 								}
-							} catch (e) {
+							})
 
-								errorHelper.show(e.message);
-							}
-						})
+							return null;
+						} catch (e) {
 
-						return null;
-					} catch (e) {
+							return e;
+						}
+					};
+				} catch (e) {
 
-						return e;
-					}
-				};
-			} catch (e) {
-
-				errorHelper.show(e.message);
+					errorHelper.show(e.message);
+				}
 			}
+
+			return new functionSnippetHelper();
+		} catch (e) {
+
+			errorHelper.show(e.message);
 		}
-
-		return new functionSnippetHelper();
-	} catch (e) {
-
-		errorHelper.show(e.message);
-	}
-});
+	});

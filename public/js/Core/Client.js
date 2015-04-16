@@ -4,6 +4,7 @@
 // Return constructor function.
 //
 
+// 
 define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/LoginDialog/LoginDialog", "Core/Project"],
 	function (errorHelper, ProjectsDialog, LoginDialog, Project) {
 
@@ -27,25 +28,15 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Lo
 					// Public methods.
 
 					// Start off the client.
-					// self.create = function (iUserId) {
-
-					// 	try {
-
-					// 		// Save.
-					// 		m_iUserId = iUserId;
-
-					// 		return self.showProjectsDialog();
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
-					self.create = function () {
+					self.create = function (iUserId) {
 
 						try {
 
-							return self.showLoginDialog();
+							// Save.
+							m_iUserId = iUserId;
+
+							//return self.showLoginDialog();
+							return self.showProjectsDialog();
 						} catch (e) {
 
 							return e;

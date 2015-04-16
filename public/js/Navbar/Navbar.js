@@ -1,70 +1,73 @@
 /////////////////////////////////////////
 // Navbar wraps code associated with the navbar.
 //
+// Return constructor function.
+//
 
+// 
 define(["Core/errorHelper"], 
 	function (errorHelper) {
 
-	try {
+		try {
 
-		// Define constructor function.
-		var functionConstructor = function Navbar() {
+			// Define constructor function.
+			var functionConstructor = function Navbar() {
 
-			try {
+				try {
 
-				var self = this;			// Uber closure.
+					var self = this;			// Uber closure.
 
-				////////////////////////////////
-				// Pulbic methods.
+					////////////////////////////////
+					// Pulbic methods.
 
-				// Attach instance to DOM.
-				self.attach = function (client) {
+					// Attach instance to DOM.
+					self.attach = function (client) {
 
-					try {
+						try {
 
-						// Wire theme buttons:
-						$("#UnicornButton").click(function () {
+							// Wire theme buttons:
+							$("#UnicornButton").click(function () {
 
-							$("body").css("background-image", "url('../media/images/ru.jpg')");
-						});
-						$("#TechButton").click(function () {
+								$("body").css("background-image", "url('../media/images/ru.jpg')");
+							});
+							$("#TechButton").click(function () {
 
-							$("body").css("background-image", "url('../media/images/t.png')");
-						});
+								$("body").css("background-image", "url('../media/images/t.png')");
+							});
 
-						// Wire projects button click.
-						$("#ProjectsButton").click(function () {
+							// Wire projects button click.
+							$("#ProjectsButton").click(function () {
 
-							try {
+								try {
 
-								// Show the projects dialog.
-								var exceptionRet = client.showProjectsDialog();
-								if (exceptionRet) {
+									// Show the projects dialog.
+									var exceptionRet = client.showProjectsDialog();
+									if (exceptionRet) {
 
-									throw exceptionRet;
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
 								}
-							} catch (e) {
+							});
 
-								errorHelper.show(e);
-							}
-						});
+							return null;
+						} catch (e) {
 
-						return null;
-					} catch (e) {
+							return e;
+						}
+					};
+				} catch (e) {
 
-						return e;
-					}
-				};
-			} catch (e) {
+					errorHelper.show(e);
+				}
+			};
 
-				errorHelper.show(e);
-			}
-		};
+			// Return constructor function.
+			return functionConstructor;
+		} catch (e) {
 
-		// Return constructor function.
-		return functionConstructor;
-	} catch (e) {
-
-		errorHelper.show(e);
-	}
-});
+			errorHelper.show(e);
+		}
+	});
