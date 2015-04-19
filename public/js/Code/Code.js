@@ -20,7 +20,7 @@ define(["Core/errorHelper"],
 					// Pulbic methods.
 
 					// Attach instance to DOM.
-					self.attach = function () {
+					self.create = function () {
 
 						try {
 

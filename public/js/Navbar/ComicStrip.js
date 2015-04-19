@@ -5,13 +5,13 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Navbar/Comic"],
-	function (errorHelper, Comic) {
+define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
+	function (errorHelper, Comic, ScrollRegion) {
 
 		try {
 
 			// Define ComicStrip constructor function. 
-			var functionConstructor = function ComicStrip(dItemWidth) {
+			var functionConstructor = function ComicStrip() {
 
 				try {
 
@@ -20,25 +20,73 @@ define(["Core/errorHelper", "Navbar/Comic"],
 					///////////////////////////////////
 					// Public properties.
 
+					// Selector of scrollable element row.
+					self.rowSelector = "#comicstriprow";
+					// Selector of scrollable element.
+					self.selector = "#comicstrip";
 					// Width of item.
-					self.itemWidth = dItemWidth || 64;
+					self.itemWidth = 64;
 
 					///////////////////////////////////
 					// Public methods.
 
 					// Create the comic strip.
 					// Attach to specified element.
-					self.create = function (strSelector) {
+					self.create = function () {
 
 						try {
 
 							// Get a j-reference to the scroll container element.
-							m_jStrip = $(strSelector);
+							m_jStrip = $(self.selector);
 
-							// Add 100 test items.
-							for (var i = 0; i < 10; i++) {
+							// Attach scrollableregion.
+							m_srComicStrip = new ScrollRegion();
+							return m_srComicStrip.attach(self.rowSelector);
+						} catch (e) {
 
-								var exceptionRet = self.addItem(new Comic("comic" + i));
+							return e;
+						}
+					};
+
+					// Load up comics.
+					self.load = function (objectData) {
+
+						try {
+
+							// Clear out first.
+							m_jStrip.empty();
+
+							// And the collection....
+							m_arrayComics = [];
+
+							// Add N test items.
+							for (var i = 0; i < objectData.items.length; i++) {
+
+								// Get the ith comic.
+								var comicIth = objectData.items[i];
+
+								// Allocate.
+								var comicNew = new Comic();
+
+								// Create.
+								var exceptionRet = comicNew.load(comicIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+								// Add.
+								var exceptionRet = self.addItem(comicNew);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Automatically allocate the first comic.
+							if (m_arrayComics.length > 0) {
+
+								var exceptionRet = m_arrayComics[0].activate();
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -84,6 +132,8 @@ define(["Core/errorHelper", "Navbar/Comic"],
 
 					// The container for the strip items.
 					var m_jStrip = null;
+					// Scrollable region reference.
+					var m_srComicStrip = null;
 					// Collection of comic items.
 					var m_arrayComics = [];
 				} catch (e) {

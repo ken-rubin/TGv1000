@@ -5,13 +5,13 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Code/Type"],
-	function (errorHelper, Type) {
+define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
+	function (errorHelper, Type, ScrollRegion) {
 
 		try {
 
 			// Define TypeStrip constructor function. 
-			var functionConstructor = function TypeStrip(dItemWidth) {
+			var functionConstructor = function TypeStrip() {
 
 				try {
 
@@ -20,42 +20,61 @@ define(["Core/errorHelper", "Code/Type"],
 					///////////////////////////////////
 					// Public properties.
 
+					// Selector to DOM element to wrap.
+					self.rowSelector = "#typestriprow";
+					// Selector to DOM element to wrap.
+					self.selector = "#typestrip";
 					// Width of item.
-					self.itemWidth = dItemWidth || 200;
+					self.itemWidth = 200;
 
 					///////////////////////////////////
 					// Public methods.
 
 					// Create the Type strip.
 					// Attach to specified element.
-					self.create = function (strSelector) {
+					self.create = function () {
 
 						try {
 
 							// Get a j-reference to the scroll container element.
-							m_jStrip = $(strSelector);
+							m_jStrip = $(self.selector);
 
-					        // Add the add type type.
-							var exceptionRet = self.addItem(new Type("addtypetype",
-								"../media/images/plus.png"));
-							if (exceptionRet) {
+							// Attach scrollableregion.
+							m_srTypeStrip = new ScrollRegion();
+							return m_srTypeStrip.attach(self.rowSelector);
+						} catch (e) {
 
-								throw exceptionRet;
-							}
+							return e;
+						}
+					};
 
-					        // Add the app type.
-							var exceptionRet = self.addItem(new Type("apptype",
-								"../media/images/Chester.png"));
-							if (exceptionRet) {
+					// Load the Type strip item collection.
+					self.load = function (objectData) {
 
-								throw exceptionRet;
-							}
+						try {
 
-							// Add 100 test items.
-							for (var i = 0; i < 0; i++) {
+							// First destroy.
+							m_jStrip.empty();
 
-								exceptionRet = self.addItem(new Type("type" + i,
-								"../media/images/Homer.png"));
+							// And the collection.
+							m_arrayTypes = [];
+
+							// Loop over items and insert into the DOM.
+							for (var i = 0; i < objectData.items.length; i++) {
+
+								// Extract the item (type).
+								var itemIth = objectData.items[i];
+
+								// Allocate the type object which holds/wrapps the data.
+								var typeIth = new Type();
+								var exceptionRet = typeIth.load(itemIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+						        // Add the app type.
+								var exceptionRet = self.addItem(typeIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;

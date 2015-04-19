@@ -5,8 +5,8 @@
 //
 
 // 
-define(["Core/errorHelper", "Navbar/ComicStrip", "Designer/ToolStrip", "Code/TypeStrip"],
-	function (errorHelper, ComicStrip, ToolStrip, TypeStrip) {
+define(["Core/errorHelper", "Navbar/ComicStrip"],
+	function (errorHelper, ComicStrip) {
 
 		try {
 
@@ -33,43 +33,11 @@ define(["Core/errorHelper", "Navbar/ComicStrip", "Designer/ToolStrip", "Code/Typ
 					// Public methods.
 
 					// Attach GUI wrappers.
-					self.create = function () {
+					self.load = function (objectData) {
 
 						try {
 
-							m_csComicStrip = new ComicStrip();
-							var exceptionRet = m_csComicStrip.create("#comicstrip");
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
-							m_tsToolStrip = new ToolStrip();
-							var exceptionRet = m_tsToolStrip.create("#toolstrip");
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
-							m_tsTypeStrip = new TypeStrip();
-							return m_tsTypeStrip.create("#typestrip");
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// initialize a new project.
-					self.initialize = function () {
-
-						try {
-
-							// Call general create method.
-							var exceptionRet = self.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
+							return comicStrip.load(objectData.comicStrip);
 						} catch (e) {
 
 							return e;
@@ -81,10 +49,6 @@ define(["Core/errorHelper", "Navbar/ComicStrip", "Designer/ToolStrip", "Code/Typ
 
 					// The strip of comic frames.
 					var m_csComicStrip = null;
-					// The strip of tools.
-					var m_tsToolStrip = null;
-					// The strip of types.
-					var m_tsTypeStrip = null;
 				} catch (e) {
 
 					errorHelper.show(e);

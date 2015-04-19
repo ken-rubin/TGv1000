@@ -4,7 +4,7 @@
 // Return constructor function.
 //
 
-// 
+// Define module.
 define(["Core/errorHelper"], 
 	function (errorHelper) {
 
@@ -20,8 +20,8 @@ define(["Core/errorHelper"],
 					////////////////////////////////
 					// Pulbic methods.
 
-					// Attach instance to DOM.
-					self.attach = function (client) {
+					// Create instance to DOM.
+					self.create = function (client) {
 
 						try {
 

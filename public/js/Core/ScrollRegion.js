@@ -27,7 +27,7 @@ define(["Core/errorHelper"],
 
 							// Wire strip controllers.
 							var leftCookie = null;
-							$("#" + strId + " .leftcontroller").on("mouseenter", function () {
+							$(strId + " .leftcontroller").on("mouseenter", function () {
 
 								var strTargetSelector = $(this).attr("data-targetselector");
 								leftCookie = setInterval(function () {
@@ -36,12 +36,12 @@ define(["Core/errorHelper"],
 									jStrip.scrollLeft(jStrip.scrollLeft() - 1);
 								}, 1);
 							});
-							$("#" + strId + " .leftcontroller").on("mouseleave", function () {
+							$(strId + " .leftcontroller").on("mouseleave", function () {
 
 								clearInterval(leftCookie);
 							});
 							var rightCookie = null;
-							$("#" + strId + " .rightcontroller").on("mouseenter", function () {
+							$(strId + " .rightcontroller").on("mouseenter", function () {
 
 								var strTargetSelector = $(this).attr("data-targetselector");
 								rightCookie = setInterval(function () {
@@ -50,7 +50,7 @@ define(["Core/errorHelper"],
 									jStrip.scrollLeft(jStrip.scrollLeft() + 1);
 								}, 1);
 							});
-							$("#" + strId + " .rightcontroller").on("mouseleave", function () {
+							$(strId + " .rightcontroller").on("mouseleave", function () {
 
 								clearInterval(rightCookie);
 							});

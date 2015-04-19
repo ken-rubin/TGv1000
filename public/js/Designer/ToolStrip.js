@@ -5,13 +5,13 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Designer/Tool"],
-	function (errorHelper, Tool) {
+define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
+	function (errorHelper, Tool, ScrollRegion) {
 
 		try {
 
 			// Define ToolStrip constructor function. 
-			var functionConstructor = function ToolStrip(dItemWidth) {
+			var functionConstructor = function ToolStrip() {
 
 				try {
 
@@ -20,26 +20,61 @@ define(["Core/errorHelper", "Designer/Tool"],
 					///////////////////////////////////
 					// Public properties.
 
+					// Selector to row element to wrap.
+					self.rowSelector = "#toolstriprow";
+					// Selector to DOM element to wrap.
+					self.selector = "#toolstrip";
 					// Width of item.
-					self.itemWidth = dItemWidth || 55;
+					self.itemWidth = 55;
 
 					///////////////////////////////////
 					// Public methods.
 
 					// Create the tool strip.
 					// Attach to specified element.
-					self.create = function (strSelector) {
+					self.create = function () {
 
 						try {
 
 							// Get a j-reference to the scroll container element.
-							m_jStrip = $(strSelector);
+							m_jStrip = $(self.selector);
+
+							// Attach scrollableregion.
+							m_srToolStrip = new ScrollRegion();
+							return m_srToolStrip.attach(self.rowSelector);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Load up data.
+					self.load = function (objectData) {
+
+						try {
+
+							// First destroy.
+							m_jStrip.empty();
+
+							// And the collection.
+							m_arrayTools = [];
 
 							// Add 100 test items.
-							for (var i = 0; i < 1; i++) {
+							for (var i = 0; i < objectData.items.length; i++) {
 
-								var exceptionRet = self.addItem(new Tool("tool" + i,
-									"../media/images/Chester.png"));
+								// Extract data.
+								var itemIth = objectData.items[i];
+
+								// Allocate and load the tool.
+								var toolIth = new Tool();
+								var exceptionRet = toolIth.load(itemIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+								// Add to collection.
+								exceptionRet = self.addItem(toolIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -85,6 +120,8 @@ define(["Core/errorHelper", "Designer/Tool"],
 
 					// The container for the strip items.
 					var m_jStrip = null;
+					// Scroll object.
+					var m_srToolStrip = null;
 					// Collection of tool items.
 					var m_arrayTools = [];
 				} catch (e) {

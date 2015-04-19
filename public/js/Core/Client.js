@@ -4,7 +4,7 @@
 // Return constructor function.
 //
 
-// 
+// Define module and require dependencies.
 define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/LoginDialog/LoginDialog", "Core/Project"],
 	function (errorHelper, ProjectsDialog, LoginDialog, Project) {
 
@@ -92,7 +92,47 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Lo
 
 				    		// Allocate project.
 				    		m_project = new Project();
-				    		return m_project.initialize();
+				    		return m_project.load({ 
+
+				    			version: 1,
+				    			id: 1,
+				    			name: "Project 1",
+				    			resourceId: 0,
+				    			description: "This is a test of the emergency broadcast system....",
+				    			comicStrip: {
+
+				    				items: [{
+
+				    					id: 1,
+				    					name:"default comic",
+				    					resourceId: 1,
+					    				toolStrip: {
+
+					    					items: []
+					    				},
+					    				typeStrip: {
+
+					    					items: [{
+
+					    						add: true,
+					    						id: -1,
+					    						name: "add",
+					    						resourceId: 2
+					    					}, {
+
+					    						app: true,
+					    						properties: [],
+					    						methods: [],
+					    						events: [],
+					    						dependencies: [],
+					    						id: 0,
+					    						name: "app",
+					    						resourceId: 3
+					    					}]
+					    				}
+					    			}]
+				    			}
+				    		});
 						} catch (e) {
 
 							return e;
@@ -138,6 +178,7 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Lo
 				}
 			};
 
+			// Return constructor function.
 			return functionConstructor;
 		} catch (e) {
 

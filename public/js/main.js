@@ -4,64 +4,77 @@
 // Return null--no module object.
 //
 
+// Define some app-globals.
+var client = null;
+var navbar = null;
+var comicStrip = null;
+var designer = null;
+var toolStrip = null;
+var code = null;
+var typeStrip = null;
+
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
 	
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/Client", "Code/Code", "Designer/Designer", "Navbar/Navbar", "Core/ScrollRegion"], 
-			function (errorHelper, Client, Code, Designer, Navbar, ScrollRegion) {
+		require(["Core/errorHelper", "Core/Client", "Code/Code", "Code/TypeStrip", "Designer/Designer", "Designer/ToolStrip", "Navbar/Navbar", "Navbar/ComicStrip"], 
+			function (errorHelper, Client, Code, TypeStrip, Designer, ToolStrip, Navbar, ComicStrip) {
 
 			try {
 
 				// Allocate and initialize the client.
-				var client = new Client();
-				var exceptionRet = client.create(1/*iUserId*/);
+				client = new Client();
+				var exceptionRet = client.create(1/*iUserId -- eventually from server specified cookie*/);
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
 
 				// Allocate and attach the designer.
-				var designer = new Designer();
-				exceptionRet = designer.attach("surfacecanvas");
+				designer = new Designer();
+				exceptionRet = designer.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
 
 				// Allocate and attach the code module.
-				var code = new Code();
-				exceptionRet = code.attach();
+				code = new Code();
+				exceptionRet = code.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
 
 				// Allocate and attach the navbar module.
-				var navbar = new Navbar();
-				exceptionRet = navbar.attach(client);
+				navbar = new Navbar();
+				exceptionRet = navbar.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
 
-				// Allocate and attach the designers.
-				var srTypeStrip = new ScrollRegion();
-				var exceptionRet = srTypeStrip.attach("typestriprow");
+				// Allocate the strips too.
+				comicStrip = new ComicStrip();
+				exceptionRet = comicStrip.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
-				var srToolStrop = new ScrollRegion();
-				exceptionRet = srToolStrop.attach("toolstriprow");
+
+				// Allocate the strips too.
+				toolStrip = new ToolStrip();
+				exceptionRet = toolStrip.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
-				var srComicStrip = new ScrollRegion();
-				exceptionRet = srComicStrip.attach("comicstriprow");
+
+				// Allocate the strips too.
+				typeStrip = new TypeStrip();
+				exceptionRet = typeStrip.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;

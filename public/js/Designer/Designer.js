@@ -18,15 +18,18 @@ define(["Core/errorHelper"],
 					var self = this;			// Uber closure.
 
 					////////////////////////////////
+					// Pulbic properties.
+
+					// Selector.
+					self.selector = "#surfacecanvas";
+
+					////////////////////////////////
 					// Pulbic methods.
 
 					// Attach instance to DOM.
-					self.attach = function (strId) {
+					self.create = function () {
 
 						try {
-
-							// Ensure there is some value for selector.
-							strId = strId || "surfacecanvas";
 
 							$(window).resize(function () {
 
@@ -38,20 +41,21 @@ define(["Core/errorHelper"],
 									var iNavbarHeight = $(".navbar").height();
 									var iBordersAndSpacingPadding = 48;
 
-									$("#" + strId).height(iViewportHeight - 
+									var jCanvas = $(self.selector);
+									var canvas = jCanvas[0];
+									jCanvas.height(iViewportHeight - 
 										iToolStripHeight -
 										iNavbarHeight -
 										iBordersAndSpacingPadding);
 
-									var dWidth = $("#" + strId).width();
-									var dHeight = $("#" + strId).height();
-									$("#" + strId).attr("width",
+									var dWidth = jCanvas.width();
+									var dHeight = jCanvas.height();
+									jCanvas.attr("width",
 										dWidth);
-									$("#" + strId).attr("height",
+									jCanvas.attr("height",
 										dHeight);
 
-									// Get canvas and context.
-									var canvas = document.getElementById(strId);
+									// Get context.
 									var context = canvas.getContext("2d");
 
 									context.transform(1, 0, 0, -1, dWidth / 2, dHeight / 2);

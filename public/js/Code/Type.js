@@ -5,13 +5,13 @@
 //
 
 // 
-define(["Core/errorHelper"],
-	function (errorHelper) {
+define(["Core/errorHelper", "Core/resourceHelper"],
+	function (errorHelper, resourceHelper) {
 
 		try {
 
 			// Define the type constructor function.
-			var functionConstructor = function Type(strId, strSrc) {
+			var functionConstructor = function Type() {
 
 				try {
 
@@ -20,28 +20,46 @@ define(["Core/errorHelper"],
 					/////////////////////////////
 					// Public properties.
 
-					// Collection of properties (type members).
-					self.properties = [];
-					// Collection of methods (type members).
-					self.methods = [];
-					// Collection of events (type members).
-					self.events = [];
-
-					// Id of the type.
-					self.id = strId || "type1";
-					// Image resource id.
-					self.src = strSrc || "../media/images/plus.png";
+					// The data this instance wrapps.
+					// Schema:
+					// add -- indicates this is the addtype type.
+					// app -- indicates this is the app type.
+					// properties -- collection of properties of type.
+					// methods -- collection of methods of type.
+					// events -- collection of events of type.
+					// dependencies -- collection of dependencies of type.
+					// id -- the DB id of type.
+					// name -- the name of type.
+					// resourceId -- the resource id.
+					self.data = null;
 
 					/////////////////////////////
 					// Public methods.
+
+					// Create this instance.
+					self.load = function (objectData) {
+
+						try {
+
+							// Save data.
+							self.data = objectData;
+
+							// process properties methods events and dependencies collections.
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
 
 					// Return the DOM element representing a prototypical comic item.
 					self.generateDOM = function () {
 
 						return $("<img class='typestripitem' id='" + 
-							self.id + 
+							self.data.id + 
 							"' src='" +
-							self.src +
+							resourceHelper.toURL(self.data.resourceId) +
 							"'></img>");
 					};
 				} catch (e) {

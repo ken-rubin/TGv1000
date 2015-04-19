@@ -5,13 +5,13 @@
 //
 
 // Define module.
-define(["Core/errorHelper"],
-	function (errorHelper) {
+define(["Core/errorHelper", "Core/resourceHelper"],
+	function (errorHelper, resourceHelper) {
 
 		try {
 
 			// Define constructor function.
-			var functionConstructor = function Tool(strId, strSrc) {
+			var functionConstructor = function Tool() {
 
 				try {
 
@@ -20,25 +20,40 @@ define(["Core/errorHelper"],
 					/////////////////////////////
 					// Public properties.
 
-					// Id of matching element.
-					self.id = strId || "tool0";
-					// Image URL.
-					self.src = strSrc || "../media/images/BlowUp.png";
+					// Data.
+					// Schema:
+					// id -- DB id of tool.
+					// name -- name of tool.
+					// resourceId -- resource id for tool.
+					self.data = null;
 
 					/////////////////////////////
 					// Public methods.
+
+					// Load up tool.
+					self.load = function (objectData) {
+
+						try {
+
+							// Save tool state.
+							self.data = objectData;
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
 
 					// Return the DOM element representing a prototypical tool item.
 					self.generateDOM = function () {
 
 						return $("<img class='toolstripitem' id='" + 
-							self.id + 
+							self.data.name + 
 							"' src='" +
-						 	self.src + 
+						 	resourceHelper.toURL(self.data.resourceId) + 
 						 	"'></img>");
 					};
-
-
 				} catch (e) {
 
 					errorHelper.show(e);
