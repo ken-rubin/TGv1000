@@ -113,18 +113,36 @@ app.post("/renderJadeSnippet", function (req, res) {
 console.log("Map main route (login.jade).");
 app.get("/", function (req, res) {
 
-	try {
+    try {
 
-		// Render the jade file to the client.
-		res.render("Login/login", { 
+        // Render the jade file to the client.
+        res.render("Login/login", { 
 
-			// Pass in jade context property just for the hell of it.
-	  		title : "TGv1000" 
-		});
-	} catch (e) {
+            // Pass in jade context property just for the hell of it.
+            title : "TGv1000" 
+        });
+    } catch (e) {
 
-		res.send(e.message);
-	}
+        res.send(e.message);
+    }
+});
+
+/////////////////////////////////////
+console.log("Map main route (index.jade).");
+app.get("/index", function (req, res) {
+
+    try {
+
+        // Render the jade file to the client.
+        res.render("Index/index", { 
+
+            // Pass in jade context property just for the hell of it.
+            title : "TGv1000" 
+        });
+    } catch (e) {
+
+        res.send(e.message);
+    }
 });
 
 /////////////////////////////////////

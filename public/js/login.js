@@ -31,67 +31,67 @@ $(document).ready(function () {
 	                // Wire up the signIn button
 	                $("#signinBtn").click(function () {
 	                    
-	                    m_functionSignInButtonClick();
+	                    m_functionSignInButtonClick(errorHelper);
 
 	                });
 	                $("#signinBtn").keypress(function(event){
 
 	                    if (event.which == 13) {
 
-		                    m_functionSignInButtonClick();
+		                    m_functionSignInButtonClick(errorHelper);
 	                    }
 	                });
 	                $("#inputPassword").keypress(function(event){
 
 	                    if (event.which == 13) {
 
-		                    m_functionSignInButtonClick();
+		                    m_functionSignInButtonClick(errorHelper);
 	                    }
 	                });
 	                
-	// $("#inputName").val('jerry'); $("#inputPassword").val('y'); $("#signinBtn").click();
+					// $("#inputName").val('ken'); $("#inputPassword").val('a'); $("#signinBtn").click();
 
 	                // Wire up the forgot link.
 	                $("#forgotLink").click(function () {
 	                    
-	                    var userName = $("#inputName").val();
-	                    if (userName.length === 0) {
+	                    // var userName = $("#inputName").val();
+	                    // if (userName.length === 0) {
 	                        
-	                        alert("Close this message. Then enter your name and click the 'forgot' link again.");
-	                    } else {
+	                    //     alert("Close this message. Then enter your name and click the 'forgot' link again.");
+	                    // } else {
 
-	                        $.ajax({
+	                    //     $.ajax({
 	                            
-	                            type: "POST",
-	                            url: "/BOL/UtilityBO/ForgotPW",
-	                            data: { 
-	                                    userName: userName
-	                            },
-	                            success: function (objectData,
-	                                strTextStatus,
-	                                jqxhr) {
+	                    //         type: "POST",
+	                    //         url: "/BOL/UtilityBO/ForgotPW",
+	                    //         data: { 
+	                    //                 userName: userName
+	                    //         },
+	                    //         success: function (objectData,
+	                    //             strTextStatus,
+	                    //             jqxhr) {
 
-	                                    try {
+	                    //                 try {
 	                                        
-	                                        if (!objectData.success) {
+	                    //                     if (!objectData.success) {
 	                                            
-	                                            alert("We had a problem recording your reset request. Please....");
-	                                        } else {
+	                    //                         alert("We had a problem recording your reset request. Please....");
+	                    //                     } else {
 
-	                                            alert("After your password is reset, you will be notified.");
-	                                        }
-	                                    } catch (e) {
+	                    //                         alert("After your password is reset, you will be notified.");
+	                    //                     }
+	                    //                 } catch (e) {
 
-	                                        alert("We had a problem recording your reset request. Please....");
-	                                    }},
-	                            error: function (jqxhr,
-	                                strTextStatus,
-	                                strError) {
+	                    //                     alert("We had a problem recording your reset request. Please....");
+	                    //                 }},
+	                    //         error: function (jqxhr,
+	                    //             strTextStatus,
+	                    //             strError) {
 
-	                                    alert("We had a problem recording your reset request. Please....");
-	                                }
-	                        });
-	                    }
+	                    //                 alert("We had a problem recording your reset request. Please....");
+	                    //             }
+	                    //     });
+	                    // }
 	                });
 
 					// Cause the code and designer panels to size themselves.
@@ -118,13 +118,14 @@ function getTGCookie (name) {
     }
 };
 
-var m_functionSignInButtonClick = function() {
+var m_functionSignInButtonClick = function(errorHelper) {
 
 	try {
 
+		var userName = $("#inputName").val();
 		var posting = $.post("/BOL/ValidateBO/UserAuthenticate", 
 			{
-				userName:$("#inputName").val(), 
+				userName:userName, 
 				password:$("#inputPassword").val()
 			}, 
 			'json');
@@ -132,9 +133,10 @@ var m_functionSignInButtonClick = function() {
 
             if (data.success) {
 
-            	var userId = data.userId;
+                document.cookie = "userId=" + data.userId.toString();
+                document.cookie = "userName=" + userName;
 
-            	window.href = '/index';
+            	location.href = '/index';
 
             } else {
 
