@@ -1,0 +1,24 @@
+//- ////////////////////////////////////
+//- Login--marketing/login/registration/enrollment application markup file.
+//- 
+
+//-
+doctype
+html
+  head
+    meta(charset="utf-8")
+    title #{title}
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+    //- Include list of staticly referenced CSS files.
+    include ./loginstylesheets.jade
+
+  body
+    .container-fluid
+
+      //- Include the code element DOM.
+      include ./logincode.jade
+
+    //- Inlcude the list of scripts.
+    include ./loginscripts.jade
+
