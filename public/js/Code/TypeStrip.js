@@ -59,6 +59,28 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
 							// And the collection.
 							m_arrayTypes = [];
 
+							// Add:
+							var itemAdd = {
+
+								add: true,
+								resourceId: 2
+							};
+
+							// Allocate the type object which holds/wrapps the data.
+							var typeAdd = new Type();
+							var exceptionRet = typeAdd.load(itemAdd);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+					        // Add the app type.
+							exceptionRet = self.addItem(typeAdd);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
 							// Loop over items and insert into the DOM.
 							for (var i = 0; i < objectData.items.length; i++) {
 
@@ -67,14 +89,21 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
 
 								// Allocate the type object which holds/wrapps the data.
 								var typeIth = new Type();
-								var exceptionRet = typeIth.load(itemIth);
+								exceptionRet = typeIth.load(itemIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
-						        // Add the app type.
-								var exceptionRet = self.addItem(typeIth);
+						        // Add the type.
+								exceptionRet = self.addItem(typeIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+						        // Also add to the designer/tool strip.
+								exceptionRet = toolStrip.addItem(typeIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;

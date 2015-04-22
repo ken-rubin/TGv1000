@@ -53,11 +53,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					// Return the DOM element representing a prototypical comic item.
+					// Return the DOM element representing a prototypical item.
 					self.generateDOM = function () {
 
+
 						return $("<img class='typestripitem' id='" + 
-							self.data.id + 
+							self.data.name + 
 							"' src='" +
 							resourceHelper.toURL(self.data.resourceId) +
 							"'></img>");

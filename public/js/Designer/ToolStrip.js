@@ -48,53 +48,20 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 						}
 					};
 
-					// Load up data.
-					self.load = function (objectData) {
+					// Add tool to strip.
+					self.addItem = function (type) {
 
 						try {
 
-							// First destroy.
-							m_jStrip.empty();
+							var toolNew = new Tool();
+							var exceptionRet = toolNew.load(type);
+							if (exceptionRet) {
 
-							// And the collection.
-							m_arrayTools = [];
-
-							// Add 100 test items.
-							for (var i = 0; i < objectData.items.length; i++) {
-
-								// Extract data.
-								var itemIth = objectData.items[i];
-
-								// Allocate and load the tool.
-								var toolIth = new Tool();
-								var exceptionRet = toolIth.load(itemIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
-
-								// Add to collection.
-								exceptionRet = self.addItem(toolIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								return exceptionRet;
 							}
 
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Add tool to strip.
-					self.addItem = function (tool) {
-
-						try {
-
 							// Define object prototype.
-							var jItem = tool.generateDOM();
+							var jItem = toolNew.generateDOM();
 
 							// Set its position.
 							jItem.css({
@@ -106,7 +73,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 							m_jStrip.append(jItem);
 
 							// Also add to the collection of comics.
-							m_arrayTools.push(tool);
+							m_arrayTools.push(toolNew);
 
 							return null;
 						} catch (e) {

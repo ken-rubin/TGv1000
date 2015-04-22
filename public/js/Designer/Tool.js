@@ -20,23 +20,19 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					/////////////////////////////
 					// Public properties.
 
-					// Data.
-					// Schema:
-					// id -- DB id of tool.
-					// name -- name of tool.
-					// resourceId -- resource id for tool.
-					self.data = null;
+					// Type upon which this tool is based.
+					self.type = null;
 
 					/////////////////////////////
 					// Public methods.
 
 					// Load up tool.
-					self.load = function (objectData) {
+					self.load = function (type) {
 
 						try {
 
 							// Save tool state.
-							self.data = objectData;
+							self.type = type;
 
 							return null;
 						} catch (e) {
@@ -49,9 +45,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.generateDOM = function () {
 
 						return $("<img class='toolstripitem' id='" + 
-							self.data.name + 
+							self.type.data.name + 
 							"' src='" +
-						 	resourceHelper.toURL(self.data.resourceId) + 
+						 	resourceHelper.toURL(self.type.data.resourceId) + 
 						 	"'></img>");
 					};
 				} catch (e) {

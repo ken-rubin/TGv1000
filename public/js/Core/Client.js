@@ -106,19 +106,9 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Lo
 				    					id: 1,
 				    					name:"default comic",
 				    					resourceId: 1,
-					    				toolStrip: {
-
-					    					items: []
-					    				},
 					    				typeStrip: {
 
 					    					items: [{
-
-					    						add: true,
-					    						id: -1,
-					    						name: "add",
-					    						resourceId: 2
-					    					}, {
 
 					    						app: true,
 					    						properties: [],

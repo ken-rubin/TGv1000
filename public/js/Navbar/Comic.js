@@ -38,11 +38,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							// Create or re-create the strips with this comic's data.
-							var exceptionRet = toolStrip.load(self.data.toolStrip);
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
 							return typeStrip.load(self.data.typeStrip);
 						} catch (e) {
 
