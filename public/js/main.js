@@ -50,7 +50,7 @@ $(document).ready(function () {
 
 				// Allocate and attach the navbar module.
 				navbar = new Navbar();
-				exceptionRet = navbar.create();
+				exceptionRet = navbar.create(client);
 				if (exceptionRet) {
 
 					throw exceptionRet;

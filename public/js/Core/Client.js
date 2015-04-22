@@ -5,8 +5,8 @@
 //
 
 // Define module and require dependencies.
-define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/LoginDialog/LoginDialog", "Core/Project"],
-	function (errorHelper, ProjectsDialog, LoginDialog, Project) {
+define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Project"],
+	function (errorHelper, ProjectsDialog, Project) {
 
 		try {
 
@@ -35,30 +35,12 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Lo
 							// Save.
 							m_iUserId = iUserId;
 
-							//return self.showLoginDialog();
 							return self.showProjectsDialog();
 						} catch (e) {
 
 							return e;
 						}
 					};
-
-					self.showLoginDialog = function () {
-
-						try {
-
-							var ld = new LoginDialog();
-							var exceptionRet = ld.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-						} catch (e) {
-
-							return e;
-						}
-					}
 
 					// Open popup--map callbacks to private functions.
 					self.showProjectsDialog = function () {

@@ -68,28 +68,6 @@ app.get("/projectsDialog", function (req, res) {
 	}
 });
 
-console.log("Map loginDialog route (loginDialog.jade).");
-app.get("/loginDialog", function (req, res) {
-
-	try {
-
-		// Get some data/stuff from the DB, or 
-		// where-ever, and pass into jade render.
-		var objectContext = {
-
-			// This space intentionally left blank.
-			// But is could be used to customize....
-		};
-
-		// Render the jade file to the client.
-		res.render("Dialogs/LoginDialog/loginDialog", 
-			objectContext);
-	} catch (e) {
-
-		res.send(e.message);
-	}
-});
-
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");
 var objectInstantiatedModules = {};
@@ -132,21 +110,39 @@ app.post("/renderJadeSnippet", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (index.jade).");
+console.log("Map main route (login.jade).");
 app.get("/", function (req, res) {
 
-	try {
+    try {
 
-		// Render the jade file to the client.
-		res.render("Index/index", { 
+        // Render the jade file to the client.
+        res.render("Login/login", { 
 
-			// Pass in jade context property just for the hell of it.
-	  		title : "TGv1000" 
-		});
-	} catch (e) {
+            // Pass in jade context property just for the hell of it.
+            title : "TGv1000" 
+        });
+    } catch (e) {
 
-		res.send(e.message);
-	}
+        res.send(e.message);
+    }
+});
+
+/////////////////////////////////////
+console.log("Map main route (index.jade).");
+app.get("/index", function (req, res) {
+
+    try {
+
+        // Render the jade file to the client.
+        res.render("Index/index", { 
+
+            // Pass in jade context property just for the hell of it.
+            title : "TGv1000" 
+        });
+    } catch (e) {
+
+        res.send(e.message);
+    }
 });
 
 /////////////////////////////////////

@@ -106,9 +106,9 @@ module.exports = function ValidateBO(app, sql) {
                                         var id = rows[0].id;
                                         var pwHash = rows[0].pwHash;
 
-                                        bcrypt.compare(req.body.password, pwHash, function(err, res){
+                                        bcrypt.compare(req.body.password, pwHash, function(err, result){
 
-                                            if (!res) {
+                                            if (!result) {
                                                 res.json({
                                                     success: false,
                                                     message: 'Error received validating user.'
