@@ -5,8 +5,8 @@
 //
 
 // Define module and require dependencies.
-define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Project"],
-	function (errorHelper, ProjectsDialog, Project) {
+define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/TypesDialog/TypesDialog", "Core/Project"],
+	function (errorHelper, ProjectsDialog, TypesDialog, Project) {
 
 		try {
 
@@ -64,10 +64,30 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Proje
 						}
 					};
 
+					// Open popup--map callbacks to private functions.
+					self.showTypesDialog = function (functionNewType, functionCloneType) {
+
+						try {
+
+							var td = new TypesDialog();
+							var exceptionRet = td.create(functionNewType,
+								functionCloneType);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////
 					// Private functions.
 
-					// Invoked when the project dialog exist newly.
+					// Invoked when the projects dialog exist newly.
 					var m_functionNewProject = function () {
 
 						try {
@@ -80,7 +100,7 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Proje
 				    			id: 1,
 				    			name: "Project 1",
 				    			resourceId: 0,
-				    			description: "This is a test of the emergency broadcast system....",
+				    			description: "This is a project of the emergency broadcast system....",
 				    			comicStrip: {
 
 				    				items: [{
@@ -111,7 +131,7 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Proje
 						}
 					};
 
-					// Invoked when the project dialog exist openly.
+					// Invoked when the projects dialog exist openly.
 					var m_functionOpenProject = function (strId) {
 
 						try {
@@ -125,7 +145,7 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Core/Proje
 						}
 					};
 
-					// Invoked when the project dialog exist clonely.
+					// Invoked when the projects dialog exist clonely.
 					var m_functionCloneProject = function (strId) {
 
 						try {

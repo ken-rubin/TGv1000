@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
-	function (errorHelper, Type, ScrollRegion) {
+define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelper"],
+	function (errorHelper, Type, ScrollRegion, resourceHelper) {
 
 		try {
 
@@ -59,23 +59,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
 							// And the collection.
 							m_arrayTypes = [];
 
-							// Add:
-							var itemAdd = {
-
-								add: true,
-								resourceId: 2
-							};
-
-							// Allocate the type object which holds/wrapps the data.
-							var typeAdd = new Type();
-							var exceptionRet = typeAdd.load(itemAdd);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-					        // Add the app type.
-							exceptionRet = self.addItem(typeAdd);
+							// Create the add button.
+							var exceptionRet = m_functionCreateAddButton();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -128,7 +113,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
 							// Set its position.
 							jItem.css({
 
-								left: (m_arrayTypes.length * self.itemWidth) + "px"
+								left: ((m_arrayTypes.length + 1) * self.itemWidth) + "px"
 							});
 
 							// Add to the DOM.
@@ -136,6 +121,103 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion"],
 
 							// Also add to the collection of comics.
 							m_arrayTypes.push(type);
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					///////////////////////////////////
+					// Private methods.
+
+					// Invoked when the types dialog exist newly.
+					var m_functionNewType = function () {
+
+						try {
+
+				    		// Allocate project.
+				    		var type = new Type();
+				    		var exceptionRet = type.load({ 
+
+	    						properties: [],
+	    						methods: [],
+	    						events: [],
+	    						dependencies: [],
+	    						name: "new type",
+	    						id: m_arrayTypes.length + 1,
+	    						resourceId: 3
+				    		});
+				    		if (exceptionRet) {
+
+				    			return exceptionRet;
+				    		}
+
+				    		// Add the type.
+							exceptionRet = self.addItem(type);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+					        // Also add to the designer/tool strip.
+							exceptionRet = toolStrip.addItem(type);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Invoked when the types dialog exist clonely.
+					var m_functionCloneType = function (strId) {
+
+						try {
+
+				    		BootstrapDialog.alert(":Clone " + strId + " type....");
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Create a new type.
+					var m_functionAddNewType = function (e) {
+
+						try {
+
+							// Show the types dialog.
+							var exceptionRet = client.showTypesDialog(m_functionNewType,
+								m_functionCloneType);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					// Create the add button.
+					var m_functionCreateAddButton = function () {
+
+						try {
+
+							var jAdd = $("<img class='typestripitem' id='AddType' src='" +
+								resourceHelper.toURL(2) +
+								"'></img>");
+
+							// Add to the DOM.
+							m_jStrip.append(jAdd);
+
+							jAdd.click(m_functionAddNewType);
 
 							return null;
 						} catch (e) {

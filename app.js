@@ -68,6 +68,29 @@ app.get("/projectsDialog", function (req, res) {
 	}
 });
 
+////////////////////////////////////////////
+console.log("Map typesDialog route (typesDialog.jade).");
+app.get("/typesDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // where-ever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/TypesDialog/typesDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");
 var objectInstantiatedModules = {};
