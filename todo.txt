@@ -1,6 +1,11 @@
-jquery.min.map
-blockly-frameworks-scripts
-organization of files
+When create property, method or event, first 
+	show dialog asking for specific information.
 
-type controls and add new/clone/open dialog (similar to project)
-db-ize/bo-ize everything
+Set image for type.
+
+Select text in rename dialog when first shown.
+
+Change property to just be a name--no code associated.
+
+Change event to just be a name and a method name--no code either.
+
