@@ -129,6 +129,38 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
+					// Specify the active type.
+					self.select = function (typeActive) {
+
+						try {
+
+							m_typeActive = typeActive;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Update the blockly data in the active type/method.
+					self.update = function (strWorkspace, strMethod) {
+
+						try {
+
+							// Drop out if no active item.
+							if (!m_typeActive) {
+
+								return null;
+							}
+
+							// Else, update the type.
+							return m_typeActive.update(strWorkspace,
+								strMethod);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////////
 					// Private methods.
 
@@ -233,6 +265,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_jStrip = null;
 					// Collection of type items.
 					var m_arrayTypes = [];
+					// Active item.
+					var m_typeActive = null;
 				} catch (e) {
 
 					errorHelper.show(e);

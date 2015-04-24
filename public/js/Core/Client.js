@@ -113,9 +113,9 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 					    					items: [{
 
 					    						app: true,
-					    						properties: [{ name: "someProperty", codeDOM: "" }, { name: "anotherProperty", codeDOM: "" }],
-					    						methods: [{ name: "someMethod", codeDOM: "" }, { name: "anotherMethod", codeDOM: "" }],
-					    						events: [{ name: "anEvent", codeDOM: "" }],
+					    						properties: [{ name: "someProperty", workspace: "", method: "" }, { name: "anotherProperty", workspace: "", method: "" }],
+					    						methods: [{ name: "someMethod", workspace: "", method: "" }, { name: "anotherMethod", workspace: "", method: "" }],
+					    						events: [{ name: "anEvent", workspace: "", method: "" }],
 					    						dependencies: [],
 					    						id: 0,
 					    						name: "app",
