@@ -113,9 +113,9 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 					    					items: [{
 
 					    						app: true,
-					    						properties: [],
-					    						methods: [],
-					    						events: [],
+					    						properties: [{ name: "someProperty", codeDOM: "" }, { name: "anotherProperty", codeDOM: "" }],
+					    						methods: [{ name: "someMethod", codeDOM: "" }, { name: "anotherMethod", codeDOM: "" }],
+					    						events: [{ name: "anEvent", codeDOM: "" }],
 					    						dependencies: [],
 					    						id: 0,
 					    						name: "app",
