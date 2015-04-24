@@ -129,7 +129,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
-					// Specify the active type.
+					// Specify the active type.  Called from 
+					// a type when a member button is clicked.
 					self.select = function (typeActive) {
 
 						try {

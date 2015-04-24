@@ -279,7 +279,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					// General handler to process a selection.
+					// General handler to process a selection of a member.
 					var m_functionSelect = function (arrayActive, jMember) {
 
 						try {
@@ -288,11 +288,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							$(".SelectedType").removeClass("SelectedType");
 							$(".SelectedTypeMember").removeClass("SelectedTypeMember");
 
-							// Set the selection in the item.
+							// Set the selection to this item.
 							m_jType.addClass("SelectedType");
 							jMember.addClass("SelectedTypeMember");
 
-							// Set the selection state.
+							// Store module instance selection state.
 							var strIndex = jMember.attr("data-index");
 							var iIndex = parseInt(strIndex);
 							m_iActiveIndex = iIndex;
@@ -318,7 +318,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							self.data.properties.push({ name: "new property", codeDOM: "" });
+							// Add a new, empty member.
+							self.data.properties.push({ 
+
+								name: "new property", 
+								workspace: "", 
+								method: "" 
+							});
 
 							// Add the contents to the newly allocated type.
 							var exceptionRet = m_functionGenerateTypeContents();
