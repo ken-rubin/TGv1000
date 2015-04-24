@@ -82,6 +82,40 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 						}
 					};
 
+					// Remove item from DOM and state.
+					self.removeItem = function (type) {
+
+						try {
+
+							// Find the matching tool.
+							for (var i = 0; i < m_arrayTools.length; i++) {
+
+								// Splice on match.
+								if (m_arrayTools[i].type === type) {
+
+									// Get the tool.
+									var toolIth = m_arrayTools[i];
+
+									// Remove form GUI.
+									var exceptionRet = toolIth.destroy();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+
+									// Remove from collection.
+									m_arrayTools.splice(i, 1);
+									break;
+								}
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////////
 					// Private fields.
 

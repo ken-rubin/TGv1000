@@ -48,6 +48,37 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
+					// Remove item from DOM and state.
+					self.removeItem = function (type) {
+
+						try {
+
+							// Remove the type from the collection of types.
+							for (var i = 0; i < m_arrayTypes.length; i++) {
+
+								// Splice on match.
+								if (m_arrayTypes[i] === type) {
+
+									m_arrayTypes.splice(i, 1);
+									break;
+								}
+							}
+
+							// Remove form GUI.
+							var exceptionRet = type.destroy();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Remove from toolStrip.
+							return toolStrip.removeItem(type);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Load the Type strip item collection.
 					self.load = function (objectData) {
 
