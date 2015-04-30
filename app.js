@@ -91,6 +91,29 @@ app.get("/typesDialog", function (req, res) {
     }
 });
 
+////////////////////////////////////////////
+console.log("Map imageSoundDialog route (imageSoundDialog.jade).");
+app.get("/imageSoundDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // whereever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/ImageSoundDialog/imageSoundDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");
 var objectInstantiatedModules = {};
