@@ -53,13 +53,26 @@
 	background:rgba(0,0,155,0.5);
 }
 
-// The actual designer canvas element.
-#surfacecanvas
+// The designer container.
+#designerwrapper
 {
+	position:inline-block;
+
 	height:0px;
 	margin-left:2%;
 	margin-right:2%;
 	width:96%;
+
+	overflow:hidden !important;
+}
+
+// The designer background canvas element.
+#surfacecanvas
+{
+	height:100%;
+	width:100%;
+
+	z-index:10;
 	
 	cursor:crosshair;
 

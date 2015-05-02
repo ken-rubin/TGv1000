@@ -9,8 +9,11 @@
   //- First row is the designer.
   .row
 
-    //- Ultimatly the designer surface is a canvas.
-    canvas#surfacecanvas(width="1024",height="768")
+    //- Owns the designer.
+    #designerwrapper
+
+      //- Ultimatly the designer surface is a canvas.
+      canvas#surfacecanvas(width="1024",height="768")
 
   //- Second row is the tool-strip row.
   .row
@@ -26,4 +29,12 @@
 
       //- Right controller.
       .rightcontroller(data-targetselector="#toolstrip")
+ul#DesignerContextMenu.dropdown-menu(role="menu",style="display:none")
+  li
+    a(tabindex="-1")
+      | a
+  li.divider
+  li
+    a(tabindex="-1")
+      | b
 

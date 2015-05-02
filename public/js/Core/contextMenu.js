@@ -26,8 +26,13 @@ define(["Core/errorHelper"],
                         $(this).on("contextmenu", function (e) {
 
                             // Return native menu if pressing control.
-                            if (e.ctrlKey) return;
-                            
+                            if (e.ctrlKey || 
+                                ($.isFunction(settings.test) &&
+                                settings.test(e) === false)) {
+
+                                return;
+                            }
+
                             // Open menu.
                             $(settings.menuSelector)
                                 .data("invokedOn", $(e.target))
