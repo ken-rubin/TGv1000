@@ -10,6 +10,8 @@
     "morgan": "^1.5.1",
     "mysql": "2.5.4",
     "multer": "0.1.8",
+    "gm": "^1.17.0",
+    "imagemagick": "*",
     "bcrypt-nodejs": "0.0.3"
   },
   "scripts": {
