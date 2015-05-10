@@ -197,6 +197,26 @@ var SQL = require("./modules/SQL");
 var sql = new SQL(app);
 sql.setPool('root', '');
 
+var Logger = require("./modules/Logger");
+var logger = new Logger(app, sql);
+var multer = require("multer");
+var done = false;
+app.use(multer({ dest: './uploads/',
+    rename: function (fieldname, filename) {
+        return filename + Date.now();
+    },
+    onFileUploadStart: function (file) {
+        //console.log(file.originalname + ' is starting ...');
+    },
+    onFileUploadComplete: function (file, req, res) {
+        console.log(file.fieldname + ' uploaded to  ' + file.path + "; req.body=" + JSON.stringify(req.body));
+        req.body.filePath = file.path;
+        done=true;
+    }
+}));
+
+
+
 ////////////////////////////////////
 app.set("portnum",80);
 console.log('Server will be listening on port ' + app.get("portnum") + ".");
@@ -223,7 +243,7 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                     } else {
 
                         var mod = require(rowi.path + rowi.moduleName);
-                        moduleInstance = new mod(app, sql);
+                        moduleInstance = new mod(app, sql, logger);
                         moduleInstances[rowi.moduleName] = moduleInstance;
                     }
 

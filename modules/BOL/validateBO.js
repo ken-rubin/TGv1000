@@ -4,7 +4,7 @@
 //////////////////////////////////
 
 var bcrypt = require("bcrypt-nodejs");
-module.exports = function ValidateBO(app, sql) {
+module.exports = function ValidateBO(app, sql, logger) {
 
     var self = this;                // Über closure.
 
