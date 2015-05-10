@@ -48,6 +48,30 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
+					// Method loads the schema from all types into the blockly frame.
+					self.loadSchema = function () {
+
+						try {
+
+							// Process each type.
+							for (var i = 0; i < m_arrayTypes.length; i++) {
+
+								var typeIth = m_arrayTypes[i];
+
+								// Insert the type.
+								var exceptionRet = code.AddType(typeIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+							return code.setWorkspaceStringInBlocklyFrame();
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Remove item from DOM and state.
 					self.removeItem = function (type) {
 
@@ -153,7 +177,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// Also add to the collection of comics.
 							m_arrayTypes.push(type);
 
-							return null;
+							// Also add to code.
+							return code.addItem(type);
 						} catch (e) {
 
 							return e;

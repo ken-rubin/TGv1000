@@ -84,6 +84,28 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 						}
 					};
 
+					// Open popup--map callbacks to private functions.
+					// Upon successfull resolution, call functionOK(resourceId).
+					self.showImageSoundDialog = function (bImage, functionOK) {
+
+						try {
+
+							// If image mode, show for images, otherwise, sounds....
+							var isd = new ImageSoundDialog();
+							var exceptionRet = isd.create(bImage,
+								functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////
 					// Private functions.
 

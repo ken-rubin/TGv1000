@@ -7,7 +7,7 @@
 //
 //////////////////////////////////////////////////////
 
-
+// Function returns a schema from an array of names.
 function getSchemaFromArrayOfNames(nameArray) {
 
     var Global = {};
@@ -417,6 +417,25 @@ BlocklyMenuRenderer = function (include) {
         strRet += '<category name="Functions" custom="PROCEDURE"></category>';
     }
 
+    if (include.Types) {
+
+        // Loop over each type.
+        for (var key in include.Types) {
+
+            strRet += '<category name="' + key + '">';
+
+            var objectType = include.Types[key];
+
+            // Loop over each member.
+            for (var keyInner in objectType) {
+
+                strRet += '<block type="' + keyInner + '"></block>';
+            }
+
+            strRet += '</category>';
+        }
+    }
+
     strRet += "</xml>";
 
     return strRet;
@@ -434,7 +453,7 @@ var defaultSchema = {
         SetTimeout: true,
         SetBackgroundUrl: true,
         SetBackgroundDrift: true
-    },
+    }/*,
     Object: {
 
         Add: true,
@@ -477,7 +496,7 @@ var defaultSchema = {
         BeginThrust: true,
         EndThrust: true,
         Fire: true
-    },
+    }*/,
     Event: {
 
         WhoAmI: true,
