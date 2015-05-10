@@ -437,6 +437,18 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 											throw exceptionRet;
 										}
+
+										if (strType === "property") {
+
+											// Update code module.
+											exceptionRet = code.renameProperty(self,
+												objectMember,
+												m_strOriginalName);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+										}
 							        }
 							    }
 							});
@@ -498,6 +510,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 								throw exceptionRet;
 							}
+
+							// Add the property to code too.
+							exceptionRet = code.addProperty(self, 
+								self.data.properties[self.data.properties.length - 1]);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -509,7 +529,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 						try {
 
-							// Get the type clicked.
+							/* Get the type clicked.
 							var jPropertyClicked = $(this);
 
 							// Call unified click handler.
@@ -519,6 +539,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 								throw exceptionRet;
 							}
+							*/
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -543,6 +564,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							// Handle different menu items differently.
 							if (selectedMenu.text() === "rename") {
+
+								// Save original.
+								m_strOriginalName = propertyClicked.name;
 
 								// Show rename dialog.
 								var exceptionRet = m_functionRenameDialogHelper("property",
@@ -746,6 +770,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 					var m_iActiveIndex = -1;
 					// Active collection of members.
 					var m_arrayActive = null;
+					// Original name about to be renamed.
+					var m_strOriginalName = "";
 				} catch (e) {
 
 					errorHelper.show(e);

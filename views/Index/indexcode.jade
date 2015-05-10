@@ -6,10 +6,28 @@
 //- Code section is a gzsection.
 .row.gzsection#code
 
+  script
+    | function functionBlockChangeListener() {
+    | 
+    |   if (code) {
+    | 
+    |     return code.blocklyChangeListener();
+    |   }
+    |   return null;
+    | }
+    | function functionBlockFrameLoaded() {
+    | 
+    |   if (code) {
+    | 
+    |     return code;
+    |   }
+    |   return null;
+    | }
+
   //- First the Blockly frame.
   .row
     .col-xs-12
-      iframe#BlocklyIFrame(src='./frameworks/blockly/blocklyframe.html')
+      iframe#BlocklyIFrame
 
   //- Next the solution explorer.
   .row
