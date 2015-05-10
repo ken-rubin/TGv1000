@@ -19,7 +19,7 @@ define(["Core/errorHelper"],
 
 					////////////////////////////////
 					// Pulbic fields.
-
+ 
 					// Blockly schema as defined by the types loaded from the comic.
 					self.schema = {};
 					// Blockly Blocks defined by the types.

@@ -514,11 +514,16 @@ $(document).ready(function () {
             Schema.Types = code.schema.Types;
             for (var strKey in code.blocks) {
 
-                Blockly.Blocks[strKey] = code.blocks[strKey];
+                var strLocalKey = strKey;
+                var functionF = function (str) {
+
+                    return function () { this.appendDummyInput().appendField(str); };
+                };
+                Blockly.Blocks[strKey] = { init: functionF(strLocalKey) }; //code.blocks[strKey];
             }
             for (var strKey in code.javaScript) {
 
-                Blockly.JavaScript[strKey] = code.javaScript[strKey];
+                Blockly.JavaScript[strKey] = function() { return ""; } ; //code.javaScript[strKey];
             }
             Workspace = code.workspace;
         }

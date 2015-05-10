@@ -147,6 +147,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								resourceHelper.toURL(self.data.resourceId) + 
 								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 							m_jType.append(jTypeImage);
+							jTypeImage.contextMenu({
+
+								menuSelector: "#TypeImageContextMenu",
+								menuSelected: m_functionTypeImageContextMenu
+							});
 
 							/////////////////////////
 							// Properties.
@@ -488,6 +493,57 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 						} catch (e) {
 
 							errorHelper.show(e);
+						}
+					};
+
+					// Invoked when a type image is right-clicked.
+					var m_functionTypeImageContextMenu = function (invokedOn, selectedMenu) {
+
+						try {
+
+							// Handle different menu items differently.
+							if (selectedMenu.text() === "change...") {
+
+								// Show rename dialog.
+								var exceptionRet = m_functionImageDialogHelper();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					// Invoked to set a new image for the type.
+					var m_functionImageDialogHelper = function () {
+
+						try {
+
+							// Ask client to show the image/sound dialog in image mode.
+							var exceptionRet = client.showImageSoundDialog(true,
+								m_functionOnGotResourceId);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					// 
+					var m_functionOnGotResourceId = function (iResourceId) {
+
+						try {
+
+
+						} catch (e) {
+
+
 						}
 					};
 
