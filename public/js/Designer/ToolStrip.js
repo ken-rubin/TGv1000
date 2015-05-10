@@ -75,6 +75,14 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 							// Also add to the collection of comics.
 							m_arrayTools.push(toolNew);
 
+							// Wire up the dragability of the tool.
+		                    jItem.draggable({
+
+		                        helper: "clone",
+		                        appendTo: $(document.body),
+		                        zIndex: 100000
+		                    });
+
 							return null;
 						} catch (e) {
 

@@ -1,5 +1,5 @@
 When create property, method or event, first 
-	show dialog asking for specific information.
+	show dialog asking for specific information (rather than make the user right-click and edit).
 
 Set image for type.
 
@@ -9,3 +9,4 @@ Change property to just be a name--no code associated.
 
 Change event to just be a name and a method name--no code either.
 
+Designer....

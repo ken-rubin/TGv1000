@@ -60,12 +60,24 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.generateDOM = function () {
 
 						m_jTool = $("<img class='toolstripitem' id='" + 
-							self.type.data.name + 
+							m_functionRemoveSpaces(self.type.data.name) + 
 							"' src='" +
 						 	resourceHelper.toURL(self.type.data.resourceId) + 
-						 	"'></img>");
+						 	"' data-resourceid='" +
+						 	self.type.data.resourceId+ 
+						 	"' data-type='" + 
+						 	self.type.data.name + "' style='width:55px;'></img>");
 
 						return m_jTool;
+					};
+
+					///////////////////////////////////////
+					// Private methods.
+
+					// Helper method removes spaces from input.
+					var m_functionRemoveSpaces = function (strPossiblyWithSpaces) {
+
+						return strPossiblyWithSpaces.replace(/ /g, '');
 					};
 
 					///////////////////////////////////////
