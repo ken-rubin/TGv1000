@@ -1,0 +1,39 @@
+//- Jade DOM for the imageSound dialog. 
+//-
+//- Dialog displays:
+//-   buttons: load and search.
+//-  It also contains a string for the user to enter search terms
+//-  and a strip for displaying the results of a search.
+//-
+
+//- All in a well--should be panel?
+.well
+  .row
+    .col-xs-9
+      h4 Please choose to load a New resource or Search for an existing one by entering search tags and clicking the Search button below.
+      br
+  .row
+
+    //- 2 buttons in a row => xs-3.
+    .col-xs-3
+      button.btn.NewButton#NewButton
+        h3
+          | New
+        h2
+          span.glyphicon.glyphicon-plus-sign
+        | Create new.  Select to create a new type from scratch.
+
+    .col-xs-9
+      .row
+        | Type in your search tags.  We'll try to find the type for which you're searching.
+        br
+        .row
+          br
+          .col-xs-2
+            label.control-label(for="SearchInput") Search string
+          .col-xs-6
+            input.form-control#SearchInput(type="text", placeholder="type your search tags here")
+          .col-xs-4
+            button.btn.btn-info#InnerSearchButton Search
+        br
+        .well#SearchWell
