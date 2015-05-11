@@ -19,6 +19,7 @@
     | 
     |   if (code) {
     | 
+    |     if (code.BlocklyIFrame_OnLoad) { code.BlocklyIFrame_OnLoad(); code.BlocklyIFrame_OnLoad = null; }
     |     return code;
     |   }
     |   return null;

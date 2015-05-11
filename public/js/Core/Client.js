@@ -42,6 +42,21 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 						}
 					};
 
+					// Start off the client.
+					self.debug = function () {
+
+						try {
+
+							// 
+							alert($("#BlocklyIFrame")[0].contentWindow.getMethodString());
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Open popup--map callbacks to private functions.
 					self.showProjectsDialog = function () {
 

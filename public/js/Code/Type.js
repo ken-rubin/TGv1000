@@ -585,17 +585,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 						try {
 
-							/* Get the type clicked.
-							var jPropertyClicked = $(this);
-
-							// Call unified click handler.
-							var exceptionRet = m_functionSelect(self.data.properties,
-								jPropertyClicked);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-							*/
+							// Take no action.
 						} catch (e) {
 
 							errorHelper.show(e);

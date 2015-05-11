@@ -30,6 +30,9 @@ define(["Core/errorHelper"],
 					// Current workspace or null.
 					self.workspace = null;
 
+					// Callback invoked (if set) when the blockly frame is loaded or re-loaded.
+					BlocklyIFrame_OnLoad = null;
+
 					////////////////////////////////
 					// Pulbic methods.
 
@@ -140,8 +143,6 @@ define(["Core/errorHelper"],
 								}
 							});
 
-							// Point the blocky frame at its destination.
-							$("#BlocklyIFrame")[0].src = "./frameworks/blockly/blocklyframe.html";
 							return null;
 						} catch (e) {
 
@@ -154,10 +155,35 @@ define(["Core/errorHelper"],
 
 						try {
 
-							// Load the specified code DOM string into the blockly frame.
-							$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString(strCodeDOM);
-
+							// Save off workspace string.
 							self.workspace = strCodeDOM;
+
+							// Define a function which is invoked either immediately, or when the page loads.
+							var functionLoad = function () {
+
+								try {
+
+									// Load the specified code DOM string into the blockly frame.
+									$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString(self.workspace);
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							};
+
+							// First time, point the frame at the blockly page.
+							if (!m_bLoaded) {
+
+								// Set the callback.
+								self.BlocklyIFrame_OnLoad = functionLoad;
+
+								// Load up blockly.
+								$("#BlocklyIFrame")[0].src = "./frameworks/blockly/blocklyframe.html";
+								m_bLoaded = true;
+							} else {
+
+								functionLoad();
+							}
 
 							return null;
 						} catch (e) {
@@ -171,18 +197,6 @@ define(["Core/errorHelper"],
 
 						// Save the specified code DOM string into the blockly frame.
 						return $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
-					};
-
-					// Save code from frame.
-					self.setWorkspace = function (strWorkspace) {
-
-						self.workspace = strWorkspace;
-					};
-
-					// Sets the workspace string in the blockly frame.
-					self.setWorkspaceStringInBlocklyFrame = function () {
-
-						$("#BlocklyIFrame")[0].contentWindow.getWorkspaceString(self.workspace);
 					};
 
 					// Method invoked when the blockly frame content changes.
@@ -210,6 +224,61 @@ define(["Core/errorHelper"],
 					///////////////////////////////////////
 					// Private methods.
 
+					// Helper method generates the function string for a "new" type function.
+					var m_functionGenerateBlocksTypeNewFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('new_"+strName+"');" +
+							"this.setColour(10);" +
+							"this.setOutput(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('Allocate new type instance.');";
+					};
+
+					// Helper method generates the javascript string for a property get function.
+					var m_functionGenerateJavaScriptTypeNewFunctionString = function (strName) {
+
+						return 'return [" new ' + strName + '() ", Blockly.JavaScript.ORDER_MEMBER];';
+					};
+
+					// Helper method generates the function string for a property get function.
+					var m_functionGenerateBlocksPropertyGetFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('SELF').appendField('self');" +
+							"this.setColour(20);" +
+							"this.setOutput(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a property get function.
+					var m_functionGenerateJavaScriptPropertyGetFunctionString = function (strName) {
+
+						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+            				'return [" " + strId + "[\'' + strName + '\'] ", Blockly.JavaScript.ORDER_MEMBER];';
+					};
+
+					// Helper method generates the function string for a property set function.
+					var m_functionGenerateBlocksPropertySetFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('SELF').appendField('self');" +
+							"this.appendValueInput('VALUE').appendField('value');" +
+							"this.setColour(30);" +
+							"this.setPreviousStatement(true);" +
+							"this.setNextStatement(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a property set function.
+					var m_functionGenerateJavaScriptPropertySetFunctionString = function (strName) {
+
+						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'var strValue = Blockly.JavaScript.valueToCode(block, "VALUE",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
+					};
+
 					// Helper method adds a type's new_ constructor function.
 					var m_functionAdd_Type_New = function (type) {
 
@@ -217,25 +286,12 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							self.blocks["new_" + type.data.name] = {
 
-						        init: function() {
-
-						            this.appendDummyInput()
-						                .appendField("new_" + type.data.name);
-						            this.setColour(10);
-						            this.setOutput(true);
-						            this.setInputsInline(true);
-						           this.setTooltip("Allocate new type instance.");
-						        }
-						    };
+							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript["new_" + type.data.name] = function() {
-
-						        return [" new " + type.data.name + "() ", 1];	// 1 --> ORDER_MEMBER
-						    };
+							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
 
 							////////////////////////
 							// Schema.
@@ -268,36 +324,11 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strGetName = type.data.name + "_get" + property.name;
-							self.blocks[strGetName] = {
-
-						        init: function() {
-
-						            this.appendDummyInput()
-						                .appendField(strGetName);
-						            this.appendValueInput("SELF")
-              							.appendField("self");
-						            this.setColour(20);
-						            this.setOutput(true);
-						            this.setInputsInline(true);
-						           this.setTooltip(strGetName);
-						        }
-						    };
+							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strGetName] = function(block) {
-
-								var blockly = m_ifBlockly.contentWindow.Blockly;
-						        var strId = blockly.JavaScript.valueToCode(block, 
-						        	"SELF", 
-						        	blockly.JavaScript.ORDER_ADDITION) || "";
-						        return [" " + 
-							        	strId + 
-							        	"['" + 
-							        	property.name + 
-							        	"'] ", 
-						        	blockly.JavaScript.ORDER_MEMBER];
-						    };
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
 
 							////////////////////////
 							// Schema.
@@ -318,43 +349,11 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strSetName = type.data.name + "_set" + property.name;
-							self.blocks[strSetName] = {
-
-						        init: function() {
-
-						            this.appendDummyInput()
-						                .appendField(strSetName);
-						            this.appendValueInput("SELF")
-              							.appendField("self");
-						            this.appendValueInput("VALUE")
-              							.appendField("value");
-						            this.setColour(30);
-						            this.setPreviousStatement(true);
-						            this.setNextStatement(true);
-						            this.setInputsInline(true);
-						           this.setTooltip(strSetName);
-						        }
-						    };
+							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSetName] = function(block) {
-
-								var blockly = m_ifBlockly.contentWindow.Blockly;
-						        var strId = blockly.JavaScript.valueToCode(block, 
-						        	"SELF", 
-						        	blockly.JavaScript.ORDER_ADDITION) || "";
-						        var strValue = blockly.JavaScript.valueToCode(block, 
-						        	"VALUE", 
-						        	blockly.JavaScript.ORDER_ADDITION) || "";
-						        return " " + 
-							        	strId + 
-							        	"['" + 
-							        	property.name + 
-							        	"'] = " + 
-							        	strValue + 
-							        	"; ";
-						    };
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
 
 							////////////////////////
 							// Schema.
@@ -387,13 +386,13 @@ define(["Core/errorHelper"],
 							// Blocks.
 							var strOriginalName = type.data.name + "_get" + strOriginal;
 							var strGetName = type.data.name + "_get" + property.name;
-							self.blocks[strGetName] = self.blocks[strOriginalName];
 							delete self.blocks[strOriginalName];
+							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strGetName] = self.javaScript[strOriginalName];
 							delete self.javaScript[strOriginalName];
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
 
 							////////////////////////
 							// Schema.
@@ -415,13 +414,13 @@ define(["Core/errorHelper"],
 							// Blocks.
 							var strOriginalSetName = type.data.name + "_set" + strOriginal;
 							var strSetName = type.data.name + "_set" + property.name;
-							self.blocks[strSetName] = self.blocks[strOriginalSetName];
 							delete self.blocks[strOriginalSetName];
+							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSetName] = self.javaScript[strOriginalSetName];
 							delete self.javaScript[strOriginalSetName];
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
 
 							////////////////////////
 							// Schema.
@@ -448,6 +447,8 @@ define(["Core/errorHelper"],
 					var m_ifBlockly = null;
 					// Indicates there is something to save.
 					var m_bDirty = false;
+					// Indicates load has been called on this instance.
+					var m_bLoaded = false;
 				} catch (e) {
 
 					errorHelper.show(e);
