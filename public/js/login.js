@@ -5,6 +5,7 @@
 //
 
 // Define some app-globals.
+var clientL = null;
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
@@ -12,10 +13,32 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper"], 
-			function (errorHelper) {
+		require(["Core/errorHelper", "Core/ClientL"], 
+			function (errorHelper, ClientL) {
 
 				try {
+
+					// Allocate and initialize the client.
+					clientL = new ClientL();
+					var exceptionRet = clientL.create(/*iUserId -- eventually from server specified cookie*/);
+					if (exceptionRet) {
+
+						throw exceptionRet;
+					}
+
+	                // Wire up the enroll button
+	                $("#enrollBtn").click(function () {
+	                    
+	                    m_functionEnrollButtonClick(errorHelper);
+
+	                });
+
+	                // Wire up the model button
+	                $("#modelBtn").click(function () {
+	                    
+	                    m_functionModelButtonClick(errorHelper);
+
+	                });
 
 	                // Get the signed in user id from a cookie.
 	                var strUserName = getTGCookie("userName");
@@ -94,21 +117,9 @@ $(document).ready(function () {
 	                    // }
 	                });
 
-	                // Wire up the enroll button
-	                $("#enrollBtn").click(function () {
-	                    
-	                    m_functionEnrollButtonClick(errorHelper);
-
-	                });
-
-	                // Wire up the model button
-	                $("#modelBtn").click(function () {
-	                    
-	                    m_functionModelButtonClick(errorHelper);
-
-	                });
 					// Cause the code and designer panels to size themselves.
 					$(window).resize();
+
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -136,7 +147,7 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	try {
 
 		// Ask client to show the enroll dialog.
-		var exceptionRet = client.showEnrollDialog(m_functionOnGotNewEnrollee);
+		var exceptionRet = clientL.showEnrollDialog(m_functionOnGotNewEnrollee);
 		if (exceptionRet) {
 
 			throw exceptionRet;
@@ -147,11 +158,21 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	}
 }
 
+var m_functionOnGotNewEnrollee = function(userName, password) {
+
+	try {
+
+	} catch (e) {
+
+		errorHelper.show(e.message);
+	}
+}
+
 var m_functionModelButtonClick = function(errorHelper) {
 	
 	try {
 
-		var exceptionRet = client.showModelDialog(m_functionOnCloseModelDialog);
+		var exceptionRet = clientL.showModelDialog(m_functionOnCloseModelDialog);
 		if (exceptionRet) {
 
 			throw exceptionRet;
@@ -166,7 +187,7 @@ var m_functionOnCloseModelDialog = function() {
 
 	try {
 
-		client.closeModelDialog();
+		clientL.closeModelDialog();
 
 	} catch (e) {
 
