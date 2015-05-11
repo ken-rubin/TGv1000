@@ -5,8 +5,20 @@
 //
 
 // Define module and require dependencies.
-define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/TypesDialog/TypesDialog", "Dialogs/ImageSoundDialog/ImageSoundDialog", "Core/Project"],
-	function (errorHelper, ProjectsDialog, TypesDialog, ImageSoundDialog, Project) {
+define(["Core/errorHelper", 
+		"Dialogs/ProjectsDialog/ProjectsDialog", 
+		"Dialogs/TypesDialog/TypesDialog", 
+		"Dialogs/ImageSoundDialog/ImageSoundDialog", 
+		"Dialogs/EnrollDialog/EnrollDialog", 
+		"Dialogs/ModelDialog/ModelDialog", 
+		"Core/Project"],
+	function (errorHelper, 
+				ProjectsDialog, 
+				TypesDialog, 
+				ImageSoundDialog, 
+				EnrollDialog,
+				ModelDialog,
+				Project) {
 
 		try {
 
@@ -79,6 +91,43 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 						}
 					};
 
+					// The ModalDialog exists to copy from.
+					self.showModelDialog = function () {
+
+						try {
+
+							m_modelDialog = new ModelDialog();
+							var exceptionRet = m_modelDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					self.closeModelDialog = function () {
+
+						try {
+
+							var exceptionRet = m_modelDialog.close();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							m_modelDialog = null;
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					// Open popup--map callbacks to private functions.
 					self.showTypesDialog = function (functionNewType, functionCloneType) {
 
@@ -87,6 +136,25 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 							var td = new TypesDialog();
 							var exceptionRet = td.create(functionNewType,
 								functionCloneType);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Open popup--map callbacks to private functions.
+					self.showEnrollDialog = function (functionOK) {
+
+						try {
+
+							var td = new EnrollDialog();
+							var exceptionRet = td.create(functionOK);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -201,6 +269,7 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 
 					// The current project.
 					var m_project = null;
+					var m_modelDialog = null;
 				} catch (e) {
 
 					errorHelper.show(e);

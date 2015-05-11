@@ -49,6 +49,24 @@ begin
     
     end if;
 
+    if @dbstate = 1.0 THEN
+        
+--		UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
+    
+    end if;
+
+    if @dbstate = 2.0 THEN
+        
+--		UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
+    
+    end if;
+
+    if @dbstate = 3.0 THEN
+        
+--		UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
+    
+    end if;
+
 end;
 
 //

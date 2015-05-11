@@ -94,6 +94,19 @@ $(document).ready(function () {
 	                    // }
 	                });
 
+	                // Wire up the enroll button
+	                $("#enrollBtn").click(function () {
+	                    
+	                    m_functionEnrollButtonClick(errorHelper);
+
+	                });
+
+	                // Wire up the model button
+	                $("#modelBtn").click(function () {
+	                    
+	                    m_functionModelButtonClick(errorHelper);
+
+	                });
 					// Cause the code and designer panels to size themselves.
 					$(window).resize();
 				} catch (e) {
@@ -117,6 +130,49 @@ function getTGCookie (name) {
         return parts.pop().split(";").shift();
     }
 };
+
+var m_functionEnrollButtonClick = function(errorHelper) {
+	
+	try {
+
+		// Ask client to show the enroll dialog.
+		var exceptionRet = client.showEnrollDialog(m_functionOnGotNewEnrollee);
+		if (exceptionRet) {
+
+			throw exceptionRet;
+		}
+	} catch (e) {
+
+    	errorHelper.show(e.message);
+	}
+}
+
+var m_functionModelButtonClick = function(errorHelper) {
+	
+	try {
+
+		var exceptionRet = client.showModelDialog(m_functionOnCloseModelDialog);
+		if (exceptionRet) {
+
+			throw exceptionRet;
+		}
+	} catch (e) {
+
+    	errorHelper.show(e.message);
+	}
+}
+
+var m_functionOnCloseModelDialog = function() {
+
+	try {
+
+		client.closeModelDialog();
+
+	} catch (e) {
+
+    	errorHelper.show(e.message);
+	}
+}
 
 var m_functionSignInButtonClick = function(errorHelper) {
 
