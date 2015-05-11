@@ -52,6 +52,23 @@ define(["Core/errorHelper"],
 								}
 							});
 
+							// Wire debug button click.
+							$("#DebugButton").click(function () {
+
+								try {
+
+									// Let client handle this.
+									var exceptionRet = client.debug();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
 							return null;
 						} catch (e) {
 

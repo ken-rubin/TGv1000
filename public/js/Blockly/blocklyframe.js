@@ -87,6 +87,12 @@ function Create() {
               toolbox: document.getElementById("toolbox")
             });
 
+        // Set the workspace if something to set.
+        if (Workspace) {
+
+            setWorkspaceString(Workspace);
+        }
+
         // Have to re-specify this change listener (probably 
         // becaue it is injected into the DOM as an attribute).
         Blockly.mainWorkspace.addChangeListener(function () {
@@ -115,15 +121,20 @@ function Create() {
 // Sets the structure.
 function setWorkspaceString(strData) {
 
-    // Set the new environment.
-    Blockly.mainWorkspace.clear();
-
+    // Save off.
     Workspace = strData;
-    if (strData) {
 
-      var xml = Blockly.Xml.textToDom(strData);
-      Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, 
-        xml);
+    // Set in environment.
+    if (Blockly.mainWorkspace) {
+
+        Blockly.mainWorkspace.clear();
+
+        if (strData) {
+
+          var xml = Blockly.Xml.textToDom(strData);
+          Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, 
+            xml);
+        }
     }
 };
 
@@ -514,16 +525,11 @@ $(document).ready(function () {
             Schema.Types = code.schema.Types;
             for (var strKey in code.blocks) {
 
-                var strLocalKey = strKey;
-                var functionF = function (str) {
-
-                    return function () { this.appendDummyInput().appendField(str); };
-                };
-                Blockly.Blocks[strKey] = { init: functionF(strLocalKey) }; //code.blocks[strKey];
+                Blockly.Blocks[strKey] = { init: new Function(code.blocks[strKey]) };
             }
             for (var strKey in code.javaScript) {
 
-                Blockly.JavaScript[strKey] = function() { return ""; } ; //code.javaScript[strKey];
+                Blockly.JavaScript[strKey] = new Function("block", code.javaScript[strKey]);
             }
             Workspace = code.workspace;
         }
