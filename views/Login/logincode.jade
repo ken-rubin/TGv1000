@@ -4,6 +4,10 @@
 
 //- Code section is a gzsection.
 .row.gzsection#code
+  div.pull-left
+        a#enrollBtn.btn.btn-primary.btn-sm(tabindex='5') Enroll
+        | &nbsp;&nbsp;&nbsp;
+        a#modelBtn.btn.btn-primary.btn-sm(tabindex='6') Model
   div.pull-right
         input#inputName(type='text', placeholder='Enter your name', tabindex='1', style="color:blue; font-family:Verdana; background-color:aliceblue;")
         | &nbsp;&nbsp;&nbsp;
@@ -11,4 +15,4 @@
         | &nbsp;&nbsp;&nbsp;
         a#signinBtn.btn.btn-primary.btn-sm(tabindex='3') Sign in
         | &nbsp;&nbsp;&nbsp;
-        a#forgotLink(tabindex='4') I forgot my password
+        a#forgotLink.label(tabindex='4') I forgot my password

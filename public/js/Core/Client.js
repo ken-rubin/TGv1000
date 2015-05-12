@@ -5,8 +5,16 @@
 //
 
 // Define module and require dependencies.
-define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/TypesDialog/TypesDialog", "Core/Project"],
-	function (errorHelper, ProjectsDialog, TypesDialog, Project) {
+define(["Core/errorHelper", 
+		"Dialogs/ProjectsDialog/ProjectsDialog", 
+		"Dialogs/TypesDialog/TypesDialog", 
+		"Dialogs/ImageSoundDialog/ImageSoundDialog", 
+		"Core/Project"],
+	function (errorHelper, 
+				ProjectsDialog, 
+				TypesDialog, 
+				ImageSoundDialog, 
+				Project) {
 
 		try {
 
@@ -201,6 +209,7 @@ define(["Core/errorHelper", "Dialogs/ProjectsDialog/ProjectsDialog", "Dialogs/Ty
 
 					// The current project.
 					var m_project = null;
+
 				} catch (e) {
 
 					errorHelper.show(e);
