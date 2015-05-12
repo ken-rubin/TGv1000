@@ -37,7 +37,7 @@ define(["Core/errorHelper"],
 					// Pulbic methods.
 
 					// Method adds a type to blockly.
-					self.addItem = function (type) {
+					self.addType = function (type) {
 
 						try {
 
@@ -49,11 +49,48 @@ define(["Core/errorHelper"],
 							}
 
 							// Add properties.
-							for (var i = 0; i < type.properties; i++) {
+							for (var i = 0; i < type.data.properties.length; i++) {
 
-								var propertyIth = type.properties[i];
+								var propertyIth = type.data.properties[i];
 								exceptionRet = m_functionAdd_Type_Property(type,
 									propertyIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Method renames a type in blockly.
+					self.renameType = function (type, strOriginalName) {
+
+						try {
+
+							// Rename type.
+							var exceptionRet = m_functionRename_Type_New(type, 
+								strOriginalName);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Rename properties.
+							for (var i = 0; i < type.data.properties.length; i++) {
+
+								var propertyIth = type.data.properties[i];
+								var exceptionRet = m_functionRename_Type_Property(type,
+									propertyIth,
+									propertyIth.name, 
+									strOriginalName);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -129,11 +166,13 @@ define(["Core/errorHelper"],
 
 									var iViewportHeight = $(window).height();
 
+									var iTitleHeight = $("#titlerow").height();
 									var iProjectItemHeight = $("#typestriprow").height();
 									var iNavbarHeight = $(".navbar").height();
 									var iBordersAndSpacingPadding = 48;
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
+										iTitleHeight -
 										iProjectItemHeight -
 										iNavbarHeight -
 										iBordersAndSpacingPadding);
@@ -151,9 +190,14 @@ define(["Core/errorHelper"],
 					};
 
 					// Load code into frame.
-					self.load = function (strCodeDOM) {
+					self.load = function (type,
+						method,
+						strCodeDOM) {
 
 						try {
+
+							// Set the title.
+							$("#titlediv").text(type.data.name + " :: " + method.name);
 
 							// Save off workspace string.
 							self.workspace = strCodeDOM;
@@ -301,6 +345,59 @@ define(["Core/errorHelper"],
 							}
 							var objectTypes = self.schema.Types;
 							var typeNew = { };
+							typeNew["new_" + type.data.name] = true;
+							objectTypes[type.data.name] = typeNew;
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method renames a type's new_ constructor function.
+					var m_functionRename_Type_New = function (type, strOriginalName) {
+
+						try {
+
+							////////////////////////
+							// Blocks.
+
+							delete self.blocks["new_" + strOriginalName];
+							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
+
+							////////////////////////
+							// JavaScript.
+							delete self.javaScript["new_" + strOriginalName];
+							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
+
+							////////////////////////
+							// Workspace.
+							if (self.workspace) {
+
+								var re = new RegExp("new_" + strOriginalName,"g");
+								self.workspace = self.workspace.replace(re,
+									"new_" + type.data.name);
+							}
+
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
+
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+
+							// Bet the type.
+							var typeNew = objectTypes[type.data.name];
+
+							// Remove the old name.
+							delete objectTypes[strOriginalName];
+
+							if (!typeNew) {
+
+								typeNew = {};
+							}
 							typeNew["new_" + type.data.name] = true
 							objectTypes[type.data.name] = typeNew;
 
@@ -373,10 +470,14 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method renames a type's property accessor functions.
-					var m_functionRename_Type_Property = function (type, property, strOriginal) {
+					var m_functionRename_Type_Property = function (type, property, strOriginal, strOriginalTypeName) {
 
 						try {
 
+							if (!strOriginalTypeName) {
+
+								strOriginalTypeName = type.data.name;
+							}
 							////////////////////////
 							////////////////////////
 							////////////////////////
@@ -384,7 +485,7 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strOriginalName = type.data.name + "_get" + strOriginal;
+							var strOriginalName = strOriginalTypeName + "_get" + strOriginal;
 							var strGetName = type.data.name + "_get" + property.name;
 							delete self.blocks[strOriginalName];
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
@@ -393,6 +494,15 @@ define(["Core/errorHelper"],
 							// JavaScript.
 							delete self.javaScript[strOriginalName];
 							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+
+							////////////////////////
+							// Workspace.
+							if (self.workspace) {
+
+								var re = new RegExp(strOriginalName,"g");
+								self.workspace = self.workspace.replace(re,
+									strGetName);
+							}
 
 							////////////////////////
 							// Schema.
@@ -412,7 +522,7 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strOriginalSetName = type.data.name + "_set" + strOriginal;
+							var strOriginalSetName = strOriginalTypeName + "_set" + strOriginal;
 							var strSetName = type.data.name + "_set" + property.name;
 							delete self.blocks[strOriginalSetName];
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
@@ -421,6 +531,15 @@ define(["Core/errorHelper"],
 							// JavaScript.
 							delete self.javaScript[strOriginalSetName];
 							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+
+							////////////////////////
+							// Workspace.
+							if (self.workspace) {
+
+								var re = new RegExp(strOriginalSetName,"g");
+								self.workspace = self.workspace.replace(re,
+									strSetName);
+							}
 
 							////////////////////////
 							// Schema.

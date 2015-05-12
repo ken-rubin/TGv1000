@@ -154,7 +154,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							m_arrayTypes.push(type);
 
 							// Also add to code.
-							return code.addItem(type);
+							return code.addType(type);
 						} catch (e) {
 
 							return e;

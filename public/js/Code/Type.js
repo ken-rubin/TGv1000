@@ -346,7 +346,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 							}
 
 							// Load workspace string into blockly frame.
-							return code.load(m_arrayActive[m_iActiveIndex].workspace);
+							return code.load(self,
+								m_arrayActive[m_iActiveIndex],
+								m_arrayActive[m_iActiveIndex].workspace);
 						} catch (e) {
 
 							return e;
@@ -357,6 +359,18 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 					var m_functionDeleteDialogHelper = function (strType, arrayCollection, iIndex, objectMember) {
 
 						try {
+
+							// Ask
+
+
+
+
+
+
+
+
+
+							
 
 							BootstrapDialog.confirm({
 
@@ -453,6 +467,15 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 												throw exceptionRet;
 											}
+										} else if (strType === "type") {
+
+											// Update code module.
+											exceptionRet = code.renameType(self,
+												m_strOriginalName);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
 										}
 							        }
 							    }
@@ -470,6 +493,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							// Handle different menu items differently.
 							if (selectedMenu.text() === "rename") {
+
+								// Save off original name.
+								m_strOriginalName = self.data.name;
 
 								// Show rename dialog.
 								var exceptionRet = m_functionRenameDialogHelper("type",
@@ -698,6 +724,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 							// Handle different menu items differently.
 							if (selectedMenu.text() === "rename") {
 
+								// Save off original name.
+								m_strOriginalName = methodClicked.name;
+
 								// Show rename dialog.
 								var exceptionRet = m_functionRenameDialogHelper("method",
 									methodClicked);
@@ -781,6 +810,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							// Handle different menu items differently.
 							if (selectedMenu.text() === "rename") {
+
+								// Save off original name.
+								m_strOriginalName = eventClicked.name;
 
 								// Show rename dialog.
 								var exceptionRet = m_functionRenameDialogHelper("event",
