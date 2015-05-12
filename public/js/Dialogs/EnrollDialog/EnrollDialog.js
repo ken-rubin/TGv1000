@@ -24,22 +24,19 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Pass user id,
 					// New callback -- void.
 					// Clone callback -- takes strId.
-					self.create = function(callbackNew,
-						callbackClone) {
+					self.create = function(callbackNewEnrollee) {
 
 						try {
 
-							// Save user id in private field.
-							m_callbackNew = callbackNew;
-							m_callbackClone = callbackClone;
+							m_callbackNewEnrollee = callbackNewEnrollee;
 
 							// Show the dialog--load the content from 
 							// the EnrollDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Types",
+								title: "Enroll",
 								size: BootstrapDialog.SIZE_WIDE,
-					            message: $("<div></div>").load("/EnrollDialog"),
+					            message: $("<div></div>").load("/enrollDialog"),
 					            buttons: [{
 
 					                label: "Close",
@@ -82,28 +79,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Expose clone event.
-					// Takes the id of the Type to clone.
-					self.clone = function (strId) {
-
-						try {
-
-							// Dismiss the dialog.
-					        m_dialog.close();
-
-					        // Call the callback.
-					        if ($.isFunction(m_callbackClone)) {
-
-					        	return m_callbackClone(strId);
-					        }
-
-					        return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					//////////////////////////////////
 					// Private functions.
 
@@ -124,56 +99,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Invoked when the request to get the open button snippet returns.
-					var m_functionInnerSearchSnippetResponse = function (htmlData) {
-
-						try {
-
-							var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
-								htmlData,
-								"#SearchWell",
-								"#EnrollDialogInnerSearchSnippet");
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch (e) {
-
-							errorHelper.show(e.message);
-						}
-					};
-
-					// Invoked when a Type item is clicked.
-					var m_functionInnerSearchButtonClick = function () {
-
-						try {
-
-							// Get the string from the search input.
-							var strSearchString = $("#SearchInput").val();
-
-							// Get the search results.
-							$.ajax({
-
-								cache: false,
-								data: {
-
-									templateFile: "Dialogs/EnrollDialog/EnrollDialogInnerSearchSnippet",
-									businessObject: {
-
-										module: "GUI/Dialogs/EnrollDialog/EnrollDialogInnerSearchSnippet",
-										method: "process"
-									}
-								},
-								dataType: "HTML",
-								method: "POST",
-								url: "/renderJadeSnippet"
-							}).done(m_functionInnerSearchSnippetResponse).error(errorHelper.show);
-						} catch (e) {
-
-							errorHelper.show(e.message);
-						}
-					};
-
 					// Wire up event handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {
 
@@ -184,7 +109,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Wire click events.
 							$("#NewButton").click(m_functionNewButtonClick);
-							$("#InnerSearchButton").click(m_functionInnerSearchButtonClick);
+
 						} catch (e) {
 
 							errorHelper.show(e.message);
@@ -201,13 +126,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				// Invoked when the dialog is dismissed for a new Type.
-				var m_callbackNew = null;
-				// Invoked when the dialog is dismissed for a clone Type.
-				var m_callbackClone = null;
+				var m_callbackNewEnrollee = null;
 			};
 
 			// Return the constructor function as the module object.
 			return functionEnrollDialog;
+
 		} catch (e) {
 
 			errorHelper.show(e.message);

@@ -261,8 +261,6 @@ app.use(multer({ dest: './uploads/',
     }
 }));
 
-
-
 ////////////////////////////////////
 app.set("portnum",80);
 console.log('Server will be listening on port ' + app.get("portnum") + ".");
@@ -270,40 +268,39 @@ console.log('Server will be listening on port ' + app.get("portnum") + ".");
 /////////////////////////////////////
 console.log("Setting up routes from database.");
 var moduleInstances = {};
-sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
+sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order by id asc;",
     function(rows){
 
         var moduleInstance = null;
+        console.log('Setting up ' + rows.length + ' routes.')
 
         for (var i = 0; i < rows.length; i++) {
 
             var rowi = rows[i];
-            if (rowi.inuse) {
 
-                try {
+            try {
 
-                    if (moduleInstances.hasOwnProperty(rowi.moduleName)) {
+                if (moduleInstances.hasOwnProperty(rowi.moduleName)) {
 
-                        moduleInstance = moduleInstances[rowi.moduleName];
+                    moduleInstance = moduleInstances[rowi.moduleName];
 
-                    } else {
+                } else {
 
-                        var mod = require(rowi.path + rowi.moduleName);
-                        moduleInstance = new mod(app, sql, logger);
-                        moduleInstances[rowi.moduleName] = moduleInstance;
-                    }
-
-                    var methodInstance = moduleInstance[rowi.method];
-                    app[rowi.verb](rowi.route, methodInstance);
-
-                } catch (e) {
-
-                    console.log(' ');
-                    console.log('*************** ERROR ****************');
-                    console.log('Error setting up route for ' + rowi.route + '; skipping it.');
-                    console.log('*************** ERROR ****************');
-                    console.log(' ');
+                    var mod = require(rowi.path + rowi.moduleName);
+                    moduleInstance = new mod(app, sql, logger);
+                    moduleInstances[rowi.moduleName] = moduleInstance;
                 }
+
+                var methodInstance = moduleInstance[rowi.method];
+                app[rowi.verb](rowi.route, methodInstance);
+
+            } catch (e) {
+
+                console.log(' ');
+                console.log('*************** ERROR ****************');
+                console.log('Error setting up route for ' + rowi.route + '; skipping it.');
+                console.log('*************** ERROR ****************');
+                console.log(' ');
             }
         }
 /*
@@ -343,7 +340,6 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
 */
         app.listen(app.get("portnum"));
         console.log("Listening on port " + app.get("portnum") + ".");
-        //module.exports = app;    
     },
     function(strError) {
 

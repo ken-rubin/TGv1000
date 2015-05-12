@@ -1,5 +1,5 @@
 ///////////////////////////////
-// ClientL module runs client state and manages gui/server interaction during Login view.
+// ClientLogin module runs client state and manages gui/server interaction during Login view.
 //
 // Return constructor function.
 //
@@ -15,7 +15,7 @@ define(["Core/errorHelper",
 		try {
 
 			// Define the client constructor function.
-			var functionConstructor = function ClientL() {
+			var functionConstructor = function ClientLogin() {
 
 				try {
 
@@ -75,24 +75,6 @@ define(["Core/errorHelper",
 							return e;
 						}
 					};
-
-					self.closeModelDialog = function () {
-
-						try {
-
-							var exceptionRet = m_modelDialog.close();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							m_modelDialog = null;
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					}
 
 					// Open popup--map callbacks to private functions.
 					self.showEnrollDialog = function (functionNewEnrollee) {

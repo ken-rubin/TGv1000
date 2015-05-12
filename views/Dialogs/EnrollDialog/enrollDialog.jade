@@ -1,0 +1,39 @@
+//- Jade DOM for the types dialog. 
+//-
+//- Dialog displays 2 buttons: new, open, clone and search.
+//-
+
+//- All in a well--should be panel?
+.well
+  .row
+    .col-xs-12
+      h4 
+        | Take advantage of this limited time offer and enroll in TechGroms completely for free.
+        | Simply enter a user ID for your child
+        | along with your e-mail address and then click enroll.
+      br
+      h4 Your child will be able to log in after your receive an enrollment e-mail with his or her password and then click the link contained therein.
+      br
+
+  .row
+    .col-xs-12
+          br
+          .col-xs-2
+            label.control-label(for="UserId", style="margin-top:6px;") User Id
+          .col-xs-2
+            input.form-control#UserId(type="text", placeholder="like: PaulD")
+          .col-xs-2
+          .col-xs-2
+            label.control-label(for="Email", style="margin-top:6px;") E-mail address
+          .col-xs-4
+            input.form-control#Email(type="text", placeholder="your e-mail address")
+          br
+          br
+          br
+          br
+          .col-xs-2.pull-right
+            button.btn.btn-info#InnerEnrollButton Enroll
+  .row
+    .col-xs-12
+          br
+          .well#EnrollWell

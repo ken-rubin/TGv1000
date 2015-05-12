@@ -14,8 +14,42 @@ module.exports = function ValidateBO(app, sql, logger) {
     // Public methods
     
     // Router handler function.
+    self.routeNewEnrollment = function (req, res) {
+        // req.body.userName
+        // req.body.parentEmail
+
+        try {
+        
+            console.log("Entered routeNewEnrollment with req.body=" + JSON.stringify(req.body));
+
+        } catch (e) {
+
+            res.json({
+                
+                success: false,
+                message: 'Enrollment exception: ' + e.message
+            });
+        }
+    }
+
+    self.routeForgotPassword = function (req, res) {
+        // req.body.userName
+
+        try {
+        
+            console.log("Entered routeForgotPassword with req.body=" + JSON.stringify(req.body));
+
+        } catch (e) {
+
+            res.json({
+                
+                success: false,
+                message: 'Forgot exception: ' + e.message
+            });
+        }
+    }
+
     self.routeUserAuthenticate = function (req, res) {
-    
         // req.body.userName
         // req.body.password
         

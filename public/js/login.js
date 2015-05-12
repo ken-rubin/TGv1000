@@ -5,7 +5,7 @@
 //
 
 // Define some app-globals.
-var clientL = null;
+var clientLogin = null;
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
@@ -13,14 +13,14 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/ClientL"], 
-			function (errorHelper, ClientL) {
+		require(["Core/errorHelper", "Core/ClientLogin"], 
+			function (errorHelper, ClientLogin) {
 
 				try {
 
 					// Allocate and initialize the client.
-					clientL = new ClientL();
-					var exceptionRet = clientL.create(/*iUserId -- eventually from server specified cookie*/);
+					clientLogin = new ClientLogin();
+					var exceptionRet = clientLogin.create(/*iUserId -- eventually from server specified cookie*/);
 					if (exceptionRet) {
 
 						throw exceptionRet;
@@ -147,7 +147,7 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	try {
 
 		// Ask client to show the enroll dialog.
-		var exceptionRet = clientL.showEnrollDialog(m_functionOnGotNewEnrollee);
+		var exceptionRet = clientLogin.showEnrollDialog(m_functionOnGotNewEnrollee);
 		if (exceptionRet) {
 
 			throw exceptionRet;
@@ -172,7 +172,7 @@ var m_functionModelButtonClick = function(errorHelper) {
 	
 	try {
 
-		var exceptionRet = clientL.showModelDialog();
+		var exceptionRet = clientLogin.showModelDialog();
 		if (exceptionRet) {
 
 			throw exceptionRet;
