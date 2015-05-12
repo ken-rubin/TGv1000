@@ -22,6 +22,31 @@ module.exports = function ValidateBO(app, sql, logger) {
         
             console.log("Entered routeNewEnrollment with req.body=" + JSON.stringify(req.body));
 
+            // 1. See if parent exists. If so, grab id. Otherwise, create parent; grab id.
+            // 2. Gen password for user. Hash the password. Create the user. Grab the id as userId.
+            // 3. Return success and userId.
+
+            sql.execute("select id from " + self.dbname + "parent where email='" + req.body.parentEmail + "';",
+                function(rows) {
+
+                    if (rows.length === 0) {
+
+                        // Need to insert parent
+
+                    } else {
+
+                        // parent already existed
+                        
+                    }
+                },
+                function(strError) {
+
+                    res.json({
+                        success: false,
+                        message: "Error gotten retrieving parent from database: " + strError
+                    });
+                }
+            );
         } catch (e) {
 
             res.json({

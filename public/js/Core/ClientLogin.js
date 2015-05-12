@@ -62,8 +62,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							m_modelDialog = new ModelDialog();
-							var exceptionRet = m_modelDialog.create();
+							var td = new ModelDialog();
+							var exceptionRet = td.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -103,7 +103,6 @@ define(["Core/errorHelper",
 					/////////////////////////////////
 					// Private fields.
 
-					var m_modelDialog = null;
 				} catch (e) {
 
 					errorHelper.show(e);
