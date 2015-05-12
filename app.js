@@ -114,6 +114,52 @@ app.get("/imageSoundDialog", function (req, res) {
     }
 });
 
+////////////////////////////////////////////
+console.log("Map enrollDialog route (enrollDialog.jade).");
+app.get("/enrollDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // whereever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/EnrollDialog/enrollDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+////////////////////////////////////////////
+console.log("Map modelDialog route (modelDialog.jade).");
+app.get("/modelDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // whereever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/ModelDialog/modelDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");
 var objectInstantiatedModules = {};

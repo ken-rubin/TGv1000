@@ -21,23 +21,22 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					// Pass user id,
-					// New callback -- void.
-					// Clone callback -- takes strId.
-					self.create = function(callbackNew,
-						callbackClone) {
+					// bImage: true means image; false means sound
+					// functionOK is callback with resourceId as parameter.
+					self.create = function(bImage,
+						functionOK) {
 
 						try {
 
-							// Save user id in private field.
-							m_callbackNew = callbackNew;
-							m_callbackClone = callbackClone;
+							// Save params in private fields.
+							m_bImage = bImage;
+							m_functionOK = functionOK;
 
 							// Show the dialog--load the content from 
 							// the ImageSoundDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Types",
+								title: bImage ? "Image" : "Sound",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $("<div></div>").load("/ImageSoundDialog"),
 					            buttons: [{
@@ -65,7 +64,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-
 							// Dismiss the dialog.
 					        m_dialog.close();
 
@@ -76,6 +74,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					        }
 
 					    	return null;
+					    	
 						} catch (e) {
 
 							return e;
@@ -168,6 +167,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								method: "POST",
 								url: "/renderJadeSnippet"
 							}).done(m_functionInnerSearchSnippetResponse).error(errorHelper.show);
+
 						} catch (e) {
 
 							errorHelper.show(e.message);
@@ -198,16 +198,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				/////////////////////////////////
 				// Private fields.
 
-				// Reference to the dialog object instance.
 				var m_dialog = null;
-				// Invoked when the dialog is dismissed for a new Type.
-				var m_callbackNew = null;
-				// Invoked when the dialog is dismissed for a clone Type.
-				var m_callbackClone = null;
+				var m_bImage = null;
+				var m_functionOK = null;
 			};
 
 			// Return the constructor function as the module object.
 			return functionImageSoundDialog;
+
 		} catch (e) {
 
 			errorHelper.show(e.message);

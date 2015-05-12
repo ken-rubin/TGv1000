@@ -172,23 +172,11 @@ var m_functionModelButtonClick = function(errorHelper) {
 	
 	try {
 
-		var exceptionRet = clientL.showModelDialog(m_functionOnCloseModelDialog);
+		var exceptionRet = clientL.showModelDialog();
 		if (exceptionRet) {
 
 			throw exceptionRet;
 		}
-	} catch (e) {
-
-    	errorHelper.show(e.message);
-	}
-}
-
-var m_functionOnCloseModelDialog = function() {
-
-	try {
-
-		clientL.closeModelDialog();
-
 	} catch (e) {
 
     	errorHelper.show(e.message);
