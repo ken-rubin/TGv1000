@@ -129,6 +129,18 @@ define(["Core/errorHelper",
 						}
 					};
 
+					self.navToAdminzone = function() {
+
+						try {
+
+							location.href = "/adminzone"
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////
 					// Private functions.
 

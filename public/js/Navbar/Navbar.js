@@ -52,6 +52,23 @@ define(["Core/errorHelper"],
 								}
 							});
 
+							// Wire Adminzone button click.
+							$("#AdminzoneButton").click(function () {
+
+								try {
+
+									// Switch to Adminzone.
+									var exceptionRet = client.navToAdminzone();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
 							// Wire debug button click.
 							$("#DebugButton").click(function () {
 

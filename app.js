@@ -238,6 +238,24 @@ app.get("/index", function (req, res) {
 });
 
 /////////////////////////////////////
+console.log("Map main route (adminzone.jade).");
+app.get("/adminzone", function (req, res) {
+
+    try {
+
+        // Render the jade file to the client.
+        res.render("Adminzone/adminzone", { 
+
+            // Pass in jade context property just for the hell of it.
+            title : "TGv1000" 
+        });
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+/////////////////////////////////////
 console.log("Set up SQL module.");
 var SQL = require("./modules/SQL");
 var sql = new SQL(app);
