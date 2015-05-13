@@ -55,9 +55,13 @@ module.exports = function ValidateBO(app, sql, logger) {
                         to: req.body.parentEmail, // list of receivers
                         subject: "TechGroms Registration ✔", // Subject line
                         text: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "\r\n\r\n    We have created a login user for your child. Your child will use the name you entered along with" +
-                        " this password: " + strPassword + " . There will some day be a URL here to click on." +
-                        "\r\n\r\n    Thank you for signing your child up for a class with TechGroms!\r\n\r\n    Warm regards, The Grom Team"
+                        "\r\n\r\nWe have created a login user for your child. Your child will use the name you entered along with" +
+                        " this password: " + strPassword + ". Go to http://localhost to sign in." +
+                        "\r\n\r\nThank you for signing your child up for a class with TechGroms!\r\n\r\nWarm regards, The Grom Team",
+                        html: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
+                        "<br><br>We have created a login user for your child. Your child will use the name you entered along with" +
+                        " this password: " + strPassword + ". Go to <a href='http://localhost'>http://localhost</a> to sign in." +
+                        "<br><br>Thank you for signing your child up for a class with TechGroms!<br><br>Warm regards, The Grom Team"
                     };
 
                     // send mail with defined transport object
@@ -103,59 +107,59 @@ module.exports = function ValidateBO(app, sql, logger) {
                                     success: false,
                                     message: "Error checking database for prior use of user Id."
                                 });
-                            }
-                            if (rows[0].cnt > 0) {
+                            } else if (rows[0].cnt > 0) {
 
                                 res.json({
                                     success: false,
                                     message: "User Id " + req.body.userName + " is already in use."
                                 });
-                            }
+                            } else {
 
-                            // userName is ok.
-                            // Generate and encrypt a password.
-                            var strPassword = (Math.random() * 100000000).toFixed(0);
-                            bcrypt.hash(strPassword, null, null, function(err, hash){
+                                // userName is ok.
+                                // Generate and encrypt a password.
+                                var strPassword = (Math.random() * 100000000).toFixed(0);
+                                bcrypt.hash(strPassword, null, null, function(err, hash){
 
-                                if (err) {
-
-                                    res.json({
-                                        success: false,
-                                        message: "Error received encrypting password."
-                                    });
-
-                                } else {
-
-                                    exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,parentId) values ('" + req.body.userName + "','" + hash + "'," + parentId + ");",
-                                        function(rows){
-
-                                            if (rows.length === 0) {
-
-                                                res.json({
-                                                    success: false,
-                                                    message: "Database error inserting new user into database."
-                                                });
-                                            }
-                                            functionSendEnrollmentEmail(strPassword, rows[0].insertId);
-                                        },
-                                        function(strError) {
-
-                                            res.json({
-                                                success: false,
-                                                message: strError
-                                            });
-                                        }
-                                    );
-
-                                    if (exceptionRet2) {
+                                    if (err) {
 
                                         res.json({
                                             success: false,
-                                            message: exceptionRet2.message
+                                            message: "Error received encrypting password."
                                         });
+
+                                    } else {
+
+                                        exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,parentId) values ('" + req.body.userName + "','" + hash + "'," + parentId + ");",
+                                            function(rows){
+
+                                                if (rows.length === 0) {
+
+                                                    res.json({
+                                                        success: false,
+                                                        message: "Database error inserting new user into database."
+                                                    });
+                                                }
+                                                functionSendEnrollmentEmail(strPassword, rows[0].insertId);
+                                            },
+                                            function(strError) {
+
+                                                res.json({
+                                                    success: false,
+                                                    message: strError
+                                                });
+                                            }
+                                        );
+
+                                        if (exceptionRet2) {
+
+                                            res.json({
+                                                success: false,
+                                                message: exceptionRet2.message
+                                            });
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         },
                         function(strError) {
 

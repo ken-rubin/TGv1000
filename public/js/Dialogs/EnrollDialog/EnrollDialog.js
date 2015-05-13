@@ -103,7 +103,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
                 					document.cookie = "userName=" + userId;
 
                 					m_wellMessage("Your child has been enrolled. Please follow the e-mail just sent to you.", 
-                									{waittime: 10000, callback: function(){	m_dialog.close(); location.href = '/index';}});
+                									{waittime: 10000, callback: function(){	m_dialog.close(); location.href = '/';}});
             					} else {
 
                 					// !data.success
