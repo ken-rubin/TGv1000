@@ -187,28 +187,37 @@ var m_functionSignInButtonClick = function(errorHelper) {
 
 	try {
 
-		var userName = $("#inputName").val();
-		var posting = $.post("/BOL/ValidateBO/UserAuthenticate", 
-			{
-				userName:userName, 
-				password:$("#inputPassword").val()
-			}, 
-			'json');
-        posting.done(function(data){
+		var userName = $("#inputName").val().toLowerCase().trim();
+		var password = $("#inputPassword").val().trim();
 
-            if (data.success) {
+		if (userName.length === 0 || password.length === 0) {
 
-                document.cookie = "userId=" + data.userId.toString();
-                document.cookie = "userName=" + userName;
+			errorHelper.show("You must enter both a user Id and a password.");
 
-            	location.href = '/index';
+		} else {
 
-            } else {
+			var posting = $.post("/BOL/ValidateBO/UserAuthenticate", 
+				{
+					userName:userName, 
+					password:password
+				}, 
+				'json');
+	        posting.done(function(data){
 
-                // !data.success
-                errorHelper.show(data.message);
-            }
-        });
+	            if (data.success) {
+
+	                document.cookie = "userId=" + data.userId.toString();
+	                document.cookie = "userName=" + userName;
+
+	            	location.href = '/index';
+
+	            } else {
+
+	                // !data.success
+	                errorHelper.show(data.message);
+	            }
+	        });
+		}
     } catch(e) {
 
     	errorHelper.show(e.message);

@@ -27,25 +27,172 @@ module.exports = function ValidateBO(app, sql, logger) {
             // 2. Gen password for user. Hash the password. Create the user. Grab the id as userId.
             // 3. Return success and userId.
 
-            var exceptionRet = sql.execute("select id from " + self.dbname + "parent where email='" + req.body.parentEmail + "';",
+            var exceptionRet1 = null;
+            var exceptionRet2 = null;
+            var exceptionRet3 = null;
+            var exceptionRet4 = null;
+
+            var functionSendEnrollmentEmail = function(strPassword, userId) {
+
+                try {
+
+                    var smtpTransport = nodemailer.createTransport("SMTP", {
+                    
+                        service: "Gmail",
+                        auth: {
+                        
+                            user: "techgroms@gmail.com",
+                            pass: "Albatross!1"
+                        }
+                    });
+
+                    // setup e-mail data with unicode symbols
+                    var mailOptions = null;
+
+                    mailOptions = {
+             
+                        from: "TechGroms <techgroms@gmail.com>", // sender address
+                        to: req.body.parentEmail, // list of receivers
+                        subject: "TechGroms Registration ✔", // Subject line
+                        text: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
+                        "\r\n\r\n    We have created a login user for your child. Your child will use the name you entered along with" +
+                        " this password: " + strPassword + " . There will some day be a URL here to click on." +
+                        "\r\n\r\n    Thank you for signing your child up for a class with TechGroms!\r\n\r\n    Warm regards, The Grom Team"
+                    };
+
+                    // send mail with defined transport object
+                    smtpTransport.sendMail(mailOptions, function(error, response){
+                    
+                        if (error) {
+                        
+                            res.json({
+                                success: false,
+                                message: "Error sending enrollment e-mail: " + error.toString()
+                            });
+                        }
+
+                        res.json({
+                            success: true,
+                            userId: userId
+                        });
+
+                        // if you don't want to use this transport object anymore, uncomment following line
+                        //smtpTransport.close(); // shut down the connection pool, no more messages
+                    });
+                } catch (e) {
+
+                    res.json({
+                        success: false,
+                        message: "Error sending enrollment e-mail: " + e.message
+                    });
+                }
+            }
+
+            var functionEnrollmentStep2 = function (parentId) {
+
+                try {
+
+                    // Have new or old parentId (based on email).
+                    // Check to make sure userId isn't in use yet.
+                    exceptionRet1 = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';",
+                        function(rows){
+
+                            if (rows.length === 0) {
+
+                                res.json({
+                                    success: false,
+                                    message: "Error checking database for prior use of user Id."
+                                });
+                            }
+                            if (rows[0].cnt > 0) {
+
+                                res.json({
+                                    success: false,
+                                    message: "User Id " + req.body.userName + " is already in use."
+                                });
+                            }
+
+                            // userName is ok.
+                            // Generate and encrypt a password.
+                            var strPassword = (Math.random() * 100000000).toFixed(0);
+                            bcrypt.hash(strPassword, null, null, function(err, hash){
+
+                                if (err) {
+
+                                    res.json({
+                                        success: false,
+                                        message: "Error received encrypting password."
+                                    });
+
+                                } else {
+
+                                    exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,parentId) values ('" + req.body.userName + "','" + hash + "'," + parentId + ");",
+                                        function(rows){
+
+                                            if (rows.length === 0) {
+
+                                                res.json({
+                                                    success: false,
+                                                    message: "Database error inserting new user into database."
+                                                });
+                                            }
+                                            functionSendEnrollmentEmail(strPassword, rows[0].insertId);
+                                        },
+                                        function(strError) {
+
+                                            res.json({
+                                                success: false,
+                                                message: strError
+                                            });
+                                        }
+                                    );
+
+                                    if (exceptionRet2) {
+
+                                        res.json({
+                                            success: false,
+                                            message: exceptionRet2.message
+                                        });
+                                    }
+                                }
+                            });
+                        },
+                        function(strError) {
+
+                            res.json({
+                                success: false,
+                                message: "Error checking database for prior use of user Id."
+                            });
+                        }
+                    );
+                    if (exceptionRet1){
+
+                        res.json({
+                            success: false,
+                            message: exceptionRet1.message
+                        });
+                    }
+                } catch (e) {
+
+                    res.json({
+                        success: false,
+                        message: e.message
+                    });
+                }
+            }
+
+            exceptionRet1 = sql.execute("select id from " + self.dbname + "parent where email='" + req.body.parentEmail + "';",
                 function(rows) {
 
                     if (rows.length === 0) {
 
                         // Need to insert parent
-                        sql.execute("insert " + self.dbname + "parent (email) values ('" + req.body.parentEmail + "');",
+                        exceptionRet2 = sql.execute("insert " + self.dbname + "parent (email) values ('" + req.body.parentEmail + "');",
                             function(rows) {
 
                                 if (rows.length > 0) {
 
-                                    exceptionRet = m_finishEnrollment(rows[0].insertId, req, res);
-                                    if (exceptionRet) {
-
-                                        res.json({
-                                            success: false,
-                                            message: exceptionRet.message
-                                        });
-                                    }
+                                    functionEnrollmentStep2(rows[0].insertId);
                                 }
                             },
                             function(strError) {
@@ -56,18 +203,17 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 });
                             }
                         );
+                        if (exceptionRet2) {
 
+                            res.json({
+                                success: false,
+                                message: "Error gotten adding parent to database: " + exceptionRet2.message
+                            });
+                        }
                     } else {
 
                         // parent already existed
-                        exceptionRet = m_finishEnrollment(rows[0].id, req, res);
-                        if (exceptionRet) {
-                            
-                            res.json({
-                                success: false,
-                                message: exceptionRet.message
-                            });
-                        }
+                        functionEnrollmentStep2(rows[0].id);
                     }
                 },
                 function(strError) {
@@ -79,11 +225,11 @@ module.exports = function ValidateBO(app, sql, logger) {
                 }
             );
 
-            if (exceptionRet) {
+            if (exceptionRet1) {
 
                 res.json({
                     success: false,
-                    message: exceptionRet.message
+                    message: exceptionRet1.message
                 });
             }
         } catch (e) {
@@ -93,131 +239,6 @@ module.exports = function ValidateBO(app, sql, logger) {
                 success: false,
                 message: 'Enrollment exception: ' + e.message
             });
-        }
-    }
-
-    var m_finishEnrollment = function (parentId, req, res) {
-
-        try {
-
-            // Have new or old parentId (based on email).
-            // Check to make sure userId isn't in use yet.
-            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';",
-                function(rows){
-
-                    if (rows.length === 0) {
-
-                        return new Error("Error checking database for prior use of user Id.");
-                    }
-                    if (rows[0].cnt > 0) {
-
-                        return new Error("User Id " + req.body.userName + " is already in use.");
-                    }
-
-                    // userName is ok.
-                    // Generate and encrypt a password.
-                    var strPassword = (Math.random() * 100000000).toFixed(0);
-                    bcrypt.hash(strPassword, null, null, function(err, hash){
-
-                        if (err) {
-
-                            return new Error("Error received encrypting password.");
-                        } else {
-
-                            exceptionRet = sql.execute("insert " + self.dbname + "user (userName,pwHash,parentId) values ('" + req.body.userName + "','" + hash + "'," + parentId + ");",
-                                function(rows){
-
-                                    if (rows.length === 0) {
-
-                                        return new Error("Database error inserting new user into database.");
-                                    }
-                                    exceptionRet = m_sendEnrollmentEmail(strPassword, req, res);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-
-                                    } else {
-
-                                        res.json({
-                                            success: true,
-                                            userId: rows[0].insertId
-                                        });
-                                        return null;
-                                    }
-                                },
-                                function(strError) {
-
-                                    return new Error(strError);
-                                }
-                            );
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                        }
-                    });
-                },
-                function(strError) {
-
-                    return new Error("Error checking database for prior use of user Id.");
-                }
-            );
-            if (exceptionRet){
-
-                return exceptionRet;
-            }
-        } catch (e) {
-
-            return e;
-        }
-    }
-
-    var m_sendEnrollmentEmail = function(strPassword, req, res) {
-
-        try {
-
-            var smtpTransport = nodemailer.createTransport("SMTP", {
-            
-                service: "Gmail",
-                auth: {
-                
-                    user: "techgroms@gmail.com",
-                    pass: "Albatross!1"
-                }
-            });
-
-            // setup e-mail data with unicode symbols
-            var mailOptions = null;
-
-            mailOptions = {
-     
-                from: "TechGroms <techgroms@gmail.com>", // sender address
-                to: req.body.parentEmail, // list of receivers
-                subject: "TechGroms Registration ✔", // Subject line
-                text: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                "\r\n\r\n    We have created a login user for your child. Your child will use the name you entered along with" +
-                " this password: " + strPassword + " . There will some day be a URL here to click on." +
-                "\r\n\r\n    Thank you for signing your child up for a class with TechGroms!\r\n\r\n    Warm regards, The Grom Team"
-            };
-
-            // send mail with defined transport object
-            smtpTransport.sendMail(mailOptions, function(error, response){
-            
-                if (error) {
-                
-                    return new Error("Error sending enrollment e-mail: " + error.toString());
-
-                } else {
-
-                    return null;
-                }
-
-                // if you don't want to use this transport object anymore, uncomment following line
-                //smtpTransport.close(); // shut down the connection pool, no more messages
-            });
-        } catch (e) {
-
-            return new Error("Error sending enrollment e-mail: " + e.message);
         }
     }
 
