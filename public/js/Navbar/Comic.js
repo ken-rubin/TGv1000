@@ -37,6 +37,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							// Set as active comic in comic strip.
+							var exceptionRet = comicStrip.select(self);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
 							// Create or re-create the strips with this comic's data.
 							return typeStrip.load(self.data.typeStrip);
 						} catch (e) {

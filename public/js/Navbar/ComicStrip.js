@@ -127,6 +127,19 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 						}
 					};
 
+					// Method sets the specified comic as the active comic.
+					self.select = function (comic) {
+
+						try {
+
+							m_comicActive = comic;
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////////
 					// Private fields.
 
@@ -136,6 +149,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 					var m_srComicStrip = null;
 					// Collection of comic items.
 					var m_arrayComics = [];
+					// The active comic.
+					var m_comicActive = null;
 				} catch (e) {
 
 					errorHelper.show(e);

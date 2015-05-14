@@ -107,6 +107,73 @@ define(["Core/errorHelper"],
 						}
 					};
 
+					// Remove type from schema, blocks and javaScript.  
+					// It is already not in any workspace per validation.
+					self.removeType = function (type) {
+
+						try {
+
+							// Remove the new.
+							var exceptionRet = m_functionRemove_Type_New(type);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Remove properties.
+							for (var i = 0; i < type.data.properties.length; i++) {
+
+								var propertyIth = type.data.properties[i];
+								var exceptionRet = m_functionRemove_Type_Property(type,
+									propertyIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Return referencing method for the specified Type.
+					self.isTypeReferencedInWorkspace = function (type) {
+
+						try {
+
+							// Test if the type-new function is referenced.
+							var methodReferenced = m_functionIsReferenced_Type_New(type);
+							if (methodReferenced) {
+
+								return methodReferenced;
+							}
+
+							// Rename properties.
+							for (var i = 0; i < type.data.properties.length; i++) {
+
+								var propertyIth = type.data.properties[i];
+								var methodReferenced = m_functionIsReferenced_Type_Property(type,
+									propertyIth);
+								if (methodReferenced) {
+
+									return methodReferenced;
+								}
+							}
+
+							return null;
+						} catch (e) {
+
+							errorHelper.show(e);
+							return null;
+						}
+					};
+
 					// Method adds a property to a type to blockly.
 					self.addProperty = function (type, property) {
 
@@ -152,6 +219,36 @@ define(["Core/errorHelper"],
 
 							return e;
 						}
+					};
+
+					// Remove property from schema, blocks and javaScript.  
+					// It is already not in any workspace per validation.
+					self.removeProperty = function (type, property) {
+
+						try {
+
+							var exceptionRet = m_functionRemove_Type_Property(type,
+								property);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Return referencing method for the specified property.
+					self.isPropertyReferencedInWorkspace = function (type, property) {
+
+						return m_functionIsReferenced_Type_Property(type,
+							property);
 					};
 
 					// Attach instance to DOM.
@@ -355,6 +452,51 @@ define(["Core/errorHelper"],
 						}
 					};
 
+					// Helper method removes a type's new_ constructor function.
+					var m_functionRemove_Type_New = function (type) {
+
+						try {
+
+							////////////////////////
+							// Blocks.
+
+							delete self.blocks["new_" + type.data.name];
+
+							////////////////////////
+							// JavaScript.
+							delete self.javaScript["new_" + type.data.name];
+
+							////////////////////////
+							// Schema.
+							if (self.schema &&
+								self.schema.Types) {
+
+								delete self.schema.Types[type.data.name];
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method determines if the type's new is referenced 
+					// anywhere.  Returns the referencing method if found.
+					var m_functionIsReferenced_Type_New = function (type) {
+
+						try {
+
+							// Look for this:
+							var strLookFor = "new_" + type.data.name;
+
+							return typeStrip.isReferencedInWorkspace(strLookFor);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Helper method renames a type's new_ constructor function.
 					var m_functionRename_Type_New = function (type, strOriginalName) {
 
@@ -378,6 +520,12 @@ define(["Core/errorHelper"],
 								var re = new RegExp("new_" + strOriginalName,"g");
 								self.workspace = self.workspace.replace(re,
 									"new_" + type.data.name);
+								var exceptionRet = typeStrip.replaceInWorkspaces("new_" + strOriginalName,
+									"new_" + type.data.name);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
 							}
 
 							////////////////////////
@@ -469,6 +617,66 @@ define(["Core/errorHelper"],
 						}
 					};
 
+					// Helper method removes a type's new_ constructor function.
+					var m_functionRemove_Type_Property = function (type, property) {
+
+						try {
+
+							var strGet = type.data.name + "_get" + property.name;
+							var strSet = type.data.name + "_set" + property.name;
+
+							////////////////////////
+							// Blocks.
+
+							delete self.blocks[strGet];
+							delete self.blocks[strSet];
+
+							////////////////////////
+							// JavaScript.
+
+							delete self.javaScript[strGet];
+							delete self.javaScript[strSet];
+
+							////////////////////////
+							// Schema.
+							if (self.schema &&
+								self.schema.Types &&
+								self.schema.Types[type.data.name]) {
+
+								var objectType = self.schema.Types[type.data.name];
+								delete objectType[strGet];
+								delete objectType[strSet];
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method determines if the type's new is referenced 
+					// anywhere.  Returns the referencing method if found.
+					var m_functionIsReferenced_Type_Property = function (type, property) {
+
+						try {
+
+							// Look for this:
+							var strGetName = type.data.name + "_get" + property.name;
+							var strSetName = type.data.name + "_set" + property.name;
+
+							var methodReferenced = typeStrip.isReferencedInWorkspace(strGetName);
+							if (methodReferenced) {
+
+								return methodReferenced;
+							}
+							return typeStrip.isReferencedInWorkspace(strSetName);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Helper method renames a type's property accessor functions.
 					var m_functionRename_Type_Property = function (type, property, strOriginal, strOriginalTypeName) {
 
@@ -502,6 +710,12 @@ define(["Core/errorHelper"],
 								var re = new RegExp(strOriginalName,"g");
 								self.workspace = self.workspace.replace(re,
 									strGetName);
+								var exceptionRet = typeStrip.replaceInWorkspaces(strOriginalName,
+									strGetName);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
 							}
 
 							////////////////////////
@@ -539,6 +753,12 @@ define(["Core/errorHelper"],
 								var re = new RegExp(strOriginalSetName,"g");
 								self.workspace = self.workspace.replace(re,
 									strSetName);
+								var exceptionRet = typeStrip.replaceInWorkspaces(strOriginalSetName,
+									strSetName);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
 							}
 
 							////////////////////////

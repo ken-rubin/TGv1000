@@ -48,6 +48,54 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
+					// Loop over all Types, indicate if the specified
+					// string is found in any of their workspaces.
+					// Returns the method referenced or null.
+					self.isReferencedInWorkspace = function (strTest) {
+
+						// Loop over the collection of types.
+						for (var i = 0; i < m_arrayTypes.length; i++) {
+
+							var typeIth = m_arrayTypes[i];
+
+							// Get the method which references the string, if any.
+							var methodReferenced = typeIth.isReferencedInWorkspace(strTest);
+							if (methodReferenced) {
+
+								return methodReferenced;
+							}
+						}
+
+						return null;
+					};
+
+					// Loop over all Types, update any occurrences  
+					// of the specified unique proper string.
+					self.replaceInWorkspaces = function (strOld, strNew) {
+
+						try {
+
+							// Loop over the collection of types.
+							for (var i = 0; i < m_arrayTypes.length; i++) {
+
+								var typeIth = m_arrayTypes[i];
+
+								// Get the method which references the string, if any.
+								var exceptionRet = typeIth.replaceInWorkspaces(strOld, 
+									strNew);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Remove item from DOM and state.
 					self.removeItem = function (type) {
 

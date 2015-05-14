@@ -91,6 +91,53 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 						return m_jType;
 					};
 
+					// Loop over all methods, indicate if the specified
+					// string is found in any of their workspaces.
+					// Returns the method referenced or null.
+					self.isReferencedInWorkspace = function (strTest) {
+
+						// Loop over the collection of methods.
+						for (var i = 0; i < self.data.methods.length; i++) {
+
+							var methodIth = self.data.methods[i];
+
+							// Get the workspace.
+							var strWorkspace = methodIth.workspace;
+
+							// Check.
+							if (strWorkspace.indexOf(strTest) !== -1) {
+
+								// Save this type in the method to make it 
+								// easier to report on who the method is.
+								methodIth.type = self;
+								return methodIth;
+							}
+						}
+
+						return null;
+					};
+
+					// Loop over all methods, updates their workspace with the replacement.
+					// Returns the method referenced or null.
+					self.replaceInWorkspaces = function (strOld, strNew) {
+
+						// Loop over the collection of methods.
+						for (var i = 0; i < self.data.methods.length; i++) {
+
+							var methodIth = self.data.methods[i];
+
+							// Construct the global RegExp and apply to workspace.
+							var re = new RegExp(strOld,"g");
+							if (methodIth.workspace) {
+
+								methodIth.workspace = methodIth.workspace.replace(re,
+									strNew);
+							}
+						}
+
+						return null;
+					};
+
 					// Update the blockly data in the active member.
 					self.update = function (strWorkspace, strMethod) {
 
@@ -360,17 +407,35 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 						try {
 
-							// Ask
+							// Figure out if this type is referenced anywhere
+							var methodReference = null;
+							if (strType === "type") {
+
+								methodReference = code.isTypeReferencedInWorkspace(self);
+							} else if (strType === "property") {
+
+								methodReference = code.isPropertyReferencedInWorkspace(self, objectMember);
+							} else if (strType === "method") {
 
 
+							} else if (strType === "event") {
 
 
+							}
 
+							// If a reference was found, report it and drop out.
+							if (methodReference) {
 
+								BootstrapDialog.alert({
 
-
-
-							
+									title: "WARNING",
+									message: "Can not delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
+									type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+									closable: true, // <-- Default value is false
+									draggable: true // <-- Default value is false
+								});
+								return;
+       						}
 
 							BootstrapDialog.confirm({
 
@@ -391,8 +456,15 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							        		// Handle the type itself:
 
+							        		// Remove from code/blockly.
+											var exceptionRet = code.removeType(self);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+
 							        		// Remove from the typeStrip.
-											var exceptionRet = typeStrip.removeItem(self);
+											exceptionRet = typeStrip.removeItem(self);
 											if (exceptionRet) {
 
 												throw exceptionRet;
@@ -401,12 +473,20 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							        		// Handle member:
 
+							        		// Remove from code/blockly.
+											var exceptionRet = code.removeProperty(self, 
+												objectMember);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+
 								        	// Actually delete it.
 								        	arrayCollection.splice(iIndex, 
 								        		1);
 
 											// Refresh display.
-											var exceptionRet = m_functionGenerateTypeContents();
+											exceptionRet = m_functionGenerateTypeContents();
 											if (exceptionRet) {
 
 												throw exceptionRet;
