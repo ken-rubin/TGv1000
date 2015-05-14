@@ -60,78 +60,41 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					};
 
 					// Expose new event.
-					self.new = function () {
+					// self.new = function () {
 
-						try {
+					// 	try {
 
-							// Dismiss the dialog.
-					        m_dialog.close();
+					// 		// Dismiss the dialog.
+					//         m_dialog.close();
 
-					        // Call the callback.
-					        if ($.isFunction(m_callbackNew)) {
+					//         // Call the callback.
+					//         if ($.isFunction(m_callbackNew)) {
 
-					        	return m_callbackNew();
-					        }
+					//         	return m_callbackNew();
+					//         }
 
-					    	return null;
+					//     	return null;
 					    	
-						} catch (e) {
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
-
-					// Expose clone event.
-					// Takes the id of the Type to clone.
-					self.clone = function (strId) {
-
-						try {
-
-							// Dismiss the dialog.
-					        m_dialog.close();
-
-					        // Call the callback.
-					        if ($.isFunction(m_callbackClone)) {
-
-					        	return m_callbackClone(strId);
-					        }
-
-					        return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					//////////////////////////////////
 					// Private functions.
 
-					// Invoked when the new button is clicked.
-					var m_functionNewButtonClick = function () {
+					// Invoked when the server request 
+					// to get the search snippet returns.
+					var m_functionNewSnippetResponse = function (htmlData) {
 
 						try {
 
-					        // Call this object's new handler.
-					        var exceptionRet = self.new();
-					        if (exceptionRet) {
-
-					        	throw exceptionRet;
-					        }
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					};
-
-					// Invoked when the request to get the open button snippet returns.
-					var m_functionInnerSearchSnippetResponse = function (htmlData) {
-
-						try {
-
+							// Inject result.
 							var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
 								htmlData,
-								"#SearchWell",
-								"#ImageSoundDialogInnerSearchSnippet");
+								"#TypeWell",
+								"#ImageSoundDialogNewSnippet");
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -143,31 +106,67 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					};
 
 					// Invoked when a Type item is clicked.
-					var m_functionInnerSearchButtonClick = function () {
+					var m_functionNewButtonClick = function () {
 
 						try {
 
-							// Get the string from the search input.
-							var strSearchString = $("#SearchInput").val();
-
-							// Get the search results.
+							// Get the search snippet.
 							$.ajax({
 
 								cache: false,
 								data: {
 
-									templateFile: "Dialogs/ImageSoundDialog/ImageSoundDialogInnerSearchSnippet",
-									businessObject: {
-
-										module: "GUI/Dialogs/ImageSoundDialog/ImageSoundDialogInnerSearchSnippet",
-										method: "process"
-									}
+									templateFile: "Dialogs/ImageSoundDialog/imageSoundDialogNewSnippet"
 								},
 								dataType: "HTML",
 								method: "POST",
 								url: "/renderJadeSnippet"
-							}).done(m_functionInnerSearchSnippetResponse).error(errorHelper.show);
+							}).done(m_functionNewSnippetResponse).error(errorHelper.show);
+						} catch (e) {
 
+							errorHelper.show(e.message);
+						}
+					};
+
+
+					// Invoked when the server request 
+					// to get the search snippet returns.
+					var m_functionSearchSnippetResponse = function (htmlData) {
+
+						try {
+
+							// Inject result.
+							var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
+								htmlData,
+								"#TypeWell",
+								"#ImageSoundDialogSearchSnippet");
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e.message);
+						}
+					};
+
+					// Invoked when a Type item is clicked.
+					var m_functionSearchButtonClick = function () {
+
+						try {
+
+							// Get the search snippet.
+							$.ajax({
+
+								cache: false,
+								data: {
+
+									templateFile: "Dialogs/ImageSoundDialog/imageSoundDialogSearchSnippet"
+								},
+								dataType: "HTML",
+								method: "POST",
+								url: "/renderJadeSnippet"
+							}).done(m_functionSearchSnippetResponse).error(errorHelper.show);
 						} catch (e) {
 
 							errorHelper.show(e.message);
@@ -183,8 +182,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							m_dialog = dialogItself;
 
 							// Wire click events.
-							$("#NewButton").click(m_functionNewButtonClick);
-							$("#InnerSearchButton").click(m_functionInnerSearchButtonClick);
+							$("#NewResourceButton").click(m_functionNewButtonClick);
+							$("#SearchResourceButton").click(m_functionSearchButtonClick);
+
 						} catch (e) {
 
 							errorHelper.show(e.message);

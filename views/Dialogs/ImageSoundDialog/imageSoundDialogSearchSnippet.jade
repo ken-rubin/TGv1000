@@ -1,0 +1,17 @@
+//- Jade DOM for the imageSound dialog search snippet. 
+//-
+
+.snippetcontext#ImageSoundDialogSearchSnippet(data-module="Dialogs/ImageSoundDialog/ImageSoundDialogSearchButtonHandler")
+.row
+  | Type in a search string.  We'll try to find the resource you're looking for.
+  br
+  .row
+    br
+    .col-xs-2
+      label.control-label(for="SearchInput") Search string
+    .col-xs-6
+      input.form-control#SearchInput(type="text", placeholder="type your search string here")
+    .col-xs-4
+      button.btn.btn-info#InnerSearchButton Search
+  br
+  .well#SearchWell

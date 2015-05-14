@@ -10,32 +10,22 @@
 .well
   .row
     .col-xs-12
-      h4 Please <em>Load a New Resource</em> from your computer or an external URL or <em>Search for an Existing Resource</em> by entering search tags and clicking the Search button below.
+      h4 Please choose <em>New</em> or <em>Search</em> by clicking one of the option buttons below.
       br
   .row
 
     //- 2 buttons in a row => xs-3.
-    .col-xs-5
-      button.btn.NewButton#NewButton
+    .col-xs-6
+      button.btn.NewButton#NewResourceButton
         h3
           | New
         h2
           span.glyphicon.glyphicon-plus-sign
-        | Create new. Click to load a new resource.
-    .col-xs-1
-      | OR
+        | Create new. Click to load a new resource from your computer or a URL.
     .col-xs-6
-      .row
-        | Type in your search tags.  If one exists, we'll find the resources that match all of your tags.
-        br
-        .row
-          br
-          .col-xs-2
-            label.control-label(for="SearchInput", style="margin-top:8px;") Search tags
-          .col-xs-6
-            input.form-control#SearchInput(type="text", placeholder="type your search tags here")
-          .col-xs-4
-            button.btn.btn-info#InnerSearchButton Search
-  .row
-        br
-        .well#SearchWell
+      button.btn.SearchButton#SearchResourceButton
+        h3
+          | Search
+        h2
+          span.glyphicon.glyphicon-search
+        | Search existing resources. Click to enter tags and begin a search.
