@@ -417,7 +417,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								methodReference = code.isPropertyReferencedInWorkspace(self, objectMember);
 							} else if (strType === "method") {
 
-
+								methodReference = code.isMethodReferencedInWorkspace(self, objectMember);
 							} else if (strType === "event") {
 
 
@@ -471,14 +471,33 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 											}
 							        	} else {
 
+											// Reset selection if just deleted selected item.
+											if (m_iActiveIndex === iIndex &&
+												m_arrayActive === arrayCollection) {
+
+												m_iActiveIndex = -1;
+												m_arrayActive = null;
+											}
+
 							        		// Handle member:
 
 							        		// Remove from code/blockly.
-											var exceptionRet = code.removeProperty(self, 
-												objectMember);
-											if (exceptionRet) {
+							        		if (strType === "property") {
 
-												throw exceptionRet;
+												var exceptionRet = code.removeProperty(self, 
+													objectMember);
+												if (exceptionRet) {
+
+													throw exceptionRet;
+												}
+											} else if (strType === "method") {
+
+												var exceptionRet = code.removeMethod(self, 
+													objectMember);
+												if (exceptionRet) {
+
+													throw exceptionRet;
+												}
 											}
 
 								        	// Actually delete it.
@@ -541,6 +560,16 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 											// Update code module.
 											exceptionRet = code.renameProperty(self,
+												objectMember,
+												m_strOriginalName);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+										} else if (strType === "method") {
+
+											// Update code module.
+											exceptionRet = code.renameMethod(self,
 												objectMember,
 												m_strOriginalName);
 											if (exceptionRet) {
@@ -750,10 +779,18 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 						try {
 
-							self.data.methods.push({ name: "new method", codeDOM: "" });
+							self.data.methods.push({ name: "new method", codeDOM: "", workspace: "" });
 
 							// Add the contents to the newly allocated type.
 							var exceptionRet = m_functionGenerateTypeContents();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Add the method to code too.
+							exceptionRet = code.addMethod(self, 
+								self.data.methods[self.data.methods.length - 1]);
 							if (exceptionRet) {
 
 								throw exceptionRet;

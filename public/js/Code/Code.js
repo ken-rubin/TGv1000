@@ -60,6 +60,18 @@ define(["Core/errorHelper"],
 								}
 							}
 
+							// Add methods.
+							for (var i = 0; i < type.data.methods.length; i++) {
+
+								var methodIth = type.data.methods[i];
+								exceptionRet = m_functionAdd_Type_Method(type,
+									methodIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
@@ -90,6 +102,20 @@ define(["Core/errorHelper"],
 								var exceptionRet = m_functionRename_Type_Property(type,
 									propertyIth,
 									propertyIth.name, 
+									strOriginalName);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Rename methods.
+							for (var i = 0; i < type.data.methods.length; i++) {
+
+								var methodIth = type.data.methods[i];
+								var exceptionRet = m_functionRename_Type_Method(type,
+									methodIth,
+									methodIth.name, 
 									strOriginalName);
 								if (exceptionRet) {
 
@@ -132,6 +158,18 @@ define(["Core/errorHelper"],
 								}
 							}
 
+							// Remove methods.
+							for (var i = 0; i < type.data.methods.length; i++) {
+
+								var methodIth = type.data.methods[i];
+								var exceptionRet = m_functionRemove_Type_Method(type,
+									methodIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
@@ -154,12 +192,24 @@ define(["Core/errorHelper"],
 								return methodReferenced;
 							}
 
-							// Rename properties.
+							// Test if any of the properties are referenced.
 							for (var i = 0; i < type.data.properties.length; i++) {
 
 								var propertyIth = type.data.properties[i];
 								var methodReferenced = m_functionIsReferenced_Type_Property(type,
 									propertyIth);
+								if (methodReferenced) {
+
+									return methodReferenced;
+								}
+							}
+
+							// Test if any of the methods are referenced.
+							for (var i = 0; i < type.data.methods.length; i++) {
+
+								var methodIth = type.data.methods[i];
+								var methodReferenced = m_functionIsReferenced_Type_Method(type,
+									methodIth);
 								if (methodReferenced) {
 
 									return methodReferenced;
@@ -249,6 +299,83 @@ define(["Core/errorHelper"],
 
 						return m_functionIsReferenced_Type_Property(type,
 							property);
+					};
+
+					// Method adds a method to a type to blockly.
+					self.addMethod = function (type, method) {
+
+						try {
+
+							// Add method for the type.
+							var exceptionRet = m_functionAdd_Type_Method(type,
+								method);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Method renmes a method of a type to blockly.
+					self.renameMethod = function (type, method, strOriginalName) {
+
+						try {
+
+							// Rename a method for the type.
+							var exceptionRet = m_functionRename_Type_Method(type,
+								method,
+								strOriginalName);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Rebuild blockly.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Remove method from schema, blocks and javaScript.  
+					// It is already not in any workspace per validation.
+					self.removeMethod = function (type, method) {
+
+						try {
+
+							var exceptionRet = m_functionRemove_Type_Method(type,
+								method);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Return referencing method for the specified property.
+					self.isMethodReferencedInWorkspace = function (type, method) {
+
+						return m_functionIsReferenced_Type_Method(type,
+							method);
 					};
 
 					// Attach instance to DOM.
@@ -420,6 +547,24 @@ define(["Core/errorHelper"],
 					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
 					};
 
+					// Helper method generates the function string for a method function.
+					var m_functionGenerateBlocksMethodFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('SELF').appendField('self');" +
+							"this.setColour(40);" +
+							"this.setOutput(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a method function.
+					var m_functionGenerateJavaScriptMethodFunctionString = function (strName) {
+
+						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+            				'return [" " + strId + "[\'' + strName + '\']() ", Blockly.JavaScript.ORDER_MEMBER];';
+					};
+
 					// Helper method adds a type's new_ constructor function.
 					var m_functionAdd_Type_New = function (type) {
 
@@ -481,22 +626,6 @@ define(["Core/errorHelper"],
 						}
 					};
 
-					// Helper method determines if the type's new is referenced 
-					// anywhere.  Returns the referencing method if found.
-					var m_functionIsReferenced_Type_New = function (type) {
-
-						try {
-
-							// Look for this:
-							var strLookFor = "new_" + type.data.name;
-
-							return typeStrip.isReferencedInWorkspace(strLookFor);
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Helper method renames a type's new_ constructor function.
 					var m_functionRename_Type_New = function (type, strOriginalName) {
 
@@ -550,6 +679,22 @@ define(["Core/errorHelper"],
 							objectTypes[type.data.name] = typeNew;
 
 							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method determines if the type's new is referenced 
+					// anywhere.  Returns the referencing method if found.
+					var m_functionIsReferenced_Type_New = function (type) {
+
+						try {
+
+							// Look for this:
+							var strLookFor = "new_" + type.data.name;
+
+							return typeStrip.isReferencedInWorkspace(strLookFor);
 						} catch (e) {
 
 							return e;
@@ -655,28 +800,6 @@ define(["Core/errorHelper"],
 						}
 					};
 
-					// Helper method determines if the type's new is referenced 
-					// anywhere.  Returns the referencing method if found.
-					var m_functionIsReferenced_Type_Property = function (type, property) {
-
-						try {
-
-							// Look for this:
-							var strGetName = type.data.name + "_get" + property.name;
-							var strSetName = type.data.name + "_set" + property.name;
-
-							var methodReferenced = typeStrip.isReferencedInWorkspace(strGetName);
-							if (methodReferenced) {
-
-								return methodReferenced;
-							}
-							return typeStrip.isReferencedInWorkspace(strSetName);
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Helper method renames a type's property accessor functions.
 					var m_functionRename_Type_Property = function (type, property, strOriginal, strOriginalTypeName) {
 
@@ -773,6 +896,164 @@ define(["Core/errorHelper"],
 							delete objectType[strOriginalSetName];
 
 							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method determines if the type's new is referenced 
+					// anywhere.  Returns the referencing method if found.
+					var m_functionIsReferenced_Type_Property = function (type, property) {
+
+						try {
+
+							// Look for this:
+							var strGetName = type.data.name + "_get" + property.name;
+							var strSetName = type.data.name + "_set" + property.name;
+
+							var methodReferenced = typeStrip.isReferencedInWorkspace(strGetName);
+							if (methodReferenced) {
+
+								return methodReferenced;
+							}
+							return typeStrip.isReferencedInWorkspace(strSetName);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method adds a type's method accessor functions.
+					var m_functionAdd_Type_Method = function (type, method) {
+
+						try {
+
+							////////////////////////
+							// Blocks.
+							var strName = type.data.name + "_" + method.name;
+							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
+
+							////////////////////////
+							// JavaScript.
+							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
+
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
+
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+							var objectType = objectTypes[type.data.name];
+							objectType[strName] = true;
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method removes a type's new_ constructor function.
+					var m_functionRemove_Type_Method = function (type, method) {
+
+						try {
+
+							var strName = type.data.name + "_" + method.name;
+
+							////////////////////////
+							// Blocks.
+
+							delete self.blocks[strName];
+
+							////////////////////////
+							// JavaScript.
+
+							delete self.javaScript[strName];
+
+							////////////////////////
+							// Schema.
+							if (self.schema &&
+								self.schema.Types &&
+								self.schema.Types[type.data.name]) {
+
+								var objectType = self.schema.Types[type.data.name];
+								delete objectType[strName];
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method renames a type's method accessor functions.
+					var m_functionRename_Type_Method = function (type, method, strOriginal, strOriginalTypeName) {
+
+						try {
+
+							if (!strOriginalTypeName) {
+
+								strOriginalTypeName = type.data.name;
+							}
+
+							////////////////////////
+							// Blocks.
+							var strOriginalName = strOriginalTypeName + "_" + strOriginal;
+							var strName = type.data.name + "_" + method.name;
+							delete self.blocks[strOriginalName];
+							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
+
+							////////////////////////
+							// JavaScript.
+							delete self.javaScript[strOriginalName];
+							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
+
+							////////////////////////
+							// Workspace.
+							if (self.workspace) {
+
+								var re = new RegExp(strOriginalName,"g");
+								self.workspace = self.workspace.replace(re,
+									strName);
+								var exceptionRet = typeStrip.replaceInWorkspaces(strOriginalName,
+									strName);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
+
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+							var objectType = objectTypes[type.data.name];
+							objectType[strName] = true;
+							delete objectType[strOriginalName];
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method determines if the type's new is referenced 
+					// anywhere.  Returns the referencing method if found.
+					var m_functionIsReferenced_Type_Method = function (type, method) {
+
+						try {
+
+							// Look for this:
+							var strName = type.data.name + "_" + method.name;
+
+							return typeStrip.isReferencedInWorkspace(strName);
 						} catch (e) {
 
 							return e;
