@@ -5,8 +5,8 @@
 //
 
 // Define an AMD module.
-define(["Core/errorHelper"], 
-	function (errorHelper) {
+define(["Core/snippetHelper", "Core/errorHelper"], 
+	function (snippetHelper, errorHelper) {
 
 		try {
 
@@ -31,9 +31,9 @@ define(["Core/errorHelper"],
 						// // Activate tooltips.
 						// $("[data-toggle='tooltip']").tooltip();
 
-						// // Wire buttons.
-						// $(".projectItem").off("click");
-						// $(".projectItem").on("click", m_functionResourceClick);
+						// Wire buttons.
+						$("#NewLocalResourceButton").click(m_functionLocalResourceClick);
+						$("#NewInternetResourceButton").click(m_functionInternetResourceClick);
 					} catch (e) {
 
 						errorHelper.show(e.message);
@@ -42,6 +42,92 @@ define(["Core/errorHelper"],
 
 				//////////////////////////////////////
 				// Private methods.
+
+				// Invoked when user clicks local resource desired.
+				var m_functionNewLocalSnippetResponse = function (htmlData) {
+
+					try {
+
+						// Inject result.
+						var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:self },
+							htmlData,
+							"#ImageSoundNewWell",
+							"#ImageSoundDialogNewLocalSnippet");
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
+					} catch (e) {
+
+						errorHelper.show(e.message);
+					}
+				}
+
+				// Invoked when the load local resource button is clicked.
+				var m_functionLocalResourceClick = function () {
+
+					try {
+
+						// Get the snippet.
+						$.ajax({
+
+							cache: false,
+							data: {
+
+								templateFile: "Dialogs/ImageSoundDialog/imageSoundDialogNewLocalSnippet"
+							},
+							dataType: "HTML",
+							method: "POST",
+							url: "/renderJadeSnippet"
+						}).done(m_functionNewLocalSnippetResponse).error(errorHelper.show);
+					} catch (e) {
+
+						errorHelper.show(e.message);
+					}
+				}
+
+				// Invoked when user clicks internet resource desired.
+				var m_functionNewInternetSnippetResponse = function (htmlData) {
+
+					try {
+
+						// Inject result.
+						var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:self },
+							htmlData,
+							"#ImageSoundNewWell",
+							"#ImageSoundDialogNewInternetSnippet");
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
+					} catch (e) {
+
+						errorHelper.show(e.message);
+					}
+				}
+
+				// Invoked when the load internet resource button is clicked.
+				var m_functionInternetResourceClick = function () {
+
+					try {
+
+						// Get the snippet.
+						$.ajax({
+
+							cache: false,
+							data: {
+
+								templateFile: "Dialogs/ImageSoundDialog/imageSoundDialogNewInternetSnippet"
+							},
+							dataType: "HTML",
+							method: "POST",
+							url: "/renderJadeSnippet"
+						}).done(m_functionNewInternetSnippetResponse).error(errorHelper.show);
+					} catch (e) {
+
+						errorHelper.show(e.message);
+					}
+				}
 
 				// Invoked when a project item is clicked.
 				// var m_functionResourceClick = function () {

@@ -5,8 +5,8 @@
 //
 
 // Define an AMD module.
-define(["Core/errorHelper"], 
-	function (errorHelper) {
+define(["Core/snippetHelper", "Core/errorHelper"], 
+	function (snippetHelper, errorHelper) {
 
 		try {
 
