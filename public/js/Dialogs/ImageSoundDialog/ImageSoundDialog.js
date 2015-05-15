@@ -93,7 +93,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Inject result.
 							var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
 								htmlData,
-								"#TypeWell",
+								"#ImageSoundWell",
 								"#ImageSoundDialogNewSnippet");
 							if (exceptionRet) {
 
@@ -138,7 +138,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Inject result.
 							var exceptionRet = snippetHelper.process({ dialog:m_dialog, parent:self },
 								htmlData,
-								"#SearchWell",
+								"#ImageSoundWell",
 								"#ImageSoundDialogSearchSnippet");
 							if (exceptionRet) {
 

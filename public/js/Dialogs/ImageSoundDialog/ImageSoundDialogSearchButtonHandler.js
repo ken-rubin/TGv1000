@@ -1,5 +1,5 @@
 //////////////////////////////////////////
-// ImageSoundDialog inner search button handler. 
+// ImageSoundDialog search button handler. 
 //
 // Return constructor function.
 //

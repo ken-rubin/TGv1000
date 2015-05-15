@@ -8,6 +8,8 @@
 @OpenColor: #a0a;
 @TemplatesColor: #0aa;
 @SearchColor: #a66;
+@LocalColor: #a5b;
+@InternetColor: #d0b;
 
 @HoverAdditive: #222;
 
@@ -40,6 +42,34 @@
 	&:hover 
 	{
 		background-color:@NewColor + @HoverAdditive;
+	}
+}
+
+// The Local button on the dialog.
+.LocalButton
+{
+	height:200px;
+
+	background-color:@LocalColor;
+	white-space: normal !important;
+
+	&:hover 
+	{
+		background-color:@LocalColor + @HoverAdditive;
+	}
+}
+
+// The Internet button on the dialog.
+.InternetButton
+{
+	height:200px;
+
+	background-color:@InternetColor;
+	white-space: normal !important;
+
+	&:hover 
+	{
+		background-color:@InternetColor + @HoverAdditive;
 	}
 }
 
