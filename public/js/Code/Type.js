@@ -637,7 +637,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 						try {
 
 							// Handle different menu items differently.
-							if (selectedMenu.text() === "change...") {
+							if (selectedMenu.text() === "Change...") {
 
 								// Show rename dialog.
 								var exceptionRet = m_functionImageDialogHelper();

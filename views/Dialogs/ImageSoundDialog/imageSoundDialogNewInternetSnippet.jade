@@ -5,10 +5,18 @@
 .well
   .row
     .col-xs-12
-      h4 Click the <em>Enter URL</em> button to retrieve your resource file.
+      h4 Enter an image URL and click the <em>Retrieve URL</em> button to retrieve your resource file.
       h5 You will be able to use the resource on a temporary basis--until it is judged compliant with TechGroms's standards.
       br
   .row
+    br
+    .col-xs-2
+      label.control-label(for="URLInput", style="margin-top:8px;") Image URL
+    .col-xs-6
+      input.form-control#URLInput(type="text", placeholder="type or paste the resource URL here")
+    .col-xs-1
+    .col-xs-2
+      button.btn.btn-info#RetrieveURLButton Retrieve URL
 
 br
 .well#ImageSoundNewInternetWell
