@@ -28,12 +28,12 @@ define(["Core/errorHelper"],
 						m_dialogContext = objectContext.dialog;
 						m_pdParent = objectContext.parent;
 
-						// Activate tooltips.
-						$("[data-toggle='tooltip']").tooltip();
+						// // Activate tooltips.
+						// $("[data-toggle='tooltip']").tooltip();
 
-						// Wire buttons.
-						$(".projectItem").off("click");
-						$(".projectItem").on("click", m_functionResourceClick);
+						// // Wire buttons.
+						// $(".projectItem").off("click");
+						// $(".projectItem").on("click", m_functionResourceClick);
 					} catch (e) {
 
 						errorHelper.show(e.message);
@@ -44,24 +44,24 @@ define(["Core/errorHelper"],
 				// Private methods.
 
 				// Invoked when a project item is clicked.
-				var m_functionResourceClick = function () {
+				// var m_functionResourceClick = function () {
 
-					try {
+				// 	try {
 
-						// Get the project id from this (i.e. what was clicked).
-						var strResourceId = $(this).attr("id");
+				// 		// Get the project id from this (i.e. what was clicked).
+				// 		var strResourceId = $(this).attr("id");
 
-				        // Call the ImageSoundDialog's open handler.
-				        var exceptionRet = m_pdParent.open(strResourceId);
-				        if (exceptionRet) {
+				//         // Call the ImageSoundDialog's open handler.
+				//         var exceptionRet = m_pdParent.open(strResourceId);
+				//         if (exceptionRet) {
 
-				        	throw exceptionRet;
-				        }
-					} catch (e) {
+				//         	throw exceptionRet;
+				//         }
+				// 	} catch (e) {
 
-						errorHelper.show(e.message);
-					}
-				};
+				// 		errorHelper.show(e.message);
+				// 	}
+				// };
 
 				//////////////////////////////////////
 				// Private fields.

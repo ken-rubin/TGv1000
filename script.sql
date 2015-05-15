@@ -68,6 +68,53 @@ begin
     
     end if;
 
+    if @dbstate = 2.0 THEN
+
+		CREATE TABLE `TGv1000`.`resources` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `createdByUserId` int(11) NOT NULL,
+		  `friendlyName` varchar(255) NOT NULL,
+		  `resourceTypeId` int(11) NOT NULL,
+		  `public` tinyint(1) NOT NULL DEFAULT '0',
+		  `ext` varchar(5) NOT NULL,
+		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
+		  `origext` varchar(5) DEFAULT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`tags` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`resources_tags` (
+		  `resourceId` int(11) NOT NULL,
+		  `tagId` int(11) NOT NULL,
+		  PRIMARY KEY (`resourceId`,`tagId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`resourceTypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+        insert INTO TGv1000.tags (id,description) values (1,'Chester');
+        insert INTO TGv1000.resources (id,createdByUserId,friendlyName,resourceTypeId,public,ext,quarantined)
+			values (1,1,'Chester',1,1,'png',0);
+		insert into TGv1000.resources_tags values (1,1);
+		insert TGv1000.resourceTypes (id,description) values (1,'image');
+		insert TGv1000.resourceTypes (id,description) values (2,'sound');
+		insert TGv1000.resourceTypes (id,description) values (3,'video');
+
+		UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
+
+    end if;
+        
 end;
 
 //
