@@ -50,7 +50,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					try {
 
 						// Inject result.
-						var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:self },
+						var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:m_pdParent },
 							htmlData,
 							"#ImageSoundNewWell",
 							"#ImageSoundDialogNewLocalSnippet");
@@ -93,7 +93,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					try {
 
 						// Inject result.
-						var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:self },
+						var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:m_pdParent },
 							htmlData,
 							"#ImageSoundNewWell",
 							"#ImageSoundDialogNewInternetSnippet");

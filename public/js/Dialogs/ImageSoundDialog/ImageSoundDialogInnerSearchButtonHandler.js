@@ -29,11 +29,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						m_pdParent = objectContext.parent;
 
 						// Activate tooltips.
-						$("[data-toggle='tooltip']").tooltip();
+						// $("[data-toggle='tooltip']").tooltip();
 
-						// Wire buttons.
-						$(".projectItem").off("click");
-						$(".projectItem").on("click", m_functionResourceClick);
+						// // Wire buttons.
+						// $(".projectItem").off("click");
+						// $(".projectItem").on("click", m_functionResourceClick);
 					} catch (e) {
 
 						errorHelper.show(e.message);
