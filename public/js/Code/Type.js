@@ -689,7 +689,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							} else {
 
-								throw new Error('Bad recourdId received from ImageSoundDialog chain.');
+								throw new Error("Bad ResourceId received from ImageSoundDialog chain.");
 							}
 						} catch (e) {
 

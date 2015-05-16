@@ -512,7 +512,7 @@ define(["Core/errorHelper"],
 					var m_functionGenerateBlocksPropertyGetFunctionString = function (strName) {
 
 						return "this.appendDummyInput().appendField('"+strName+"');" +
-							"this.appendValueInput('SELF').appendField('self');" +
+							"this.appendValueInput('SELF').appendField('from');" +
 							"this.setColour(20);" +
 							"this.setOutput(true);" +
 							"this.setInputsInline(true);" +
@@ -530,8 +530,8 @@ define(["Core/errorHelper"],
 					var m_functionGenerateBlocksPropertySetFunctionString = function (strName) {
 
 						return "this.appendDummyInput().appendField('"+strName+"');" +
-							"this.appendValueInput('SELF').appendField('self');" +
-							"this.appendValueInput('VALUE').appendField('value');" +
+							"this.appendValueInput('SELF').appendField('in');" +
+							"this.appendValueInput('VALUE').appendField('to');" +
 							"this.setColour(30);" +
 							"this.setPreviousStatement(true);" +
 							"this.setNextStatement(true);" +
@@ -551,7 +551,7 @@ define(["Core/errorHelper"],
 					var m_functionGenerateBlocksMethodFunctionString = function (strName) {
 
 						return "this.appendDummyInput().appendField('"+strName+"');" +
-							"this.appendValueInput('SELF').appendField('self');" +
+							"this.appendValueInput('SELF').appendField('using');" +
 							"this.setColour(40);" +
 							"this.setOutput(true);" +
 							"this.setInputsInline(true);" +
