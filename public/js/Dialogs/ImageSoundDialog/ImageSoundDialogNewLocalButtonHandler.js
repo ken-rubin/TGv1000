@@ -49,6 +49,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					try {
 
 						$("#resourcename").trigger("click");
+
+						$("#resourcename").change(function() {
+
+							var file = $(this).val();
+							alert(file);
+						});						
 						
 					} catch (e) {
 
