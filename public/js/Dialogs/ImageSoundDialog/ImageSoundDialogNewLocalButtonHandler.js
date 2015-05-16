@@ -54,113 +54,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						errorHelper(e);
 					}
-				}
-
-				// // Invoked when user clicks local resource desired.
-				// var m_functionNewLocalSnippetResponse = function (htmlData) {
-
-				// 	try {
-
-				// 		// Inject result.
-				// 		var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:m_pdParent },
-				// 			htmlData,
-				// 			"#ImageSoundNewWell",
-				// 			"#ImageSoundDialogNewLocalSnippet");
-				// 		if (exceptionRet) {
-
-				// 			throw exceptionRet;
-				// 		}
-				// 	} catch (e) {
-
-				// 		errorHelper.show(e.message);
-				// 	}
-				// }
-
-				// // Invoked when the load local resource button is clicked.
-				// var m_functionLocalResourceClick = function () {
-
-				// 	try {
-
-				// 		// Get the snippet.
-				// 		$.ajax({
-
-				// 			cache: false,
-				// 			data: {
-
-				// 				templateFile: "Dialogs/ImageSoundDialog/imageSoundDialogNewLocalSnippet"
-				// 			},
-				// 			dataType: "HTML",
-				// 			method: "POST",
-				// 			url: "/renderJadeSnippet"
-				// 		}).done(m_functionNewLocalSnippetResponse).error(errorHelper.show);
-				// 	} catch (e) {
-
-				// 		errorHelper.show(e.message);
-				// 	}
-				// }
-
-				// // Invoked when user clicks internet resource desired.
-				// var m_functionNewInternetSnippetResponse = function (htmlData) {
-
-				// 	try {
-
-				// 		// Inject result.
-				// 		var exceptionRet = snippetHelper.process({ dialog:m_dialogContext, parent:m_pdParent },
-				// 			htmlData,
-				// 			"#ImageSoundNewWell",
-				// 			"#ImageSoundDialogNewInternetSnippet");
-				// 		if (exceptionRet) {
-
-				// 			throw exceptionRet;
-				// 		}
-				// 	} catch (e) {
-
-				// 		errorHelper.show(e.message);
-				// 	}
-				// }
-
-				// // Invoked when the load internet resource button is clicked.
-				// var m_functionInternetResourceClick = function () {
-
-				// 	try {
-
-				// 		// Get the snippet.
-				// 		$.ajax({
-
-				// 			cache: false,
-				// 			data: {
-
-				// 				templateFile: "Dialogs/ImageSoundDialog/imageSoundDialogNewInternetSnippet"
-				// 			},
-				// 			dataType: "HTML",
-				// 			method: "POST",
-				// 			url: "/renderJadeSnippet"
-				// 		}).done(m_functionNewInternetSnippetResponse).error(errorHelper.show);
-				// 	} catch (e) {
-
-				// 		errorHelper.show(e.message);
-				// 	}
-				// }
-
-				// Invoked when a project item is clicked.
-				// var m_functionResourceClick = function () {
-
-				// 	try {
-
-				// 		// Get the project id from this (i.e. what was clicked).
-				// 		var strResourceId = $(this).attr("id");
-
-				//         // Call the ImageSoundDialog's open handler.
-				//         var exceptionRet = m_pdParent.open(strResourceId);
-				//         if (exceptionRet) {
-
-				//         	throw exceptionRet;
-				//         }
-				// 	} catch (e) {
-
-				// 		errorHelper.show(e.message);
-				// 	}
-				// };
+				};
 
 				//////////////////////////////////////
 				// Private fields.
@@ -174,6 +68,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			return functionHandler;
 		} catch (e) {
 
-			alert(e.message);
+			errorHelper.show(e);
 		}
 	});
