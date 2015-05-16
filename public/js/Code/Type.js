@@ -675,10 +675,25 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 						try {
 
+							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
+								// Do stuff with it.
+								self.data.resourceId = iResourceId;
+								var exceptionRet = m_functionGenerateTypeContents();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+								// TO-DO
+								// Cause the instances of type to repaint in designer, too. (Or animator or whatever it's called.)
+
+							} else {
+
+								throw new Error('Bad recourdId received from ImageSoundDialog chain.');
+							}
 						} catch (e) {
 
-
+							errorHelper.show(e);
 						}
 					};
 
