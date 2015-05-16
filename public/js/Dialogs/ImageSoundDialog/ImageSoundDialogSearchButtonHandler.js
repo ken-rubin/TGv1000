@@ -34,6 +34,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// // Wire buttons.
 						// $(".projectItem").off("click");
 						// $(".projectItem").on("click", m_functionResourceClick);
+						$("#InnerSearchButton").click(m_functionInnerResourceBtnClicked);
+
 					} catch (e) {
 
 						errorHelper.show(e.message);
@@ -43,25 +45,30 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				//////////////////////////////////////
 				// Private methods.
 
-				// Invoked when a project item is clicked.
-				// var m_functionResourceClick = function () {
+				// Invoked (presumably) after user has entered tags and clicks Search.
+				var m_functionInnerResourceBtnClicked = function () {
 
-				// 	try {
+					// Temporary code. Actual code will go to server to find a tag match ("image" or "sound" will have been added to tagset).
+					m_wellMessage("Will display 'no match' error or strip of matching images or sounds.", null);
+				}
 
-				// 		// Get the project id from this (i.e. what was clicked).
-				// 		var strResourceId = $(this).attr("id");
+				var m_wellMessage = function(msg, timeoutAction) {
 
-				//         // Call the ImageSoundDialog's open handler.
-				//         var exceptionRet = m_pdParent.open(strResourceId);
-				//         if (exceptionRet) {
+					try {
 
-				//         	throw exceptionRet;
-				//         }
-				// 	} catch (e) {
+						$("#ImageSoundSearchWell").empty();
+						$("#ImageSoundSearchWell").append("<p class='text-danger'>" + msg + "</p>");
 
-				// 		errorHelper.show(e.message);
-				// 	}
-				// };
+						if (timeoutAction !== null) {
+
+							setTimeout(timeoutAction.callback, timeoutAction.waittime);
+						}
+
+					} catch (e) {
+
+						errorHelper.show(msg);
+					}
+				}
 
 				//////////////////////////////////////
 				// Private fields.

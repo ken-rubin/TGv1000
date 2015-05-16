@@ -59,28 +59,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Expose new event.
-					// self.new = function () {
-
-					// 	try {
-
-					// 		// Dismiss the dialog.
-					//         m_dialog.close();
-
-					//         // Call the callback.
-					//         if ($.isFunction(m_callbackNew)) {
-
-					//         	return m_callbackNew();
-					//         }
-
-					//     	return null;
-					    	
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
 					//////////////////////////////////
 					// Private functions.
 
@@ -128,7 +106,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-
 					// Invoked when the server request 
 					// to get the search snippet returns.
 					var m_functionSearchSnippetResponse = function (htmlData) {
@@ -150,7 +127,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Invoked when a Type item is clicked.
+					// Invoked when a Search btn is clicked.
 					var m_functionSearchButtonClick = function () {
 
 						try {

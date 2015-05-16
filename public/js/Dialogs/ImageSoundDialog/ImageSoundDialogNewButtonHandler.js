@@ -34,6 +34,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// Wire buttons.
 						$("#NewLocalResourceButton").click(m_functionLocalResourceClick);
 						$("#NewInternetResourceButton").click(m_functionInternetResourceClick);
+						
 					} catch (e) {
 
 						errorHelper.show(e.message);
