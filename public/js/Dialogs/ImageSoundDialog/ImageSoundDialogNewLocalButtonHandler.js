@@ -32,6 +32,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// $("[data-toggle='tooltip']").tooltip();
 
 						// Wire things up.
+						m_bUserHasSeenImage = false;
 					    var strUserIdResources = client.getTGCookie("userId");
 
 					    var optionsImages = {
@@ -44,7 +45,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					    };
 
 					    $('#imageUploadForm').ajaxForm(optionsImages);
-						
+					    $("#imageFile").change(m_functionFileHasBeenChosen);
+
 					} catch (e) {
 
 						errorHelper.show(e.message);
@@ -53,6 +55,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				//////////////////////////////////////
 				// Private methods.
+
+				var m_functionFileHasBeenChosen = function() {
+
+			    	$("#imageSubmit").click();
+				}
 
 				var m_validateImageUploadRequest = function (formData, jqForm, options) {
 
@@ -77,25 +84,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				    
 				    errorHelper.show('Upload error on server: ' + JSON.stringify({error:err}));
 				}
-
-				// // Invoked to open CommonFileDialog
-				// var m_functionOpenCommonFileDialog = function() {
-
-				// 	try {
-
-				// 		$("#resourcename").trigger("click");
-
-				// 		$("#resourcename").change(function() {
-
-				// 			var file = $(this).val();
-				// 			alert(file);
-				// 		});						
-						
-				// 	} catch (e) {
-
-				// 		errorHelper(e);
-				// 	}
-				// };
 
 				//////////////////////////////////////
 				// Private fields.

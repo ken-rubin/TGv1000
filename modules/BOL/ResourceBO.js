@@ -27,6 +27,8 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
             // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
 
+            // Note: image files are always saved with extension png, even if they're jpgs.
+
             var friendlyName = req.body.friendlyName.replace(/\.[0-9a-z]+$/i, '').replace(' ','_').toLowerCase();  // replace .ext if present with ''
             var ext = req.body.filePath.replace(/^.*\./, '');                       // replace up to .ext with ''
 
@@ -144,7 +146,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                             });
                                                         } else {
 
-                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
+//                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
                                                             res.json({
                                                                 success:true,
                                                                 id: id,
@@ -160,7 +162,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                             });
                                         } else {
 
-                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
+//                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
                                             // a non-image (for now a sound)
                                             res.json({
                                                 success:true,

@@ -4,9 +4,13 @@
 .snippetcontext#ImageSoundDialogNewLocalSnippet(data-module="Dialogs/ImageSoundDialog/ImageSoundDialogNewLocalButtonHandler")
 .row
   .col-xs-7
-    h4 Click the <em>Open</em> button to find your resource file.
+    h5 Click the <em>Choose File</em> button to find your resource file.
+    br
+    br
+    img#LocalResourceImage
   .col-xs-2
     form#imageUploadForm(enctype="multipart/form-data" action="/BOL/ResourceBO/SaveResource" method="post")
+        br
         input#imageFile(type="file" name="userImage" accept="image/*")
         br
         input#imageName(type="text" name="friendlyName" placeholder='Image friendly name')
@@ -15,7 +19,7 @@
         textarea#imageTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="Enter one or more tags to help you search for this image")
         br
         br
-        input.center-block(type="submit" value="Upload image" name="submit")
+        input.center-block#imageSubmit(type="submit" value="Upload image" name="submit" style="visibility:hidden;")
         br
         br
         #output1
