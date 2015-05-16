@@ -6,7 +6,18 @@
   .col-xs-7
     h4 Click the <em>Open</em> button to find your resource file.
   .col-xs-2
-    button.btn.btn-info#OpenCommonFileDialogButton Open
-    input#resourcename(type='file', name='resourcename', style='visibility:hidden;')
+    form#imageUploadForm(enctype="multipart/form-data" action="/BOL/ResourceBO/SaveResource" method="post")
+        input#imageFile(type="file" name="userImage" accept="image/*")
+        br
+        input#imageName(type="text" name="friendlyName" placeholder='Image friendly name')
+        br
+        br
+        textarea#imageTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="Enter one or more tags to help you search for this image")
+        br
+        br
+        input.center-block(type="submit" value="Upload image" name="submit")
+        br
+        br
+        #output1
 br
 .well#ImageSoundNewLocalWell

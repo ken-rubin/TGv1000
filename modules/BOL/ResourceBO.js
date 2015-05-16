@@ -16,6 +16,229 @@ module.exports = function ResourceBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+    self.routeSaveResource = function (req, res) {
+
+        try {
+
+            console.log("Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
+            // req.body.userId
+            // req.body.friendlyName    without extension; if present, remove it
+            // req.body.resourceTypeId  1=image; 2=sound; 3=video
+            // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
+            // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
+
+            var friendlyName = req.body.friendlyName.replace(/\.[0-9a-z]+$/i, '').replace(' ','_').toLowerCase();  // replace .ext if present with ''
+            var ext = req.body.filePath.replace(/^.*\./, '');                       // replace up to .ext with ''
+
+            var tagArray = [];
+            tagArray.push(friendlyName);
+            tagArray.push(req.body.resourceTypeId === "1" ? "image" : "sound");
+            var tags = req.body.tags.toLowerCase();
+            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+            if (ccArray){
+                tagArray = tagArray.concat(ccArray);
+            }
+            // Remove possible dups from tagArray.
+            var uniqueArray = [];
+            uniqueArray.push(tagArray[0]);
+            for (var i = 1; i < tagArray.length; i++) {
+                var compIth = tagArray[i];
+                var found = false;
+                for (var j = 0; j < uniqueArray.length; j++) {
+                    if (uniqueArray[j] === compIth){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    uniqueArray.push(compIth);
+                }
+            }
+            tagArray = uniqueArray;
+            console.log('**********************************');
+            console.log('TAGS: ' + tagArray);
+
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId, public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
+            sql.execute(sqlString,
+                function(rows){
+
+                    if (rows.length === 0) {
+
+                        res.json({
+                            success:false,
+                            message: 'Failed to create resource in database'
+                        });
+                    } else {
+
+                        var id = rows[0].insertId;
+
+                        // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
+                        // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
+                        m_doTags(tagArray, id, function(err){
+
+                            if (err) {
+
+                                res.json({
+                                    success:false,
+                                    message: err.message
+                                });
+                            } else {
+
+                                var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
+                                fs.rename(req.body.filePath, origImagePath, function(err){
+
+                                    if (err) {
+
+                                        res.json({
+                                            success:false,
+                                            message: err.message
+                                        });
+                                    } else {
+
+                                        // The original file has been placed into the resources folder.
+                                        // If it is an image, further processing is needed to create a thumbnail.
+
+                                        if (req.body.resourceTypeId === "1") {
+
+                                            // Now we want a thumbnail of it with filename id + 't.' + ext.
+                                            gm(origImagePath)
+                                            .options({imageMagick:true})
+                                            .size(function(err, size){
+
+                                                if (err) {
+
+                                                    res.json({
+                                                        success:false,
+                                                        message: err.message
+                                                    });
+                                                } else {
+
+                                                    // resize, keeping a/r.
+                                                    var maxW = 100;
+                                                    var maxH = 100;
+                                                    var ratio = 0;
+                                                    var height = size.height;
+                                                    var width = size.width;
+                                                    if (width > maxW) {
+                                                        ratio = maxW / width;
+                                                        height = height * ratio;
+                                                        width = width * ratio;
+                                                    }
+                                                    if (height > maxH) {
+                                                        ratio = maxH / height;
+                                                        height = height * ratio;
+                                                        width = width * ratio;
+                                                    }
+
+                                                    gm(origImagePath)
+                                                    .options({imageMagick:true})
+                                                    .resize(width, height)
+                                                    .noProfile()
+                                                    .write('public/resources/' + id.toString() + 't.' + ext, function(err){
+
+                                                        if (err) {
+
+                                                            res.json({
+                                                                success:false,
+                                                                message: err.message
+                                                            });
+                                                        } else {
+
+                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
+                                                            res.json({
+                                                                success:true,
+                                                                id: id,
+                                                                createdByUserId: req.body.userId,
+                                                                ext: ext,
+                                                                friendlyName: friendlyName,
+                                                                resourceTypeId: req.body.resourceTypeId,
+                                                                public: 0
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        } else {
+
+                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
+                                            // a non-image (for now a sound)
+                                            res.json({
+                                                success:true,
+                                                id: id,
+                                                createdByUserId: req.body.userId,
+                                                ext: ext,
+                                                friendlyName: friendlyName,
+                                                resourceTypeId: req.body.resourceTypeId,
+                                                public: 0
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                },
+                function(strError){
+
+                    res.json({
+                        success:false,
+                        message:strError
+                    }
+                );
+
+            });
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    self.routeFetchResources = function (req, res) {
+
+        try {
+
+            console.log("Entered AdminBO/routeFetchResources with req.body=" + JSON.stringify(req.body));
+            // req.body.strUserId
+            // req.body.resourceTypeId
+
+            var sqlString = "select * from " + self.dbname + "resources where (createdByUserId=" + req.body.strUserId + " or public=1) AND resourceTypeId=" + req.body.resourceTypeId + " order by public asc, friendlyName asc;";
+            //console.log(sqlString);
+            var exceptionRet = sql.execute(sqlString,
+                function(rows){
+
+                    res.json({
+                        success: true,
+                        arrayRows: rows
+                    });
+                },
+                function(strError) {
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                }
+            );
+
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
+        } catch(e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     // self.routeMaintainResource = function (req, res) {
 
     //     try {
@@ -354,186 +577,6 @@ module.exports = function ResourceBO(app, sql, logger) {
     //     }
     // }
 
-    self.routeSaveResource = function (req, res) {
-
-        try {
-
-            console.log("Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
-            // req.body.userId
-            // req.body.friendlyName    without extension; if present, remove it
-            // req.body.resourceTypeId  1=image; 2=sound; 3=video
-            // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
-            // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
-
-            var friendlyName = req.body.friendlyName.replace(/\.[0-9a-z]+$/i, '').replace(' ','_').toLowerCase();  // replace .ext if present with ''
-            var ext = req.body.filePath.replace(/^.*\./, '');                       // replace up to .ext with ''
-
-            var tagArray = [];
-            tagArray.push(friendlyName);
-            tagArray.push(req.body.resourceTypeId === "1" ? "image" : "sound");
-            var tags = req.body.tags.toLowerCase();
-            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
-            if (ccArray){
-                tagArray = tagArray.concat(ccArray);
-            }
-            // Remove possible dups from tagArray.
-            var uniqueArray = [];
-            uniqueArray.push(tagArray[0]);
-            for (var i = 1; i < tagArray.length; i++) {
-                var compIth = tagArray[i];
-                var found = false;
-                for (var j = 0; j < uniqueArray.length; j++) {
-                    if (uniqueArray[j] === compIth){
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueArray.push(compIth);
-                }
-            }
-            tagArray = uniqueArray;
-            console.log('**********************************');
-            console.log('TAGS: ' + tagArray);
-
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId, public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
-            sql.execute(sqlString,
-                function(rows){
-
-                    if (rows.length === 0) {
-
-                        res.json({
-                            success:false,
-                            message: 'Failed to create resource in database'
-                        });
-                    } else {
-
-                        var id = rows[0].insertId;
-
-                        // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
-                        // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                        m_doTags(tagArray, id, function(err){
-
-                            if (err) {
-
-                                res.json({
-                                    success:false,
-                                    message: err.message
-                                });
-                            } else {
-
-                                var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
-                                fs.rename(req.body.filePath, origImagePath, function(err){
-
-                                    if (err) {
-
-                                        res.json({
-                                            success:false,
-                                            message: err.message
-                                        });
-                                    } else {
-
-                                        // The original file has been placed into the resources folder.
-                                        // If it is an image, further processing is needed to create a thumbnail.
-
-                                        if (req.body.resourceTypeId === "1") {
-
-                                            // Now we want a thumbnail of it with filename id + 't.' + ext.
-                                            gm(origImagePath)
-                                            .options({imageMagick:true})
-                                            .size(function(err, size){
-
-                                                if (err) {
-
-                                                    res.json({
-                                                        success:false,
-                                                        message: err.message
-                                                    });
-                                                } else {
-
-                                                    // resize, keeping a/r.
-                                                    var maxW = 100;
-                                                    var maxH = 100;
-                                                    var ratio = 0;
-                                                    var height = size.height;
-                                                    var width = size.width;
-                                                    if (width > maxW) {
-                                                        ratio = maxW / width;
-                                                        height = height * ratio;
-                                                        width = width * ratio;
-                                                    }
-                                                    if (height > maxH) {
-                                                        ratio = maxH / height;
-                                                        height = height * ratio;
-                                                        width = width * ratio;
-                                                    }
-
-                                                    gm(origImagePath)
-                                                    .options({imageMagick:true})
-                                                    .resize(width, height)
-                                                    .noProfile()
-                                                    .write('public/resources/' + id.toString() + 't.' + ext, function(err){
-
-                                                        if (err) {
-
-                                                            res.json({
-                                                                success:false,
-                                                                message: err.message
-                                                            });
-                                                        } else {
-
-                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                                            res.json({
-                                                                success:true,
-                                                                id: id,
-                                                                createdByUserId: req.body.userId,
-                                                                ext: ext,
-                                                                friendlyName: friendlyName,
-                                                                resourceTypeId: req.body.resourceTypeId,
-                                                                public: 0
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        } else {
-
-                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                            // a non-image (for now a sound)
-                                            res.json({
-                                                success:true,
-                                                id: id,
-                                                createdByUserId: req.body.userId,
-                                                ext: ext,
-                                                friendlyName: friendlyName,
-                                                resourceTypeId: req.body.resourceTypeId,
-                                                public: 0
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }
-                },
-                function(strError){
-
-                    res.json({
-                        success:false,
-                        message:strError
-                    }
-                );
-
-            });
-        } catch (e) {
-
-            res.json({
-                success: false,
-                message: e.message
-            });
-        }
-    }
-
     // self.routeUndeleteResource = function (req, res) {
 
     //     try {
@@ -845,49 +888,6 @@ module.exports = function ResourceBO(app, sql, logger) {
     //         });
     //     }
     // }
-
-    self.routeFetchResources = function (req, res) {
-
-        try {
-
-            console.log("Entered AdminBO/routeFetchResources with req.body=" + JSON.stringify(req.body));
-            // req.body.strUserId
-            // req.body.resourceTypeId
-
-            var sqlString = "select * from " + self.dbname + "resources where (createdByUserId=" + req.body.strUserId + " or public=1) AND resourceTypeId=" + req.body.resourceTypeId + " order by public asc, friendlyName asc;";
-            //console.log(sqlString);
-            var exceptionRet = sql.execute(sqlString,
-                function(rows){
-
-                    res.json({
-                        success: true,
-                        arrayRows: rows
-                    });
-                },
-                function(strError) {
-
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
-                }
-            );
-
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-            }
-        } catch(e) {
-
-            res.json({
-                success: false,
-                message: e.message
-            });
-        }
-    }
 
     // Private methods
     // var m_doJohnsImage = function(imageFile, callback) {

@@ -31,8 +31,19 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// // Activate tooltips.
 						// $("[data-toggle='tooltip']").tooltip();
 
-						// Wire buttons.
-						$("#OpenCommonFileDialogButton").click(m_functionOpenCommonFileDialog);
+						// Wire things up.
+					    var strUserIdResources = client.getTGCookie("userId");
+
+					    var optionsImages = {
+
+					        beforeSubmit: m_validateImageUploadRequest,
+					        dataType: 'json',
+					        data: {userId:strUserIdResources, resourceTypeId:1},
+					        clearForm: true,
+					        error: m_handleUploadError
+					    };
+
+					    $('#imageUploadForm').ajaxForm(optionsImages);
 						
 					} catch (e) {
 
@@ -43,24 +54,48 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				//////////////////////////////////////
 				// Private methods.
 
-				// Invoked to open CommonFileDialog
-				var m_functionOpenCommonFileDialog = function() {
+				var m_validateImageUploadRequest = function (formData, jqForm, options) {
 
-					try {
+				    var friendlyNameLength = $("#imageName").val().length;
+				    var fileName = $("#imageFile").val();
+				    var fileNameLength = fileName.length;
+				    var ext = fileName.replace(/^.*\./, '').toLowerCase();
+				    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg'){
+				        errorHelper.show('We support only .png and .jpg (or .jpeg) image files.');
+				        return false;
+				    }
+				    var tagsLength = $("#imageTags").val().length;
+				    if (friendlyNameLength === 0 || fileNameLength === 0 || tagsLength === 0) {
 
-						$("#resourcename").trigger("click");
+				        errorHelper.show('You must enter a friendly name, at least one tag and choose an image file to upload.');
+				        return false;
+				    }
+				    return true;
+				}
 
-						$("#resourcename").change(function() {
+				var m_handleUploadError = function(err) {
+				    
+				    errorHelper.show('Upload error on server: ' + JSON.stringify({error:err}));
+				}
 
-							var file = $(this).val();
-							alert(file);
-						});						
+				// // Invoked to open CommonFileDialog
+				// var m_functionOpenCommonFileDialog = function() {
+
+				// 	try {
+
+				// 		$("#resourcename").trigger("click");
+
+				// 		$("#resourcename").change(function() {
+
+				// 			var file = $(this).val();
+				// 			alert(file);
+				// 		});						
 						
-					} catch (e) {
+				// 	} catch (e) {
 
-						errorHelper(e);
-					}
-				};
+				// 		errorHelper(e);
+				// 	}
+				// };
 
 				//////////////////////////////////////
 				// Private fields.

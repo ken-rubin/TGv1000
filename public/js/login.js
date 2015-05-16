@@ -41,7 +41,7 @@ $(document).ready(function () {
 	                });
 
 	                // Get the signed in user id from a cookie.
-	                var strUserName = getTGCookie("userName");
+	                var strUserName = clientLogin.getTGCookie("userName");
 	                if (strUserName && strUserName.length > 0) {
 
 	                    $("#inputName").val(strUserName);
@@ -131,16 +131,6 @@ $(document).ready(function () {
 		alert(e.message);
 	}
 });
-
-function getTGCookie (name) {
-
-    var value = "; " + document.cookie;
-    var parts = value.split("; " + name + "=");
-    if (parts.length == 2) {
-
-        return parts.pop().split(";").shift();
-    }
-};
 
 var m_functionEnrollButtonClick = function(errorHelper) {
 	
