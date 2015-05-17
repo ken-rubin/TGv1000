@@ -27,10 +27,29 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
             // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
 
-            // Note: image files are always saved with extension png, even if they're jpgs.
+            // Notes: 
+            //      Allowed image extensions are png, jpg, jpeg and gif. That has been checked on the client for local file uploads, but
+            //      it's re-checked here for URL fetches.
+            //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
 
             var friendlyName = req.body.friendlyName.replace(/\.[0-9a-z]+$/i, '').replace(' ','_').toLowerCase();  // replace .ext if present with ''
             var ext = req.body.filePath.replace(/^.*\./, '');                       // replace up to .ext with ''
+            // validate ext if image type
+            if (req.body.resourceTypeId === 1) {
+
+                if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif') {
+
+                    res.json({
+                        success: false,
+                        message: 'Invalid file extension. TechGroms allows png, jpg, jpeg and gif.'
+                    });
+                    return;
+                } else {
+
+                    // The image if presumably ok. Set extension to png as described in notes above.
+                    ext = 'png';
+                }
+            }
 
             var tagArray = [];
             tagArray.push(friendlyName);
@@ -57,10 +76,8 @@ module.exports = function ResourceBO(app, sql, logger) {
                 }
             }
             tagArray = uniqueArray;
-            console.log('**********************************');
-            console.log('TAGS: ' + tagArray);
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId, public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
             sql.execute(sqlString,
                 function(rows){
 
