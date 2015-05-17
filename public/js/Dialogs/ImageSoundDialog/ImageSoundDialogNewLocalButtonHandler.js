@@ -32,7 +32,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// $("[data-toggle='tooltip']").tooltip();
 
 						// Wire things up.
-						m_bUserHasSeenImage = false;
 					    var strUserIdResources = client.getTGCookie("userId");
 
 					    var optionsImages = {

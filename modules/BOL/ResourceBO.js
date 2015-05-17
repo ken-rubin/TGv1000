@@ -241,6 +241,215 @@ module.exports = function ResourceBO(app, sql, logger) {
         }
     }
 
+    self.routeDeleteResource = function (req, res) {
+
+        try {
+
+            console.log("Entered AdminBO/routeDeleteResource with req.body=" + JSON.stringify(req.body));
+            // req.body.resourceId
+            // req.body.resourceTypeId
+            // req.body.ext (ext of the original)
+
+            // Copy old resource to /public/quarantine. Keep the same name it had.
+            // For images, overwrite originals with public/images/disallowed.png and thumbnail with disallowedt.png.
+            // For sounds, overwrite origianl with public/sounds/Evil_laugh_male.mp3.
+
+            // Update the record in resources, set quarantined=1, origext=ext and ext='png' or 'mp3', as appropriate.
+
+            fs.readFile('public/resources/' + req.body.resourceId + '.' + req.body.ext, function(err, data){
+
+                if (err) {
+                    res.json({
+                        success:false,
+                        message:'Error reading original resource: ' + err.message + '. Nothing done.'
+                    });
+                    return;
+                }
+                fs.writeFile('public/quarantine/' + req.body.resourceId + '.' + req.body.ext, data, function(err){
+                    if (err){
+                        res.json({
+                            success:false,
+                            message:'Error writing original resource to quarantine folder: ' + err.message + '. Nothing done.'
+                        });
+                        return;
+                    }
+                    if (req.body.resourceTypeId === "1") {
+
+                        // Now the thumbnail
+                        fs.readFile('public/resources/' + req.body.resourceId + 't.' + req.body.ext, function(err, data){
+
+                            if (err) {
+                                res.json({
+                                    success:false,
+                                    message:'Error reading original resource thumbnail: ' + err.message + '. Nothing done.'
+                                });
+                                return;
+                            }
+                            fs.writeFile('public/quarantine/' + req.body.resourceId + 't.' + req.body.ext, data, function(err){
+                                if (err){
+                                    res.json({
+                                        success:false,
+                                        message:'Error writing original resource thumbnail to quarantine folder: ' + err.message + '. Nothing done.'
+                                    });
+                                    return;
+                                }
+
+                                // Read disallowed.png into buffer from '/public/images/' and write it to '/public/resources/' + new name that uses id
+                                fs.readFile('public/images/disallowed.png', function(err, data){
+
+                                    if (err) {
+
+                                        res.json({
+                                            success:false,
+                                            message:'Error reading "disallowed" file: ' + err.message
+                                        });
+                                    } else {
+
+                                        var newFn = 'public/resources/' + req.body.resourceId + '.png';
+                                        fs.writeFile(newFn, data, function(err){    // this overwrites (if the previous file was a png)
+
+                                            if (err) {
+
+                                                res.json({
+                                                    success:false,
+                                                    message:'Error writing new "disallowed" file: ' + err.message
+                                                });
+                                            } else {
+
+                                                // Read disallowedt.png into buffer from '/public/images/' and write it to '/public/resources/' + new name that uses id + 't'
+                                                fs.readFile('public/images/disallowedt.png', function(err, data){
+
+                                                    if (err) {
+
+                                                        res.json({
+                                                            success:false,
+                                                            message:'Error reading "disallowed" thumbnail file: ' + err.message
+                                                        });
+                                                    } else {
+
+                                                        var newFn = 'public/resources/' + req.body.resourceId + 't.png';
+                                                        fs.writeFile(newFn, data, function(err){    // this overwrites (again, if the previous was a png)
+
+                                                            if (err) {
+
+                                                                res.json({
+                                                                    success:false,
+                                                                    message:'Error writing new "disallowed" thumbnail file: ' + err.message
+                                                                });
+                                                            } else {
+
+                                                                if (req.body.ext !== 'png') {
+
+                                                                    // need to delete the original image files with their non-png extensions
+                                                                    // need to update the ext in the resources table and will need to update the data when we get back
+                                                                    // Also, mark as quarantined, etc.
+                                                                    fs.unlink('public/resources/' + req.body.resourceId + '.' + req.body.ext, function(err){
+
+                                                                        if (err) {
+
+                                                                            res.json({
+                                                                                success:false,
+                                                                                message:'Error removing original image: ' + err.message
+                                                                            });
+                                                                        } else {
+
+                                                                            fs.unlink('public/resources/' + req.body.resourceId + 't.' + req.body.ext, function(err){
+
+                                                                                if (err) {
+
+                                                                                    res.json({
+                                                                                        success:false,
+                                                                                        message:'Error removing original thumbnail image: ' + err.message
+                                                                                    });
+                                                                                } else {
+
+                                                                                    sql.execute("update " + self.dbname + "resources set quarantined=1, origext=ext, ext='png' where id=" + req.body.resourceId + ";",
+                                                                                        function(rows){
+
+                                                                                            res.json({
+                                                                                                success:true
+                                                                                            });
+                                                                                        },
+                                                                                        function(strError){
+
+                                                                                            res.json({
+                                                                                                success:false,
+                                                                                                message:'Error updating database record with new extension: ' + err.message
+                                                                                            });
+                                                                                        });
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                } else {
+                                                                    res.json({
+                                                                        success:true
+                                                                    });
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            })
+                        });
+                    } else {
+
+                        // Read Evil_Laugh_Male.mp3 into buffer from '/public/sounds/' and write it to '/public/resources/' + new name that uses id
+                        fs.readFile('public/sounds/Evil_Laugh_Male.mp3', function(err, data){
+
+                            if (err) {
+
+                                res.json({
+                                    success:false,
+                                    message:'Error reading "disallowed" sound file: ' + err.message
+                                });
+                            } else {
+
+                                var newFn = 'public/resources/' + req.body.resourceId + '.mp3';
+                                fs.writeFile(newFn, data, function(err){    // this overwrites if originally an mp3
+
+                                    if (err) {
+
+                                        res.json({
+                                            success:false,
+                                            message:'Error writing new "disallowed" file: ' + err.message
+                                        });
+                                    } else {
+
+                                        sql.execute("update " + self.dbname + "resources set origext=ext, quarantined=1, ext='mp3' where id=" + req.body.resourceId + ";",
+                                            function(rows){
+
+                                                res.json({
+                                                    success:true
+                                                });
+                                            },
+                                            function(strError){
+
+                                                res.json({
+                                                    success:false,
+                                                    message:'Error updating database record with new extension: ' + err.message
+                                                });
+                                            });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        } catch (e) {
+            
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     // self.routeMaintainResource = function (req, res) {
 
     //     try {
@@ -672,215 +881,6 @@ module.exports = function ResourceBO(app, sql, logger) {
     //                     });
     //                 });
 
-    //         });
-    //     } catch (e) {
-            
-    //         res.json({
-    //             success: false,
-    //             message: e.message
-    //         });
-    //     }
-    // }
-
-    // self.routeDeleteResource = function (req, res) {
-
-    //     try {
-
-    //         console.log("Entered AdminBO/routeDeleteResource with req.body=" + JSON.stringify(req.body));
-    //         // req.body.resourceId
-    //         // req.body.resourceTypeId
-    //         // req.body.ext (ext of the original)
-
-    //         // Copy old resource to /public/quarantine. Keep the same name it had.
-    //         // For images, overwrite originals with public/images/disallowed.png and thumbnail with disallowedt.png.
-    //         // For sounds, overwrite origianl with public/sounds/Evil_laugh_male.mp3.
-
-    //         // Update the record in resources, set quarantined=1, origext=ext and ext='png' or 'mp3', as appropriate.
-
-    //         fs.readFile('public/resources/' + req.body.resourceId + '.' + req.body.ext, function(err, data){
-
-    //             if (err) {
-    //                 res.json({
-    //                     success:false,
-    //                     message:'Error reading original resource: ' + err.message + '. Nothing done.'
-    //                 });
-    //                 return;
-    //             }
-    //             fs.writeFile('public/quarantine/' + req.body.resourceId + '.' + req.body.ext, data, function(err){
-    //                 if (err){
-    //                     res.json({
-    //                         success:false,
-    //                         message:'Error writing original resource to quarantine folder: ' + err.message + '. Nothing done.'
-    //                     });
-    //                     return;
-    //                 }
-    //                 if (req.body.resourceTypeId === "1") {
-
-    //                     // Now the thumbnail
-    //                     fs.readFile('public/resources/' + req.body.resourceId + 't.' + req.body.ext, function(err, data){
-
-    //                         if (err) {
-    //                             res.json({
-    //                                 success:false,
-    //                                 message:'Error reading original resource thumbnail: ' + err.message + '. Nothing done.'
-    //                             });
-    //                             return;
-    //                         }
-    //                         fs.writeFile('public/quarantine/' + req.body.resourceId + 't.' + req.body.ext, data, function(err){
-    //                             if (err){
-    //                                 res.json({
-    //                                     success:false,
-    //                                     message:'Error writing original resource thumbnail to quarantine folder: ' + err.message + '. Nothing done.'
-    //                                 });
-    //                                 return;
-    //                             }
-
-    //                             // Read disallowed.png into buffer from '/public/images/' and write it to '/public/resources/' + new name that uses id
-    //                             fs.readFile('public/images/disallowed.png', function(err, data){
-
-    //                                 if (err) {
-
-    //                                     res.json({
-    //                                         success:false,
-    //                                         message:'Error reading "disallowed" file: ' + err.message
-    //                                     });
-    //                                 } else {
-
-    //                                     var newFn = 'public/resources/' + req.body.resourceId + '.png';
-    //                                     fs.writeFile(newFn, data, function(err){    // this overwrites (if the previous file was a png)
-
-    //                                         if (err) {
-
-    //                                             res.json({
-    //                                                 success:false,
-    //                                                 message:'Error writing new "disallowed" file: ' + err.message
-    //                                             });
-    //                                         } else {
-
-    //                                             // Read disallowedt.png into buffer from '/public/images/' and write it to '/public/resources/' + new name that uses id + 't'
-    //                                             fs.readFile('public/images/disallowedt.png', function(err, data){
-
-    //                                                 if (err) {
-
-    //                                                     res.json({
-    //                                                         success:false,
-    //                                                         message:'Error reading "disallowed" thumbnail file: ' + err.message
-    //                                                     });
-    //                                                 } else {
-
-    //                                                     var newFn = 'public/resources/' + req.body.resourceId + 't.png';
-    //                                                     fs.writeFile(newFn, data, function(err){    // this overwrites (again, if the previous was a png)
-
-    //                                                         if (err) {
-
-    //                                                             res.json({
-    //                                                                 success:false,
-    //                                                                 message:'Error writing new "disallowed" thumbnail file: ' + err.message
-    //                                                             });
-    //                                                         } else {
-
-    //                                                             if (req.body.ext !== 'png') {
-
-    //                                                                 // need to delete the original image files with their non-png extensions
-    //                                                                 // need to update the ext in the resources table and will need to update the data when we get back
-    //                                                                 // Also, mark as quarantined, etc.
-    //                                                                 fs.unlink('public/resources/' + req.body.resourceId + '.' + req.body.ext, function(err){
-
-    //                                                                     if (err) {
-
-    //                                                                         res.json({
-    //                                                                             success:false,
-    //                                                                             message:'Error removing original image: ' + err.message
-    //                                                                         });
-    //                                                                     } else {
-
-    //                                                                         fs.unlink('public/resources/' + req.body.resourceId + 't.' + req.body.ext, function(err){
-
-    //                                                                             if (err) {
-
-    //                                                                                 res.json({
-    //                                                                                     success:false,
-    //                                                                                     message:'Error removing original thumbnail image: ' + err.message
-    //                                                                                 });
-    //                                                                             } else {
-
-    //                                                                                 sql.execute("update " + self.dbname + "resources set quarantined=1, origext=ext, ext='png' where id=" + req.body.resourceId + ";",
-    //                                                                                     function(rows){
-
-    //                                                                                         res.json({
-    //                                                                                             success:true
-    //                                                                                         });
-    //                                                                                     },
-    //                                                                                     function(strError){
-
-    //                                                                                         res.json({
-    //                                                                                             success:false,
-    //                                                                                             message:'Error updating database record with new extension: ' + err.message
-    //                                                                                         });
-    //                                                                                     });
-    //                                                                             }
-    //                                                                         });
-    //                                                                     }
-    //                                                                 });
-    //                                                             } else {
-    //                                                                 res.json({
-    //                                                                     success:true
-    //                                                                 });
-    //                                                             }
-    //                                                         }
-    //                                                     });
-    //                                                 }
-    //                                             });
-    //                                         }
-    //                                     });
-    //                                 }
-    //                             });
-    //                         })
-    //                     });
-    //                 } else {
-
-    //                     // Read Evil_Laugh_Male.mp3 into buffer from '/public/sounds/' and write it to '/public/resources/' + new name that uses id
-    //                     fs.readFile('public/sounds/Evil_Laugh_Male.mp3', function(err, data){
-
-    //                         if (err) {
-
-    //                             res.json({
-    //                                 success:false,
-    //                                 message:'Error reading "disallowed" sound file: ' + err.message
-    //                             });
-    //                         } else {
-
-    //                             var newFn = 'public/resources/' + req.body.resourceId + '.mp3';
-    //                             fs.writeFile(newFn, data, function(err){    // this overwrites if originally an mp3
-
-    //                                 if (err) {
-
-    //                                     res.json({
-    //                                         success:false,
-    //                                         message:'Error writing new "disallowed" file: ' + err.message
-    //                                     });
-    //                                 } else {
-
-    //                                     sql.execute("update " + self.dbname + "resources set origext=ext, quarantined=1, ext='mp3' where id=" + req.body.resourceId + ";",
-    //                                         function(rows){
-
-    //                                             res.json({
-    //                                                 success:true
-    //                                             });
-    //                                         },
-    //                                         function(strError){
-
-    //                                             res.json({
-    //                                                 success:false,
-    //                                                 message:'Error updating database record with new extension: ' + err.message
-    //                                             });
-    //                                         });
-    //                                 }
-    //                             });
-    //                         }
-    //                     });
-    //                 }
-    //             });
     //         });
     //     } catch (e) {
             
