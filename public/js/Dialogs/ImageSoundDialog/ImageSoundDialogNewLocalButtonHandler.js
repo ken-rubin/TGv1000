@@ -66,7 +66,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				    var fileName = $("#imageFile").val();
 				    var fileNameLength = fileName.length;
 				    var ext = fileName.replace(/^.*\./, '').toLowerCase();
-				    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg'){
+				    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif'){
 				        errorHelper.show('We support only .png and .jpg (or .jpeg) image files.');
 				        return false;
 				    }

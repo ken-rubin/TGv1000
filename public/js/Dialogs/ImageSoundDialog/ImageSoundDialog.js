@@ -59,6 +59,18 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
+					self.callFunctionOK = function(iResourceId) {
+
+						try {
+
+							m_functionOK(iResourceId);
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
 					//////////////////////////////////
 					// Private functions.
 

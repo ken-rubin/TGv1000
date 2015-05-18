@@ -135,6 +135,15 @@ begin
     
     end if;
 
+    if @dbstate = 5.0 THEN
+        
+		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
+			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1);
+
+		UPDATE `TGv1000`.`control` set dbstate=6.0 where id=1;
+    
+    end if;
+
 end;
 
 //
