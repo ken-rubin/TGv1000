@@ -4,7 +4,8 @@
 //////////////////////////////////
 var fs = require("fs"),
     gm = require("gm"),
-    util = require("util");
+    util = require("util"),
+    request = require("request");
 
 module.exports = function ResourceBO(app, sql, logger) {
 
@@ -30,8 +31,29 @@ module.exports = function ResourceBO(app, sql, logger) {
             //      Allowed image extensions are png, jpg, jpeg and gif. It's checked here for URL fetches.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
 
-            var friendlyName = req.body.friendlyName.replace(/\.[0-9a-z]+$/i, '').replace(' ','_').toLowerCase();  // replace .ext if present with ''
-            var ext = req.body.filePath.replace(/^.*\./, '');                       // replace up to .ext with ''
+            var urlParts = req.body.url.split('//');
+            var l = urlParts.length;
+            if (l === 0) {
+
+                req.json({
+                    success:false,
+                    message: 'Could not understand your URL. Sorry.'
+                });
+                return;
+            }
+            var filename = urlParts[l - 1]; // like: xxxx.png
+            var filenameParts = filename.split('.');
+            l = filenameParts.length;
+            if (l !== 2) {
+
+                req.json({
+                    success:false,
+                    message: 'Could not understand your URL. Sorry.'
+                });
+                return;
+            }
+            var friendlyName = filenameParts[0];
+            var ext = filenameParts[1];
             // validate ext if image type
             if (req.body.resourceTypeId === 1) {
 
@@ -75,135 +97,152 @@ module.exports = function ResourceBO(app, sql, logger) {
             }
             tagArray = uniqueArray;
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
-            sql.execute(sqlString,
-                function(rows){
+            // Grab the image.
+            request(req.body.url, function (error, response, body) {
 
-                    if (rows.length === 0) {
+                if (error || response.statusCode !== 200) {
 
-                        res.json({
-                            success:false,
-                            message: 'Failed to create resource in database'
-                        });
-                    } else {
+                    res.json({
+                        success: false,
+                        message: 'Could not retrieve image to server.'
+                    });
+                    return;
+                }
 
-                        var id = rows[0].insertId;
+                // body is some sort of buffer containing the image. I guess.
 
-                        // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
-                        // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                        m_doTags(tagArray, id, function(err){
+                var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
+                sql.execute(sqlString,
+                    function(rows){
 
-                            if (err) {
+                        if (rows.length === 0) {
 
-                                res.json({
-                                    success:false,
-                                    message: err.message
-                                });
-                            } else {
+                            res.json({
+                                success:false,
+                                message: 'Failed to create resource in database'
+                            });
+                        } else {
 
-                                var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
-                                fs.rename(req.body.filePath, origImagePath, function(err){
+                            var id = rows[0].insertId;
 
-                                    if (err) {
+                            // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
+                            // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
+                            m_doTags(tagArray, id, function(err){
 
-                                        res.json({
-                                            success:false,
-                                            message: err.message
-                                        });
-                                    } else {
+                                if (err) {
 
-                                        // The original file has been placed into the resources folder.
-                                        // If it is an image, further processing is needed to create a thumbnail.
+                                    res.json({
+                                        success:false,
+                                        message: err.message
+                                    });
+                                } else {
 
-                                        if (req.body.resourceTypeId === "1") {
+                                    var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
+                                    fs.write(origImagePath, body, function(err, written, string){
 
-                                            // Now we want a thumbnail of it with filename id + 't.' + ext.
-                                            gm(origImagePath)
-                                            .options({imageMagick:true})
-                                            .size(function(err, size){
+                                        if (err) {
 
-                                                if (err) {
-
-                                                    res.json({
-                                                        success:false,
-                                                        message: err.message
-                                                    });
-                                                } else {
-
-                                                    // resize, keeping a/r.
-                                                    var maxW = 100;
-                                                    var maxH = 100;
-                                                    var ratio = 0;
-                                                    var height = size.height;
-                                                    var width = size.width;
-                                                    if (width > maxW) {
-                                                        ratio = maxW / width;
-                                                        height = height * ratio;
-                                                        width = width * ratio;
-                                                    }
-                                                    if (height > maxH) {
-                                                        ratio = maxH / height;
-                                                        height = height * ratio;
-                                                        width = width * ratio;
-                                                    }
-
-                                                    gm(origImagePath)
-                                                    .options({imageMagick:true})
-                                                    .resize(width, height)
-                                                    .noProfile()
-                                                    .write('public/resources/' + id.toString() + 't.' + ext, function(err){
-
-                                                        if (err) {
-
-                                                            res.json({
-                                                                success:false,
-                                                                message: err.message
-                                                            });
-                                                        } else {
-
-//                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                                            res.json({
-                                                                success:true,
-                                                                id: id,
-                                                                createdByUserId: req.body.userId,
-                                                                ext: ext,
-                                                                friendlyName: friendlyName,
-                                                                resourceTypeId: req.body.resourceTypeId,
-                                                                public: 0
-                                                            });
-                                                        }
-                                                    });
-                                                }
+                                            res.json({
+                                                success:false,
+                                                message: err.message
                                             });
                                         } else {
 
-//                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                            // a non-image (for now a sound)
-                                            res.json({
-                                                success:true,
-                                                id: id,
-                                                createdByUserId: req.body.userId,
-                                                ext: ext,
-                                                friendlyName: friendlyName,
-                                                resourceTypeId: req.body.resourceTypeId,
-                                                public: 0
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }
-                },
-                function(strError){
+                                            // The original file has been placed into the resources folder.
+                                            // If it is an image, further processing is needed to create a thumbnail.
 
-                    res.json({
-                        success:false,
-                        message:strError
-                    }
-                );
+                                            if (req.body.resourceTypeId === "1") {
+
+                                                // Now we want a thumbnail of it with filename id + 't.' + ext.
+                                                gm(origImagePath)
+                                                .options({imageMagick:true})
+                                                .size(function(err, size){
+
+                                                    if (err) {
+
+                                                        res.json({
+                                                            success:false,
+                                                            message: err.message
+                                                        });
+                                                    } else {
+
+                                                        // resize, keeping a/r.
+                                                        var maxW = 100;
+                                                        var maxH = 100;
+                                                        var ratio = 0;
+                                                        var height = size.height;
+                                                        var width = size.width;
+                                                        if (width > maxW) {
+                                                            ratio = maxW / width;
+                                                            height = height * ratio;
+                                                            width = width * ratio;
+                                                        }
+                                                        if (height > maxH) {
+                                                            ratio = maxH / height;
+                                                            height = height * ratio;
+                                                            width = width * ratio;
+                                                        }
+
+                                                        gm(origImagePath)
+                                                        .options({imageMagick:true})
+                                                        .resize(width, height)
+                                                        .noProfile()
+                                                        .write('public/resources/' + id.toString() + 't.' + ext, function(err){
+
+                                                            if (err) {
+
+                                                                res.json({
+                                                                    success:false,
+                                                                    message: err.message
+                                                                });
+                                                            } else {
+
+    //                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
+                                                                res.json({
+                                                                    success:true,
+                                                                    id: id,
+                                                                    createdByUserId: req.body.userId,
+                                                                    ext: ext,
+                                                                    friendlyName: friendlyName,
+                                                                    resourceTypeId: req.body.resourceTypeId,
+                                                                    public: 0
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            } else {
+
+    //                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
+                                                // a non-image (for now a sound)
+                                                res.json({
+                                                    success:true,
+                                                    id: id,
+                                                    createdByUserId: req.body.userId,
+                                                    ext: ext,
+                                                    friendlyName: friendlyName,
+                                                    resourceTypeId: req.body.resourceTypeId,
+                                                    public: 0
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    function(strError){
+
+                        res.json({
+                            success:false,
+                            message:strError
+                        }
+                    );
+
+                });
 
             });
+
         } catch (e) {
 
             res.json({
