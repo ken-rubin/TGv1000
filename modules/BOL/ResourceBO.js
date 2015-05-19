@@ -98,9 +98,9 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             // Grab the image.
             var request = require('request').defaults({ encoding: null });
-            request.get(req.body.url, function (err, res, body) {
+            request.get(req.body.url, function (err, resp, body) {
 
-                if (err || res.statusCode !== 200) {
+                if (err || resp.statusCode !== 200) {
 
                     res.json({
                         success: false,
