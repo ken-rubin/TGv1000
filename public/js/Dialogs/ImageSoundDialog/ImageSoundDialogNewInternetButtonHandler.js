@@ -74,7 +74,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
         					if (data.success) {
 
-        						m_pdParent.callFunctionOK(data.resourceId);
+        						m_pdParent.callFunctionOK(data.id);
 
         					} else {
 

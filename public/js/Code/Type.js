@@ -191,7 +191,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							// Generate the image for the type.
 							var jTypeImage = $("<img src='" + 
-								resourceHelper.toURL(self.data.resourceId) + 
+								resourceHelper.toURL('resources', self.data.resourceId, '', 'image', '') + 
 								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 							m_jType.append(jTypeImage);
 							jTypeImage.contextMenu({
@@ -214,7 +214,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddProperties);
@@ -270,7 +270,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddMethods);
@@ -326,7 +326,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddEvents);

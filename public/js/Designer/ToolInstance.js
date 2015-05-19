@@ -30,7 +30,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     // Load up the image.
                     self.imageRender = new Image();
-                    self.imageRender.src = resourceHelper.toURL(self.resourceId);
+                    self.imageRender.src = resourceHelper.toURL('resources', self.resourceId, 't', 'image');
 
 					/////////////////////////////
 					// Public methods.

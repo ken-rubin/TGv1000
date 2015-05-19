@@ -126,7 +126,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                                 // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
                                 // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                                m_doTags(tagArray, id, function(err){
+                                m_doTags(tagArray, id, function(err) {
 
                                     if (err) {
 
@@ -197,7 +197,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                                 } else {
 
                                                                     res.json({
-                                                                        success:true,
+                                                                        success: true,
                                                                         id: id,
                                                                         createdByUserId: req.body.userId,
                                                                         ext: ext,
@@ -213,7 +213,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                                                     // a non-image (for now a sound)
                                                     res.json({
-                                                        success:true,
+                                                        success: true,
                                                         id: id,
                                                         createdByUserId: req.body.userId,
                                                         ext: ext,
@@ -233,10 +233,9 @@ module.exports = function ResourceBO(app, sql, logger) {
                             res.json({
                                 success:false,
                                 message:strError
-                            }
-                        );
-
-                    });
+                            });
+                        }
+                    );
                 }
             });
         } catch (e) {
