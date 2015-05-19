@@ -64,6 +64,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						try {
 
 							m_functionOK(iResourceId);
+							dialogItself.close();
 
 						} catch (e) {
 
