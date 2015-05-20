@@ -129,27 +129,25 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						        var rowIth = m_searchResultProcessedArray[i];
 
-					            strbuild = strbuild + '<img id="carousel' + i.toString() + '" class="imageitem" src="' + rowIth.url + '" title="' + rowIth.friendlyName + '" onclick="m_resourceClicked(' + i.toString() + ');" style="left:' + (i * 120 + 5).toString() + 'px;">';
+					            strbuild = strbuild + '<img id="carousel' + i.toString() + '" class="imageitem" src="' + rowIth.url + '" title="' + rowIth.friendlyName + '" style="left:' + (i * 120 + 5).toString() + 'px;">';
 						    }
+
 						    $("#ISSearchWell").append(strbuild);
+
+						    for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
+
+						    	$("#carousel" + i.toString()).on("click", function(){
+
+						    		var jq = $( this );
+						    		var j = parseInt(jq.context.id.substring(8), 10);
+						    		var resourceId = m_searchResultRawArray[j].id;
+						    		m_pdParent.callFunctionOK(resourceId);
+						    	});
+						    }
 						}
 					} catch (e) {
 
 						return e;
-					}
-				}
-
-				var m_resourceClicked = function (index) {
-
-					try {
-
-					    var rowIth = m_searchResultRawArray[index];
-
-					    m_pdParent.callFunctionOK(rowIth.id);
-
-					} catch (e) {
-
-						errorHelper.show(e);
 					}
 				}
 
