@@ -521,26 +521,24 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 					};
 
 					// Helper shows the rename dialog.
-					var m_functionRenameDialogHelper = function (strType, objectMember) {
+					var m_functionRenameDialogHelper = function (strType, objectMember, bNew) {
 
 						try {
 
 							// Build up the string defining the GUI for the rename dialog.
-							var strMessage = "<span>Please specify new name for " + 
+							var strMessage = "<span>Specify " + (bNew ? "" : "a new ") + "name for " + 
 								strType +
-								"," + 
-								objectMember.name + 
-								":</span>&nbsp;<input id='RenameDialogTextInput' type='text' value='" + 
+								":&nbsp;&nbsp;</span><input id='RenameDialogTextInput' type='text' value='" + 
 								objectMember.name + 
 								"'></input>";
 
 							BootstrapDialog.confirm({
 
-							    title: 'Rename',
+							    title: (bNew ? 'Add' : 'Rename'),
 							    message: strMessage,
 							    closable: true, // <-- Default value is false
 							    draggable: true, // <-- Default value is false
-							    btnOKLabel: 'Rename!', // <-- Default value is 'OK',
+							    btnOKLabel: (bNew ? 'Add' : 'Rename'), // <-- Default value is 'OK',
 							    callback: function(result) {
 
 							        // result will be true if button was click, while it will be false if users close the dialog directly.
@@ -702,24 +700,31 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 						try {
 
-							// Add a new, empty member.
-							self.data.properties.push({ 
+							var property = { 
 
 								name: "new property", 
 								workspace: "", 
 								method: "" 
-							});
+							};
 
-							// Add the contents to the newly allocated type.
-							var exceptionRet = m_functionGenerateTypeContents();
+							// Add a new, empty member.
+							self.data.properties.push(property);
+
+							// Add the property to code.
+							var exceptionRet = code.addProperty(self, 
+								property);
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
-							// Add the property to code too.
-							exceptionRet = code.addProperty(self, 
-								self.data.properties[self.data.properties.length - 1]);
+							// Save original.
+							m_strOriginalName = property.name;
+
+							// Show rename dialog.
+							exceptionRet = m_functionRenameDialogHelper("property",
+								property,
+								true);
 							if (exceptionRet) {
 
 								throw exceptionRet;
