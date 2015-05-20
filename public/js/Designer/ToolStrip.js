@@ -134,7 +134,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 							for (var i = 0; i < m_arrayTools.length; i++) {
 
 								// Extract the ith tool.
-								var toolIth = m_arrayItems[i];
+								var toolIth = m_arrayTools[i];
 
 								// If the id's match...
 								if (toolIth.type === type) {
@@ -149,14 +149,14 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 							}
 
 							// Also pass on to the tool strip.
-							var exceptionRet = toolStrip.updateImage(type);
-							if (exceptionRet) {
+							// var exceptionRet = toolStrip.updateImage(type);
+							// if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+							// 	throw exceptionRet;
+							// }
 
 							// Cause a refresh.
-							return m_functionRender();
+							return null; //m_functionRender();
 						} catch (e) {
 
 							return e;
