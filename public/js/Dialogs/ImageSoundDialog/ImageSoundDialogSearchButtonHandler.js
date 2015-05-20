@@ -5,8 +5,8 @@
 //
 
 // Define an AMD module.
-define(["Core/snippetHelper", "Core/errorHelper"], 
-	function (snippetHelper, errorHelper) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
 
@@ -34,7 +34,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// // Wire buttons.
 						// $(".projectItem").off("click");
 						// $(".projectItem").on("click", m_functionResourceClick);
-						$("#ISInnerSearchButton").click(m_functionInnerResourceBtnClicked);
+						$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
 
 					} catch (e) {
 
@@ -46,9 +46,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				// Private methods.
 
 				// Invoked (presumably) after user has entered tags and clicks Search.
-				var m_functionInnerResourceBtnClicked = function () {
+				var m_functionSearchBtnClicked = function () {
 
-				    var tags = $("#resourceSearchTags").val().toLowerCase();
+				    var tags = $("#ISSearchInput").val().toLowerCase();
 				    var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
 
 			        var foundImage = false;
@@ -60,9 +60,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			                    foundImage = true;
 			            }
 			        }
-			        if (!foundImage)
+			        if (!foundImage) {
 			            tags = tags + " image";
-				    }
+			        }
 
 				    ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
 
@@ -74,6 +74,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				    try {
 
+					    var strUserIdResources = client.getTGCookie("userId");
 				        var posting = $.post("/BOL/UtilityBO/Search", {tags:tags, userId:strUserIdResources}, 'json');
 				        posting.done(function(data){
 
@@ -89,7 +90,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				                        dot = 't.';
 				                    }
-				                    m_searchResultProcessedArray.push({index: i, url: resourceHelper.toURL('resources', rowIth.id, '', 'image', ''), friendlyName: rowIth.friendlyName, resourceTypeId: rowIth.resourceTypeId});
+				                    m_searchResultProcessedArray.push({index: i, url: resourceHelper.toURL('resources', rowIth.id, 't', 'image', ''), friendlyName: rowIth.friendlyName, resourceTypeId: rowIth.resourceTypeId});
 				                }
 
 				                var exceptionRet = m_rebuildCarousel();
@@ -116,7 +117,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					    $("#ISSearchWell").empty();
 
-					    if (searchResultProcessedArray.length === 0) {
+					    if (m_searchResultProcessedArray.length === 0) {
 
 					    	m_wellMessage("There were no matches to ALL of your tags.", null);
 
@@ -124,9 +125,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						    var strbuild = '';
 
-						    for (var i = 0; i < searchResultProcessedArray.length; i++) {
+						    for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
 
-						        var rowIth = searchResultProcessedArray[i];
+						        var rowIth = m_searchResultProcessedArray[i];
 
 					            strbuild = strbuild + '<img id="carousel' + i.toString() + '" class="imageitem" src="' + rowIth.url + '" title="' + rowIth.friendlyName + '" onclick="m_resourceClicked(' + i.toString() + ');" style="left:' + (i * 120 + 5).toString() + 'px;">';
 						    }
@@ -138,11 +139,18 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					}
 				}
 
-				var m_resourceClicked = function(index) {
+				var m_resourceClicked = function (index) {
 
-				    var rowIth = searchResultRawArray[index];
+					try {
 
-				    m_pdParent.callFunctionOK(rowIth.id);
+					    var rowIth = m_searchResultRawArray[index];
+
+					    m_pdParent.callFunctionOK(rowIth.id);
+
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
 				}
 
 				var m_wellMessage = function(msg, timeoutAction) {
@@ -170,6 +178,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				var m_dialogContext = null;
 				// The ImageSoundDialog object which owns the "owning dialog".
 				var m_pdParent = null;
+				var m_searchResultProcessedArray = [];
+				var m_searchResultRawArray;
 			};
 
 			return functionHandler;
