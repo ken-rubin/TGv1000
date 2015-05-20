@@ -153,6 +153,15 @@ begin
     
     end if;
 
+    if @dbstate = 7.0 THEN
+        
+		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
+			VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/Search','post','routeSearch',1);
+
+		UPDATE `TGv1000`.`control` set dbstate=8.0 where id=1;
+    
+    end if;
+
 end;
 
 //

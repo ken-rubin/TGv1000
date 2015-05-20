@@ -15,103 +15,94 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
-    // self.routeSearch = function (req, res) {
+    self.routeSearch = function (req, res) {
 
-    //     try {
+        try {
 
-    //         console.log("Entered UtilityBO/routeSearch with req.body = " + JSON.stringify(req.body));
-    //         // req.body.tags
-    //         // req.body.userId
-    //         // req.body.userGroupId
+            console.log("Entered UtilityBO/routeSearch with req.body = " + JSON.stringify(req.body));
+            // req.body.tags
+            // req.body.userId
 
-    //         var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g); // guaranteed to have some tags
+            var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g); // guaranteed to have some tags
 
-    //         var ccString = '';
-    //         for (var i = 0; i < ccArray.length; i++) {
+            var ccString = '';
+            for (var i = 0; i < ccArray.length; i++) {
 
-    //             if (i > 0) {
+                if (i > 0) {
 
-    //                 ccString = ccString + ',';
-    //             }
+                    ccString = ccString + ',';
+                }
 
-    //             ccString = ccString + "'" + ccArray[i] + "'";
-    //         }
+                ccString = ccString + "'" + ccArray[i] + "'";
+            }
 
-    //         var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-    //         console.log(sqlString);
-    //         // We have to get the same number of rows back from the query as ccArray.length.
+            var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+            console.log(sqlString);
+            // We have to get the same number of rows back from the query as ccArray.length.
 
-    //         var exceptionRet = sql.execute(sqlString,
-    //             function (arrayRows) {
+            var exceptionRet = sql.execute(sqlString,
+                function (arrayRows) {
                 
-    //                 if (arrayRows.length !== ccArray.length) {
+                    if (arrayRows.length !== ccArray.length) {
 
-    //                     // Success as far as the function is concerned but no result array
-    //                     res.json({
-    //                         success:true,
-    //                         arrayRows: new Array()
-    //                     });
-    //                 } else {
+                        // Success as far as the function is concerned but no result array
+                        res.json({
+                            success:true,
+                            arrayRows: new Array()
+                        });
+                    } else {
 
-    //                     // We can proceed since all tags exist and their id's are in arrayRows
-    //                     var idString = '';
-    //                     for (var i = 0; i < arrayRows.length; i++) {
+                        // We can proceed since all tags exist and their id's are in arrayRows
+                        var idString = '';
+                        for (var i = 0; i < arrayRows.length; i++) {
 
-    //                         if (i > 0) {
+                            if (i > 0) {
 
-    //                             idString = idString + ',';
-    //                         }
-    //                         idString = idString + arrayRows[i].id.toString();
-    //                     }
+                                idString = idString + ',';
+                            }
+                            idString = idString + arrayRows[i].id.toString();
+                        }
 
-    //                     var strFirstCondition;
-    //                     if (req.body.userGroupId === '1' || req.body.userGroupId === '2' || req.body.userGroupId === '3') {
+                        var strFirstCondition = "(createdByUserId=" + req.body.userId + " or public=1) and ";
 
-    //                         strFirstCondition = '';
-
-    //                     } else {
-
-    //                         strFirstCondition = "(createdByUserId=" + req.body.userId + " or public=1) and ";
-    //                     }
-
-    //                     sqlString = "select * from " + self.dbname + "resources where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
-    //                     exceptionRet = sql.execute(sqlString,
-    //                         function(rows){
-    //                             res.json({
-    //                                 success:true,
-    //                                 arrayRows: rows
-    //                             });
-    //                         },
-    //                         function(err){
-    //                             res.json({
-    //                                 success:false,
-    //                                 message: err
-    //                             });
-    //                         });
-    //                 }
-    //             },
-    //             function (strError) {
+                        sqlString = "select * from " + self.dbname + "resources where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                        exceptionRet = sql.execute(sqlString,
+                            function(rows){
+                                res.json({
+                                    success:true,
+                                    arrayRows: rows
+                                });
+                            },
+                            function(err){
+                                res.json({
+                                    success:false,
+                                    message: err
+                                });
+                            });
+                    }
+                },
+                function (strError) {
                 
-    //                 res.json({
-    //                     success: false,
-    //                     message: strError
-    //                 });
-    //         });
-    //         if (exceptionRet !== null) {
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+            });
+            if (exceptionRet !== null) {
 
-    //             res.json({
-    //                 success: false,
-    //                 message: exceptionRet.message
-    //             });
-    //         }
-    //     } catch (e) {
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
+        } catch (e) {
 
-    //         res.json({
-    //             success: false,
-    //             message: e.message
-    //         });
-    //     }
-    // }
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
 
     self.routeAddLogitem = function (req, res) {
 
