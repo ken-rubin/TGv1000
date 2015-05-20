@@ -324,7 +324,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							var jAdd = $("<img class='typestripitem' id='AddType' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>");
 
 							// Add to the DOM.

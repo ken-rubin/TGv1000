@@ -63,25 +63,25 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					    var strUserIdResources = client.getTGCookie("userId");
 						var posting = $.post("/BOL/ResourceBO/SaveURLResource", 
-						{
-							userId: strUserIdResources, 
-							url: m_url,
-							tags: tags,
-							resourceTypeId: 1
-						}, 
-						'json');
+							{
+								userId: strUserIdResources, 
+								url: m_url,
+								tags: tags,
+								resourceTypeId: 1
+							}, 
+							'json');
     					posting.done(function(data){
 
         					if (data.success) {
 
-        						m_pdParent.callFunctionOK(data.resourceId);
+        						m_pdParent.callFunctionOK(data.id);
 
         					} else {
 
         						// !data.success
         						errorHelper.show(data.message);
         					}
-
+        				});
 					} catch (e) {
 
 						errorHelper.show(e);

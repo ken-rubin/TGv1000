@@ -144,6 +144,15 @@ begin
     
     end if;
 
+    if @dbstate = 6.0 THEN
+        
+		UPDATE TGv1000.resources set id=3 where id=1;
+		UPDATE TGv1000.resources_tags set resourceId=3 where resourceId=1;
+
+		UPDATE `TGv1000`.`control` set dbstate=7.0 where id=1;
+    
+    end if;
+
 end;
 
 //

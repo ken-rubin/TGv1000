@@ -5,8 +5,8 @@
 //
 
 // Define Type module.
-define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
-	function (errorHelper, resourceHelper, contextMenu) {
+define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/Comic", "Navbar/ComicStrip"],
+	function (errorHelper, resourceHelper, contextMenu, comic, comicStrip) {
 
 		try {
 
@@ -191,7 +191,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 
 							// Generate the image for the type.
 							var jTypeImage = $("<img src='" + 
-								resourceHelper.toURL(self.data.resourceId) + 
+								resourceHelper.toURL('resources', self.data.resourceId, '', 'image', '') + 
 								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 							m_jType.append(jTypeImage);
 							jTypeImage.contextMenu({
@@ -214,7 +214,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddProperties);
@@ -270,7 +270,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddMethods);
@@ -326,7 +326,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL(2) +
+								resourceHelper.toURL('images', null, null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddEvents);
@@ -676,6 +676,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
 								// Do stuff with it.
+								var oldResourceId = self.data.resourceId;
 								self.data.resourceId = iResourceId;
 								var exceptionRet = m_functionGenerateTypeContents();
 								if (exceptionRet) {
@@ -683,8 +684,22 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu"],
 									throw exceptionRet;
 								}
 								// TO-DO
-								// Cause the instances of type to repaint in designer, too. (Or animator or whatever it's called.)
+								// Cause the instances of type with old matching resourceId to repaint in designer and in the toolstrip.
+								var project = client.getProject();
+								if (project) {
 
+									project.comicStrip.items.forEach(function(comic){
+
+										comic.typeStrip.items.forEach(function(type){
+
+											if (type.resourceId === oldResourceId) {
+
+												type.resourceId = self.data.resourceId;
+												type.m_functionGenerateTypeContents();
+											}
+										});
+									});
+								}
 							} else {
 
 								throw new Error("Bad ResourceId received from ImageSoundDialog chain.");

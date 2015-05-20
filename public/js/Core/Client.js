@@ -151,6 +151,11 @@ define(["Core/errorHelper",
 					    }
 					};
 
+					self.getProject = function () {
+
+						return m_project;
+					};
+
 					///////////////////////////////
 					// Private functions.
 

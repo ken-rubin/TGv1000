@@ -34,7 +34,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Show the dialog--load the content from 
 							// the ImageSoundDialog jade HTML-snippet.
-							BootstrapDialog.show({
+							m_dialog = BootstrapDialog.show({
 
 								title: bImage ? "Image" : "Sound",
 								size: BootstrapDialog.SIZE_WIDE,
@@ -64,6 +64,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						try {
 
 							m_functionOK(iResourceId);
+							m_dialog.close();
 
 						} catch (e) {
 
@@ -163,12 +164,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					};
 
 					// Wire up event handlers to dialog controls.
-					var m_functionOnShownDialog = function (dialogItself) {
+					var m_functionOnShownDialog = function () {
 
 						try {
-
-							// Save the dailog object reference.
-							m_dialog = dialogItself;
 
 							// Wire click events.
 							$("#NewResourceButton").click(m_functionNewButtonClick);

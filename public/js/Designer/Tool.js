@@ -62,7 +62,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						m_jTool = $("<img class='toolstripitem' id='" + 
 							m_functionRemoveSpaces(self.type.data.name) + 
 							"' src='" +
-						 	resourceHelper.toURL(self.type.data.resourceId) + 
+						 	resourceHelper.toURL('resources', self.type.data.resourceId, '', 'image') + 
 						 	"' data-resourceid='" +
 						 	self.type.data.resourceId+ 
 						 	"' data-type='" + 

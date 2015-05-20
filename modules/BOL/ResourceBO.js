@@ -4,8 +4,7 @@
 //////////////////////////////////
 var fs = require("fs"),
     gm = require("gm"),
-    util = require("util"),
-    request = require("request");
+    util = require("util");
 
 module.exports = function ResourceBO(app, sql, logger) {
 
@@ -31,11 +30,11 @@ module.exports = function ResourceBO(app, sql, logger) {
             //      Allowed image extensions are png, jpg, jpeg and gif. It's checked here for URL fetches.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
 
-            var urlParts = req.body.url.split('//');
+            var urlParts = req.body.url.split("/");
             var l = urlParts.length;
             if (l === 0) {
 
-                req.json({
+                res.json({
                     success:false,
                     message: 'Could not understand your URL. Sorry.'
                 });
@@ -46,7 +45,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             l = filenameParts.length;
             if (l !== 2) {
 
-                req.json({
+                res.json({
                     success:false,
                     message: 'Could not understand your URL. Sorry.'
                 });
@@ -55,7 +54,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             var friendlyName = filenameParts[0];
             var ext = filenameParts[1];
             // validate ext if image type
-            if (req.body.resourceTypeId === 1) {
+            if (req.body.resourceTypeId === "1") {
 
                 if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif') {
 
@@ -98,151 +97,147 @@ module.exports = function ResourceBO(app, sql, logger) {
             tagArray = uniqueArray;
 
             // Grab the image.
-            request(req.body.url, function (error, response, body) {
+            var request = require('request').defaults({ encoding: null });
+            request.get(req.body.url, function (err, resp, body) {
 
-                if (error || response.statusCode !== 200) {
+                if (err || resp.statusCode !== 200) {
 
                     res.json({
                         success: false,
-                        message: 'Could not retrieve image to server.'
+                        message: 'Could not load image.'
                     });
-                    return;
-                }
+                } else {
 
-                // body is some sort of buffer containing the image. I guess.
+                    // body is a buffer containing the image. I guess.
 
-                var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
-                sql.execute(sqlString,
-                    function(rows){
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
+                    sql.execute(sqlString,
+                        function(rows){
 
-                        if (rows.length === 0) {
+                            if (rows.length === 0) {
 
-                            res.json({
-                                success:false,
-                                message: 'Failed to create resource in database'
-                            });
-                        } else {
+                                res.json({
+                                    success:false,
+                                    message: 'Failed to create resource in database'
+                                });
+                            } else {
 
-                            var id = rows[0].insertId;
+                                var id = rows[0].insertId;
 
-                            // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
-                            // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                            m_doTags(tagArray, id, function(err){
+                                // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
+                                // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
+                                m_doTags(tagArray, id, function(err) {
 
-                                if (err) {
+                                    if (err) {
 
-                                    res.json({
-                                        success:false,
-                                        message: err.message
-                                    });
-                                } else {
+                                        res.json({
+                                            success:false,
+                                            message: err.message
+                                        });
+                                    } else {
 
-                                    var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
-                                    fs.write(origImagePath, body, function(err, written, string){
+                                        var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
+                                        fs.writeFile(origImagePath, body, function(err) {
 
-                                        if (err) {
+                                            if (err) {
 
-                                            res.json({
-                                                success:false,
-                                                message: err.message
-                                            });
-                                        } else {
-
-                                            // The original file has been placed into the resources folder.
-                                            // If it is an image, further processing is needed to create a thumbnail.
-
-                                            if (req.body.resourceTypeId === "1") {
-
-                                                // Now we want a thumbnail of it with filename id + 't.' + ext.
-                                                gm(origImagePath)
-                                                .options({imageMagick:true})
-                                                .size(function(err, size){
-
-                                                    if (err) {
-
-                                                        res.json({
-                                                            success:false,
-                                                            message: err.message
-                                                        });
-                                                    } else {
-
-                                                        // resize, keeping a/r.
-                                                        var maxW = 100;
-                                                        var maxH = 100;
-                                                        var ratio = 0;
-                                                        var height = size.height;
-                                                        var width = size.width;
-                                                        if (width > maxW) {
-                                                            ratio = maxW / width;
-                                                            height = height * ratio;
-                                                            width = width * ratio;
-                                                        }
-                                                        if (height > maxH) {
-                                                            ratio = maxH / height;
-                                                            height = height * ratio;
-                                                            width = width * ratio;
-                                                        }
-
-                                                        gm(origImagePath)
-                                                        .options({imageMagick:true})
-                                                        .resize(width, height)
-                                                        .noProfile()
-                                                        .write('public/resources/' + id.toString() + 't.' + ext, function(err){
-
-                                                            if (err) {
-
-                                                                res.json({
-                                                                    success:false,
-                                                                    message: err.message
-                                                                });
-                                                            } else {
-
-    //                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                                                res.json({
-                                                                    success:true,
-                                                                    id: id,
-                                                                    createdByUserId: req.body.userId,
-                                                                    ext: ext,
-                                                                    friendlyName: friendlyName,
-                                                                    resourceTypeId: req.body.resourceTypeId,
-                                                                    public: 0
-                                                                });
-                                                            }
-                                                        });
-                                                    }
+                                                res.json({
+                                                    success:false,
+                                                    message: err.message
                                                 });
                                             } else {
 
-    //                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                                // a non-image (for now a sound)
-                                                res.json({
-                                                    success:true,
-                                                    id: id,
-                                                    createdByUserId: req.body.userId,
-                                                    ext: ext,
-                                                    friendlyName: friendlyName,
-                                                    resourceTypeId: req.body.resourceTypeId,
-                                                    public: 0
-                                                });
+                                                // The original file has been placed into the resources folder.
+                                                // If it is an image, further processing is needed to create a thumbnail.
+
+                                                if (req.body.resourceTypeId === "1") {
+
+                                                    // Now we want a thumbnail of it with filename id + 't.' + ext.
+                                                    gm(origImagePath)
+                                                    .options({imageMagick:true})
+                                                    .size(function(err, size){
+
+                                                        if (err) {
+
+                                                            res.json({
+                                                                success:false,
+                                                                message: err.message
+                                                            });
+                                                        } else {
+
+                                                            // resize, keeping a/r.
+                                                            var maxW = 100;
+                                                            var maxH = 100;
+                                                            var ratio = 0;
+                                                            var height = size.height;
+                                                            var width = size.width;
+                                                            if (width > maxW) {
+                                                                ratio = maxW / width;
+                                                                height = height * ratio;
+                                                                width = width * ratio;
+                                                            }
+                                                            if (height > maxH) {
+                                                                ratio = maxH / height;
+                                                                height = height * ratio;
+                                                                width = width * ratio;
+                                                            }
+
+                                                            gm(origImagePath)
+                                                            .options({imageMagick:true})
+                                                            .resize(width, height)
+                                                            .noProfile()
+                                                            .write('public/resources/' + id.toString() + 't.' + ext, function(err){
+
+                                                                if (err) {
+
+                                                                    res.json({
+                                                                        success:false,
+                                                                        message: err.message
+                                                                    });
+                                                                } else {
+
+                                                                    res.json({
+                                                                        success: true,
+                                                                        id: id,
+                                                                        createdByUserId: req.body.userId,
+                                                                        ext: ext,
+                                                                        friendlyName: friendlyName,
+                                                                        resourceTypeId: req.body.resourceTypeId,
+                                                                        public: 0
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                } else {
+
+                                                    // a non-image (for now a sound)
+                                                    res.json({
+                                                        success: true,
+                                                        id: id,
+                                                        createdByUserId: req.body.userId,
+                                                        ext: ext,
+                                                        friendlyName: friendlyName,
+                                                        resourceTypeId: req.body.resourceTypeId,
+                                                        public: 0
+                                                    });
+                                                }
                                             }
-                                        }
-                                    });
-                                }
+                                        });
+                                    }
+                                });
+                            }
+                        },
+                        function(strError){
+
+                            res.json({
+                                success:false,
+                                message:strError
                             });
                         }
-                    },
-                    function(strError){
-
-                        res.json({
-                            success:false,
-                            message:strError
-                        }
                     );
-
-                });
-
+                }
             });
-
         } catch (e) {
 
             res.json({
@@ -1390,29 +1385,29 @@ module.exports = function ResourceBO(app, sql, logger) {
     //     }
     // }
 
-    // var m_createTagJunctions = function(resourceId, tagIds) {
+    var m_createTagJunctions = function(resourceId, tagIds) {
 
-    //     var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
-    //     for (var j = 0; j < tagIds.length; j++) {
+        var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
+        for (var j = 0; j < tagIds.length; j++) {
 
-    //         strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
-    //         if (j !== tagIds.length - 1){
+            strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
+            if (j !== tagIds.length - 1){
 
-    //             strSql = strSql + ",";
-    //         }
-    //     }
-    //     strSql = strSql + ";";
-    //     console.log('SQL to insert into resources_tags: ' + strSql);
-    //     sql.execute(strSql,
-    //         function(rows){
+                strSql = strSql + ",";
+            }
+        }
+        strSql = strSql + ";";
+        console.log('SQL to insert into resources_tags: ' + strSql);
+        sql.execute(strSql,
+            function(rows){
 
-    //             return null;
-    //         },
-    //         function(strErr){
+                return null;
+            },
+            function(strErr){
 
-    //             return {message:'Error received inserting into resources_tags: ' + strErr};
-    //         });
-    // }
+                return {message:'Error received inserting into resources_tags: ' + strErr};
+            });
+    }
 
     var m_doTags = function(tagArray, resourceId, callback){
 
