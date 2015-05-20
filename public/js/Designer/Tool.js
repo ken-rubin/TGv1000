@@ -60,7 +60,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.generateDOM = function () {
 
 						m_jTool = $("<img class='toolstripitem' id='" + 
-							m_functionRemoveSpaces(self.type.data.name) + 
+							client.removeSpaces(self.type.data.name) + 
 							"' src='" +
 						 	resourceHelper.toURL('resources', self.type.data.resourceId, '', 'image') + 
 						 	"' data-resourceid='" +
@@ -71,13 +71,31 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						return m_jTool;
 					};
 
-					///////////////////////////////////////
-					// Private methods.
+					// Type image has changed, update tool.
+					self.updateImage = function () {
 
-					// Helper method removes spaces from input.
-					var m_functionRemoveSpaces = function (strPossiblyWithSpaces) {
+						try {
 
-						return strPossiblyWithSpaces.replace(/ /g, '');
+							// Compose the id.
+							var strId = client.removeSpaces(self.type.data.name);
+
+							//  Select the DOM element for the tool.
+							var jToolDOM = $("#" + strId);
+							if (jToolDOM.length != 1) {
+
+								throw new Error("Selected invalid number of tools on image update: " + strId);
+							}
+
+							// Update the resourceId and src attributes on the DOM.
+							jToolDOM.attr("data-resourceid",
+								self.type.data.resourceId);
+							jToolDOM.attr("src",
+								resourceHelper.toURL('resources', self.type.data.resourceId, '', 'image'));
+
+						} catch (e) {
+
+							return e;
+						}
 					};
 
 					///////////////////////////////////////

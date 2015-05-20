@@ -156,6 +156,12 @@ define(["Core/errorHelper",
 						return m_project;
 					};
 
+					// Helper method removes spaces from input.
+					self.removeSpaces = function (strPossiblyWithSpaces) {
+
+						return strPossiblyWithSpaces.replace(/ /g, '');
+					};
+
 					///////////////////////////////
 					// Private functions.
 

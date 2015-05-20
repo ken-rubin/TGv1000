@@ -108,6 +108,48 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 						}
 					};
 
+					// Type image has changed, update in designer.
+					self.updateImage  = function (type) {
+
+						try {
+
+							// Compose id to lookup.
+							var strTypeId = client.removeSpaces(type.data.name);
+
+							// Loop over all tool instances, ask each if it wraps the type which 
+							// was just updated and passed into this method.  If so, update image.
+							for (var i = 0; i < m_arrayItems.length; i++) {
+
+								// Extract the ith item.
+								var tiIth = m_arrayItems[i];
+
+								// If the id's match...
+								if (tiIth.id === strTypeId) {
+
+									// ...update the resource id.
+									var exceptionRet = tiIth.updateImage(type.data.resourceId);
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								}
+							}
+
+							// Also pass on to the tool strip.
+							var exceptionRet = toolStrip.updateImage(type);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Cause a refresh.
+							return m_functionRender();
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////
 					// Private functions.
 
@@ -532,7 +574,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 		            var m_jCanvas = null;
 		            // The rendering context.
 		            var m_context = null;
-		            // Collection of tools.
+		            // Collection of tool instances.
 		            var m_arrayItems = [];
 		            // Dimension of canvas.
 		            var m_dWidth = 0;

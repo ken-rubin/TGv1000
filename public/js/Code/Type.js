@@ -675,30 +675,21 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
-								// Do stuff with it.
-								var oldResourceId = self.data.resourceId;
+								// Save off the new resource in state.
 								self.data.resourceId = iResourceId;
+
+								// Cause type to regenerate.
 								var exceptionRet = m_functionGenerateTypeContents();
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
-								// TO-DO
-								// Cause the instances of type with old matching resourceId to repaint in designer and in the toolstrip.
-								var project = client.getProject();
-								if (project) {
 
-									project.comicStrip.items.forEach(function(comic){
+								// Call off to the designer to update the picture in the toolstrip and the designer surface.
+								exceptionRet = designer.updateImage(self);
+								if (exceptionRet) {
 
-										comic.typeStrip.items.forEach(function(type){
-
-											if (type.resourceId === oldResourceId) {
-
-												type.resourceId = self.data.resourceId;
-												type.m_functionGenerateTypeContents();
-											}
-										});
-									});
+									throw exceptionRet;
 								}
 							} else {
 

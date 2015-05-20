@@ -53,11 +53,25 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					///////////////////////////////////////
-					// Private methods.
+					// Type image has changed, update tool.
+					self.updateImage = function (strResourceId) {
 
-					///////////////////////////////////////
-					// Private fields.
+						try {
+
+							// Save state.
+							self.resourceId = strResourceId;
+
+		                    // Load up the image.
+		                    self.imageRender.src = resourceHelper.toURL('resources', 
+		                    	self.resourceId, 
+		                    	't', 
+		                    	'image');
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 				} catch (e) {
 
 					errorHelper.show(e);

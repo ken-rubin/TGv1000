@@ -124,6 +124,45 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 						}
 					};
 
+					// Type image has changed, update in designer.
+					self.updateImage = function (type) {
+
+						try {
+
+							// Loop over all tools, ask each if it wraps the type which was 
+							// just updated and passed into this method.  If so, update image.
+							for (var i = 0; i < m_arrayTools.length; i++) {
+
+								// Extract the ith tool.
+								var toolIth = m_arrayItems[i];
+
+								// If the id's match...
+								if (toolIth.type === type) {
+
+									// ...ask the tool to update its display.
+									var exceptionRet = toolIth.updateImage();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								}
+							}
+
+							// Also pass on to the tool strip.
+							var exceptionRet = toolStrip.updateImage(type);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Cause a refresh.
+							return m_functionRender();
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					///////////////////////////////////
 					// Private fields.
 
