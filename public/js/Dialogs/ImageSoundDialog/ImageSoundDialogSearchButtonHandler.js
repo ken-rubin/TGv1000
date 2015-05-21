@@ -115,13 +115,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					try {
 
-					    $("#ISSearchWell").empty();
-
 					    if (m_searchResultProcessedArray.length === 0) {
 
 					    	m_wellMessage("There were no matches to ALL of your tags.", null);
 
 					    } else {
+
+						    $("#IStoolstrip").empty();
 
 						    var strbuild = '';
 
@@ -129,10 +129,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						        var rowIth = m_searchResultProcessedArray[i];
 
-					            strbuild = strbuild + '<img id="carousel' + i.toString() + '" class="imageitem" src="' + rowIth.url + '" title="' + rowIth.friendlyName + '" style="left:' + (i * 120 + 5).toString() + 'px;">';
+					            strbuild = strbuild + '<img id="carousel' + i.toString() + '" class="toolstripitem" src="' + rowIth.url + '" title="' + rowIth.friendlyName + '" style="left:' + (i * 120 + 5).toString() + 'px;">';
 						    }
 
-						    $("#ISSearchWell").append(strbuild);
+						    $("#IStoolstrip").append(strbuild);
+						    $("#ISWellMsg").css("display", "none");
+						    $("#IStoolstriprow").css("display", "block");
 
 						    for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
 
@@ -155,8 +157,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					try {
 
-						$("#ISSearchWell").empty();
-						$("#ISSearchWell").append("<p class='text-danger'>" + msg + "</p>");
+						$("#ISWellMsg").empty();
+						$("#ISWellMsg").append("<p class='text-danger'>" + msg + "</p>");
+					    $("#ISWellMsg").css("display", "block");
+					    $("#IStoolstriprow").css("display", "none");
 
 						if (timeoutAction !== null) {
 
