@@ -5,8 +5,8 @@
 //
 
 // Define an AMD module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
-	function (snippetHelper, errorHelper, resourceHelper) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"], 
+	function (snippetHelper, errorHelper, resourceHelper, ScrollRegion) {
 
 		try {
 
@@ -146,6 +146,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						    		m_pdParent.callFunctionOK(resourceId);
 						    	});
 						    }
+
+							m_scISImageStrip = new ScrollRegion();
+							m_scISImageStrip.attach("#IStoolstriprow");
 						}
 					} catch (e) {
 
@@ -182,6 +185,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_pdParent = null;
 				var m_searchResultProcessedArray = [];
 				var m_searchResultRawArray;
+				var m_scISImageStrip;
 			};
 
 			return functionHandler;

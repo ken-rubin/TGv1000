@@ -14,17 +14,16 @@
     .col-xs-4
       button.btn.btn-info#ISInnerSearchButton Search
   br
-  .well
-      .col-xs-12#ISWellMsg(style="display:none;")
+  .well#ISWellMsg(style="display:none;")
 
-      //- Define a scrollable row.
-      .col-xs-12#IStoolstriprow(style="display:none;")
+  //- Define a scrollable row.
+  .col-xs-12#IStoolstriprow(style="display:none;")
 
-        //- Left controller.
-        .leftcontroller(data-targetselector="#IStoolstrip")
+    //- Left controller.
+    .leftcontroller(data-targetselector="#IStoolstrip")
 
-        //- Scrollable region.
-        #IStoolstrip
+    //- Scrollable region.
+    #IStoolstrip
 
-        //- Right controller.
-        .rightcontroller(data-targetselector="#IStoolstrip")
+    //- Right controller.
+    .rightcontroller(data-targetselector="#IStoolstrip")
