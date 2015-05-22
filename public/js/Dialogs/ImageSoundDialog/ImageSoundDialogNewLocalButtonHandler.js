@@ -31,9 +31,17 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// // Activate tooltips.
 						// $("[data-toggle='tooltip']").tooltip();
 
+						if (window.File && window.FileReader && window.FileList && window.Blob) {
+
+						} else {
+
+							m_wellMessage("This browser doesn't support File methods we need. Either switch browsers or use an Internet image.", null);
+							return;
+						}
+
 						// Wire things up.
 					    $("#imageFile").change(m_functionFileHasBeenChosen);
-					    $("#ISSaveBtn").click(m_functionSaveInternetResource);
+					    $("#ISSaveBtn").click(m_functionSaveLocalResource);
 					    $("#ISResetBtn").click(m_functionReset);
 
 					} catch (e) {
@@ -49,12 +57,27 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					try {
 
+					    m_fileName = $("#imageFile").val();
+					    var fileNameLength = m_fileName.length;
+
+					    if (fileNameLength === 0) {
+
+							m_wellMessage("You didn't select a resource.", null);
+							return;
+					    }
+
+					    var ext = m_fileName.replace(/^.*\./, '').toLowerCase();
+					    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif'){
+					        m_wellMessage('We support only png, jpg (or jpeg) and gif image files.', null);
+					        return false;
+					    }
+
 					    m_cvs = document.getElementById('iSCanvas'),
 					    m_ctx = m_cvs.getContext('2d');
+					    m_file = document.getElementById("imageFile").files[0];
 					    var img = new Image(),
-					        f = document.getElementById("imageFile").files[0],
 					        url = window.URL || window.webkitURL,
-					        src = url.createObjectURL(f);
+					        src = url.createObjectURL(m_file);
 
 					    img.src = src;
 					    img.onload = function() {
@@ -86,22 +109,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					}
 				}
 
-				var m_functionSaveInternetResource = function () {
+				var m_functionSaveLocalResource = function () {
 
 					try {
 
 						// Going to use filename w/o extension as friendly name (server side).
 						// User must have non-empty tags.
 						// Grab userId.
-						// Post info, including url.
 						// On successful return, call callback with resourceId.
-					    var fileName = $("#imageFile").val();
-					    var fileNameLength = fileName.length;
-					    var ext = fileName.replace(/^.*\./, '').toLowerCase();
-					    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif'){
-					        m_wellMessage('We support only png, jpg (or jpeg) and gif image files.', null);
-					        return false;
-					    }
 						var tags = $("#ISTags").val().trim();
 						if (tags.length === 0) {
 
@@ -110,25 +125,42 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 
 					    var strUserIdResources = client.getTGCookie("userId");
-						var posting = $.post("/BOL/ResourceBO/SaveResource", 
-							{
-								userId: strUserIdResources, 
-								tags: tags,
-								resourceTypeId: 1
-							}, 
-							'json');
-    					posting.done(function(data){
 
-        					if (data.success) {
+					    var formData = new FormData();
 
-        						m_pdParent.callFunctionOK(data.id);
+					    formData.append("userId", strUserIdResources);
+					    formData.append("tags", tags);
+					    formData.append("resourceTypeId", "1");
 
+					    // Now the file.
+					    formData.append("userFile", m_file);
+
+
+					    var request = new XMLHttpRequest();
+						request.open("POST", "/BOL/ResourceBO/SaveResource");
+						request.responseType = 'json';
+						request.send(formData);
+
+    					request.onload = function(oEvent){
+
+        					if (request.status === 200) {
+
+        						var res = request.response;
+        						if (res.success) {
+
+        							m_pdParent.callFunctionOK(res.id);
+
+        						} else {
+
+        							// !res.success
+        							m_wellMessage(res.message, null);
+        						}
         					} else {
 
-        						// !data.success
-        						errorHelper.show(data.message);
+        						// request.status !== 200
+        						m_wellMessage("Could not upload file to server.", null);
         					}
-        				});
+        				};
 					} catch (e) {
 
 						errorHelper.show(e);
@@ -143,6 +175,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				        var maxW = m_cvs.width;
 					    var maxH = m_cvs.height;
 				        m_ctx.clearRect( 0, 0, maxW, maxH);
+						$("#ISNewLocalWell").empty();
 
 						$("#ISPhase2").css("display", "none");
 
@@ -150,31 +183,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						errorHelper.show(e);
 					}
-				}
-
-				var m_validateImageUploadRequest = function (formData, jqForm, options) {
-
-				    // var friendlyNameLength = $("#imageName").val().length;
-				    var fileName = $("#imageFile").val();
-				    var fileNameLength = fileName.length;
-				    var ext = fileName.replace(/^.*\./, '').toLowerCase();
-				    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif'){
-				        m_wellMessage('We support only png, jpg (or jpeg) and gif image files.', null);
-				        return false;
-				    }
-				    // var tagsLength = $("#imageTags").val().length;
-				    // if (
-				    // 	friendlyNameLength === 0 
-				    // 	|| 
-				    // 	fileNameLength === 0 
-				    // 	|| 
-				    // 	tagsLength === 0
-				    // 	) {
-
-				    //     errorHelper.show('You must enter a friendly name, at least one tag and choose an image file to upload.');
-				    //     return false;
-				    // }
-				    return true;
 				}
 
 				// Put a message in the well, optionally closing the dialog after n ms.
@@ -205,6 +213,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				var m_pdParent = null;
 				var m_cvs = null;
 				var m_ctx = null;
+				var m_file = null;
+				var m_fileName = null;
 			};
 
 			return functionHandler;

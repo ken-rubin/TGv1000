@@ -255,17 +255,50 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.userId
             // req.body.resourceTypeId  1=image; 2=sound; 3=video
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
+            // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
 
             // Notes: 
             //      Allowed image extensions are png, jpg, jpeg and gif. That has been checked on the client.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
 
-            var ext = req.body.resourceTypeId === "1" ? "png" : "mp3";
+            // Until we add back friendlyName as a user-entered field, we'll use the filename part of req.body.filepath with possible space replaced by _.
+            var friendlyName = req.body.filePath.replace(/\.[0-9a-z]+$/i, '').replace(' ', '_').toLowerCase().substring(7);
+            if (req.body.resourceTypeId === "1") {
+
+                ext = 'png';
+
+            } else {
+
+                ext = "mp3";
+            }
 
             var tagArray = [];
+            tagArray.push(friendlyName);
             tagArray.push(req.body.resourceTypeId === "1" ? "image" : "sound");
+            var tags = req.body.tags.toLowerCase();
+            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+            if (ccArray){
+                tagArray = tagArray.concat(ccArray);
+            }
+            // Remove possible dups from tagArray.
+            var uniqueArray = [];
+            uniqueArray.push(tagArray[0]);
+            for (var i = 1; i < tagArray.length; i++) {
+                var compIth = tagArray[i];
+                var found = false;
+                for (var j = 0; j < uniqueArray.length; j++) {
+                    if (uniqueArray[j] === compIth){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    uniqueArray.push(compIth);
+                }
+            }
+            tagArray = uniqueArray;
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,ext) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + ext + "');";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,ext,friendlyName) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + ext + "','" + friendlyName + "');";
             console.log(sqlString);
             sql.execute(sqlString,
                 function(rows){
