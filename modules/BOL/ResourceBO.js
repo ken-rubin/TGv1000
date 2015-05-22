@@ -253,62 +253,20 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             console.log("Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
             // req.body.userId
-            // req.body.friendlyName    without extension; if present, remove it
             // req.body.resourceTypeId  1=image; 2=sound; 3=video
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
-            // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
 
             // Notes: 
-            //      Allowed image extensions are png, jpg, jpeg and gif. That has been checked on the client for local file uploads, but
-            //      it's re-checked here for URL fetches.
+            //      Allowed image extensions are png, jpg, jpeg and gif. That has been checked on the client.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
 
-            var friendlyName = req.body.friendlyName.replace(/\.[0-9a-z]+$/i, '').replace(' ','_').toLowerCase();  // replace .ext if present with ''
-            var ext = req.body.filePath.replace(/^.*\./, '');                       // replace up to .ext with ''
-            // validate ext if image type
-            if (req.body.resourceTypeId === 1) {
-
-                if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif') {
-
-                    res.json({
-                        success: false,
-                        message: 'Invalid file extension. TechGroms allows png, jpg, jpeg and gif.'
-                    });
-                    return;
-                } else {
-
-                    // The image if presumably ok. Set extension to png as described in notes above.
-                    ext = 'png';
-                }
-            }
+            var ext = req.body.resourceTypeId === "1" ? "png" : "mp3";
 
             var tagArray = [];
-            tagArray.push(friendlyName);
             tagArray.push(req.body.resourceTypeId === "1" ? "image" : "sound");
-            var tags = req.body.tags.toLowerCase();
-            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
-            if (ccArray){
-                tagArray = tagArray.concat(ccArray);
-            }
-            // Remove possible dups from tagArray.
-            var uniqueArray = [];
-            uniqueArray.push(tagArray[0]);
-            for (var i = 1; i < tagArray.length; i++) {
-                var compIth = tagArray[i];
-                var found = false;
-                for (var j = 0; j < uniqueArray.length; j++) {
-                    if (uniqueArray[j] === compIth){
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueArray.push(compIth);
-                }
-            }
-            tagArray = uniqueArray;
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,ext) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + ext + "');";
+            console.log(sqlString);
             sql.execute(sqlString,
                 function(rows){
 
@@ -400,7 +358,6 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                                 id: id,
                                                                 createdByUserId: req.body.userId,
                                                                 ext: ext,
-                                                                friendlyName: friendlyName,
                                                                 resourceTypeId: req.body.resourceTypeId,
                                                                 public: 0
                                                             });
@@ -417,7 +374,6 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                 id: id,
                                                 createdByUserId: req.body.userId,
                                                 ext: ext,
-                                                friendlyName: friendlyName,
                                                 resourceTypeId: req.body.resourceTypeId,
                                                 public: 0
                                             });

@@ -50,7 +50,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					                }
 					            }],
 					            draggable: true,
-					            onshown: m_functionOnShownDialog
+					            onshown: m_functionOnShownDialog	// wires click handlers for New and Search btns.
 					        });
 							return null;
 						} catch (e) {
@@ -74,6 +74,21 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					//////////////////////////////////
 					// Private functions.
+
+					// Wire up event handlers to dialog controls.
+					var m_functionOnShownDialog = function () {
+
+						try {
+
+							// Wire click events.
+							$("#NewResourceButton").click(m_functionNewButtonClick);
+							$("#SearchResourceButton").click(m_functionSearchButtonClick);
+
+						} catch (e) {
+
+							errorHelper.show(e.message);
+						}
+					};
 
 					// Invoked when the server request 
 					// to get the search snippet returns.
@@ -163,20 +178,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Wire up event handlers to dialog controls.
-					var m_functionOnShownDialog = function () {
-
-						try {
-
-							// Wire click events.
-							$("#NewResourceButton").click(m_functionNewButtonClick);
-							$("#SearchResourceButton").click(m_functionSearchButtonClick);
-
-						} catch (e) {
-
-							errorHelper.show(e.message);
-						}
-					};
 				} catch (e) {
 
 					errorHelper.show(e.message);

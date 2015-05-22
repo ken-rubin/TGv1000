@@ -38,9 +38,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					        beforeSubmit: m_validateImageUploadRequest,
 					        dataType: 'json',
-					        data: {userId:strUserIdResources, resourceTypeId:1},
-					        clearForm: true,
-					        error: m_handleUploadError
+					        data: {userId:strUserIdResources, resourceTypeId:"1"},
+					        clearForm: false,
+					        error: m_handleUploadError,
+					        success: m_processDataOnSuccess
 					    };
 
 					    $('#imageUploadForm').ajaxForm(optionsImages);
@@ -55,6 +56,25 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				//////////////////////////////////////
 				// Private methods.
 
+				var m_processDataOnSuccess = function (data) {
+
+					if (data.success) {
+
+						// data also contains these fields: id, createdByUserId, ext, resourceTypeId, public.
+						$("#ISLocalPhase1"),css("display", "none");
+
+
+
+
+						$("#ISLocalPhase2"),css("display", "block");
+
+					} else {
+
+						// !data.success
+
+					}
+				}
+
 				var m_functionFileHasBeenChosen = function() {
 
 			    	$("#imageSubmit").click();
@@ -62,26 +82,51 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				var m_validateImageUploadRequest = function (formData, jqForm, options) {
 
-				    var friendlyNameLength = $("#imageName").val().length;
+				    // var friendlyNameLength = $("#imageName").val().length;
 				    var fileName = $("#imageFile").val();
 				    var fileNameLength = fileName.length;
 				    var ext = fileName.replace(/^.*\./, '').toLowerCase();
 				    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif'){
-				        errorHelper.show('We support only .png and .jpg (or .jpeg) image files.');
+				        m_wellMessage('We support only png, jpg (or jpeg) and gif image files.', null);
 				        return false;
 				    }
-				    var tagsLength = $("#imageTags").val().length;
-				    if (friendlyNameLength === 0 || fileNameLength === 0 || tagsLength === 0) {
+				    // var tagsLength = $("#imageTags").val().length;
+				    // if (
+				    // 	friendlyNameLength === 0 
+				    // 	|| 
+				    // 	fileNameLength === 0 
+				    // 	|| 
+				    // 	tagsLength === 0
+				    // 	) {
 
-				        errorHelper.show('You must enter a friendly name, at least one tag and choose an image file to upload.');
-				        return false;
-				    }
+				    //     errorHelper.show('You must enter a friendly name, at least one tag and choose an image file to upload.');
+				    //     return false;
+				    // }
 				    return true;
 				}
 
 				var m_handleUploadError = function(err) {
 				    
 				    errorHelper.show('Upload error on server: ' + JSON.stringify({error:err}));
+				}
+
+				// Put a message in the well, optionally closing the dialog after n ms.
+				var m_wellMessage = function(msg, timeoutAction) {
+
+					try {
+
+						$("#ImageSoundNewLocalWell").empty();
+						$("#ImageSoundNewLocalWell").append("<p class='text-danger'>" + msg + "</p>");
+
+						if (timeoutAction !== null) {
+
+							setTimeout(timeoutAction.callback, timeoutAction.waittime);
+						}
+
+					} catch (e) {
+
+						errorHelper.show(msg);
+					}
 				}
 
 				//////////////////////////////////////

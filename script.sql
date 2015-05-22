@@ -162,6 +162,15 @@ begin
     
     end if;
 
+    if @dbstate = 8.0 THEN
+        
+		ALTER TABLE `TGv1000`.`resources` 
+			CHANGE COLUMN `friendlyName` `friendlyName` VARCHAR(255) NULL ;
+
+		UPDATE `TGv1000`.`control` set dbstate=9.0 where id=1;
+    
+    end if;
+
 end;
 
 //
