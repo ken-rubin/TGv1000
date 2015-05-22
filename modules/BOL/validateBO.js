@@ -117,7 +117,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                                 // userName is ok.
                                 // Generate and encrypt a password.
-                                var strPassword = (Math.random() * 100000000).toFixed(0);
+                                var strPassword = (Math.random() * 10000).toFixed(0);
                                 bcrypt.hash(strPassword, null, null, function(err, hash){
 
                                     if (err) {

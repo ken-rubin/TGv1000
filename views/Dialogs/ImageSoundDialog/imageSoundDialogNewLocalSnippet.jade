@@ -1,29 +1,25 @@
-//- Jade DOM for the imageSound dialog new snippet. 
+//- Jade DOM for the imageSound dialog new local snippet. 
 //-
 
 .snippetcontext#ImageSoundDialogNewLocalSnippet(data-module="Dialogs/ImageSoundDialog/ImageSoundDialogNewLocalButtonHandler")
 .row
   .col-xs-12
     h4 Click the <em>Choose File</em> button to find your resource file.
-    h5 It will be uploaded to the server and then displayed to you for the next step.
-    br
+    h5 You will be able to use the resource on a temporary basis--until it is judged compliant with TechGroms's standards.
 .row
-  br
   .col-xs-5
-      #ISLocalPhase1.col-xs-2(style="display:block;")
-        form#imageUploadForm(enctype="multipart/form-data" action="/BOL/ResourceBO/SaveResource" method="post")
-            br
-            input#imageFile(type="file" name="userImage" accept="image/*")
-            input.center-block#imageSubmit(type="submit" value="Upload image" name="submit" style="visibility:hidden;")
-      #ISLocalPhase2(style="display:none;")
-          label.control-label(for="ISTags") Search tags
-          br
-          textarea.form-control#ISTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="enter one or more tags to help you search for this image")
-          br
-          button.btn.btn-info#ISSaveBtn Save &amp; Select Image
-          | &nbsp;&nbsp;&nbsp;
-          button.btn.btn-info#ISResetBtn Reset
+    br
+    input#imageFile(type="file" name="userImage" accept="image/*")
+    #ISPhase2(style="display:none;")
+      br
+      label.control-label(for="ISTags") Search tags
+      br
+      textarea.form-control#ISTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="enter one or more tags to help you search for this image")
+      br
+      button.btn.btn-info#ISSaveBtn Save &amp; Select Image
+      | &nbsp;&nbsp;&nbsp;
+      button.btn.btn-info#ISResetBtn Reset
   .col-xs-7
-    img#InternetResourceImage.img-responsive
+      canvas#iSCanvas.img-responsive
 br
-.well#ImageSoundNewLocalWell
+.well#ISNewLocalWell

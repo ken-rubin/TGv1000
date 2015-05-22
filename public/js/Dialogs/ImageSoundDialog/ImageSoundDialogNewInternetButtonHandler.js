@@ -1,5 +1,5 @@
 //////////////////////////////////////////
-// ImageSoundDialog new LOCAL FILE button handler. 
+// ImageSoundDialog new INTERNET FILE button handler. 
 //
 // Return constructor function.
 //
