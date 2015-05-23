@@ -28,8 +28,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.width = iWidth || 100;
 					self.height = iHeight || 100;
 
-                    // Load up the image.
+                    // Allocate the image.
                     self.imageRender = new Image();
+
+                    // Set callback to refresh display when image is loaded.
+                    $(self.imageRender).bind("load", function () { designer.refresh(); });
+
+                    // Load up the image.
                     self.imageRender.src = resourceHelper.toURL('resources', self.resourceId, 't', 'image');
 
 					/////////////////////////////
@@ -71,7 +76,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							return e;
 						}
 					};
-
 				} catch (e) {
 
 					errorHelper.show(e);

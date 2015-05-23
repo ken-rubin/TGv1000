@@ -108,6 +108,19 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 						}
 					};
 
+					// Update the designer surface.
+					self.refresh = function () {
+
+						try {
+
+							// Just call to helper method.
+							return m_functionRender();
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					// Type image has changed, update in designer.
 					self.updateImage  = function (type) {
 
@@ -477,7 +490,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 							m_context.transform(1, 0, 0, 1, m_dWidth / 2, m_dHeight / 2);
 
 							// Draw out the background and grid lines.
-							m_context.fillStyle = "black";
+							m_context.fillStyle = "rgb(0,0,0)";
 							m_context.fillRect(-m_dWidth / 2, -m_dHeight / 2, m_dWidth, m_dHeight);
 
 							m_context.fillStyle = "#333";
