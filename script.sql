@@ -18,7 +18,6 @@ begin
 		insert `TGv1000`.`control` (id, dbstate) values (1, 0.0);
         
 	end if;
-    
     set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
     
     if @dbstate = 0.0 THEN
@@ -46,6 +45,7 @@ begin
 		INSERT INTO TGv1000.routes VALUES (1,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
         
 		UPDATE `TGv1000`.`control` set dbstate=1.0 where id=1;
+		set @dbstate := 1.0;
     
     end if;
 
@@ -65,6 +65,7 @@ begin
 		INSERT INTO TGv1000.routes VALUES (133,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/ForgotPassword','post','routeForgotPassword',1);        
 
 		UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
+		set @dbstate := 2.0;
     
     end if;
 
@@ -112,6 +113,7 @@ begin
 		insert TGv1000.resourceTypes (id,description) values (3,'video');
 
 		UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
+		set @dbstate := 3.0;
 
     end if;
         
@@ -123,6 +125,7 @@ begin
 			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveResource','post','routeSaveResource',1);
 
 		UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
+		set @dbstate := 4.0;
     
     end if;
 
@@ -132,6 +135,7 @@ begin
 			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/DeleteResource','post','routeDeleteResource',1);
 
 		UPDATE `TGv1000`.`control` set dbstate=5.0 where id=1;
+		set @dbstate := 5.0;
     
     end if;
 
@@ -141,6 +145,7 @@ begin
 			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1);
 
 		UPDATE `TGv1000`.`control` set dbstate=6.0 where id=1;
+		set @dbstate := 6.0;
     
     end if;
 
@@ -150,6 +155,7 @@ begin
 		UPDATE TGv1000.resources_tags set resourceId=3 where resourceId=1;
 
 		UPDATE `TGv1000`.`control` set dbstate=7.0 where id=1;
+		set @dbstate := 7.0;
     
     end if;
 
@@ -159,6 +165,7 @@ begin
 			VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/Search','post','routeSearch',1);
 
 		UPDATE `TGv1000`.`control` set dbstate=8.0 where id=1;
+		set @dbstate := 8.0;
     
     end if;
 
@@ -168,6 +175,7 @@ begin
 			CHANGE COLUMN `friendlyName` `friendlyName` VARCHAR(255) NULL ;
 
 		UPDATE `TGv1000`.`control` set dbstate=9.0 where id=1;
+		set @dbstate := 9.0;
     
     end if;
 
