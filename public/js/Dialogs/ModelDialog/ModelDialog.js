@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper"], 
-	function (snippetHelper, errorHelper) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/contextMenu"], 
+	function (snippetHelper, errorHelper, contextMenu) {
 
 		try {
 
@@ -66,6 +66,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
+							// var jqMW = $("#ModelWell");
+							// jqMW.contextMenu({
+							// 	menuSelector: "#ModelContextMenu",
+							// 	menuSelected: m_functionMenuHandler
+							// });
+
 						} catch (e) {
 
 							errorHelper.show(e.message);
@@ -75,6 +81,26 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					errorHelper.show(e.message);
 				}
+
+				// var m_functionMenuHandler = function (invokedOn, selectedMenu) {
+
+				// 	try {
+
+				// 		// Handle different menu items differently.
+				// 		if (selectedMenu.text() === "Change...") {
+
+				// 			// Show rename dialog.
+				// 			// var exceptionRet = m_functionImageDialogHelper();
+				// 			// if (exceptionRet) {
+
+				// 			// 	throw exceptionRet;
+				// 			// }
+				// 		}
+				// 	} catch (e) {
+
+				// 		errorHelper.show(e);
+				// 	}
+				// }
 
 				/////////////////////////////////
 				// Private fields.

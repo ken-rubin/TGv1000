@@ -9,7 +9,33 @@
     .col-xs-12
       h4 This is a prototype dialog. Its wiring serves as a model for future dialogs.
       br
-  .row
+      .row
     .col-xs-12
           br
           .well#ModelWell
+              li.dropdown
+                a#drop1.dropdown-toggle(href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false")
+                    | Dropdown
+                    span.caret
+                ul.dropdown-menu(role="menu" aria-labelledby="drop1")
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Add type
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Rename type
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Change icon
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Delete type
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Add Property
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Add Method
+                    li(role="presentation")
+                        a(role="menuitem" tabindex="-1" href="#")
+                            | Add Event

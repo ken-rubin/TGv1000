@@ -178,8 +178,27 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// Start empty.
 							m_jType.empty();
 
+							// Add first TGAction button. It applies to the whole Type.
+							var jMainTGActionButton = $("<button style='background-color:Transparent;border:none;outline:none;cursor:pointer;position:absolute;left:48px;top:8px;'>" +
+								"<img id='typeTGAction' class='TGAction' src='" +
+									resourceHelper.toURL("images", null, null, null, "TGAction.png") +
+									"'></img>" + 
+								"</button>");
+							m_jType.append(jMainTGActionButton);
+							jMainTGActionButton.click(m_functionMainTGActionBtnClick);
+
+
+							// m_jType.append("<img id='typeTGAction' class='TGAction' src='" +
+							// 		resourceHelper.toURL("images", null, null, null, "TGAction.png") +
+							// 		"' style='position:absolute;top:8px;left:48px;'></img>"
+							// 	);
+							// $("#typeTGAction").off("click");
+							// $("#typeTGAction").on("click", function(){alert('TGAction was clicked');});
+
+							// Place a TGAction image (button) in the top-left corner,
+
 							// Generate the name to add to the type.
-							var jTypeName = $("<div style='position:absolute;left:8px;top:8px;right:72px'>" + 
+							var jTypeName = $("<div style='position:absolute;left:8px;top:38px;right:72px'>" + 
 								self.data.name + 
 								"</div>");
 							m_jType.append(jTypeName);
@@ -365,6 +384,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							return e;
 						}
 					};
+
+					var m_functionMainTGActionBtnClick = function() {
+
+						alert('got click on main TGAction btn');
+					}
 
 					// General handler to process a selection of a member.
 					var m_functionSelect = function (arrayActive, jMember) {
