@@ -283,7 +283,7 @@ app.use(multer(
 ));
 
 ////////////////////////////////////
-app.set("portnum",80);
+app.set("portnum",8001);
 console.log('Server will be listening on port ' + app.get("portnum") + ".");
 
 /////////////////////////////////////
