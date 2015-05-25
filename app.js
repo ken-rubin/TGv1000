@@ -320,6 +320,7 @@ sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order b
                 console.log(' ');
                 console.log('*************** ERROR ****************');
                 console.log('Error setting up route for ' + rowi.route + '; skipping it.');
+                console.log(e.message);
                 console.log('*************** ERROR ****************');
                 console.log(' ');
             }
