@@ -179,6 +179,61 @@ begin
     
     end if;
 
+    if @dbstate = 9.0 THEN
+        
+		ALTER TABLE `TGv1000`.`resources` 
+			CHANGE COLUMN `friendlyName` `friendlyName` VARCHAR(255) NOT NULL ;
+		ALTER TABLE `TGv1000`.`resources` 
+			CHANGE COLUMN `ext` `ext` VARCHAR(5) NULL ;            
+
+		UPDATE TGv1000.resourceTypes set description='project' where id=3;
+        INSERT TGv1000.resourceTypes values (4, 'type');
+
+		CREATE TABLE `TGv1000`.`comics` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `projectId` int(11) NOT NULL,
+          `ordinal` int(11) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`projects` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `name` varchar(255) NOT NULL,
+          `createdByUserId` int(11) NOT NULL,
+          `template` tinyint(1) NOT NULL DEFAULT '0',
+		  `price` decimal(5,2) NOT NULL DEFAULT '0.00',
+          `imageResourceId` int(11) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`types` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `comicId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `isApp` tinyint(1) NOT NULL DEFAULT '0',
+          `imageResourceId` int(11) NOT NULL,
+          `ordinal` int(11) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		UPDATE `TGv1000`.`control` set dbstate=10.0 where id=1;
+		set @dbstate := 10.0;
+    
+    end if;
+
+    if @dbstate = 10.0 THEN
+        
+		ALTER TABLE `TGv1000`.`types` 
+			ADD COLUMN `jsonCode` MEDIUMTEXT NOT NULL ;
+
+		UPDATE `TGv1000`.`control` set dbstate=11.0 where id=1;
+		set @dbstate := 11.0;
+    
+    end if;
+
 end;
 
 //
