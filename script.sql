@@ -247,6 +247,26 @@ begin
 		set @dbstate := 12.0;
         
     end if;
+    
+    if @dbstate = 12.0 THEN
+    
+        INSERT TGv1000.resourceTypes values (5, 'comic');
+        INSERT TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK)
+			values (1,1,5,0,0,1);
+
+		UPDATE `TGv1000`.`control` set dbstate=13.0 where id=1;
+		set @dbstate := 13.0;
+    
+    end if;
+
+    if @dbstate = 13.0 THEN
+    
+		ALTER TABLE `TGv1000`.`comics` 
+			ADD COLUMN `imageResourceId` INT(11) NOT NULL AFTER `ordinal`;
+            
+		UPDATE `TGv1000`.`control` set dbstate=14.0 where id=1;
+		set @dbstate := 14.0;
+        end if;
 
 end;
 
