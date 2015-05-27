@@ -234,6 +234,20 @@ begin
     
     end if;
 
+    if @dbstate = 11.0 THEN
+
+		ALTER TABLE `TGv1000`.`resources` 
+			AUTO_INCREMENT = 100 ,
+			DROP COLUMN `origext`,
+			DROP COLUMN `ext`,
+			DROP COLUMN `friendlyName`,
+			ADD COLUMN `optnlFK` INT(11) NULL AFTER `quarantined`;
+
+		UPDATE `TGv1000`.`control` set dbstate=12.0 where id=1;
+		set @dbstate := 12.0;
+        
+    end if;
+
 end;
 
 //
