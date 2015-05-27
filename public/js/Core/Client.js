@@ -36,14 +36,14 @@ define(["Core/errorHelper",
 					// Public methods.
 
 					// Start off the client.
-					self.create = function (iUserId) {
+					self.create = function () {
 
 						try {
 
 							// Save.
-							m_iUserId = iUserId;
+							m_iUserId = self.getTGCookie('userId');
 
-							return self.showProjectsDialog();
+							return null;	//self.showProjectsDialog();
 						} catch (e) {
 
 							return e;

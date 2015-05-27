@@ -26,7 +26,7 @@ $(document).ready(function () {
 
 				// Allocate and initialize the client.
 				client = new Client();
-				var exceptionRet = client.create(1/*iUserId -- eventually from server specified cookie*/);
+				var exceptionRet = client.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;

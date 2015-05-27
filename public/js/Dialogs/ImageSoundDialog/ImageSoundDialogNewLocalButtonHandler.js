@@ -125,16 +125,17 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 
 					    var strUserIdResources = client.getTGCookie("userId");
+					    var strUserNameResources = client.getTGCookie("userName");
 
 					    var formData = new FormData();
 
 					    formData.append("userId", strUserIdResources);
+					    formData.append("userName", strUserNameResources);
 					    formData.append("tags", tags);
 					    formData.append("resourceTypeId", "1");
 
 					    // Now the file.
 					    formData.append("userFile", m_file);
-
 
 					    var request = new XMLHttpRequest();
 						request.open("POST", "/BOL/ResourceBO/SaveResource");

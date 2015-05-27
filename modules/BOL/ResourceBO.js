@@ -10,21 +10,58 @@ module.exports = function ResourceBO(app, sql, logger) {
 
     var self = this;                // Über closure.
 
+    // Private fields
+    var m_resourceTypes = ['0-unused'];
+
     self.dbname = app.get("dbname");
+
+    // Fill m_resourceTypes from database.
+    try {
+
+        var exceptionRet = sql.execute("select * from " + self.dbname + "resourceTypes order by id asc",
+            function(rows) {
+
+                if (rows.length === 0) {
+
+                    throw new Error('Failed to read resource types from database. Cannot proceed.');
+
+                } else {
+
+                    for (var i = 0; i < rows.length; i++) {
+
+                        m_resourceTypes.push(rows[i].description);
+                    }
+                }
+            },
+            function (strError) {
+
+                throw new Error("Received error reading resource types from database. Cannot proceed. " + strError);
+
+            });
+        if (exceptionRet) {
+
+            throw exceptionRet;
+        }
+
+    } catch (e) {
+
+        throw e;
+    }
     
     ////////////////////////////////////
     // Public methods
     
     // Router handler functions.
-    self.routeSaveURLResource =function (req, res) {
+    self.routeSaveURLResource = function (req, res) {
 
         try {
 
             console.log("Entered AdminBO/routeSaveURLResource with req.body=" + JSON.stringify(req.body));
             // req.body.userId
+            // req.body.userName
             // req.body.url             image or sound to retrieve
             // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
-            // req.body.resourceTypeId  1=image; 2=sound; 3=video
+            // req.body.resourceTypeId
 
             // Notes: 
             //      Allowed image extensions are png, jpg, jpeg and gif. It's checked here for URL fetches.
@@ -51,16 +88,16 @@ module.exports = function ResourceBO(app, sql, logger) {
                 });
                 return;
             }
-            var friendlyName = filenameParts[0];
             var ext = filenameParts[1];
+
             // validate ext if image type
             if (req.body.resourceTypeId === "1") {
 
-                if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif') {
+                if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg') {
 
                     res.json({
                         success: false,
-                        message: 'Invalid file extension. TechGroms allows png, jpg, jpeg and gif.'
+                        message: 'Invalid file extension. TechGroms allows png, jpg and jpeg.'
                     });
                     return;
                 } else {
@@ -68,16 +105,20 @@ module.exports = function ResourceBO(app, sql, logger) {
                     // The image if presumably ok. Set extension to png as described in notes above.
                     ext = 'png';
                 }
+            } else {
+
+                ext = 'mp3';
             }
 
             var tagArray = [];
-            tagArray.push(friendlyName);
-            tagArray.push(req.body.resourceTypeId === "1" ? "image" : "sound");
+            tagArray.push(m_resourceTypes[parseInt(req.body.resourceTypeId, 10)]);
+            tagArray.push(req.body.userName);
             var tags = req.body.tags.toLowerCase();
             var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
             if (ccArray){
                 tagArray = tagArray.concat(ccArray);
             }
+
             // Remove possible dups from tagArray.
             var uniqueArray = [];
             uniqueArray.push(tagArray[0]);
@@ -96,7 +137,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             }
             tagArray = uniqueArray;
 
-            // Grab the image.
+            // Grab the image or sound.
             var request = require('request').defaults({ encoding: null });
             request.get(req.body.url, function (err, resp, body) {
 
@@ -104,13 +145,13 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                     res.json({
                         success: false,
-                        message: 'Could not load image.'
+                        message: 'Could not load resource from URL.'
                     });
                 } else {
 
-                    // body is a buffer containing the image. I guess.
+                    // body is a buffer containing the resource.
 
-                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,friendlyName,resourceTypeId,public,ext) values (" + req.body.userId + ",'" + friendlyName + "'," + req.body.resourceTypeId + ",0,'" + ext + "');";
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0);";
                     sql.execute(sqlString,
                         function(rows){
 
@@ -136,8 +177,8 @@ module.exports = function ResourceBO(app, sql, logger) {
                                         });
                                     } else {
 
-                                        var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
-                                        fs.writeFile(origImagePath, body, function(err) {
+                                        var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
+                                        fs.writeFile(resourcePath, body, function(err) {
 
                                             if (err) {
 
@@ -148,80 +189,10 @@ module.exports = function ResourceBO(app, sql, logger) {
                                             } else {
 
                                                 // The original file has been placed into the resources folder.
-                                                // If it is an image, further processing is needed to create a thumbnail.
-
-                                                if (req.body.resourceTypeId === "1") {
-
-                                                    // Now we want a thumbnail of it with filename id + 't.' + ext.
-                                                    gm(origImagePath)
-                                                    .options({imageMagick:true})
-                                                    .size(function(err, size){
-
-                                                        if (err) {
-
-                                                            res.json({
-                                                                success:false,
-                                                                message: err.message
-                                                            });
-                                                        } else {
-
-                                                            // resize, keeping a/r.
-                                                            var maxW = 100;
-                                                            var maxH = 100;
-                                                            var ratio = 0;
-                                                            var height = size.height;
-                                                            var width = size.width;
-                                                            if (width > maxW) {
-                                                                ratio = maxW / width;
-                                                                height = height * ratio;
-                                                                width = width * ratio;
-                                                            }
-                                                            if (height > maxH) {
-                                                                ratio = maxH / height;
-                                                                height = height * ratio;
-                                                                width = width * ratio;
-                                                            }
-
-                                                            gm(origImagePath)
-                                                            .options({imageMagick:true})
-                                                            .resize(width, height)
-                                                            .noProfile()
-                                                            .write('public/resources/' + id.toString() + 't.' + ext, function(err){
-
-                                                                if (err) {
-
-                                                                    res.json({
-                                                                        success:false,
-                                                                        message: err.message
-                                                                    });
-                                                                } else {
-
-                                                                    res.json({
-                                                                        success: true,
-                                                                        id: id,
-                                                                        createdByUserId: req.body.userId,
-                                                                        ext: ext,
-                                                                        friendlyName: friendlyName,
-                                                                        resourceTypeId: req.body.resourceTypeId,
-                                                                        public: 0
-                                                                    });
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                } else {
-
-                                                    // a non-image (for now a sound)
-                                                    res.json({
-                                                        success: true,
-                                                        id: id,
-                                                        createdByUserId: req.body.userId,
-                                                        ext: ext,
-                                                        friendlyName: friendlyName,
-                                                        resourceTypeId: req.body.resourceTypeId,
-                                                        public: 0
-                                                    });
-                                                }
+                                                res.json({
+                                                    success: true,
+                                                    id: id
+                                                });
                                             }
                                         });
                                     }
@@ -253,16 +224,16 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             console.log("Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
             // req.body.userId
-            // req.body.resourceTypeId  1=image; 2=sound; 3=video
+            // req.body.userName
+            // req.body.resourceTypeId
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
             // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
 
             // Notes: 
-            //      Allowed image extensions are png, jpg, jpeg and gif. That has been checked on the client.
+            //      Allowed image extensions are png, jpg, jpeg. That has been checked on the client.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
+            //      Only mp3 sound resources are allowed.
 
-            // Until we add back friendlyName as a user-entered field, we'll use the filename part of req.body.filepath with possible space replaced by _.
-            var friendlyName = req.body.filePath.replace(/\.[0-9a-z]+$/i, '').replace(' ', '_').toLowerCase().substring(7);
             if (req.body.resourceTypeId === "1") {
 
                 ext = 'png';
@@ -273,8 +244,8 @@ module.exports = function ResourceBO(app, sql, logger) {
             }
 
             var tagArray = [];
-            tagArray.push(friendlyName);
-            tagArray.push(req.body.resourceTypeId === "1" ? "image" : "sound");
+            tagArray.push(req.body.userName);
+            tagArray.push(m_resourceTypes[parseInt(req.body.resourceTypeId, 10)]);
             var tags = req.body.tags.toLowerCase();
             var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
             if (ccArray){
@@ -298,8 +269,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             }
             tagArray = uniqueArray;
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,ext,friendlyName) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + ext + "','" + friendlyName + "');";
-            console.log(sqlString);
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0);";
             sql.execute(sqlString,
                 function(rows){
 
@@ -325,8 +295,8 @@ module.exports = function ResourceBO(app, sql, logger) {
                                 });
                             } else {
 
-                                var origImagePath = 'public/resources/' + id.toString() + '.' + ext;
-                                fs.rename(req.body.filePath, origImagePath, function(err){
+                                var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
+                                fs.rename(req.body.filePath, resourcePath, function(err){
 
                                     if (err) {
 
@@ -337,80 +307,10 @@ module.exports = function ResourceBO(app, sql, logger) {
                                     } else {
 
                                         // The original file has been placed into the resources folder.
-                                        // If it is an image, further processing is needed to create a thumbnail.
-
-                                        if (req.body.resourceTypeId === "1") {
-
-                                            // Now we want a thumbnail of it with filename id + 't.' + ext.
-                                            gm(origImagePath)
-                                            .options({imageMagick:true})
-                                            .size(function(err, size){
-
-                                                if (err) {
-
-                                                    res.json({
-                                                        success:false,
-                                                        message: err.message
-                                                    });
-                                                } else {
-
-                                                    // resize, keeping a/r.
-                                                    var maxW = 100;
-                                                    var maxH = 100;
-                                                    var ratio = 0;
-                                                    var height = size.height;
-                                                    var width = size.width;
-                                                    if (width > maxW) {
-                                                        ratio = maxW / width;
-                                                        height = height * ratio;
-                                                        width = width * ratio;
-                                                    }
-                                                    if (height > maxH) {
-                                                        ratio = maxH / height;
-                                                        height = height * ratio;
-                                                        width = width * ratio;
-                                                    }
-
-                                                    gm(origImagePath)
-                                                    .options({imageMagick:true})
-                                                    .resize(width, height)
-                                                    .noProfile()
-                                                    .write('public/resources/' + id.toString() + 't.' + ext, function(err){
-
-                                                        if (err) {
-
-                                                            res.json({
-                                                                success:false,
-                                                                message: err.message
-                                                            });
-                                                        } else {
-
-//                                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                                            res.json({
-                                                                success:true,
-                                                                id: id,
-                                                                createdByUserId: req.body.userId,
-                                                                ext: ext,
-                                                                resourceTypeId: req.body.resourceTypeId,
-                                                                public: 0
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        } else {
-
-//                                            logger.logItem(9, {"userId":req.body.userId, "tags":tagArray, "resourceId":id, "ext":ext});
-                                            // a non-image (for now a sound)
-                                            res.json({
-                                                success:true,
-                                                id: id,
-                                                createdByUserId: req.body.userId,
-                                                ext: ext,
-                                                resourceTypeId: req.body.resourceTypeId,
-                                                public: 0
-                                            });
-                                        }
+                                        res.json({
+                                            success:true,
+                                            id: id
+                                        });
                                     }
                                 });
                             }
@@ -1464,7 +1364,4 @@ module.exports = function ResourceBO(app, sql, logger) {
                 });
         });
     }
-
-    // Private fields
-    // var m_JohnsUserId;
 };
