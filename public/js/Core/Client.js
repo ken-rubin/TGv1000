@@ -66,46 +66,160 @@ define(["Core/errorHelper",
 					};
 
 					// Open popup--map callbacks to private functions.
-					self.showProjectsDialog = function () {
+					// self.showProjectsDialog = function () {
 
-						try {
+					// 	try {
 
-							var pd = new ProjectsDialog();
-							var exceptionRet = pd.create(m_iUserId,
-								m_functionNewProject,
-								m_functionOpenProject,
-								m_functionCloneProject);
-							if (exceptionRet) {
+					// 		var pd = new ProjectsDialog();
+					// 		var exceptionRet = pd.create(m_iUserId,
+					// 			m_functionNewProject,
+					// 			m_functionOpenProject,
+					// 			m_functionCloneProject);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+					// 			throw exceptionRet;
+					// 		}
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					// Open popup--map callbacks to private functions.
-					self.showTypesDialog = function (functionNewType, functionCloneType) {
+					// self.showTypesDialog = function (functionNewType, functionCloneType) {
+
+					// 	try {
+
+					// 		var td = new TypesDialog();
+					// 		var exceptionRet = td.create(functionNewType,
+					// 			functionCloneType);
+					// 		if (exceptionRet) {
+
+					// 			throw exceptionRet;
+					// 		}
+
+					// 		return null;
+					// 	} catch (e) {
+
+					// 		return e;
+					// 	}
+					// };
+
+					self.showNewProjectDialog = function () {
 
 						try {
 
-							var td = new TypesDialog();
-							var exceptionRet = td.create(functionNewType,
-								functionCloneType);
+							var d = new NewProjectDialog();
+							var exceptionRet = d.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 							return null;
+
 						} catch (e) {
 
 							return e;
 						}
-					};
+					}
+
+					self.showOpenProjectDialog = function () {
+
+						try {
+
+							var d = new OpenProjectDialog();
+							var exceptionRet = d.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showSaveProjectDialog = function () {
+
+						try {
+
+							var d = new SaveProjectDialog();
+							var exceptionRet = d.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showSaveProjectAsDialog = function () {
+
+						try {
+
+							var d = new SaveProjectAsDialog();
+							var exceptionRet = d.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showNewTypeDialog = function () {
+
+						try {
+
+							var d = new NewTypeDialog();
+							var exceptionRet = d.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showTypeSearchDialog = function () {
+
+						try {
+
+							var d = new TypeSearchDialog();
+							var exceptionRet = d.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					// Open popup--map callbacks to private functions.
 					// Upon successfull resolution, call functionOK(resourceId).

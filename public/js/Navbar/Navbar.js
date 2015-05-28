@@ -35,22 +35,97 @@ define(["Core/errorHelper"],
 								$("body").css("background-image", "url('../media/images/t.png')");
 							});
 
-							// Wire projects button click.
-							// $("#ProjectsButton").click(function () {
+							// Wire projects buttons.
+							$("#NewProjectButton").click(function () {
 
-							// 	try {
+								try {
 
-							// 		// Show the projects dialog.
-							// 		var exceptionRet = client.showProjectsDialog();
-							// 		if (exceptionRet) {
+									var exceptionRet = client.showNewProjectDialog();
+									if (exceptionRet) {
 
-							// 			throw exceptionRet;
-							// 		}
-							// 	} catch (e) {
+										throw exceptionRet;
+									}
+								} catch (e) {
 
-							// 		errorHelper.show(e);
-							// 	}
-							// });
+									errorHelper.show(e);
+								}
+							});
+
+							$("#OpenProjectButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.showOpenProjectDialog();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
+							$("#SaveProjectButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.showSaveProjectDialog();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
+							$("#SaveProjectAsButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.showSaveProjectAsDialog();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
+							// Wire typess buttons.
+							$("#NewTypeButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.showNewTypeDialog();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
+							$("#TypeSearchButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.showTypeSearchDialog();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
 
 							// Wire Adminzone button click.
 							$("#AdminzoneButton").click(function () {
