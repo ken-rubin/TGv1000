@@ -36,21 +36,21 @@ define(["Core/errorHelper"],
 							});
 
 							// Wire projects button click.
-							$("#ProjectsButton").click(function () {
+							// $("#ProjectsButton").click(function () {
 
-								try {
+							// 	try {
 
-									// Show the projects dialog.
-									var exceptionRet = client.showProjectsDialog();
-									if (exceptionRet) {
+							// 		// Show the projects dialog.
+							// 		var exceptionRet = client.showProjectsDialog();
+							// 		if (exceptionRet) {
 
-										throw exceptionRet;
-									}
-								} catch (e) {
+							// 			throw exceptionRet;
+							// 		}
+							// 	} catch (e) {
 
-									errorHelper.show(e);
-								}
-							});
+							// 		errorHelper.show(e);
+							// 	}
+							// });
 
 							// Wire Adminzone button click.
 							$("#AdminzoneButton").click(function () {
