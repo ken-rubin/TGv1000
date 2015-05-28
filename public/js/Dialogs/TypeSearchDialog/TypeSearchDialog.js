@@ -30,7 +30,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Type Search",
+								title: "Search for Type",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $("<div></div>").load("/typeSearchDialog"),
 					            buttons: [{
@@ -82,7 +82,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			};
 
 			// Return the constructor function as the module object.
-			return functionTypesDialog;
+			return functionTypeSearchDialog;
 		} catch (e) {
 
 			errorHelper.show(e.message);

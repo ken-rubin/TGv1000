@@ -6,13 +6,21 @@
 
 // Define module and require dependencies.
 define(["Core/errorHelper", 
-		"Dialogs/ProjectsDialog/ProjectsDialog", 
-		"Dialogs/TypesDialog/TypesDialog", 
+		"Dialogs/NewProjectDialog/NewProjectDialog", 
+		"Dialogs/OpenProjectDialog/OpenProjectDialog", 
+		"Dialogs/SaveProjectDialog/SaveProjectDialog", 
+		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
+		"Dialogs/NewTypeDialog/NewTypeDialog", 
+		"Dialogs/TypeSearchDialog/TypeSearchDialog", 
 		"Dialogs/ImageSoundDialog/ImageSoundDialog", 
 		"Core/Project"],
 	function (errorHelper, 
-				ProjectsDialog, 
-				TypesDialog, 
+				NewProjectDialog, 
+				OpenProjectDialog,
+				SaveProjectDialog,
+				SaveProjectAsDialog,
+				NewTypeDialog, 
+				TypeSearchDialog, 
 				ImageSoundDialog, 
 				Project) {
 

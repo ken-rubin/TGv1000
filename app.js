@@ -46,36 +46,13 @@ app.set("dbname","TGv1000.");
 console.log("dbname is " +  app.get("dbname"));
 
 ////////////////////////////////////////////
-console.log("Map projectsDialog route (projectsDialog.jade).");
-app.get("/projectsDialog", function (req, res) {
-
-	try {
-
-		// Get some data/stuff from the DB, or 
-		// where-ever, and pass into jade render.
-		var objectContext = {
-
-			// This space intentionally left blank.
-			// But is could be used to customize....
-		};
-
-		// Render the jade file to the client.
-		res.render("Dialogs/ProjectsDialog/projectsDialog", 
-			objectContext);
-	} catch (e) {
-
-		res.send(e.message);
-	}
-});
-
-////////////////////////////////////////////
-console.log("Map typesDialog route (typesDialog.jade).");
-app.get("/typesDialog", function (req, res) {
+console.log("Map enrollDialog route (enrollDialog.jade).");
+app.get("/enrollDialog", function (req, res) {
 
     try {
 
         // Get some data/stuff from the DB, or 
-        // where-ever, and pass into jade render.
+        // whereever, and pass into jade render.
         var objectContext = {
 
             // This space intentionally left blank.
@@ -83,7 +60,7 @@ app.get("/typesDialog", function (req, res) {
         };
 
         // Render the jade file to the client.
-        res.render("Dialogs/TypesDialog/typesDialog", 
+        res.render("Dialogs/EnrollDialog/enrollDialog", 
             objectContext);
     } catch (e) {
 
@@ -115,29 +92,6 @@ app.get("/imageSoundDialog", function (req, res) {
 });
 
 ////////////////////////////////////////////
-console.log("Map enrollDialog route (enrollDialog.jade).");
-app.get("/enrollDialog", function (req, res) {
-
-    try {
-
-        // Get some data/stuff from the DB, or 
-        // whereever, and pass into jade render.
-        var objectContext = {
-
-            // This space intentionally left blank.
-            // But is could be used to customize....
-        };
-
-        // Render the jade file to the client.
-        res.render("Dialogs/EnrollDialog/enrollDialog", 
-            objectContext);
-    } catch (e) {
-
-        res.send(e.message);
-    }
-});
-
-////////////////////////////////////////////
 console.log("Map modelDialog route (modelDialog.jade).");
 app.get("/modelDialog", function (req, res) {
 
@@ -153,6 +107,144 @@ app.get("/modelDialog", function (req, res) {
 
         // Render the jade file to the client.
         res.render("Dialogs/ModelDialog/modelDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+////////////////////////////////////////////
+console.log("Map newProjectDialog route (newProjectDialog.jade).");
+app.get("/newProjectDialog", function (req, res) {
+
+	try {
+
+		// Get some data/stuff from the DB, or 
+		// where-ever, and pass into jade render.
+		var objectContext = {
+
+			// This space intentionally left blank.
+			// But is could be used to customize....
+		};
+
+		// Render the jade file to the client.
+		res.render("Dialogs/NewProjectDialog/newProjectDialog", 
+			objectContext);
+	} catch (e) {
+
+		res.send(e.message);
+	}
+});
+
+////////////////////////////////////////////
+console.log("Map newTypeDialog route (newTypeDialog.jade).");
+app.get("/newTypeDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // where-ever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/NewTypeDialog/newTypeDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+////////////////////////////////////////////
+console.log("Map openProjectDialog route (openProjectDialog.jade).");
+app.get("/openProjectDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // where-ever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/OpenProjectDialog/openProjectDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+////////////////////////////////////////////
+console.log("Map saveProjectDialog route (saveProjectDialog.jade).");
+app.get("/saveProjectDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // where-ever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/SaveProjectDialog/saveProjectDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+////////////////////////////////////////////
+console.log("Map saveProjectAsDialog route (saveProjectAsDialog.jade).");
+app.get("/saveProjectAsDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // where-ever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/SaveProjectAsDialog/saveProjectAsDialog", 
+            objectContext);
+    } catch (e) {
+
+        res.send(e.message);
+    }
+});
+
+////////////////////////////////////////////
+console.log("Map typeSearchDialog route (typeSearchDialog.jade).");
+app.get("/typeSearchDialog", function (req, res) {
+
+    try {
+
+        // Get some data/stuff from the DB, or 
+        // where-ever, and pass into jade render.
+        var objectContext = {
+
+            // This space intentionally left blank.
+            // But is could be used to customize....
+        };
+
+        // Render the jade file to the client.
+        res.render("Dialogs/typeSearchDialog/typeSearchDialog", 
             objectContext);
     } catch (e) {
 

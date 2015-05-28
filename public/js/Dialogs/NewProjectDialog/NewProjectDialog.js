@@ -82,7 +82,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			};
 
 			// Return the constructor function as the module object.
-			return functionTypesDialog;
+			return functionNewProjectDialog;
 		} catch (e) {
 
 			errorHelper.show(e.message);
