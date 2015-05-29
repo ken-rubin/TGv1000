@@ -65,9 +65,9 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.userName
             // req.body.projectJson
 
-            // image resources have already been created or selected for the project, its comics and their types.
-            // projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
-            /*
+            // Image resources have already been created or selected for the project, its comics and their types.
+            /* req.body.projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
+
             {
                 name: "name",
                 description: "description",
@@ -83,7 +83,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                             typeStrip: {
                                 types: [
                                     {
-                                        app: true,                  only one type (thye first) can have app: true
+                                        app: true,                  only one type (the first) can have app: true
                                         imageResourceId: 789,
                                         name: "tname",
                                         tags: "tag7 tag8 tag9",
@@ -107,10 +107,12 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                 { ... },
                                                 { name: "enamen", eventFunctionName: "efnamen" }
                                             ]
-                                    }
+                                    },
+                                    { ... }
                                 ]
                             }
-                        }
+                        },
+                        { ... }
                     ]
                 }
             }
