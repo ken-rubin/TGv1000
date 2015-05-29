@@ -172,6 +172,24 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.quickSaveProject = function () {
+
+						try {
+
+							var exceptionRet = m_project.saveToDatabase();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.showSaveProjectAsDialog = function () {
 
 						try {

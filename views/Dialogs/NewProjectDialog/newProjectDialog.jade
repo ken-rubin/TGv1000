@@ -6,34 +6,40 @@
       h4 
         | A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.
       h5
-        | You may enter them now or your may wait until you'ce started working on the project and understand what it does.
+        | You may enter them now or your may wait until you've started working on the project and understand what it does.
       br
 
   .row
     .col-xs-12
-          br
-          .col-xs-2
+        br
+        .col-xs-2
             label.control-label(for="ProjectName", style="margin-top:6px;") Name
-          .col-xs-4
-            input.form-control#ProjectName(type="text", placeholder="enter project name")
-          .col-xs-3
-          .col-xs-3
-            img#ProjectImage(src="media/images/clicktochange.png" style="height:120px;width=120px;")
-  .row
-    .col-xs-12
+        .col-xs-4
+            input.form-control#ProjectName(type="text", placeholder="Enter project name.")
+        br
         br
         .col-xs-2
             label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
         .col-xs-10
-            textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="enter words to help you search for this project later")
-    br
+            textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this project later.")
   .row
     br
-    br
     .col-xs-12
-        button#CreateProjectBtn.btn.pull-right
+      .col-xs-4
+        label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
+        br
+        img#ProjectImage.pull-left(src="media/images/clicktochange.png" style="height:120px;width=120px;")
+      .col-xs-6
+      .col-xs-2
+        br
+        br
+        br
+        br
+        br
+        br
+        button#CreateProjectBtn.btn.pull-left.btn-info
             | Create Project
   .row
+    br
     .col-xs-12
-          br
           .well#NewProjectWell

@@ -81,6 +81,24 @@ define(["Core/errorHelper"],
 								}
 							});
 
+							$("#QuickSaveProjectButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.quickSaveProject();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+
+									errorHelper.show("Project was saved.");
+
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
 							$("#SaveProjectAsButton").click(function () {
 
 								try {

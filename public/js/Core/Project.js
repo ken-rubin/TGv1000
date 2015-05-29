@@ -44,6 +44,19 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 						}
 					};
 
+					self.saveToDatabase = function () {
+
+						try {
+
+
+							return null;
+						
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					//////////////////////////////
 					// Private fields.
 
