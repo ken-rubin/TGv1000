@@ -52,6 +52,79 @@ module.exports = function ResourceBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+    self.routeRetrieveProject = function (req, res) {
+
+    }
+
+    self.routeSaveProject = function (req, res) {
+
+        try {
+
+            console.log("Entered AdminBO/routeSaveURLResource with req.body=" + JSON.stringify(req.body));
+            // req.body.userId
+            // req.body.userName
+            // req.body.projectJson
+
+            // image resources have already been created or selected for the project, its comics and their types.
+            // projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
+            /*
+            {
+                name: "name",
+                description: "description",
+                tags: "tag1 tag2 tag3",
+                imageResourceId: 123,
+                comicStrip: {
+                    comics: [
+                        {
+                            imageResourceId: 456,
+                            name: "cname",
+                            tags: "tag4 tag5 tag6",
+                            ordinal: 1
+                            typeStrip: {
+                                types: [
+                                    {
+                                        app: true,                  only one type (thye first) can have app: true
+                                        imageResourceId: 789,
+                                        name: "tname",
+                                        tags: "tag7 tag8 tag9",
+                                        ordinal: 1,
+                                        properties: 
+                                            [
+                                                { name: "pname1", propertyTypeId: 111 },
+                                                { ... },
+                                                { name: "pnamen", propertyTypeId: nnn }
+                                            ],
+                                        methods: 
+                                            [
+                                                { name: "initialize", workspace: "", method: "" },
+                                                { name: '...', workspace: "...", method: "..." },
+                                                { ... }
+                                                { name: '...', workspace: "...", method: "..." }
+                                            ],
+                                        events: 
+                                            [
+                                                { name: "ename1", eventFunctionName: "efname1" },
+                                                { ... },
+                                                { name: "enamen", eventFunctionName: "efnamen" }
+                                            ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+            */
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeSaveURLResource = function (req, res) {
 
         try {

@@ -4,18 +4,23 @@
   .row
     .col-xs-12
       h4 
-        | A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.
+        | A TechGroms project has a <em>name</em>, an identifying <em>image</em> and a number of <em>tags</em> that will help you or others search for it later.
+        | You may also enter a longer description of your project.
       h5
-        | You may enter them now or your may wait until you've started working on the project and understand what it does.
-      br
-
+        | You may enter them now or you may wait until you've started working on the project and understand what it does.
   .row
     .col-xs-12
-        br
         .col-xs-2
             label.control-label(for="ProjectName", style="margin-top:6px;") Name
         .col-xs-4
             input.form-control#ProjectName(type="text", placeholder="Enter project name.")
+        br
+        br
+        .col-xs-2
+            label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
+        .col-xs-10
+            textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
+        br
         br
         br
         .col-xs-2
@@ -25,11 +30,11 @@
   .row
     br
     .col-xs-12
-      .col-xs-4
+      .col-xs-2
         label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
-        br
+      .col-xs-4
         img#ProjectImage.pull-left(src="media/images/clicktochange.png" style="height:120px;width=120px;")
-      .col-xs-6
+      .col-xs-4
       .col-xs-2
         br
         br

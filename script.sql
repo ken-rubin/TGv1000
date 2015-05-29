@@ -266,7 +266,20 @@ begin
             
 		UPDATE `TGv1000`.`control` set dbstate=14.0 where id=1;
 		set @dbstate := 14.0;
-        end if;
+    end if;
+
+	if @dbstate = 14.0 then
+
+		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
+			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveProject','post','routeSaveProject',1);
+
+		DELETE FROM TGv1000.resources;
+        DELETE FROM TGv1000.tags;
+        DELETE FROM TGv1000.resources_tags;
+
+		UPDATE `TGv1000`.`control` set dbstate=15.0 where id=1;
+		set @dbstate := 15.0;
+    end if;
 
 end;
 
