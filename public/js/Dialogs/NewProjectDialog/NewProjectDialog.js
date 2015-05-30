@@ -69,6 +69,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 								throw exceptionRet;
 							}
+
+							exceptionRet = $("#ProjectImage").click(m_functionChangeProjectImage);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 						} catch (e) {
 
 							errorHelper.show(e.message);
@@ -83,8 +89,31 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					try {
 
+						m_projectName = $("#ProjectName").val();
+						m_projectTags = $("#ProjectTags").val();
+						m_projectDescription = $("#ProjectDescription")
+
 						// Create minimal project based on the new project dialog's fields.
-						var project = {};
+						var project = 
+							{
+								name: m_projectName,
+								description: m_projectDescription,
+								tags: m_projectTags,
+								imageResourceId: m_imageResourceId,
+								comicStrip: {
+									comics: [{
+										imageResourceId: 1,
+										name: m_comicName,
+										tags: m_comicTags,
+										ordinal: 0,
+										typeStrip: {
+											types: [{
+												app:true,
+											}]
+										}
+									}]
+								}
+							};
 
 
 
@@ -116,6 +145,20 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					} catch (e) {
 
 						errorHelper.show(e);
+					}
+				}
+
+				var m_functionChangeProjectImage = function () {
+
+					try {
+
+
+
+						return null;
+
+					} catch (e) {
+
+						return e;
 					}
 				}
 

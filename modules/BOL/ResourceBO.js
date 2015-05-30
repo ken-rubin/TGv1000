@@ -74,43 +74,43 @@ module.exports = function ResourceBO(app, sql, logger) {
             /* req.body.projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
 
             {
-                name: "name",
-                description: "description",
-                tags: "tag1 tag2 tag3",
-                imageResourceId: 123,
+                projectName: "name",
+                projectDescription: "description",
+                projectTags: "tag1 tag2 tag3",
+                projectImageResourceId: 123,
+                projectPrice: 0.0,
                 comicStrip: {
                     comics: [
                         {
-                            imageResourceId: 456,
-                            name: "cname",
-                            tags: "tag4 tag5 tag6",
-                            ordinal: 1
+                            comicImageResourceId: 456,
+                            comicName: "cname",
+                            comicTags: "tag4 tag5 tag6",
+                            comicOrdinal: 0
                             typeStrip: {
                                 types: [
                                     {
-                                        app: true,                  only one type (the first) can have app: true
-                                        imageResourceId: 789,
-                                        name: "tname",
-                                        tags: "tag7 tag8 tag9",
-                                        ordinal: 1,
-                                        properties: 
+                                        typeIsApp: true,                  only one type (the first) can have app: true
+                                        typeImageResourceId: 789,
+                                        typeName: "tname",
+                                        typeTags: "tag7 tag8 tag9",
+                                        typeOrdinal: 0,
+                                        typeProperties: 
                                             [
-                                                { name: "pname1", propertyTypeId: 111 },
+                                                { propertyName: "pname1", propertyTypeId: 111 },
                                                 { ... },
-                                                { name: "pnamen", propertyTypeId: nnn }
+                                                { propertyName: "pnamen", propertyTypeId: nnn }
                                             ],
-                                        methods: 
+                                        typeMethods: 
                                             [
-                                                { name: "initialize", workspace: "", method: "" },
-                                                { name: '...', workspace: "...", method: "..." },
+                                                { methodName: "initialize", methodWorkspace: "", methodMethod: "" },
                                                 { ... }
-                                                { name: '...', workspace: "...", method: "..." }
+                                                { methodName: '...', methodWorkspace: "...", methodMethod: "..." }
                                             ],
-                                        events: 
+                                        typeEvents: 
                                             [
-                                                { name: "ename1", eventFunctionName: "efname1" },
+                                                { typeName: "ename1", typeEventFunctionName: "efname1" },
                                                 { ... },
-                                                { name: "enamen", eventFunctionName: "efnamen" }
+                                                { typeName: "enamen", typeEventFunctionName: "efnamen" }
                                             ]
                                     },
                                     { ... }
@@ -122,6 +122,12 @@ module.exports = function ResourceBO(app, sql, logger) {
                 }
             }
             */
+
+            // 1. Add row to projects table. Save id in projectId. Add 'project' row to resources table pointing back to projectId. Save id in resourceId. Associate projectTags with resourceId.
+            // 2. Loop (on i) through comics in comicStrip and for each:
+            //      2a. Add row to comics table. Save id in comicId. Add 'comic' row to resources table pointing back to comicId. Save id in resourceId. Associate comicTags[i] with resourceId.
+            //      2b. Loop (on j) through types in typeStrip and for each:
+            //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
 
         } catch (e) {
 
