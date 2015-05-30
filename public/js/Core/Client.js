@@ -302,52 +302,56 @@ define(["Core/errorHelper",
 						return strPossiblyWithSpaces.replace(/ /g, '');
 					};
 
-					///////////////////////////////
-					// Private functions.
-
 					// Invoked when the projects dialog exist newly.
-					var m_functionNewProject = function () {
+					self.functionNewProject = function (project) {
 
 						try {
 
 				    		// Allocate project.
 				    		m_project = new Project();
-				    		return m_project.load({ 
+				    		return m_project.load(
 
-				    			version: 1,
-				    			id: 1,
-				    			name: "Project 1",
-				    			resourceId: 0,
-				    			description: "This is a project of the emergency broadcast system....",
-				    			comicStrip: {
+				    			m_project;
+				    		// { 
 
-				    				items: [{
+				    		// 	version: 1,
+				    		// 	id: 1,
+				    		// 	name: "Project 1",
+				    		// 	resourceId: 0,
+				    		// 	description: "This is a project of the emergency broadcast system....",
+				    		// 	comicStrip: {
 
-				    					id: 1,
-				    					name:"default comic",
-				    					resourceId: 1,
-					    				typeStrip: {
+				    		// 		items: [{
 
-					    					items: [{
+				    		// 			id: 1,
+				    		// 			name:"default comic",
+				    		// 			resourceId: 1,
+					    	// 			typeStrip: {
 
-					    						app: true,
-					    						properties: [],
-					    						methods: [{ name: "initialize", workspace: "", method: "" }],
-					    						events: [],
-					    						dependencies: [],
-					    						id: 0,
-					    						name: "app",
-					    						resourceId: 3
-					    					}]
-					    				}
-					    			}]
-				    			}
-				    		});
+					    	// 				items: [{
+
+					    	// 					app: true,
+					    	// 					properties: [],
+					    	// 					methods: [{ name: "initialize", workspace: "", method: "" }],
+					    	// 					events: [],
+					    	// 					dependencies: [],
+					    	// 					id: 0,
+					    	// 					name: "app",
+					    	// 					resourceId: 3
+					    	// 				}]
+					    	// 			}
+					    	// 		}]
+				    		// 	}
+				    		// }
+				    		);
 						} catch (e) {
 
 							return e;
 						}
 					};
+
+					///////////////////////////////
+					// Private functions.
 
 					// Invoked when the projects dialog exist openly.
 					var m_functionOpenProject = function (strId) {

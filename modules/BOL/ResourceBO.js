@@ -54,6 +54,11 @@ module.exports = function ResourceBO(app, sql, logger) {
     // Router handler functions.
     self.routeRetrieveProject = function (req, res) {
 
+            console.log("Entered AdminBO/routeSaveURLResource with req.body=" + JSON.stringify(req.body));
+            // req.body.projectId
+
+            // For the items in the project that have imageResourceIds, those will just be used to construct URLs in <img> tags.
+            // So we're really returning JSON as described below in routeSaveProject.
     }
 
     self.routeSaveProject = function (req, res) {

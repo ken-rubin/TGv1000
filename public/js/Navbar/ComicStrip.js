@@ -42,6 +42,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 							// Attach scrollableregion.
 							m_srComicStrip = new ScrollRegion();
 							return m_srComicStrip.attach(self.rowSelector);
+							
 						} catch (e) {
 
 							return e;

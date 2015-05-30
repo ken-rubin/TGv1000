@@ -46,6 +46,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 							// Create or re-create the strips with this comic's data.
 							return typeStrip.load(self.data.typeStrip);
+							
 						} catch (e) {
 
 							return e;

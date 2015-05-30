@@ -38,6 +38,7 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 						try {
 
 							return comicStrip.load(objectData.comicStrip);
+
 						} catch (e) {
 
 							return e;
@@ -47,6 +48,9 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 					self.saveToDatabase = function () {
 
 						try {
+
+
+
 
 
 							return null;
@@ -62,6 +66,7 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 
 					// The strip of comic frames.
 					var m_csComicStrip = null;
+
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -69,6 +74,7 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 			};
 
 			return functionConstructor;
+			
 		} catch (e) {
 
 			errorHelper.show(e);

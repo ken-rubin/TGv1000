@@ -64,6 +64,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
+							var exceptionRet = $("#CreateProjectBtn").click(m_functionCreateProject);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 						} catch (e) {
 
 							errorHelper.show(e.message);
@@ -74,11 +79,55 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					errorHelper.show(e.message);
 				}
 
+				var m_functionCreateProject = function () {
+
+					try {
+
+						// Create minimal project based on the new project dialog's fields.
+						var project = {};
+
+
+
+
+
+
+						
+
+						var posting = $.post("/BOL/ResourceBO/SaveProject", 
+								{
+									userId: client.getTGCookie('userId'),
+									userName: client.getTGCookie('userName'),
+									projectJson: JSON.stringify(project)
+								}, 
+								'json');
+						posting.done = function (data) {
+
+							if (data.success) {
+
+								client.functionNewProject(data.project);
+
+							} else {
+
+								// !data.success
+								throw new Error(new Error(data.message));
+							}
+						}
+
+					} catch (e) {
+
+						errorHelper.show(e);
+					}
+				}
+
 				/////////////////////////////////
 				// Private fields.
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
+				var m_imageResourceId = null;
+				var m_projectName = null;
+				var m_projectTags = null;
+				var m_projectDescription = null;
 			};
 
 			// Return the constructor function as the module object.
