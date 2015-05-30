@@ -79,6 +79,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 projectTags: "tag1 tag2 tag3",
                 projectImageResourceId: 123,
                 projectPrice: 0.0,
+                projectIsTemplate: 0,
                 comicStrip: {
                     comics: [
                         {
@@ -129,6 +130,94 @@ module.exports = function ResourceBO(app, sql, logger) {
             //      2b. Loop (on j) through types in typeStrip and for each:
             //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
 
+            var project = JSON.parse(req.body.projectJson);
+            var exceptionRet = sql.execute("insert into " + self.dbname + "projects (name,createdByUserId,template,price,imageResourceId) values ('" + project.projectName + "'," + req.body.userId + "," + project.projectIsTemplate + "," + project.projectPrice + "," + project.imageResourceId + ");",
+                function(rows) {
+
+                    if (rows.length === 0) {
+
+                        res.json({
+                            success: false,
+                            message: "Error inserting project into database."
+                        });
+                    } else {
+
+                        var projectId = rows[0].insertId;
+                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + projectId + ");",
+                            function(rows) {
+
+                                if (rows.length === 0) {
+
+                                    res.json({
+                                        success: false,
+                                        message: "Error inserting project resource into database."
+                                    });
+                                } else {
+
+                                    var resourceId = rows[0].insertId;
+                                    m_setUpAndDoTags(resourceId, 3, req.body.userName, project.projectTags, function(err) {
+
+                                        if (err) {
+
+                                            res.json({
+                                                success:false,
+                                                message: err.message
+                                            });
+                                        } else {
+
+                                            m_doComicStripPlusTypes(projectId, project, req, function(err) {
+
+                                                if (err) {
+
+                                                    res.json({
+                                                        success:false,
+                                                        message: err.message
+                                                    });
+                                                } else {
+
+                                                    // We're done.
+                                                    res.json({
+                                                        success: true,
+                                                        project: project
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            },
+                            function(strError) {
+
+                                res.json({
+                                    success: false,
+                                    message: "Error inserting project resource into database: " + strError
+                                });
+                            }
+                        );
+                        if (exceptionRet) {
+
+                            res.json({
+                                success: false,
+                                message: "Error inserting project resource into database: " + exceptionRet.message
+                            });
+                        }
+                    }
+                },
+                function(strError) {
+
+                    res.json({
+                        success: false,
+                        message: "Error inserting project into database."
+                    });
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: "Error inserting project into database: " + exceptionRet.message
+                });
+            }
         } catch (e) {
 
             res.json({
@@ -1384,9 +1473,47 @@ module.exports = function ResourceBO(app, sql, logger) {
             });
     }
 
+    var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, callback) {
+
+        try {
+
+            var tagArray = [];
+            tagArray.push(m_resourceTypes[resourceTypeId]);
+            tagArray.push(userName);
+            var tags = strTags.toLowerCase();
+            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+            if (ccArray){
+                tagArray = tagArray.concat(ccArray);
+            }
+
+            // Remove possible dups from tagArray.
+            var uniqueArray = [];
+            uniqueArray.push(tagArray[0]);
+            for (var i = 1; i < tagArray.length; i++) {
+                var compIth = tagArray[i];
+                var found = false;
+                for (var j = 0; j < uniqueArray.length; j++) {
+                    if (uniqueArray[j] === compIth){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    uniqueArray.push(compIth);
+                }
+            }
+
+            m_doTags(uniqueArray, resourceId, callback);
+
+        } catch(e) {
+
+            callback(e);
+            return;
+        }
+    }
+
     var m_doTags = function(tagArray, resourceId, callback){
 
-        console.log('Called m_doTags with tagArray=' + tagArray);
         var tagIds = [];
         var iCtr = tagArray.length;
         // For each string in tagArry:

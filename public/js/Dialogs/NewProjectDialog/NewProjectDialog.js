@@ -96,10 +96,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						// Create minimal project based on the new project dialog's fields.
 						var project = 
 							{
-								name: m_projectName,
-								description: m_projectDescription,
-								tags: m_projectTags,
-								imageResourceId: m_imageResourceId,
+								projectName: m_projectName,
+								projectDescription: m_projectDescription,
+								projectTags: m_projectTags,
+								projectImageResourceId: m_imageResourceId,
+								projectPrice: 0,
+								projectIsTemplate: 0,
 								comicStrip: {
 									comics: [{
 										imageResourceId: 1,
