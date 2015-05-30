@@ -270,6 +270,9 @@ begin
 
 	if @dbstate = 14.0 then
 
+		ALTER TABLE `TGv1000`.`projects` 
+			ADD COLUMN `description` VARCHAR(255) NULL AFTER `imageResourceId`;
+
 		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
 			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveProject','post','routeSaveProject',1);
 

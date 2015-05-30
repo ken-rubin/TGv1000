@@ -74,6 +74,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             /* req.body.projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
 
             {
+                projectId: 0,
                 projectName: "name",
                 projectDescription: "description",
                 projectTags: "tag1 tag2 tag3",
@@ -83,6 +84,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 comicStrip: {
                     comics: [
                         {
+                            comicId: 0,
                             comicImageResourceId: 456,
                             comicName: "cname",
                             comicTags: "tag4 tag5 tag6",
@@ -90,6 +92,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                             typeStrip: {
                                 types: [
                                     {
+                                        typeId: 0,
                                         typeIsApp: true,                  only one type (the first) can have app: true
                                         typeImageResourceId: 789,
                                         typeName: "tname",
@@ -142,8 +145,8 @@ module.exports = function ResourceBO(app, sql, logger) {
                         });
                     } else {
 
-                        var projectId = rows[0].insertId;
-                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + projectId + ");",
+                        project.projectId = rows[0].insertId;
+                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.projectId + ");",
                             function(rows) {
 
                                 if (rows.length === 0) {
@@ -165,7 +168,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                             });
                                         } else {
 
-                                            m_doComicStripPlusTypes(projectId, project, req, function(err) {
+                                            m_doComicStripPlusTypes(project, req, function(err) {
 
                                                 if (err) {
 
@@ -1448,6 +1451,10 @@ module.exports = function ResourceBO(app, sql, logger) {
     //         callback(e.message);
     //     }
     // }
+
+    var m_doComicStripPlusTypes = function(project, req, callback) {
+
+    }
 
     var m_createTagJunctions = function(resourceId, tagIds) {
 
