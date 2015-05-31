@@ -90,7 +90,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 				                        dot = 't.';
 				                    }
-				                    m_searchResultProcessedArray.push({index: i, url: resourceHelper.toURL('resources', rowIth.id, 't', 'image', ''), friendlyName: rowIth.friendlyName, resourceTypeId: rowIth.resourceTypeId});
+				                    m_searchResultProcessedArray.push({index: i, url: resourceHelper.toURL('resources', rowIth.id, 'image', ''), friendlyName: rowIth.friendlyName, resourceTypeId: rowIth.resourceTypeId});
 				                }
 
 				                var exceptionRet = m_rebuildCarousel();

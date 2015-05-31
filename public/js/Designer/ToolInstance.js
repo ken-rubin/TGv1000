@@ -35,7 +35,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     $(self.imageRender).bind("load", function () { designer.refresh(); });
 
                     // Load up the image.
-                    self.imageRender.src = resourceHelper.toURL('resources', self.resourceId, 't', 'image');
+                    self.imageRender.src = resourceHelper.toURL('resources', self.resourceId, 'image');
 
 					/////////////////////////////
 					// Public methods.
@@ -69,7 +69,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 		                    // Load up the image.
 		                    self.imageRender.src = resourceHelper.toURL('resources', 
 		                    	self.resourceId, 
-		                    	't', 
 		                    	'image');
 						} catch (e) {
 

@@ -74,7 +74,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						return $("<img class='comicstripitem' id='" + 
 							self.data.id + 
 							"' src='" +
-						 	resourceHelper.toURL('comics', self.data.resourceId) + 
+						 	resourceHelper.toURL('resources', self.data.resourceId, 'image', '') + 
 						 	"'></img>");
 					};
 				} catch (e) {

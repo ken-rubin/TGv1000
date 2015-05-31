@@ -312,37 +312,6 @@ define(["Core/errorHelper",
 				    		return m_project.load(
 
 				    			m_project;
-				    		// { 
-
-				    		// 	version: 1,
-				    		// 	id: 1,
-				    		// 	name: "Project 1",
-				    		// 	resourceId: 0,
-				    		// 	description: "This is a project of the emergency broadcast system....",
-				    		// 	comicStrip: {
-
-				    		// 		items: [{
-
-				    		// 			id: 1,
-				    		// 			name:"default comic",
-				    		// 			resourceId: 1,
-					    	// 			typeStrip: {
-
-					    	// 				items: [{
-
-					    	// 					app: true,
-					    	// 					properties: [],
-					    	// 					methods: [{ name: "initialize", workspace: "", method: "" }],
-					    	// 					events: [],
-					    	// 					dependencies: [],
-					    	// 					id: 0,
-					    	// 					name: "app",
-					    	// 					resourceId: 3
-					    	// 				}]
-					    	// 			}
-					    	// 		}]
-				    		// 	}
-				    		// }
 				    		);
 						} catch (e) {
 

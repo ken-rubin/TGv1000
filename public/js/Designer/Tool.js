@@ -62,7 +62,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						m_jTool = $("<img class='toolstripitem' id='" + 
 							client.removeSpaces(self.type.data.name) + 
 							"' src='" +
-						 	resourceHelper.toURL('resources', self.type.data.resourceId, '', 'image') + 
+						 	resourceHelper.toURL('resources', self.type.data.resourceId, 'image') + 
 						 	"' data-resourceid='" +
 						 	self.type.data.resourceId+ 
 						 	"' data-type='" + 
@@ -90,7 +90,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							jToolDOM.attr("data-resourceid",
 								self.type.data.resourceId);
 							jToolDOM.attr("src",
-								resourceHelper.toURL('resources', self.type.data.resourceId, '', 'image'));
+								resourceHelper.toURL('resources', self.type.data.resourceId, 'image'));
 
 						} catch (e) {
 

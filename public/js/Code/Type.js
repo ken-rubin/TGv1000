@@ -181,21 +181,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// Add first TGAction button. It applies to the whole Type.
 							var jMainTGActionButton = $("<button style='background-color:Transparent;border:none;outline:none;cursor:pointer;position:absolute;left:48px;top:8px;'>" +
 								"<img id='typeTGAction' class='TGAction' src='" +
-									resourceHelper.toURL("images", null, null, null, "TGAction.png") +
+									resourceHelper.toURL("images", null, null, "TGAction.png") +
 									"'></img>" + 
 								"</button>");
 							m_jType.append(jMainTGActionButton);
 							jMainTGActionButton.click(m_functionMainTGActionBtnClick);
-
-
-							// m_jType.append("<img id='typeTGAction' class='TGAction' src='" +
-							// 		resourceHelper.toURL("images", null, null, null, "TGAction.png") +
-							// 		"' style='position:absolute;top:8px;left:48px;'></img>"
-							// 	);
-							// $("#typeTGAction").off("click");
-							// $("#typeTGAction").on("click", function(){alert('TGAction was clicked');});
-
-							// Place a TGAction image (button) in the top-left corner,
 
 							// Generate the name to add to the type.
 							var jTypeName = $("<div style='position:absolute;left:8px;top:38px;right:72px'>" + 
@@ -210,7 +200,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Generate the image for the type.
 							var jTypeImage = $("<img src='" + 
-								resourceHelper.toURL('resources', self.data.resourceId, '', 'image', '') + 
+								resourceHelper.toURL('resources', self.data.resourceId, 'image', '') + 
 								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 							m_jType.append(jTypeImage);
 							jTypeImage.contextMenu({
@@ -233,7 +223,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL('images', null, null, null, 'plus.png') +
+								resourceHelper.toURL('images', null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddProperties);
@@ -289,7 +279,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL('images', null, null, null, 'plus.png') +
+								resourceHelper.toURL('images', null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddMethods);
@@ -345,7 +335,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 								self.buttonHeight +
 								"px;width:26px;'>" + 
 								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL('images', null, null, null, 'plus.png') +
+								resourceHelper.toURL('images', null, null, 'plus.png') +
 								"'></img>" + 
 								"</button>");
 							m_jType.append(jTypeAddEvents);

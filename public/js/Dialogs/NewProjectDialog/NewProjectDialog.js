@@ -89,60 +89,104 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					try {
 
-						m_projectName = $("#ProjectName").val();
-						m_projectTags = $("#ProjectTags").val();
-						m_projectDescription = $("#ProjectDescription")
+						m_projectName = $("#ProjectName").val() || 'no name';
+						m_projectTags = $("#ProjectTags").val() || 'enter search tags';
+						m_projectDescription = $("#ProjectDescription") || 'no description';
 
-						// Create minimal project based on the new project dialog's fields.
+						// Create minimal project based on the new project dialog's fields--or lack thereof.
+			    		// { 
+
+			    		// 	version: 1,
+			    		// 	id: 1,
+			    		// 	name: "Project 1",
+			    		// 	resourceId: 0,
+			    		// 	description: "This is a project of the emergency broadcast system....",
+			    		// 	comicStrip: {
+
+			    		// 		items: [{
+
+			    		// 			id: 1,
+			    		// 			name:"default comic",
+			    		// 			resourceId: 1,
+				    	// 			typeStrip: {
+
+				    	// 				items: [{
+
+				    	// 					app: true,
+				    	// 					properties: [],
+				    	// 					methods: [{ name: "initialize", workspace: "", method: "" }],
+				    	// 					events: [],
+				    	// 					dependencies: [],
+				    	// 					id: 0,
+				    	// 					name: "app",
+				    	// 					resourceId: 3
+				    	// 				}]
+				    	// 			}
+				    	// 		}]
+			    		// 	}
+			    		// }
 						var project = 
-							{
-								projectName: m_projectName,
-								projectDescription: m_projectDescription,
-								projectTags: m_projectTags,
-								projectImageResourceId: m_imageResourceId,
-								projectPrice: 0,
-								projectIsTemplate: 0,
-								comicStrip: {
-									comics: [{
-										imageResourceId: 1,
-										name: m_comicName,
-										tags: m_comicTags,
-										ordinal: 0,
-										typeStrip: {
-											types: [{
-												app:true,
-											}]
-										}
-									}]
-								}
-							};
+						{
+							projectName: m_projectName,
+							projectId: 0,
+							projectDescription: m_projectDescription,
+							projectTags: m_projectTags,
+							projectImageResourceId: m_imageResourceId,
+							projectPrice: 0,
+							projectIsTemplate: 0,
+							comicStrip: {
+								comics: [{
+									comicImageResourceId: 1,
+									comicId: 0,
+									comicName: m_comicName,
+									comicTags: m_comicTags,
+									comicOrdinal: 0,
+									typeStrip: {
+										types: [{
+											typeIsApp: true,
+											typeId: 0,
+											typeProperties: [],
+											typeMethods: [{ methodName: "initialize", methodWorkspace: "", methodMethod: "" }],
+											typeEvents: [],
+											typeDependencies: [],
+											typeName: "app",
+											typeImageResourceId: 3
+										}]
+									}
+								}]
+							}
+						};
 
+						var exceptionRet = client.functionNewProject(project);
+						if (exceptionRet) {
 
+							throw exceptionRet;
+						}
 
 
 
 
 						
 
-						var posting = $.post("/BOL/ResourceBO/SaveProject", 
-								{
-									userId: client.getTGCookie('userId'),
-									userName: client.getTGCookie('userName'),
-									projectJson: JSON.stringify(project)
-								}, 
-								'json');
-						posting.done = function (data) {
+						// var posting = $.post("/BOL/ResourceBO/SaveProject", 
+						// 		{
+						// 			userId: client.getTGCookie('userId'),
+						// 			userName: client.getTGCookie('userName'),
+						// 			projectJson: JSON.stringify(project)
+						// 		}, 
+						// 		'json');
+						// posting.done = function (data) {
 
-							if (data.success) {
+						// 	if (data.success) {
 
-								client.functionNewProject(data.project);
+						// 		client.functionNewProject(data.project);
 
-							} else {
+						// 	} else {
 
-								// !data.success
-								throw new Error(new Error(data.message));
-							}
-						}
+						// 		// !data.success
+						// 		throw new Error(new Error(data.message));
+						// 	}
+						// }
 
 					} catch (e) {
 
@@ -173,6 +217,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				var m_projectName = null;
 				var m_projectTags = null;
 				var m_projectDescription = null;
+				var m_comicName = '';
+				var m_comicTags = '';
 			};
 
 			// Return the constructor function as the module object.
