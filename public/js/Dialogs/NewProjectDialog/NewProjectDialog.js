@@ -63,26 +63,20 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+							m_imageResourceId = 0;
 
-							var exceptionRet = $("#CreateProjectBtn").click(m_functionCreateProject);
-							if (exceptionRet) {
+							$("#CreateProjectBtn").click(m_functionCreateProject);
 
-								throw exceptionRet;
-							}
+							$("#ProjectImage").click(m_functionChangeProjectImage);
 
-							exceptionRet = $("#ProjectImage").click(m_functionChangeProjectImage);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
 						} catch (e) {
 
-							errorHelper.show(e.message);
+							errorHelper.show(e);
 						}
 					};
 				} catch (e) {
 
-					errorHelper.show(e.message);
+					errorHelper.show(e);
 				}
 
 				var m_functionCreateProject = function () {
@@ -136,10 +130,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							projectIsTemplate: 0,
 							comicStrip: {
 								comics: [{
-									comicImageResourceId: 1,
+									comicImageResourceId: 0,
 									comicId: 0,
-									comicName: m_comicName,
-									comicTags: m_comicTags,
+									comicName: 'default',
+									comicTags: 'a b',
 									comicOrdinal: 0,
 									typeStrip: {
 										types: [{
@@ -150,7 +144,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 											typeEvents: [],
 											typeDependencies: [],
 											typeName: "app",
-											typeImageResourceId: 3
+											typeImageResourceId: 0
 										}]
 									}
 								}]
@@ -163,8 +157,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							throw exceptionRet;
 						}
 
-
-
+						m_dialog.close();
 
 						
 
@@ -225,6 +218,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			return functionNewProjectDialog;
 		} catch (e) {
 
-			errorHelper.show(e.message);
+			errorHelper.show(e);
 		}
 	});

@@ -28,7 +28,10 @@ define(["Core/errorHelper"],
 						//		images: return "media/images/" + strResourceFilename
 
 						if (strResourceSource === "resources")
-							return "resources/" + iResourceId + (strResourceType === "image" ? ".png" : ".mp3");
+							if (iResourceId > 0)
+								return "resources/" + iResourceId + (strResourceType === "image" ? ".png" : ".mp3");
+							else
+								return "media/images/clicktochange.png";
 						else if (strResourceSource === "images")
 							return "media/images/" + strResourceFilename;
 						else

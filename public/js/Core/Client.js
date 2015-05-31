@@ -311,7 +311,7 @@ define(["Core/errorHelper",
 				    		m_project = new Project();
 				    		return m_project.load(
 
-				    			m_project;
+				    			project
 				    		);
 						} catch (e) {
 

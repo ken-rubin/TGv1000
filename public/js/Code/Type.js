@@ -78,7 +78,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 						// Allocate the type.
 						m_jType = $("<div id='" + 
-							self.data.name + 
+							self.data.typeName + 
 							"' class='typestripitem' style='background:black;'></div>");
 
 						// Add the contents to the newly allocated type.
@@ -189,7 +189,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Generate the name to add to the type.
 							var jTypeName = $("<div style='position:absolute;left:8px;top:38px;right:72px'>" + 
-								self.data.name + 
+								self.data.typeName + 
 								"</div>");
 							m_jType.append(jTypeName);
 							jTypeName.contextMenu({
@@ -200,7 +200,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Generate the image for the type.
 							var jTypeImage = $("<img src='" + 
-								resourceHelper.toURL('resources', self.data.resourceId, 'image', '') + 
+								resourceHelper.toURL('resources', self.data.typeImageResourceId, 'image', '') + 
 								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 							m_jType.append(jTypeImage);
 							jTypeImage.contextMenu({
@@ -231,9 +231,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Loop over and add the properties.
 							var iCursorY = 132;
-							for (var i = 0; i < self.data.properties.length; i++) {
+							for (var i = 0; i < self.data.typeProperties.length; i++) {
 
-								var propertyIth = self.data.properties[i];
+								var propertyIth = self.data.typeProperties[i];
 
 								// Add the property.
 								var jTypeProperty = $("<button data-index='" + 
@@ -243,7 +243,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 									"px;right:8px;height:" + 
 									self.buttonHeight + 
 									"px;'>" + 
-									propertyIth.name + 
+									propertyIth.propertyName + 
 									"</button>");
 								m_jType.append(jTypeProperty);
 								jTypeProperty.click(m_functionPropertyClick);
@@ -287,9 +287,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							jTypeAddMethods.click(m_functionAddMethodClick);
 
 							// Loop over and add the methods.
-							for (var i = 0; i < self.data.methods.length; i++) {
+							for (var i = 0; i < self.data.typeMethods.length; i++) {
 
-								var methodIth = self.data.methods[i];
+								var methodIth = self.data.typeMethods[i];
 
 								// Add the property.
 								var jTypeMethod = $("<button data-index='" + 
@@ -299,7 +299,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 									"px;right:8px;height:" + 
 									self.buttonHeight + 
 									"px;'>" + 
-									methodIth.name + 
+									methodIth.methodName + 
 									"</button>");
 								m_jType.append(jTypeMethod);
 								jTypeMethod.click(m_functionMethodClick);
@@ -343,9 +343,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							jTypeAddEvents.click(m_functionAddEventClick);
 
 							// Loop over and add the events.
-							for (var i = 0; i < self.data.events.length; i++) {
+							for (var i = 0; i < self.data.typeEvents.length; i++) {
 
-								var eventsIth = self.data.events[i];
+								var eventsIth = self.data.typeEvents[i];
 
 								// Add the Events.
 								var jTypeEvent = $("<button data-index='" + 

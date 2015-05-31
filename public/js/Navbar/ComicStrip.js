@@ -61,10 +61,10 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 							m_arrayComics = [];
 
 							// Add N test items.
-							for (var i = 0; i < objectData.items.length; i++) {
+							for (var i = 0; i < objectData.comics.length; i++) {
 
 								// Get the ith comic.
-								var comicIth = objectData.items[i];
+								var comicIth = objectData.comics[i];
 
 								// Allocate.
 								var comicNew = new Comic();

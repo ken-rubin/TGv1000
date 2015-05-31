@@ -72,9 +72,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.generateDOM = function () {
 
 						return $("<img class='comicstripitem' id='" + 
-							self.data.id + 
+							self.data.comicName + 
 							"' src='" +
-						 	resourceHelper.toURL('resources', self.data.resourceId, 'image', '') + 
+						 	resourceHelper.toURL('resources', self.data.comicImageResourceId, 'image', '') + 
 						 	"'></img>");
 					};
 				} catch (e) {

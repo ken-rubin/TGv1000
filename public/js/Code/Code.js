@@ -49,9 +49,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Add properties.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < type.data.typeProperties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
+								var propertyIth = type.data.typeProperties[i];
 								exceptionRet = m_functionAdd_Type_Property(type,
 									propertyIth);
 								if (exceptionRet) {
@@ -61,9 +61,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Add methods.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < type.data.typeMethods.length; i++) {
 
-								var methodIth = type.data.methods[i];
+								var methodIth = type.data.typeMethods[i];
 								exceptionRet = m_functionAdd_Type_Method(type,
 									methodIth);
 								if (exceptionRet) {
@@ -96,9 +96,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Rename properties.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < type.data.typeProperties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
+								var propertyIth = type.data.typeProperties[i];
 								var exceptionRet = m_functionRename_Type_Property(type,
 									propertyIth,
 									propertyIth.name, 
@@ -110,9 +110,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Rename methods.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < type.data.typeMethods.length; i++) {
 
-								var methodIth = type.data.methods[i];
+								var methodIth = type.data.typeMethods[i];
 								var exceptionRet = m_functionRename_Type_Method(type,
 									methodIth,
 									methodIth.name, 
@@ -147,9 +147,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Remove properties.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < type.data.typeProperties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
+								var propertyIth = type.data.typeProperties[i];
 								var exceptionRet = m_functionRemove_Type_Property(type,
 									propertyIth);
 								if (exceptionRet) {
@@ -159,9 +159,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Remove methods.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < type.data.typeMethods.length; i++) {
 
-								var methodIth = type.data.methods[i];
+								var methodIth = type.data.typeMethods[i];
 								var exceptionRet = m_functionRemove_Type_Method(type,
 									methodIth);
 								if (exceptionRet) {
@@ -193,9 +193,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Test if any of the properties are referenced.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < type.data.typeProperties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
+								var propertyIth = type.data.typeProperties[i];
 								var methodReferenced = m_functionIsReferenced_Type_Property(type,
 									propertyIth);
 								if (methodReferenced) {
@@ -205,9 +205,9 @@ define(["Core/errorHelper"],
 							}
 
 							// Test if any of the methods are referenced.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < type.data.typeMethods.length; i++) {
 
-								var methodIth = type.data.methods[i];
+								var methodIth = type.data.typeMethods[i];
 								var methodReferenced = m_functionIsReferenced_Type_Method(type,
 									methodIth);
 								if (methodReferenced) {
@@ -421,7 +421,7 @@ define(["Core/errorHelper"],
 						try {
 
 							// Set the title.
-							$("#titlediv").text(type.data.name + " :: " + method.name);
+							$("#titlediv").text(type.data.typeName + " :: " + method.methodName);
 
 							// Save off workspace string.
 							self.workspace = strCodeDOM;
@@ -573,11 +573,11 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 
-							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
+							self.blocks["new_" + type.data.typeName] = m_functionGenerateBlocksTypeNewFunctionString(type.data.typeName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
+							self.javaScript["new_" + type.data.typeName] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.typeName);
 
 							////////////////////////
 							// Schema.
@@ -587,8 +587,8 @@ define(["Core/errorHelper"],
 							}
 							var objectTypes = self.schema.Types;
 							var typeNew = { };
-							typeNew["new_" + type.data.name] = true;
-							objectTypes[type.data.name] = typeNew;
+							typeNew["new_" + type.data.typeName] = true;
+							objectTypes[type.data.typeName] = typeNew;
 
 							return null;
 						} catch (e) {
@@ -605,18 +605,18 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 
-							delete self.blocks["new_" + type.data.name];
+							delete self.blocks["new_" + type.data.typeName];
 
 							////////////////////////
 							// JavaScript.
-							delete self.javaScript["new_" + type.data.name];
+							delete self.javaScript["new_" + type.data.typeName];
 
 							////////////////////////
 							// Schema.
 							if (self.schema &&
 								self.schema.Types) {
 
-								delete self.schema.Types[type.data.name];
+								delete self.schema.Types[type.data.typeName];
 							}
 
 							return null;
@@ -635,12 +635,12 @@ define(["Core/errorHelper"],
 							// Blocks.
 
 							delete self.blocks["new_" + strOriginalName];
-							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
+							self.blocks["new_" + type.data.typeName] = m_functionGenerateBlocksTypeNewFunctionString(type.data.typeName);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript["new_" + strOriginalName];
-							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
+							self.javaScript["new_" + type.data.typeName] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.typeName);
 
 							////////////////////////
 							// Workspace.
@@ -648,9 +648,9 @@ define(["Core/errorHelper"],
 
 								var re = new RegExp("new_" + strOriginalName,"g");
 								self.workspace = self.workspace.replace(re,
-									"new_" + type.data.name);
+									"new_" + type.data.typeName);
 								var exceptionRet = typeStrip.replaceInWorkspaces("new_" + strOriginalName,
-									"new_" + type.data.name);
+									"new_" + type.data.typeName);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -666,7 +666,7 @@ define(["Core/errorHelper"],
 							var objectTypes = self.schema.Types;
 
 							// Bet the type.
-							var typeNew = objectTypes[type.data.name];
+							var typeNew = objectTypes[type.data.typeName];
 
 							// Remove the old name.
 							delete objectTypes[strOriginalName];
@@ -675,8 +675,8 @@ define(["Core/errorHelper"],
 
 								typeNew = {};
 							}
-							typeNew["new_" + type.data.name] = true
-							objectTypes[type.data.name] = typeNew;
+							typeNew["new_" + type.data.typeName] = true
+							objectTypes[type.data.typeName] = typeNew;
 
 							return null;
 						} catch (e) {
@@ -692,7 +692,7 @@ define(["Core/errorHelper"],
 						try {
 
 							// Look for this:
-							var strLookFor = "new_" + type.data.name;
+							var strLookFor = "new_" + type.data.typeName;
 
 							return typeStrip.isReferencedInWorkspace(strLookFor);
 						} catch (e) {
@@ -713,12 +713,12 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strGetName = type.data.name + "_get" + property.name;
+							var strGetName = type.data.typeName + "_get" + property.propertyName;
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.propertyName);
 
 							////////////////////////
 							// Schema.
@@ -727,7 +727,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[type.data.typeName];
 							objectType[strGetName] = true;
 
 
@@ -738,12 +738,12 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strSetName = type.data.name + "_set" + property.name;
+							var strSetName = type.data.typeName + "_set" + property.propertyName;
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.propertyName);
 
 							////////////////////////
 							// Schema.
@@ -752,7 +752,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[type.data.typeName];
 							objectType[strSetName] = true;
 
 							return null;
@@ -767,8 +767,8 @@ define(["Core/errorHelper"],
 
 						try {
 
-							var strGet = type.data.name + "_get" + property.name;
-							var strSet = type.data.name + "_set" + property.name;
+							var strGet = type.data.typeName + "_get" + property.propertyName;
+							var strSet = type.data.typeName + "_set" + property.propertyName;
 
 							////////////////////////
 							// Blocks.
@@ -786,9 +786,9 @@ define(["Core/errorHelper"],
 							// Schema.
 							if (self.schema &&
 								self.schema.Types &&
-								self.schema.Types[type.data.name]) {
+								self.schema.Types[type.data.typeName]) {
 
-								var objectType = self.schema.Types[type.data.name];
+								var objectType = self.schema.Types[type.data.typeName];
 								delete objectType[strGet];
 								delete objectType[strSet];
 							}
@@ -807,7 +807,7 @@ define(["Core/errorHelper"],
 
 							if (!strOriginalTypeName) {
 
-								strOriginalTypeName = type.data.name;
+								strOriginalTypeName = type.data.typeName;
 							}
 							////////////////////////
 							////////////////////////
@@ -817,14 +817,14 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strOriginalName = strOriginalTypeName + "_get" + strOriginal;
-							var strGetName = type.data.name + "_get" + property.name;
+							var strGetName = type.data.typeName + "_get" + property.propertyName;
 							delete self.blocks[strOriginalName];
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalName];
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.propertyName);
 
 							////////////////////////
 							// Workspace.
@@ -848,7 +848,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[type.data.typeName];
 							objectType[strGetName] = true;
 							delete objectType[strOriginalName];
 
@@ -860,14 +860,14 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strOriginalSetName = strOriginalTypeName + "_set" + strOriginal;
-							var strSetName = type.data.name + "_set" + property.name;
+							var strSetName = type.data.typeName + "_set" + property.propertyName;
 							delete self.blocks[strOriginalSetName];
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalSetName];
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.propertyName);
 
 							////////////////////////
 							// Workspace.
@@ -891,7 +891,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[type.data.typeName];
 							objectType[strSetName] = true;
 							delete objectType[strOriginalSetName];
 
@@ -909,8 +909,8 @@ define(["Core/errorHelper"],
 						try {
 
 							// Look for this:
-							var strGetName = type.data.name + "_get" + property.name;
-							var strSetName = type.data.name + "_set" + property.name;
+							var strGetName = type.data.typeName + "_get" + property.propertyName;
+							var strSetName = type.data.typeName + "_set" + property.propertyName;
 
 							var methodReferenced = typeStrip.isReferencedInWorkspace(strGetName);
 							if (methodReferenced) {
@@ -931,12 +931,12 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strName = type.data.name + "_" + method.name;
+							var strName = type.data.typeName + "_" + method.methodName;
 							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
+							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.methodName);
 
 							////////////////////////
 							// Schema.
@@ -945,7 +945,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[type.data.typeName];
 							objectType[strName] = true;
 
 							return null;
@@ -960,7 +960,7 @@ define(["Core/errorHelper"],
 
 						try {
 
-							var strName = type.data.name + "_" + method.name;
+							var strName = type.data.typeName + "_" + method.methodName;
 
 							////////////////////////
 							// Blocks.
@@ -976,9 +976,9 @@ define(["Core/errorHelper"],
 							// Schema.
 							if (self.schema &&
 								self.schema.Types &&
-								self.schema.Types[type.data.name]) {
+								self.schema.Types[type.data.typeName]) {
 
-								var objectType = self.schema.Types[type.data.name];
+								var objectType = self.schema.Types[type.data.typeName];
 								delete objectType[strName];
 							}
 
@@ -996,20 +996,20 @@ define(["Core/errorHelper"],
 
 							if (!strOriginalTypeName) {
 
-								strOriginalTypeName = type.data.name;
+								strOriginalTypeName = type.data.typeName;
 							}
 
 							////////////////////////
 							// Blocks.
 							var strOriginalName = strOriginalTypeName + "_" + strOriginal;
-							var strName = type.data.name + "_" + method.name;
+							var strName = type.data.typeName + "_" + method.methodName;
 							delete self.blocks[strOriginalName];
 							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalName];
-							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
+							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.methodName);
 
 							////////////////////////
 							// Workspace.
@@ -1033,7 +1033,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[type.data.typeName];
 							objectType[strName] = true;
 							delete objectType[strOriginalName];
 
@@ -1051,7 +1051,7 @@ define(["Core/errorHelper"],
 						try {
 
 							// Look for this:
-							var strName = type.data.name + "_" + method.name;
+							var strName = type.data.typeName + "_" + method.methodName;
 
 							return typeStrip.isReferencedInWorkspace(strName);
 						} catch (e) {

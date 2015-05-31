@@ -146,10 +146,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							}
 
 							// Loop over items and insert into the DOM.
-							for (var i = 0; i < objectData.items.length; i++) {
+							for (var i = 0; i < objectData.types.length; i++) {
 
 								// Extract the item (type).
-								var itemIth = objectData.items[i];
+								var itemIth = objectData.types[i];
 
 								// Allocate the type object which holds/wrapps the data.
 								var typeIth = new Type();
