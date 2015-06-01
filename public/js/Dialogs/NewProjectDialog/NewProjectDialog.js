@@ -159,28 +159,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						m_dialog.close();
 
-						
-
-						// var posting = $.post("/BOL/ResourceBO/SaveProject", 
-						// 		{
-						// 			userId: client.getTGCookie('userId'),
-						// 			userName: client.getTGCookie('userName'),
-						// 			projectJson: JSON.stringify(project)
-						// 		}, 
-						// 		'json');
-						// posting.done = function (data) {
-
-						// 	if (data.success) {
-
-						// 		client.functionNewProject(data.project);
-
-						// 	} else {
-
-						// 		// !data.success
-						// 		throw new Error(new Error(data.message));
-						// 	}
-						// }
-
 					} catch (e) {
 
 						errorHelper.show(e);
