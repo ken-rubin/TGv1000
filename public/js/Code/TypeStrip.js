@@ -139,11 +139,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							m_arrayTypes = [];
 
 							// Create the add button.
-							var exceptionRet = m_functionCreateAddButton();
-							if (exceptionRet) {
+							// var exceptionRet = m_functionCreateAddButton();
+							// if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+							// 	throw exceptionRet;
+							// }
 
 							// Loop over items and insert into the DOM.
 							for (var i = 0; i < objectData.types.length; i++) {
@@ -287,57 +287,57 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					};
 
 					// Invoked when the types dialog exist clonely.
-					var m_functionCloneType = function (strId) {
+					// var m_functionCloneType = function (strId) {
 
-						try {
+					// 	try {
 
-				    		BootstrapDialog.alert(":Clone " + strId + " type....");
+				 //    		BootstrapDialog.alert(":Clone " + strId + " type....");
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					// Create a new type.
-					var m_functionAddNewType = function (e) {
+					// var m_functionAddNewType = function (e) {
 
-						try {
+					// 	try {
 
-							// Show the types dialog.
-							var exceptionRet = client.showTypesDialog(m_functionNewType,
-								m_functionCloneType);
-							if (exceptionRet) {
+					// 		// Show the types dialog.
+					// 		var exceptionRet = client.showTypesDialog(m_functionNewType,
+					// 			m_functionCloneType);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Create the add button.
-					var m_functionCreateAddButton = function () {
+					// var m_functionCreateAddButton = function () {
 
-						try {
+					// 	try {
 
-							var jAdd = $("<img class='typestripitem' id='AddType' src='" +
-								resourceHelper.toURL('images', null, null, 'plus.png') +
-								"'></img>");
+					// 		var jAdd = $("<img class='typestripitem' id='AddType' src='" +
+					// 			resourceHelper.toURL('images', null, null, 'plus.png') +
+					// 			"'></img>");
 
-							// Add to the DOM.
-							m_jStrip.append(jAdd);
+					// 		// Add to the DOM.
+					// 		m_jStrip.append(jAdd);
 
-							jAdd.click(m_functionAddNewType);
+					// 		jAdd.click(m_functionAddNewType);
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					///////////////////////////////////
 					// Private fields.

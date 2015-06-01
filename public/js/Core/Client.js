@@ -51,7 +51,7 @@ define(["Core/errorHelper",
 							// Save.
 							m_iUserId = self.getTGCookie('userId');
 
-							return null;	//self.showProjectsDialog();
+							return null;
 						} catch (e) {
 
 							return e;
@@ -309,10 +309,8 @@ define(["Core/errorHelper",
 
 				    		// Allocate project.
 				    		m_project = new Project();
-				    		return m_project.load(
+				    		return m_project.load(project);
 
-				    			project
-				    		);
 						} catch (e) {
 
 							return e;
@@ -323,32 +321,32 @@ define(["Core/errorHelper",
 					// Private functions.
 
 					// Invoked when the projects dialog exist openly.
-					var m_functionOpenProject = function (strId) {
+					// var m_functionOpenProject = function (strId) {
 
-						try {
+					// 	try {
 
-				    		BootstrapDialog.alert(":Open " + strId + " project....");
+				 //    		BootstrapDialog.alert(":Open " + strId + " project....");
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					// Invoked when the projects dialog exist clonely.
-					var m_functionCloneProject = function (strId) {
+					// var m_functionCloneProject = function (strId) {
 
-						try {
+					// 	try {
 
-				    		BootstrapDialog.alert(":Clone " + strId + " project....");
+				 //    		BootstrapDialog.alert(":Clone " + strId + " project....");
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					/////////////////////////////////
 					// Private fields.
