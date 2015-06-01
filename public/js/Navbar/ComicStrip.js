@@ -160,6 +160,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 
 			// Return the constructor function.
 			return functionConstructor;
+			
 		} catch (e) {
 
 			errorHelper.show(e);

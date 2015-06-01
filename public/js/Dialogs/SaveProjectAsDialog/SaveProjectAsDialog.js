@@ -63,12 +63,25 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+							var project = client.getProject();
+
+							$("#ProjectName").val(project.projectName);
+							$("#ProjectDescription").val(project.projectDescription);
+							$("#ProjectTags").val(project.projectTags);
+
+							$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 
 						} catch (e) {
 
 							errorHelper.show(e.message);
 						}
 					};
+
+					var m_functionSaveProjectAs = function () {
+
+						alert(JSON.stringify(client.getProject()));
+					}
+
 				} catch (e) {
 
 					errorHelper.show(e.message);

@@ -27,7 +27,7 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 	                self.projectImageResourceId = 123;
 	                self.projectPrice = 0.0;
 	                self.projectIsTemplate = 0;
-
+	                self.comicStrip = comicStrip;		// the app global
 
 					//////////////////////////////
 					// Public methods.
@@ -68,7 +68,7 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 									userName: lient.getTGCookie('userName'),
 									projectJson: self
 								}),
-								dataType: 'json,'
+								dataType: 'json',
 								success: function (objectData, strTextStatus, jqxhr) {
 
 								},

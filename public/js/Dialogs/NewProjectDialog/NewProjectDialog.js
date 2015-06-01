@@ -66,7 +66,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							m_imageResourceId = 0;
 
 							$("#CreateProjectBtn").click(m_functionCreateProject);
-
 							$("#ProjectImage").click(m_functionChangeProjectImage);
 
 						} catch (e) {
@@ -85,7 +84,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						m_projectName = $("#ProjectName").val() || 'no name';
 						m_projectTags = $("#ProjectTags").val() || 'enter search tags';
-						m_projectDescription = $("#ProjectDescription") || 'no description';
+						m_projectDescription = $("#ProjectDescription").val() || 'no description';
 
 						// Create minimal project based on the new project dialog's fields--or lack thereof.
 			    		// { 

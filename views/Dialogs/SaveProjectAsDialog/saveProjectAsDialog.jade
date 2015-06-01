@@ -19,6 +19,13 @@
         br
         br
         .col-xs-2
+            label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
+        .col-xs-10
+            textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
+        br
+        br
+        br
+        .col-xs-2
             label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
         .col-xs-10
             textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this project later.")
@@ -37,9 +44,9 @@
         br
         br
         br
-        button#CreateProjectBtn.btn.pull-left.btn-info
-            | Create Project
+        button#SaveProjectBtn.btn.pull-left.btn-info
+            | Save Project
   .row
     br
     .col-xs-12
-          .well#NewProjectWell
+          .well#SaveProjectAsWell
