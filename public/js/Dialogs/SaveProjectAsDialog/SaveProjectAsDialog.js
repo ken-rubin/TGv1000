@@ -79,7 +79,20 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					var m_functionSaveProjectAs = function () {
 
-						alert(JSON.stringify(client.getProject().data));
+						try {
+
+							exceptionRet = client.saveProjectAs();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							m_dialog.close();
+
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 
 				} catch (e) {

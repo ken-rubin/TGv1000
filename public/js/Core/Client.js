@@ -317,6 +317,18 @@ define(["Core/errorHelper",
 						}
 					};
 
+					self.saveProjectAs = function () {
+
+						try {
+
+							return m_project.saveToDatabase();
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////
 					// Private functions.
 

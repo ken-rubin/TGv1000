@@ -46,28 +46,34 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							$.ajax({
-
-								type: "POST",
-								url: "/BOL/ResourceBO/SaveProject",
-								contentType: "application/json",
-								data: JSON.stringify({
+							alert(JSON.stringify({
 									userId: client.getTGCookie('userId'),
-									userName: lient.getTGCookie('userName'),
-									projectJson: self
-								}),
-								dataType: 'json',
-								success: function (objectData, strTextStatus, jqxhr) {
+									userName: client.getTGCookie('userName'),
+									projectJson: self.data
+								})
+							);
+							// $.ajax({
 
-								},
-								error: function (jqxhr, strTextStatus, strError) {
+							// 	type: "POST",
+							// 	url: "/BOL/ResourceBO/SaveProject",
+							// 	contentType: "application/json",
+							// 	data: JSON.stringify({
+							// 		userId: client.getTGCookie('userId'),
+							// 		userName: lient.getTGCookie('userName'),
+							// 		projectJson: self
+							// 	}),
+							// 	dataType: 'json',
+							// 	success: function (objectData, strTextStatus, jqxhr) {
 
-								},
-								complete: function (jqxhr, strTextStatus) {
+							// 	},
+							// 	error: function (jqxhr, strTextStatus, strError) {
 
-									// called after success or error callback completes. Not necessary to do anything here.
-								}
-							});
+							// 	},
+							// 	complete: function (jqxhr, strTextStatus) {
+
+							// 		// called after success or error callback completes. Not necessary to do anything here.
+							// 	}
+							// });
 
 							return null;
 						
