@@ -82,9 +82,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					try {
 
-						m_projectName = $("#ProjectName").val() || 'no name';
-						m_projectTags = $("#ProjectTags").val() || 'enter search tags';
-						m_projectDescription = $("#ProjectDescription").val() || 'no description';
+						m_projectName = $("#ProjectName").val() || '';
+						m_projectTags = $("#ProjectTags").val() || '';
+						m_projectDescription = $("#ProjectDescription").val() || '';
 
 						// Create minimal project based on the new project dialog's fields--or lack thereof.
 			    		// { 
@@ -94,14 +94,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			    		// 	name: "Project 1",
 			    		// 	resourceId: 0,
 			    		// 	description: "This is a project of the emergency broadcast system....",
-			    		// 	comicStrip: {
+			    		// 	comics: {
 
 			    		// 		items: [{
 
 			    		// 			id: 1,
 			    		// 			name:"default comic",
 			    		// 			resourceId: 1,
-				    	// 			typeStrip: {
+				    	// 			types: {
 
 				    	// 				items: [{
 
@@ -120,30 +120,32 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			    		// }
 						var project = 
 						{
-							projectName: m_projectName,
-							projectId: 0,
-							projectDescription: m_projectDescription,
-							projectTags: m_projectTags,
-							projectImageResourceId: m_imageResourceId,
-							projectPrice: 0,
-							projectIsTemplate: 0,
-							comicStrip: {
-								comics: [{
-									comicImageResourceId: 0,
-									comicId: 0,
-									comicName: 'default',
-									comicTags: 'a b',
-									comicOrdinal: 0,
-									typeStrip: {
-										types: [{
-											typeIsApp: true,
-											typeId: 0,
-											typeProperties: [],
-											typeMethods: [{ methodName: "initialize", methodWorkspace: "", methodMethod: "" }],
-											typeEvents: [],
-											typeDependencies: [],
-											typeName: "app",
-											typeImageResourceId: 0
+							name: m_projectName,
+							id: 0,
+							description: m_projectDescription,
+							tags: m_projectTags,
+							imageResourceId: m_imageResourceId,
+							price: 0,
+							isTemplate: 0,
+							comics: {
+								items: [{
+									imageResourceId: 0,
+									id: 0,
+									name: 'default',
+									tags: '',
+									ordinal: 0,
+									types: {
+										items: [{
+											isApp: true,
+											id: 0,
+											ordinal: 0,
+											tags: '',
+											properties: [],
+											methods: [{ name: "initialize", workspace: "", method: "" }],
+											events: [],
+											dependencies: [],
+											name: "app",
+											imageResourceId: 0
 										}]
 									}
 								}]

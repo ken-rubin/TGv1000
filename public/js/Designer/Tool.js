@@ -60,13 +60,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.generateDOM = function () {
 
 						m_jTool = $("<img class='toolstripitem' id='" + 
-							client.removeSpaces(self.type.data.typeName) + 
+							client.removeSpaces(self.type.data.name) + 
 							"' src='" +
-						 	resourceHelper.toURL('resources', self.type.data.typeImageResourceId, 'image') + 
+						 	resourceHelper.toURL('resources', self.type.data.imageResourceId, 'image') + 
 						 	"' data-resourceid='" +
-						 	self.type.data.typeImageResourceId+ 
+						 	self.type.data.imageResourceId+ 
 						 	"' data-type='" + 
-						 	self.type.data.typeName + "' style='width:55px;'></img>");
+						 	self.type.data.name + "' style='width:55px;'></img>");
 
 						return m_jTool;
 					};
@@ -77,7 +77,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							// Compose the id.
-							var strId = client.removeSpaces(self.type.data.typeName);
+							var strId = client.removeSpaces(self.type.data.name);
 
 							//  Select the DOM element for the tool.
 							var jToolDOM = $("#" + strId);
@@ -88,9 +88,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 							// Update the resourceId and src attributes on the DOM.
 							jToolDOM.attr("data-resourceid",
-								self.type.data.typeImageResourceId);
+								self.type.data.imageResourceId);
 							jToolDOM.attr("src",
-								resourceHelper.toURL('resources', self.type.data.typeImageResourceId, 'image'));
+								resourceHelper.toURL('resources', self.type.data.imageResourceId, 'image'));
 
 						} catch (e) {
 

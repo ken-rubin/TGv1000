@@ -25,8 +25,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					// id -- DB id of comic.
 					// name -- Name of comic.
 					// resourceId -- Image URL.
-					// toolStrip -- the data for the toolstrip.
-					// typeStrip -- the data for the typestrip.
+					// tools -- the data for the toolstrip.
+					// types -- the data for the typestrip.
 					self.data = null;
 
 					/////////////////////////////
@@ -38,14 +38,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							// Set as active comic in comic strip.
-							var exceptionRet = comicStrip.select(self);
+							var exceptionRet = comics.select(self);
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 							// Create or re-create the strips with this comic's data.
-							return typeStrip.load(self.data.typeStrip);
+							return types.load(self.data.types);
 							
 						} catch (e) {
 
@@ -72,9 +72,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					self.generateDOM = function () {
 
 						return $("<img class='comicstripitem' id='" + 
-							self.data.comicName + 
+							self.data.name + 
 							"' src='" +
-						 	resourceHelper.toURL('resources', self.data.comicImageResourceId, 'image', '') + 
+						 	resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
 						 	"'></img>");
 					};
 				} catch (e) {

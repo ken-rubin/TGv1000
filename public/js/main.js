@@ -7,11 +7,11 @@
 // Define some app-globals.
 var client = null;
 var navbar = null;
-var comicStrip = null;
+var comics = null;
 var designer = null;
-var toolStrip = null;
+var tools = null;
 var code = null;
-var typeStrip = null;
+var types = null;
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
@@ -19,8 +19,8 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/Client", "Code/Code", "Code/TypeStrip", "Designer/Designer", "Designer/ToolStrip", "Navbar/Navbar", "Navbar/ComicStrip"], 
-			function (errorHelper, Client, Code, TypeStrip, Designer, ToolStrip, Navbar, ComicStrip) {
+		require(["Core/errorHelper", "Core/Client", "Code/Code", "Code/Types", "Designer/Designer", "Designer/Tools", "Navbar/Navbar", "Navbar/Comics"], 
+			function (errorHelper, Client, Code, Types, Designer, Tools, Navbar, Comics) {
 
 			try {
 
@@ -57,24 +57,24 @@ $(document).ready(function () {
 				}
 
 				// Allocate the strips too.
-				comicStrip = new ComicStrip();
-				exceptionRet = comicStrip.create();
+				comics = new Comics();
+				exceptionRet = comics.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
 
 				// Allocate the strips too.
-				toolStrip = new ToolStrip();
-				exceptionRet = toolStrip.create();
+				tools = new Tools();
+				exceptionRet = tools.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;
 				}
 
 				// Allocate the strips too.
-				typeStrip = new TypeStrip();
-				exceptionRet = typeStrip.create();
+				types = new Types();
+				exceptionRet = types.create();
 				if (exceptionRet) {
 
 					throw exceptionRet;

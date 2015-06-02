@@ -149,7 +149,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 							}
 
 							// Also pass on to the tool strip.
-							var exceptionRet = toolStrip.updateImage(type);
+							var exceptionRet = tools.updateImage(type);
 							if (exceptionRet) {
 
 								throw exceptionRet;

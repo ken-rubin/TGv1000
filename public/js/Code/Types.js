@@ -1,5 +1,5 @@
 /////////////////////////////////////////
-// TypeStrip
+// Types
 //
 // Returns constructor functions.
 //
@@ -10,8 +10,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 		try {
 
-			// Define TypeStrip constructor function. 
-			var functionConstructor = function TypeStrip() {
+			// Define Types constructor function. 
+			var functionConstructor = function Types() {
 
 				try {
 
@@ -119,8 +119,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								throw exceptionRet;
 							}
 
-							// Remove from toolStrip.
-							return toolStrip.removeItem(type);
+							// Remove from tools.
+							return tools.removeItem(type);
 						} catch (e) {
 
 							return e;
@@ -167,7 +167,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								}
 
 						        // Also add to the designer/tool strip.
-								exceptionRet = toolStrip.addItem(typeIth);
+								exceptionRet = tools.addItem(typeIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -275,7 +275,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							}
 
 					        // Also add to the designer/tool strip.
-							exceptionRet = toolStrip.addItem(type);
+							exceptionRet = tools.addItem(type);
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -74,47 +74,47 @@ module.exports = function ResourceBO(app, sql, logger) {
             /* req.body.projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
 
             {
-                projectId: 0,
-                projectName: "name",
-                projectDescription: "description",
-                projectTags: "tag1 tag2 tag3",
-                projectImageResourceId: 123,
-                projectPrice: 0.0,
-                projectIsTemplate: 0,
-                comicStrip: {
-                    comics: [
+                id: 0,
+                name: "name",
+                description: "description",
+                tags: "tag1 tag2 tag3",
+                imageResourceId: 123,
+                price: 0.0,
+                isTemplate: 0,
+                comics: {
+                    items: [
                         {
-                            comicId: 0,
-                            comicImageResourceId: 456,
-                            comicName: "cname",
-                            comicTags: "tag4 tag5 tag6",
-                            comicOrdinal: 0
-                            typeStrip: {
-                                types: [
+                            id: 0,
+                            imageResourceId: 456,
+                            name: "cname",
+                            tags: "tag4 tag5 tag6",
+                            ordinal: 0
+                            types: {
+                                items: [
                                     {
-                                        typeId: 0,
-                                        typeIsApp: true,                  only one type (the first) can have app: true
-                                        typeImageResourceId: 789,
-                                        typeName: "tname",
-                                        typeTags: "tag7 tag8 tag9",
+                                        id: 0,
+                                        isApp: true,                  only one type (the first) can have app: true
+                                        imageResourceId: 789,
+                                        name: "tname",
+                                        tags: "tag7 tag8 tag9",
                                         typeOrdinal: 0,
-                                        typeProperties: 
+                                        properties: 
                                             [
                                                 { propertyName: "pname1", propertyTypeId: 111 },
                                                 { ... },
                                                 { propertyName: "pnamen", propertyTypeId: nnn }
                                             ],
-                                        typeMethods: 
+                                        methods: 
                                             [
-                                                { methodName: "initialize", methodWorkspace: "", methodMethod: "" },
+                                                { name: "initialize", workspace: "", method: "" },
                                                 { ... }
-                                                { methodName: '...', methodWorkspace: "...", methodMethod: "..." }
+                                                { name: '...', workspace: "...", method: "..." }
                                             ],
-                                        typeEvents: 
+                                        events: 
                                             [
-                                                { typeName: "ename1", typeEventFunctionName: "efname1" },
+                                                { name: "ename1", eventFunctionName: "efname1" },
                                                 { ... },
-                                                { typeName: "enamen", typeEventFunctionName: "efnamen" }
+                                                { name: "enamen", eventFunctionName: "efnamen" }
                                             ]
                                     },
                                     { ... }
@@ -128,13 +128,13 @@ module.exports = function ResourceBO(app, sql, logger) {
             */
 
             // 1. Add row to projects table. Save id in projectId. Add 'project' row to resources table pointing back to projectId. Save id in resourceId. Associate projectTags with resourceId.
-            // 2. Loop (on i) through comics in comicStrip and for each:
+            // 2. Loop (on i) through items in comics and for each:
             //      2a. Add row to comics table. Save id in comicId. Add 'comic' row to resources table pointing back to comicId. Save id in resourceId. Associate comicTags[i] with resourceId.
-            //      2b. Loop (on j) through types in typeStrip and for each:
+            //      2b. Loop (on j) through items in types and for each:
             //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
 
             var project = JSON.parse(req.body.projectJson);
-            var exceptionRet = sql.execute("insert into " + self.dbname + "projects (name,createdByUserId,template,price,imageResourceId) values ('" + project.projectName + "'," + req.body.userId + "," + project.projectIsTemplate + "," + project.projectPrice + "," + project.imageResourceId + ");",
+            var exceptionRet = sql.execute("insert into " + self.dbname + "projects (name,createdByUserId,template,price,imageResourceId) values ('" + project.name + "'," + req.body.userId + "," + project.isTemplate + "," + project.price + "," + project.imageResourceId + ");",
                 function(rows) {
 
                     if (rows.length === 0) {
@@ -145,8 +145,8 @@ module.exports = function ResourceBO(app, sql, logger) {
                         });
                     } else {
 
-                        project.projectId = rows[0].insertId;
-                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.projectId + ");",
+                        project.id = rows[0].insertId;
+                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.id + ");",
                             function(rows) {
 
                                 if (rows.length === 0) {
@@ -158,7 +158,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                 } else {
 
                                     var resourceId = rows[0].insertId;
-                                    m_setUpAndDoTags(resourceId, 3, req.body.userName, project.projectTags, function(err) {
+                                    m_setUpAndDoTags(resourceId, 3, req.body.userName, project.tags, function(err) {
 
                                         if (err) {
 
@@ -168,7 +168,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                             });
                                         } else {
 
-                                            m_doComicStripPlusTypes(project, req, function(err) {
+                                            m_doComicsPlusTypes(project, req, function(err) {
 
                                                 if (err) {
 
@@ -1452,7 +1452,7 @@ module.exports = function ResourceBO(app, sql, logger) {
     //     }
     // }
 
-    var m_doComicStripPlusTypes = function(project, req, callback) {
+    var m_doComicsPlusTypes = function(project, req, callback) {
 
     }
 

@@ -1,5 +1,5 @@
 /////////////////////////////////////////
-// ComicStrip
+// Comics
 //
 // Returns constructor functions.
 //
@@ -10,8 +10,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 
 		try {
 
-			// Define ComicStrip constructor function. 
-			var functionConstructor = function ComicStrip() {
+			// Define Comics constructor function. 
+			var functionConstructor = function Comics() {
 
 				try {
 
@@ -61,10 +61,10 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 							m_arrayComics = [];
 
 							// Add N test items.
-							for (var i = 0; i < objectData.comics.length; i++) {
+							for (var i = 0; i < objectData.items.length; i++) {
 
 								// Get the ith comic.
-								var comicIth = objectData.comics[i];
+								var comicIth = objectData.items[i];
 
 								// Allocate.
 								var comicNew = new Comic();
@@ -152,6 +152,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 					var m_arrayComics = [];
 					// The active comic.
 					var m_comicActive = null;
+					
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -160,7 +161,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 
 			// Return the constructor function.
 			return functionConstructor;
-			
+
 		} catch (e) {
 
 			errorHelper.show(e);

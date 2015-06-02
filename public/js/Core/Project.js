@@ -5,8 +5,8 @@
 //
 
 // 
-define(["Core/errorHelper", "Navbar/ComicStrip"],
-	function (errorHelper, ComicStrip) {
+define(["Core/errorHelper", "Navbar/Comics"],
+	function (errorHelper, Comics) {
 
 		try {
 
@@ -20,14 +20,7 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 					/////////////////////////////
 					// Public properties.
 
-	                self.projectId = 0;
-	                self.projectName = "name";
-	                self.projectDescription = "description";
-	                self.projectTags = "tag1 tag2 tag3";
-	                self.projectImageResourceId = 123;
-	                self.projectPrice = 0.0;
-	                self.projectIsTemplate = 0;
-	                self.comicStrip = comicStrip;		// the app global
+					self.data = null;
 
 					//////////////////////////////
 					// Public methods.
@@ -37,14 +30,9 @@ define(["Core/errorHelper", "Navbar/ComicStrip"],
 
 						try {
 
-			                self.projectId = objectData.projectId;
-			                self.projectName = objectData.projectName;
-			                self.projectDescription = objectData.projectDescription;
-			                self.projectTags = objectData.projectTags;
-			                self.projectImageResourceId = objectData.projectImageResourceId;
-			                self.projectPrice = objectData.projectPrice;
-			                self.projectIsTemplate = objectData.projectIsTemplate;
-							return comicStrip.load(objectData.comicStrip);
+							self.data = objectData;
+
+							return comics.load(objectData.comics);
 
 						} catch (e) {
 

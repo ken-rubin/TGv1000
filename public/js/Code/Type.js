@@ -5,8 +5,8 @@
 //
 
 // Define Type module.
-define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/Comic", "Navbar/ComicStrip"],
-	function (errorHelper, resourceHelper, contextMenu, comic, comicStrip) {
+define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/Comic", "Navbar/Comics"],
+	function (errorHelper, resourceHelper, contextMenu, comic, comics) {
 
 		try {
 
@@ -78,7 +78,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 						// Allocate the type.
 						m_jType = $("<div id='" + 
-							self.data.typeName + 
+							self.data.name + 
 							"' class='typestripitem' style='background:black;'></div>");
 
 						// Add the contents to the newly allocated type.
@@ -189,7 +189,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Generate the name to add to the type.
 							var jTypeName = $("<div style='position:absolute;left:8px;top:38px;right:72px'>" + 
-								self.data.typeName + 
+								self.data.name + 
 								"</div>");
 							m_jType.append(jTypeName);
 							jTypeName.contextMenu({
@@ -200,7 +200,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Generate the image for the type.
 							var jTypeImage = $("<img src='" + 
-								resourceHelper.toURL('resources', self.data.typeImageResourceId, 'image', '') + 
+								resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
 								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 							m_jType.append(jTypeImage);
 							jTypeImage.contextMenu({
@@ -231,9 +231,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Loop over and add the properties.
 							var iCursorY = 132;
-							for (var i = 0; i < self.data.typeProperties.length; i++) {
+							for (var i = 0; i < self.data.properties.length; i++) {
 
-								var propertyIth = self.data.typeProperties[i];
+								var propertyIth = self.data.properties[i];
 
 								// Add the property.
 								var jTypeProperty = $("<button data-index='" + 
@@ -287,9 +287,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							jTypeAddMethods.click(m_functionAddMethodClick);
 
 							// Loop over and add the methods.
-							for (var i = 0; i < self.data.typeMethods.length; i++) {
+							for (var i = 0; i < self.data.methods.length; i++) {
 
-								var methodIth = self.data.typeMethods[i];
+								var methodIth = self.data.methods[i];
 
 								// Add the property.
 								var jTypeMethod = $("<button data-index='" + 
@@ -299,7 +299,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 									"px;right:8px;height:" + 
 									self.buttonHeight + 
 									"px;'>" + 
-									methodIth.methodName + 
+									methodIth.name + 
 									"</button>");
 								m_jType.append(jTypeMethod);
 								jTypeMethod.click(m_functionMethodClick);
@@ -343,9 +343,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							jTypeAddEvents.click(m_functionAddEventClick);
 
 							// Loop over and add the events.
-							for (var i = 0; i < self.data.typeEvents.length; i++) {
+							for (var i = 0; i < self.data.events.length; i++) {
 
-								var eventsIth = self.data.typeEvents[i];
+								var eventsIth = self.data.events[i];
 
 								// Add the Events.
 								var jTypeEvent = $("<button data-index='" + 
@@ -399,8 +399,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							m_iActiveIndex = iIndex;
 							m_arrayActive = arrayActive;
 
-							// Tell the TypeStrip that "this" item was just selected.
-							var exceptionRet = typeStrip.select(self);
+							// Tell the Types that "this" item was just selected.
+							var exceptionRet = types.select(self);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -477,8 +477,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 												throw exceptionRet;
 											}
 
-							        		// Remove from the typeStrip.
-											exceptionRet = typeStrip.removeItem(self);
+							        		// Remove from the type.
+											exceptionRet = type.removeItem(self);
 											if (exceptionRet) {
 
 												throw exceptionRet;

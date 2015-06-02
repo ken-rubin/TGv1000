@@ -1,5 +1,5 @@
 /////////////////////////////////////////
-// ToolStrip
+// Tools
 //
 // Returns constructor functions.
 //
@@ -10,8 +10,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 
 		try {
 
-			// Define ToolStrip constructor function. 
-			var functionConstructor = function ToolStrip() {
+			// Define Tools constructor function. 
+			var functionConstructor = function Tools() {
 
 				try {
 
@@ -149,7 +149,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 							}
 
 							// Also pass on to the tool strip.
-							// var exceptionRet = toolStrip.updateImage(type);
+							// var exceptionRet = tools.updateImage(type);
 							// if (exceptionRet) {
 
 							// 	throw exceptionRet;
