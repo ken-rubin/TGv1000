@@ -221,7 +221,34 @@ define(["Core/errorHelper"],
 
 						} else {
 
+							// Any open project can be closed (with appropriate warning, if warranted.)
+							m_functionEnable("CloseProject");
+
 							var status = project.getStatus();
+
+							// inDBAlready: (self.data.id > 0),
+							// userOwnsProject: (self.data.createdByUserId === client.getTGCookie('userId')),
+							// canBeQuickSaved: (	self.data.name.trim().length > 0 
+							// 				&& self.data.tags.trim().length > 0 
+							// 				&& self.data.imageResourceId > 0
+							// 			),
+							// isDirty: self.data.isDirty
+							if (status.isDirty) {
+
+								m_functionEnable("SaveProject");
+								m_functionEnable("SaveProjectAs");
+							}
+
+							if (status.canBeQuickSaved) {
+
+								m_functionEnable("QuickSaveProject");
+							}
+
+
+
+
+
+
 						}
 					}
 

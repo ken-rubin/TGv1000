@@ -31,7 +31,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							self.data = objectData;
-							client.setProjectDirtyBool(false);
+							client.setProjectDirtyBool(true);
 
 							return comics.load(objectData.comics);
 
@@ -94,10 +94,10 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						return {
 
 							inDBAlready: (self.data.id > 0),
-							usersOwnProject: (self.data.createdByUserId === client.getTGCookie('userId')),
-							canBeSaved: (	self.data.name.trim().length > 0 
+							userOwnsProject: (self.data.createdByUserId === client.getTGCookie('userId')),
+							canBeQuickSaved: (	self.data.name.trim().length > 0 
 											&& self.data.tags.trim().length > 0 
-											&& self.data.imageResourceId > 0
+											// && self.data.imageResourceId > 0
 										),
 							isDirty: self.data.isDirty
 						};

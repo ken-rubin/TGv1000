@@ -70,12 +70,46 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							$("#ProjectTags").val(project.tags);
 
 							$("#SaveProjectBtn").click(m_functionSaveProjectAs);
+							$("#ProjectImage").click(m_functionChangeProjectImage);
+							$("#ProjectName").blur(m_functionNameBlur);
+							$("#ProjectDescription").blur(m_functionDescriptionBlur);
+							$("#ProjectTags").blur(m_functionTagsBlur);
 
 						} catch (e) {
 
 							errorHelper.show(e.message);
 						}
 					};
+
+					var m_functionNameBlur = function() {
+
+						var txt = $("#ProjectName").val().trim();
+						if (txt !== m_projectName) {
+
+							m_projectName = txt;
+							client.setProjectDirtyBool(true);
+						}
+					}
+
+					var m_functionDescriptionBlur = function() {
+
+						var txt = $("#ProjectDescription").val().trim();
+						if (txt !== m_projectDescription) {
+
+							m_projectDescription = txt;
+							client.setProjectDirtyBool(true);
+						}
+					}
+
+					var m_functionTagsBlur = function() {
+
+						var txt = $("#ProjectTags").val().trim();
+						if (txt !== m_projectTags) {
+
+							m_projectTags = txt;
+							client.setProjectDirtyBool(true);
+						}
+					}
 
 					var m_functionSaveProjectAs = function () {
 
@@ -95,6 +129,19 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					}
 
+					var m_functionChangeProjectImage = function () {
+
+						try {
+
+							// Will eventually do something.
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 				} catch (e) {
 
 					errorHelper.show(e.message);
@@ -109,6 +156,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 			// Return the constructor function as the module object.
 			return functionSaveProjectAsDialog;
+			
 		} catch (e) {
 
 			errorHelper.show(e.message);
