@@ -31,6 +31,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							self.data = objectData;
+							client.setProjectDirtyBool(false);
 
 							return comics.load(objectData.comics);
 
@@ -81,21 +82,26 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 							return e;
 						}
+					};
+
+					self.setDirtyBool = function (bVal) {
+
+						self.data.isDirty = bVal;
 					}
 
-					self.getStatus() = function () {
+					self.getStatus = function () {
 
 						return {
 
-							inDBAlready: (data.id > 0),
-							usersOwnProject: (data.createdByUserId === client.getTGCookie('userId')),
-							canBeSaved: (	data.name.trim().length > 0 
-											&& data.tags.trim().length > 0 
-											&& data.imageResourceId > 0
+							inDBAlready: (self.data.id > 0),
+							usersOwnProject: (self.data.createdByUserId === client.getTGCookie('userId')),
+							canBeSaved: (	self.data.name.trim().length > 0 
+											&& self.data.tags.trim().length > 0 
+											&& self.data.imageResourceId > 0
 										),
-							isDirty: data.isDirty
+							isDirty: self.data.isDirty
 						};
-					}
+					};
 
 					//////////////////////////////
 					// Private fields.

@@ -194,6 +194,8 @@ define(["Core/errorHelper"],
 								}
 							});
 
+							client.setProjectDirtyBool(false);
+
 							return null;
 
 						} catch (e) {
@@ -206,6 +208,7 @@ define(["Core/errorHelper"],
 					self.enableDisableProjectsMenuItems = function () {
 
 						var project = client.getProject();
+
 						if (project === null) {
 
 							// New and search are enabled. others are disabled.
@@ -219,23 +222,6 @@ define(["Core/errorHelper"],
 						} else {
 
 							var status = project.getStatus();
-							if (status.inDBAlready) {
-								
-							} else {
-
-							}
-
-							if (status.usersOwnProject) {
-								
-							} else {
-
-							}
-
-							if (status.canBeSaved) {
-								
-							} else {
-
-							}
 						}
 					}
 

@@ -87,37 +87,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						m_projectDescription = $("#ProjectDescription").val() || '';
 
 						// Create minimal project based on the new project dialog's fields--or lack thereof.
-			    		// { 
-
-			    		// 	version: 1,
-			    		// 	id: 1,
-			    		// 	name: "Project 1",
-			    		// 	resourceId: 0,
-			    		// 	description: "This is a project of the emergency broadcast system....",
-			    		// 	comics: {
-
-			    		// 		items: [{
-
-			    		// 			id: 1,
-			    		// 			name:"default comic",
-			    		// 			resourceId: 1,
-				    	// 			types: {
-
-				    	// 				items: [{
-
-				    	// 					app: true,
-				    	// 					properties: [],
-				    	// 					methods: [{ name: "initialize", workspace: "", method: "" }],
-				    	// 					events: [],
-				    	// 					dependencies: [],
-				    	// 					id: 0,
-				    	// 					name: "app",
-				    	// 					resourceId: 3
-				    	// 				}]
-				    	// 			}
-				    	// 		}]
-			    		// 	}
-			    		// }
+						// Call client to inject it throughout.
 						var project = 
 						{
 							name: m_projectName,
@@ -128,7 +98,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							price: 0,
 							isTemplate: 0,
 							createdByUserId: client.getTGCookie('userId'),
-							isDirty: true,
+							isDirty: false,
 							comics: {
 								items: [{
 									imageResourceId: 0,

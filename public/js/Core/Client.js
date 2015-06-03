@@ -264,16 +264,23 @@ define(["Core/errorHelper",
 					    }
 					};
 
-					self.getProject = function () {
-
-						return m_project;
-					};
-
 					// Helper method removes spaces from input.
 					self.removeSpaces = function (strPossiblyWithSpaces) {
 
 						return strPossiblyWithSpaces.replace(/ /g, '');
 					};
+
+					// Project methods.
+					self.setProjectDirtyBool = function (bVal) {
+
+						if (m_project) {
+
+							m_project.setDirtyBool(bVal);
+						}
+
+						// Something happened. Refresh the navbar.
+						navbar.enableDisableProjectsMenuItems();
+					}
 
 					self.functionNewProject = function (project) {
 
@@ -287,6 +294,11 @@ define(["Core/errorHelper",
 
 							return e;
 						}
+					};
+
+					self.getProject = function () {
+
+						return m_project;
 					};
 
 					self.saveProjectAs = function () {
