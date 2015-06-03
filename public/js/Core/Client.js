@@ -73,48 +73,6 @@ define(["Core/errorHelper",
 						}
 					};
 
-					// Open popup--map callbacks to private functions.
-					// self.showProjectsDialog = function () {
-
-					// 	try {
-
-					// 		var pd = new ProjectsDialog();
-					// 		var exceptionRet = pd.create(m_iUserId,
-					// 			m_functionNewProject,
-					// 			m_functionOpenProject,
-					// 			m_functionCloneProject);
-					// 		if (exceptionRet) {
-
-					// 			throw exceptionRet;
-					// 		}
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
-					// Open popup--map callbacks to private functions.
-					// self.showTypesDialog = function (functionNewType, functionCloneType) {
-
-					// 	try {
-
-					// 		var td = new TypesDialog();
-					// 		var exceptionRet = td.create(functionNewType,
-					// 			functionCloneType);
-					// 		if (exceptionRet) {
-
-					// 			throw exceptionRet;
-					// 		}
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
 					self.showNewProjectDialog = function () {
 
 						try {
@@ -247,6 +205,21 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.closeProject = function () {
+
+						// Warn if project is dirty.
+
+
+
+						m_project = null;
+
+						// Undo in ....
+
+
+						return null;
+					}
+
+
 					// Open popup--map callbacks to private functions.
 					// Upon successfull resolution, call functionOK(resourceId).
 					self.showImageSoundDialog = function (bImage, functionOK) {
@@ -302,7 +275,6 @@ define(["Core/errorHelper",
 						return strPossiblyWithSpaces.replace(/ /g, '');
 					};
 
-					// Invoked when the projects dialog exist newly.
 					self.functionNewProject = function (project) {
 
 						try {
@@ -329,41 +301,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-					///////////////////////////////
-					// Private functions.
-
-					// Invoked when the projects dialog exist openly.
-					// var m_functionOpenProject = function (strId) {
-
-					// 	try {
-
-				 //    		BootstrapDialog.alert(":Open " + strId + " project....");
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
-					// Invoked when the projects dialog exist clonely.
-					// var m_functionCloneProject = function (strId) {
-
-					// 	try {
-
-				 //    		BootstrapDialog.alert(":Clone " + strId + " project....");
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
-					/////////////////////////////////
-					// Private fields.
-
-					// The current project.
 					var m_project = null;
 
 				} catch (e) {

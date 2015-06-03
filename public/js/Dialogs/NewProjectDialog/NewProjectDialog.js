@@ -127,6 +127,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							imageResourceId: m_imageResourceId,
 							price: 0,
 							isTemplate: 0,
+							createdByUserId: client.getTGCookie('userId'),
+							isDirty: true,
 							comics: {
 								items: [{
 									imageResourceId: 0,
@@ -170,7 +172,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					try {
 
-
+						// Will 
 
 						return null;
 

@@ -80,8 +80,11 @@ $(document).ready(function () {
 					throw exceptionRet;
 				}
 
+				navbar.enableDisableProjectsMenuItems();
+
 				// Cause the code and designer panels to size themselves.
 				$(window).resize();
+
 			} catch (e) {
 
 				errorHelper.show(e);

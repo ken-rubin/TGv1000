@@ -83,6 +83,20 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					}
 
+					self.getStatus() = function () {
+
+						return {
+
+							inDBAlready: (data.id > 0),
+							usersOwnProject: (data.createdByUserId === client.getTGCookie('userId')),
+							canBeSaved: (	data.name.trim().length > 0 
+											&& data.tags.trim().length > 0 
+											&& data.imageResourceId > 0
+										),
+							isDirty: data.isDirty
+						};
+					}
+
 					//////////////////////////////
 					// Private fields.
 

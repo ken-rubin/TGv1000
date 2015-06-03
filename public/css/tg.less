@@ -169,3 +169,19 @@ body
         color: @colHighlight;
         background-color: @bgHighlight; }}}
 }
+
+// Disabled dropdown customization
+.dropdown-menu > .disabled{
+ cursor: default; 
+}
+
+.dropdown-menu > :not(.disabled){
+  &:hover
+  {
+    background:rgba(255,255,100,0.5);
+  }
+ }
+ 
+.dropdown-menu > .disabled > a{
+ pointer-events: none;
+}

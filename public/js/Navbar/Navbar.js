@@ -114,6 +114,21 @@ define(["Core/errorHelper"],
 								}
 							});
 
+							$("#CloseProjectButton").click(function () {
+
+								try {
+
+									var exceptionRet = client.closeProject();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
 							// Wire typess buttons.
 							$("#NewTypeButton").click(function () {
 
@@ -180,11 +195,61 @@ define(["Core/errorHelper"],
 							});
 
 							return null;
+
 						} catch (e) {
 
 							return e;
 						}
 					};
+
+					// A bunch of functions that enable/disable navbar menu items.
+					self.enableDisableProjectsMenuItems = function () {
+
+						var project = client.getProject();
+						if (project === null) {
+
+							// New and search are enabled. others are disabled.
+							m_functionEnable("NewProject");
+							m_functionEnable("OpenProject");
+							m_functionDisable("SaveProject");
+							m_functionDisable("SaveProjectAs");
+							m_functionDisable("QuickSaveProject");
+							m_functionDisable("CloseProject");
+
+						} else {
+
+							var status = project.getStatus();
+							if (status.inDBAlready) {
+								
+							} else {
+
+							}
+
+							if (status.usersOwnProject) {
+								
+							} else {
+
+							}
+
+							if (status.canBeSaved) {
+								
+							} else {
+
+							}
+						}
+					}
+
+					// Private methods
+					var m_functionEnable = function (part) {
+
+						$("#" + part + "LI").removeClass("disabled");
+					}
+
+					var m_functionDisable = function (part) {
+
+						$("#" + part + "LI").addClass("disabled");
+					}
+
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -193,6 +258,7 @@ define(["Core/errorHelper"],
 
 			// Return constructor function.
 			return functionConstructor;
+
 		} catch (e) {
 
 			errorHelper.show(e);
