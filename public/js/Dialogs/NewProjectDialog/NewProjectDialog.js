@@ -80,9 +80,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					var m_functionNameBlur = function() {
 
 						var txt = $("#ProjectName").val().trim();
-						if (txt !== m_projectName) {
+						if (txt !== self.data.name) {
 
-							m_projectName = txt;
+							self.data.name = txt;
 							client.setProjectDirtyBool(true);
 						}
 					}
@@ -90,9 +90,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					var m_functionDescriptionBlur = function() {
 
 						var txt = $("#ProjectDescription").val().trim();
-						if (txt !== m_projectDescription) {
+						if (txt !== self.data.description) {
 
-							m_projectDescription = txt;
+							self.data.description = txt;
 							client.setProjectDirtyBool(true);
 						}
 					}
@@ -100,9 +100,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					var m_functionTagsBlur = function() {
 
 						var txt = $("#ProjectTags").val().trim();
-						if (txt !== m_projectTags) {
+						if (txt !== self.data.tags) {
 
-							m_projectTags = txt;
+							self.data.tags = txt;
 							client.setProjectDirtyBool(true);
 						}
 					}
@@ -111,18 +111,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							m_projectName = $("#ProjectName").val() || '';
-							m_projectTags = $("#ProjectTags").val() || '';
-							m_projectDescription = $("#ProjectDescription").val() || '';
-
 							// Create minimal project based on the new project dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
 							var project = 
 							{
-								name: m_projectName,
+								name: $("#ProjectName").val() || '',
 								id: 0,
-								description: m_projectDescription,
-								tags: m_projectTags,
+								description: $("#ProjectDescription").val() || '',
+								tags: $("#ProjectTags").val() || '',
 								imageResourceId: m_imageResourceId,
 								price: 0,
 								isTemplate: 0,
@@ -190,10 +186,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_imageResourceId = null;
-				var m_projectName = '';
-				var m_projectTags = '';
-				var m_projectDescription = '';
+				var m_imageResourceId = 0;
 				var m_comicName = '';
 				var m_comicTags = '';
 			};

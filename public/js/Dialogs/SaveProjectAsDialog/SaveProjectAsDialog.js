@@ -63,11 +63,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							var project = client.getProject().data;
+							m_project = client.getProject().data;
 
-							$("#ProjectName").val(project.name);
-							$("#ProjectDescription").val(project.description);
-							$("#ProjectTags").val(project.tags);
+							$("#ProjectName").val(m_project.name);
+							$("#ProjectDescription").val(m_project.description);
+							$("#ProjectTags").val(m_project.tags);
 
 							$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 							$("#ProjectImage").click(m_functionChangeProjectImage);
@@ -84,9 +84,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					var m_functionNameBlur = function() {
 
 						var txt = $("#ProjectName").val().trim();
-						if (txt !== m_projectName) {
+						if (txt !== m_project.name) {
 
-							m_projectName = txt;
+							m_project.name = txt;
 							client.setProjectDirtyBool(true);
 						}
 					}
@@ -94,9 +94,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					var m_functionDescriptionBlur = function() {
 
 						var txt = $("#ProjectDescription").val().trim();
-						if (txt !== m_projectDescription) {
+						if (txt !== m_project.description) {
 
-							m_projectDescription = txt;
+							m_project.description = txt;
 							client.setProjectDirtyBool(true);
 						}
 					}
@@ -104,9 +104,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					var m_functionTagsBlur = function() {
 
 						var txt = $("#ProjectTags").val().trim();
-						if (txt !== m_projectTags) {
+						if (txt !== m_project.tags) {
 
-							m_projectTags = txt;
+							m_project.tags = txt;
 							client.setProjectDirtyBool(true);
 						}
 					}
@@ -152,11 +152,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
+				var m_project = null;
 			};
 
 			// Return the constructor function as the module object.
 			return functionSaveProjectAsDialog;
-			
+
 		} catch (e) {
 
 			errorHelper.show(e.message);

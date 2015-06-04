@@ -68,64 +68,10 @@ module.exports = function ResourceBO(app, sql, logger) {
             console.log("Entered AdminBO/routeSaveURLResource with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
-            // req.body.projectJson
+            // req.body.typeOfSave :  'saveNew', 'save', 'saveAs'
+            // req.body.projectJson : See NewProjectDialog.js for schema.
 
             // Image resources have already been created or selected for the project, its comics and their types.
-            /* req.body.projectJson looks like (after JSON.parse) (this will be what routeRetrieveProject returns, too):
-
-            {
-                id: 0,
-                name: "name",
-                description: "description",
-                tags: "tag1 tag2 tag3",
-                imageResourceId: 123,
-                price: 0.0,
-                isTemplate: 0,
-                comics: {
-                    items: [
-                        {
-                            id: 0,
-                            imageResourceId: 456,
-                            name: "cname",
-                            tags: "tag4 tag5 tag6",
-                            ordinal: 0
-                            types: {
-                                items: [
-                                    {
-                                        id: 0,
-                                        isApp: true,                  only one type (the first) can have app: true
-                                        imageResourceId: 789,
-                                        name: "tname",
-                                        tags: "tag7 tag8 tag9",
-                                        typeOrdinal: 0,
-                                        properties: 
-                                            [
-                                                { propertyName: "pname1", propertyTypeId: 111 },
-                                                { ... },
-                                                { propertyName: "pnamen", propertyTypeId: nnn }
-                                            ],
-                                        methods: 
-                                            [
-                                                { name: "initialize", workspace: "", method: "" },
-                                                { ... }
-                                                { name: '...', workspace: "...", method: "..." }
-                                            ],
-                                        events: 
-                                            [
-                                                { name: "ename1", eventFunctionName: "efname1" },
-                                                { ... },
-                                                { name: "enamen", eventFunctionName: "efnamen" }
-                                            ]
-                                    },
-                                    { ... }
-                                ]
-                            }
-                        },
-                        { ... }
-                    ]
-                }
-            }
-            */
 
             // 1. Add row to projects table. Save id in projectId. Add 'project' row to resources table pointing back to projectId. Save id in resourceId. Associate projectTags with resourceId.
             // 2. Loop (on i) through items in comics and for each:

@@ -47,34 +47,39 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							alert(JSON.stringify({
-									userId: client.getTGCookie('userId'),
-									userName: client.getTGCookie('userName'),
-									projectJson: self.data
-								})
-							);
-							// $.ajax({
-
-							// 	type: "POST",
-							// 	url: "/BOL/ResourceBO/SaveProject",
-							// 	contentType: "application/json",
-							// 	data: JSON.stringify({
+							// alert(JSON.stringify({
 							// 		userId: client.getTGCookie('userId'),
-							// 		userName: lient.getTGCookie('userName'),
-							// 		projectJson: self
-							// 	}),
-							// 	dataType: 'json',
-							// 	success: function (objectData, strTextStatus, jqxhr) {
+							// 		userName: client.getTGCookie('userName'),
+							// 		projectJson: self.data
+							// 	})
+							// );
+							var strUserId = client.getTGCookie('userId');
 
-							// 	},
-							// 	error: function (jqxhr, strTextStatus, strError) {
+							$.ajax({
 
-							// 	},
-							// 	complete: function (jqxhr, strTextStatus) {
+								type: "POST",
+								url: "/BOL/ResourceBO/SaveProject",
+								contentType: "application/json",
+								data: JSON.stringify({
+									userId: strUserId,
+									userName: lient.getTGCookie('userName'),
+									typeOfSave: (self.data.id === 0) ? 'saveNew' : (strUserId === self.data.createdByUserId) ? 'saveAs' : 'save',
+									projectJson: self.data
+								}),
+								dataType: 'json',
+								success: function (objectData, strTextStatus, jqxhr) {
 
-							// 		// called after success or error callback completes. Not necessary to do anything here.
-							// 	}
-							// });
+								},
+								error: function (jqxhr, strTextStatus, strError) {
+
+								},
+								complete: function (jqxhr, strTextStatus) {
+
+									// called after success or error callback completes. Not necessary to do anything here.
+								}
+							});
+
+							client.setProjectDirtyBool(false);	// Reset menu items.
 
 							return null;
 						
