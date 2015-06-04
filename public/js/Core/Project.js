@@ -47,35 +47,46 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							// alert(JSON.stringify({
-							// 		userId: client.getTGCookie('userId'),
-							// 		userName: client.getTGCookie('userName'),
-							// 		projectJson: self.data
-							// 	})
-							// );
 							var strUserId = client.getTGCookie('userId');
+
+							var sdata = JSON.stringify({
+									userId: strUserId,
+									userName: client.getTGCookie('userName'),
+									projectJson: self.data
+								});
+							alert('Sending ' + sdata);
 
 							$.ajax({
 
 								type: "POST",
 								url: "/BOL/ResourceBO/SaveProject",
 								contentType: "application/json",
-								data: JSON.stringify({
-									userId: strUserId,
-									userName: lient.getTGCookie('userName'),
-									typeOfSave: (self.data.id === 0) ? 'saveNew' : (strUserId === self.data.createdByUserId) ? 'saveAs' : 'save',
-									projectJson: self.data
-								}),
+								data: sdata,
 								dataType: 'json',
 								success: function (objectData, strTextStatus, jqxhr) {
 
+									if (objectData.success) {
+
+										// objectData holds a completely filled in project: objectData.project.
+										// We need to replace this with that. Let's try:
+										
+										client.closeProject();
+										
+										// cause whichever dialog was open to close.
+										client.closeCurrentDialog();
+
+										client.functionNewProject(objectData.project);
+
+									} else {
+
+										// !objectData.success -- error message in objectData.message
+										throw new Error(objectData.message);
+									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
 
-								},
-								complete: function (jqxhr, strTextStatus) {
-
-									// called after success or error callback completes. Not necessary to do anything here.
+									// Non-computational error in strError
+									throw new Error(strError);
 								}
 							});
 

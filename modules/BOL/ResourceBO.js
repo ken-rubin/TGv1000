@@ -65,7 +65,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
         try {
 
-            console.log("Entered AdminBO/routeSaveURLResource with req.body=" + JSON.stringify(req.body));
+            console.log("Entered AdminBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.typeOfSave :  'saveNew', 'save', 'saveAs'
@@ -79,7 +79,13 @@ module.exports = function ResourceBO(app, sql, logger) {
             //      2b. Loop (on j) through items in types and for each:
             //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
 
-            var project = JSON.parse(req.body.projectJson);
+            var project = req.body.projectJson;
+            var typeOfSave = (project.id === 0) ? 'saveNew' : (req.body.userId === project.createdByUserId) ? 'saveAs' : 'save';
+            // typeOfSave info:
+            //  saveNew inserts and has to insert id's into project, comics and types.
+            //  saveAs does that and has to replace project.createdByUserId with req.body.userId.
+            //  save does an update of the project, but comics and types may have been added, deleted or modified. They'll take more work.
+
             var exceptionRet = sql.execute("insert into " + self.dbname + "projects (name,createdByUserId,template,price,imageResourceId) values ('" + project.name + "'," + req.body.userId + "," + project.isTemplate + "," + project.price + "," + project.imageResourceId + ");",
                 function(rows) {
 
@@ -174,6 +180,11 @@ module.exports = function ResourceBO(app, sql, logger) {
                 message: e.message
             });
         }
+    }
+
+    var m_doComicsPlusTypes = function(project, req, callback) {
+
+        callback(null);
     }
 
     self.routeSaveURLResource = function (req, res) {
@@ -1397,10 +1408,6 @@ module.exports = function ResourceBO(app, sql, logger) {
     //         callback(e.message);
     //     }
     // }
-
-    var m_doComicsPlusTypes = function(project, req, callback) {
-
-    }
 
     var m_createTagJunctions = function(resourceId, tagIds) {
 

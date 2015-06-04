@@ -59,6 +59,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
+					self.closeYourself = function() {
+
+						m_dialog.close();
+					}
+
 					self.callFunctionOK = function(iResourceId) {
 
 						try {

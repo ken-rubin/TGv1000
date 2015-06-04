@@ -77,8 +77,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							var d = new NewProjectDialog();
-							var exceptionRet = d.create();
+							m_openDialog = new NewProjectDialog();
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -96,8 +96,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							var d = new OpenProjectDialog();
-							var exceptionRet = d.create();
+							m_openDialog = new OpenProjectDialog();
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -115,8 +115,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							var d = new SaveProjectDialog();
-							var exceptionRet = d.create();
+							m_openDialog = new SaveProjectDialog();
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -152,8 +152,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							var d = new SaveProjectAsDialog();
-							var exceptionRet = d.create();
+							m_openDialog = new SaveProjectAsDialog();
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -171,8 +171,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							var d = new NewTypeDialog();
-							var exceptionRet = d.create();
+							m_openDialog = new NewTypeDialog();
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -190,8 +190,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							var d = new TypeSearchDialog();
-							var exceptionRet = d.create();
+							m_openDialog = new TypeSearchDialog();
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -227,8 +227,8 @@ define(["Core/errorHelper",
 						try {
 
 							// If image mode, show for images, otherwise, sounds....
-							var isd = new ImageSoundDialog();
-							var exceptionRet = isd.create(bImage,
+							m_openDialog= new ImageSoundDialog();
+							var exceptionRet = m_openDialog.create(bImage,
 								functionOK);
 							if (exceptionRet) {
 
@@ -313,7 +313,19 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.closeCurrentDialog() {
+
+						if (m_openDialog) {
+
+							m_openDialog.closeYourself();
+						}
+					}
+
+					// Private methods
+
+					// Private variables.
 					var m_project = null;
+					var m_openDialog = null;
 
 				} catch (e) {
 
