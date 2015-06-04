@@ -63,11 +63,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							m_project = client.getProject().data;
+							m_project = client.getProject();
 
-							$("#ProjectName").val(m_project.name);
-							$("#ProjectDescription").val(m_project.description);
-							$("#ProjectTags").val(m_project.tags);
+							$("#ProjectName").val(m_project.data.name);
+							$("#ProjectDescription").val(m_project.data.description);
+							$("#ProjectTags").val(m_project.data.tags);
 
 							$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 							$("#ProjectImage").click(m_functionChangeProjectImage);
@@ -75,39 +75,54 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							$("#ProjectDescription").blur(m_functionDescriptionBlur);
 							$("#ProjectTags").blur(m_functionTagsBlur);
 
+							m_setStateSaveAsBtn();
+
 						} catch (e) {
 
 							errorHelper.show(e.message);
 						}
 					};
 
+					var m_setStateSaveAsBtn = function () {
+
+						var status = m_project.getStatus();
+						if (!status.canBeQuickSaved) {
+							$("#SaveProjectBtn").addClass("disabled");
+						} else {
+							$("#SaveProjectBtn").removeClass("disabled");
+						}
+					}
+
 					var m_functionNameBlur = function() {
 
 						var txt = $("#ProjectName").val().trim();
-						if (txt !== m_project.name) {
+						if (txt !== m_project.data.name) {
 
-							m_project.name = txt;
+							m_project.data.name = txt;
 							client.setProjectDirtyBool(true);
+							m_setStateSaveAsBtn();
 						}
 					}
 
 					var m_functionDescriptionBlur = function() {
 
 						var txt = $("#ProjectDescription").val().trim();
-						if (txt !== m_project.description) {
+						if (txt !== m_project.data.description) {
 
-							m_project.description = txt;
+							m_project.data.description = txt;
 							client.setProjectDirtyBool(true);
+							m_setStateSaveAsBtn();
 						}
 					}
 
 					var m_functionTagsBlur = function() {
 
 						var txt = $("#ProjectTags").val().trim();
-						if (txt !== m_project.tags) {
+						if (txt !== m_project.data.tags) {
 
-							m_project.tags = txt;
+							m_project.data.tags = txt;
 							client.setProjectDirtyBool(true);
+							m_setStateSaveAsBtn();
 						}
 					}
 

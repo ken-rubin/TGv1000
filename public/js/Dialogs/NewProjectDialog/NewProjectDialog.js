@@ -67,45 +67,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							$("#CreateProjectBtn").click(m_functionCreateProject);
 							$("#ProjectImage").click(m_functionChangeProjectImage);
-							$("#ProjectName").blur(m_functionNameBlur);
-							$("#ProjectDescription").blur(m_functionDescriptionBlur);
-							$("#ProjectTags").blur(m_functionTagsBlur);
 
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
-
-					var m_functionNameBlur = function() {
-
-						var txt = $("#ProjectName").val().trim();
-						if (txt !== self.data.name) {
-
-							self.data.name = txt;
-							client.setProjectDirtyBool(true);
-						}
-					}
-
-					var m_functionDescriptionBlur = function() {
-
-						var txt = $("#ProjectDescription").val().trim();
-						if (txt !== self.data.description) {
-
-							self.data.description = txt;
-							client.setProjectDirtyBool(true);
-						}
-					}
-
-					var m_functionTagsBlur = function() {
-
-						var txt = $("#ProjectTags").val().trim();
-						if (txt !== self.data.tags) {
-
-							self.data.tags = txt;
-							client.setProjectDirtyBool(true);
-						}
-					}
 
 					var m_functionCreateProject = function () {
 
@@ -123,7 +90,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								price: 0,
 								isTemplate: 0,
 								createdByUserId: client.getTGCookie('userId'),
-								isDirty: false,
+								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0, // || imageId > 0
 								comics: {
 									items: [{
 										imageResourceId: 0,
