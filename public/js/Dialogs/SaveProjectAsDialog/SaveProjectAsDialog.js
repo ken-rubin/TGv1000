@@ -141,7 +141,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								throw exceptionRet;
 							}
 
-							m_dialog.close();
+							// m_dialog.close();
 
 						} catch(e) {
 

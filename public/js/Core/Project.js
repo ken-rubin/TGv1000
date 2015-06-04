@@ -54,7 +54,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									userName: client.getTGCookie('userName'),
 									projectJson: self.data
 								});
-							alert('Sending ' + sdata);
+							// alert(sdata);
 
 							$.ajax({
 
@@ -67,7 +67,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 									if (objectData.success) {
 
-										// objectData holds a completely filled in project: objectData.project.
+										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
 										
 										client.closeProject();
@@ -75,18 +75,19 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// cause whichever dialog was open to close.
 										client.closeCurrentDialog();
 
+										// Set up the modified project.
 										client.functionNewProject(objectData.project);
 
 									} else {
 
 										// !objectData.success -- error message in objectData.message
-										throw new Error(objectData.message);
+										errorHelper.show(objectData.message);
 									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
 
 									// Non-computational error in strError
-									throw new Error(strError);
+									errorHelper.show(strError);
 								}
 							});
 

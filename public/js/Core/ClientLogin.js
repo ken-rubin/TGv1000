@@ -6,11 +6,9 @@
 
 // Define module and require dependencies.
 define(["Core/errorHelper", 
-		"Dialogs/EnrollDialog/EnrollDialog", 
-		"Dialogs/ModelDialog/ModelDialog"],
+		"Dialogs/EnrollDialog/EnrollDialog"],
 	function (errorHelper, 
-				EnrollDialog,
-				ModelDialog) {
+				EnrollDialog) {
 
 		try {
 
@@ -50,25 +48,6 @@ define(["Core/errorHelper",
 						try {
 
 							// 
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// The ModalDialog exists to copy from.
-					self.showModelDialog = function () {
-
-						try {
-
-							var td = new ModelDialog();
-							var exceptionRet = td.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
 							return null;
 						} catch (e) {
 

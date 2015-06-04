@@ -6,11 +6,9 @@
 
 // Define module and require dependencies.
 define(["Core/errorHelper", 
-		"Dialogs/EnrollDialog/EnrollDialog", 
-		"Dialogs/ModelDialog/ModelDialog"],
+		"Dialogs/EnrollDialog/EnrollDialog"],
 	function (errorHelper, 
-				EnrollDialog,
-				ModelDialog) {
+				EnrollDialog) {
 
 		try {
 

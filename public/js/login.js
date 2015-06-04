@@ -33,13 +33,6 @@ $(document).ready(function () {
 
 	                });
 
-	                // Wire up the model button
-	                $("#modelBtn").click(function () {
-	                    
-	                    m_functionModelButtonClick(errorHelper);
-
-	                });
-
 	                // Get the signed in user id from a cookie.
 	                var strUserName = clientLogin.getTGCookie("userName");
 	                if (strUserName && strUserName.length > 0) {
@@ -155,21 +148,6 @@ var m_functionOnGotNewEnrollee = function(userName, password) {
 	} catch (e) {
 
 		errorHelper.show(e.message);
-	}
-}
-
-var m_functionModelButtonClick = function(errorHelper) {
-	
-	try {
-
-		var exceptionRet = clientLogin.showModelDialog();
-		if (exceptionRet) {
-
-			throw exceptionRet;
-		}
-	} catch (e) {
-
-    	errorHelper.show(e.message);
 	}
 }
 

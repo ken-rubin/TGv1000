@@ -313,11 +313,12 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.closeCurrentDialog() {
+					self.closeCurrentDialog = function () {
 
 						if (m_openDialog) {
 
 							m_openDialog.closeYourself();
+							m_openDialog = null;
 						}
 					}
 
