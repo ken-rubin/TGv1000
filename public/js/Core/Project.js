@@ -70,20 +70,20 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							var strUserId = client.getTGCookie('userId');
+							var strUserName = client.getTGCookie('userName');
 
-							var sdata = JSON.stringify({
+							var data = {
 									userId: strUserId,
-									userName: client.getTGCookie('userName'),
+									userName: strUserName,
 									projectJson: self.data
-								});
-							// alert(sdata);
+							};
 
 							$.ajax({
 
-								type: "POST",
-								url: "/BOL/ResourceBO/SaveProject",
-								contentType: "application/json",
-								data: sdata,
+								type: 'POST',
+								url: '/BOL/ResourceBO/SaveProject',
+								contentType: 'application/json',
+								data: JSON.stringify(data),
 								dataType: 'json',
 								success: function (objectData, strTextStatus, jqxhr) {
 

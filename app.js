@@ -20,6 +20,7 @@ console.log("Set development (" + app.get("development") + ").");
 /////////////////////////////////////
 console.log("Configure body-parser.");
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 /////////////////////////////////////
 console.log("Configure view folder (views) and view engine (jade).");

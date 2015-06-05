@@ -86,7 +86,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             //  saveAs does that and has to replace project.createdByUserId with req.body.userId.
             //  save does an update of the project, but comics and types may have been added, deleted or modified. They'll take more work.
 
-            var exceptionRet = sql.execute("insert into " + self.dbname + "projects (name,createdByUserId,template,price,imageResourceId) values ('" + project.name + "'," + req.body.userId + "," + project.isTemplate + "," + project.price + "," + project.imageResourceId + ");",
+            var exceptionRet = sql.execute("insert into " + self.dbname + "projects (name,createdByUserId,template,price,imageResourceId, description) values ('" + project.name + "'," + req.body.userId + "," + project.isTemplate + "," + project.price + "," + project.imageResourceId + ",'" + project.description + "');",
                 function(rows) {
 
                     if (rows.length === 0) {
