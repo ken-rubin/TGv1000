@@ -33,7 +33,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							self.data = objectData;
 							client.setProjectDirtyBool(true);
 
-							return comics.load(objectData.comics);
+							return comics.load(objectData.comics);	// the global object
 
 						} catch (e) {
 
@@ -47,7 +47,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							var exceptionRet = comics.unload();
+							var exceptionRet = comics.unload();	// the global object
 							if (exceptionRet) {
 
 								throw exceptionRet;

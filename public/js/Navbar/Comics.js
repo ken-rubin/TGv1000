@@ -106,12 +106,20 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 
 						try {
 
-							// Do the opposite of what self.load did. Kinda.
+							// Do the opposite of what self.load did. In the opposite order, too.
+							for (var i = 0; i < m_arrayComics.length; i++) {
 
+								var comicIth = m_arrayComics[i];
+								var exceptionRet = comicIth.unload();
+								if (exceptionRet) {
 
+									throw exceptionRet;
+								}
+							}
 
-
-
+							// Now blow away our stuff.
+							m_jStrip.empty();
+							m_arrayComics = [];
 
 							return null;
 

@@ -68,6 +68,22 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
+					self.unload = function () {
+
+						try {
+
+							var exceptionRet = types.unload();	// The global object
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Return the DOM element representing a prototypical comic item.
 					self.generateDOM = function () {
 

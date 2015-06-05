@@ -42,6 +42,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// Attach scrollableregion.
 							m_srTypeStrip = new ScrollRegion();
 							return m_srTypeStrip.attach(self.rowSelector);
+							
 						} catch (e) {
 
 							return e;
@@ -121,6 +122,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							// Remove from tools.
 							return tools.removeItem(type);
+
 						} catch (e) {
 
 							return e;
@@ -180,6 +182,28 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							return e;
 						}
 					};
+
+					// Unload.
+					self.unload = function () {
+
+						try {
+
+							for (var i = 0; i < m_arrayTypes.length; i++) {
+
+								var itemIth = m_arrayTypes[i];
+								var exceptionRet = self.removeItem(itemIth);
+							}
+
+							m_jStrip.empty();
+							m_arrayTypes = [];
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					// Add Type to strip.
 					self.addItem = function (type) {
