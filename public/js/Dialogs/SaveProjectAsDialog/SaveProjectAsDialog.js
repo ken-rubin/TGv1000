@@ -11,11 +11,12 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 		try {
 
 			// Define the NewProjectDialog constructor function.
-			var functionSaveProjectAsDialog = function () {
+			var functionSaveProjectAsDialog = function (saveOrSaveAs) {
 
 				try {
 
 					var self = this;			// Uber closure.
+					m_saveOrSaveAs = saveOrSaveAs;
 
 					//////////////////////////////////
 					// Public methods.
@@ -30,7 +31,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Save Project As",
+								title: m_saveOrSaveAs === "save" ? "Save Project" : "Save Project As",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $("<div></div>").load("/saveProjectAsDialog"),
 					            buttons: [{
@@ -70,13 +71,27 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							m_dialog = dialogItself;
 							m_project = client.getProject();
 
-							$("#ProjectName").val(m_project.data.name);
+							$("PlaceForProjectName").empty();
+
+							if (m_saveOrSaveAs === "save") {
+
+								$("#SaveProjectBtn").click(m_functionSaveProject);
+								$("#SaveAsH4").append("<span>Change project description or tags and click the <em>Save Project</em> button to save.</span>");
+								$("#PlaceForProjectName").append("<span>" + m_project.data.name + "</span>");
+
+							} else {
+
+								$("#ProjectName").val(m_project.data.name);
+								$("#SaveProjectBtn").click(m_functionSaveProjectAs);
+								$("#ProjectName").blur(m_functionNameBlur);
+								$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
+								$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
+							}
+
 							$("#ProjectDescription").val(m_project.data.description);
 							$("#ProjectTags").val(m_project.data.tags);
 
-							$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 							$("#ProjectImage").click(m_functionChangeProjectImage);
-							$("#ProjectName").blur(m_functionNameBlur);
 							$("#ProjectDescription").blur(m_functionDescriptionBlur);
 							$("#ProjectTags").blur(m_functionTagsBlur);
 
@@ -149,6 +164,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					}
 
+					var m_functionSaveProject = function () {
+
+					}
+
 					var m_functionChangeProjectImage = function () {
 
 						try {
@@ -184,6 +203,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_project = null;
+				var m_saveOrSaveAs;
 			};
 
 			// Return the constructor function as the module object.

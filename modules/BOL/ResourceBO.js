@@ -120,7 +120,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                         });
                     } else {
 
-                        if (typeOfSave !== 'save') {
+                        if (typeOfSave === 'save') {
 
                             project.id = rows[0].insertId;
                             m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
@@ -233,7 +233,7 @@ module.exports = function ResourceBO(app, sql, logger) {
         // Otherwise, a new comic or type is being INSERTed.
 
         // And we have asynchronous loops to deal with.
-        
+
 
 
 

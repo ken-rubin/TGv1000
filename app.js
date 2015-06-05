@@ -162,29 +162,6 @@ app.get("/openProjectDialog", function (req, res) {
 });
 
 ////////////////////////////////////////////
-console.log("Map saveProjectDialog route (saveProjectDialog.jade).");
-app.get("/saveProjectDialog", function (req, res) {
-
-    try {
-
-        // Get some data/stuff from the DB, or 
-        // where-ever, and pass into jade render.
-        var objectContext = {
-
-            // This space intentionally left blank.
-            // But is could be used to customize....
-        };
-
-        // Render the jade file to the client.
-        res.render("Dialogs/SaveProjectDialog/saveProjectDialog", 
-            objectContext);
-    } catch (e) {
-
-        res.send(e.message);
-    }
-});
-
-////////////////////////////////////////////
 console.log("Map saveProjectAsDialog route (saveProjectAsDialog.jade).");
 app.get("/saveProjectAsDialog", function (req, res) {
 

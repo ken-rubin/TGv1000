@@ -8,7 +8,6 @@
 define(["Core/errorHelper", 
 		"Dialogs/NewProjectDialog/NewProjectDialog", 
 		"Dialogs/OpenProjectDialog/OpenProjectDialog", 
-		"Dialogs/SaveProjectDialog/SaveProjectDialog", 
 		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
 		"Dialogs/NewTypeDialog/NewTypeDialog", 
 		"Dialogs/TypeSearchDialog/TypeSearchDialog", 
@@ -17,7 +16,6 @@ define(["Core/errorHelper",
 	function (errorHelper, 
 				NewProjectDialog, 
 				OpenProjectDialog,
-				SaveProjectDialog,
 				SaveProjectAsDialog,
 				NewTypeDialog, 
 				TypeSearchDialog, 
@@ -111,25 +109,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showSaveProjectDialog = function () {
-
-						try {
-
-							m_openDialog = new SaveProjectDialog();
-							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
 					self.quickSaveProject = function () {
 
 						try {
@@ -148,11 +127,30 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.showSaveProjectDialog = function () {
+
+						try {
+
+							m_openDialog = new SaveProjectAsDialog('save');
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.showSaveProjectAsDialog = function () {
 
 						try {
 
-							m_openDialog = new SaveProjectAsDialog();
+							m_openDialog = new SaveProjectAsDialog('saveAs');
 							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
