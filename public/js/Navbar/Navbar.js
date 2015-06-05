@@ -118,7 +118,7 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.closeProject();
+									var exceptionRet = client.unloadProject();
 									if (exceptionRet) {
 
 										throw exceptionRet;

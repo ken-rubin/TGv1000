@@ -41,6 +41,28 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
+					// Make like there's no project, because there soon won't be.
+					// It's meant to be the opposite of self.load.
+					self.unload = function () {
+
+						try {
+
+							var exceptionRet = comics.unload();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							self.data = null;
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// The following will not be called with any gaps or errors in the Project's structure.
 					// All images are already resources with their id's in the items in the Project. Etc.
 					self.saveToDatabase = function () {
@@ -70,7 +92,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
 										
-										client.closeProject();
+										client.unloadProject();
 										
 										// cause whichever dialog was open to close.
 										client.closeCurrentDialog();

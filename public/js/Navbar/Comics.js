@@ -101,6 +101,26 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 						}
 					};
 
+					// User (or system, after save) is unloading the project.
+					self.unload = function () {
+
+						try {
+
+							// Do the opposite of what self.load did. Kinda.
+
+
+
+
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Add frame to comic strip.
 					self.addItem = function (comic) {
 

@@ -205,18 +205,30 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.closeProject = function () {
+					self.unloadProject = function () {
 
 						// Warn if project is dirty.
 
 
 
-						m_project = null;
-
-						// Undo in ....
 
 
-						return null;
+						try {
+
+							var exceptionRet = m_project.unload();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							m_project = null;
+
+							return null;
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
 					}
 
 
