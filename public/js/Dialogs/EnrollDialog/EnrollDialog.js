@@ -21,35 +21,25 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					// Pass user id,
-					// New callback -- void.
-					// Clone callback -- takes strId.
 					self.create = function(callbackNewEnrollee) {
 
 						try {
 
 							m_callbackNewEnrollee = callbackNewEnrollee;
 
-							// Show the dialog--load the content from 
-							// the EnrollDialog jade HTML-snippet.
-							BootstrapDialog.show({
+							// Get the dialog DOM.
+							$.ajax({
 
-								title: "Enroll",
-								size: BootstrapDialog.SIZE_WIDE,
-					            message: $("<div></div>").load("/enrollDialog"),
-					            buttons: [{
+								cache: false,
+								data: { 
 
-					                label: "Close",
-					                icon: "glyphicon glyphicon-remove-circle",
-					                cssClass: "btn-warning",
-					                action: function(dialogItself){
+									templateFile: "Dialogs/EnrollDialog/enrollDialog"
+								}, 
+								dataType: "HTML",
+								method: "POST",
+								url: "/renderJadeSnippet"
+							}).done(m_functionRenderJadeSnippetResponse).error(errorHelper.show);
 
-					                    dialogItself.close();
-					                }
-					            }],
-					            draggable: true,
-					            onshown: m_functionOnShownDialog
-					        });
 							return null;
 						} catch (e) {
 
@@ -120,7 +110,38 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					};
 
 					//////////////////////////////////
-					// Private functions.
+					// Private methods.
+
+					// Have converted jade of dialog to HTML. Open its dialog.
+					var m_functionRenderJadeSnippetResponse = function (htmlData) {
+
+						try {
+
+							// Show the dialog--load the content from 
+							// the EnrollDialog jade HTML-snippet.
+							BootstrapDialog.show({
+
+								title: "Enroll",
+								size: BootstrapDialog.SIZE_WIDE,
+					            message: $(htmlData),
+					            buttons: [{
+
+					                label: "Close",
+					                icon: "glyphicon glyphicon-remove-circle",
+					                cssClass: "btn-warning",
+					                action: function(dialogItself){
+
+					                    dialogItself.close();
+					                }
+					            }],
+					            draggable: true,
+					            onshown: m_functionOnShownDialog
+					        });
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
 
 					// Invoked when the new button is clicked.
 					var m_functionEnrollButtonClick = function () {

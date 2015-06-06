@@ -21,11 +21,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					// Pass user id,
 					self.create = function() {
 
 						try {
-
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -53,8 +51,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					}
 
 					//////////////////////////////////
-					// Private functions.
+					// Private methods.
 
+					// Have converted jade of dialog to HTML. Open its dialog.
 					var m_functionRenderJadeSnippetResponse = function (htmlData) {
 
 						try {

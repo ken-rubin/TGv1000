@@ -11,7 +11,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 		try {
 
 			// Define the ImageSoundDialog constructor function.
-			var functionImageSoundDialog = function () {
+			var functionImageSoundDialog = function (bImage,
+						functionOK) {
 
 				try {
 
@@ -23,8 +24,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Create and show Bootstrap dialog.
 					// bImage: true means image; false means sound
 					// functionOK is callback with resourceId as parameter.
-					self.create = function(bImage,
-						functionOK) {
+					self.create = function() {
 
 						try {
 
@@ -32,26 +32,19 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							m_bImage = bImage;
 							m_functionOK = functionOK;
 
-							// Show the dialog--load the content from 
-							// the ImageSoundDialog jade HTML-snippet.
-							m_dialog = BootstrapDialog.show({
+							// Get the dialog DOM.
+							$.ajax({
 
-								title: bImage ? "Image" : "Sound",
-								size: BootstrapDialog.SIZE_WIDE,
-					            message: $("<div></div>").load("/ImageSoundDialog"),
-					            buttons: [{
+								cache: false,
+								data: { 
 
-					                label: "Close",
-					                icon: "glyphicon glyphicon-remove-circle",
-					                cssClass: "btn-warning",
-					                action: function(dialogItself){
+									templateFile: "Dialogs/ImageSoundDialog/imageSoundDialog"
+								}, 
+								dataType: "HTML",
+								method: "POST",
+								url: "/renderJadeSnippet"
+							}).done(m_functionRenderJadeSnippetResponse).error(errorHelper.show);
 
-					                    dialogItself.close();
-					                }
-					            }],
-					            draggable: true,
-					            onshown: m_functionOnShownDialog	// wires click handlers for New and Search btns.
-					        });
 							return null;
 						} catch (e) {
 
@@ -78,7 +71,38 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					}
 
 					//////////////////////////////////
-					// Private functions.
+					// Private methods.
+
+					// Have converted jade of dialog to HTML. Open its dialog.
+					var m_functionRenderJadeSnippetResponse = function (htmlData) {
+
+						try {
+
+							// Show the dialog--load the content from 
+							// the ImageSoundDialog jade HTML-snippet.
+							m_dialog = BootstrapDialog.show({
+
+								title: bImage ? "Image" : "Sound",
+								size: BootstrapDialog.SIZE_WIDE,
+					            message: $(htmlData),
+					            buttons: [{
+
+					                label: "Close",
+					                icon: "glyphicon glyphicon-remove-circle",
+					                cssClass: "btn-warning",
+					                action: function(dialogItself){
+
+					                    dialogItself.close();
+					                }
+					            }],
+					            draggable: true,
+					            onshown: m_functionOnShownDialog	// wires click handlers for New and Search btns.
+					        });
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
 
 					// Wire up event handlers to dialog controls.
 					var m_functionOnShownDialog = function () {

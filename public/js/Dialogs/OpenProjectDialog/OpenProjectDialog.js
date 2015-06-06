@@ -21,31 +21,23 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					// Pass user id,
 					self.create = function() {
 
 						try {
 
-							// Show the dialog--load the content from 
-							// the TypesDialog jade HTML-snippet.
-							BootstrapDialog.show({
+							// Get the dialog DOM.
+							$.ajax({
 
-								title: "Open Project",
-								size: BootstrapDialog.SIZE_WIDE,
-					            message: $("<div></div>").load("/openProjectDialog"),
-					            buttons: [{
+								cache: false,
+								data: { 
 
-					                label: "Close",
-					                icon: "glyphicon glyphicon-remove-circle",
-					                cssClass: "btn-warning",
-					                action: function(dialogItself){
+									templateFile: "Dialogs/OpenProjectDialog/openProjectDialog"
+								}, 
+								dataType: "HTML",
+								method: "POST",
+								url: "/renderJadeSnippet"
+							}).done(m_functionRenderJadeSnippetResponse).error(errorHelper.show);
 
-					                    dialogItself.close();
-					                }
-					            }],
-					            draggable: true,
-					            onshown: m_functionOnShownDialog
-					        });
 							return null;
 						} catch (e) {
 
@@ -60,6 +52,37 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					//////////////////////////////////
 					// Private functions.
+
+					// Have converted jade of dialog to HTML. Open its dialog.
+					var m_functionRenderJadeSnippetResponse = function(htmlData) {
+
+						try {
+
+							// Show the dialog--load the content from 
+							// the TypesDialog jade HTML-snippet.
+							BootstrapDialog.show({
+
+								title: "Open Project",
+								size: BootstrapDialog.SIZE_WIDE,
+					            message: $(htmlData),
+					            buttons: [{
+
+					                label: "Close",
+					                icon: "glyphicon glyphicon-remove-circle",
+					                cssClass: "btn-warning",
+					                action: function(dialogItself){
+
+					                    dialogItself.close();
+					                }
+					            }],
+					            draggable: true,
+					            onshown: m_functionOnShownDialog
+					        });
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
 
 					// Wire up event handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {

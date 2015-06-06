@@ -209,39 +209,36 @@ define(["Core/errorHelper"],
 
 						var project = client.getProject();
 
-						if (project === null) {
+						// New and search are enabled. others are disabled.
+						m_functionEnable("NewProject");
+						m_functionEnable("OpenProject");
+						m_functionDisable("SaveProject");
+						m_functionDisable("SaveProjectAs");
+						m_functionDisable("QuickSaveProject");
+						m_functionDisable("CloseProject");
 
-							// New and search are enabled. others are disabled.
-							m_functionEnable("NewProject");
-							m_functionEnable("OpenProject");
-							m_functionDisable("SaveProject");
-							m_functionDisable("SaveProjectAs");
-							m_functionDisable("QuickSaveProject");
-							m_functionDisable("CloseProject");
-
-						} else {
+						if (project !== null) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 
+							// See definition of status in Project.js method self.getStatus(). Of course.
 							var status = project.getStatus();
 
-							// inDBAlready: (self.data.id > 0),
-							// userOwnsProject: (self.data.createdByUserId === client.getTGCookie('userId')),
-							// canBeQuickSaved: (	self.data.name.trim().length > 0 
-							// 				&& self.data.tags.trim().length > 0 
-							// 				&& self.data.imageResourceId > 0
-							// 			),
-							// isDirty: self.data.isDirty
-							if (status.isDirty) {
+							// User's own project or an opened-by-searching project can be saved as--even if not all fields are filled in yet,
+							// because Save As allows entering all fields and setting a project image.
+							m_functionEnable("SaveProjectAs");
 
+							if (status.isDirty && status.userOwnsProject && status.projectNameIsFilled) {
+
+								// projectNameIsFilled is required, since project name cannot be changed in Save, just Save As.
 								m_functionEnable("SaveProject");
-								m_functionEnable("SaveProjectAs");
-							}
+								
+								if (status.allRequiredFieldsFilled) {
 
-							if (status.canBeQuickSaved) {
-
-								m_functionEnable("QuickSaveProject");
+									// Since all fields are filled, one-click "quick" Save is enabled.
+									m_functionEnable("QuickSaveProject");
+								}
 							}
 						}
 					}

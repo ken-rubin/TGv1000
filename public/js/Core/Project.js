@@ -134,11 +134,12 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 							inDBAlready: (self.data.id > 0),
 							userOwnsProject: (self.data.createdByUserId === client.getTGCookie('userId')),
-							canBeQuickSaved: (	self.data.name.trim().length > 0 
+							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
 											&& self.data.tags.trim().length > 0 
-											// && self.data.imageResourceId > 0
+											&& self.data.imageResourceId > 0
 										),
-							isDirty: self.data.isDirty
+							isDirty: self.data.isDirty,
+							projectNameIsFilled: (self.data.name.trim().length > 0)
 						};
 					};
 
