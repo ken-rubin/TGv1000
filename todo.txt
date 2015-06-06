@@ -12,3 +12,12 @@ Jerry
 - SaveAs button not solid
 - Propogate new method of opening dialogs; copy from "new project"
 - Hungarian notation- m_setXxx -> m_functionSetXxx
+- Do better enabling/disabling Save/Save As
+
+
+Questions (mostly J to K) or messages. Delete if answered or handled.
+•	You know that last resouceId typo in Type.js? How did it ever work????
+•	You'll have to do an npm install (and most likely run the db script) next time you pull.
+•	Should I make description mandatory in project? How about image, sound, comic, type?
+•	Should I add name back to image and sound resources for the tooltip?
+•	If description is ‘’ or null, the tooltip shouldn’t display the second line.
