@@ -243,12 +243,6 @@ define(["Core/errorHelper"],
 
 								m_functionEnable("QuickSaveProject");
 							}
-
-
-
-
-
-
 						}
 					}
 
@@ -256,11 +250,13 @@ define(["Core/errorHelper"],
 					var m_functionEnable = function (part) {
 
 						$("#" + part + "LI").removeClass("disabled");
+						$("#" + part + "LI").addClass("enabled");
 					}
 
 					var m_functionDisable = function (part) {
 
 						$("#" + part + "LI").addClass("disabled");
+						$("#" + part + "LI").removeClass("enabled");
 					}
 
 				} catch (e) {

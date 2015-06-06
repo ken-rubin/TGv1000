@@ -5,7 +5,7 @@
 //
 
 // Define an AMD module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"], 
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion2"], 
 	function (snippetHelper, errorHelper, resourceHelper, ScrollRegion) {
 
 		try {
@@ -36,6 +36,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						// $(".projectItem").on("click", m_functionResourceClick);
 						$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
 
+						// Attach the region to the DOM.
+						m_scISImageStrip = new ScrollRegion();
+						var exceptionRet = m_scISImageStrip.create("#IStoolstrip",
+							100,
+							function(){
+
+					    		var jq = this;
+					    		var j = parseInt(jq.context.id.substring(8), 10);
+					    		alert(j);
+					    		var resourceId = m_searchResultRawArray[j].id;
+					    		m_pdParent.callFunctionOK(resourceId);
+					    	});
+						if (exceptionRet) {
+
+							throw exceptionRet;
+						}
 					} catch (e) {
 
 						errorHelper.show(e.message);
@@ -85,12 +101,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 				                for (var i = 0; i < m_searchResultRawArray.length; i++) {
 
 				                    var rowIth = m_searchResultRawArray[i];
-				                    var dot = '.';
-				                    if (rowIth.resourceTypeId === 1) {
+				                    m_searchResultProcessedArray.push({
 
-				                        dot = 't.';
-				                    }
-				                    m_searchResultProcessedArray.push({index: i, url: resourceHelper.toURL('resources', rowIth.id, 'image', ''), friendlyName: rowIth.friendlyName, resourceTypeId: rowIth.resourceTypeId});
+				                    	index: i, 
+				                    	url: resourceHelper.toURL('resources', 
+				                    		rowIth.id, 
+				                    		'image', 
+				                    		''), 
+				                    	resourceTypeId: rowIth.resourceTypeId});
 				                }
 
 				                var exceptionRet = m_rebuildCarousel();
@@ -121,20 +139,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 					    } else {
 
-						    $("#IStoolstrip").empty();
-
+						    $("#ISWellMsg").css("display", "none");
+						    $("#IStoolstriprow").css("display", "block");
+/*
 						    var strbuild = '';
 
 						    for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
 
 						        var rowIth = m_searchResultProcessedArray[i];
 
-					            strbuild = strbuild + '<img id="carousel' + i.toString() + '" class="toolstripitem" src="' + rowIth.url + '" title="' + rowIth.friendlyName + '" style="left:' + (i * 120 + 5).toString() + 'px;">';
+					            strbuild = strbuild + 
+					            	'<img id="carousel' + 
+					            	i.toString() + 
+					            	'" class="toolstripitem" src="' + 
+					            	rowIth.url + 
+					            	'" title="' + 
+					            	rowIth.friendlyName + 
+					            	'" style="left:' + 
+					            	(i * 120 + 5).toString() + 
+					            	'px;">';
 						    }
 
 						    $("#IStoolstrip").append(strbuild);
-						    $("#ISWellMsg").css("display", "none");
-						    $("#IStoolstriprow").css("display", "block");
 
 						    for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
 
@@ -146,9 +172,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						    		m_pdParent.callFunctionOK(resourceId);
 						    	});
 						    }
+*/
+							// Attach the region to the DOM.
+							var exceptionRet = m_scISImageStrip.empty();
+							if (exceptionRet) {
 
-							m_scISImageStrip = new ScrollRegion();
-							m_scISImageStrip.attach("#IStoolstriprow");
+								throw exceptionRet;
+							}
+
+							// Add returned images to the scrollregion.
+							for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
+
+						        var rowIth = m_searchResultProcessedArray[i];
+
+						        // Add each processed image to the region.
+						        exceptionRet = m_scISImageStrip.addImage("carousel" + i.toString(),
+						        	"N" + i.toString(),
+						        	"D" + i.toString(),
+						        	rowIth.url);
+						        if (exceptionRet) {
+
+						        	throw exceptionRet;
+						        }
+						    }
+
 						}
 					} catch (e) {
 

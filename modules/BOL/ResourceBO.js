@@ -122,7 +122,6 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                         if (typeOfSave === 'save') {
 
-                            project.id = rows[0].insertId;
                             m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
 
                                 if (err) {
@@ -142,6 +141,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                             });
                         } else {
 
+                            project.id = rows[0].insertId;
                             exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.id + ");",
                                 function(rows) {
 

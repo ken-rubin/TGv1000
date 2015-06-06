@@ -93,29 +93,6 @@ app.get("/imageSoundDialog", function (req, res) {
 });
 
 ////////////////////////////////////////////
-console.log("Map newProjectDialog route (newProjectDialog.jade).");
-app.get("/newProjectDialog", function (req, res) {
-
-	try {
-
-		// Get some data/stuff from the DB, or 
-		// where-ever, and pass into jade render.
-		var objectContext = {
-
-			// This space intentionally left blank.
-			// But is could be used to customize....
-		};
-
-		// Render the jade file to the client.
-		res.render("Dialogs/NewProjectDialog/newProjectDialog", 
-			objectContext);
-	} catch (e) {
-
-		res.send(e.message);
-	}
-});
-
-////////////////////////////////////////////
 console.log("Map newTypeDialog route (newTypeDialog.jade).");
 app.get("/newTypeDialog", function (req, res) {
 

@@ -1,12 +1,14 @@
-When create property, method or event, first 
-	show dialog asking for specific information (rather than make the user right-click and edit).
+Ken
 
-Set image for type.
+- Review code
+- Navbar menu highlight color
 
-Select text in rename dialog when first shown.
+Jerry
 
-Change property to just be a name--no code associated.
-
-Change event to just be a name and a method name--no code either.
-
-Designer....
+- Search for project 
+- Finish save project using promises
+- Incorportate new scrollregion for images and project searching
+- Remove projects dialog and types dialog
+- SaveAs button not solid
+- Propogate new method of opening dialogs; copy from "new project"
+- Hungarian notation- m_setXxx -> m_functionSetXxx

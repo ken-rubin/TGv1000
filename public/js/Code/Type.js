@@ -690,7 +690,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
 								// Save off the new resource in state.
-								self.data.resourceId = iResourceId;
+								self.data.imageResourceId = iResourceId;
 
 								// Cause type to regenerate.
 								var exceptionRet = m_functionGenerateTypeContents();
