@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper"], 
-	function (snippetHelper, errorHelper) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
 
@@ -65,16 +65,25 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								title: "New Project",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
-					            buttons: [{
+					            buttons: [
+					            	{
+					            		label: "Create Project",
+					            		cssClass: "btn-primary",
+					            		action: function(){
 
-					                label: "Close",
-					                icon: "glyphicon glyphicon-remove-circle",
-					                cssClass: "btn-warning",
-					                action: function(dialogItself){
+					            			m_functionCreateProject();
+					            		}
+					            	},
+					            	{
+						                label: "Close",
+						                icon: "glyphicon glyphicon-remove-circle",
+						                cssClass: "btn-warning",
+						                action: function(dialogItself){
 
-					                    dialogItself.close();
-					                }
-					            }],
+						                    dialogItself.close();
+						                }
+					            	}
+					            ],
 					            draggable: true,
 					            onshown: m_functionOnShownDialog
 					        });
@@ -91,10 +100,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							m_imageResourceId = 0;
-
-							$("#CreateProjectBtn").click(m_functionCreateProject);
-							$("#ProjectImage").click(m_functionChangeProjectImage);
+							m_functionSetImageSrc(0);
+							$("#ImageSearchLink").click(m_functionSearchClick);
+							$("#NewImageURLLink").click(m_functionURLClick);
+							$("#NewImageDiskLink").click(m_functionDiskClick);
 
 						} catch (e) {
 
@@ -114,7 +123,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								id: 0,
 								description: $("#ProjectDescription").val() || '',
 								tags: $("#ProjectTags").val() || '',
-								imageResourceId: m_imageResourceId,
+								imageResourceId: 0,
 								price: 0,
 								isTemplate: 0,
 								createdByUserId: client.getTGCookie('userId'),
@@ -158,19 +167,25 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					}
 
-					var m_functionChangeProjectImage = function () {
+					// 3 functions to handle the Image changing link clicks.
+					var m_functionSearchClick = function () {
 
-						try {
-
-							// Will eventually do something.
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
 					}
+					
+					var m_functionURLClick = function () {
+
+					}
+					
+					var m_functionDiskClick = function () {
+						
+					}
+
+					// Display the chosen image.
+					var m_functionSetImageSrc = function (imageResourceId) {
+
+						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageResourceId, "image"));
+					}
+
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -181,7 +196,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_imageResourceId = 0;
 				var m_comicName = '';
 				var m_comicTags = '';
 			};

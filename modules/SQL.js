@@ -37,83 +37,81 @@ module.exports = function SQL(app) {
     };
     
     // Router handler function.
-    self.routeHandler = function (req, res, next) {
+    // self.routeHandler = function (req, res, next) {
     
-        try {
+    //     try {
         
-        console.log("Enter sql");
-//            console.log("enter sql " + req.body.sql);
-            // Execute sql if specified.
-            if (req.body &&
-                req.body.sql) {
+    //         // Execute sql if specified.
+    //         if (req.body &&
+    //             req.body.sql) {
 
-                console.log("Process sql: " + req.body.sql + ".");
+    //             console.log("Process sql: " + req.body.sql + ".");
                 
-                // Call execute pass the sql from the client request.
-                var exceptionRet = self.execute(req.body.sql,
-                    function (rows) {
+    //             // Call execute pass the sql from the client request.
+    //             var exceptionRet = self.execute(req.body.sql,
+    //                 function (rows) {
                     
-                        try {
+    //                     try {
                         
-                            // Return success.
-                            res.json({
+    //                         // Return success.
+    //                         res.json({
                             
-                                success: true,
-                                result: rows
-                            });
-                        } catch (e) {
+    //                             success: true,
+    //                             result: rows
+    //                         });
+    //                     } catch (e) {
                         
-                            // Return error.
-                            res.json({
+    //                         // Return error.
+    //                         res.json({
                             
-                                success: false,
-                                reason: e.message
-                            });
-                        }
-                    },
-                    function (strError) {
+    //                             success: false,
+    //                             reason: e.message
+    //                         });
+    //                     }
+    //                 },
+    //                 function (strError) {
                     
-                        try {
+    //                     try {
                         
-                            // Return error.
-                            res.json({
+    //                         // Return error.
+    //                         res.json({
                             
-                                success: false,
-                                reason: strError
-                            });
-                        } catch (e) {
+    //                             success: false,
+    //                             reason: strError
+    //                         });
+    //                     } catch (e) {
                         
-                            // Return error.
-                            res.json({
+    //                         // Return error.
+    //                         res.json({
                             
-                                success: false,
-                                reason: e.message
-                            });
-                        }
-                    });
+    //                             success: false,
+    //                             reason: e.message
+    //                         });
+    //                     }
+    //                 });
                 
-                if (exceptionRet !== null) {
+    //             if (exceptionRet !== null) {
                 
-                    // Return error.
-                    res.json({
+    //                 // Return error.
+    //                 res.json({
                     
-                        success: false,
-                        reason: exceptionRet.message
-                    });
-                }
-            } else {
+    //                     success: false,
+    //                     reason: exceptionRet.message
+    //                 });
+    //             }
+    //         } else {
             
-                // Call the next route.
-                next();
-            }
-        } catch (e) {
+    //             // Call the next route.
+    //             next();
+    //         }
+    //     } catch (e) {
         
-            console.log("Error: " + e.message + ".");
+    //         console.log("Error: " + e.message + ".");
             
-            // Call the next route errorly.
-            next("Error: " + e.message + ".");
-        }
-    };
+    //         // Call the next route errorly.
+    //         next("Error: " + e.message + ".");
+    //     }
+    // };
 
     // Process sql query.
     self.execute = function (strSql, functionSuccess, functionError) {

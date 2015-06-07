@@ -1,3 +1,7 @@
+Either of us
+
+- New Project followed by New Project ends up with type image two times in toolstrip.
+
 Ken
 
 - Review code
@@ -7,7 +11,7 @@ Ken
 Jerry
 
 - Search for project and open chosen one
-- Implement image search for projects
+- Implement image search for projects - DOING THIS ONE NOW
 - Finish save project using promises
 - Incorportate new scrollregion for project searching in project open (checkboxes for Only mine, Templates, I think)
 - Remove projects dialog and types dialog
