@@ -2,20 +2,27 @@ Ken
 
 - Review code
 - Navbar menu highlight color
+- If description is ‘’ or null, the tooltip shouldn’t display the second line.
 
 Jerry
 
-- Search for project 
+- Search for project and open chosen one
+- Implement image search for projects
 - Finish save project using promises
-- Incorportate new scrollregion for images and project searching
+- Incorportate new scrollregion for project searching in project open (checkboxes for Only mine, Templates, I think)
 - Remove projects dialog and types dialog
-- SaveAs button not solid
+- SaveAs button not solid. Why not?
 - Hungarian notation- m_setXxx -> m_functionSetXxx
-
+- When searching, for example, for images, add the image tag behind the scenes. But not userName.
+- Maybe add paging to search results; like 100 at a time.
 
 Questions (mostly J to K) or messages. Delete if answered or handled.
-•	You know that last resouceId typo in Type.js? How did it ever work????
-•	You'll have to do an npm install (and most likely run the db script) next time you pull.
-•	Should I make description mandatory in project? How about image, sound, comic, type?
-•	Should I add name back to image and sound resources for the tooltip?
-•	If description is ‘’ or null, the tooltip shouldn’t display the second line.
+
+- You know that resouceId typo in Type.js so change image didn't work? How did it ever work????
+- Should I make description mandatory in project? How about in image, sound, comic, type? The tooltip would look better.
+- Should I add name (used to be called friendlyName) back to image and sound resources for the tooltip?
+
+Messages
+
+- You'll have to do an npm install (and most likely run the db script) next time you pull. I've added bluebird.
+- Until image search and assignment is finished (some time Sunday), you won't be able to save (as) a project.
