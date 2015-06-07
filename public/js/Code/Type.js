@@ -651,8 +651,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// Handle different menu items differently.
 							if (selectedMenu.text() === "Search for a Type Image") {
 
-								// Show rename dialog.
-								var exceptionRet = m_functionImageDialogHelper();
+								var exceptionRet = client.showImageSearchDialog(true, m_functionOnGotResourceId);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -660,8 +659,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							}
 							if (selectedMenu.text() === "Load a new Type Image using a URL") {
 
-								// Show rename dialog.
-								var exceptionRet = m_functionImageDialogHelper();
+								var exceptionRet = client.showImageURLDialog(true, m_functionOnGotResourceId);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -669,30 +667,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							}
 							if (selectedMenu.text() === "Load a new Type Image that's already on your computer") {
 
-								// Show rename dialog.
-								var exceptionRet = m_functionImageDialogHelper();
+								var exceptionRet = client.showImageDiskDialog(true, m_functionOnGotResourceId);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
-							}
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					};
-
-					// Invoked to set a new image for the type.
-					var m_functionImageDialogHelper = function () {
-
-						try {
-
-							// Ask client to show the image/sound dialog in image mode.
-							var exceptionRet = client.showImageSoundDialog(true,
-								m_functionOnGotResourceId);
-							if (exceptionRet) {
-
-								throw exceptionRet;
 							}
 						} catch (e) {
 

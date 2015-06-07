@@ -210,19 +210,53 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// 3 functions to handle the Image changing link clicks.
 					var m_functionSearchClick = function () {
 
+						try {
+
+							var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 					
 					var m_functionURLClick = function () {
 
+						try {
+
+							var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 					
 					var m_functionDiskClick = function () {
 						
+						try {
+
+							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageResourceId) {
 
+						m_project.setImageResourceId(imageResourceId);
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageResourceId, "image"));
 					}
 				} catch (e) {

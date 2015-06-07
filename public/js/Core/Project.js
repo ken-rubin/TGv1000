@@ -123,6 +123,12 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
+					self.setImageResourceId = function (imageResourceId) {
+
+						self.data.imageResourceId = imageResourceId;
+						self.setDirtyBool(true);
+					}
+
 					self.setDirtyBool = function (bVal) {
 
 						self.data.isDirty = bVal;

@@ -11,7 +11,9 @@ define(["Core/errorHelper",
 		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
 		"Dialogs/NewTypeDialog/NewTypeDialog", 
 		"Dialogs/TypeSearchDialog/TypeSearchDialog", 
-		"Dialogs/ImageSoundDialog/ImageSoundDialog", 
+		"Dialogs/ImageDiskDialog/ImageDiskDialog", 
+		"Dialogs/ImageURLDialog/ImageURLDialog", 
+		"Dialogs/ImageSearchDialog/ImageSearchDialog", 
 		"Core/Project"],
 	function (errorHelper, 
 				NewProjectDialog, 
@@ -19,7 +21,9 @@ define(["Core/errorHelper",
 				SaveProjectAsDialog,
 				NewTypeDialog, 
 				TypeSearchDialog, 
-				ImageSoundDialog, 
+				ImageDiskDialog, 
+				ImageURLDialog, 
+				ImageSearchDialog, 
 				Project) {
 
 		try {
@@ -229,16 +233,59 @@ define(["Core/errorHelper",
 						}
 					}
 
-
 					// Open popup--map callbacks to private functions.
 					// Upon successfull resolution, call functionOK(resourceId).
-					self.showImageSoundDialog = function (bImage, functionOK) {
+					self.showImageDiskDialog = function (bImage, functionOK) {
 
 						try {
 
 							// If image mode, show for images, otherwise, sounds....
-							m_openDialog= new ImageSoundDialog();
-							var exceptionRet = m_openDialog.create(bImage,
+							m_openDialog2 = new ImageDiskDialog();
+							var exceptionRet = m_openDialog2.create(bImage,
+								functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Open popup--map callbacks to private functions.
+					// Upon successfull resolution, call functionOK(resourceId).
+					self.showImageSearchDialog = function (bImage, functionOK) {
+
+						try {
+
+							// If image mode, show for images, otherwise, sounds....
+							m_openDialog2 = new ImageSearchDialog();
+							var exceptionRet = m_openDialog2.create(bImage,
+								functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Open popup--map callbacks to private functions.
+					// Upon successfull resolution, call functionOK(resourceId).
+					self.showImageURLDialog = function (bImage, functionOK) {
+
+						try {
+
+							// If image mode, show for images, otherwise, sounds....
+							m_openDialog2 = new ImageURLDialog();
+							var exceptionRet = m_openDialog2.create(bImage,
 								functionOK);
 							if (exceptionRet) {
 
@@ -329,6 +376,11 @@ define(["Core/errorHelper",
 
 							m_openDialog.closeYourself();
 							m_openDialog = null;
+						
+						} else if (m_openDialog2) {
+
+							m_openDialog2.closeYourself();
+							m_openDialog2 = null;
 						}
 					}
 
@@ -337,6 +389,9 @@ define(["Core/errorHelper",
 					// Private variables.
 					var m_project = null;
 					var m_openDialog = null;
+
+					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.
+					var m_openDialog2 = null;
 
 				} catch (e) {
 

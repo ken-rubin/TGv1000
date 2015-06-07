@@ -123,7 +123,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								id: 0,
 								description: $("#ProjectDescription").val() || '',
 								tags: $("#ProjectTags").val() || '',
-								imageResourceId: 0,
+								imageResourceId: m_imageResourceId,
 								price: 0,
 								isTemplate: 0,
 								createdByUserId: client.getTGCookie('userId'),
@@ -170,20 +170,54 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// 3 functions to handle the Image changing link clicks.
 					var m_functionSearchClick = function () {
 
+						try {
+
+							var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 					
 					var m_functionURLClick = function () {
 
+						try {
+
+							var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 					
 					var m_functionDiskClick = function () {
-						
+
+						try {
+
+							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
 					}
 
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageResourceId) {
 
-						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageResourceId, "image"));
+						m_imageResourceId = imageResourceId;
+						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
 					}
 
 				} catch (e) {
@@ -198,6 +232,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_comicName = '';
 				var m_comicTags = '';
+				var m_imageResourceId = 0;
 			};
 
 			// Return the constructor function as the module object.

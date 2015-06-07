@@ -1,0 +1,27 @@
+.well
+  .row
+    .col-xs-12
+      h4 Enter an image URL and click the <em>Retrieve URL</em> button to retrieve your resource file.
+      h5 You will be able to use the resource on a temporary basis--until it is judged compliant with TechGroms's standards.
+      br
+  .row
+    br
+    .col-xs-5
+      label.control-label(for="URLInput") Image URL
+      br
+      input.form-control#URLInput(type="text", placeholder="type or paste the resource URL here")
+      br
+      #ISPhase1(style="display:block;")
+        button.btn.btn-info#RetrieveURLButton Retrieve Image
+      #ISPhase2(style="display:none;")
+        label.control-label(for="ISTags") Search tags
+        br
+        textarea.form-control#ISTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="enter one or more tags to help you search for this image")
+        br
+        button.btn.btn-info#ISSaveBtn Save &amp; Select Image
+        | &nbsp;&nbsp;&nbsp;
+        button.btn.btn-info#ISResetBtn Reset
+    .col-xs-7
+      img#InternetResourceImage.img-responsive
+  br
+  .well#ImageSoundNewInternetWell
