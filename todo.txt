@@ -1,6 +1,6 @@
 Either of us
 
-- New Project followed by New Project ends up with type image two times in toolstrip.
+- New Project followed immediately by another New Project ends up with the type image two times in the toolstrip.
 
 Ken
 
@@ -11,14 +11,14 @@ Ken
 Jerry
 
 - Search for project and open chosen one
-- Implement image search for projects - DOING THIS ONE NOW
-- Finish save project using promises
+- Implement image search for projects, type - DOING THIS ONE NOW
+- Finish save project using promises -- promisify mysql to do it.
 - Incorportate new scrollregion for project searching in project open (checkboxes for Only mine, Templates, I think)
 - Remove projects dialog and types dialog
-- SaveAs button not solid. Why not?
+- SaveAs button not solid. Why not? I think I fixed this.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
-- When searching, for example, for images, add the image tag behind the scenes. But not userName.
-- Maybe add paging to search results; like 100 at a time.
+- When searching, for example, for images, add the "image" tag behind the scenes. But not userName.
+- Consider adding paging to search results; like 100 at a time.
 - Implement Change Comic image on context menu (not doing add new comic for now).
 - Do New Type and Search for Type dialogs.
 
