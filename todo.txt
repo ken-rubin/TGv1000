@@ -1,9 +1,9 @@
 Either of us
 
-- New Project followed immediately by another New Project ends up with the type image two times in the toolstrip.
 
 Ken
 
+- New Project followed immediately by another New Project ends up with the type image two times in the toolstrip. We also don't clear the designer.
 - Review code
 - Navbar menu highlight color
 - If description is ‘’ or null, the tooltip shouldn’t display the second line.
