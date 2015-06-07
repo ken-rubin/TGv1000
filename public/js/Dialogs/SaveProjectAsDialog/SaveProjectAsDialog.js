@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper"], 
-	function (snippetHelper, errorHelper) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
 
@@ -66,16 +66,27 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								title: m_saveOrSaveAs === "save" ? "Save Project" : "Save Project As",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
-					            buttons: [{
+					            buttons: [
+					            	{
+					            		id: "SaveProjectBtn",
+					            		label: "Save Project",
+					            		cssClass: "btn-primary"
+					            		// ,
+					            		// action: function(){
 
-					                label: "Close",
-					                icon: "glyphicon glyphicon-remove-circle",
-					                cssClass: "btn-warning",
-					                action: function(dialogItself){
+					            		// 	m_functionCreateProject();
+					            		// }
+					            	},
+					            	{
+						                label: "Close",
+						                icon: "glyphicon glyphicon-remove-circle",
+						                cssClass: "btn-warning",
+						                action: function(dialogItself){
 
-					                    dialogItself.close();
-					                }
-					            }],
+						                    dialogItself.close();
+						                }
+					            	}
+					            ],
 					            draggable: true,
 					            onshown: m_functionOnShownDialog
 					        });
@@ -93,6 +104,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							m_project = client.getProject();
+							m_functionSetImageSrc(m_project.data.imageResourceId);
 
 							$("PlaceForProjectName").empty();
 
@@ -104,17 +116,16 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							} else {
 
-								$("#ProjectName").val(m_project.data.name);
 								$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 								$("#ProjectName").blur(m_functionNameBlur);
 								$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
 								$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
+								$("#ProjectName").val(m_project.data.name);
 							}
 
 							$("#ProjectDescription").val(m_project.data.description);
 							$("#ProjectTags").val(m_project.data.tags);
 
-							$("#ProjectImage").click(m_functionChangeProjectImage);
 							$("#ProjectDescription").blur(m_functionDescriptionBlur);
 							$("#ProjectTags").blur(m_functionTagsBlur);
 
@@ -191,29 +202,23 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					}
 
-					var m_functionChangeProjectImage = function () {
+					// 3 functions to handle the Image changing link clicks.
+					var m_functionSearchClick = function () {
 
-						try {
+					}
+					
+					var m_functionURLClick = function () {
 
-							// Will eventually do something.
+					}
+					
+					var m_functionDiskClick = function () {
+						
+					}
 
+					// Display the chosen image.
+					var m_functionSetImageSrc = function (imageResourceId) {
 
-
-
-
-
-
-
-
-
-							
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
+						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageResourceId, "image"));
 					}
 				} catch (e) {
 

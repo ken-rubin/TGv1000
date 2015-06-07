@@ -19,6 +19,8 @@ Jerry
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - When searching, for example, for images, add the image tag behind the scenes. But not userName.
 - Maybe add paging to search results; like 100 at a time.
+- Implement Change Comic image on context menu (not doing add new comic for now).
+- Do New Type and Search for Type dialogs.
 
 Questions (mostly J to K) or messages. Delete if answered or handled.
 

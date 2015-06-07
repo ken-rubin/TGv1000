@@ -28,20 +28,19 @@
   .row
     br
     .col-xs-12
-      .col-xs-4
-        label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
-        br
-        img#ProjectImage.pull-left(src="media/images/clicktochange.png" style="height:120px;width=120px;")
-      .col-xs-6
       .col-xs-2
+        label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
+      .col-xs-2
+        img#ProjectImage.pull-left(style="height:120px;width=120px;")
+      .col-xs-8
+        br
+        a#ImageSearchLink Search for a Project Image
         br
         br
+        a#NewImageURLLink Load a new Project Image using a URL
         br
         br
-        br
-        br
-        button#SaveProjectBtn.btn.pull-left.btn-info
-            | Save Project
+        a#NewImageDiskLink Load a new Project Image that's already on your computer
   .row
     br
     .col-xs-12

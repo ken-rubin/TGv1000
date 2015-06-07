@@ -649,7 +649,25 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						try {
 
 							// Handle different menu items differently.
-							if (selectedMenu.text() === "Change...") {
+							if (selectedMenu.text() === "Search for a Type Image") {
+
+								// Show rename dialog.
+								var exceptionRet = m_functionImageDialogHelper();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+							if (selectedMenu.text() === "Load a new Type Image using a URL") {
+
+								// Show rename dialog.
+								var exceptionRet = m_functionImageDialogHelper();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+							if (selectedMenu.text() === "Load a new Type Image that's already on your computer") {
 
 								// Show rename dialog.
 								var exceptionRet = m_functionImageDialogHelper();
