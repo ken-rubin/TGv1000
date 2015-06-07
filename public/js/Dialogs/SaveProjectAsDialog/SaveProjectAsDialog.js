@@ -105,6 +105,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_dialog = dialogItself;
 							m_project = client.getProject();
 							m_functionSetImageSrc(m_project.data.imageResourceId);
+							$("#ImageSearchLink").click(m_functionSearchClick);
+							$("#NewImageURLLink").click(m_functionURLClick);
+							$("#NewImageDiskLink").click(m_functionDiskClick);
 
 							$("PlaceForProjectName").empty();
 
@@ -200,6 +203,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_functionSaveProject = function () {
 
+						// Is this any different from Save As????
+						
 					}
 
 					// 3 functions to handle the Image changing link clicks.

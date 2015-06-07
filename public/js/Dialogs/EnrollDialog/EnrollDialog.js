@@ -124,16 +124,26 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								title: "Enroll",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
-					            buttons: [{
+					            buttons: [
+					            	{
+					            		id: 'EnrollButton',
+					            		label: "Enroll",
+					            		cssClass: 'btn-primary',
+					            		action: function () {
 
-					                label: "Close",
-					                icon: "glyphicon glyphicon-remove-circle",
-					                cssClass: "btn-warning",
-					                action: function(dialogItself){
+					            			m_functionEnrollButtonClick();
+					            		}
+					            	},
+					            	{
+						                label: "Close",
+						                icon: "glyphicon glyphicon-remove-circle",
+						                cssClass: "btn-warning",
+						                action: function(dialogItself){
 
-					                    dialogItself.close();
-					                }
-					            }],
+						                    dialogItself.close();
+						                }
+					            	}
+					            ],
 					            draggable: true,
 					            onshown: m_functionOnShownDialog
 					        });
