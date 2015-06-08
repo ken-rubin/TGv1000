@@ -258,7 +258,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.resourceTypeId
 
             // Notes: 
-            //      Allowed image extensions are png, jpg, jpeg and gif. It's checked here for URL fetches.
+            //      Allowed image extensions are png, jpg and jpeg. It's checked here for URL fetches.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
 
             var urlParts = req.body.url.split("/");
