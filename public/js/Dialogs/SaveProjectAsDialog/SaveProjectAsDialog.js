@@ -119,10 +119,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							} else {
 
-								$("#SaveProjectBtn").click(m_functionSaveProjectAs);
-								$("#ProjectName").blur(m_functionNameBlur);
 								$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
+								$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 								$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
+								$("#ProjectName").blur(m_functionNameBlur);
 								$("#ProjectName").val(m_project.data.name);
 							}
 
@@ -258,6 +258,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						m_project.setImageResourceId(imageResourceId);
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageResourceId, "image"));
+						m_setStateSaveAsBtn();
 					}
 				} catch (e) {
 

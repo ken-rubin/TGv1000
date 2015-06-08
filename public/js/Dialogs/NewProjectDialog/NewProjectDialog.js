@@ -127,7 +127,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								price: 0,
 								isTemplate: 0,
 								createdByUserId: client.getTGCookie('userId'),
-								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0, // || imageId > 0
+								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0 || m_imageResourceId > 0,
 								comics: {
 									items: [{
 										imageResourceId: 0,
@@ -219,7 +219,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						m_imageResourceId = imageResourceId;
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
 					}
-
 				} catch (e) {
 
 					errorHelper.show(e);

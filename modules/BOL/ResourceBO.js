@@ -71,7 +71,10 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.userName
             // req.body.projectJson : See NewProjectDialog.js for schema.
 
-            // Important: All image resources have already been created or selected for the project, its comics and their types.
+            // Important: All image resources have already been created or selected for the project, its comics and their types. (Or their defaults exist.)
+
+            // Muis important: the project's name must be unique to within the user's projects, but can be the same as another user's project name.
+            // This doesn't have to be checked for a typeOfSave === 'save'.
 
             var project = req.body.projectJson;
             var typeOfSave = (project.id === 0) ? 'saveNew' : (req.body.userId === project.createdByUserId) ? 'saveAs' : 'save';
@@ -101,13 +104,66 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                 whereClause = " WHERE id=" + project.id;
                 verb = "UPDATE ";
+                
+                m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
 
             } else {
 
                 verb = "INSERT ";
-            }
 
-            sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
+                // Look for and reject an attempt to add a 2nd project for same user with same name.
+                var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where createdByUserId=" + req.body.userId + " and name='" + project.name + "';",
+                    function(rows) {
+
+                        if (rows.length === 0) {
+
+                            res.json({
+                                success:false,
+                                message:'Failed database action checking for duplicate project name.'
+                            });
+                        } else {
+
+                            if (rows[0].cnt > 0) {
+
+                                res.json({
+                                    success:false,
+                                    message:'You already have a project with that name.'
+                                });
+                            } else {
+                                
+                                m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
+                            }
+                        }
+                    },
+                    function(strError) {
+
+                        res.json({
+                            success:false,
+                            message:'Failed database action checking for duplicate project name.'
+                        });
+                    }
+                );
+                if (exceptionRet) {
+                    res.json({
+                        success:false,
+                        message:'Failed database action checking for duplicate project name.'
+                    });
+                }
+            }
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    var m_functionProjectSavePart2 = function (req,res,typeOfSave,project,verb,guts,whereclause) {
+
+        try {
+
+            var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
             console.log(sqlStmt);
 
             var exceptionRet = sql.execute(sqlStmt,
@@ -155,7 +211,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                     } else {
 
                                         var resourceId = rows[0].insertId;
-                                        m_setUpAndDoTags(resourceId, 3, req.body.userName, project.tags, function(err) {
+                                        m_setUpAndDoTags(resourceId, 3, req.body.userName, project.tags, project.name, function(err) {
 
                                             if (err) {
 
@@ -219,11 +275,11 @@ module.exports = function ResourceBO(app, sql, logger) {
                     message: "Error inserting project into database: " + exceptionRet.message
                 });
             }
-        } catch (e) {
+        } catch(e) {
 
             res.json({
-                success: false,
-                message: e.message
+                success:false,
+                message:e.message
             });
         }
     }
@@ -1492,13 +1548,14 @@ module.exports = function ResourceBO(app, sql, logger) {
             });
     }
 
-    var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, callback) {
+    var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, strProjectName, callback) {
 
         try {
 
             var tagArray = [];
             tagArray.push(m_resourceTypes[resourceTypeId]);
             tagArray.push(userName);
+            tagArray.push(strProjectName);
             var tags = strTags.toLowerCase();
             var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
             if (ccArray){
