@@ -31,9 +31,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						// // Activate tooltips.
 						// $("[data-toggle='tooltip']").tooltip();
 
-						// // Wire buttons.
-						// $(".projectItem").off("click");
-						// $(".projectItem").on("click", m_functionResourceClick);
+						// Wire buttons.
 						$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
 
 						// Attach the region to the DOM.

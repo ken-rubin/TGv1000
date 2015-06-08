@@ -12,14 +12,13 @@ Ken
 Jerry
 
 - Search for project and open chosen one.
-- Implement image search for projects, type - DOING THIS ONE NOW
-- Finish save project using promises -- probably promisify mysql to do it.
+- Finish save project Business Object using promises -- probably promisify mysql to do it.
 - Incorportate new scrollregion for project searching in project open (checkboxes for Only mine, Templates, I think). Is there a better name than 'Templates'?
 - Finish Save Project now that Save As works well.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
-- When searching, for example, for images, add the "image" tag behind the scenes. But not userName.
 - Consider adding paging to search results; like 100 at a time.
 - Implement Change Comic image on context menu (not doing add new comic for now).
 - Do New Type and Search for Type dialogs.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes to save as, changes the name to one already used (which does update the project), 
 -    backs out (which doesn't reset the project's name) and then uses straight Save with this duplicate name. This must be prohibited.
+- If project name is multiple words, that's how it is saved in tags and projects. Searcg will never work. Think about the _ thing again.
