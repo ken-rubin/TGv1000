@@ -55,7 +55,9 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showOpenProjectDialog();
+									var exceptionRet = client.showOpenProjectDialog(function (iProjectId) {
+										
+									});
 									if (exceptionRet) {
 
 										throw exceptionRet;

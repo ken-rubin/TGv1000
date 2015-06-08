@@ -2,15 +2,31 @@
 //-
 .well
   .row
-    .col-xs-12
-      h4 
-        | Words
+    | Enter search tags. We'll find any projects that match every tag you enter.
+    br
+    .row
       br
+      .col-xs-2
+        label.control-label(for="ISSearchInput", style="margin-top:8px;") Search string
+      .col-xs-6
+        input.form-control#ISSearchInput(type="text", placeholder="Type your set of tags to match here")
+      .col-xs-4
+        button.btn.btn-info#ISInnerSearchButton Search
+      br
+      .row
+        .col-xs-3
+        .col-xs-9
+          label.checkbox
+            input(type='checkbox')
+            | Limit retrieved projects to those I created
+          label.checkbox
+            input(type='checkbox')
+            | Also retrieve all Template projects
+    br
+    .well#ISWellMsg(style="display:none;")
 
-  .row
-    .col-xs-12
-          br
-  .row
-    .col-xs-12
-          br
-          .well#OpenProjectWell
+    //- Define a scrollable row.
+    .col-xs-12#IStoolstriprow
+
+      //- Scrollable region.
+      #IStoolstrip.ScrollRegion

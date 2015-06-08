@@ -94,12 +94,16 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showOpenProjectDialog = function () {
+					self.showOpenProjectDialog = function (functionOK) {
 
 						try {
 
+							// functionOK is an anonymous function in Navbar.js.
+							// It will be called with iProjectId if a project is selected.
+							// It will call client to fetch and open the project.
+
 							m_openDialog = new OpenProjectDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create(functionOK);
 							if (exceptionRet) {
 
 								throw exceptionRet;

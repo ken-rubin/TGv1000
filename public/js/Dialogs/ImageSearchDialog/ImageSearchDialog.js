@@ -96,7 +96,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					                }
 					            }],
 					            draggable: true,
-					            onshown: m_functionOnShownDialog	// wires click handlers for New and Search btns.
+					            onshown: m_functionOnShownDialog
 					        });
 						} catch (e) {
 
@@ -156,11 +156,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 					    ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
 
-					    if (!ccArray) {
+					    // if (!ccArray) {
 
-					        m_wellMessage('You must enter one or more tags.', null);
-					        return;
-					    }
+					    //     m_wellMessage('You must enter one or more tags.', null);
+					    //     return;
+					    // }
 
 					    try {
 
