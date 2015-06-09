@@ -117,8 +117,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
 						    		alert(j);
-						    		var resourceId = m_searchResultRawArray[j].id;
-						    		self.callFunctionOK(resourceId);
+						    		var projectId = m_searchResultRawArray[j].id;
+						    		self.callFunctionOK(projectId);
 						    	});
 							if (exceptionRet) {
 
@@ -160,8 +160,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 					    try {
 
-						    var strUserIdResources = client.getTGCookie("userId");
-					        var posting = $.post("/BOL/UtilityBO/Search", {tags:tags, userId:strUserIdResources}, 'json');
+						    var strUserId = client.getTGCookie("userId");
+						    var strUserName = client.getTGCookie("userName");
+					        var posting = $.post("/BOL/UtilityBO/Search", 
+					        	{
+					        		tags: tags, 
+					        		userId: strUserId,
+					        		userName: strUserName,
+					        		resourceTypeId: 3,
+					        		onlyCreatedByUser: 0,	// set from cb1
+					        		includeTemplates: 0		// set from cb2
+					        	}, 
+					        	'json');
 					        posting.done(function(data){
 
 					            if (data.success) {
@@ -173,11 +183,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					                    var rowIth = m_searchResultRawArray[i];
 					                    m_searchResultProcessedArray.push({
 
-					                    	index: i, 
+					                    	index: i,
+					                    	id: rowIth.id,
+					                    	name: rowIth.name,
+					                    	description: rowIth.description,
 					                    	url: resourceHelper.toURL('resources', 
-					                    		rowIth.id, 
+					                    		rowIth.imageResourceId, 
 					                    		'image', 
-					                    		''), 
+					                    		''),
 					                    	resourceTypeId: rowIth.resourceTypeId});
 					                }
 
@@ -226,8 +239,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 							        // Add each processed image to the region.
 							        exceptionRet = m_scISImageStrip.addImage("carousel" + i.toString(),
-							        	"N" + i.toString(),
-							        	"D" + i.toString(),
+							        	rowIth.name,
+							        	rowIth.description,
 							        	rowIth.url);
 							        if (exceptionRet) {
 

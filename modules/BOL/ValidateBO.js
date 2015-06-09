@@ -253,10 +253,23 @@ module.exports = function ValidateBO(app, sql, logger) {
         
             console.log("Entered routeForgotPassword with req.body=" + JSON.stringify(req.body));
 
+            var exceptionRet = logger.logItem(1, {"userName":req.body.userName});
+
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            } else {
+
+                res.json({
+                    success: true
+                });
+            }
         } catch (e) {
 
             res.json({
-                
                 success: false,
                 message: 'Forgot exception: ' + e.message
             });

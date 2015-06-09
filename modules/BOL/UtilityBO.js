@@ -22,6 +22,10 @@ module.exports = function UtilityBO(app, sql, logger) {
             console.log("Entered UtilityBO/routeSearch with req.body = " + JSON.stringify(req.body));
             // req.body.tags
             // req.body.userId
+            // req.body.userName
+            // req.body.resourceTypeId  Currently handle 1, 3; 2 needs a little work; 4, 5 need full work.
+            // req.body.onlyCreatedByUser   0 or 1
+            // req.body.includeTemplates    0 or 1 Applies only to projects (resourceTypeId=3)
 
             var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g); // guaranteed to have some tags
 
@@ -63,9 +67,19 @@ module.exports = function UtilityBO(app, sql, logger) {
                             idString = idString + arrayRows[i].id.toString();
                         }
 
-                        var strFirstCondition = "(createdByUserId=" + req.body.userId + " or public=1) and ";
+                        if (req.body.resourceTypeId === '3') {
 
-                        sqlString = "select * from " + self.dbname + "resources where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                            var strFirstCondition = "(p.createdByUserId=" + req.body.userId + " or public=1) and ";
+
+                            sqlString = "select p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+
+                        } else {
+
+                            var strFirstCondition = "(createdByUserId=" + req.body.userId + " or public=1) and ";
+
+                            sqlString = "select * from " + self.dbname + "resources where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                        }
+
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
                                 res.json({
@@ -78,7 +92,8 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     success:false,
                                     message: err
                                 });
-                            });
+                            }
+                        );
                     }
                 },
                 function (strError) {
@@ -184,42 +199,6 @@ module.exports = function UtilityBO(app, sql, logger) {
     //         });
     //     }
     // }
-
-    self.routeForgotPW = function (req, res, next) {
-    
-        // req.body = {
-        //                  "userName":"Ken"
-        //    }
-        
-        try {
-        
-            console.log("Entered UtilityBO/routeForgotPW with req.body = " + JSON.stringify(req.body));
-
-            var exceptionRet = logger.logItem(1, {"userName":req.body.userName});
-
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-            } else {
-
-                res.json({
-                    
-                    success: true
-                });
-            }
-        } catch (e) {
-        
-             // Return success: false
-            res.json({
-                
-                success: false,
-                message: e.message
-            });
-        }
-    };
 
     // self.routeGetDashboardFuncs = function (req, res) {
 

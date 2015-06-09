@@ -284,6 +284,15 @@ begin
 		set @dbstate := 15.0;
     end if;
 
+	if @dbstate = 15.0 then
+
+		DELETE FROM TGv1000.routes where method = 'routeDeleteResource';
+		DELETE FROM TGv1000.routes where method = 'routeFetchResources';
+
+		UPDATE `TGv1000`.`control` set dbstate=16.0 where id=1;
+		set @dbstate := 16.0;
+    end if;
+
 end;
 
 //

@@ -164,8 +164,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 					    try {
 
-						    var strUserIdResources = client.getTGCookie("userId");
-					        var posting = $.post("/BOL/UtilityBO/Search", {tags:tags, userId:strUserIdResources}, 'json');
+						    var strUserId = client.getTGCookie("userId");
+						    var strUserName = client.getTGCookie("userName");
+					        var posting = $.post("/BOL/UtilityBO/Search", 
+					        	{
+					        		tags: tags, 
+					        		userId: strUserId,
+					        		userName: strUserName,
+					        		resourceTypeId: 1,
+					        		onlyCreatedByUser: 0,
+					        		includeTemplates: 0
+					        	},
+					        	'json');
 					        posting.done(function(data){
 
 					            if (data.success) {
