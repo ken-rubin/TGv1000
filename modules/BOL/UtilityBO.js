@@ -67,19 +67,36 @@ module.exports = function UtilityBO(app, sql, logger) {
                             idString = idString + arrayRows[i].id.toString();
                         }
 
+                        var strFirstCondition = "(r.createdByUserId=" + req.body.userId + " or r.public=1) and ";
+
                         if (req.body.resourceTypeId === '3') {
 
-                            var strFirstCondition = "(p.createdByUserId=" + req.body.userId + " or public=1) and ";
+                            if (req.body.onlyCreatedByUser === "1") {
 
-                            sqlString = "select p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                                strFirstCondition += "(p.createdByUserId=" + req.body.userId;
+
+                                if (req.body.includeTemplates === "1") {
+
+                                    strFirstCondition += " or p.template=1) and ";
+                                
+                                } else {
+
+                                    strFirstCondition += ") and ";
+                                }
+                            } else if (req.body.includeTemplates === "1") {
+
+                                strFirstCondition = "(p.template=1) and ";
+                            }
+
+                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
 
                         } else {
 
-                            var strFirstCondition = "(createdByUserId=" + req.body.userId + " or public=1) and ";
 
-                            sqlString = "select * from " + self.dbname + "resources where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                            sqlString = "select r.* from " + self.dbname + "resources r where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
                         }
 
+                        console.log('Query: ' + sqlString);
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
                                 res.json({

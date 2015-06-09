@@ -11,9 +11,8 @@ Ken
 
 Jerry
 
-- Search for project and open chosen one.
+- Search for project and open chosen one. Not sure if my query is totally correct.
 - Finish Save Project BO using promises -- probably promisify mysql to do it.
-- Incorportate new scrollregion for project searching in project open (checkboxes for Only mine, Templates, I think). Is there a better name than 'Templates'?
 - Finish Save Project now that Save As works well--once Save Project BO is done.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time.
@@ -24,4 +23,4 @@ Jerry
 -    I think that the blur handlers in Save As need update the project only if Save Project is called. Otherwise, they set member variables.
 - If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
-- Replace existing scroll regions.
+- Replace existing scroll regions with ScrollRegion2.
