@@ -121,7 +121,12 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/ResourceBO/RetrieveProject", {projectId: iProjectId}, 'json');
+							var posting = $.post("/BOL/ResourceBO/RetrieveProject", 
+								{
+									projectId: iProjectId,
+									userId: self.getTGCookie("userId"),
+								},
+								'json');
 							posting.done(function(data){
 
 								if (data.success) {

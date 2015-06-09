@@ -60,8 +60,8 @@ define(["Core/errorHelper"],
 
 										if (iProjectId > 0) {
 
-											exceptionRet = client.openProjectFromDB(iProjectID);
-											
+											exceptionRet = client.openProjectFromDB(iProjectId);
+
 											if (exceptionRet) {
 
 												throw exceptionRet;

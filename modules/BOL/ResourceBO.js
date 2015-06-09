@@ -57,7 +57,50 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             console.log("Entered ResourceBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
+            // req.body.userId          just for the fakeout
 
+            // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
+            // read all types with matching comicId. And return project: json.
+
+            // For now, a total fakeout:
+
+            res.json({
+                success: true,
+                project: {
+                            name: 'Fake project',
+                            id: req.body.projectId,
+                            description: 'Fake description',
+                            tags: 'a b c',
+                            imageResourceId: 0,
+                            price: 0,
+                            isTemplate: 0,
+                            createdByUserId: req.body.userId,
+                            isDirty: 1,
+                            comics: {
+                                items: [{
+                                    imageResourceId: 0,
+                                    id: 0,
+                                    name: 'default',
+                                    tags: '',
+                                    ordinal: 0,
+                                    types: {
+                                        items: [{
+                                            isApp: true,
+                                            id: 0,
+                                            ordinal: 0,
+                                            tags: '',
+                                            properties: [],
+                                            methods: [{ name: "initialize", workspace: "", method: "" }],
+                                            events: [],
+                                            dependencies: [],
+                                            name: "app",
+                                            imageResourceId: 0
+                                        }]
+                                    }
+                                }]
+                            }
+                }
+            });
     }
 
     self.routeSaveProject = function (req, res) {
