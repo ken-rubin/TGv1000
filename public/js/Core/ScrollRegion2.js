@@ -169,6 +169,7 @@ define(["Core/errorHelper"],
                     m_jSlider.empty();
 
                     return null;
+
                 } catch (e) {
 
                     return e;
@@ -221,6 +222,7 @@ define(["Core/errorHelper"],
                     m_jRoot.append(m_jTooltip);
 
                     return null;
+                    
                 } catch (e) {
 
                     return e;
@@ -283,7 +285,7 @@ define(["Core/errorHelper"],
 
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -300,7 +302,7 @@ define(["Core/errorHelper"],
                     }
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -343,7 +345,7 @@ define(["Core/errorHelper"],
                     }
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -384,7 +386,7 @@ define(["Core/errorHelper"],
                     }
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -419,7 +421,7 @@ define(["Core/errorHelper"],
                     }
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -442,7 +444,7 @@ define(["Core/errorHelper"],
                     m_jLeft.addClass("ScrollRegionButtonDown");
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -483,9 +485,10 @@ define(["Core/errorHelper"],
                     // Start a timer that decrements the increment.
                     setTimeout(functionSomeFunction, 
                         m_dDampeningRefreshMS)
+
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -506,9 +509,10 @@ define(["Core/errorHelper"],
 
                     // Indicate in the DOM that the button is depressed.
                     m_jRight.addClass("ScrollRegionButtonDown");
+
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 
@@ -549,9 +553,10 @@ define(["Core/errorHelper"],
                     // Start a timer that decrements the increment.
                     setTimeout(functionSomeFunction, 
                         m_dDampeningRefreshMS)
+
                 } catch (e) {
 
-                    alert(e.message);
+                    errorHelper.show(e);
                 }
             };
 

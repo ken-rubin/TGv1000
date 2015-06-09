@@ -56,6 +56,32 @@ define(["Core/errorHelper"],
 								try {
 
 									var exceptionRet = client.showOpenProjectDialog(function (iProjectId) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+										errorHelper.show('Want to open project with id: ' + iProjectId);
+
+
+
+
+
+
+
+
+
+
+
 										
 									});
 									if (exceptionRet) {

@@ -76,7 +76,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 							// Show the dialog--load the content from 
 							// the TypesDialog jade HTML-snippet.
-							BootstrapDialog.show({
+							m_dialog = BootstrapDialog.show({
 
 								title: "Open/Search for Project",
 								size: BootstrapDialog.SIZE_WIDE,
@@ -116,7 +116,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
-						    		alert(j);
 						    		var projectId = m_searchResultRawArray[j].id;
 						    		self.callFunctionOK(projectId);
 						    	});
