@@ -58,31 +58,18 @@ define(["Core/errorHelper"],
 									var exceptionRet = client.showOpenProjectDialog(function (iProjectId) {
 
 
+										if (iProjectId > 0) {
 
+											exceptionRet = client.openProjectFromDB(iProjectID);
+											
+											if (exceptionRet) {
 
+												throw exceptionRet;
+											}
+										} else {
 
-
-
-
-
-
-
-
-
-
-										errorHelper.show('Want to open project with id: ' + iProjectId);
-
-
-
-
-
-
-
-
-
-
-
-										
+											throw new Error("Invalid project id returned.")
+										}
 									});
 									if (exceptionRet) {
 

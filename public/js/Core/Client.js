@@ -117,6 +117,39 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.openProjectFromDB = function (iProjectId) {
+
+						try {
+
+							var posting = $.post("/BOL/ResourceBO/RetrieveProject", {projectId: iProjectId}, 'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									m_project = new Project();
+									var exceptionRet = m_project.load(data.project);
+									if (exceptionRet) {
+
+										return exceptionRet;
+									}
+
+									return null;
+
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.quickSaveProject = function () {
 
 						try {

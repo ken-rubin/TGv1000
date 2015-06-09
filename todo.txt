@@ -24,3 +24,4 @@ Jerry
 -    I think that the blur handlers in Save As need update the project only if Save Project is called. Otherwise, they set member variables.
 - If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
+- Replace existing scroll regions.
