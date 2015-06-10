@@ -92,11 +92,13 @@ define(["Core/errorHelper"],
                                 try {
 
                                     // Get the location of the cursor relative to the page.
-                                    var dLeft = e.pageX - m_jRoot.position().left + m_dTooltipWidthOffset;
-                                    var dTop = e.pageY - m_jRoot.position().top + m_dTooltipHeightOffset;
+                                    var dLeft = e.pageX - m_jRoot.offset().left + m_dTooltipWidthOffset;
+                                    var dTop = e.pageY + m_dTooltipHeightOffset;
+                                    // var dLeft = e.pageX - m_jRoot.position().left + m_dTooltipWidthOffset;
+                                    // var dTop = e.pageY - m_jRoot.position().top + m_dTooltipHeightOffset;
 
                                     // Configure and show the tooltip.
-                                    m_jTooltip.html(strName + "<br/>" + strDescription);
+                                    m_jTooltip.html("<span>" + strName + "</span><br><span>" + strDescription + "</span>");
                                     m_jTooltip.css("left",
                                         dLeft.toString() + "px");
                                     m_jTooltip.css("top",

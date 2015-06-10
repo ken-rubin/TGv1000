@@ -302,6 +302,15 @@ begin
 		set @dbstate := 17.0;
     end if;
     
+	if @dbstate = 17.0 then
+
+		UPDATE TGv1000.resourceTypes set description='comic' where id=4;
+		UPDATE TGv1000.resourceTypes set description='type' where id=5;
+
+		UPDATE `TGv1000`.`control` set dbstate=18.0 where id=1;
+		set @dbstate := 18.0;
+    end if;
+    
 end;
 
 //

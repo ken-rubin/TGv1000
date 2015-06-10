@@ -80,7 +80,7 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewProjectDialog();
-							var exceptionRet = m_openDialog.create(functionOK);
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -6,8 +6,9 @@ Ken
 - New Project followed immediately by another New Project ends up with the type image two times in the toolstrip. We also don't clear the designer.
 - Review code
 - Navbar menu highlight color
-- If description is ‘’ or null, the tooltip shouldn’t display the second line.
+- ScrollRegion2: If description is ‘’ or null, the tooltip shouldn’t display the second line.
 - Now that's there's no more huge + button in the TypeStrip, remove the offset to the left of the first Type.
+- Get ScrollRegion2 tooltip to work (better?). There's something that works now, but it doesn't make sense. Look at it and adjust.
 
 Jerry
 
@@ -15,7 +16,7 @@ Jerry
 - Finish Save Project BO using promises -- probably promisify mysql to do it.
 - Finish Save Project now that Save As works well--once Save Project BO is done.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
-- Consider adding paging to search results; like 100 at a time.
+- Consider adding paging to search results; like 100 at a time. See code below.
 - Implement Change Comic image on context menu (not doing add new comic for now).
 - Do New Type and Search for Type dialogs.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes to save as, changes the name to one already used (which does update the project), 
@@ -24,3 +25,48 @@ Jerry
 - If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions with ScrollRegion2.
+
+
+
+
+
+
+
+
+
+Just saving this here for possible ScrollRegion paging:
+
+2. Try using a Deferred Join
+
+This is an interesting trick. Suppose you have pages of customers. Each page displays ten customers. The query will use LIMIT to get ten records, and OFFSET to skip all the previous page results. When you get to the 100th page, it's doing LIMIT 10 OFFSET 990. So the server has to go and read all those records, then discard them.
+
+Also: AirBNB didn't have to fail during an AWS outage.
+
+[code]
+SELECT id, name, address, phone FROM customers ORDER BY name LIMIT 10 OFFSET 990;
+[/code]
+
+MySQL is first scanning an index then retrieving rows in the table by primary key id. So it's doing double lookups and so forth. Turns out you can make this faster with a tricky thing called a deferred join.
+
+The inside piece just uses the primary key. An explain plan shows us "using index" which we love!
+
+[code]
+SELECT id
+FROM customers
+ORDER BY name
+LIMIT 10 OFFSET 990;
+[/code]
+
+Now combine this using an INNER JOIN to get the ten rows and data you want:
+
+[code]
+SELECT id, name, address, phone
+FROM customers
+INNER JOIN (
+SELECT id
+FROM customers
+ORDER BY name
+LIMIT 10 OFFSET 990)
+AS my_results USING(id);
+[/code]
+

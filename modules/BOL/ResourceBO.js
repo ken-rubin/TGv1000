@@ -330,17 +330,51 @@ module.exports = function ResourceBO(app, sql, logger) {
         // If typeOfSave = 'save', then comics and types MIGHT exist already. The way to tell is if they have an id and if (for comics) comic.projectId === project.id or (for types) type.comicId => comic.projectId === project BEFORE the comic is saved.
         // Otherwise, a new comic or type is being INSERTed.
 
-        // And we have asynchronous loops to deal with.
+        // 1. Delete from types where comicId in (select id from comics where projectId=id);
+        // 2. Delete from comics where projectId=id;
+        // 3. For each comic in project, insert into comics, returning id as comicId. 
+        // 3a. With that comicId, insert into resources, setting optnlFK=comicId. (resourceTypeId=4)
+        // 3b. Also with that comicId, for each type in comic, insert into types, returning id as typeId.
+        // 3c. With that typeId, insert into resources, setting optnlFK=typeId. (resourceTypeId=5)
+
+        // Remember: comics and types have tags, too.
+
+        try {
+
+            var exceptionRet = sql.execute("delete from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId=" + project.id +");",
+                function(rows){
+
+                    exceptionRet = sql.execute("delete from " + self.dbname + "comics where projectId=" + project.id +";",
+                        function(rows){
+
+                            for (var c = 0; c < project.comics.items.length; c++) {
+
+                                comicCth = project.comics.items[c];
+                            }
+                        },
+                        function(strError){
+
+                            callback(new Error(strError));
+                        });
+                },
+                function(strError){
+
+                    callback(new Error(strError));
+                }
+            );
+            if (exceptionRet) {
+
+                callback(exceptionRet);
+            }
 
 
 
+            callback(null);
 
+        } catch (e) {
 
-
-
-
-
-        callback(null);
+            callback(err);   
+        }
     }
 
     self.routeSaveURLResource = function (req, res) {

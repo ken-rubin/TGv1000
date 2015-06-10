@@ -120,7 +120,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
-						    		alert(j);
 						    		var resourceId = m_searchResultRawArray[j].id;
 						    		self.callFunctionOK(resourceId);
 						    	});
