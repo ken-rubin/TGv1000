@@ -9,14 +9,11 @@ Ken
 - Now that's there's no more huge + button in the TypeStrip, remove the offset to the left of the first Type.
 - Get ScrollRegion2 tooltip to work (better?). There's something that works now, but it doesn't make sense. Look at it and adjust. The latest: even though I see a tooltip when searching for a Project or a Project image,
 -   I don't see a tooltip when I search for a Type image. Probably because it's not open over another dialog. I'm tired of tooltips. They're yours. Oh yeah: I don't display an empty description if it's "".
--   Also we need a name for images, since the tooltip is N###.
 
 Jerry
 
 - Search for project: Not sure if my scrollregion-filling query is totally correct. Especially check the effects of the checkboxes.
-- Does image search need a "my own only" checkbox?
 - Finish ResourcesBO#self.routeRetrieveProject now that the project is fully saved to the database, replacing dummy project that is now returned.
-- Finish Save Project BO -- need to save comic and type tags. Also, every comic needs >=1 type (don't think that's a problem). 
 - Note: comic has no name in the db. Worry about this when we address multiple comics and/or comic creation/editing.
 - Finish Save Project now that Save As works well--once Save Project BO is done.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
@@ -26,12 +23,17 @@ Jerry
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
-- If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
 - Review setting of tags: are we always adding resource type description and userName? Where?
 
 
+To discuss
+
+-   Also we need a name for images, since the tooltip is N###.
+- Does image search need a "my own only" checkbox?
+- Every comic needs >=1 type (don't think that's a problem). 
+- If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 
 
 

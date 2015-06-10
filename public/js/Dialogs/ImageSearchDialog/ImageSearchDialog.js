@@ -138,24 +138,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 					    var tags = $("#ISSearchInput").val().toLowerCase();
 
-					    // I'm not going to add tags "image".
-					    // var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+					    var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
 
-				     //    var foundImage = false;
-				     //    if (ccArray) {
+				        var foundImage = false;
+				        if (ccArray) {
 
-				     //        for (var i = 0; i < ccArray.length; i++){
+				            for (var i = 0; i < ccArray.length; i++){
 
-				     //            if (ccArray[i] === 'image')
-				     //                foundImage = true;
-				     //        }
-				     //    }
-				     //    if (!foundImage) {
+				                if (ccArray[i] === 'image')
+				                    foundImage = true;
+				            }
+				        }
+				        if (!foundImage) {
 				        	
-				     //        tags = tags + " image";
-				     //    }
+				            tags = tags + " image";
+				        }
 
-					    // ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+					    ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
 
 					    // if (!ccArray) {
 
