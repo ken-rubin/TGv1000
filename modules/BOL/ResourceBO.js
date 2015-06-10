@@ -81,14 +81,14 @@ module.exports = function ResourceBO(app, sql, logger) {
                                     imageResourceId: 0,
                                     id: 0,
                                     name: 'default',
-                                    tags: '',
+                                    tags: 'd e f',
                                     ordinal: 0,
                                     types: {
                                         items: [{
                                             isApp: true,
                                             id: 0,
                                             ordinal: 0,
-                                            tags: '',
+                                            tags: 'g h i',
                                             properties: [],
                                             methods: [{ name: "initialize", workspace: "", method: "" }],
                                             events: [],
@@ -371,29 +371,63 @@ module.exports = function ResourceBO(app, sql, logger) {
                                             function(rows){
 
                                                 // error check needed
-                                                comicCth.types.items.forEach(function(typeTth) {
+                                                var resourceId = rows[0].insertId;
+                                                m_setUpAndDoTags(resourceId, 4, req.body.userName, comicCth.tags, comicCth.name, function(err) {
 
-                                                    var jsonCode = JSON.stringify({
-                                                        properties:typeTth.properties,
-                                                        methods:typeTth.methods,
-                                                        events:typeTth.events,
-                                                        dependencies:typeTth.dependencies
-                                                    });
-                                                    console.log('***************inserting type ' + typeTth.name);
-                                                    exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "');",
-                                                        function(rows){
+                                                    if (err) {
 
-                                                            // error check needed
-                                                            var typeId = rows[0].insertId;
+                                                        callback(err);
+                                                        return;
 
-                                                            console.log('********************inserting type resource');
-                                                            exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
+                                                    } else {
+
+                                                        comicCth.types.items.forEach(function(typeTth) {
+
+                                                            var jsonCode = JSON.stringify({
+                                                                properties:typeTth.properties,
+                                                                methods:typeTth.methods,
+                                                                events:typeTth.events,
+                                                                dependencies:typeTth.dependencies
+                                                            });
+                                                            console.log('***************inserting type ' + typeTth.name);
+                                                            exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "');",
                                                                 function(rows){
 
                                                                     // error check needed
-                                                                    if (--allTypesCtr === 0) {
+                                                                    var typeId = rows[0].insertId;
 
-                                                                        callback(null);
+                                                                    console.log('********************inserting type resource');
+                                                                    exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
+                                                                        function(rows){
+
+                                                                            // error check needed
+                                                                            var resourceId = rows[0].insertId;
+                                                                            m_setUpAndDoTags(resourceId, 5, req.body.userName, typeTth.tags, typeTth.name, function(err) {
+
+                                                                                if (err) {
+
+                                                                                    callback(err);
+                                                                                    return;
+
+                                                                                } else {
+
+                                                                                    if (--allTypesCtr === 0) {
+
+                                                                                        callback(null);
+                                                                                        return;
+                                                                                    }
+                                                                                }
+                                                                            });
+                                                                        },
+                                                                        function(strError){
+
+                                                                            callback(new Error(strError));
+                                                                            return;
+                                                                        }
+                                                                    );
+                                                                    if (exceptionRet) {
+
+                                                                        callback(exceptionRet);
                                                                         return;
                                                                     }
                                                                 },
@@ -408,19 +442,9 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                                 callback(exceptionRet);
                                                                 return;
                                                             }
-                                                        },
-                                                        function(strError){
-
-                                                            callback(new Error(strError));
-                                                            return;
-                                                        }
-                                                    );
-                                                    if (exceptionRet) {
-
-                                                        callback(exceptionRet);
-                                                        return;
+                                                        });   // comicCth.types.items,forEach(function(typeTth)
                                                     }
-                                                });   // comicCth.types.items,forEach(function(typeTth) {
+                                                });
                                             },
                                             function(strError){
 
@@ -1723,14 +1747,17 @@ module.exports = function ResourceBO(app, sql, logger) {
         );
     }
 
-    var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, strProjectName, callback) {
+    var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, strName, callback) {
 
         try {
 
             var tagArray = [];
             tagArray.push(m_resourceTypes[resourceTypeId]);
             tagArray.push(userName);
-            tagArray.push(strProjectName);
+            if (strName.length > 0) {
+
+                tagArray.push(strName);
+            }
             var tags = strTags.toLowerCase();
             var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
             if (ccArray){
