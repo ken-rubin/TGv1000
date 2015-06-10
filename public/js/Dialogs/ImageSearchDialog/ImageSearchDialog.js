@@ -240,7 +240,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 							        // Add each processed image to the region.
 							        exceptionRet = m_scISImageStrip.addImage("carousel" + i.toString(),
 							        	"N" + i.toString(),
-							        	"D" + i.toString(),
+							        	"",
 							        	rowIth.url);
 							        if (exceptionRet) {
 

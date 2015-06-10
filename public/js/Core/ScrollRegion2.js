@@ -98,7 +98,7 @@ define(["Core/errorHelper"],
                                     // var dTop = e.pageY - m_jRoot.position().top + m_dTooltipHeightOffset;
 
                                     // Configure and show the tooltip.
-                                    m_jTooltip.html("<span>" + strName + "</span><br><span>" + strDescription + "</span>");
+                                    m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));
                                     m_jTooltip.css("left",
                                         dLeft.toString() + "px");
                                     m_jTooltip.css("top",
