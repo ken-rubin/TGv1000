@@ -349,105 +349,131 @@ module.exports = function ResourceBO(app, sql, logger) {
                         function(rows){
 
                             // error check needed
-                            for (var c = 0; c < project.comics.items.length; c++) {
+                            var allTypesCtr = 0;
 
-                                var comicCth = project.comics.items[c];
+                            project.comics.items.forEach(function(comicCth) {
+
+                                allTypesCtr += comicCth.types.items.length;
+                            });
+
+
+                            project.comics.items.forEach(function(comicCth) {
+
+                                console.log('*****inserting comic');
                                 exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ");",
                                     function(rows){
 
                                         // error check needed
                                         var comicId = rows[0].insertId;
 
+                                        console.log('**********inserting comic resource');
                                         exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",4,0,0," + comicId + ");",
                                             function(rows){
 
                                                 // error check needed
-                                                for (var t = 0; t < comicCth.types.items.length; t++) {
+                                                comicCth.types.items.forEach(function(typeTth) {
 
-                                                    var typeTth = comicCth.types.items[t];
                                                     var jsonCode = JSON.stringify({
                                                         properties:typeTth.properties,
                                                         methods:typeTth.methods,
                                                         events:typeTth.events,
                                                         dependencies:typeTth.dependencies
                                                     });
-                                                    exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "'');",
+                                                    console.log('***************inserting type ' + typeTth.name);
+                                                    exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "');",
                                                         function(rows){
 
                                                             // error check needed
                                                             var typeId = rows[0].insertId;
 
+                                                            console.log('********************inserting type resource');
                                                             exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
                                                                 function(rows){
 
                                                                     // error check needed
+                                                                    if (--allTypesCtr === 0) {
+
+                                                                        callback(null);
+                                                                        return;
+                                                                    }
                                                                 },
                                                                 function(strError){
 
                                                                     callback(new Error(strError));
+                                                                    return;
                                                                 }
                                                             );
                                                             if (exceptionRet) {
 
                                                                 callback(exceptionRet);
+                                                                return;
                                                             }
                                                         },
                                                         function(strError){
 
                                                             callback(new Error(strError));
+                                                            return;
                                                         }
                                                     );
                                                     if (exceptionRet) {
 
                                                         callback(exceptionRet);
+                                                        return;
                                                     }
-                                                }
-
-                                                callback(null);
+                                                });   // comicCth.types.items,forEach(function(typeTth) {
                                             },
                                             function(strError){
 
                                                 callback(new Error(strError));
+                                                return;
                                             }
                                         );
                                         if (exceptionRet) {
 
                                             callback(exceptionRet);
+                                            return;
                                         }
                                     },
                                     function(strError){
 
                                         callback(new Error(strError));
+                                        return;
                                     }
                                 );
                                 if (exceptionRet) {
 
                                     callback(exceptionRet);
+                                    return;
                                 }
-                            }
+                            });  // project.comics.items.forEach(function(comicCth) {
                         },
                         function(strError){
 
                             callback(new Error(strError));
+                            return;
                         }
                     );
                     if (exceptionRet) {
 
                         callback(exceptionRet);
+                        return;
                     }
                 },
                 function(strError){
 
                     callback(new Error(strError));
+                    return;
                 }
             );
             if (exceptionRet) {
 
                 callback(exceptionRet);
+                return;
             }
         } catch (e) {
 
             callback(err);   
+            return;
         }
     }
 
@@ -1693,7 +1719,8 @@ module.exports = function ResourceBO(app, sql, logger) {
             function(strErr){
 
                 return {message:'Error received inserting into resources_tags: ' + strErr};
-            });
+            }
+        );
     }
 
     var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, strProjectName, callback) {
