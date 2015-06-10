@@ -330,32 +330,111 @@ module.exports = function ResourceBO(app, sql, logger) {
         // If typeOfSave = 'save', then comics and types MIGHT exist already. The way to tell is if they have an id and if (for comics) comic.projectId === project.id or (for types) type.comicId => comic.projectId === project BEFORE the comic is saved.
         // Otherwise, a new comic or type is being INSERTed.
 
-        // 1. Delete from types where comicId in (select id from comics where projectId=id);
-        // 2. Delete from comics where projectId=id;
+        // 1. Delete from types where comicId in (select id from comics where projectId=id); delete corr. rows from resources_tags
+        // 2. Delete from comics where projectId=id; delete corr. rows from resources_tags
         // 3. For each comic in project, insert into comics, returning id as comicId. 
         // 3a. With that comicId, insert into resources, setting optnlFK=comicId. (resourceTypeId=4)
         // 3b. Also with that comicId, for each type in comic, insert into types, returning id as typeId.
         // 3c. With that typeId, insert into resources, setting optnlFK=typeId. (resourceTypeId=5)
 
-        // Remember: comics and types have tags, too.
+        // Remember: comics and types have tags, too, that need to be added.
 
         try {
 
-            var exceptionRet = sql.execute("delete from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId=" + project.id +");",
+            var exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId = " + project.id + ")));" + "delete from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId=" + project.id +");",
                 function(rows){
 
-                    exceptionRet = sql.execute("delete from " + self.dbname + "comics where projectId=" + project.id +";",
+                    // error check needed
+                    exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "comics where projectId = " + project.id + "));" + "delete from " + self.dbname + "comics where projectId=" + project.id +";",
                         function(rows){
 
+                            // error check needed
                             for (var c = 0; c < project.comics.items.length; c++) {
 
-                                comicCth = project.comics.items[c];
+                                var comicCth = project.comics.items[c];
+                                exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ");",
+                                    function(rows){
+
+                                        // error check needed
+                                        var comicId = rows[0].insertId;
+
+                                        exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",4,0,0," + comicId + ");",
+                                            function(rows){
+
+                                                // error check needed
+                                                for (var t = 0; t < comicCth.types.items.length; t++) {
+
+                                                    var typeTth = comicCth.types.items[t];
+                                                    var jsonCode = JSON.stringify({
+                                                        properties:typeTth.properties,
+                                                        methods:typeTth.methods,
+                                                        events:typeTth.events,
+                                                        dependencies:typeTth.dependencies
+                                                    });
+                                                    exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "'');",
+                                                        function(rows){
+
+                                                            // error check needed
+                                                            var typeId = rows[0].insertId;
+
+                                                            exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
+                                                                function(rows){
+
+                                                                    // error check needed
+                                                                },
+                                                                function(strError){
+
+                                                                    callback(new Error(strError));
+                                                                }
+                                                            );
+                                                            if (exceptionRet) {
+
+                                                                callback(exceptionRet);
+                                                            }
+                                                        },
+                                                        function(strError){
+
+                                                            callback(new Error(strError));
+                                                        }
+                                                    );
+                                                    if (exceptionRet) {
+
+                                                        callback(exceptionRet);
+                                                    }
+                                                }
+
+                                                callback(null);
+                                            },
+                                            function(strError){
+
+                                                callback(new Error(strError));
+                                            }
+                                        );
+                                        if (exceptionRet) {
+
+                                            callback(exceptionRet);
+                                        }
+                                    },
+                                    function(strError){
+
+                                        callback(new Error(strError));
+                                    }
+                                );
+                                if (exceptionRet) {
+
+                                    callback(exceptionRet);
+                                }
                             }
                         },
                         function(strError){
 
                             callback(new Error(strError));
-                        });
+                        }
+                    );
+                    if (exceptionRet) {
+
+                        callback(exceptionRet);
+                    }
                 },
                 function(strError){
 
@@ -366,11 +445,6 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                 callback(exceptionRet);
             }
-
-
-
-            callback(null);
-
         } catch (e) {
 
             callback(err);   

@@ -30,7 +30,8 @@ module.exports = function SQL(app) {
             host: "localhost",
             user: strUser,
             database: self.dbname,
-            password: strPassword
+            password: strPassword,
+            multipleStatements: true
         });  
         console.log("Created pool for " + strUser + "/'" + strPassword + "' for database: " + self.dbname + ".");
         
