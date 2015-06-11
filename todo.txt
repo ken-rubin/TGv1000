@@ -13,7 +13,6 @@ Ken
 Jerry
 
 - Search for project: Not sure if my scrollregion-filling query is totally correct. Especially check the effects of the checkboxes.
-- Finish ResourcesBO#self.routeRetrieveProject now that the project is fully saved to the database, replacing dummy project that is now returned.
 - Note: comic has no name in the db. Worry about this when we address multiple comics and/or comic creation/editing.
 - Finish Save Project now that Save As works well--once Save Project BO is done.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
@@ -30,7 +29,7 @@ Jerry
 
 To discuss
 
--   Also we need a name for images, since the tooltip is N###.
+- Also we need a name for images, since the tooltip is N###.
 - Does image search need a "my own only" checkbox?
 - Every comic needs >=1 type (don't think that's a problem). 
 - If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.

@@ -86,7 +86,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 imageResourceId: 0,
                 id: 0,
                 name: 'default',
-                tags: 'd e f',
+                tags: '',
                 ordinal: 0,
                 types: {
                     items: []
@@ -98,7 +98,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 isApp: true,
                 id: 0,
                 ordinal: 0,
-                tags: 'g h i',
+                tags: '',
                 properties: [],
                 methods: [{ name: "initialize", workspace: "", method: "" }],
                 events: [],
@@ -107,114 +107,147 @@ module.exports = function ResourceBO(app, sql, logger) {
                 imageResourceId: 0
             };
 
-            var exceptionRet = sql.execute("select * from " + self.dbname + "projects where id=" + req.body.projectId + ";",
+            var ex = sql.execute("select count(t.id) as cnt from " + self.dbname + "types t where t.comicId in (select id from " + self.dbname + "comics where projectId=" + req.body.projectId + ");",
                 function(rows){
 
                     if (rows.length !== 1) {
 
                         res.json({
                             success: false,
-                            message: 'Could not retrieve project from database.'
+                            message: "Could not retrieve project."
                         });
                     } else {
 
-                        project.name = rows[0].name;
-                        project.id = rows[0].id;
-                        project.description = rows[0].description;
-                        project.imageResourceId = rows[0].imageResourceId;
-                        project.price = rows[0].price;
-                        project.isTemplate = rows[0].isTemplate;
-                        project.createdByUserId = rows[0].createdByUserId;
-                        project.isDirty = false;
-                        m_functionFetchTags(project.id, "project", req.body.userName, function(tags){
+                        typesCtr = rows[0].cnt;
 
-                            project.tags = tags;
+                        var exceptionRet = sql.execute("select * from " + self.dbname + "projects where id=" + req.body.projectId + ";",
+                            function(rows){
 
-                            // Now comics.
-                            exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.id + " order by ordinal asc;",
-                                function(rows){
-
-                                    rows.forEach(function(row) {
-
-                                        var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
-                                        comicItem.imageResourceId = row.imageResourceId;
-                                        comicItem.id = row.id;
-                                        // comicItem.name = row.name;   don't have in db yet.
-                                        comicItem.ordinal = row.ordinal;
-                                        m_functionFetchTags(comicItem.id, "comic", req.body.userName, function(tags){
-
-                                            comicItem.tags = tags;
-
-                                            // Now types.
-                                            exceptionRet = sql.execute("select * from " + self.dbname + "types where comicId=" + comicItem.id + " order by ordinal asc;",
-                                                function(rows){
-
-                                                    rows.forEach(function(row) {
-
-                                                        var typeItem = JSON.parse(JSON.stringify(type));    // clone type.
-                                                        typeItem.isApp = row.isApp;
-                                                        typeItem.id = row.id;
-                                                        typeItem.ordinal = row.ordinal;
-                                                        typeItem.name = row.name;
-                                                        typeItem.imageResourceId = row.imageResourceId;
-                                                        var code = JSON.parse(row.jsonCode);
-                                                        typeItem.properties = code.properties;
-                                                        typeItem.methods = code.methods;
-                                                        typeItem.events = code.events;
-                                                        typeItem.dependencies = code.dependencies;
-                                                        typeItem.tags = m_functionFetchTags(typeItem.id, "type", req.body.userName, function(tags){
-
-                                                            typeItem.tags = tags;
-                                                            
-                                                            comicItem.types.items.push(typeItem);
-                                                        });
-                                                    });
-                                                },
-                                                function(strError){
-
-                                                    res.json({
-                                                        success: false,
-                                                        message: strError
-                                                    });
-                                                    return;
-                                                }
-                                            );
-                                            if (exceptionRet) {
-
-                                                res.json({
-                                                    success: false,
-                                                    message: exceptionRet.message
-                                                });
-                                                return;
-                                            }
-                                        });
-                                        project.comics.items.push(comicItem);
-                                    });
-
-                                    res.json({
-                                        success: true,
-                                        project: project
-                                    });
-                                },
-                                function(strError){
+                                if (rows.length !== 1) {
 
                                     res.json({
                                         success: false,
-                                        message: strError
+                                        message: 'Could not retrieve project from database.'
                                     });
-                                    return;
+                                } else {
+
+                                    project.name = rows[0].name;
+                                    project.id = rows[0].id;
+                                    project.description = rows[0].description;
+                                    project.imageResourceId = rows[0].imageResourceId;
+                                    project.price = rows[0].price;
+                                    project.isTemplate = rows[0].isTemplate;
+                                    project.createdByUserId = rows[0].createdByUserId;
+                                    project.isDirty = false;
+                                    m_functionFetchTags(project.id, 3, req.body.userName, function(tags){
+
+                                        project.tags = tags;
+
+                                        // Now comics.
+                                        exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.id + " order by ordinal asc;",
+                                            function(rows){
+
+                                                rows.forEach(function(row) {
+
+                                                    var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
+                                                    comicItem.imageResourceId = row.imageResourceId;
+                                                    comicItem.id = row.id;
+                                                    // comicItem.name = row.name;   don't have in db yet.
+                                                    comicItem.ordinal = row.ordinal;
+                                                    m_functionFetchTags(comicItem.id, 4, req.body.userName, function(tags){
+
+                                                        comicItem.tags = tags;
+
+                                                        // Now types.
+                                                        exceptionRet = sql.execute("select * from " + self.dbname + "types where comicId=" + comicItem.id + " order by ordinal asc;",
+                                                            function(rows){
+
+                                                                rows.forEach(function(row) {
+
+                                                                    var typeItem = JSON.parse(JSON.stringify(type));    // clone type.
+                                                                    typeItem.isApp = row.isApp;
+                                                                    typeItem.id = row.id;
+                                                                    typeItem.ordinal = row.ordinal;
+                                                                    typeItem.name = row.name;
+                                                                    typeItem.imageResourceId = row.imageResourceId;
+                                                                    var code = JSON.parse(row.jsonCode);
+                                                                    typeItem.properties = code.properties;
+                                                                    typeItem.methods = code.methods;
+                                                                    typeItem.events = code.events;
+                                                                    typeItem.dependencies = code.dependencies;
+                                                                    typeItem.tags = m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
+
+                                                                        typeItem.tags = tags;
+                                                                        
+                                                                        comicItem.types.items.push(typeItem);
+
+                                                                        if (--typesCtr === 0) {
+
+                                                                            res.json({
+                                                                                success: true,
+                                                                                project: project
+                                                                            });
+                                                                            return;
+                                                                        }
+                                                                    });
+                                                                });
+                                                            },
+                                                            function(strError){
+
+                                                                res.json({
+                                                                    success: false,
+                                                                    message: strError
+                                                                });
+                                                                return;
+                                                            }
+                                                        );
+                                                        if (exceptionRet) {
+
+                                                            res.json({
+                                                                success: false,
+                                                                message: exceptionRet.message
+                                                            });
+                                                            return;
+                                                        }
+                                                    });
+                                                    project.comics.items.push(comicItem);
+                                                });
+                                            },
+                                            function(strError){
+
+                                                res.json({
+                                                    success: false,
+                                                    message: strError
+                                                });
+                                                return;
+                                            }
+                                        );
+                                        if (exceptionRet) {
+
+                                            res.json({
+                                                success: false,
+                                                message: exceptionRet.message
+                                            });
+                                            return;
+                                        }
+                                    });
                                 }
-                            );
-                            if (exceptionRet) {
+                            },
+                            function(strError){
 
                                 res.json({
                                     success: false,
-                                    message: exceptionRet.message
+                                    message: strError
                                 });
-                                return;
                             }
-                        });
+                        );
+                        if (exceptionRet) {
 
+                            res.json({
+                                success: false,
+                                message: exceptionRet.message
+                            });
+                        }
                     }
                 },
                 function(strError){
@@ -225,13 +258,14 @@ module.exports = function ResourceBO(app, sql, logger) {
                     });
                 }
             );
-            if (exceptionRet) {
+            if (ex) {
 
                 res.json({
                     success: false,
-                    message: exceptionRet.message
+                    message: ex.message
                 });
             }
+
         } catch(e) {
 
             res.json({
@@ -241,22 +275,25 @@ module.exports = function ResourceBO(app, sql, logger) {
         }
     }
 
-    var m_functionFetchTags = function(thingId, thingType, userName, callback) {
+    var m_functionFetchTags = function(thingId, resourceTypeId, userName, callback) {
 
         try {
 
             // Retireve and set project.tags, skipping "project" and req.body.userName.
-            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + ";",
+            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
                 function(rows){
 
                     var tags = "";
-                    rows.forEach(function(row) {
+                    if (rows.length > 0) {
 
-                        if (row.description !== thingType && row.description !== userName) {    // Add filtering out all valid e-mail addresses (in case e-mail addresses are used as userNames in the future).
+                        rows.forEach(function(row) {
 
-                            tags += row.description + ' ';
-                        }
-                    });
+                            if (row.description !== m_resourceTypes[resourceTypeId] && row.description !== userName) {    // Add filtering out all valid e-mail addresses (in case e-mail addresses are used as userNames in the future).
+
+                                tags += row.description + ' ';
+                            }
+                        });
+                    }
 
                     callback(tags);
                     return;
