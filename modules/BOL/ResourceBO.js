@@ -85,7 +85,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             {
                 imageResourceId: 0,
                 id: 0,
-                name: 'default',
+                name: '',
                 tags: '',
                 ordinal: 0,
                 types: {
@@ -103,7 +103,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 methods: [{ name: "initialize", workspace: "", method: "" }],
                 events: [],
                 dependencies: [],
-                name: "app",
+                name: "",
                 imageResourceId: 0
             };
 
@@ -152,7 +152,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                     var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
                                                     comicItem.imageResourceId = row.imageResourceId;
                                                     comicItem.id = row.id;
-                                                    // comicItem.name = row.name;   don't have in db yet.
+                                                    comicItem.name = row.name;
                                                     comicItem.ordinal = row.ordinal;
                                                     m_functionFetchTags(comicItem.id, 4, req.body.userName, function(tags){
 

@@ -107,6 +107,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 							// Wire buttons.
 							$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
+							$("#ISSearchInput").focus();
 
 							// Attach the region to the DOM.
 							m_scISImageStrip = new ScrollRegion();

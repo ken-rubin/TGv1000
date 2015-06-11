@@ -114,6 +114,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						    $("#ISSaveBtn").click(m_functionSaveInternetResource);
 						    $("#ISResetBtn").click(m_functionReset);
 
+						    $("#URLInput").focus();
+
 						} catch (e) {
 
 							errorHelper.show(e.message);

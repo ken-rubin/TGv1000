@@ -311,6 +311,15 @@ begin
 		set @dbstate := 18.0;
     end if;
     
+	if @dbstate = 18.0 then
+    
+		ALTER TABLE `TGv1000`.`comics` 
+			ADD COLUMN `name` VARCHAR(255) NOT NULL DEFAULT '' AFTER `imageResourceId`;
+
+		UPDATE `TGv1000`.`control` set dbstate=19.0 where id=1;
+		set @dbstate := 19.0;
+    end if;
+    
 end;
 
 //

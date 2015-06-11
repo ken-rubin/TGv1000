@@ -13,7 +13,6 @@ Ken
 Jerry
 
 - Search for project: Not sure if my scrollregion-filling query is totally correct. Especially check the effects of the checkboxes.
-- Note: comic has no name in the db. Worry about this when we address multiple comics and/or comic creation/editing.
 - Finish Save Project now that Save As works well--once Save Project BO is done.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
@@ -25,6 +24,7 @@ Jerry
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
 - Review setting of tags: are we always adding resource type description and userName? Where?
+
 
 
 To discuss
