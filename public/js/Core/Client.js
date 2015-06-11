@@ -124,7 +124,7 @@ define(["Core/errorHelper",
 							var posting = $.post("/BOL/ResourceBO/RetrieveProject", 
 								{
 									projectId: iProjectId,
-									userId: self.getTGCookie("userId"),
+									userName: self.getTGCookie("userName")	// for tag elimination
 								},
 								'json');
 							posting.done(function(data){

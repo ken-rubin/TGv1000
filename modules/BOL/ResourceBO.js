@@ -57,50 +57,129 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             console.log("Entered ResourceBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
-            // req.body.userId          just for the fakeout
+            // req.body.userName
 
             // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
-            // read all types with matching comicId. And return project: json.
+            // read all types with matching comicId. And return the project javascript object.
 
-            // For now, a total fakeout:
-
-            res.json({
-                success: true,
-                project: {
-                            name: 'Fake project',
-                            id: req.body.projectId,
-                            description: 'Fake description',
-                            tags: 'a b c',
-                            imageResourceId: 0,
-                            price: 0,
-                            isTemplate: 0,
-                            createdByUserId: req.body.userId,
-                            isDirty: 1,
-                            comics: {
-                                items: [{
-                                    imageResourceId: 0,
-                                    id: 0,
-                                    name: 'default',
-                                    tags: 'd e f',
-                                    ordinal: 0,
-                                    types: {
-                                        items: [{
-                                            isApp: true,
-                                            id: 0,
-                                            ordinal: 0,
-                                            tags: 'g h i',
-                                            properties: [],
-                                            methods: [{ name: "initialize", workspace: "", method: "" }],
-                                            events: [],
-                                            dependencies: [],
-                                            name: "app",
-                                            imageResourceId: 0
-                                        }]
-                                    }
-                                }]
-                            }
+            // res.json({
+            //     success: true,
+            var project = 
+            {
+                name: 'Fake project',
+                id: req.body.projectId,
+                description: 'Fake description',
+                tags: 'a b c',
+                imageResourceId: 0,
+                price: 0,
+                isTemplate: 0,
+                createdByUserId: req.body.userId,
+                isDirty: 1,
+                comics: 
+                {
+                    items: []
                 }
-            });
+            };
+
+            var comicItem = 
+            {
+                imageResourceId: 0,
+                id: 0,
+                name: 'default',
+                tags: 'd e f',
+                ordinal: 0,
+                types: {
+                    items: []
+                }
+            };
+
+            var typeItem =
+            {
+                isApp: true,
+                id: 0,
+                ordinal: 0,
+                tags: 'g h i',
+                properties: [],
+                methods: [{ name: "initialize", workspace: "", method: "" }],
+                events: [],
+                dependencies: [],
+                name: "app",
+                imageResourceId: 0
+            };
+
+            var exceptionRet = sql.execute("select * from projects where id=req.body.projectId;",
+                function(rows){
+
+                    if (rows.length !== 1) {
+
+                        res.json({
+                            success: false,
+                            message: 'Could not retrieve project from database.'
+                        });
+                    } else {
+
+                        project.name = rows[0].name;
+                        project.id = rows[0].id;
+                        project.description = rows[0].description;
+                        project.imageResourceId = rows[0].imageResourceId;
+                        project.price = rows[0].price;
+                        project.isTemplate = rows[0].isTemplate;
+                        project.createdByUserId = rows[0].createdByUserId;
+                        project.isDirty = false;
+
+                        // Retireve and set project.tags, skipping "project" and req.body.userName.
+                        exceptionRet = sql.execute("select t.description from resources r inner join resources_tags rt on r.id=rt.resourceId inner join tags t on t.id=rt.tagId where r.optnlFK=project.id;",
+                            function(rows){
+
+                                project.tags = "";
+                                rows.forEach(row) {
+
+                                    if (row.description !== 'project' && row.description !== req.body.userName) {
+
+                                        project.tags += row.description + ' ';
+                                    }
+                                }
+                                // tags are done
+
+                                // Now comics.
+                                exceptionRet = sql.execute("select * from comics where projectId=project.id order by ordinal asc;",
+                                    function(rows){
+
+                                    },
+                                    function(strError){
+
+                                        res.json({
+                                            success: false,
+                                            message: strError
+                                        });
+                                    }
+                                );
+                            },
+                            function(strError){
+
+                                res.json({
+                                    success: false,
+                                    message: strError
+                                });
+                            }
+                        );
+                    }
+                },
+                function(strError){
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
     }
 
     self.routeSaveProject = function (req, res) {
