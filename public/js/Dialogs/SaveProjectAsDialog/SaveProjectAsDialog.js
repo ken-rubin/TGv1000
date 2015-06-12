@@ -71,11 +71,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            		id: "SaveProjectBtn",
 					            		label: "Save Project",
 					            		cssClass: "btn-primary"
-					            		// ,
-					            		// action: function(){
-
-					            		// 	m_functionCreateProject();
-					            		// }
 					            	},
 					            	{
 						                label: "Close",

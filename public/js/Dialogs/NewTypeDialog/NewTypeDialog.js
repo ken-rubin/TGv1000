@@ -67,7 +67,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Project",
+					            		label: "Create Type",
+					            		id: 'CreateTypeBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
@@ -106,11 +107,39 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 							$("#TypeName").focus();
 
+							$("#TypeName").blur(m_functionBlurTypeName);
+							$("#TypeTags").blur(m_functionBlurTypeTags);
+
+							m_setStateCreateBtn();
+
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionBlurTypeName = function() {
+
+							m_setStateCreateBtn();
+					}
+
+					var m_functionBlurTypeTags = function() {
+
+							m_setStateCreateBtn();
+					}
+
+					var m_setStateCreateBtn = function() {
+
+						var nameStatus = $("#TypeName").val().trim().length > 0;
+						var tagStatus = $("#TypeTags").val().trim().length > 0;
+						var imgStatus = m_imageResourceId > 0;
+
+						if (!nameStatus || !tagStatus || !imgStatus) {
+							$("#CreateTypeBtn").addClass("disabled");
+						} else {
+							$("#CreateTypeBtn").removeClass("disabled");
+						}
+					}
 
 					var m_functionCreateType = function () {
 
@@ -197,6 +226,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						m_imageResourceId = imageResourceId;
 						$("#TypeImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						m_setStateCreateBtn();
 					}
 				} catch (e) {
 
@@ -208,8 +238,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_comicName = '';
-				var m_comicTags = '';
 				var m_imageResourceId = 0;
 			};
 

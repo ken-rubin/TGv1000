@@ -7,30 +7,30 @@ Ken
 - Review code
 - Navbar menu highlight color
 - Now that's there's no more huge + button in the TypeStrip, remove the offset to the left of the first Type.
-- Get ScrollRegion2 tooltip to work (better?). There's something that works now, but it doesn't make sense. Look at it and adjust. The latest: even though I see a tooltip when searching for a Project or a Project image,
--   I don't see a tooltip when I search for a Type image. Probably because it's not open over another dialog. I'm tired of tooltips. They're yours. Oh yeah: I don't display an empty description if it's "".
+- Get ScrollRegion2 tooltip to position better. There's something that works now, but it doesn't make sense. Look at it and adjust. Also, even though I see a tooltip when searching for a Project or a Project image,
+-   I don't see a tooltip when I search for a Type image. Probably because it's not open over another dialog. I'm tired of tooltips. They're yours. Oh yeah: I don't display an empty description if it's "". And I
+-   now don't display any tooltip for images. I decided images don't need names, since the user is looking at the image and can identify it that way.
 
 Jerry
 
-- Search for project: Not sure if my scrollregion-filling query is totally correct. Especially check the effects of the checkboxes.
-- Finish Save Project now that Save As works well--once Save Project BO is done.
+- Not sure if my scrollregion-filling query in Search for/Open Project is totally correct. Especially check the effects of the checkboxes. And check Search for/Open Type while you're at it.
+- Finish Save Project.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
 - Implement Change Comic image on context menu (not doing add new comic for now).
-- Do New Type and Search for Type dialogs.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
 - Review setting of tags: are we always adding resource type description and userName? Where?
-
+- Show at least the current project name someplace--the image, too, if possible
+- Test New Type and Search for Type dialogs.
 
 
 To discuss
 
-- Also we need a name for images, since the tooltip is N###.
-- Does image search need a "my own only" checkbox?
+- Does image search need a "my own only" checkbox? Even if not, would it be useful?
 - Every comic needs >=1 type (don't think that's a problem). 
 - If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 
