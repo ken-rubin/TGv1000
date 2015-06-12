@@ -164,7 +164,21 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showTypeSearchDialog();
+									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
+
+										if (iTypeId > 0) {
+
+											exceptionRet = client.addTypeToProjectFromDB(iTypeId);
+
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+										} else {
+
+											throw new Error("Invalid project id returned.")
+										}
+									});
 									if (exceptionRet) {
 
 										throw exceptionRet;
@@ -231,11 +245,17 @@ define(["Core/errorHelper"],
 						m_functionDisable("SaveProjectAs");
 						m_functionDisable("QuickSaveProject");
 						m_functionDisable("CloseProject");
+						m_functionDisable("NewType");
+						m_functionDisable("TypeSearch");
 
 						if (project !== null) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
+
+							// Any open project can have types added
+							m_functionEnable("NewType");
+							m_functionEnable("TypeSearch");
 
 							// See definition of status in Project.js method self.getStatus(). Of course.
 							var status = project.getStatus();

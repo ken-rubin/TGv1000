@@ -230,16 +230,53 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showTypeSearchDialog = function () {
+					self.showTypeSearchDialog = function (functionOK) {
 
 						try {
 
 							m_openDialog = new TypeSearchDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create(functionOK);
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addTypeToProjectFromDB = function (iTypeId) {
+
+						try {
+
+							var posting = $.post("/BOL/ResourceBO/RetrieveType", 
+								{
+									typeId: iTypeId,
+									userName: self.getTGCookie("userName")	// for tag elimination
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									var exceptionRet = m_project.addType(data.type);
+									if (exceptionRet) {
+
+										return exceptionRet;
+									}
+
+									return null;
+
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
 
 							return null;
 

@@ -78,7 +78,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 							// the TypesDialog jade HTML-snippet.
 							m_dialog = BootstrapDialog.show({
 
-								title: "Open/Search for Project",
+								title: "Search for/Open Project",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [{

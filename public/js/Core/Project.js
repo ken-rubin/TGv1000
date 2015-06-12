@@ -41,6 +41,30 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
+					self.addType(type) {
+
+						try {
+
+
+
+
+
+
+
+
+
+
+
+
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					// Make like there's no project, because there soon won't be.
 					// It's meant to be the opposite of self.load.
 					self.unload = function () {

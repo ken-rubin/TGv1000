@@ -53,14 +53,32 @@ module.exports = function ResourceBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+    self.routeRetrieveType = function (req, res) {
+
+        console.log("Entered ResourceBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
+        // req.body.typeId
+        // req.body.userName
+
+        try{
+
+
+        } catch(e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeRetrieveProject = function (req, res) {
 
-            console.log("Entered ResourceBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
-            // req.body.projectId
-            // req.body.userName
+        console.log("Entered ResourceBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+        // req.body.projectId
+        // req.body.userName
 
-            // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
-            // read all types with matching comicId. And return the project javascript object.
+        // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
+        // read all types with matching comicId. And return the project javascript object.
 
         try{
 

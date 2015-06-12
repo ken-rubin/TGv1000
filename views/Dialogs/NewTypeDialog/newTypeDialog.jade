@@ -1,16 +1,45 @@
-//- Jade DOM for the New Type dialog. 
+//- Jade DOM for the New Project dialog. 
 //-
 .well
   .row
     .col-xs-12
       h4 
-        | Words
-      br
-
+        | A TechGroms project has a <em>name</em>, an identifying <em>image</em> and a number of <em>tags</em> that will help you or others search for it later.
+        | You may also enter a longer description of your project.
+      h5
+        | You may enter them now or you may wait until you've started working on the project and understand what it does.
   .row
     .col-xs-12
-          br
+        .col-xs-2
+            label.control-label(for="ProjectName", style="margin-top:6px;") Name
+        .col-xs-4
+            input.form-control#ProjectName(type="text", placeholder="Enter project name.")
+        br
+        br
+        .col-xs-2
+            label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
+        .col-xs-10
+            textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
+        br
+        br
+        br
+        .col-xs-2
+            label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
+        .col-xs-10
+            textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this project later.")
   .row
+    br
     .col-xs-12
-          br
-          .well#NewTypeWell
+      .col-xs-2
+        label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
+      .col-xs-2
+        img#ProjectImage.pull-left(style="height:120px;width=120px;")
+      .col-xs-8
+        br
+        a#ImageSearchLink(href="#") Search for a Project Image
+        br
+        br
+        a#NewImageURLLink(href="#") Load a new Project Image using a URL
+        br
+        br
+        a#NewImageDiskLink(href="#") Load a new Project Image that's already on your computer

@@ -1,16 +1,20 @@
-//- Jade DOM for the Type Search dialog. 
-//-
 .well
   .row
-    .col-xs-12
-      h4 
-        | Words
+    | Enter a search string.  We'll try to find the Type you're looking for.
+    br
+    .row
       br
+      .col-xs-2
+        label.control-label(for="ISSearchInput", style="margin-top:8px;") Search string
+      .col-xs-6
+        input.form-control#ISSearchInput(type="text", placeholder="type your set of tags to match here")
+      .col-xs-4
+        button.btn.btn-info#ISInnerSearchButton Search
+    br
+    .well#ISWellMsg(style="display:none;")
 
-  .row
-    .col-xs-12
-          br
-  .row
-    .col-xs-12
-          br
-          .well#TypeSearchWell
+    //- Define a scrollable row.
+    .col-xs-12#IStoolstriprow
+
+      //- Scrollable region.
+      #IStoolstrip.ScrollRegion
