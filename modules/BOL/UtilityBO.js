@@ -23,7 +23,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.body.userId
             // req.body.userName
-            // req.body.resourceTypeId  Currently handle 1, 3; 2 needs a little work; 4, 5 need full work.
+            // req.body.resourceTypeId  Currently handle 1, 3, 5; 2 needs a little work; 4 needs full work.
             // req.body.onlyCreatedByUser   0 or 1
             // req.body.includeTemplates    0 or 1 Applies only to projects (resourceTypeId=3)
 
@@ -69,7 +69,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         var strFirstCondition = "(r.createdByUserId=" + req.body.userId + " or r.public=1) and ";
 
-                        if (req.body.resourceTypeId === '3') {
+                        if (req.body.resourceTypeId >= '3') {
 
                             if (req.body.onlyCreatedByUser === "1") {
 
@@ -88,10 +88,15 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 strFirstCondition = "(p.template=1) and ";
                             }
 
-                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            if (req.body.resourceTypeId === "3") {
 
+                                sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+
+                            } else if (req.body.resourceTypeId === "5") {
+
+                                sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optnlFK=p.id where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            }
                         } else {
-
 
                             sqlString = "select r.* from " + self.dbname + "resources r where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
                         }

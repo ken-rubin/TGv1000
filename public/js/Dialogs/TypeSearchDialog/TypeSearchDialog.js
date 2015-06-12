@@ -170,8 +170,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        		userId: strUserId,
 					        		userName: strUserName,
 					        		resourceTypeId: 5,
-					        		onlyCreatedByUser: 0,
-					        		includeTemplates: 0
+					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0,
+					        		includeTemplates: 0	// used only in project searches
 					        	},
 					        	'json');
 					        posting.done(function(data){

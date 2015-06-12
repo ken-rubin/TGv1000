@@ -1,45 +1,38 @@
-//- Jade DOM for the New Project dialog. 
+//- Jade DOM for the New Type dialog. 
 //-
 .well
   .row
     .col-xs-12
       h4 
-        | A TechGroms project has a <em>name</em>, an identifying <em>image</em> and a number of <em>tags</em> that will help you or others search for it later.
-        | You may also enter a longer description of your project.
+        | A TechGroms Type has a <em>name</em> and a number of <em>tags</em> that will help you or others search for it later.
+        | If you create a Type, it will be added to the currently active Comic.
       h5
-        | You may enter them now or you may wait until you've started working on the project and understand what it does.
+        | You may enter them now or you may wait until you've started working on the Type and understand what it does.
   .row
     .col-xs-12
         .col-xs-2
-            label.control-label(for="ProjectName", style="margin-top:6px;") Name
+            label.control-label(for="TypeName", style="margin-top:6px;") Name
         .col-xs-4
-            input.form-control#ProjectName(type="text", placeholder="Enter project name.")
+            input.form-control#TypeName(type="text", placeholder="Enter Type name.")
         br
         br
         .col-xs-2
-            label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
+            label.control-label(for="TypeTags", style="margin-top:6px;") Search tags
         .col-xs-10
-            textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
-        br
-        br
-        br
-        .col-xs-2
-            label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
-        .col-xs-10
-            textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this project later.")
+            textarea#TypeTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this Type later.")
   .row
     br
     .col-xs-12
       .col-xs-2
-        label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
+        label.control-label(for="TypeImage", style="margin-top:6px;")  Type image
       .col-xs-2
-        img#ProjectImage.pull-left(style="height:120px;width=120px;")
+        img#TypeImage.pull-left(style="height:120px;width=120px;")
       .col-xs-8
         br
-        a#ImageSearchLink(href="#") Search for a Project Image
+        a#ImageSearchLink(href="#") Search for a Type Image
         br
         br
-        a#NewImageURLLink(href="#") Load a new Project Image using a URL
+        a#NewImageURLLink(href="#") Load a new Type Image using a URL
         br
         br
-        a#NewImageDiskLink(href="#") Load a new Project Image that's already on your computer
+        a#NewImageDiskLink(href="#") Load a new Type Image that's already on your computer

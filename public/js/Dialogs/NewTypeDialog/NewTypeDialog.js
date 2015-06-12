@@ -1,5 +1,5 @@
 ////////////////////////////////////
-// NewProjectDialog module.
+// NewTypeDialog module.
 // 
 // Return constructor function.
 //
@@ -10,8 +10,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 		try {
 
-			// Define the NewProjectDialog constructor function.
-			var functionNewProjectDialog = function () {
+			// Define the NewTypeDialog constructor function.
+			var functionNewTypeDialog = function () {
 
 				try {
 
@@ -31,7 +31,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								cache: false,
 								data: { 
 
-									templateFile: "Dialogs/NewProjectDialog/newProjectDialog"
+									templateFile: "Dialogs/NewTypeDialog/newTypeDialog"
 								}, 
 								dataType: "HTML",
 								method: "POST",
@@ -62,7 +62,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "New Project",
+								title: "New Type",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -71,7 +71,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionCreateProject();
+					            			m_functionCreateType();
 					            		}
 					            	},
 					            	{
@@ -104,7 +104,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
-							$("#ProjectName").focus();
+							$("#TypeName").focus();
 
 						} catch (e) {
 
@@ -112,49 +112,27 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					var m_functionCreateProject = function () {
+					var m_functionCreateType = function () {
 
 						try {
 
-							// Create minimal project based on the new project dialog's fields--or lack thereof.
+							// Create minimal Type based on the dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
-							var project = 
+							var type = 
 							{
-								name: $("#ProjectName").val() || '',
+								isApp: false,
 								id: 0,
-								description: $("#ProjectDescription").val() || '',
-								tags: $("#ProjectTags").val() || '',
-								imageResourceId: m_imageResourceId,
-								price: 0,
-								isTemplate: 0,
-								createdByUserId: client.getTGCookie('userId'),
-								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0 || m_imageResourceId > 0,
-								comics: {
-									items: [{
-										imageResourceId: 0,
-										id: 0,
-										name: 'default',
-										tags: 'tagComic',
-										ordinal: 0,
-										types: {
-											items: [{
-												isApp: true,
-												id: 0,
-												ordinal: 0,
-												tags: 'tagType',
-												properties: [],
-												methods: [{ name: "initialize", workspace: "", method: "" }],
-												events: [],
-												dependencies: [],
-												name: "app",
-												imageResourceId: 0
-											}]
-										}
-									}]
-								}
+								ordinal: client.getNumberOfTypesInActiveComic(),
+								tags: $("#TypeTags").val() || "",
+								properties: [],
+								methods: [{ name: "initialize", workspace: "", method: "" }],
+								events: [],
+								dependencies: [],
+								name: $("#TypeName").val() || "",
+								imageResourceId: 0
 							};
 
-							var exceptionRet = client.functionNewProject(project);
+							var exceptionRet = client.addTypeToProject(type);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -218,7 +196,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionSetImageSrc = function (imageResourceId) {
 
 						m_imageResourceId = imageResourceId;
-						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						$("#TypeImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
 					}
 				} catch (e) {
 
@@ -236,7 +214,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 			};
 
 			// Return the constructor function as the module object.
-			return functionNewProjectDialog;
+			return functionNewTypeDialog;
 
 		} catch (e) {
 

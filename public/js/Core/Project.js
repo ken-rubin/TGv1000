@@ -41,7 +41,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
-					self.addType(type) {
+					self.addType = function(type) {
 
 						try {
 

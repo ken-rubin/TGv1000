@@ -263,13 +263,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var exceptionRet = m_project.addType(data.type);
-									if (exceptionRet) {
-
-										return exceptionRet;
-									}
-
-									return null;
+									return m_project.addType(data.type);
 
 								} else {
 
@@ -279,6 +273,18 @@ define(["Core/errorHelper",
 							});
 
 							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addTypeToProject = function(type) {
+
+						try {
+
+							return m_project.addType(type);
 
 						} catch (e) {
 
