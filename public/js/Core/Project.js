@@ -45,19 +45,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-
-
-
-
-
-
-
-
-
-
-
-
-							return null;
+							return comics.addTypeToActiveComic(type);
 
 						} catch (e) {
 

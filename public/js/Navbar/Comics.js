@@ -60,7 +60,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 							// And the collection....
 							m_arrayComics = [];
 
-							// Add N test items.
 							for (var i = 0; i < objectData.items.length; i++) {
 
 								// Get the ith comic.
@@ -168,6 +167,18 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 							return e;
 						}
 					};
+
+					self.addTypeToActiveComic = function(type) {
+
+						try {
+
+							return m_comicActive.addType(type);
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					///////////////////////////////////
 					// Private fields.

@@ -84,6 +84,18 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
+					self.addType = function(type) {
+
+						try {
+
+							return self.data.types.addItem(type);
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Return the DOM element representing a prototypical comic item.
 					self.generateDOM = function () {
 
@@ -101,6 +113,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 			// Return constructor function.
 			return functionConstructor;
+
 		} catch (e) {
 
 			errorHelper.show(e);

@@ -59,9 +59,71 @@ module.exports = function ResourceBO(app, sql, logger) {
         // req.body.typeId
         // req.body.userName
 
-        try{
+        try {
 
+            var type =
+            {
+                isApp: true,
+                id: 0,
+                ordinal: 0,
+                tags: '',
+                properties: [],
+                methods: [{ name: "initialize", workspace: "", method: "" }],
+                events: [],
+                dependencies: [],
+                name: "",
+                imageResourceId: 0
+            };
 
+            var exceptionRet = sql.execute("select * from " + self.dbname + "types where typeId=" + req.body.typeId+ ";",
+                function(rows){
+
+                    if (rows.length !== 1) {
+
+                        res.json({
+                            success: false,
+                            message: 'Could not retrieve type from database.'
+                        });
+                    } else {
+
+                        type.isApp = row.isApp;
+                        type.id = row.id;
+                        type.ordinal = row.ordinal;
+                        type.name = row.name;
+                        type.imageResourceId = row.imageResourceId;
+                        var code = JSON.parse(row.jsonCode);
+                        type.properties = code.properties;
+                        type.methods = code.methods;
+                        type.events = code.events;
+                        type.dependencies = code.dependencies;
+                        m_functionFetchTags(type.id, 5, req.body.userName, function(tags){
+
+                            type.tags = tags;
+
+                            res.json({
+                                success: true,
+                                type: type
+                            });
+                        });
+                    }
+                },
+                function(strError){
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                    return;
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+                return;
+            }
         } catch(e) {
 
             res.json({
@@ -193,7 +255,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                                                     typeItem.methods = code.methods;
                                                                     typeItem.events = code.events;
                                                                     typeItem.dependencies = code.dependencies;
-                                                                    typeItem.tags = m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
+                                                                    m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
 
                                                                         typeItem.tags = tags;
                                                                         
