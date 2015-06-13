@@ -31,7 +31,7 @@ Jerry
 To discuss
 
 - Does image search need a "my own only" checkbox? Even if not, would it be useful?
-- Every comic needs >=1 type (don't think that's a problem). 
+- Every comic needs >=1 type (don't think that's a problem--every comic gets an type named 'app'). 
 - If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
 
 

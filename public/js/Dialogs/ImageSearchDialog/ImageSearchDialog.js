@@ -137,34 +137,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					// Invoked (presumably) after user has entered tags and clicks Search.
 					var m_functionSearchBtnClicked = function () {
 
-					    var tags = $("#ISSearchInput").val().toLowerCase();
-
-					    var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
-
-				        var foundImage = false;
-				        if (ccArray) {
-
-				            for (var i = 0; i < ccArray.length; i++){
-
-				                if (ccArray[i] === 'image')
-				                    foundImage = true;
-				            }
-				        }
-				        if (!foundImage) {
-				        	
-				            tags = tags + " image";
-				        }
-
-					    ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
-
-					    // if (!ccArray) {
-
-					    //     m_wellMessage('You must enter one or more tags.', null);
-					    //     return;
-					    // }
-
 					    try {
 
+						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
 						    var strUserId = client.getTGCookie("userId");
 						    var strUserName = client.getTGCookie("userName");
 					        var posting = $.post("/BOL/UtilityBO/Search", 
@@ -173,7 +148,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        		userId: strUserId,
 					        		userName: strUserName,
 					        		resourceTypeId: 1,
-					        		onlyCreatedByUser: 0,
+					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0,
 					        		includeTemplates: 0
 					        	},
 					        	'json');

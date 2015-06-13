@@ -9,7 +9,43 @@ module.exports = function UtilityBO(app, sql, logger) {
 
     var self = this;                // Über closure.
 
+    // Private fields
+    var m_resourceTypes = ['0-unused'];
+
     self.dbname = app.get("dbname");
+    
+    // Fill m_resourceTypes from database.
+    try {
+
+        var exceptionRet = sql.execute("select * from " + self.dbname + "resourceTypes order by id asc",
+            function(rows) {
+
+                if (rows.length === 0) {
+
+                    throw new Error('Failed to read resource types from database. Cannot proceed.');
+
+                } else {
+
+                    for (var i = 0; i < rows.length; i++) {
+
+                        m_resourceTypes.push(rows[i].description);
+                    }
+                }
+            },
+            function (strError) {
+
+                throw new Error("Received error reading resource types from database. Cannot proceed. " + strError);
+
+            });
+        if (exceptionRet) {
+
+            throw exceptionRet;
+        }
+
+    } catch (e) {
+
+        throw e;
+    }
     
     ////////////////////////////////////
     // Public methods
@@ -27,7 +63,17 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.onlyCreatedByUser   0 or 1
             // req.body.includeTemplates    0 or 1 Applies only to projects (resourceTypeId=3)
 
-            var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g); // guaranteed to have some tags
+            // Add resource type description to the tags the user (may have) entered.
+            var tags = req.body.tags + " " + m_resourceTypes[req.body.resourceTypeId];
+
+            // If we're retrieving only items created by user, add userName to tags.
+            if (req.body.onlyCreatedByUser === "1") {
+
+                tags += " " + req.body.userName;
+            }
+
+            // Turn tags into string with commas between tags and tags surrounded by single quotes.
+            var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g);
 
             var ccString = '';
             for (var i = 0; i < ccArray.length; i++) {
@@ -41,12 +87,11 @@ module.exports = function UtilityBO(app, sql, logger) {
             }
 
             var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-            console.log(sqlString);
-            // We have to get the same number of rows back from the query as ccArray.length.
 
             var exceptionRet = sql.execute(sqlString,
                 function (arrayRows) {
                 
+                    // We have to get the same number of rows back from the query as ccArray.length.
                     if (arrayRows.length !== ccArray.length) {
 
                         // Success as far as the function is concerned but no result array
@@ -64,44 +109,32 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                                 idString = idString + ',';
                             }
+
                             idString = idString + arrayRows[i].id.toString();
                         }
 
-                        var strFirstCondition = "(r.createdByUserId=" + req.body.userId + " or r.public=1) and ";
+                        // For non-project retrievals (resourceTypeId = 1, 2, 5) there's only one case. Total
+                        // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
+                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works even if req.body.onlyCreatedByUser, because of the userName match requirement.
 
-                        if (req.body.resourceTypeId >= '3') {
+                        // For project retrievals we want to retrieve all projects just as described above PLUS some number of projects that are Templates.
+                        // For now we're going to retrieve all teamplate projects, but this is going to have to be defined better at some point in the future.
 
-                            if (req.body.onlyCreatedByUser === "1") {
+                        if (req.body.resourceTypeId !== "3") {  // Non-projects.
 
-                                strFirstCondition += "(p.createdByUserId=" + req.body.userId;
+                            sqlString = "select r.* from " + self.dbname + "resources r where " + "(r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
 
-                                if (req.body.includeTemplates === "1") {
-
-                                    strFirstCondition += " or p.template=1) and ";
-                                
-                                } else {
-
-                                    strFirstCondition += ") and ";
-                                }
-                            } else if (req.body.includeTemplates === "1") {
-
-                                strFirstCondition = "(p.template=1) and ";
-                            }
-
-                            if (req.body.resourceTypeId === "3") {
-
-                                sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
-
-                            } else if (req.body.resourceTypeId === "5") {
-
-                                sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optnlFK=p.id where " + strFirstCondition + "r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
-                            }
                         } else {
 
-                            sqlString = "select r.* from " + self.dbname + "resources r where " + strFirstCondition + "id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                            // Totally different retrieval for projects.
+                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where " + "(r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+
+                            // Need to add union if templates are required.
                         }
 
+                        console.log(' ');
                         console.log('Query: ' + sqlString);
+                        console.log(' ');
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
                                 res.json({

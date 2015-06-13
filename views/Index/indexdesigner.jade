@@ -21,14 +21,9 @@
     //- Define a scrollable row.
     .col-xs-12#toolstriprow
 
-      //- Left controller.
-      .leftcontroller(data-targetselector="#toolstrip")
-
       //- Scrollable region.
-      #toolstrip
+      #toolstrip.ScrollRegion
 
-      //- Right controller.
-      .rightcontroller(data-targetselector="#toolstrip")
 ul#DesignerContextMenu.dropdown-menu(role="menu",style="display:none")
   li
     a(tabindex="-1")

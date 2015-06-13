@@ -42,6 +42,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 							// Attach scrollableregion.
 							m_srToolStrip = new ScrollRegion();
 							return m_srToolStrip.attach(self.rowSelector);
+							
 						} catch (e) {
 
 							return e;
