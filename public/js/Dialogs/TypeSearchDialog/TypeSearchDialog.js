@@ -145,8 +145,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        		userId: strUserId,
 					        		userName: strUserName,
 					        		resourceTypeId: 5,
-					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0,
-					        		includeTemplates: 0	// used only in project searches
+					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},
 					        	'json');
 					        posting.done(function(data){

@@ -59,9 +59,8 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.body.userId
             // req.body.userName
-            // req.body.resourceTypeId  Currently handle 1, 3, 5; 2 needs a little work; 4 needs full work.
+            // req.body.resourceTypeId  1-5
             // req.body.onlyCreatedByUser   0 or 1
-            // req.body.includeTemplates    0 or 1 Applies only to projects (resourceTypeId=3)
 
             // Add resource type description to the tags the user (may have) entered.
             var tags = req.body.tags + " " + m_resourceTypes[req.body.resourceTypeId];
@@ -71,6 +70,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                 tags += " " + req.body.userName;
             }
+            console.log("tags massaged='" + tags + "'");
 
             // Turn tags into string with commas between tags and tags surrounded by single quotes.
             var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g);
@@ -87,6 +87,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             }
 
             var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+            console.log('Query to get tag ids: ' + sqlString);
 
             var exceptionRet = sql.execute(sqlString,
                 function (arrayRows) {
@@ -113,21 +114,18 @@ module.exports = function UtilityBO(app, sql, logger) {
                             idString = idString + arrayRows[i].id.toString();
                         }
 
-                        // For non-project retrievals (resourceTypeId = 1, 2, 5) there's only one case. Total
+                        // For non-project retrievals (resourceTypeId = 1, 2, 5) there's only one case.
                         // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works even if req.body.onlyCreatedByUser, because of the userName match requirement.
 
-                        // For project retrievals we want to retrieve all projects just as described above PLUS some number of projects that are Templates.
-                        // For now we're going to retrieve all teamplate projects, but this is going to have to be defined better at some point in the future.
-
                         if (req.body.resourceTypeId !== "3") {  // Non-projects.
 
-                            sqlString = "select r.* from " + self.dbname + "resources r where " + "(r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                            sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
 
-                        } else {
+                        } else {    // Projects -- a totally different query.
 
                             // Totally different retrieval for projects.
-                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where " + "(r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
 
                             // Need to add union if templates are required.
                         }

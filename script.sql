@@ -329,6 +329,46 @@ begin
 		set @dbstate := 20.0;
     end if;
     
+    if @dbstate = 20.0 then
+
+		ALTER TABLE `TGv1000`.`projects` 
+			DROP COLUMN `template`;
+		INSERT `TGv1000`.`resourceTypes` values (6,'property');
+		INSERT `TGv1000`.`resourceTypes` values (7,'method');
+		INSERT `TGv1000`.`resourceTypes` values (8,'event');
+
+		CREATE TABLE `TGv1000`.`properties` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `typeId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `jsonCode` mediumtext NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`methods` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `typeId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `jsonCode` mediumtext NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`events` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `typeId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `jsonCode` mediumtext NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+	
+		UPDATE `TGv1000`.`control` set dbstate=21.0 where id=1;
+		set @dbstate := 21.0;
+    end if;
+        
 end;
 
 //
