@@ -53,6 +53,10 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Router handler functions.
     self.routeSearch = function (req, res) {
 
+        // This is a search for something based on tags. There are 8 knds of something whose descriptions have been loaded into m_resourceTypes above.
+        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others use a different query. This is because images and sounds have no
+        // FK table relationship, but the other do.
+
         try {
 
             console.log("Entered UtilityBO/routeSearch with req.body = " + JSON.stringify(req.body));
@@ -62,8 +66,10 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.resourceTypeId  1-5
             // req.body.onlyCreatedByUser   0 or 1
 
+            var resourceTypeDescr = m_resourceTypes[req.body.resourceTypeId];
+
             // Add resource type description to the tags the user (may have) entered.
-            var tags = req.body.tags + " " + m_resourceTypes[req.body.resourceTypeId];
+            var tags = req.body.tags + " " + resourceTypeDescr;
 
             // If we're retrieving only items created by user, add userName to tags.
             if (req.body.onlyCreatedByUser === "1") {
@@ -87,7 +93,9 @@ module.exports = function UtilityBO(app, sql, logger) {
             }
 
             var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+            console.log(' ');
             console.log('Query to get tag ids: ' + sqlString);
+            console.log(' ');
 
             var exceptionRet = sql.execute(sqlString,
                 function (arrayRows) {
@@ -102,7 +110,8 @@ module.exports = function UtilityBO(app, sql, logger) {
                         });
                     } else {
 
-                        // We can proceed since all tags exist and their id's are in arrayRows
+                        // We can proceed since all tags exist and their id's are in arrayRows.
+                        // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
                         var idString = '';
                         for (var i = 0; i < arrayRows.length; i++) {
 
@@ -114,20 +123,17 @@ module.exports = function UtilityBO(app, sql, logger) {
                             idString = idString + arrayRows[i].id.toString();
                         }
 
-                        // For non-project retrievals (resourceTypeId = 1, 2, 5) there's only one case.
+                        // For non-FK retrievals (resourceTypeId = 1, 2) there's only one case.
                         // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
-                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works even if req.body.onlyCreatedByUser, because of the userName match requirement.
+                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        if (req.body.resourceTypeId !== "3") {  // Non-projects.
+                        if (req.body.resourceTypeId < "3") {  // Non-FKs.
 
                             sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
 
-                        } else {    // Projects -- a totally different query.
+                        } else {    // Projects, etc. -- a totally different query.
 
-                            // Totally different retrieval for projects.
-                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + "projects p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
-
-                            // Need to add union if templates are required.
+                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s" + " p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
 
                         console.log(' ');

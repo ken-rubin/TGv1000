@@ -368,7 +368,16 @@ begin
 		UPDATE `TGv1000`.`control` set dbstate=21.0 where id=1;
 		set @dbstate := 21.0;
     end if;
+    
+    if @dbstate = 21.0 then
+    
+		ALTER TABLE `TGv1000`.`properties` 
+			RENAME TO  `TGv1000`.`propertys` ;
         
+		UPDATE `TGv1000`.`control` set dbstate=22.0 where id=1;
+		set @dbstate := 22.0;
+    end if;
+
 end;
 
 //
