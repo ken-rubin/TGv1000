@@ -88,7 +88,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							return self.data.types.addItem(type);
+							return types.addItem(type);
 
 						} catch(e) {
 

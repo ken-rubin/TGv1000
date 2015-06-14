@@ -75,7 +75,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 imageResourceId: 0
             };
 
-            var exceptionRet = sql.execute("select * from " + self.dbname + "types where typeId=" + req.body.typeId+ ";",
+            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId+ ";",
                 function(rows){
 
                     if (rows.length !== 1) {
@@ -86,6 +86,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                         });
                     } else {
 
+                        var row = rows[0];
                         type.isApp = row.isApp;
                         type.id = row.id;
                         type.ordinal = row.ordinal;
@@ -853,7 +854,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             tagArray.push(m_resourceTypes[parseInt(req.body.resourceTypeId, 10)]);
             tagArray.push(req.body.userName);
             var tags = req.body.tags.toLowerCase();
-            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+            var ccArray = tags.match(/([\w\-]+)/g);
             if (ccArray){
                 tagArray = tagArray.concat(ccArray);
             }
@@ -986,7 +987,7 @@ module.exports = function ResourceBO(app, sql, logger) {
             tagArray.push(req.body.userName);
             tagArray.push(m_resourceTypes[parseInt(req.body.resourceTypeId, 10)]);
             var tags = req.body.tags.toLowerCase();
-            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+            var ccArray = tags.match(/([\w\-]+)/g);
             if (ccArray){
                 tagArray = tagArray.concat(ccArray);
             }
@@ -1361,7 +1362,7 @@ module.exports = function ResourceBO(app, sql, logger) {
     //         } else {
 
     //             // addtags. On success it returns success:true and strTags:strTags as in next function.
-    //             var tagArray = req.body.addTags.match(/[A-Za-z0-9_\-]+/g);
+    //             var tagArray = req.body.addTags.match(/([\w\-]+)/g);
     //             m_doTags(tagArray, req.body.resourceId, function(err){
 
     //                 if (err) {
@@ -2049,7 +2050,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                 tagArray.push(strName);
             }
             var tags = strTags.toLowerCase();
-            var ccArray = tags.match(/[A-Za-z0-9_\-]+/g);
+            var ccArray = tags.match(/([\w\-]+)/g);
             if (ccArray){
                 tagArray = tagArray.concat(ccArray);
             }

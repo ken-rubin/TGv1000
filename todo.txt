@@ -13,7 +13,7 @@ Ken
 
 Jerry
 
-- Not sure if my scrollregion-filling query in Search for/Open Project is totally correct. Especially check the effects of the checkboxes. And check Search for/Open Type while you're at it.
+- Not sure if my scrollregion-filling query in Search for/Open Project is totally correct. Especially check the effects of the checkboxes.
 - Finish Save Project.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
@@ -23,16 +23,14 @@ Jerry
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
-- Review setting of tags: are we always adding resource type description and userName? Where?
 - Show at least the current project name someplace--the image, too, if possible
 - Test New Type and Search for Type dialogs.
 
 
 To discuss
 
-- Does image search need a "my own only" checkbox? Even if not, would it be useful?
 - Every comic needs >=1 type (don't think that's a problem--every comic gets an type named 'app'). 
-- If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about the '_' thing again.
+- If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about replacing ' ' with '_' again.
 
 
 

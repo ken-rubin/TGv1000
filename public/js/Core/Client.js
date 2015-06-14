@@ -14,7 +14,8 @@ define(["Core/errorHelper",
 		"Dialogs/ImageDiskDialog/ImageDiskDialog", 
 		"Dialogs/ImageURLDialog/ImageURLDialog", 
 		"Dialogs/ImageSearchDialog/ImageSearchDialog", 
-		"Core/Project"],
+		"Core/Project",
+		"Code/Type"],
 	function (errorHelper, 
 				NewProjectDialog, 
 				OpenProjectDialog,
@@ -24,7 +25,8 @@ define(["Core/errorHelper",
 				ImageDiskDialog, 
 				ImageURLDialog, 
 				ImageSearchDialog, 
-				Project) {
+				Project,
+				Type) {
 
 		try {
 
@@ -263,7 +265,9 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									return m_project.addType(data.type);
+									var type = new Type();
+									type.load(data.type);
+									return m_project.addType(type);
 
 								} else {
 

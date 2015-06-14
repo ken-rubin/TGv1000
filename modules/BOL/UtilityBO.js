@@ -63,10 +63,11 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.body.userId
             // req.body.userName
-            // req.body.resourceTypeId  1-5
+            // req.body.resourceTypeId  1-8
             // req.body.onlyCreatedByUser   0 or 1
 
-            var resourceTypeDescr = m_resourceTypes[req.body.resourceTypeId];
+            var iResourceTypeId = parseInt(req.body.resourceTypeId,10);
+            var resourceTypeDescr = m_resourceTypes[iResourceTypeId];
 
             // Add resource type description to the tags the user (may have) entered.
             var tags = req.body.tags + " " + resourceTypeDescr;
@@ -79,7 +80,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             console.log("tags massaged='" + tags + "'");
 
             // Turn tags into string with commas between tags and tags surrounded by single quotes.
-            var ccArray = req.body.tags.match(/[A-Za-z0-9_\-]+/g);
+            var ccArray = tags.match(/([\w\-]+)/g);
 
             var ccString = '';
             for (var i = 0; i < ccArray.length; i++) {
@@ -133,7 +134,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         } else {    // Projects, etc. -- a totally different query.
 
-                            sqlString = "select distinct p.* from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s" + " p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s" + " p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
 
                         console.log(' ');

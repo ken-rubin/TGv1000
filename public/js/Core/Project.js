@@ -33,6 +33,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							self.data = objectData;
 							client.setProjectDirtyBool(true);
 
+							document.title = 'Project: ' + self.data.name;
+
 							return comics.load(objectData.comics);	// the global object
 
 						} catch (e) {
