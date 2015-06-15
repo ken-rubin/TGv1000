@@ -57,19 +57,19 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					// Return the DOM element representing a prototypical tool item.
-					self.generateDOM = function () {
+					// self.generateDOM = function () {
 
-						m_jTool = $("<img class='toolstripitem' id='" + 
-							client.removeSpaces(self.type.data.name) + 
-							"' src='" +
-						 	resourceHelper.toURL('resources', self.type.data.imageResourceId, 'image') + 
-						 	"' data-resourceid='" +
-						 	self.type.data.imageResourceId+ 
-						 	"' data-type='" + 
-						 	self.type.data.name + "' style='width:55px;'></img>");
+					// 	m_jTool = $("<img class='toolstripitem' id='" + 
+					// 		client.removeSpaces(self.type.data.name) + 
+					// 		"' src='" +
+					// 	 	resourceHelper.toURL('resources', self.type.data.imageResourceId, 'image') + 
+					// 	 	"' data-resourceid='" +
+					// 	 	self.type.data.imageResourceId+ 
+					// 	 	"' data-type='" + 
+					// 	 	self.type.data.name + "' style='width:55px;'></img>");
 
-						return m_jTool;
-					};
+					// 	return m_jTool;
+					// };
 
 					// Type image has changed, update tool.
 					self.updateImage = function () {

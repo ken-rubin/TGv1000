@@ -97,14 +97,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					}
 
 					// Return the DOM element representing a prototypical comic item.
-					self.generateDOM = function () {
+					// self.generateDOM = function () {
 
-						return $("<img class='comicstripitem' id='" + 
-							self.data.name + 
-							"' src='" +
-						 	resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
-						 	"'></img>");
-					};
+					// 	return $("<img class='comicstripitem' id='" + 
+					// 		self.data.name + 
+					// 		"' src='" +
+					// 	 	resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
+					// 	 	"'></img>");
+					// };
 				} catch (e) {
 
 					errorHelper.show(e);

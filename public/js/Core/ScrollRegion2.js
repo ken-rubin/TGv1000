@@ -206,7 +206,8 @@ define(["Core/errorHelper"],
                     jItem.attr("src",
                         strResourceUrl)
 
-                    return null;
+                    return jItem;
+                    
                 } catch (e) {
 
                     return e;

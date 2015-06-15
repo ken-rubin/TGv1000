@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2"],
-	function (errorHelper, Tool, ScrollRegion) {
+define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourceHelper"],
+	function (errorHelper, Tool, ScrollRegion, resourceHelper) {
 
 		try {
 
@@ -36,15 +36,11 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2"],
 
 						try {
 
-							// Get a j-reference to the scroll container element.
-							m_jStrip = $(self.selector);
-
 							// Attach scrollableregion.
 							m_srToolStrip = new ScrollRegion();
-							// return m_srToolStrip.attach(self.rowSelector);
 							var exceptionRet = m_srToolStrip.create(
 								self.selector,		// inner row selector
-								55,					// item width
+								80,					// item width
 								function() {}		// functionClick
 							);
 							if (exceptionRet) {
@@ -56,6 +52,12 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2"],
 							return e;
 						}
 					};
+
+					// Remove old items for project switch or whatever.
+					self.empty = function () {
+
+						m_srToolStrip.empty();
+					}
 
 					// Add tool to strip.
 					self.addItem = function (type) {
@@ -69,17 +71,13 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2"],
 								return exceptionRet;
 							}
 
-							// Define object prototype.
-							var jItem = toolNew.generateDOM();
-
-							// Set its position.
-							jItem.css({
-
-								left: (m_arrayTools.length * self.itemWidth) + "px"
-							});
-
 							// Add to the DOM.
-							m_jStrip.append(jItem);
+							var jItem = m_srToolStrip.addImage(
+								client.removeSpaces(type.data.name),		// id
+								type.data.name,		// name
+								"",					// description
+								resourceHelper.toURL('resources', type.data.imageResourceId, 'image') // url
+							);
 
 							// Also add to the collection of comics.
 							m_arrayTools.push(toolNew);
@@ -175,8 +173,6 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2"],
 					///////////////////////////////////
 					// Private fields.
 
-					// The container for the strip items.
-					var m_jStrip = null;
 					// Scroll object.
 					var m_srToolStrip = null;
 					// Collection of tool items.
