@@ -434,6 +434,18 @@ define(["Core/errorHelper",
 						if (m_project) {
 
 							m_project.setDirtyBool(bVal);
+							if (m_project.data.name.length > 0) {
+
+								document.title = 'Project: ' + self.data.name;
+
+							} else {
+
+								document.title = "TechGroms";
+							}
+
+						} else {
+
+							document.title = "TechGroms";
 						}
 
 						// Something happened. Refresh the navbar.

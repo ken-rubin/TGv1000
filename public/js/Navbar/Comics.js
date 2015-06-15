@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
-	function (errorHelper, Comic, ScrollRegion) {
+define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resourceHelper"],
+	function (errorHelper, Comic, ScrollRegion, resourceHelper) {
 
 		try {
 
@@ -20,13 +20,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 					///////////////////////////////////
 					// Public properties.
 
-					// Selector of scrollable element row.
-					self.rowSelector = "#comicstriprow";
-					// Selector of scrollable element.
-					self.selector = "#comicstrip";
-					// Width of item.
-					self.itemWidth = 64;
-
 					///////////////////////////////////
 					// Public methods.
 
@@ -36,13 +29,18 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 
 						try {
 
-							// Get a j-reference to the scroll container element.
-							m_jStrip = $(self.selector);
-
 							// Attach scrollableregion.
 							m_srComicStrip = new ScrollRegion();
-							return m_srComicStrip.attach(self.rowSelector);
-							
+							// return m_srComicStrip.attach(self.rowSelector);
+							var exceptionRet = m_srComicStrip.create(
+								"#comicstrip",		// inner row selector
+								80,					// item width
+								function() {}		// functionClick
+							);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 						} catch (e) {
 
 							return e;
@@ -55,7 +53,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 						try {
 
 							// Clear out first.
-							m_jStrip.empty();
+							m_srComicStrip.empty();
 
 							// And the collection....
 							m_arrayComics = [];
@@ -117,7 +115,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 							}
 
 							// Now blow away our stuff.
-							m_jStrip.empty();
+							m_srComicStrip.empty();
 							m_arrayComics = [];
 
 							return null;
@@ -133,17 +131,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion"],
 
 						try {
 
-							// Define object prototype.
-							var jItem = comic.generateDOM();
-
-							// Set its position.
-							jItem.css({
-
-								left: (m_arrayComics.length * self.itemWidth) + "px"
-							});
-
 							// Add to the DOM.
-							m_jStrip.append(jItem);
+							var exceptionRet = m_srComicStrip.addImage(
+								"carousel" + m_arrayComics.length.toString(),		// id
+								'',		// name
+								'',		// description
+								resourceHelper.toURL('resources', comic.data.imageResourceId, 'image', '')		// url
+							);
 
 							// Also add to the collection of comics.
 							m_arrayComics.push(comic);

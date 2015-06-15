@@ -5,7 +5,7 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
+define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2"],
 	function (errorHelper, Tool, ScrollRegion) {
 
 		try {
@@ -41,8 +41,16 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion"],
 
 							// Attach scrollableregion.
 							m_srToolStrip = new ScrollRegion();
-							return m_srToolStrip.attach(self.rowSelector);
-							
+							// return m_srToolStrip.attach(self.rowSelector);
+							var exceptionRet = m_srToolStrip.create(
+								self.selector,		// inner row selector
+								55,					// item width
+								function() {}		// functionClick
+							);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 						} catch (e) {
 
 							return e;

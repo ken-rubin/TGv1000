@@ -24,6 +24,59 @@ define(["Core/errorHelper"],
             ///////////////////////////
             // Public methods
 
+            // Method creates, attaches and injects scroll region.
+            //
+            // strRootElementSelector - selector for DOM element.
+            self.create = function (strRootElementSelector,
+                dWidth,
+                functionClick) {
+
+                try {
+
+                    // Save state.
+                    m_dWidth = dWidth;
+                    self.click = functionClick;
+
+                    // Get j-reference to root element.
+                    m_jRoot = $(strRootElementSelector);
+
+                    // Allocate and inject DOM.
+                    m_jSliderContainer = $("<div class='ScrollRegionSliderContainer' />");
+                    m_jSlider = $("<div class='ScrollRegionSlider' />");
+                    m_jLeft = $("<div class='ScrollRegionLeft'>&lt;&lt;</div>");
+                    m_jRight = $("<div class='ScrollRegionRight'>&gt;&gt;</div>");
+
+                    m_jSliderContainer.append(m_jSlider);
+                    m_jRoot.append(m_jSliderContainer);
+                    m_jRoot.append(m_jLeft);
+                    m_jRoot.append(m_jRight);
+
+                    // Install size handler to position the left and right glyphs.
+                    $(window).resize(m_functionResize);
+
+                    // Hook up the "buttons".
+                    m_jLeft.mousedown(m_functionLeftDown);
+                    m_jLeft.mouseup(m_functionLeftUp);
+                    m_jLeft.mouseout(m_functionLeftUp);
+                    m_jRight.mousedown(m_functionRightDown);
+                    m_jRight.mouseup(m_functionRightUp);
+                    m_jRight.mouseout(m_functionRightUp);
+
+                    // Cause the resize functionality to kick in.
+                    m_functionResize();
+
+                    // Create tooltip.
+                    m_jTooltip = $("<div class='ScrollRegionTooltip' />");
+                    m_jRoot.append(m_jTooltip);
+
+                    return null;
+                    
+                } catch (e) {
+
+                    return e;
+                }
+            };
+
             // Method adds new item to slider.
             //
             // jItem
@@ -175,59 +228,6 @@ define(["Core/errorHelper"],
 
                     return null;
 
-                } catch (e) {
-
-                    return e;
-                }
-            };
-
-            // Method creates, attaches and injects scroll region.
-            //
-            // strRootElementSelector - selector for DOM element.
-            self.create = function (strRootElementSelector,
-                dWidth,
-                functionClick) {
-
-                try {
-
-                    // Save state.
-                    m_dWidth = dWidth;
-                    self.click = functionClick;
-
-                    // Get j-reference to root element.
-                    m_jRoot = $(strRootElementSelector);
-
-                    // Allocate and inject DOM.
-                    m_jSliderContainer = $("<div class='ScrollRegionSliderContainer' />");
-                    m_jSlider = $("<div class='ScrollRegionSlider' />");
-                    m_jLeft = $("<div class='ScrollRegionLeft'>&lt;&lt;</div>");
-                    m_jRight = $("<div class='ScrollRegionRight'>&gt;&gt;</div>");
-
-                    m_jSliderContainer.append(m_jSlider);
-                    m_jRoot.append(m_jSliderContainer);
-                    m_jRoot.append(m_jLeft);
-                    m_jRoot.append(m_jRight);
-
-                    // Install size handler to position the left and right glyphs.
-                    $(window).resize(m_functionResize);
-
-                    // Hook up the "buttons".
-                    m_jLeft.mousedown(m_functionLeftDown);
-                    m_jLeft.mouseup(m_functionLeftUp);
-                    m_jLeft.mouseout(m_functionLeftUp);
-                    m_jRight.mousedown(m_functionRightDown);
-                    m_jRight.mouseup(m_functionRightUp);
-                    m_jRight.mouseout(m_functionRightUp);
-
-                    // Cause the resiez functionality to kick in.
-                    m_functionResize();
-
-                    // Create tooltip.
-                    m_jTooltip = $("<div class='ScrollRegionTooltip' />");
-                    m_jRoot.append(m_jTooltip);
-
-                    return null;
-                    
                 } catch (e) {
 
                     return e;
@@ -442,7 +442,7 @@ define(["Core/errorHelper"],
                     }
 
                     // Set up the new scroll.
-                    m_cookieInterval = setInterval(m_functionScrollLeft,
+                    m_cookieInterval = setInterval(m_functionScrollRight,
                         m_dScrollRefreshMS);
 
                     // Indicate in the DOM that the button is depressed.
@@ -509,7 +509,7 @@ define(["Core/errorHelper"],
                     }
 
                     // Set up the new scroll.
-                    m_cookieInterval = setInterval(m_functionScrollRight,
+                    m_cookieInterval = setInterval(m_functionScrollLeft,
                         m_dScrollRefreshMS);
 
                     // Indicate in the DOM that the button is depressed.

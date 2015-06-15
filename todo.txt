@@ -11,9 +11,11 @@ Ken
 -   I don't see a tooltip when I search for a Type image. Probably because it's not open over another dialog. I'm tired of tooltips. They're yours. Oh yeah: I don't display an empty description if it's "". And I
 -   now don't display any tooltip for images. I decided images don't need names, since the user is looking at the image and can identify it that way.
 
+
 Jerry
 
-- Finish Save Project.
+- Saving a 2-type project is only saving the first type. The second type isn't in the JSON.
+- Finish Save Project (as opposed to Save As).
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
 - Implement Change Comic image on context menu (not doing add new comic for now).
@@ -22,7 +24,8 @@ Jerry
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
-- Show at least the current project name someplace--the image, too, if possible
+- I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
+-    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
 
 
 To discuss

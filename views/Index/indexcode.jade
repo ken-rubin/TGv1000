@@ -41,14 +41,8 @@
     //- Define a scrollable strip.
     .col-xs-12#typestriprow
 
-      //- The left controller.
-      .leftcontroller(data-targetselector="#typestrip")
-
       //- The scrolling region.  Contains projectitemsitem(s).
-      #typestrip
-
-      //- The right controller.
-      .rightcontroller(data-targetselector="#typestrip")
+      #typestrip.ScrollRegion
 ul#TypeMemberContextMenu.dropdown-menu(role="menu",style="display:none")
   li
     a.contextMenuItem(tabindex="-1")
