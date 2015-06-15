@@ -13,7 +13,6 @@ Ken
 
 Jerry
 
-- Not sure if my scrollregion-filling query in Search for/Open Project is totally correct. Especially check the effects of the checkboxes.
 - Finish Save Project.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
@@ -24,7 +23,6 @@ Jerry
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
 - Show at least the current project name someplace--the image, too, if possible
-- Test New Type and Search for Type dialogs.
 
 
 To discuss

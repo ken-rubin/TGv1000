@@ -232,6 +232,18 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.getNumberOfTypesInActiveComic = function () {
+
+						try {
+
+							return types.getLength();
+
+						} catch(e) {
+
+							throw e;
+						}
+					}
+
 					self.showTypeSearchDialog = function (functionOK) {
 
 						try {

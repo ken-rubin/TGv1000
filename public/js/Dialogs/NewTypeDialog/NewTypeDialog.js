@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
-	function (snippetHelper, errorHelper, resourceHelper) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Type"], 
+	function (snippetHelper, errorHelper, resourceHelper, Type) {
 
 		try {
 
@@ -147,7 +147,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Create minimal Type based on the dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
-							var type = 
+							var typeJO = 
 							{
 								isApp: false,
 								id: 0,
@@ -158,8 +158,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								events: [],
 								dependencies: [],
 								name: $("#TypeName").val() || "",
-								imageResourceId: 0
+								imageResourceId: m_imageResourceId
 							};
+
+							var type = new Type();
+							type.load(typeJO);
 
 							var exceptionRet = client.addTypeToProject(type);
 							if (exceptionRet) {

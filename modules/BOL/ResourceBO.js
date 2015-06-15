@@ -153,7 +153,6 @@ module.exports = function ResourceBO(app, sql, logger) {
                 tags: 'a b c',
                 imageResourceId: 0,
                 price: 0,
-                isTemplate: 0,
                 createdByUserId: req.body.userId,
                 isDirty: 1,
                 comics: 
@@ -217,7 +216,6 @@ module.exports = function ResourceBO(app, sql, logger) {
                                     project.description = rows[0].description;
                                     project.imageResourceId = rows[0].imageResourceId;
                                     project.price = rows[0].price;
-                                    project.isTemplate = rows[0].isTemplate;
                                     project.createdByUserId = rows[0].createdByUserId;
                                     project.isDirty = false;
                                     m_functionFetchTags(project.id, 3, req.body.userName, function(tags){
@@ -427,7 +425,6 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             var guts = " SET name='" + project.name + "'"
                 + ",createdByUserId=" + req.body.userId
-                + ",template=" + project.isTemplate
                 + ",price=" + project.price
                 + ",imageResourceId=" + project.imageResourceId
                 + ",description='" + project.description + "' ";

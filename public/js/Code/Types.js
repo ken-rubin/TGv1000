@@ -246,6 +246,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
+					self.getLength = function () {
+
+						return m_arrayTypes.length;
+					}
+
 					// Update the blockly data in the active type/method.
 					self.update = function (strWorkspace, strMethod) {
 
