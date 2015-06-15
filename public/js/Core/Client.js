@@ -277,9 +277,9 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var type = new Type();
-									type.load(data.type);
-									return m_project.addType(type);
+									var newType = new Type();
+									newType.load(data.type);
+									return m_project.addType(newType);
 
 								} else {
 
@@ -436,7 +436,7 @@ define(["Core/errorHelper",
 							m_project.setDirtyBool(bVal);
 							if (m_project.data.name.length > 0) {
 
-								document.title = 'Project: ' + self.data.name;
+								document.title = m_project.data.name;
 
 							} else {
 

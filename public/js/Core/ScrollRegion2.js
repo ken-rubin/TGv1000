@@ -35,6 +35,7 @@ define(["Core/errorHelper"],
 
                     // Save state.
                     m_dWidth = dWidth;
+                    m_dEffectiveHeight = dWidth;    // everything's a square.
                     self.click = functionClick;
 
                     // Get j-reference to root element.
@@ -115,14 +116,16 @@ define(["Core/errorHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addImage = function (strId, strName, strDescription, strResourceUrl) {
+            self.addImage = function (strId, strName, strDescription, strResourceUrl, imageClass) {
 
                 try {
+
+                    imageClass = imageClass || "ScrollRegionImage";
 
                     // Build the item.
                     var jItem = $("<img id='" + 
                         strId + 
-                        "' class='ScrollRegionImage'></img>");
+                        "' class='" + imageClass + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionImageLoad);
@@ -207,7 +210,7 @@ define(["Core/errorHelper"],
                         strResourceUrl)
 
                     return jItem;
-                    
+
                 } catch (e) {
 
                     return e;

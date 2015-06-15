@@ -40,7 +40,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							m_srToolStrip = new ScrollRegion();
 							var exceptionRet = m_srToolStrip.create(
 								self.selector,		// inner row selector
-								80,					// item width
+								55,					// item width
 								function() {}		// functionClick
 							);
 							if (exceptionRet) {
@@ -76,7 +76,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 								client.removeSpaces(type.data.name),		// id
 								type.data.name,		// name
 								"",					// description
-								resourceHelper.toURL('resources', type.data.imageResourceId, 'image') // url
+								resourceHelper.toURL('resources', type.data.imageResourceId, 'image'), // url
+								'toolstripitem'
 							);
 
 							// Also add to the collection of comics.

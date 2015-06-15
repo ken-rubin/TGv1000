@@ -31,7 +31,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 
 							// Attach scrollableregion.
 							m_srComicStrip = new ScrollRegion();
-							// return m_srComicStrip.attach(self.rowSelector);
 							var exceptionRet = m_srComicStrip.create(
 								"#comicstrip",		// inner row selector
 								80,					// item width
@@ -136,7 +135,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 								"carousel" + m_arrayComics.length.toString(),		// id
 								'',		// name
 								'',		// description
-								resourceHelper.toURL('resources', comic.data.imageResourceId, 'image', '')		// url
+								resourceHelper.toURL('resources', comic.data.imageResourceId, 'image', ''),		// url
+								'comicstripitem'	// image class
 							);
 
 							// Also add to the collection of comics.
@@ -177,8 +177,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 					///////////////////////////////////
 					// Private fields.
 
-					// The container for the strip items.
-					var m_jStrip = null;
 					// Scrollable region reference.
 					var m_srComicStrip = null;
 					// Collection of comic items.

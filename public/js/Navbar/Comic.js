@@ -88,7 +88,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							return types.addItem(type);
+							// First add to the global types.
+							types.addItem(type);
+
+							// Then add to self.data.
+							self.data.types.items.push(type);
+							return null;
 
 						} catch(e) {
 

@@ -24,8 +24,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					self.rowSelector = "#typestriprow";
 					// Selector to DOM element to wrap.
 					self.selector = "#typestrip";
-					// Width of item.
-					self.itemWidth = 200;
 
 					///////////////////////////////////
 					// Public methods.
@@ -36,15 +34,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							// Get a j-reference to the scroll container element.
-							m_jStrip = $(self.selector);
-
 							// Attach scrollableregion.
 							m_srTypeStrip = new ScrollRegion();
-							// return m_srTypeStrip.attach(self.rowSelector);
 							var exceptionRet = m_srTypeStrip.create(
-								self.selector,		// inner row selector
-								190,				// item width
+								"#typestrip",		// inner row selector
+								200,				// item width
 								function() {}		// functionClick
 							);
 							
@@ -140,7 +134,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 							// First destroy.
-							m_jStrip.empty();
+							m_srTypeStrip.empty();
 
 							// And the collection.
 							m_arrayTypes = [];
@@ -199,7 +193,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								var exceptionRet = self.removeItem(itemIth);
 							}
 
-							m_jStrip.empty();
+							m_srTypeStrip.empty();
 							m_arrayTypes = [];
 
 							return null;
@@ -218,14 +212,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							// Define object prototype.
 							var jItem = type.generateDOM();
 
-							// Set its position.
-							jItem.css({
-
-								left: ((m_arrayTypes.length + 1) * self.itemWidth) + "px"
-							});
-
 							// Add to the DOM.
-							m_jStrip.append(jItem);
+							m_srTypeStrip.addItem(jItem);
 
 							// Also add to the collection of comics.
 							m_arrayTypes.push(type);
@@ -377,8 +365,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					// Private fields.
 
 					// The container for the strip items.
-					var m_jStrip = null;
-					// Collection of type items.
 					var m_arrayTypes = [];
 					// Active item.
 					var m_typeActive = null;
