@@ -573,11 +573,11 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 
-							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.typeName);
+							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.typeName);
+							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
 
 							////////////////////////
 							// Schema.
@@ -635,12 +635,12 @@ define(["Core/errorHelper"],
 							// Blocks.
 
 							delete self.blocks["new_" + strOriginalName];
-							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.typeName);
+							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript["new_" + strOriginalName];
-							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.typeName);
+							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
 
 							////////////////////////
 							// Workspace.
@@ -713,12 +713,12 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strGetName = type.data.name + "_get" + property.propertyName;
+							var strGetName = type.data.name + "_get" + property.name;
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.propertyName);
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
 
 							////////////////////////
 							// Schema.
@@ -738,12 +738,12 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strSetName = type.data.name + "_set" + property.propertyName;
+							var strSetName = type.data.name + "_set" + property.name;
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.propertyName);
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
 
 							////////////////////////
 							// Schema.
@@ -767,8 +767,8 @@ define(["Core/errorHelper"],
 
 						try {
 
-							var strGet = type.data.name + "_get" + property.propertyName;
-							var strSet = type.data.name + "_set" + property.propertyName;
+							var strGet = type.data.name + "_get" + property.name;
+							var strSet = type.data.name + "_set" + property.name;
 
 							////////////////////////
 							// Blocks.
@@ -817,14 +817,14 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strOriginalName = strOriginalTypeName + "_get" + strOriginal;
-							var strGetName = type.data.name + "_get" + property.propertyName;
+							var strGetName = type.data.name + "_get" + property.name;
 							delete self.blocks[strOriginalName];
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalName];
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.propertyName);
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
 
 							////////////////////////
 							// Workspace.
@@ -860,14 +860,14 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strOriginalSetName = strOriginalTypeName + "_set" + strOriginal;
-							var strSetName = type.data.name + "_set" + property.propertyName;
+							var strSetName = type.data.name + "_set" + property.name;
 							delete self.blocks[strOriginalSetName];
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalSetName];
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.propertyName);
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
 
 							////////////////////////
 							// Workspace.
@@ -909,8 +909,8 @@ define(["Core/errorHelper"],
 						try {
 
 							// Look for this:
-							var strGetName = type.data.name + "_get" + property.propertyName;
-							var strSetName = type.data.name + "_set" + property.propertyName;
+							var strGetName = type.data.name + "_get" + property.name;
+							var strSetName = type.data.name + "_set" + property.name;
 
 							var methodReferenced = types.isReferencedInWorkspace(strGetName);
 							if (methodReferenced) {

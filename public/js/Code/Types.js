@@ -220,6 +220,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							// Also add to code.
 							return code.addType(type);
+							
 						} catch (e) {
 
 							return e;

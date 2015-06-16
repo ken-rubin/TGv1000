@@ -89,10 +89,22 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							// First add to the global types.
-							types.addItem(type);
+							var exceptionRet = types.addItem(type);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 
 							// Then add to self.data.
-							self.data.types.items.push(type);
+							self.data.types.items.push(type.data);
+
+					        // Also add to the designer/tool strip.
+							exceptionRet = tools.addItem(type.data);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
 							return null;
 
 						} catch(e) {

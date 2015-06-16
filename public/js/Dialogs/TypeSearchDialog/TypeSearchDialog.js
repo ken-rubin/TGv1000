@@ -215,7 +215,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 							        exceptionRet = m_scISImageStrip.addImage("carousel" + i.toString(),
 							        	rowIth.name,
 							        	"",
-							        	rowIth.url);
+							        	rowIth.url,
+							        	'ScrollRegionImage');
 							        if (exceptionRet) {
 
 							        	throw exceptionRet;

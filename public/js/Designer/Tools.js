@@ -72,13 +72,22 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							}
 
 							// Add to the DOM.
-							var jItem = m_srToolStrip.addImage(
+							var jItem = null;
+							var exceptionRet = m_srToolStrip.addImage(
 								client.removeSpaces(type.data.name),		// id
 								type.data.name,		// name
 								"",					// description
 								resourceHelper.toURL('resources', type.data.imageResourceId, 'image'), // url
-								'toolstripitem'
+								'toolstripitem',
+								function (jItemAdded) {
+
+									jItem = jItemAdded;
+								}
 							);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 
 							// Also add to the collection of comics.
 							m_arrayTools.push(toolNew);
@@ -92,6 +101,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 		                    });
 
 							return null;
+
 						} catch (e) {
 
 							return e;

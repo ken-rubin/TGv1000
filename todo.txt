@@ -14,7 +14,6 @@ Ken
 
 Jerry
 
-- Saving a 2-type project is only saving the first type. The second type isn't in the JSON.
 - Finish Save Project (as opposed to Save As).
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
@@ -23,7 +22,7 @@ Jerry
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
-- Replace existing scroll regions (comics, tools, types) with ScrollRegion2.
+- Fix up scroll regions (comics, tools, types).
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
 - Call Tools.empty() when loading a project or closing a project.
@@ -33,8 +32,7 @@ Jerry
 
 To discuss
 
-- Every comic needs >=1 type (don't think that's a problem--every comic gets an type named 'app'). 
-- If project name is multiple words, that's how it is saved in tags and projects. Search will never work. Think about replacing ' ' with '_' again.
+
 
 
 

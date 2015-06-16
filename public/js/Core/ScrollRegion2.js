@@ -107,6 +107,7 @@ define(["Core/errorHelper"],
                     m_jSlider.width((iBase + 1) * m_dWidth);
 
                     return null;
+
                 } catch (e) {
 
                     return e;
@@ -116,11 +117,9 @@ define(["Core/errorHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addImage = function (strId, strName, strDescription, strResourceUrl, imageClass) {
+            self.addImage = function (strId, strName, strDescription, strResourceUrl, imageClass, jItemCallBack) {
 
                 try {
-
-                    imageClass = imageClass || "ScrollRegionImage";
 
                     // Build the item.
                     var jItem = $("<img id='" + 
@@ -209,7 +208,12 @@ define(["Core/errorHelper"],
                     jItem.attr("src",
                         strResourceUrl)
 
-                    return jItem;
+                    if (typeof jItemCallBack == 'function') {
+
+                        jItemCallBack(jItem);
+                    }
+
+                    return null;
 
                 } catch (e) {
 

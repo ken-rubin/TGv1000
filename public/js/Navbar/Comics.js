@@ -138,11 +138,16 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 								resourceHelper.toURL('resources', comic.data.imageResourceId, 'image', ''),		// url
 								'comicstripitem'	// image class
 							);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 
 							// Also add to the collection of comics.
 							m_arrayComics.push(comic);
 
 							return null;
+
 						} catch (e) {
 
 							return e;
