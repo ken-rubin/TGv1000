@@ -126,14 +126,15 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							// User must have non-empty tags.
+							// User may have empty tags.
 							// Grab userId.
 							// Post info, including url.
 							// On successful return, call callback with resourceId.
 							var tags = $("#ISTags").val().trim();
-							if (tags.length === 0) {
+							var strResourceName = $("#ISName").val().trim();	// required
+							if (strResourceName.length === 0) {
 
-								m_wellMessage("You didn't enter any tags. They are needed for searching.", null);
+								m_wellMessage('Name is required.', null);
 								return;
 							}
 
@@ -145,7 +146,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 									userName: strUserNameResources,
 									url: m_url,
 									tags: tags,
-									resourceTypeId: 1
+									resourceTypeId: 1,
+									resourceName: strResourceName
 								}, 
 								'json');
 	    					posting.done(function(data){

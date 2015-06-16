@@ -126,7 +126,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								tags: $("#ProjectTags").val() || '',
 								imageResourceId: m_imageResourceId,
 								price: 0,
-								isTemplate: 0,
 								createdByUserId: client.getTGCookie('userId'),
 								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0 || m_imageResourceId > 0,
 								comics: {

@@ -540,7 +540,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                                     } else {
 
                                         var resourceId = rows[0].insertId;
-                                        m_setUpAndDoTags(resourceId, 3, req.body.userName, project.tags, project.name, function(err) {
+                                        m_setUpAndDoTags(resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
 
                                             if (err) {
 
@@ -648,7 +648,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                             project.comics.items.forEach(function(comicCth) {
 
                                 console.log('*****inserting comic');
-                                exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ");",
+                                exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId,name) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ",'" + comicCth.name + "');",
                                     function(rows){
 
                                         // error check needed
@@ -660,7 +660,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                                                 // error check needed
                                                 var resourceId = rows[0].insertId;
-                                                m_setUpAndDoTags(resourceId, 4, req.body.userName, comicCth.tags, comicCth.name, function(err) {
+                                                m_setUpAndDoTags(resourceId, '4', req.body.userName, comicCth.tags, comicCth.name, function(err) {
 
                                                     if (err) {
 
@@ -690,7 +690,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                                                                             // error check needed
                                                                             var resourceId = rows[0].insertId;
-                                                                            m_setUpAndDoTags(resourceId, 5, req.body.userName, typeTth.tags, typeTth.name, function(err) {
+                                                                            m_setUpAndDoTags(resourceId, '5', req.body.userName, typeTth.tags, typeTth.name, function(err) {
 
                                                                                 if (err) {
 
@@ -797,8 +797,9 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.userId
             // req.body.userName
             // req.body.url             image or sound to retrieve
-            // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
+            // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
             // req.body.resourceTypeId
+            // req.body.resourceName
 
             // Notes: 
             //      Allowed image extensions are png, jpg and jpeg. It's checked here for URL fetches.
@@ -847,33 +848,6 @@ module.exports = function ResourceBO(app, sql, logger) {
                 ext = 'mp3';
             }
 
-            var tagArray = [];
-            tagArray.push(m_resourceTypes[parseInt(req.body.resourceTypeId, 10)]);
-            tagArray.push(req.body.userName);
-            var tags = req.body.tags.toLowerCase();
-            var ccArray = tags.match(/([\w\-]+)/g);
-            if (ccArray){
-                tagArray = tagArray.concat(ccArray);
-            }
-
-            // Remove possible dups from tagArray.
-            var uniqueArray = [];
-            uniqueArray.push(tagArray[0]);
-            for (var i = 1; i < tagArray.length; i++) {
-                var compIth = tagArray[i];
-                var found = false;
-                for (var j = 0; j < uniqueArray.length; j++) {
-                    if (uniqueArray[j] === compIth){
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueArray.push(compIth);
-                }
-            }
-            tagArray = uniqueArray;
-
             // Grab the image or sound.
             var request = require('request').defaults({ encoding: null });
             request.get(req.body.url, function (err, resp, body) {
@@ -904,7 +878,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                                 // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
                                 // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                                m_doTags(tagArray, id, function(err) {
+                                m_setUpAndDoTags(id, req.body.resourceTypeId, req.body.userName, req.body.tags, req.body.resourceName, function(err) {
 
                                     if (err) {
 
@@ -964,47 +938,15 @@ module.exports = function ResourceBO(app, sql, logger) {
             // req.body.userName
             // req.body.resourceTypeId
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
-            // req.body.tags            tags to associate with resource (in addition to friendlyName and 'sound' or 'image')
+            // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
+            // req.body.resourceName
 
             // Notes: 
             //      Allowed image extensions are png, jpg, jpeg. That has been checked on the client.
             //      All image files are saved with extension png. That way we only have to save resourceId throughout. The browser knows how to display them.
             //      Only mp3 sound resources are allowed.
 
-            if (req.body.resourceTypeId === "1") {
-
-                ext = 'png';
-
-            } else {
-
-                ext = "mp3";
-            }
-
-            var tagArray = [];
-            tagArray.push(req.body.userName);
-            tagArray.push(m_resourceTypes[parseInt(req.body.resourceTypeId, 10)]);
-            var tags = req.body.tags.toLowerCase();
-            var ccArray = tags.match(/([\w\-]+)/g);
-            if (ccArray){
-                tagArray = tagArray.concat(ccArray);
-            }
-            // Remove possible dups from tagArray.
-            var uniqueArray = [];
-            uniqueArray.push(tagArray[0]);
-            for (var i = 1; i < tagArray.length; i++) {
-                var compIth = tagArray[i];
-                var found = false;
-                for (var j = 0; j < uniqueArray.length; j++) {
-                    if (uniqueArray[j] === compIth){
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueArray.push(compIth);
-                }
-            }
-            tagArray = uniqueArray;
+            var ext = (req.body.resourceTypeId === "1") ? 'png' : "mp3";
 
             var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0);";
             sql.execute(sqlString,
@@ -1020,9 +962,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                         var id = rows[0].insertId;
 
-                        // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
-                        // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                        m_doTags(tagArray, id, function(err){
+                        m_setUpAndDoTags(id, req.body.resourceTypeId, req.body.userName, req.body.tags, req.body.resourceName, function(err) {
 
                             if (err) {
 
@@ -2035,21 +1975,30 @@ module.exports = function ResourceBO(app, sql, logger) {
         );
     }
 
-    var m_setUpAndDoTags = function(resourceId, resourceTypeId, userName, strTags, strName, callback) {
+    var m_setUpAndDoTags = function(resourceId, strResourceTypeId, userName, strTags, strName, callback) {
 
         try {
+            
+            console.log("In m_setUpAndDoTags with resourceId=" + resourceId);
 
+            // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
             var tagArray = [];
-            tagArray.push(m_resourceTypes[resourceTypeId]);
+            tagArray.push(m_resourceTypes[parseInt(strResourceTypeId, 10)]);
             tagArray.push(userName);
             if (strName.length > 0) {
 
-                tagArray.push(strName);
+                tagArray.push(strName.trim().replace(/\s/g, '_'));
             }
-            var tags = strTags.toLowerCase();
-            var ccArray = tags.match(/([\w\-]+)/g);
-            if (ccArray){
-                tagArray = tagArray.concat(ccArray);
+
+            // Get optional user-entered tags ready to combine with above three tags.
+            var ccArray = [];
+            if (strTags) {
+
+                ccArray = strTags.toLowerCase().match(/([\w\-]+)/g);
+
+                if (ccArray){
+                    tagArray = tagArray.concat(ccArray);
+                }
             }
 
             // Remove possible dups from tagArray.

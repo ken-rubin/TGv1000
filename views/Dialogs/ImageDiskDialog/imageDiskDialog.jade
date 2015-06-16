@@ -8,10 +8,12 @@
       br
       input#imageFile(type="file" name="userImage" accept="image/*")
       #ISPhase2(style="display:none;")
+        label.control-label(for="ISName", style="margin-top:6px;") Name
+        input.form-control#ISName(type="text", placeholder="Enter image name.")
         br
         label.control-label(for="ISTags") Search tags
         br
-        textarea.form-control#ISTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="enter one or more tags to help you search for this image")
+        textarea.form-control#ISTags(name="tags" spellcheck=true cols=40 rows=2 placeholder="Optionally enter words to help you search for this image later.")
         br
         button.btn.btn-info#ISSaveBtn Save &amp; Select Image
         | &nbsp;&nbsp;&nbsp;

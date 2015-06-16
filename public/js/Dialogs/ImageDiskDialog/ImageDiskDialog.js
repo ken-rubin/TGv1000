@@ -145,6 +145,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						        return false;
 						    }
 
+						    // Isolate the filename portion of m_filename and set it as value of $("#ISName").
+						    var name_without_ext = m_fileName.replace(/^.*[\\\/]/, '').split('.');
+						    $("#ISName").val(name_without_ext[0]);
+
 						    m_cvs = document.getElementById('iSCanvas'),
 						    m_ctx = m_cvs.getContext('2d');
 						    m_file = document.getElementById("imageFile").files[0];
@@ -186,14 +190,16 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							// Going to use filename w/o extension as friendly name (server side).
-							// User must have non-empty tags.
+							// As soon as the file was opened, the filename (w/o ext) was set into #ISName.
+							// User may have altered it, but we'll get it and send it to the server.
+							// User may have empty tags.
 							// Grab userId.
 							// On successful return, call callback with resourceId.
 							var tags = $("#ISTags").val().trim();
-							if (tags.length === 0) {
+							var strResourceName = $("#ISName").val().trim();	// required
+							if (strResourceName.length === 0) {
 
-								m_wellMessage("You didn't enter any tags. They are needed for searching.", null);
+								m_wellMessage('Name is required.', null);
 								return;
 							}
 
@@ -206,6 +212,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						    formData.append("userName", strUserNameResources);
 						    formData.append("tags", tags);
 						    formData.append("resourceTypeId", "1");
+						    formData.append("resourceName", strResourceName);
 
 						    // Now the file.
 						    formData.append("userFile", m_file);
