@@ -41,6 +41,37 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					/////////////////////////////
 					// Public methods.
 
+					// Activate/select type instance.
+					self.activate = function () {
+
+						try {
+
+							// Cause types to fill the type well with this type.
+							return types.select(self.data);
+							
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Create this instance.
+					self.load = function (typesItem) {
+
+						try {
+
+							// Save data.
+							self.data = typesItem;
+
+							// process properties methods events and dependencies collections.
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Destroy this instance.
 					self.destroy = function () {
 
@@ -56,40 +87,23 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					};
 
-					// Create this instance.
-					self.load = function (objectData) {
-
-						try {
-
-							// Save data.
-							self.data = objectData;
-
-							// process properties methods events and dependencies collections.
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Return the DOM element representing a prototypical item.
-					self.generateDOM = function () {
+					// self.generateDOM = function () {
 
-						// Allocate the type.
-						m_jType = $("<div id='" + 
-							self.data.name + 
-							"' class='typestripitem' style='background:black;'></div>");
+					// 	// Allocate the type.
+					// 	m_jType = $("<div id='" + 
+					// 		self.data.name + 
+					// 		"' class='typestripitem' style='background:black;'></div>");
 
-						// Add the contents to the newly allocated type.
-						var exceptionRet = m_functionGenerateTypeContents();
-						if (exceptionRet) {
+					// 	// Add the contents to the newly allocated type.
+					// 	var exceptionRet = m_functionGenerateTypeContents();
+					// 	if (exceptionRet) {
 
-							throw exceptionRet;
-						}
+					// 		throw exceptionRet;
+					// 	}
 
-						return m_jType;
-					};
+					// 	return m_jType;
+					// };
 
 					// Loop over all methods, indicate if the specified
 					// string is found in any of their workspaces.

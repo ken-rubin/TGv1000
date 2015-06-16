@@ -108,7 +108,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							$("#TypeName").focus();
 
 							$("#TypeName").blur(m_functionBlurTypeName);
-							$("#TypeTags").blur(m_functionBlurTypeTags);
 
 							m_setStateCreateBtn();
 
@@ -123,18 +122,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							m_setStateCreateBtn();
 					}
 
-					var m_functionBlurTypeTags = function() {
-
-							m_setStateCreateBtn();
-					}
-
 					var m_setStateCreateBtn = function() {
 
 						var nameStatus = $("#TypeName").val().trim().length > 0;
-						var tagStatus = $("#TypeTags").val().trim().length > 0;
 						var imgStatus = m_imageResourceId > 0;
 
-						if (!nameStatus || !tagStatus || !imgStatus) {
+						if (!nameStatus || !imgStatus) {
 							$("#CreateTypeBtn").addClass("disabled");
 						} else {
 							$("#CreateTypeBtn").removeClass("disabled");
@@ -154,7 +147,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								ordinal: client.getNumberOfTypesInActiveComic(),
 								tags: $("#TypeTags").val() || "",
 								properties: [],
-								methods: [{ name: "initialize", workspace: "", method: "" }],
+								methods: [
+									// { name: "initialize", workspace: "", method: "" }
+								],
 								events: [],
 								dependencies: [],
 								name: $("#TypeName").val() || "",

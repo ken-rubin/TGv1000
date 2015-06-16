@@ -26,14 +26,14 @@ define(["Core/errorHelper", "Navbar/Comics"],
 					// Public methods.
 
 					// Attach GUI wrappers.
-					self.load = function (objectData) {
+					self.load = function (project) {
 
 						try {
 
-							self.data = objectData;
+							self.data = project;
 							client.setProjectDirtyBool(true);
 
-							return comics.load(objectData.comics);	// the global object
+							return comics.load(project.comics);	// the global object
 
 						} catch (e) {
 

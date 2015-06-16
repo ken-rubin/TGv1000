@@ -20,11 +20,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					///////////////////////////////////
 					// Public properties.
 
-					// Selector to DOM element to wrap.
-					self.rowSelector = "#typestriprow";
-					// Selector to DOM element to wrap.
-					self.selector = "#typestrip";
-
 					///////////////////////////////////
 					// Public methods.
 
@@ -38,10 +33,127 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							m_srTypeStrip = new ScrollRegion();
 							var exceptionRet = m_srTypeStrip.create(
 								"#typestrip",		// inner row selector
-								200,				// item width
-								function() {}		// functionClick
+								80,				// item width
+								function() {		// functionClick
+
+						    		var jq = this;
+						    		var j = parseInt(jq.context.id.substring(8), 10);
+						    		self.select(m_arrayTypes[j].data);
+								}
 							);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Load the Type strip item collection.
+					self.load = function (activeComicTypes) {
+
+						try {
+
+							// First destroy type and tool strips.
+							m_srTypeStrip.empty();
+							tools.empty();
+
+							// And the collection.
+							m_arrayTypes = [];
+
+							// Loop over items and insert into the DOM.
+							for (var i = 0; i < activeComicTypes.items.length; i++) {
+
+								// Extract the item (type).
+								var itemIth = activeComicTypes.items[i];
+
+								// Allocate the type object which holds/wrapps the data.
+								var newType = new Type();
+								exceptionRet = newType.load(itemIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+						        // Add the type.
+								exceptionRet = self.addItem(newType);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+						        // Also add to the designer/tool strip.
+								exceptionRet = tools.addItem(newType);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Automatically allocate the first type.
+							if (m_arrayTypes.length > 0) {
+
+								// Following will activate the 0th type and set it up for maintenance in the type well.
+								var exceptionRet = m_arrayTypes[0].activate();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Add Type to strip.
+					self.addItem = function (type) {
+
+						try {
+
+							// Add to the DOM.
+							var exceptionRet = m_srTypeStrip.addImage(
+								"carousel" + m_arrayTypes.length.toString(),		// id
+								type.data.name,		// name
+								'',		// description
+								resourceHelper.toURL('resources', type.data.imageResourceId, 'image', ''),		// url
+								'typestripitem'	// image class
+							);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+
+							// Also add to the collection of comics.
+							m_arrayTypes.push(type);
+
+							// Also add to code.
+							return code.addType(type);
 							
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Specify the active type.  Called from 
+					// a type when its image is clicked in the type strip.
+					self.select = function (typeActive) {
+
+						try {
+
+							m_typeActive = typeActive;
+
+							var exceptionRet = m_functionSetUpTheWell();
+							if (exceptionRet) {
+
+								return exceptionRet;
+							}
+
+							return null;
+
 						} catch (e) {
 
 							return e;
@@ -128,60 +240,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						}
 					};
 
-					// Load the Type strip item collection.
-					self.load = function (objectData) {
-
-						try {
-
-							// First destroy.
-							m_srTypeStrip.empty();
-
-							// And the collection.
-							m_arrayTypes = [];
-
-							// Create the add button.
-							// var exceptionRet = m_functionCreateAddButton();
-							// if (exceptionRet) {
-
-							// 	throw exceptionRet;
-							// }
-
-							// Loop over items and insert into the DOM.
-							for (var i = 0; i < objectData.items.length; i++) {
-
-								// Extract the item (type).
-								var itemIth = objectData.items[i];
-
-								// Allocate the type object which holds/wrapps the data.
-								var typeIth = new Type();
-								exceptionRet = typeIth.load(itemIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
-
-						        // Add the type.
-								exceptionRet = self.addItem(typeIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
-
-						        // Also add to the designer/tool strip.
-								exceptionRet = tools.addItem(typeIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
-							}
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Unload.
 					self.unload = function () {
 
@@ -203,42 +261,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							return e;
 						}
 					}
-
-					// Add Type to strip.
-					self.addItem = function (type) {
-
-						try {
-
-							// Define object prototype.
-							var jItem = type.generateDOM();
-
-							// Add to the DOM.
-							m_srTypeStrip.addItem(jItem);
-
-							// Also add to the collection of comics.
-							m_arrayTypes.push(type);
-
-							// Also add to code.
-							return code.addType(type);
-							
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Specify the active type.  Called from 
-					// a type when a member button is clicked.
-					self.select = function (typeActive) {
-
-						try {
-
-							m_typeActive = typeActive;
-						} catch (e) {
-
-							return e;
-						}
-					};
 
 					self.getLength = function () {
 
@@ -267,6 +289,33 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 					///////////////////////////////////
 					// Private methods.
+
+					// Invoked when a type is activated, thus causing its representatrion in the type well for maintenance by the user.
+					var m_functionSetUpTheWell = function() {
+
+						try {
+
+							if (m_typeActive) {	// There will always be an active type.
+
+								$("#TypeWellMsg1").text("The active Type is named " + m_typeActive.name + ".");
+
+								if (m_arrayTypes.length > 1) {
+
+									$("#TypeWellMsg2").text("Click another type to work with it.");
+	
+								} else {
+
+									$("#TypeWellMsg2").text("");
+								}
+							}
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
 
 					// Invoked when the types dialog exist newly.
 					var m_functionNewType = function () {
@@ -369,6 +418,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					var m_arrayTypes = [];
 					// Active item.
 					var m_typeActive = null;
+
 				} catch (e) {
 
 					errorHelper.show(e);

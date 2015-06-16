@@ -84,6 +84,17 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 									jItem = jItemAdded;
 								}
 							);
+							// var exceptionRet = m_srToolStrip.addImage(
+							// 	client.removeSpaces(type.data.name),		// id
+							// 	type.data.name,		// name
+							// 	"",					// description
+							// 	resourceHelper.toURL('resources', type.data.imageResourceId, 'image'), // url
+							// 	'toolstripitem',
+							// 	function (jItemAdded) {
+
+							// 		jItem = jItemAdded;
+							// 	}
+							// );
 							if (exceptionRet) {
 
 								throw exceptionRet;

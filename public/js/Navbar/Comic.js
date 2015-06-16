@@ -32,7 +32,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					/////////////////////////////
 					// Public methods.
 
-					// Create comic instance.
+					// Activate/select comic instance.
 					self.activate = function () {
 
 						try {
@@ -54,12 +54,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					// Create comic instance.
-					self.load = function (objectData) {
+					self.load = function (comic) {
 
 						try {
 
 							// Save state.
-							self.data = objectData;
+							self.data = comic;
 
 							return null;
 						} catch (e) {
@@ -96,7 +96,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							// Then add to self.data.
-							self.data.types.items.push(type.data);
+							// This seems unnecessary--when debugging, I see it there already
+							// self.data.types.items.push(type.data);
 
 					        // Also add to the designer/tool strip.
 							exceptionRet = tools.addItem(type.data);

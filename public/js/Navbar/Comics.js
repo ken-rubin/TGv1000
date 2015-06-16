@@ -47,7 +47,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 					};
 
 					// Load up comics.
-					self.load = function (objectData) {
+					self.load = function (projectComics) {
 
 						try {
 
@@ -57,22 +57,21 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							// And the collection....
 							m_arrayComics = [];
 
-							for (var i = 0; i < objectData.items.length; i++) {
+							// Loop over comic items and insert into DOM.
+							for (var i = 0; i < projectComics.items.length; i++) {
 
 								// Get the ith comic.
-								var comicIth = objectData.items[i];
+								var comicIth = projectComics.items[i];
 
 								// Allocate.
 								var comicNew = new Comic();
-
-								// Create.
 								var exceptionRet = comicNew.load(comicIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
-								// Add.
+								// Add the comic.
 								var exceptionRet = self.addItem(comicNew);
 								if (exceptionRet) {
 
@@ -96,34 +95,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							return e;
 						}
 					};
-
-					// User (or system, after save) is unloading the project.
-					self.unload = function () {
-
-						try {
-
-							// Do the opposite of what self.load did. In the opposite order, too.
-							for (var i = 0; i < m_arrayComics.length; i++) {
-
-								var comicIth = m_arrayComics[i];
-								var exceptionRet = comicIth.unload();
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
-							}
-
-							// Now blow away our stuff.
-							m_srComicStrip.empty();
-							m_arrayComics = [];
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}
 
 					// Add frame to comic strip.
 					self.addItem = function (comic) {
@@ -161,11 +132,40 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 
 							m_comicActive = comic;
 							return null;
+							
 						} catch (e) {
 
 							return e;
 						}
 					};
+
+					// User (or system, after save) is unloading the project.
+					self.unload = function () {
+
+						try {
+
+							// Do the opposite of what self.load did. In the opposite order, too.
+							for (var i = 0; i < m_arrayComics.length; i++) {
+
+								var comicIth = m_arrayComics[i];
+								var exceptionRet = comicIth.unload();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Now blow away our stuff.
+							m_srComicStrip.empty();
+							m_arrayComics = [];
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
 
 					self.addTypeToActiveComic = function(type) {
 

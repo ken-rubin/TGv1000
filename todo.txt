@@ -26,7 +26,6 @@ Jerry
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
 - Call Tools.empty() when loading a project or closing a project.
-- Add class (like comicstripitem) as 5th parameter of ScrollRegion#addImage.
 - Tool.updateImage needs work. So does the possible duplicate ids in the tools scroll region.
 
 

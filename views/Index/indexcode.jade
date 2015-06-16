@@ -35,13 +35,24 @@
     .col-xs-12
       iframe#BlocklyIFrame
 
-  //- Next the solution explorer.
-  .row
+  //- Next the type editing area.
+.row
+    .col-xs-1
+    .col-xs-10
+      #TypeWell.panel.panel-success
+        #TypeWellMsg1.panel-body
+        br
+        br
+        br
+        br
+        br
+        br
+        #TypeWellMsg2.panel-body(style='text-align: center;')
+    .col-xs-1
 
-    //- Define a scrollable strip.
+  //- Next the typestrip.
+.row
     .col-xs-12#typestriprow
-
-      //- The scrolling region.  Contains projectitemsitem(s).
       #typestrip.ScrollRegion
 ul#TypeMemberContextMenu.dropdown-menu(role="menu",style="display:none")
   li
