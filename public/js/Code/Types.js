@@ -134,7 +134,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								throw exceptionRet;
 							}
 
-
 							// Also add to the collection of comics.
 							m_arrayTypes.push(type);
 
@@ -153,7 +152,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							m_typeActive = typeActive;
+							m_typeActive = new Type();
+							m_typeActive.load(typeActive);
 
 							var exceptionRet = m_functionSetUpTheWell();
 							if (exceptionRet) {
@@ -290,11 +290,26 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							// Else, update the type.
 							return m_typeActive.update(strWorkspace,
 								strMethod);
+
 						} catch (e) {
 
 							return e;
 						}
 					};
+
+					// Image has been changed. Update it in the TypeWell.
+					self.updateActiveTypeImage = function() {
+
+						try {
+
+							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.imageResourceId, 'image', ''));
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
 
 					///////////////////////////////////
 					// Private methods.
@@ -306,8 +321,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							if (m_typeActive) {	// There will always be an active type.
 
-								$("#TWtypeName").val(m_typeActive.name);
-								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.imageResourceId, 'image', ''));
+								$("#TWtypeName").val(m_typeActive.data.name);
+								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.data.imageResourceId, 'image', ''));
 
 								if (m_typeActive.isApp) {
 
@@ -337,9 +352,48 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					}
 
 					// TypeWell click handlers
-					var m_functionClickTWimageSearchLink = function () {}
-					var m_functionClickTWnewImageURLLink = function () {}
-					var m_functionClickTWnewImageDiskLink = function () {}
+					var m_functionClickTWimageSearchLink = function () {
+
+						try {
+
+							var exceptionRet = m_typeActive.imageSearch();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+					var m_functionClickTWnewImageURLLink = function () {
+
+						try {
+
+							var exceptionRet = m_typeActive.imageFromURL();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+					var m_functionClickTWnewImageDiskLink = function () {
+
+						try {
+
+							var exceptionRet = m_typeActive.imageFromDisk();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
 					var m_functionClickTWdeleteTypeLink = function () {}
 					var m_functionClickTWnewTypeLink = function () {
 
@@ -356,7 +410,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						}
 					}
 					var m_functionClickTWsearchTypeLink = function () {
-						
+
 						try {
 
 							var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
@@ -399,7 +453,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 	    						dependencies: [],
 	    						name: "new type",
 	    						id: m_arrayTypes.length + 1,
-	    						resourceId: 3
+	    						resourceId: 0
 				    		});
 				    		if (exceptionRet) {
 

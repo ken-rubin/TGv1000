@@ -88,22 +88,22 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Return the DOM element representing a prototypical item.
-					// self.generateDOM = function () {
+					self.generateDOM = function () {
 
-					// 	// Allocate the type.
-					// 	m_jType = $("<div id='" + 
-					// 		self.data.name + 
-					// 		"' class='typestripitem' style='background:black;'></div>");
+						// Allocate the type.
+						m_jType = $("<div id='" + 
+							self.data.name + 
+							"' class='typestripitem' style='background:black;'></div>");
 
-					// 	// Add the contents to the newly allocated type.
-					// 	var exceptionRet = m_functionGenerateTypeContents();
-					// 	if (exceptionRet) {
+						// Add the contents to the newly allocated type.
+						var exceptionRet = m_functionGenerateTypeContents();
+						if (exceptionRet) {
 
-					// 		throw exceptionRet;
-					// 	}
+							throw exceptionRet;
+						}
 
-					// 	return m_jType;
-					// };
+						return m_jType;
+					};
 
 					// Loop over all methods, indicate if the specified
 					// string is found in any of their workspaces.
@@ -181,212 +181,262 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					};
 
+					// These three are initiated by clicking links in TypeWell.
+					self.imageSearch = function () {
+
+						try {
+
+							var exceptionRet = client.showImageSearchDialog(true, m_functionOnGotResourceId);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+					self.imageFromURL = function () {
+
+						try {
+
+							var exceptionRet = client.showImageURLDialog(true, m_functionOnGotResourceId);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+					self.imageFromDisk = function () {
+
+						try {
+
+							var exceptionRet = client.showImageDiskDialog(true, m_functionOnGotResourceId);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////////////
 					// Private methods
 
 					// Helper method builds or rebuilds the type contents and replaces the types contents.
 					var m_functionGenerateTypeContents = function () {
 
-						try {
+						// try {
 
-							// Start empty.
-							m_jType.empty();
+						// 	// Start empty.
+						// 	m_jType.empty();
 
-							// Add first TGAction button. It applies to the whole Type.
-							var jMainTGActionButton = $("<button style='background-color:Transparent;border:none;outline:none;cursor:pointer;position:absolute;left:48px;top:8px;'>" +
-								"<img id='typeTGAction' class='TGAction' src='" +
-									resourceHelper.toURL("images", null, null, "TGAction.png") +
-									"'></img>" + 
-								"</button>");
-							m_jType.append(jMainTGActionButton);
-							jMainTGActionButton.click(m_functionMainTGActionBtnClick);
+						// 	// Add first TGAction button. It applies to the whole Type.
+						// 	var jMainTGActionButton = $("<button style='background-color:Transparent;border:none;outline:none;cursor:pointer;position:absolute;left:48px;top:8px;'>" +
+						// 		"<img id='typeTGAction' class='TGAction' src='" +
+						// 			resourceHelper.toURL("images", null, null, "TGAction.png") +
+						// 			"'></img>" + 
+						// 		"</button>");
+						// 	m_jType.append(jMainTGActionButton);
+						// 	jMainTGActionButton.click(m_functionMainTGActionBtnClick);
 
-							// Generate the name to add to the type.
-							var jTypeName = $("<div style='position:absolute;left:8px;top:38px;right:72px'>" + 
-								self.data.name + 
-								"</div>");
-							m_jType.append(jTypeName);
-							jTypeName.contextMenu({
+						// 	// Generate the name to add to the type.
+						// 	var jTypeName = $("<div style='position:absolute;left:8px;top:38px;right:72px'>" + 
+						// 		self.data.name + 
+						// 		"</div>");
+						// 	m_jType.append(jTypeName);
+						// 	jTypeName.contextMenu({
 
-								menuSelector: "#TypeMemberContextMenu",
-								menuSelected: m_functionTypeContextMenu
-							});
+						// 		menuSelector: "#TypeMemberContextMenu",
+						// 		menuSelected: m_functionTypeContextMenu
+						// 	});
 
-							// Generate the image for the type.
-							var jTypeImage = $("<img src='" + 
-								resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
-								"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
-							m_jType.append(jTypeImage);
-							jTypeImage.contextMenu({
+						// 	// Generate the image for the type.
+						// 	var jTypeImage = $("<img src='" + 
+						// 		resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
+						// 		"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
+						// 	m_jType.append(jTypeImage);
+						// 	jTypeImage.contextMenu({
 
-								menuSelector: "#TypeImageContextMenu",
-								menuSelected: m_functionTypeImageContextMenu
-							});
+						// 		menuSelector: "#TypeImageContextMenu",
+						// 		menuSelected: m_functionTypeImageContextMenu
+						// 	});
 
-							/////////////////////////
-							// Properties.
-							var jTypeProperties = $("<div style='color:rgb(250,250,200);position:absolute;left:8px;top:72px;right:8px;height:" + 
-								self.buttonHeight + 
-								"px;'>" + 
-								"properties" + 
-								"</div>");
-							m_jType.append(jTypeProperties);
+						// 	/////////////////////////
+						// 	// Properties.
+						// 	var jTypeProperties = $("<div style='color:rgb(250,250,200);position:absolute;left:8px;top:72px;right:8px;height:" + 
+						// 		self.buttonHeight + 
+						// 		"px;'>" + 
+						// 		"properties" + 
+						// 		"</div>");
+						// 	m_jType.append(jTypeProperties);
 
-							// Add Properties.
-							var jTypeAddProperties = $("<button class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:102px;right:8px;height:" +
-								self.buttonHeight +
-								"px;width:26px;'>" + 
-								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL('images', null, null, 'plus.png') +
-								"'></img>" + 
-								"</button>");
-							m_jType.append(jTypeAddProperties);
-							jTypeAddProperties.click(m_functionAddPropertyClick);
+						// 	// Add Properties.
+						// 	var jTypeAddProperties = $("<button class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:102px;right:8px;height:" +
+						// 		self.buttonHeight +
+						// 		"px;width:26px;'>" + 
+						// 		"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
+						// 		resourceHelper.toURL('images', null, null, 'plus.png') +
+						// 		"'></img>" + 
+						// 		"</button>");
+						// 	m_jType.append(jTypeAddProperties);
+						// 	jTypeAddProperties.click(m_functionAddPropertyClick);
 
-							// Loop over and add the properties.
-							var iCursorY = 132;
-							for (var i = 0; i < self.data.properties.length; i++) {
+						// 	// Loop over and add the properties.
+						// 	var iCursorY = 132;
+						// 	for (var i = 0; i < self.data.properties.length; i++) {
 
-								var propertyIth = self.data.properties[i];
+						// 		var propertyIth = self.data.properties[i];
 
-								// Add the property.
-								var jTypeProperty = $("<button data-index='" + 
-									i + 
-									"' class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
-									iCursorY +
-									"px;right:8px;height:" + 
-									self.buttonHeight + 
-									"px;'>" + 
-									propertyIth.propertyName + 
-									"</button>");
-								m_jType.append(jTypeProperty);
-								jTypeProperty.click(m_functionPropertyClick);
-								jTypeProperty.contextMenu({
+						// 		// Add the property.
+						// 		var jTypeProperty = $("<button data-index='" + 
+						// 			i + 
+						// 			"' class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
+						// 			iCursorY +
+						// 			"px;right:8px;height:" + 
+						// 			self.buttonHeight + 
+						// 			"px;'>" + 
+						// 			propertyIth.propertyName + 
+						// 			"</button>");
+						// 		m_jType.append(jTypeProperty);
+						// 		jTypeProperty.click(m_functionPropertyClick);
+						// 		jTypeProperty.contextMenu({
 
-									menuSelector: "#TypeMemberContextMenu",
-									menuSelected: m_functionPropertyContextMenu
-								});
+						// 			menuSelector: "#TypeMemberContextMenu",
+						// 			menuSelected: m_functionPropertyContextMenu
+						// 		});
 
-								// Move to the next row.
-								iCursorY += self.lineHeight;
-							}
+						// 		// Move to the next row.
+						// 		iCursorY += self.lineHeight;
+						// 	}
 
-							/////////////////////////
-							// Space before methods.
-							iCursorY += self.lineHeight;
+						// 	/////////////////////////
+						// 	// Space before methods.
+						// 	iCursorY += self.lineHeight;
 
-							// Methods.
-							var jTypeMethods = $("<div style='position:absolute;left:8px;top:" + 
-								iCursorY + 
-								"px;right:8px;height:" + 
-								self.buttonHeight + 
-								"px;'>" + 
-								"methods" + 
-								"</div>");
-							m_jType.append(jTypeMethods);
-							iCursorY += self.lineHeight;
+						// 	// Methods.
+						// 	var jTypeMethods = $("<div style='position:absolute;left:8px;top:" + 
+						// 		iCursorY + 
+						// 		"px;right:8px;height:" + 
+						// 		self.buttonHeight + 
+						// 		"px;'>" + 
+						// 		"methods" + 
+						// 		"</div>");
+						// 	m_jType.append(jTypeMethods);
+						// 	iCursorY += self.lineHeight;
 
-							// Add Methods.
-							var jTypeAddMethods = $("<button class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
-								iCursorY + 
-								"px;right:8px;height:" +
-								self.buttonHeight +
-								"px;width:26px;'>" + 
-								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL('images', null, null, 'plus.png') +
-								"'></img>" + 
-								"</button>");
-							m_jType.append(jTypeAddMethods);
-							iCursorY += self.lineHeight;
-							jTypeAddMethods.click(m_functionAddMethodClick);
+						// 	// Add Methods.
+						// 	var jTypeAddMethods = $("<button class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
+						// 		iCursorY + 
+						// 		"px;right:8px;height:" +
+						// 		self.buttonHeight +
+						// 		"px;width:26px;'>" + 
+						// 		"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
+						// 		resourceHelper.toURL('images', null, null, 'plus.png') +
+						// 		"'></img>" + 
+						// 		"</button>");
+						// 	m_jType.append(jTypeAddMethods);
+						// 	iCursorY += self.lineHeight;
+						// 	jTypeAddMethods.click(m_functionAddMethodClick);
 
-							// Loop over and add the methods.
-							for (var i = 0; i < self.data.methods.length; i++) {
+						// 	// Loop over and add the methods.
+						// 	for (var i = 0; i < self.data.methods.length; i++) {
 
-								var methodIth = self.data.methods[i];
+						// 		var methodIth = self.data.methods[i];
 
-								// Add the property.
-								var jTypeMethod = $("<button data-index='" + 
-									i + 
-									"' class='typebutton' style='position:absolute;left:8px;top:" + 
-									iCursorY +
-									"px;right:8px;height:" + 
-									self.buttonHeight + 
-									"px;'>" + 
-									methodIth.name + 
-									"</button>");
-								m_jType.append(jTypeMethod);
-								jTypeMethod.click(m_functionMethodClick);
-								jTypeMethod.contextMenu({
+						// 		// Add the property.
+						// 		var jTypeMethod = $("<button data-index='" + 
+						// 			i + 
+						// 			"' class='typebutton' style='position:absolute;left:8px;top:" + 
+						// 			iCursorY +
+						// 			"px;right:8px;height:" + 
+						// 			self.buttonHeight + 
+						// 			"px;'>" + 
+						// 			methodIth.name + 
+						// 			"</button>");
+						// 		m_jType.append(jTypeMethod);
+						// 		jTypeMethod.click(m_functionMethodClick);
+						// 		jTypeMethod.contextMenu({
 
-									menuSelector: "#TypeMemberContextMenu",
-									menuSelected: m_functionMethodContextMenu
-								});
+						// 			menuSelector: "#TypeMemberContextMenu",
+						// 			menuSelected: m_functionMethodContextMenu
+						// 		});
 
-								// Move to the next row.
-								iCursorY += self.lineHeight;
-							}
+						// 		// Move to the next row.
+						// 		iCursorY += self.lineHeight;
+						// 	}
 
-							/////////////////////////
-							// Space before events.
-							iCursorY += self.lineHeight;
+						// 	/////////////////////////
+						// 	// Space before events.
+						// 	iCursorY += self.lineHeight;
 
-							// Events.
-							var jTypeEvents = $("<div style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
-								iCursorY + 
-								"px;right:8px;height:" + 
-								self.buttonHeight + 
-								"px;'>" + 
-								"events" + 
-								"</div>");
-							m_jType.append(jTypeEvents);
-							iCursorY += self.lineHeight;
+						// 	// Events.
+						// 	var jTypeEvents = $("<div style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
+						// 		iCursorY + 
+						// 		"px;right:8px;height:" + 
+						// 		self.buttonHeight + 
+						// 		"px;'>" + 
+						// 		"events" + 
+						// 		"</div>");
+						// 	m_jType.append(jTypeEvents);
+						// 	iCursorY += self.lineHeight;
 
-							// Add Events.
-							var jTypeAddEvents = $("<button class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
-							 	iCursorY + 
-							 	"px;right:8px;height:" +
-								self.buttonHeight +
-								"px;width:26px;'>" + 
-								"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
-								resourceHelper.toURL('images', null, null, 'plus.png') +
-								"'></img>" + 
-								"</button>");
-							m_jType.append(jTypeAddEvents);
-							iCursorY += self.lineHeight;
-							jTypeAddEvents.click(m_functionAddEventClick);
+						// 	// Add Events.
+						// 	var jTypeAddEvents = $("<button class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
+						// 	 	iCursorY + 
+						// 	 	"px;right:8px;height:" +
+						// 		self.buttonHeight +
+						// 		"px;width:26px;'>" + 
+						// 		"<img class='typestripitem' id='AddType' style='position:absolute;left:0px;top:0px;width:24px;height:24px;' src='" +
+						// 		resourceHelper.toURL('images', null, null, 'plus.png') +
+						// 		"'></img>" + 
+						// 		"</button>");
+						// 	m_jType.append(jTypeAddEvents);
+						// 	iCursorY += self.lineHeight;
+						// 	jTypeAddEvents.click(m_functionAddEventClick);
 
-							// Loop over and add the events.
-							for (var i = 0; i < self.data.events.length; i++) {
+						// 	// Loop over and add the events.
+						// 	for (var i = 0; i < self.data.events.length; i++) {
 
-								var eventsIth = self.data.events[i];
+						// 		var eventsIth = self.data.events[i];
 
-								// Add the Events.
-								var jTypeEvent = $("<button data-index='" + 
-									i + 
-									"' class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
-									iCursorY +
-									"px;right:8px;height:" + 
-									self.buttonHeight + 
-									"px;'>" + 
-									eventsIth.name + 
-									"</button>");
-								m_jType.append(jTypeEvent);
-								jTypeEvent.click(m_functionEventClick);
-								jTypeEvent.contextMenu({
+						// 		// Add the Events.
+						// 		var jTypeEvent = $("<button data-index='" + 
+						// 			i + 
+						// 			"' class='typebutton' style='color:rgb(250,250,200);position:absolute;left:8px;top:" + 
+						// 			iCursorY +
+						// 			"px;right:8px;height:" + 
+						// 			self.buttonHeight + 
+						// 			"px;'>" + 
+						// 			eventsIth.name + 
+						// 			"</button>");
+						// 		m_jType.append(jTypeEvent);
+						// 		jTypeEvent.click(m_functionEventClick);
+						// 		jTypeEvent.contextMenu({
 
-									menuSelector: "#TypeMemberContextMenu",
-									menuSelected: m_functionEventContextMenu
-								});
+						// 			menuSelector: "#TypeMemberContextMenu",
+						// 			menuSelected: m_functionEventContextMenu
+						// 		});
 
-								// Move to the next row.
-								iCursorY += self.lineHeight;
-							}
-							return null;
-						} catch (e) {
+						// 		// Move to the next row.
+						// 		iCursorY += self.lineHeight;
+						// 	}
+						// 	return null;
+						// } catch (e) {
 
-							return e;
-						}
+						// 	return e;
+						// }
 					};
 
 					var m_functionMainTGActionBtnClick = function() {
@@ -660,40 +710,39 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// Invoked when a type image is right-clicked.
 					var m_functionTypeImageContextMenu = function (invokedOn, selectedMenu) {
 
-						try {
+						// try {
 
-							// Handle different menu items differently.
-							if (selectedMenu.text() === "Search for a Type Image") {
+						// 	// Handle different menu items differently.
+						// 	if (selectedMenu.text() === "Search for a Type Image") {
 
-								var exceptionRet = client.showImageSearchDialog(true, m_functionOnGotResourceId);
-								if (exceptionRet) {
+						// 		var exceptionRet = client.showImageSearchDialog(true, m_functionOnGotResourceId);
+						// 		if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-							if (selectedMenu.text() === "Load a new Type Image using a URL") {
+						// 			throw exceptionRet;
+						// 		}
+						// 	}
+						// 	if (selectedMenu.text() === "Load a new Type Image using a URL") {
 
-								var exceptionRet = client.showImageURLDialog(true, m_functionOnGotResourceId);
-								if (exceptionRet) {
+						// 		var exceptionRet = client.showImageURLDialog(true, m_functionOnGotResourceId);
+						// 		if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-							if (selectedMenu.text() === "Load a new Type Image that's already on your computer") {
+						// 			throw exceptionRet;
+						// 		}
+						// 	}
+						// 	if (selectedMenu.text() === "Load a new Type Image that's already on your computer") {
 
-								var exceptionRet = client.showImageDiskDialog(true, m_functionOnGotResourceId);
-								if (exceptionRet) {
+						// 		var exceptionRet = client.showImageDiskDialog(true, m_functionOnGotResourceId);
+						// 		if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-						} catch (e) {
+						// 			throw exceptionRet;
+						// 		}
+						// 	}
+						// } catch (e) {
 
-							errorHelper.show(e);
-						}
+						// 	errorHelper.show(e);
+						// }
 					};
 
-					// 
 					var m_functionOnGotResourceId = function (iResourceId) {
 
 						try {
@@ -716,6 +765,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 									throw exceptionRet;
 								}
+
+								// Call off to Types to change the image in the TypeWell.
+								exceptionRet = types.updateActiveTypeImage();
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
 							} else {
 
 								throw new Error("Bad ResourceId received from ImageSoundDialog chain.");
