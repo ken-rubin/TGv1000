@@ -41,6 +41,15 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						    		self.select(m_arrayTypes[j].data);
 								}
 							);
+
+							// Add click handlers for TypeWell.
+							$("#TWimageSearchLink").click(m_functionClickTWimageSearchLink);
+							$("#TWnewImageURLLink").click(m_functionClickTWnewImageURLLink);
+							$("#TWnewImageDiskLink").click(m_functionClickTWnewImageDiskLink);
+							$("#TWdeleteTypeLink").click(m_functionClickTWdeleteTypeLink);
+							$("#TWnewTypeLink").click(m_functionClickTWnewTypeLink);
+							$("#TWsearchTypeLink").click(m_functionClickTWsearchTypeLink);
+
 						} catch (e) {
 
 							return e;
@@ -300,6 +309,15 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								$("#TWtypeName").val(m_typeActive.name);
 								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.imageResourceId, 'image', ''));
 
+								if (m_typeActive.isApp) {
+
+									$("#TWdeleteTypeLink").addClass("disabled");
+
+								} else {
+
+									$("#TWdeleteTypeLink").removeClass("disabled");
+								}
+
 								if (m_arrayTypes.length > 1) {
 
 									$("#TypeWellMsg2").text("Click another type to work with it.");
@@ -315,6 +333,54 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						} catch(e) {
 
 							return e;
+						}
+					}
+
+					// TypeWell click handlers
+					var m_functionClickTWimageSearchLink = function () {}
+					var m_functionClickTWnewImageURLLink = function () {}
+					var m_functionClickTWnewImageDiskLink = function () {}
+					var m_functionClickTWdeleteTypeLink = function () {}
+					var m_functionClickTWnewTypeLink = function () {
+
+						try {
+
+							var exceptionRet = client.showNewTypeDialog();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+					var m_functionClickTWsearchTypeLink = function () {
+						
+						try {
+
+							var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
+
+								if (iTypeId > 0) {
+
+									exceptionRet = client.addTypeToProjectFromDB(iTypeId);
+
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} else {
+
+									throw new Error("Invalid project id returned.")
+								}
+							});
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
 						}
 					}
 

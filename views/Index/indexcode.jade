@@ -48,19 +48,15 @@
             .col-sm-3
               .row(style='margin-left:0px;margin-right:0px;')
                   img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;")
-                  br
-                  a#TWimageSearchLink(href="#") Search for a new Type Image
-                  br
-                  a#TWnewImageURLLink(href="#") Load a new Type Image using a URL
-                  br
-                  a#TWnewImageDiskLink(href="#") Load a new Type Image from your computer
+                  .list-group.pull-right(style="width:290px; margin-right:35px;")
+                    a#TWimageSearchLink.list-group-item(href="#") Search for a new Type image
+                    a#TWnewImageURLLink.list-group-item(href="#") Load a new Type image using a URL
+                    a#TWnewImageDiskLink.list-group-item(href="#") Load a new Type image from your computer
               .row(style='margin-left:0px;margin-right:0px;')
-                br
-                a#TWdeleteTypeLink(href="#" style="margin-left:50px;") Delete this Type
-                br
-                a#TWnewTypeLink(href="#" style="margin-left:50px;") Add a new Type
-                br
-                a#TWsearchTypeLink(href="#" style="margin-left:50px;") Search for a new Type
+                  .list-group.pull-right(style="width:170px;")
+                    a#TWdeleteTypeLink.list-group-item(href="#") Delete this Type
+                    a#TWnewTypeLink.list-group-item(href="#") Add a new Type
+                    a#TWsearchTypeLink.list-group-item(href="#") Search for a new Type
             .col-sm-3
                 br
                 br

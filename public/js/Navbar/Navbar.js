@@ -143,51 +143,6 @@ define(["Core/errorHelper"],
 								}
 							});
 
-							// Wire typess buttons.
-							$("#NewTypeButton").click(function () {
-
-								try {
-
-									var exceptionRet = client.showNewTypeDialog();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
-
-							$("#TypeSearchButton").click(function () {
-
-								try {
-
-									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
-
-										if (iTypeId > 0) {
-
-											exceptionRet = client.addTypeToProjectFromDB(iTypeId);
-
-											if (exceptionRet) {
-
-												throw exceptionRet;
-											}
-										} else {
-
-											throw new Error("Invalid project id returned.")
-										}
-									});
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
-
 							// Wire Adminzone button click.
 							$("#AdminzoneButton").click(function () {
 
