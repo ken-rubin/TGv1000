@@ -297,7 +297,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							if (m_typeActive) {	// There will always be an active type.
 
-								$("#TypeWellMsg1").text("The active Type is named " + m_typeActive.name + ".");
+								$("#TWtypeName").val(m_typeActive.name);
+								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.imageResourceId, 'image', ''));
 
 								if (m_arrayTypes.length > 1) {
 

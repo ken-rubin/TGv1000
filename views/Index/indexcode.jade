@@ -37,18 +37,53 @@
 
   //- Next the type editing area.
 .row
-    .col-xs-1
-    .col-xs-10
-      #TypeWell.panel.panel-success
-        #TypeWellMsg1.panel-body
-        br
-        br
-        br
-        br
-        br
-        br
-        #TypeWellMsg2.panel-body(style='text-align: center;')
-    .col-xs-1
+        #TypeWell.panel.panel-success
+          .panel-body
+            | Type name:&nbsp;&nbsp;&nbsp;
+            input#TWtypeName
+            | &nbsp;&nbsp;&nbsp;
+            a#TWRenameTypeLink(href="#") Rename
+          br
+          .row.vdivide
+            .col-sm-3
+              .row(style='margin-left:0px;margin-right:0px;')
+                  img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;")
+                  br
+                  a#TWimageSearchLink(href="#") Search for a new Type Image
+                  br
+                  a#TWnewImageURLLink(href="#") Load a new Type Image using a URL
+                  br
+                  a#TWnewImageDiskLink(href="#") Load a new Type Image from your computer
+              .row(style='margin-left:0px;margin-right:0px;')
+                br
+                a#TWdeleteTypeLink(href="#" style="margin-left:50px;") Delete this Type
+                br
+                a#TWnewTypeLink(href="#" style="margin-left:50px;") Add a new Type
+                br
+                a#TWsearchTypeLink(href="#" style="margin-left:50px;") Search for a new Type
+            .col-sm-3
+                br
+                br
+                br
+                br
+                br
+                br
+            .col-sm-3
+                br
+                br
+                br
+                br
+                br
+                br
+            .col-sm-3
+                br
+                br
+                br
+                br
+                br
+                br
+          .row
+            #TypeWellMsg2.panel-body(style='text-align: center;')
 
   //- Next the typestrip.
 .row
