@@ -64,15 +64,15 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 								var comicIth = projectComics.items[i];
 
 								// Allocate.
-								var comicNew = new Comic();
-								var exceptionRet = comicNew.load(comicIth);
+								var clComic = new Comic();
+								var exceptionRet = clComic.load(comicIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
 								// Add the comic.
-								var exceptionRet = self.addItem(comicNew);
+								var exceptionRet = self.addItem(clComic);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -97,7 +97,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 					};
 
 					// Add frame to comic strip.
-					self.addItem = function (comic) {
+					self.addItem = function (clComic) {
 
 						try {
 
@@ -106,7 +106,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 								"carousel" + m_arrayComics.length.toString(),		// id
 								'',		// name
 								'',		// description
-								resourceHelper.toURL('resources', comic.data.imageResourceId, 'image', ''),		// url
+								resourceHelper.toURL('resources', clComic.data.imageResourceId, 'image', ''),		// url
 								'comicstripitem'	// image class
 							);
 							if (exceptionRet) {
@@ -115,7 +115,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							}
 
 							// Also add to the collection of comics.
-							m_arrayComics.push(comic);
+							m_arrayComics.push(clComic);
 
 							return null;
 
@@ -126,11 +126,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 					};
 
 					// Method sets the specified comic as the active comic.
-					self.select = function (comic) {
+					self.select = function (clComic) {
 
 						try {
 
-							m_comicActive = comic;
+							m_comicActive = clComic;
 							return null;
 							
 						} catch (e) {
@@ -167,11 +167,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 						}
 					}
 
-					self.addTypeToActiveComic = function(type) {
+					self.addTypeToActiveComic = function(clType) {
 
 						try {
 
-							return m_comicActive.addType(type);
+							return m_comicActive.addType(clType);
 
 						} catch (e) {
 

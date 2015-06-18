@@ -60,8 +60,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 							// Save state.
 							self.data = comic;
-
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -84,12 +84,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					self.addType = function(type) {
+					self.addType = function(clType) {
 
 						try {
 
 							// First add to the global types.
-							var exceptionRet = types.addItem(type);
+							var exceptionRet = types.addItem(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -100,7 +100,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							// self.data.types.items.push(type.data);
 
 					        // Also add to the designer/tool strip.
-							exceptionRet = tools.addItem(type.data);
+							exceptionRet = tools.addItem(clType.data);
 							if (exceptionRet) {
 
 								throw exceptionRet;

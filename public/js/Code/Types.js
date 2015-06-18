@@ -326,12 +326,51 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 								if (m_typeActive.isApp) {
 
-									$("#TWdeleteTypeLink").addClass("disabled");
+									$("#TWdeleteTypeBtn").prop("disabled", true);
 
 								} else {
 
-									$("#TWdeleteTypeLink").removeClass("disabled");
+									$("#TWdeleteTypeBtn").prop("disabled", false);
 								}
+
+								var strBuild;
+								// Methods
+								$("#TWmethodsTbody").empty();
+								strBuild = "";
+								var haveAnyMethods = false;
+								m_typeActive.data.methods.forEach(function(m) {
+
+									haveAnyMethods = true;
+									if (m.name === 'initialize') {
+										strBuild += "<tr><td>" + m.name + "</td><td></td><td></td></tr>";
+									} else {
+										strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>rename</a></td><td><a href='#'>delete</a></td></tr>";
+									}
+								});
+								$("#TWmethodsTbody").append(strBuild);
+								if (haveAnyMethods){
+									$("#TWclickMsg").css("display", "block");
+								} else {
+									$("#TWclickMsg").css("display", "none");
+								}
+
+								// Properties
+								$("#TWpropertiesTbody").empty();
+								strBuild = "";
+								m_typeActive.data.properties.forEach(function(m) {
+
+									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
+								});
+								$("#TWpropertiesTbody").append(strBuild);
+
+								// Events
+								$("#TWeventsTbody").empty();
+								strBuild = "";
+								m_typeActive.data.properties.forEach(function(m) {
+
+									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
+								});
+								$("#TWeventsTbody").append(strBuild);
 
 								if (m_arrayTypes.length > 1) {
 

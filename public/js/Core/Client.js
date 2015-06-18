@@ -277,9 +277,9 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var newType = new Type();
-									newType.load(data.type);
-									return m_project.addType(newType);
+									var clType = new Type();
+									clType.load(data.type);
+									return m_project.addType(clType);
 
 								} else {
 

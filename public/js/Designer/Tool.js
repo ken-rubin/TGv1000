@@ -102,6 +102,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					// Private fields.
 
 					var m_jTool = null;
+					
 				} catch (e) {
 
 					errorHelper.show(e);

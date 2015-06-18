@@ -115,6 +115,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 							// Just call to helper method.
 							return m_functionRender();
+							
 						} catch (e) {
 
 							return e;
@@ -122,12 +123,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 					}
 
 					// Type image has changed, update in designer.
-					self.updateImage  = function (type) {
+					self.updateImage  = function (clType) {
 
 						try {
 
 							// Compose id to lookup.
-							var strTypeId = client.removeSpaces(type.data.name);
+							var strTypeId = client.removeSpaces(clType.data.name);
 
 							// Loop over all tool instances, ask each if it wraps the type which 
 							// was just updated and passed into this method.  If so, update image.
@@ -140,7 +141,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 								if (tiIth.id === strTypeId) {
 
 									// ...update the resource id.
-									var exceptionRet = tiIth.updateImage(type.data.resourceId);
+									var exceptionRet = tiIth.updateImage(clType.data.resourceId);
 									if (exceptionRet) {
 
 										throw exceptionRet;
@@ -149,7 +150,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 							}
 
 							// Also pass on to the tool strip.
-							var exceptionRet = tools.updateImage(type);
+							var exceptionRet = tools.updateImage(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -157,6 +158,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 							// Cause a refresh.
 							return m_functionRender();
+
 						} catch (e) {
 
 							return e;

@@ -33,7 +33,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							self.data = project;
 							client.setProjectDirtyBool(true);
 
-							return comics.load(project.comics);	// the global object
+							return comics.load(self.data.comics);	// the global object
 
 						} catch (e) {
 
@@ -41,11 +41,11 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
-					self.addType = function(type) {
+					self.addType = function(clType) {
 
 						try {
 
-							return comics.addTypeToActiveComic(type);
+							return comics.addTypeToActiveComic(clType);
 
 						} catch (e) {
 
@@ -88,27 +88,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									userId: strUserId,
 									userName: strUserName,
 									projectJson: self.data
-
-
-
-
-
-
-
-
-
-
-
-
-									// build project js object explicitly
-
-
-
-
-
-
-
-
 							};
 
 							$.ajax({

@@ -64,8 +64,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 
 						try {
 
-							var toolNew = new Tool();
-							var exceptionRet = toolNew.load(type);
+							var clTool = new Tool();
+							var exceptionRet = clTool.load(type);
 							if (exceptionRet) {
 
 								return exceptionRet;
@@ -84,24 +84,13 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 									jItem = jItemAdded;
 								}
 							);
-							// var exceptionRet = m_srToolStrip.addImage(
-							// 	client.removeSpaces(type.data.name),		// id
-							// 	type.data.name,		// name
-							// 	"",					// description
-							// 	resourceHelper.toURL('resources', type.data.imageResourceId, 'image'), // url
-							// 	'toolstripitem',
-							// 	function (jItemAdded) {
-
-							// 		jItem = jItemAdded;
-							// 	}
-							// );
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 							// Also add to the collection of comics.
-							m_arrayTools.push(toolNew);
+							m_arrayTools.push(clTool);
 
 							// Wire up the dragability of the tool.
 		                    jItem.draggable({
@@ -128,13 +117,13 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							for (var i = 0; i < m_arrayTools.length; i++) {
 
 								// Splice on match.
-								if (m_arrayTools[i].type === type) {
+								if (m_arrayTools[i].data.type === type) {
 
 									// Get the tool.
-									var toolIth = m_arrayTools[i];
+									var clToolIth = m_arrayTools[i];
 
 									// Remove form GUI.
-									var exceptionRet = toolIth.destroy();
+									var exceptionRet = clToolIth.destroy();
 									if (exceptionRet) {
 
 										throw exceptionRet;
@@ -145,8 +134,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 									break;
 								}
 							}
-
 							return null;
+
 						} catch (e) {
 
 							return e;

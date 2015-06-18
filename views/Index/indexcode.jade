@@ -35,7 +35,7 @@
     .col-xs-12
       iframe#BlocklyIFrame
 
-  //- Next the type editing area.
+//- Next the type editing area.
 .row.twsection
         #TypeWell.panel.panel-success
           .panel-body
@@ -47,15 +47,18 @@
             .col-sm-3
               .row(style='margin-left:0px;margin-right:0px;')
                   img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;")
-                  .list-group.pull-right(style="width:290px; margin-right:35px;")
+                  .list-group.pull-right(style="width:290px; margin-right:35px; margin-top:15px;")
                     a#TWimageSearchLink.list-group-item(href="#") Search for a new Type image
                     a#TWnewImageURLLink.list-group-item(href="#") Load a new Type image using a URL
                     a#TWnewImageDiskLink.list-group-item(href="#") Load a new Type image from your computer
-              .row(style='margin-left:0px;margin-right:0px;')
-                  .list-group.pull-right(style="width:170px;")
-                    a#TWdeleteTypeLink.list-group-item(href="#") Delete this Type
-                    a#TWnewTypeLink.list-group-item(href="#") Add a new Type
-                    a#TWsearchTypeLink.list-group-item(href="#") Search for a new Type
+              .row(style='text-align: center;')
+                    br
+                    br
+                    button#TWdeleteTypeBtn Delete this Type
+                    | &nbsp;&nbsp;&nbsp;
+                    button#TWnewTypeBtn Add a new Type
+                    | &nbsp;&nbsp;&nbsp;
+                    button#TWsearchTypeBtn Search for a new Type
             .col-sm-3
               .row(style='text-align: center;')
                 | Methods
@@ -63,40 +66,13 @@
                 .table-responsive
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWmethodsTbody
-                      tr
-                        td method1
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td method2 with longer name
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td method3
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td method4
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td method5
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
+              .row#TWclickMsg(style='text-align: center;display:block;')
+                | Click on a Method name to work with it.
               .row(style='text-align: center;')
-                button Add a new Method
+                br
+                button#TWaddMethodBtn Add a new Method
                 | &nbsp;&nbsp;&nbsp;
-                button Search for a new Method
+                button#TWsearchMethodBtn Search for a new Method
             .col-sm-3
               .row(style='text-align: center;')
                 | Properties
@@ -104,40 +80,8 @@
                 .table-responsive
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWpropertiesTbody
-                      tr
-                        td property1
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td property2 with a very very very very very very very very very long name
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td property3
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td property4
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td property5
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
               .row(style='text-align: center;')
-                button Add new Property
-                | &nbsp;&nbsp;&nbsp;
-                button Search for a new Property
+                button#TWaddPropertyBtn Add a new Property
             .col-sm-3
               .row(style='text-align: center;')
                 | Events
@@ -145,40 +89,8 @@
                 .table-responsive
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWeventsTbody
-                      tr
-                        td event1
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td event2
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td event3
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td event4
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
-                      tr
-                        td event5
-                        td
-                          a(href="#") edit
-                        td
-                          a(href="#") delete
               .row(style='text-align: center;')
-                button Add new Event
-                | &nbsp;&nbsp;&nbsp;
-                button Search for a new Event
+                button#TWaddEventBtn Add a new Event
           .row
             #TypeWellMsg2.panel-body(style='text-align: center;')
 
