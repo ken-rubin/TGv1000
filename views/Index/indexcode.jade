@@ -43,7 +43,6 @@
             input#TWtypeName
             | &nbsp;&nbsp;&nbsp;
             a#TWRenameTypeLink(href="#") Rename
-          br
           .row.vdivide
             .col-sm-3
               .row(style='margin-left:0px;margin-right:0px;')
@@ -58,26 +57,128 @@
                     a#TWnewTypeLink.list-group-item(href="#") Add a new Type
                     a#TWsearchTypeLink.list-group-item(href="#") Search for a new Type
             .col-sm-3
-                br
-                br
-                br
-                br
-                br
-                br
+              .row(style='text-align: center;')
+                | Methods
+              .row
+                .table-responsive
+                  table.table.table-condensed.table-striped.table-bordered
+                    tbody#TWmethodsTbody
+                      tr
+                        td method1
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td method2 with longer name
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td method3
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td method4
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td method5
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+              .row(style='text-align: center;')
+                button Add a new Method
+                | &nbsp;&nbsp;&nbsp;
+                button Search for a new Method
             .col-sm-3
-                br
-                br
-                br
-                br
-                br
-                br
+              .row(style='text-align: center;')
+                | Properties
+              .row
+                .table-responsive
+                  table.table.table-condensed.table-striped.table-bordered
+                    tbody#TWpropertiesTbody
+                      tr
+                        td property1
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td property2 with a very very very very very very very very very long name
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td property3
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td property4
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td property5
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+              .row(style='text-align: center;')
+                button Add new Property
+                | &nbsp;&nbsp;&nbsp;
+                button Search for a new Property
             .col-sm-3
-                br
-                br
-                br
-                br
-                br
-                br
+              .row(style='text-align: center;')
+                | Events
+              .row
+                .table-responsive
+                  table.table.table-condensed.table-striped.table-bordered
+                    tbody#TWeventsTbody
+                      tr
+                        td event1
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td event2
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td event3
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td event4
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+                      tr
+                        td event5
+                        td
+                          a(href="#") edit
+                        td
+                          a(href="#") delete
+              .row(style='text-align: center;')
+                button Add new Event
+                | &nbsp;&nbsp;&nbsp;
+                button Search for a new Event
           .row
             #TypeWellMsg2.panel-body(style='text-align: center;')
 
