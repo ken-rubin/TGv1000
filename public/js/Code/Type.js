@@ -41,20 +41,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					/////////////////////////////
 					// Public methods.
 
-					// Activate/select type instance.
-					self.activate = function () {
-
-						try {
-
-							// Cause types to fill the type well with this type.
-							return types.select(self.data);
-							
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Create this instance.
 					self.load = function (typesItem) {
 
@@ -66,6 +52,21 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// process properties methods events and dependencies collections.
 
 							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Activate/select type instance.
+					self.activate = function (indexInTypes) {
+
+						try {
+
+							// Cause types to fill the type well with this type.
+							return types.select(self.data, indexInTypes);
+							
 						} catch (e) {
 
 							return e;
@@ -437,6 +438,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 						// 	return e;
 						// }
+
+						return null;
 					};
 
 					var m_functionMainTGActionBtnClick = function() {
@@ -753,20 +756,20 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 								self.data.imageResourceId = iResourceId;
 
 								// Cause type to regenerate.
-								var exceptionRet = m_functionGenerateTypeContents();
-								if (exceptionRet) {
+								// var exceptionRet = m_functionGenerateTypeContents();
+								// if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+								// 	throw exceptionRet;
+								// }
 
-								// Call off to the designer to update the picture in the toolstrip and the designer surface.
+								// Call off to the designer to update the picture in the designer surface.
 								exceptionRet = designer.updateImage(self);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
-								// Call off to Types to change the image in the TypeWell.
+								// Call off to Types to change the image in the TypeWell, type typestrip and the toolstrip.
 								exceptionRet = types.updateActiveTypeImage();
 								if (exceptionRet) {
 

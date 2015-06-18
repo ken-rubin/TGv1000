@@ -42,12 +42,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					// Load up tool.
-					self.load = function (type) {
+					self.load = function (clType) {
 
 						try {
 
 							// Save tool state.
-							self.type = type;
+							self.type = clType.data;
 
 							return null;
 						} catch (e) {
@@ -77,7 +77,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							// Compose the id.
-							var strId = client.removeSpaces(self.type.data.name);
+							var strId = client.removeSpaces(self.type.name);
 
 							//  Select the DOM element for the tool.
 							var jToolDOM = $("#" + strId);
@@ -88,9 +88,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 							// Update the resourceId and src attributes on the DOM.
 							jToolDOM.attr("data-resourceid",
-								self.type.data.imageResourceId);
+								self.type.imageResourceId);
 							jToolDOM.attr("src",
-								resourceHelper.toURL('resources', self.type.data.imageResourceId, 'image'));
+								resourceHelper.toURL('resources', self.type.imageResourceId, 'image'));
 
 						} catch (e) {
 
@@ -102,7 +102,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					// Private fields.
 
 					var m_jTool = null;
-					
+
 				} catch (e) {
 
 					errorHelper.show(e);

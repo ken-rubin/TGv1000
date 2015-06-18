@@ -60,12 +60,12 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 					}
 
 					// Add tool to strip.
-					self.addItem = function (type) {
+					self.addItem = function (clType) {
 
 						try {
 
 							var clTool = new Tool();
-							var exceptionRet = clTool.load(type);
+							var exceptionRet = clTool.load(clType);
 							if (exceptionRet) {
 
 								return exceptionRet;
@@ -74,10 +74,10 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							// Add to the DOM.
 							var jItem = null;
 							var exceptionRet = m_srToolStrip.addImage(
-								client.removeSpaces(type.data.name),		// id
-								type.data.name,		// name
+								client.removeSpaces(clType.data.name),		// id
+								clType.data.name,		// name
 								"",					// description
-								resourceHelper.toURL('resources', type.data.imageResourceId, 'image'), // url
+								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image'), // url
 								'toolstripitem',
 								function (jItemAdded) {
 
@@ -163,6 +163,13 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 
 										throw exceptionRet;
 									}
+
+									// Also ask types to do so.
+									// exceptionRet = types.updateImageInTypeStrip(i, type.data.imageResourceId);
+									// if (exceptionRet) {
+
+									// 	throw exceptionRet;
+									// }
 								}
 							}
 

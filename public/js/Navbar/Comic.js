@@ -100,7 +100,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							// self.data.types.items.push(type.data);
 
 					        // Also add to the designer/tool strip.
-							exceptionRet = tools.addItem(clType.data);
+							exceptionRet = tools.addItem(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -150,11 +150,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 							}
 
 							// Also pass on to the tool strip.
-							var exceptionRet = tools.updateImage(clType);
-							if (exceptionRet) {
+							// var exceptionRet = tools.updateImage(clType);
+							// if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+							// 	throw exceptionRet;
+							// }
 
 							// Cause a refresh.
 							return m_functionRender();

@@ -37,22 +37,22 @@ define(["Core/errorHelper"],
 					// Pulbic methods.
 
 					// Method adds a type to blockly.
-					self.addType = function (type) {
+					self.addType = function (clType) {
 
 						try {
 
 							// Add a new for the type.
-							var exceptionRet = m_functionAdd_Type_New(type);
+							var exceptionRet = m_functionAdd_Type_New(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 							// Add properties.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < clType.data.properties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
-								exceptionRet = m_functionAdd_Type_Property(type,
+								var propertyIth = clType.data.properties[i];
+								exceptionRet = m_functionAdd_Type_Property(clType,
 									propertyIth);
 								if (exceptionRet) {
 
@@ -61,10 +61,10 @@ define(["Core/errorHelper"],
 							}
 
 							// Add methods.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < clType.data.methods.length; i++) {
 
-								var methodIth = type.data.methods[i];
-								exceptionRet = m_functionAdd_Type_Method(type,
+								var methodIth = clType.data.methods[i];
+								exceptionRet = m_functionAdd_Type_Method(clType,
 									methodIth);
 								if (exceptionRet) {
 
@@ -414,14 +414,14 @@ define(["Core/errorHelper"],
 					};
 
 					// Load code into frame.
-					self.load = function (type,
+					self.load = function (clType,
 						method,
 						strCodeDOM) {
 
 						try {
 
 							// Set the title.
-							$("#titlediv").text(type.data.name + " :: " + method.name);
+							$("#titlediv").text(clType.data.name + " :: " + method.name);
 
 							// Save off workspace string.
 							self.workspace = strCodeDOM;

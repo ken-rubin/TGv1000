@@ -133,8 +133,8 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									m_project = new Project();
-									var exceptionRet = m_project.load(data.project);
+									m_clProject = new Project();
+									var exceptionRet = m_clProject.load(data.project);
 									if (exceptionRet) {
 
 										return exceptionRet;
@@ -161,7 +161,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var exceptionRet = m_project.saveToDatabase();
+							var exceptionRet = m_clProject.saveToDatabase();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -279,7 +279,7 @@ define(["Core/errorHelper",
 
 									var clType = new Type();
 									clType.load(data.type);
-									return m_project.addType(clType);
+									return m_clProject.addType(clType);
 
 								} else {
 
@@ -296,11 +296,11 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addTypeToProject = function(type) {
+					self.addTypeToProject = function(clType) {
 
 						try {
 
-							return m_project.addType(type);
+							return m_clProject.addType(clType);
 
 						} catch (e) {
 
@@ -318,13 +318,13 @@ define(["Core/errorHelper",
 
 						try {
 
-							var exceptionRet = m_project.unload();
+							var exceptionRet = m_clProject.unload();
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
-							m_project = null;
+							m_clProject = null;
 
 							return null;
 
@@ -431,12 +431,12 @@ define(["Core/errorHelper",
 					// Project methods.
 					self.setProjectDirtyBool = function (bVal) {
 
-						if (m_project) {
+						if (m_clProject) {
 
-							m_project.setDirtyBool(bVal);
-							if (m_project.data.name.length > 0) {
+							m_clProject.setDirtyBool(bVal);
+							if (m_clProject.data.name.length > 0) {
 
-								document.title = m_project.data.name;
+								document.title = m_clProject.data.name;
 
 							} else {
 
@@ -457,8 +457,8 @@ define(["Core/errorHelper",
 						try {
 
 				    		// Allocate project.
-				    		m_project = new Project();
-				    		return m_project.load(project);
+				    		m_clProject = new Project();
+				    		return m_clProject.load(project);
 
 						} catch (e) {
 
@@ -468,14 +468,14 @@ define(["Core/errorHelper",
 
 					self.getProject = function () {
 
-						return m_project;
+						return m_clProject;
 					};
 
 					self.saveProjectAs = function () {
 
 						try {
 
-							return m_project.saveToDatabase();
+							return m_clProject.saveToDatabase();
 
 						} catch (e) {
 
@@ -500,7 +500,7 @@ define(["Core/errorHelper",
 					// Private methods
 
 					// Private variables.
-					var m_project = null;
+					var m_clProject = null;
 					var m_openDialog = null;
 
 					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.

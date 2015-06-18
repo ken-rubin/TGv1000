@@ -38,7 +38,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
-						    		self.select(m_arrayTypes[j].data);
+						    		self.select(m_arrayClTypes[j].data, j);
 								}
 							);
 
@@ -46,9 +46,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							$("#TWimageSearchLink").click(m_functionClickTWimageSearchLink);
 							$("#TWnewImageURLLink").click(m_functionClickTWnewImageURLLink);
 							$("#TWnewImageDiskLink").click(m_functionClickTWnewImageDiskLink);
-							$("#TWdeleteTypeLink").click(m_functionClickTWdeleteTypeLink);
-							$("#TWnewTypeLink").click(m_functionClickTWnewTypeLink);
-							$("#TWsearchTypeLink").click(m_functionClickTWsearchTypeLink);
+							$("#TWdeleteTypeBtn").click(m_functionClickTWdeleteTypeLink);
+							$("#TWnewTypeBtn").click(m_functionClickTWnewTypeLink);
+							$("#TWsearchTypeBtn").click(m_functionClickTWsearchTypeLink);
 
 						} catch (e) {
 
@@ -66,7 +66,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							tools.empty();
 
 							// And the collection.
-							m_arrayTypes = [];
+							m_arrayClTypes = [];
 
 							// Loop over items and insert into the DOM.
 							for (var i = 0; i < activeComicTypes.items.length; i++) {
@@ -75,22 +75,22 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								var itemIth = activeComicTypes.items[i];
 
 								// Allocate the type object which holds/wrapps the data.
-								var newType = new Type();
-								exceptionRet = newType.load(itemIth);
+								var clType = new Type();
+								exceptionRet = clType.load(itemIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
 						        // Add the type.
-								exceptionRet = self.addItem(newType);
+								exceptionRet = self.addItem(clType);
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
 						        // Also add to the designer/tool strip.
-								exceptionRet = tools.addItem(newType);
+								exceptionRet = tools.addItem(clType);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -98,10 +98,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							}
 
 							// Automatically allocate the first type.
-							if (m_arrayTypes.length > 0) {
+							if (m_arrayClTypes.length > 0) {
 
 								// Following will activate the 0th type and set it up for maintenance in the type well.
-								var exceptionRet = m_arrayTypes[0].activate();
+								var exceptionRet = m_arrayClTypes[0].activate(0);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -117,16 +117,16 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					};
 
 					// Add Type to strip.
-					self.addItem = function (type) {
+					self.addItem = function (clType) {
 
 						try {
 
 							// Add to the DOM.
 							var exceptionRet = m_srTypeStrip.addImage(
-								"carousel" + m_arrayTypes.length.toString(),		// id
-								type.data.name,		// name
+								"typestrp" + m_arrayClTypes.length.toString(),		// id
+								clType.data.name,		// name
 								'',		// description
-								resourceHelper.toURL('resources', type.data.imageResourceId, 'image', ''),		// url
+								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image', ''),		// url
 								'typestripitem'	// image class
 							);
 							if (exceptionRet) {
@@ -135,10 +135,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							}
 
 							// Also add to the collection of comics.
-							m_arrayTypes.push(type);
+							m_arrayClTypes.push(clType);
 
 							// Also add to code.
-							return code.addType(type);
+							return code.addType(clType);
 							
 						} catch (e) {
 
@@ -148,12 +148,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 					// Specify the active type.  Called from 
 					// a type when its image is clicked in the type strip.
-					self.select = function (typeActive) {
+					self.select = function (typeActive, index) {
 
 						try {
 
-							m_typeActive = new Type();
-							m_typeActive.load(typeActive);
+							m_clTypeActive = new Type();
+							m_clTypeActive.load(typeActive);
+							m_iIndexActive = index;
 
 							var exceptionRet = m_functionSetUpTheWell();
 							if (exceptionRet) {
@@ -175,9 +176,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					self.isReferencedInWorkspace = function (strTest) {
 
 						// Loop over the collection of types.
-						for (var i = 0; i < m_arrayTypes.length; i++) {
+						for (var i = 0; i < m_arrayClTypes.length; i++) {
 
-							var typeIth = m_arrayTypes[i];
+							var typeIth = m_arrayClTypes[i];
 
 							// Get the method which references the string, if any.
 							var methodReferenced = typeIth.isReferencedInWorkspace(strTest);
@@ -197,9 +198,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 							// Loop over the collection of types.
-							for (var i = 0; i < m_arrayTypes.length; i++) {
+							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
-								var typeIth = m_arrayTypes[i];
+								var typeIth = m_arrayClTypes[i];
 
 								// Get the method which references the string, if any.
 								var exceptionRet = typeIth.replaceInWorkspaces(strOld, 
@@ -223,12 +224,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 							// Remove the type from the collection of types.
-							for (var i = 0; i < m_arrayTypes.length; i++) {
+							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
 								// Splice on match.
-								if (m_arrayTypes[i] === type) {
+								if (m_arrayClTypes[i] === type) {
 
-									m_arrayTypes.splice(i, 1);
+									m_arrayClTypes.splice(i, 1);
 									break;
 								}
 							}
@@ -254,14 +255,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							for (var i = 0; i < m_arrayTypes.length; i++) {
+							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
-								var itemIth = m_arrayTypes[i];
+								var itemIth = m_arrayClTypes[i];
 								var exceptionRet = self.removeItem(itemIth);
 							}
 
 							m_srTypeStrip.empty();
-							m_arrayTypes = [];
+							m_arrayClTypes = [];
 
 							return null;
 
@@ -273,7 +274,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 					self.getLength = function () {
 
-						return m_arrayTypes.length;
+						return m_arrayClTypes.length;
 					}
 
 					// Update the blockly data in the active type/method.
@@ -282,13 +283,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 							// Drop out if no active item.
-							if (!m_typeActive) {
+							if (!m_clTypeActive) {
 
 								return null;
 							}
 
 							// Else, update the type.
-							return m_typeActive.update(strWorkspace,
+							return m_clTypeActive.update(strWorkspace,
 								strMethod);
 
 						} catch (e) {
@@ -302,7 +303,28 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.imageResourceId, 'image', ''));
+							// Note: the images have already been changed on the designer surface if any were there.
+
+							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', '');
+							
+							// 1. Update the image in the TypeWell
+							$("#TWimage").attr("src", strUrl);
+
+							// 2. Update the image in the typestring.
+							var exceptionRet = m_srTypeStrip.updateImage("#typestrp" + m_iIndexActive, strUrl);
+							if (exceptionRet) {
+
+								return exceptionRet;
+							}
+
+							// 3. Update the image in the toolstrip.
+
+
+
+
+
+							
+
 							return null;
 
 						} catch(e) {
@@ -319,12 +341,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							if (m_typeActive) {	// There will always be an active type.
+							if (m_clTypeActive) {	// There will always be an active type.
 
-								$("#TWtypeName").val(m_typeActive.data.name);
-								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_typeActive.data.imageResourceId, 'image', ''));
+								$("#TWtypeName").val(m_clTypeActive.data.name);
+								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
 
-								if (m_typeActive.isApp) {
+								if (m_clTypeActive.isApp) {
 
 									$("#TWdeleteTypeBtn").prop("disabled", true);
 
@@ -338,7 +360,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								$("#TWmethodsTbody").empty();
 								strBuild = "";
 								var haveAnyMethods = false;
-								m_typeActive.data.methods.forEach(function(m) {
+								m_clTypeActive.data.methods.forEach(function(m) {
 
 									haveAnyMethods = true;
 									if (m.name === 'initialize') {
@@ -357,7 +379,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								// Properties
 								$("#TWpropertiesTbody").empty();
 								strBuild = "";
-								m_typeActive.data.properties.forEach(function(m) {
+								m_clTypeActive.data.properties.forEach(function(m) {
 
 									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
 								});
@@ -366,13 +388,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								// Events
 								$("#TWeventsTbody").empty();
 								strBuild = "";
-								m_typeActive.data.properties.forEach(function(m) {
+								m_clTypeActive.data.properties.forEach(function(m) {
 
 									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
 								});
 								$("#TWeventsTbody").append(strBuild);
 
-								if (m_arrayTypes.length > 1) {
+								if (m_arrayClTypes.length > 1) {
 
 									$("#TypeWellMsg2").text("Click another type to work with it.");
 	
@@ -395,7 +417,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							var exceptionRet = m_typeActive.imageSearch();
+							var exceptionRet = m_clTypeActive.imageSearch();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -409,7 +431,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							var exceptionRet = m_typeActive.imageFromURL();
+							var exceptionRet = m_clTypeActive.imageFromURL();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -423,7 +445,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							var exceptionRet = m_typeActive.imageFromDisk();
+							var exceptionRet = m_clTypeActive.imageFromDisk();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -491,7 +513,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 	    						events: [],
 	    						dependencies: [],
 	    						name: "new type",
-	    						id: m_arrayTypes.length + 1,
+	    						id: m_arrayClTypes.length + 1,
 	    						resourceId: 0
 				    		});
 				    		if (exceptionRet) {
@@ -575,9 +597,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					// Private fields.
 
 					// The container for the strip items.
-					var m_arrayTypes = [];
+					var m_arrayClTypes = [];
+					// Hold index in m_arrayClTypes of m_clTypeActive;
+					var m_iIndexActive = -1;
 					// Active item.
-					var m_typeActive = null;
+					var m_clTypeActive = null;
 
 				} catch (e) {
 

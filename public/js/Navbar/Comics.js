@@ -55,7 +55,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							m_srComicStrip.empty();
 
 							// And the collection....
-							m_arrayComics = [];
+							m_arrayClComics = [];
 
 							// Loop over comic items and insert into DOM.
 							for (var i = 0; i < projectComics.items.length; i++) {
@@ -80,9 +80,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							}
 
 							// Automatically allocate the first comic.
-							if (m_arrayComics.length > 0) {
+							if (m_arrayClComics.length > 0) {
 
-								var exceptionRet = m_arrayComics[0].activate();
+								var exceptionRet = m_arrayClComics[0].activate();
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -103,7 +103,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 
 							// Add to the DOM.
 							var exceptionRet = m_srComicStrip.addImage(
-								"carousel" + m_arrayComics.length.toString(),		// id
+								"comicstp" + m_arrayClComics.length.toString(),		// id
 								'',		// name
 								'',		// description
 								resourceHelper.toURL('resources', clComic.data.imageResourceId, 'image', ''),		// url
@@ -115,7 +115,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							}
 
 							// Also add to the collection of comics.
-							m_arrayComics.push(clComic);
+							m_arrayClComics.push(clComic);
 
 							return null;
 
@@ -130,7 +130,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 
 						try {
 
-							m_comicActive = clComic;
+							m_clComicActive = clComic;
 							return null;
 							
 						} catch (e) {
@@ -145,9 +145,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 						try {
 
 							// Do the opposite of what self.load did. In the opposite order, too.
-							for (var i = 0; i < m_arrayComics.length; i++) {
+							for (var i = 0; i < m_arrayClComics.length; i++) {
 
-								var comicIth = m_arrayComics[i];
+								var comicIth = m_arrayClComics[i];
 								var exceptionRet = comicIth.unload();
 								if (exceptionRet) {
 
@@ -157,7 +157,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 
 							// Now blow away our stuff.
 							m_srComicStrip.empty();
-							m_arrayComics = [];
+							m_arrayClComics = [];
 
 							return null;
 
@@ -171,7 +171,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 
 						try {
 
-							return m_comicActive.addType(clType);
+							return m_clComicActive.addType(clType);
 
 						} catch (e) {
 
@@ -185,9 +185,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 					// Scrollable region reference.
 					var m_srComicStrip = null;
 					// Collection of comic items.
-					var m_arrayComics = [];
+					var m_arrayClComics = [];
 					// The active comic.
-					var m_comicActive = null;
+					var m_clComicActive = null;
 					
 				} catch (e) {
 

@@ -156,10 +156,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								imageResourceId: m_imageResourceId
 							};
 
-							var type = new Type();
-							type.load(typeJO);
+							var clType = new Type();
+							clType.load(typeJO);
 
-							var exceptionRet = client.addTypeToProject(type);
+							var exceptionRet = client.addTypeToProject(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;

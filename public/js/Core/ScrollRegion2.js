@@ -7,8 +7,8 @@
 "use strict";
 
 // Define module.
-define(["Core/errorHelper"],
-    function (errorHelper) {
+define(["Core/errorHelper", "Core/resourceHelper"],
+    function (errorHelper, resourceHelper) {
 
         // Define constructor function.
         var functionRet = function ScrollRegion() {
@@ -81,38 +81,38 @@ define(["Core/errorHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addItem = function (jItem) {
+            // self.addItem = function (jItem) {
 
-                try {
+            //     try {
 
-                    // Get calculation base.
-                    var iBase = m_arrayItems.length;
+            //         // Get calculation base.
+            //         var iBase = m_arrayItems.length;
 
-                    // Add to collection.
-                    m_arrayItems.push(jItem);
+            //         // Add to collection.
+            //         m_arrayItems.push(jItem);
 
-                    // Add to DOM.
-                    m_jSlider.append(jItem);
+            //         // Add to DOM.
+            //         m_jSlider.append(jItem);
 
-                    // Is this item taller or wider?
-                    var dWidth = jItem.width();
-                    var dHeight = jItem.height();
+            //         // Is this item taller or wider?
+            //         var dWidth = jItem.width();
+            //         var dHeight = jItem.height();
 
-                    // Position item and make room in slider.
-                    jItem.css("left",
-                        (iBase * m_dWidth).toString() + "px");
-                    jItem.css("width",
-                        m_dWidth.toString() + "px");
+            //         // Position item and make room in slider.
+            //         jItem.css("left",
+            //             (iBase * m_dWidth).toString() + "px");
+            //         jItem.css("width",
+            //             m_dWidth.toString() + "px");
 
-                    m_jSlider.width((iBase + 1) * m_dWidth);
+            //         m_jSlider.width((iBase + 1) * m_dWidth);
 
-                    return null;
+            //         return null;
 
-                } catch (e) {
+            //     } catch (e) {
 
-                    return e;
-                }
-            };
+            //         return e;
+            //     }
+            // };
 
             // Method adds new item to slider.
             //
@@ -206,7 +206,7 @@ define(["Core/errorHelper"],
                     // Load is called whether or not
                     // the image resource is cached.
                     jItem.attr("src",
-                        strResourceUrl)
+                        strResourceUrl);
 
                     if (typeof jItemCallBack == 'function') {
 
@@ -220,6 +220,24 @@ define(["Core/errorHelper"],
                     return e;
                 }
             };
+
+            // Update scroll region image.
+            self.updateImage = function(selector, strUrl) {
+
+                try {
+
+                    var jItem = $(selector)[0];
+                    // jItem.attr("src", strUrl);
+                    jItem.attributes.src.nodeValue = strUrl;
+
+                    return null;
+
+                } catch (e) {
+
+                    return e;
+                }
+
+            }
 
             // Remove all items.
             //
@@ -301,6 +319,52 @@ define(["Core/errorHelper"],
                     errorHelper.show(e);
                 }
             };
+
+            // Invoked when an image is loaded.
+            // Implemented to update image in DOM.
+            var m_functionImageUpdate = function() {
+
+                try {
+
+                    // Get reference to the item that raised the load.
+                    // var jItem = $(this);
+
+                    // // Is this item taller or wider?
+                    // var dWidth = jItem[0].naturalWidth;
+                    // var dHeight = jItem[0].naturalHeight;
+
+                    // // Position item and make room in slider.
+                    // if (dHeight > dWidth) {
+
+                    //     // Position across whole height and center on width.
+                    //     jItem.css("top",
+                    //         "0px");
+                    //     jItem.css("height",
+                    //         m_dEffectiveHeight.toString() + "px");
+                    //     var dItemWidth = m_dWidth * dWidth / dHeight;
+                    //     jItem.css("width",
+                    //         dItemWidth.toString() + "px");
+                    //     jItem.css("left",
+                    //         (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
+                    // } else {
+
+                    //     // Position across whole width and center on height.
+                    //     jItem.css("left",
+                    //         (iBase * m_dWidth).toString() + "px");
+                    //     jItem.css("width",
+                    //         m_dWidth.toString() + "px");
+                    //     var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
+                    //     jItem.css("height",
+                    //         dItemHeight.toString() + "px");
+                    //     jItem.css("top",
+                    //         ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
+                    // }
+
+                } catch(e) {
+
+                    errorHelper.show(e);
+                }
+            }
 
             // Invoked when an image is clicked.
             // Implemented to raise the event.
