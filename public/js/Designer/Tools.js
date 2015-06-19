@@ -143,7 +143,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 					};
 
 					// Type image has changed, update in designer.
-					self.updateImage = function (type) {
+					self.updateImage = function (clType) {
 
 						try {
 
@@ -155,7 +155,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 								var toolIth = m_arrayTools[i];
 
 								// If the id's match...
-								if (toolIth.type === type) {
+								if (toolIth.type === clType.data) {
 
 									// ...ask the tool to update its display.
 									var exceptionRet = toolIth.updateImage();
@@ -163,25 +163,12 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 
 										throw exceptionRet;
 									}
-
-									// Also ask types to do so.
-									// exceptionRet = types.updateImageInTypeStrip(i, type.data.imageResourceId);
-									// if (exceptionRet) {
-
-									// 	throw exceptionRet;
-									// }
 								}
 							}
 
-							// Also pass on to the tool strip.
-							// var exceptionRet = tools.updateImage(type);
-							// if (exceptionRet) {
-
-							// 	throw exceptionRet;
-							// }
-
 							// Cause a refresh.
 							return null; //m_functionRender();
+						
 						} catch (e) {
 
 							return e;

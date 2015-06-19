@@ -141,7 +141,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 								if (tiIth.id === strTypeId) {
 
 									// ...update the resource id.
-									var exceptionRet = tiIth.updateImage(clType.data.resourceId);
+									var exceptionRet = tiIth.updateImage(clType.data.imageResourceId);
 									if (exceptionRet) {
 
 										throw exceptionRet;

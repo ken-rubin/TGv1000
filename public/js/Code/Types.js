@@ -318,12 +318,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							}
 
 							// 3. Update the image in the toolstrip.
+							exceptionRet = tools.updateImage(m_clTypeActive);
+							if (exceptionRet) {
 
-
-
-
-
-							
+								return exceptionRet;
+							}
 
 							return null;
 

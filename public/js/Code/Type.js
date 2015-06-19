@@ -763,7 +763,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 								// }
 
 								// Call off to the designer to update the picture in the designer surface.
-								exceptionRet = designer.updateImage(self);
+								var exceptionRet = designer.updateImage(self);
 								if (exceptionRet) {
 
 									throw exceptionRet;

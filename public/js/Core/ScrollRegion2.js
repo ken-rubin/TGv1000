@@ -81,42 +81,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            // self.addItem = function (jItem) {
-
-            //     try {
-
-            //         // Get calculation base.
-            //         var iBase = m_arrayItems.length;
-
-            //         // Add to collection.
-            //         m_arrayItems.push(jItem);
-
-            //         // Add to DOM.
-            //         m_jSlider.append(jItem);
-
-            //         // Is this item taller or wider?
-            //         var dWidth = jItem.width();
-            //         var dHeight = jItem.height();
-
-            //         // Position item and make room in slider.
-            //         jItem.css("left",
-            //             (iBase * m_dWidth).toString() + "px");
-            //         jItem.css("width",
-            //             m_dWidth.toString() + "px");
-
-            //         m_jSlider.width((iBase + 1) * m_dWidth);
-
-            //         return null;
-
-            //     } catch (e) {
-
-            //         return e;
-            //     }
-            // };
-
-            // Method adds new item to slider.
-            //
-            // jItem
             self.addImage = function (strId, strName, strDescription, strResourceUrl, imageClass, jItemCallBack) {
 
                 try {
@@ -208,7 +172,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     jItem.attr("src",
                         strResourceUrl);
 
-                    if (typeof jItemCallBack == 'function') {
+                    if ($.isFunction(jItemCallBack)) {
 
                         jItemCallBack(jItem);
                     }
@@ -226,9 +190,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                 try {
 
-                    var jItem = $(selector)[0];
-                    // jItem.attr("src", strUrl);
-                    jItem.attributes.src.nodeValue = strUrl;
+                    var jItem = $(selector);
+                    jItem.attr("src", strUrl);
+                    // jItem.attributes.src.nodeValue = strUrl;
 
                     return null;
 
