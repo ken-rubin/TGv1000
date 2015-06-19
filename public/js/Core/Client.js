@@ -422,10 +422,10 @@ define(["Core/errorHelper",
 					    }
 					};
 
-					// Helper method removes spaces from input.
+					// Helper method replaces spaces with underscores.
 					self.removeSpaces = function (strPossiblyWithSpaces) {
 
-						return strPossiblyWithSpaces.replace(/ /g, '');
+						return strPossiblyWithSpaces.replace(/ /g, '_');
 					};
 
 					// Project methods.

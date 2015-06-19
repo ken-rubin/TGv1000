@@ -91,7 +91,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         "' class='" + imageClass + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
-                    jItem.load(m_functionImageLoad);
+                    jItem.load(m_functionOnNewImageLoaded);
 
                     // Wire the click.
                     jItem.click(m_functionImageClick);
@@ -191,8 +191,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     var jItem = $(selector);
+                    jItem.off('load');  // unbind the previous event handler or they'll all fire.
+                    jItem.load(m_functionOnUpdatedImageLoaded);
                     jItem.attr("src", strUrl);
-                    // jItem.attributes.src.nodeValue = strUrl;
 
                     return null;
 
@@ -229,7 +230,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
             // Invoked when an image is loaded.
             // Implemented to add image to DOM.
-            var m_functionImageLoad = function () {
+            var m_functionOnNewImageLoaded = function () {
 
                 try {
 
@@ -284,45 +285,46 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
-            // Invoked when an image is loaded.
-            // Implemented to update image in DOM.
-            var m_functionImageUpdate = function() {
+            var m_functionOnUpdatedImageLoaded = function() {
 
                 try {
 
                     // Get reference to the item that raised the load.
-                    // var jItem = $(this);
+                    var jItem = $(this);
 
-                    // // Is this item taller or wider?
-                    // var dWidth = jItem[0].naturalWidth;
-                    // var dHeight = jItem[0].naturalHeight;
+                    // Calculate iBase: index of this item in m_arrayItems.
+                    var iBase = parseInt(jItem.context.id.substring(8), 10);
 
-                    // // Position item and make room in slider.
-                    // if (dHeight > dWidth) {
+                    // Is this item taller or wider?
+                    var dWidth = jItem[0].naturalWidth;
+                    var dHeight = jItem[0].naturalHeight;
 
-                    //     // Position across whole height and center on width.
-                    //     jItem.css("top",
-                    //         "0px");
-                    //     jItem.css("height",
-                    //         m_dEffectiveHeight.toString() + "px");
-                    //     var dItemWidth = m_dWidth * dWidth / dHeight;
-                    //     jItem.css("width",
-                    //         dItemWidth.toString() + "px");
-                    //     jItem.css("left",
-                    //         (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
-                    // } else {
+                    // Position item and make room in slider.
+                    if (dHeight > dWidth) {
 
-                    //     // Position across whole width and center on height.
-                    //     jItem.css("left",
-                    //         (iBase * m_dWidth).toString() + "px");
-                    //     jItem.css("width",
-                    //         m_dWidth.toString() + "px");
-                    //     var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
-                    //     jItem.css("height",
-                    //         dItemHeight.toString() + "px");
-                    //     jItem.css("top",
-                    //         ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
-                    // }
+                        // Position across whole height and center on width.
+                        jItem.css("top",
+                            "0px");
+                        jItem.css("height",
+                            m_dEffectiveHeight.toString() + "px");
+                        var dItemWidth = m_dWidth * dWidth / dHeight;
+                        jItem.css("width",
+                            dItemWidth.toString() + "px");
+                        jItem.css("left",
+                            (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
+                    } else {
+
+                        // Position across whole width and center on height.
+                        jItem.css("left",
+                            (iBase * m_dWidth).toString() + "px");
+                        jItem.css("width",
+                            m_dWidth.toString() + "px");
+                        var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
+                        jItem.css("height",
+                            dItemHeight.toString() + "px");
+                        jItem.css("top",
+                            ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
+                    }
 
                 } catch(e) {
 

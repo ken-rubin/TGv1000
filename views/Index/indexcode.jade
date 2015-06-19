@@ -25,18 +25,13 @@
     |   return null;
     | }
 
-  //- First the Method.
-  .row#titlerow
-    .col-xs-12
-      #titlediv
-
-  //- Next the Blockly frame.
+  //- First the typestrip.
   .row
-    .col-xs-12
-      iframe#BlocklyIFrame
-
-//- Next the type editing area.
-.row.twsection
+    .col-xs-12#typestriprow
+      #typestrip.ScrollRegion
+        
+  //- Next the type editing area.
+  .row.twsection
         #TypeWell.panel.panel-success
           .panel-body
             | Type name:&nbsp;&nbsp;&nbsp;
@@ -94,23 +89,13 @@
           .row
             #TypeWellMsg2.panel-body(style='text-align: center;')
 
-  //- Next the typestrip.
-.row
-    .col-xs-12#typestriprow
-      #typestrip.ScrollRegion
-ul#TypeMemberContextMenu.dropdown-menu(role="menu",style="display:none")
-  li
-    a.contextMenuItem(tabindex="-1")
-      | rename
-  //- li.divider
-  li
-    a.contextMenuItem(tabindex="-1")
-      | delete
-ul#TypeImageContextMenu.dropdown-menu(role="menu",style="display:none")
-  li
-    a.contextMenuItem(tabindex="-1")
-      | Search for a Type Image
-    a.contextMenuItem(tabindex="-1")
-      | Load a new Type Image using a URL
-    a.contextMenuItem(tabindex="-1")
-      | Load a new Type Image that's already on your computer
+  //- Next the Method.
+  .row#titlerow
+    .col-xs-12
+      #titlediv
+
+  //- Next the Blockly frame.
+  .row
+    .col-xs-12
+      iframe#BlocklyIFrame
+
