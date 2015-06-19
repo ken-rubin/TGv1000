@@ -77,7 +77,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							// Compose the id.
-							var strId = client.removeSpaces(self.type.name);
+							var strId = "tool-" + client.removeSpaces(self.type.name);
 
 							//  Select the DOM element for the tool.
 							var jToolDOM = $("#" + strId);

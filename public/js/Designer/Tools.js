@@ -74,7 +74,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							// Add to the DOM.
 							var jItem = null;
 							var exceptionRet = m_srToolStrip.addImage(
-								client.removeSpaces(clType.data.name),		// id
+								"tool-" + client.removeSpaces(clType.data.name),		// id
 								clType.data.name, "",		// name + description for tooltip
 								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image'), // url
 								'toolstripitem',
@@ -97,6 +97,14 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 		                        helper: "clone",
 		                        appendTo: $(document.body),
 		                        zIndex: 100000
+		                    });
+
+		                    // Add mousedown handler to tool to fill the TypeWell
+		                    jItem.mousedown(function() {
+
+		                    	var strId = $(this).context.id;
+		                    	types.handleMouseDOwnOnToolStrip(strId);
+
 		                    });
 
 							return null;

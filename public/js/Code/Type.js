@@ -60,12 +60,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Activate/select type instance.
-					self.activate = function (indexInTypes) {
+					self.activate = function () {
 
 						try {
 
 							// Cause types to fill the type well with this type.
-							return types.select(self.data, indexInTypes);
+							return types.select(self);
 							
 						} catch (e) {
 

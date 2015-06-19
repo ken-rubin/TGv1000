@@ -18,9 +18,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					var self = this;			// Uber closure.
 
 					///////////////////////////////////
-					// Public properties.
-
-					///////////////////////////////////
 					// Public methods.
 
 					// Create the Type strip.
@@ -28,19 +25,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					self.create = function () {
 
 						try {
-
-							// Attach scrollableregion.
-							m_srTypeStrip = new ScrollRegion();
-							var exceptionRet = m_srTypeStrip.create(
-								"#typestrip",		// inner row selector
-								80,					// item width
-								function() {		// functionClick
-
-						    		var jq = this;
-						    		var j = parseInt(jq.context.id.substring(8), 10);
-						    		self.select(m_arrayClTypes[j].data, j);
-								}
-							);
 
 							// Add click handlers for TypeWell.
 							$("#TWimageSearchLink").click(m_functionClickTWimageSearchLink);
@@ -62,7 +46,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 							// First destroy type and tool strips.
-							m_srTypeStrip.empty();
+							// m_srTypeStrip.empty();
 							tools.empty();
 
 							// And the collection.
@@ -101,7 +85,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							if (m_arrayClTypes.length > 0) {
 
 								// Following will activate the 0th type and set it up for maintenance in the type well.
-								var exceptionRet = m_arrayClTypes[0].activate(0);
+								var exceptionRet = m_arrayClTypes[0].activate();
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -121,20 +105,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							// Add to the DOM.
-							var exceptionRet = m_srTypeStrip.addImage(
-								"typestrp" + m_arrayClTypes.length.toString(),		// id
-								clType.data.name,		// name
-								'',		// description
-								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image', ''),		// url
-								'typestripitem'	// image class
-							);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							// Also add to the collection of comics.
+							// Add to the collection of types.
 							m_arrayClTypes.push(clType);
 
 							// Also add to code.
@@ -147,14 +118,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					};
 
 					// Specify the active type.  Called from 
-					// a type when its image is clicked in the type strip.
-					self.select = function (typeActive, index) {
+					// a type when its image is clicked in the tool strip.
+					self.select = function (clType) {
 
 						try {
 
-							m_clTypeActive = new Type();
-							m_clTypeActive.load(typeActive);
-							m_iIndexActive = index;
+							m_clTypeActive = clType;
 
 							var exceptionRet = m_functionSetUpTheWell();
 							if (exceptionRet) {
@@ -169,6 +138,23 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							return e;
 						}
 					};
+
+					// Mousedown event handler calls this from toolstrip.
+					self.handleMouseDOwnOnToolStrip = function(strId) {
+
+						var parts = strId.split('-');
+						if (parts.length === 2) {
+
+							m_arrayClTypes.some(function(clType) {
+
+								if (parts[1] === client.removeSpaces(clType.data.name)) {
+
+									self.select(clType);
+									return true;
+								}
+							});
+						}
+					}
 
 					// Loop over all Types, indicate if the specified
 					// string is found in any of their workspaces.
@@ -261,7 +247,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								var exceptionRet = self.removeItem(itemIth);
 							}
 
-							m_srTypeStrip.empty();
+							// m_srTypeStrip.empty();
 							m_arrayClTypes = [];
 
 							return null;
@@ -310,14 +296,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							// 1. Update the image in the TypeWell
 							$("#TWimage").attr("src", strUrl);
 
-							// 2. Update the image in the typestring.
-							var exceptionRet = m_srTypeStrip.updateImage("#typestrp" + m_iIndexActive, strUrl);
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
-
-							// 3. Update the image in the toolstrip.
+							// 2. Update the image in the toolstrip.
 							exceptionRet = tools.updateImage(m_clTypeActive);
 							if (exceptionRet) {
 
@@ -600,8 +579,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 					// The container for the strip items.
 					var m_arrayClTypes = [];
-					// Hold index in m_arrayClTypes of m_clTypeActive;
-					var m_iIndexActive = -1;
 					// Active item.
 					var m_clTypeActive = null;
 
