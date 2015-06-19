@@ -137,24 +137,32 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 								// Extract the ith item.
 								var tiIth = m_arrayItems[i];
 
-								// If the id's match...
-								if (tiIth.id === strTypeId) {
+								var parts = tiIth.id.split('-');
 
-									// ...update the resource id.
-									var exceptionRet = tiIth.updateImage(clType.data.imageResourceId);
-									if (exceptionRet) {
+								if (parts.length === 2) {
 
-										throw exceptionRet;
+									// If the id's match...
+									if (parts[1] === strTypeId) {
+
+										// ...update the resource id.
+										var exceptionRet = tiIth.updateImage(clType.data.imageResourceId);
+										if (exceptionRet) {
+
+											throw exceptionRet;
+										}
 									}
+								} else {
+
+									throw new Error("In designer#updateImage got bad toolInstance id: " + tiIth.id);
 								}
 							}
 
 							// Also pass on to the tool strip.
-							// var exceptionRet = tools.updateImage(clType);
-							// if (exceptionRet) {
+							var exceptionRet = tools.updateImage(clType);
+							if (exceptionRet) {
 
-							// 	throw exceptionRet;
-							// }
+								throw exceptionRet;
+							}
 
 							// Cause a refresh.
 							return m_functionRender();

@@ -45,8 +45,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							// First destroy type and tool strips.
-							// m_srTypeStrip.empty();
+							// First destroy typestrip.
 							tools.empty();
 
 							// And the collection.
@@ -289,19 +288,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							// Note: the images have already been changed on the designer surface if any were there.
+							// Note: the images have already been changed on the designer surface if any were there and in toolstrip.
 
 							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', '');
 							
-							// 1. Update the image in the TypeWell
+							// Update the image in the TypeWell
 							$("#TWimage").attr("src", strUrl);
-
-							// 2. Update the image in the toolstrip.
-							exceptionRet = tools.updateImage(m_clTypeActive);
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
 
 							return null;
 

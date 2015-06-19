@@ -18,16 +18,6 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 					var self = this;			// Uber closure.
 
 					///////////////////////////////////
-					// Public properties.
-
-					// Selector to row element to wrap.
-					self.rowSelector = "#toolstriprow";
-					// Selector to DOM element to wrap.
-					self.selector = "#toolstrip";
-					// Width of item.
-					self.itemWidth = 55;
-
-					///////////////////////////////////
 					// Public methods.
 
 					// Create the tool strip.
@@ -39,7 +29,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							// Attach scrollableregion.
 							m_srToolStrip = new ScrollRegion();
 							var exceptionRet = m_srToolStrip.create(
-								self.selector,		// inner row selector
+								"#toolstrip",		// inner row selector
 								55,					// item width
 								function() {}		// functionClick
 							);
@@ -156,25 +146,33 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 
 							// Loop over all tools, ask each if it wraps the type which was 
 							// just updated and passed into this method.  If so, update image.
-							for (var i = 0; i < m_arrayTools.length; i++) {
+							// for (var i = 0; i < m_arrayTools.length; i++) {
 
-								// Extract the ith tool.
-								var toolIth = m_arrayTools[i];
+							// 	// Extract the ith tool.
+							// 	var toolIth = m_arrayTools[i];
 
-								// If the id's match...
-								if (toolIth.type === clType.data) {
+							// 	// If the id's match...
+							// 	if (toolIth.type.name === clType.data.name) {
 
-									// ...ask the tool to update its display.
-									var exceptionRet = toolIth.updateImage();
-									if (exceptionRet) {
+							// 		// ...ask the tool to update its display.
+							// 		var exceptionRet = toolIth.updateImage();
+							// 		if (exceptionRet) {
 
-										throw exceptionRet;
-									}
-								}
+							// 			throw exceptionRet;
+							// 		}
+							// 	}
+							// }
+
+							var strSelector = "#tool-" + clType.data.name;
+							var strUrl = resourceHelper.toURL("resources", clType.data.imageResourceId, 'image', '');
+							var exceptionRet = m_srToolStrip.updateImage(strSelector,
+								strUrl);
+							if (exceptionRet) {
+
+								return exceptionRet;
 							}
 
-							// Cause a refresh.
-							return null; //m_functionRender();
+							return null;
 						
 						} catch (e) {
 
