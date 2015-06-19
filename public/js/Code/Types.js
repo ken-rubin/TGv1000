@@ -33,7 +33,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							m_srTypeStrip = new ScrollRegion();
 							var exceptionRet = m_srTypeStrip.create(
 								"#typestrip",		// inner row selector
-								80,				// item width
+								80,					// item width
 								function() {		// functionClick
 
 						    		var jq = this;
@@ -454,7 +454,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							errorHelper.show(e);
 						}
 					}
-					var m_functionClickTWdeleteTypeLink = function () {}
+					var m_functionClickTWdeleteTypeLink = function () {
+
+					}
+					
 					var m_functionClickTWnewTypeLink = function () {
 
 						try {
@@ -504,8 +507,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 				    		// Allocate project.
-				    		var type = new Type();
-				    		var exceptionRet = type.load({ 
+				    		var clType = new Type();
+				    		var exceptionRet = clType.load({ 
 
 	    						properties: [],
 	    						methods: [],
@@ -521,14 +524,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 				    		}
 
 				    		// Add the type.
-							exceptionRet = self.addItem(type);
+							exceptionRet = self.addItem(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 					        // Also add to the designer/tool strip.
-							exceptionRet = tools.addItem(type);
+							exceptionRet = tools.addItem(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;

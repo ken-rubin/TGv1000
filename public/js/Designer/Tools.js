@@ -75,8 +75,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion2", "Core/resourc
 							var jItem = null;
 							var exceptionRet = m_srToolStrip.addImage(
 								client.removeSpaces(clType.data.name),		// id
-								clType.data.name,		// name
-								"",					// description
+								clType.data.name, "",		// name + description for tooltip
 								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image'), // url
 								'toolstripitem',
 								function (jItemAdded) {
