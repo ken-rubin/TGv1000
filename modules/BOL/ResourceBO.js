@@ -861,7 +861,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                     // body is a buffer containing the resource.
 
-                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0);";
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + req.body.resourceName + "');";
                     sql.execute(sqlString,
                         function(rows){
 
@@ -947,7 +947,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             var ext = (req.body.resourceTypeId === "1") ? 'png' : "mp3";
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0);";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + req.body.resourceName + "');";
             sql.execute(sqlString,
                 function(rows){
 

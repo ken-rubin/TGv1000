@@ -4,7 +4,7 @@ Either of us
 Ken
 
 - Navbar menu highlight color
-- Get ScrollRegion2 tooltip to position better. There's something that works now, but it doesn't make sense. Look at it and adjust. Also, even though I see a tooltip when searching for a Project or a Project image,
+- Get ScrollRegion2 tooltip to position better. It now works EXCEPT when the scroll region is in a dialog.
 - Vertical scrollregion
 - Finish Coder
 - Integrate Coder
@@ -20,6 +20,18 @@ Jerry
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
+- Start saving methods, properties and events to their own tables.
+- Disable disable Delete this Type button for type isApp--make sure not to look for type named 'app'; instead look for type where isApp = 1
+- Add click handler to method names in table
+- Make tables scrollable; fix col width
+- Smaller Type image in TW
+- Implement TW Delete this Type.
+- Get Add new Type and Search for Type working
+- Blockly code sizing and window positioning
+- Use function to check if type name is available--where? Write similar functions for methods, properties and events in active type
+- On exit or close project or new project, if project is dirty, ask if they want to save/save as.
+- Are properties and events Resources? I don't believe we'll search for them. So they're not. But Methods are.
+
 
 
 To discuss

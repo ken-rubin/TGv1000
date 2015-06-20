@@ -113,10 +113,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                                     try {
 
                                         // Get the location of the cursor relative to the page.
-                                        var dLeft = e.pageX - m_jRoot.offset().left + m_dTooltipWidthOffset;
-                                        var dTop = e.pageY + m_dTooltipHeightOffset;
-                                        // var dLeft = e.pageX - m_jRoot.position().left + m_dTooltipWidthOffset;
-                                        // var dTop = e.pageY - m_jRoot.position().top + m_dTooltipHeightOffset;
+                                        // var pos = m_jRoot.position();
+                                        // var dLeft = e.pageX - pos.left + m_dTooltipWidthOffset;
+                                        // var dTop = e.pageY - pos.top + m_dTooltipHeightOffset;
+                                        // var pos = m_jRoot.position();
+                                        var dLeft = e.pageX - $(window).scrollLeft() + m_dTooltipWidthOffset;
+                                        var dTop = e.pageY - $(window).scrollTop() + m_dTooltipHeightOffset;
 
                                         // Configure and show the tooltip.
                                         m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));

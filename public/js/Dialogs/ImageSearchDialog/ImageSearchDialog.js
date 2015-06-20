@@ -163,6 +163,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					                    m_searchResultProcessedArray.push({
 
 					                    	index: i, 
+					                    	name: rowIth.name,
 					                    	url: resourceHelper.toURL('resources', 
 					                    		rowIth.id, 
 					                    		'image', 
@@ -215,7 +216,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 							        // Add each processed image to the region.
 							        exceptionRet = m_scISImageStrip.addImage("carousel" + i.toString(),
-							        	"",
+							        	rowIth.name,
 							        	"",
 							        	rowIth.url,
 							        	'ScrollRegionImage');

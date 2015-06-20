@@ -104,7 +104,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 							// Add to the DOM.
 							var exceptionRet = m_srComicStrip.addImage(
 								"comicstp" + m_arrayClComics.length.toString(),		// id
-								'',		// name
+								clComic.data.name,		// name
 								'',		// description
 								resourceHelper.toURL('resources', clComic.data.imageResourceId, 'image', ''),		// url
 								'comicstripitem'	// image class
