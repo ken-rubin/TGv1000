@@ -11,7 +11,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 		try {
 
 			// Define constructor function.
-			var functionConstructor = function ToolInstance(strId, strType, strResourceId, iLeft, iTop, iWidth, iHeight) {
+			var functionConstructor = function ToolInstance(strId, strType, strSrc, iLeft, iTop, iWidth, iHeight) {
 
 				try {
 
@@ -22,7 +22,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 					self.id = strId || "0";
 					self.type = strType || "";
-					self.resourceId = strResourceId || "";
+					self.src = strSrc || "";
 					self.left = iLeft || 0;
 					self.top = iTop || 0;
 					self.width = iWidth || 100;
@@ -35,7 +35,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     $(self.imageRender).bind("load", function () { designer.refresh(); });
 
                     // Load up the image.
-                    self.imageRender.src = resourceHelper.toURL('resources', self.resourceId, 'image');
+                    self.imageRender.src = strSrc;
 
 					/////////////////////////////
 					// Public methods.
@@ -59,17 +59,15 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					// Type image has changed, update tool.
-					self.updateImage = function (strResourceId) {
+					self.updateImage = function (iImageResourceId) {
 
 						try {
 
 							// Save state.
-							self.resourceId = strResourceId;
+							self.src = resourceHelper.toURL('resources', iImageResourceId, 'image');
 
 		                    // Load up the image.
-		                    self.imageRender.src = resourceHelper.toURL('resources', 
-		                    	self.resourceId, 
-		                    	'image');
+		                    self.imageRender.src = self.src;
 						} catch (e) {
 
 							return e;

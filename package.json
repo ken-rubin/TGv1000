@@ -4,7 +4,6 @@
   "private": "true",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
-    "bluebird": "^2.9.27",
     "body-parser": "^1.12.2",
     "express": "*",
     "gm": "^1.17.0",

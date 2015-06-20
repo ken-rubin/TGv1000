@@ -562,13 +562,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 		                    var jHelper = $(ui.helper.context);
 
 		                    var strId = jHelper.attr("id");
-		                    var strResourceId = jHelper.attr("data-resourceid");
+		                    var strSrc = jHelper.attr("src");
 		                    var strType = jHelper.attr("data-type");
 
 		                    // Allocate a new type.
 		                    var tiNew = new ToolInstance(strId,
 		                    	strType,
-		                    	strResourceId,
+		                    	strSrc,
 		                    	iLeft,
 		                    	iTop,
 		                    	iWidth,

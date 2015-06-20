@@ -3,30 +3,23 @@ Either of us
 
 Ken
 
-- New Project followed immediately by another New Project ends up with the type image two times in the toolstrip. We also don't clear the designer.
-- Review code
 - Navbar menu highlight color
-- Now that's there's no more huge + button in the TypeStrip, remove the offset to the left of the first Type.
 - Get ScrollRegion2 tooltip to position better. There's something that works now, but it doesn't make sense. Look at it and adjust. Also, even though I see a tooltip when searching for a Project or a Project image,
--   I don't see a tooltip when I search for a Type image. Probably because it's not open over another dialog. I'm tired of tooltips. They're yours. Oh yeah: I don't display an empty description if it's "". And I
--   now don't display any tooltip for images. I decided images don't need names, since the user is looking at the image and can identify it that way.
-
+- Vertical scrollregion
+- Finish Coder
+- Integrate Coder
 
 Jerry
 
 - Finish Save Project (as opposed to Save As).
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to search results; like 100 at a time. See code below.
-- Implement Change Comic image on context menu (not doing add new comic for now).
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
-- Fix up scroll regions (comics, tools, types).
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
-- Call Tools.empty() when loading a project or closing a project.
-- Tool.updateImage needs work. So does the possible duplicate ids in the tools scroll region.
 
 
 To discuss

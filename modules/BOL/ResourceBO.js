@@ -4,8 +4,7 @@
 //////////////////////////////////
 var fs = require("fs"),
     gm = require("gm"),
-    util = require("util"),
-    Promise = require("bluebird");
+    util = require("util");
 
 module.exports = function ResourceBO(app, sql, logger) {
 

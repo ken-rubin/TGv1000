@@ -81,14 +81,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addImage = function (strId, strName, strDescription, strResourceUrl, imageClass, jItemCallBack) {
+            self.addImage = function (strId, strName, strDescription, strResourceUrl, strImageClass, functionJItemCallBack) {
 
                 try {
 
                     // Build the item.
                     var jItem = $("<img id='" + 
                         strId + 
-                        "' class='" + imageClass + "'></img>");
+                        "' class='" + strImageClass + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionOnNewImageLoaded);
@@ -172,9 +172,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     jItem.attr("src",
                         strResourceUrl);
 
-                    if ($.isFunction(jItemCallBack)) {
+                    if ($.isFunction(functionJItemCallBack)) {
 
-                        jItemCallBack(jItem);
+                        functionJItemCallBack(jItem);
                     }
 
                     return null;
@@ -293,59 +293,43 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     var jItem = $(this);
 
                     // Calculate/search for iBase: index of this item in m_arrayItems.
-                    var parts = jItem.context.id.split('-');
+                    for (var iBase = 0; iBase < m_arrayItems.length; iBase++) {
 
-                    if (parts.length === 2) {
+                        if (m_arrayItems[iBase][0].id === jItem[0].id) {
 
-                        for (var iBase = 0; iBase < m_arrayItems.length; iBase++) {
+                            // Is this item taller or wider?
+                            var dWidth = jItem[0].naturalWidth;
+                            var dHeight = jItem[0].naturalHeight;
 
-                            if (m_arrayItems[iBase].data.name === parts[1]) {
+                            // Position item and make room in slider.
+                            if (dHeight > dWidth) {
 
-                                // Use this opportunity to update m_arrayItems[iBase] with ??? new resourceId.
-                                var tiIth = m_arrayItems[iBase];
+                                // Position across whole height and center on width.
+                                jItem.css("top",
+                                    "0px");
+                                jItem.css("height",
+                                    m_dEffectiveHeight.toString() + "px");
+                                var dItemWidth = m_dWidth * dWidth / dHeight;
+                                jItem.css("width",
+                                    dItemWidth.toString() + "px");
+                                jItem.css("left",
+                                    (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
+                            } else {
 
-
-
-
-
-
-                                // Is this item taller or wider?
-                                var dWidth = jItem[0].naturalWidth;
-                                var dHeight = jItem[0].naturalHeight;
-
-                                // Position item and make room in slider.
-                                if (dHeight > dWidth) {
-
-                                    // Position across whole height and center on width.
-                                    jItem.css("top",
-                                        "0px");
-                                    jItem.css("height",
-                                        m_dEffectiveHeight.toString() + "px");
-                                    var dItemWidth = m_dWidth * dWidth / dHeight;
-                                    jItem.css("width",
-                                        dItemWidth.toString() + "px");
-                                    jItem.css("left",
-                                        (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
-                                } else {
-
-                                    // Position across whole width and center on height.
-                                    jItem.css("left",
-                                        (iBase * m_dWidth).toString() + "px");
-                                    jItem.css("width",
-                                        m_dWidth.toString() + "px");
-                                    var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
-                                    jItem.css("height",
-                                        dItemHeight.toString() + "px");
-                                    jItem.css("top",
-                                        ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
-                                }
-
-                                break;
+                                // Position across whole width and center on height.
+                                jItem.css("left",
+                                    (iBase * m_dWidth).toString() + "px");
+                                jItem.css("width",
+                                    m_dWidth.toString() + "px");
+                                var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
+                                jItem.css("height",
+                                    dItemHeight.toString() + "px");
+                                jItem.css("top",
+                                    ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
                             }
-                        }
-                    } else {
 
-                        errorHelper.show("m_functionOnUpdatedImageLoaded encountered this id: " + jItem.context.id);
+                            break;
+                        }
                     }
                 } catch(e) {
 
