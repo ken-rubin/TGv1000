@@ -497,6 +497,35 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.isComicNameAvailable = function(strName) {
+
+						if (m_clProject) {
+
+							for (var i = 0; i < m_clProject.data.comics.items.length; i++) {
+
+								var comicIth = m_clProject.data.comics.items[i];
+								if (comicIth.name === strName) {
+
+									return false;
+								}
+
+								return true;
+							}
+						}
+
+						return false;
+					}
+
+					self.isTypeNameAvailableInActiveComic = function(strName) {
+
+						if (m_clProject) {
+
+							return comics.isTypeNameAvailableInActiveComic(strName);
+						}
+
+						return false;
+					}
+
 					// Private methods
 
 					// Private variables.

@@ -179,6 +179,20 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion2", "Core/resource
 						}
 					}
 
+					self.isTypeNameAvailableInActiveComic = function(strName) {
+
+						for (var i = 0; i < m_clComicActive.data.types.items; i++) {
+
+							var typeIth = m_clComicActive.data.types.items[i];
+							if (typeIth.name === strName) {
+
+								return false;
+							}
+						}
+
+						return true;
+					}
+
 					///////////////////////////////////
 					// Private fields.
 
