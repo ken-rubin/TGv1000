@@ -26,7 +26,7 @@ Jerry
 - Make tables scrollable; fix col width
 - Smaller Type image in TW
 - Implement TW Delete this Type.
-- Get Add new Type and Search for Type working
+- Test that Types are saved correctly to DB and then test Search for Type.
 - Blockly code sizing and window positioning
 - Use function to check if type name is available--where? Write similar functions for methods, properties and events in active type
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as.

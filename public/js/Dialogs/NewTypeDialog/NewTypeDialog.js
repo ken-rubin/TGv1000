@@ -138,6 +138,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						try {
 
+							var typeName = $("#TypeName").val().trim();
+							if (!client.isTypeNameAvailableInActiveComic(typeName)) {
+
+								errorHelper.show("That name is already used. Please enter another.");
+								return;
+							}
+
 							// Create minimal Type based on the dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
 							var typeJO = 
@@ -147,12 +154,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								ordinal: client.getNumberOfTypesInActiveComic(),
 								tags: $("#TypeTags").val() || "",
 								properties: [],
-								methods: [
-									// { name: "initialize", workspace: "", method: "" }
-								],
+								methods: [],
 								events: [],
 								dependencies: [],
-								name: $("#TypeName").val() || "",
+								name: typeName,
 								imageResourceId: m_imageResourceId
 							};
 
