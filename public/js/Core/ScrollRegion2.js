@@ -120,6 +120,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                                         var dLeft = e.pageX - $(window).scrollLeft() + m_dTooltipWidthOffset;
                                         var dTop = e.pageY - $(window).scrollTop() + m_dTooltipHeightOffset;
 
+                                        // If I'm in a dialog, I also have to subtract the top left corner of the dialog.
+                                        
+
                                         // Configure and show the tooltip.
                                         m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));
                                         m_jTooltip.css("left",

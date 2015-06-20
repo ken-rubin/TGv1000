@@ -421,7 +421,7 @@ define(["Core/errorHelper"],
 						try {
 
 							// Set the title.
-							$("#titlediv").text(clType.data.name + " :: " + method.name);
+							// $("#titlediv").text(clType.data.name + " :: " + method.name);
 
 							// Save off workspace string.
 							self.workspace = strCodeDOM;

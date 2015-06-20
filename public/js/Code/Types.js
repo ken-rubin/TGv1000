@@ -328,18 +328,20 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								var strBuild;
 								// Methods
 								$("#TWmethodsTbody").empty();
-								strBuild = "";
 								var haveAnyMethods = false;
-								m_clTypeActive.data.methods.forEach(function(m) {
+								for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
 
 									haveAnyMethods = true;
+									var m = m_clTypeActive.data.methods[i];
 									if (m.name === 'initialize') {
-										strBuild += "<tr><td>" + m.name + "</td><td></td><td></td></tr>";
+										strBuild = "<tr><td>" + m.name + "</td><td></td><td></td></tr>";
+										$("#TWmethodsTbody").append(strBuild);
 									} else {
-										strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>rename</a></td><td><a href='#'>delete</a></td></tr>";
+										strBuild = '<tr><td><a id="method_' + i + '" href="#">' + m.name + '</a></td><td><a href="#" onclick="alert(\'rename dlg\');">rename</a></td><td><a href="#" onclick="alert(\'delete dlg\');">delete</a></td></tr>';
+										$("#TWmethodsTbody").append(strBuild);
+										$("#method_" + i).click(m_functionMethodClicked);
 									}
-								});
-								$("#TWmethodsTbody").append(strBuild);
+								};
 								if (haveAnyMethods){
 									$("#TWclickMsg").css("display", "block");
 								} else {
@@ -383,6 +385,25 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					}
 
 					// TypeWell click handlers
+					var m_functionMethodClicked = function(e) {
+
+						try {
+
+							var parts = e.currentTarget.id.split('_');
+							var index = parseInt(parts[1], 10);
+
+							var exceptionRet = code.load(m_clTypeActive, m_clTypeActive.data.methods[index], m_clTypeActive.data.methods[index].workspace);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
 					var m_functionClickTWimageSearchLink = function () {
 
 						try {
