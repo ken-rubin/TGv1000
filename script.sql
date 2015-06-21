@@ -388,6 +388,15 @@ begin
 		set @dbstate := 23.0;
     end if;
 
+    if @dbstate = 23.0 then
+    
+		ALTER TABLE `TGv1000`.`methods` 
+			ADD COLUMN `ordinal` int(11) NOT NULL AFTER `name`;        
+		
+        UPDATE `TGv1000`.`control` set dbstate=24.0 where id=1;
+		set @dbstate := 24.0;
+    end if;
+
 end;
 
 //
