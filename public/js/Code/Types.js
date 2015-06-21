@@ -33,6 +33,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							$("#TWdeleteTypeBtn").click(m_functionClickTWdeleteTypeLink);
 							$("#TWnewTypeBtn").click(m_functionClickTWnewTypeLink);
 							$("#TWsearchTypeBtn").click(m_functionClickTWsearchTypeLink);
+							$("#TWaddMethodBtn").click(m_functionClickTWnewMethod);
+							$("#TWsearchMethodBtn").click(m_functionClickTWsearchMethod);
+							$("#TWaddPropertyBtn").click(m_functionClickTWnewProperty);
+							$("#TWaddEventBtn").click(m_functionClickTWnewEvent);
 
 						} catch (e) {
 
@@ -123,6 +127,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						try {
 
 							m_clTypeActive = clType;
+							for (var i = 0; i < m_arrayClTypes.length; i++) {
+
+								if (m_arrayClTypes[i].data.name === clType.data.name) {
+
+									m_ActiveTypeIndex = i;
+									break;
+								}
+							}
 
 							var exceptionRet = m_functionSetUpTheWell();
 							if (exceptionRet) {
@@ -337,9 +349,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 										strBuild = "<tr><td>" + m.name + "</td><td></td><td></td></tr>";
 										$("#TWmethodsTbody").append(strBuild);
 									} else {
-										strBuild = '<tr><td><a id="method_' + i + '" href="#">' + m.name + '</a></td><td><a href="#" onclick="alert(\'rename dlg\');">rename</a></td><td><a href="#" onclick="alert(\'delete dlg\');">delete</a></td></tr>';
+										strBuild = '<tr><td><a id="method_' + i + '" href="#">' + m.name + '</a></td><td><a id="methodrename_' + i + '" href="#">rename</a></td><td><a id="methoddelete_' + i + '" href="#">delete</a></td></tr>';
 										$("#TWmethodsTbody").append(strBuild);
 										$("#method_" + i).click(m_functionMethodClicked);
+										$("#methodrename_" + i).click(m_functionMethodRenameClicked);
+										$("#methoddelete_" + i).click(m_functionMethodDeleteClicked);
 									}
 								};
 								if (haveAnyMethods){
@@ -350,21 +364,25 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 								// Properties
 								$("#TWpropertiesTbody").empty();
-								strBuild = "";
-								m_clTypeActive.data.properties.forEach(function(m) {
+								for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
-									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
-								});
-								$("#TWpropertiesTbody").append(strBuild);
+									var m = m_clTypeActive.data.properties[i];
+									strBuild = '<tr><td>' + m.name + '</td><td><a id="propertyedit_' + i + '" href="#">edit</a></td><td><a id="propertydelete_' + i + '" href="#">delete</a></td></tr>';
+									$("#TWpropertiesTbody").append(strBuild);
+									$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
+									$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
+								};
 
 								// Events
 								$("#TWeventsTbody").empty();
-								strBuild = "";
-								m_clTypeActive.data.events.forEach(function(m) {
+								for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
-									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
-								});
-								$("#TWeventsTbody").append(strBuild);
+									var m = m_clTypeActive.data.events[i];
+									strBuild = '<tr><td>' + m.name + '</td><td><a id="eventedit_' + i + '" href="#">edit</a></td><td><a id="eventdelete_' + i + '" href="#">delete</a></td></tr>';
+									$("#TWeventsTbody").append(strBuild);
+									$("#eventedit_" + i).click(m_functionEventEditClicked);
+									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
+								};
 
 								if (m_arrayClTypes.length > 1) {
 
@@ -384,13 +402,24 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						}
 					}
 
-					// TypeWell click handlers
+					// TypeWell click handlers and helpers
+					var m_functionParseOutIndex = function (event) {
+
+						try {
+
+							return parseInt(event.currentTarget.id.split('_')[1], 10);
+
+						} catch (e) {
+
+							throw e;
+						}
+					}
+
 					var m_functionMethodClicked = function(e) {
 
 						try {
 
-							var parts = e.currentTarget.id.split('_');
-							var index = parseInt(parts[1], 10);
+							var index = m_functionParseOutIndex(e);
 
 							var exceptionRet = code.load(m_clTypeActive, m_clTypeActive.data.methods[index], m_clTypeActive.data.methods[index].workspace);
 							if (exceptionRet) {
@@ -398,6 +427,108 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								throw exceptionRet;
 							}
 
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionMethodRenameClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showRenameMethodDialog(index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionMethodDeleteClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showDeleteConfirmationDialog('method', index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionPropertyEditClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showEditPropertyDialog(index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionPropertyDeleteClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showDeleteConfirmationDialog('property', index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionEventEditClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showEditEventDialog(index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionEventDeleteClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showDeleteConfirmationDialog('event', index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -451,6 +582,17 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 					var m_functionClickTWdeleteTypeLink = function () {
 
+						try {
+
+							var exceptionRet = client.showDeleteConfirmationDialog('type', m_ActiveTypeIndex);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
 					}
 					
 					var m_functionClickTWnewTypeLink = function () {
@@ -672,6 +814,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 					var m_arrayClTypes = [];
 					// Active item.
 					var m_clTypeActive = null;
+					var m_ActiveTypeIndex = -1;
 
 				} catch (e) {
 

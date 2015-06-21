@@ -308,21 +308,108 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showNewMethodDialog = function () {}
+					self.showNewMethodDialog = function () {
+
+						try {
+
+							m_openDialog = new NewMethodDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					self.addMethodToType = function (clMethod) {}
 
-					self.showMethodSearchDialog = function () {}
+					self.showMethodSearchDialog = function () {
+
+						try {
+
+							m_openDialog = new MethodSearchDialog();
+							var exceptionRet = m_openDialog.create(functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					self.addMethodToTypeFromDB = function (iMethodId) {}
 
-					self.showNewPropertyDialog = function () {}
+					self.showRenameMethodDialog = function (index) {}
+
+					self.showNewPropertyDialog = function () {
+
+						try {
+
+							m_openDialog = new NewPropertyDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					self.addPropertyToType = function (clProperty) {}
 
-					self.showNewEventDialog = function () {}
+					self.showEditPropertyDialog = function (index) {}
+
+					self.showNewEventDialog = function () {
+
+						try {
+
+							m_openDialog = new NewEventDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					self.addEventToType = function (clEvent) {}
+
+					self.showEditEventDialog = function (index) {}
+
+					self.showDeleteConfirmationDialog = function (objectType, index) {
+
+						if (objectType === 'type') {
+
+						} else if (objectType === 'method') {
+
+						} else if (objectType === 'property') {
+
+						} else if (objectType === 'event') {
+							
+						}
+					}
 
 					self.unloadProject = function () {
 

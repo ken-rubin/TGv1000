@@ -21,7 +21,7 @@ Jerry
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
 - Start saving methods, properties and events to their own tables.
-- Disable disable Delete this Type button for type isApp--make sure not to look for type named 'app'; instead look for type where isApp = 1
+- Disable  Delete this Type button for type isApp--make sure not to look for type named 'app'; instead look for type where isApp = 1
 - Add click handler to method names in table
 - Make tables scrollable; fix col width
 - Smaller Type image in TW
