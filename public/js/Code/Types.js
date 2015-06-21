@@ -360,7 +360,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								// Events
 								$("#TWeventsTbody").empty();
 								strBuild = "";
-								m_clTypeActive.data.properties.forEach(function(m) {
+								m_clTypeActive.data.events.forEach(function(m) {
 
 									strBuild += "<tr><td>" + m.name + "</td><td><a href='#'>edit</a></td><td><a href='#'>delete</a></td></tr>";
 								});
@@ -418,6 +418,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							errorHelper.show(e);
 						}
 					}
+
 					var m_functionClickTWnewImageURLLink = function () {
 
 						try {
@@ -432,6 +433,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							errorHelper.show(e);
 						}
 					}
+
 					var m_functionClickTWnewImageDiskLink = function () {
 
 						try {
@@ -446,6 +448,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							errorHelper.show(e);
 						}
 					}
+
 					var m_functionClickTWdeleteTypeLink = function () {
 
 					}
@@ -464,6 +467,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 							errorHelper.show(e);
 						}
 					}
+
 					var m_functionClickTWsearchTypeLink = function () {
 
 						try {
@@ -493,46 +497,120 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						}
 					}
 
-					// Invoked when the types dialog exist newly.
-					var m_functionNewType = function () {
+					var m_functionClickTWnewMethod = function () {
 
 						try {
 
-				    		// Allocate project.
-				    		var clType = new Type();
-				    		var exceptionRet = clType.load({ 
-
-	    						properties: [],
-	    						methods: [],
-	    						events: [],
-	    						dependencies: [],
-	    						name: "new type",
-	    						id: m_arrayClTypes.length + 1,
-	    						resourceId: 0
-				    		});
-				    		if (exceptionRet) {
-
-				    			return exceptionRet;
-				    		}
-
-				    		// Add the type.
-							exceptionRet = self.addItem(clType);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-					        // Also add to the designer/tool strip.
-							exceptionRet = tools.addItem(clType);
+							var exceptionRet = client.showNewMethodDialog();
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 						} catch (e) {
 
-							return e;
+							errorHelper.show(e);
 						}
-					};
+					}
+
+					var m_functionClickTWsearchMethod = function () {
+
+						try {
+
+							var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
+
+								if (iMethodId > 0) {
+
+									exceptionRet = client.addMethodToTypeFromDB(iMethodId);
+
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} else {
+
+									throw new Error("Invalid method id returned.")
+								}
+							});
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionClickTWnewProperty = function () {
+
+						try {
+
+							var exceptionRet = client.showNewPropertyDialog();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionClickTWnewEvent = function () {
+
+						try {
+
+							var exceptionRet = client.showNewEventDialog();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					// Invoked when the types dialog exist newly.
+					// var m_functionNewType = function () {
+
+					// 	try {
+
+				 //    		// Allocate project.
+				 //    		var clType = new Type();
+				 //    		var exceptionRet = clType.load({ 
+
+	    // 						properties: [],
+	    // 						methods: [],
+	    // 						events: [],
+	    // 						dependencies: [],
+	    // 						name: "new type",
+	    // 						id: m_arrayClTypes.length + 1,
+	    // 						resourceId: 0
+				 //    		});
+				 //    		if (exceptionRet) {
+
+				 //    			return exceptionRet;
+				 //    		}
+
+				 //    		// Add the type.
+					// 		exceptionRet = self.addItem(clType);
+					// 		if (exceptionRet) {
+
+					// 			throw exceptionRet;
+					// 		}
+
+					//         // Also add to the designer/tool strip.
+					// 		exceptionRet = tools.addItem(clType);
+					// 		if (exceptionRet) {
+
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
+
+					// 		return e;
+					// 	}
+					// };
 
 					// Invoked when the types dialog exist clonely.
 					// var m_functionCloneType = function (strId) {

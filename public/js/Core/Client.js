@@ -232,6 +232,18 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.addTypeToProject = function(clType) {
+
+						try {
+
+							return m_clProject.addType(clType);
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.getNumberOfTypesInActiveComic = function () {
 
 						try {
@@ -296,17 +308,21 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addTypeToProject = function(clType) {
+					self.showNewMethodDialog = function () {}
 
-						try {
+					self.addMethodToType = function (clMethod) {}
 
-							return m_clProject.addType(clType);
+					self.showMethodSearchDialog = function () {}
 
-						} catch (e) {
+					self.addMethodToTypeFromDB = function (iMethodId) {}
 
-							return e;
-						}
-					}
+					self.showNewPropertyDialog = function () {}
+
+					self.addPropertyToType = function (clProperty) {}
+
+					self.showNewEventDialog = function () {}
+
+					self.addEventToType = function (clEvent) {}
 
 					self.unloadProject = function () {
 
