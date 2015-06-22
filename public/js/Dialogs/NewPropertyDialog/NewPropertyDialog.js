@@ -62,7 +62,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 							// the PropertysDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "New Property",
+								title: "Add/Edit Property",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [

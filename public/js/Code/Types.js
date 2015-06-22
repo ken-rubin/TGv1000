@@ -456,7 +456,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							var index = m_functionParseOutIndex(e);
 
-							var exceptionRet = client.showDeleteConfirmationDialog('method', index);
+							var exceptionRet = client.showDeleteConfirmDialog('method', index);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -490,7 +490,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							var index = m_functionParseOutIndex(e);
 
-							var exceptionRet = client.showDeleteConfirmationDialog('property', index);
+							var exceptionRet = client.showDeleteConfirmDialog('property', index);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -524,7 +524,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							var index = m_functionParseOutIndex(e);
 
-							var exceptionRet = client.showDeleteConfirmationDialog('event', index);
+							var exceptionRet = client.showDeleteConfirmDialog('event', index);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -584,7 +584,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							var exceptionRet = client.showDeleteConfirmationDialog('type', m_ActiveTypeIndex);
+							var exceptionRet = client.showDeleteConfirmDialog('type', m_ActiveTypeIndex);
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -13,7 +13,13 @@ define(["Core/errorHelper",
 		"Dialogs/TypeSearchDialog/TypeSearchDialog", 
 		"Dialogs/ImageDiskDialog/ImageDiskDialog", 
 		"Dialogs/ImageURLDialog/ImageURLDialog", 
-		"Dialogs/ImageSearchDialog/ImageSearchDialog", 
+		"Dialogs/ImageSearchDialog/ImageSearchDialog",
+		"Dialogs/DeleteConfirmDialog/DeleteConfirmDialog",
+		"Dialogs/GenericRenameDialog/GenericRenameDialog",
+		"Dialogs/MethodSearchDialog/MethodSearchDialog",
+		"Dialogs/NewEventDialog/NewEventDialog",
+		"Dialogs/NewMethodDialog/NewMethodDialog",
+		"Dialogs/NewPropertyDialog/NewPropertyDialog",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -25,6 +31,12 @@ define(["Core/errorHelper",
 				ImageDiskDialog, 
 				ImageURLDialog, 
 				ImageSearchDialog, 
+				DeleteConfirmDialog,
+				GenericRenameDialog,
+				MethodSearchDialog,
+				NewEventDialog,
+				NewMethodDialog,
+				NewPropertyDialog,
 				Project,
 				Type) {
 
@@ -430,7 +442,7 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showDeleteConfirmationDialog = function (objectType, index) {
+					self.showDeleteConfirmDialog = function (objectType, index) {
 
 						try {
 
