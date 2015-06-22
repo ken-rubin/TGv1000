@@ -105,29 +105,29 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
-							var bldString = m_strObjectType + ' named ';
+							var strBuild = m_strObjectType + ' named ';
 							if (m_strObjectType === 'type') {
 
-								bldString += types.getActiveClType().data.name + '.';
+								strBuild += types.getActiveClType().data.name + '.';
 
 							} else if (m_strObjectType === 'method') {
 
-								bldString += types.getActiveClType().data.methods[m_iIndex].name + '.';
+								strBuild += types.getActiveClType().data.methods[m_iIndex].name + '.';
 
 							} else if (m_strObjectType === 'property') {
 
-								bldString += types.getActiveClType().data.properties[m_iIndex].name + '.';
+								strBuild += types.getActiveClType().data.properties[m_iIndex].name + '.';
 
 							} else if (m_strObjectType === 'event') {
 
-								bldString += types.getActiveClType().data.events[m_iIndex].name + '.';
+								strBuild += types.getActiveClType().data.events[m_iIndex].name + '.';
 
 							} else {
 
 								throw new Error('Invalid objectType passed to Delete COnfirmation Dialog.');
 							}
 
-							$("#DeleteThis").text(bldString);
+							$("#DeleteThis").text(strBuild);
 
 						} catch (e) {
 

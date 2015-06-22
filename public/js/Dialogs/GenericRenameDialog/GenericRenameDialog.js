@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Property"], 
-  function (snippetHelper, errorHelper, resourceHelper, Property) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Property", "Code/Types", "Code/Method", "Code/Event"], 
+  function (snippetHelper, errorHelper, resourceHelper, Property, Types, Method, Event) {
 
     try {
 
@@ -24,6 +24,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
           self.create = function(objectType, index) {
 
             try {
+
+              m_strObjectType = objectType;
+              m_iIndex = index;
 
               // Get the dialog DOM.
               $.ajax({
@@ -68,11 +71,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
                       buttons: [
                         {
                           label: "Rename",
-                          id: 'CreatePropertyBtn',
+                          id: 'RenameBtn',
                           cssClass: "btn-primary",
                           action: function(){
 
-                            m_functionCreateProperty();
+                            m_functionRename();
                           }
                         },
                         {
@@ -101,11 +104,32 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 
               // Save the dailog object reference.
               m_dialog = dialogItself;
-              // $("#PropertyName").focus();
 
-              // $("#PropertyName").blur(m_functionBlurPropertyName);
+              var strType = m_strObjectType.charAt(0).toUpperCase() + m_strObjectType.substring(1);
+              var strName = '';
+              if (m_strObjectType === 'type') {
 
-              // m_setStateCreateBtn();
+                strName = types.getActiveClType().data.name;
+
+              } else if (m_strObjectType === 'method') {
+
+                strName = types.getActiveClType().data.methods[m_iIndex].name;
+
+              } else if (m_strObjectType === 'property') {
+
+                strName = types.getActiveClType().data.properties[m_iIndex].name;
+
+              } else if (m_strObjectType === 'event') {
+
+                strName = types.getActiveClType().data.events[m_iIndex].name;
+
+              } else {
+
+                throw new Error('Invalid objectType passed to Rename Dialog.');
+              }
+
+              $("#RenameLabel").text(strType);
+              $("#RenameInput").val(strName);
 
             } catch (e) {
 
@@ -113,130 +137,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
             }
           };
 
-          // var m_functionBlurPropertyName = function() {
-
-          //    m_setStateCreateBtn();
-          // }
-
-          // var m_setStateCreateBtn = function() {
-
-          //  var nameStatus = $("#PropertyName").val().trim().length > 0;
-
-          //  if (!nameStatus) {
-          //    $("#CreatePropertyBtn").addClass("disabled");
-          //  } else {
-          //    $("#CreatePropertyBtn").removeClass("disabled");
-          //  }
-          // }
-
-          // var m_functionCreateProperty = function () {
-
-          //  try {
-
-          //    var PropertyName = $("#PropertyName").val().trim();
-              
-          //    // if (!client.isPropertyNameAvailableInActiveComic(PropertyName)) {
-
-          //    //  errorHelper.show("That name is already used. Please enter another.");
-          //    //  return;
-          //    // }
-
-          //    // // Create minimal Property based on the dialog's fields--or lack thereof.
-          //    // // Call client to inject it throughout.
-          //    // var PropertyJO = 
-          //    // {
-          //    //  isApp: false,
-          //    //  id: 0,
-          //    //  ordinal: client.getNumberOfPropertysInActiveComic(),
-          //    //  tags: $("#PropertyTags").val() || "",
-          //    //  properties: [],
-          //    //  methods: [],
-          //    //  Propertys: [],
-          //    //  dependencies: [],
-          //    //  name: PropertyName,
-          //    //  imageResourceId: m_imageResourceId
-          //    // };
-
-          //    // var clProperty = new Property();
-          //    // clProperty.load(PropertyJO);
-
-          //    // var exceptionRet = client.addPropertyToProject(clProperty);
-          //    // if (exceptionRet) {
-
-          //    //  throw exceptionRet;
-          //    // }
-
-          //    // m_dialog.close();
-
-          //  } catch (e) {
-
-          //    errorHelper.show(e);
-          //  }
-          // }
-
-          // // 3 functions to handle the Image changing link clicks.
-          // var m_functionSearchClick = function () {
-
-          //  try {
-
-          //    var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
-          //    if (exceptionRet) {
-
-          //      throw exceptionRet;
-          //    }
-          //  } catch(e) {
-
-          //    errorHelper.show(e);
-          //  }
-          // }
-          
-          // var m_functionURLClick = function () {
-
-          //  try {
-
-          //    var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
-          //    if (exceptionRet) {
-
-          //      throw exceptionRet;
-          //    }
-          //  } catch(e) {
-
-          //    errorHelper.show(e);
-          //  }
-          // }
-          
-          // var m_functionDiskClick = function () {
-
-          //  try {
-
-          //    var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
-          //    if (exceptionRet) {
-
-          //      throw exceptionRet;
-          //    }
-          //  } catch(e) {
-
-          //    errorHelper.show(e);
-          //  }
-          // }
-
-          // // Display the chosen image.
-          // var m_functionSetImageSrc = function (imageResourceId) {
-
-          //  m_imageResourceId = imageResourceId;
-          //  $("#PropertyImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
-          //  m_setStateCreateBtn();
-          // }
         } catch (e) {
 
           errorHelper.show(e);
         }
+
+        var m_functionRename = function () {}
 
         /////////////////////////////////
         // Private fields.
 
         // Reference to the dialog object instance.
         var m_dialog = null;
+        // Object type we're potentially deleting ('type','method','property','event')
+        var m_strObjectType = "";
+        // For 'method', 'property', 'event': Index in  array respective array in Types#m_clTypeActive.
+        // For 'type': Index in array Types#m_arrayClTypes.
+        var m_iIndex = -1;
       };
 
       // Return the constructor function as the module object.
