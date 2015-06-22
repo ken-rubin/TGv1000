@@ -21,9 +21,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(strNewOrEdit, iIndexIfEdit) {
 
 						try {
+
+							m_strNewOrEdit = strNewOrEdit;
+							m_iIndexIfEdit = iIndexIfEdit;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -62,17 +65,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 							// the PropertysDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Add/Edit Property",
+								title: (m_strNewOrEdit === "New") ? "Add new Property" : "Edit Property",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Property",
-					            		id: 'CreatePropertyBtn',
+					            		label: "Save Property",
+					            		id: 'SavePropertyBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionCreateProperty();
+					            			m_functionSaveProperty();
 					            		}
 					            	},
 					            	{
@@ -129,7 +132,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 						}
 					}
 
-					var m_functionCreateProperty = function () {
+					var m_functionSaveProperty = function () {
 
 						try {
 
@@ -173,60 +176,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 							errorHelper.show(e);
 						}
 					}
-
-					// 3 functions to handle the Image changing link clicks.
-					var m_functionSearchClick = function () {
-
-						try {
-
-							var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-					
-					var m_functionURLClick = function () {
-
-						try {
-
-							var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-					
-					var m_functionDiskClick = function () {
-
-						try {
-
-							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					// Display the chosen image.
-					var m_functionSetImageSrc = function (imageResourceId) {
-
-						m_imageResourceId = imageResourceId;
-						$("#PropertyImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
-						m_setStateCreateBtn();
-					}
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -237,7 +186,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_imageResourceId = 0;
+				var m_strNewOrEdit = "";
+				var m_iIndexIfEdit = -1;
 			};
 
 			// Return the constructor function as the module object.

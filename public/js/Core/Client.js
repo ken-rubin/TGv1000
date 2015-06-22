@@ -367,7 +367,7 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('new', 0);
+							var exceptionRet = m_openDialog.create('New', 0);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -388,7 +388,7 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('edit', index);
+							var exceptionRet = m_openDialog.create('Edit', index);
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -248,6 +248,55 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Add to collection.
                     m_arrayItems.push(jItem);
 
+                    var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
+                    if (exceptionRet) {
+
+                        throw exceptionRet;
+                    }
+
+                    // Last, add to DOM, ...
+                    m_jSlider.append(jItem);
+                    // ...and make room in the slider.
+                    m_jSlider.width((iBase + 1) * m_dWidth);
+
+                } catch (e) {
+
+                    errorHelper.show(e);
+                }
+            };
+
+            var m_functionOnUpdatedImageLoaded = function() {
+
+                try {
+
+                    // Get reference to the item that raised the load.
+                    var jItem = $(this);
+
+                    // Calculate/search for iBase: index of this item in m_arrayItems.
+                    for (var iBase = 0; iBase < m_arrayItems.length; iBase++) {
+
+                        if (m_arrayItems[iBase][0].id === jItem[0].id) {
+
+                            var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            break;
+                        }
+                    }
+                } catch(e) {
+
+                    errorHelper.show(e);
+                }
+            }
+
+            // Shared code for image add and update.
+            var m_functionCompleteImageAddUpdate = function (jItem, iBase) {
+
+                try {
+
                     // Is this item taller or wider?
                     var dWidth = jItem[0].naturalWidth;
                     var dHeight = jItem[0].naturalHeight;
@@ -279,66 +328,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                             ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
                     }
 
-                    // Last, add to DOM, ...
-                    m_jSlider.append(jItem);
-                    // ...and make room in the slider.
-                    m_jSlider.width((iBase + 1) * m_dWidth);
-
+                    return null;
+                
                 } catch (e) {
 
-                    errorHelper.show(e);
-                }
-            };
-
-            var m_functionOnUpdatedImageLoaded = function() {
-
-                try {
-
-                    // Get reference to the item that raised the load.
-                    var jItem = $(this);
-
-                    // Calculate/search for iBase: index of this item in m_arrayItems.
-                    for (var iBase = 0; iBase < m_arrayItems.length; iBase++) {
-
-                        if (m_arrayItems[iBase][0].id === jItem[0].id) {
-
-                            // Is this item taller or wider?
-                            var dWidth = jItem[0].naturalWidth;
-                            var dHeight = jItem[0].naturalHeight;
-
-                            // Position item and make room in slider.
-                            if (dHeight > dWidth) {
-
-                                // Position across whole height and center on width.
-                                jItem.css("top",
-                                    "0px");
-                                jItem.css("height",
-                                    m_dEffectiveHeight.toString() + "px");
-                                var dItemWidth = m_dWidth * dWidth / dHeight;
-                                jItem.css("width",
-                                    dItemWidth.toString() + "px");
-                                jItem.css("left",
-                                    (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
-                            } else {
-
-                                // Position across whole width and center on height.
-                                jItem.css("left",
-                                    (iBase * m_dWidth).toString() + "px");
-                                jItem.css("width",
-                                    m_dWidth.toString() + "px");
-                                var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
-                                jItem.css("height",
-                                    dItemHeight.toString() + "px");
-                                jItem.css("top",
-                                    ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
-                            }
-
-                            break;
-                        }
-                    }
-                } catch(e) {
-
-                    errorHelper.show(e);
+                    return e;
                 }
             }
 
