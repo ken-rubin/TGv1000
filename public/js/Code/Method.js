@@ -750,36 +750,36 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 						try {
 
-							if (Methodof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
+							// if (Methodof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
-								// Save off the new resource in state.
-								self.data.imageResourceId = iResourceId;
+							// 	// Save off the new resource in state.
+							// 	self.data.imageResourceId = iResourceId;
 
-								// Cause Method to regenerate.
-								// var exceptionRet = m_functionGenerateMethodContents();
-								// if (exceptionRet) {
+							// 	// Cause Method to regenerate.
+							// 	// var exceptionRet = m_functionGenerateMethodContents();
+							// 	// if (exceptionRet) {
 
-								// 	throw exceptionRet;
-								// }
+							// 	// 	throw exceptionRet;
+							// 	// }
 
-								// Call off to the designer to update the picture in the designer surface.
-								var exceptionRet = designer.updateImage(self);
-								if (exceptionRet) {
+							// 	// Call off to the designer to update the picture in the designer surface.
+							// 	var exceptionRet = designer.updateImage(self);
+							// 	if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+							// 		throw exceptionRet;
+							// 	}
 
-								// Call off to Methods to change the image in the MethodWell, Method Methodstrip and the toolstrip.
-								exceptionRet = Methods.updateActiveMethodImage();
-								if (exceptionRet) {
+							// 	// Call off to Methods to change the image in the MethodWell, Method Methodstrip and the toolstrip.
+							// 	exceptionRet = Methods.updateActiveMethodImage();
+							// 	if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+							// 		throw exceptionRet;
+							// 	}
 
-							} else {
+							// } else {
 
-								throw new Error("Bad ResourceId received from ImageSoundDialog chain.");
-							}
+							// 	throw new Error("Bad ResourceId received from ImageSoundDialog chain.");
+							// }
 						} catch (e) {
 
 							errorHelper.show(e);

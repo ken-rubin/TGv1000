@@ -750,36 +750,36 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 						try {
 
-							if (Eventof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
+							// if (Eventof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
-								// Save off the new resource in state.
-								self.data.imageResourceId = iResourceId;
+							// 	// Save off the new resource in state.
+							// 	self.data.imageResourceId = iResourceId;
 
-								// Cause Event to regenerate.
-								// var exceptionRet = m_functionGenerateEventContents();
-								// if (exceptionRet) {
+							// 	// Cause Event to regenerate.
+							// 	// var exceptionRet = m_functionGenerateEventContents();
+							// 	// if (exceptionRet) {
 
-								// 	throw exceptionRet;
-								// }
+							// 	// 	throw exceptionRet;
+							// 	// }
 
-								// Call off to the designer to update the picture in the designer surface.
-								var exceptionRet = designer.updateImage(self);
-								if (exceptionRet) {
+							// 	// Call off to the designer to update the picture in the designer surface.
+							// 	var exceptionRet = designer.updateImage(self);
+							// 	if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+							// 		throw exceptionRet;
+							// 	}
 
-								// Call off to Events to change the image in the EventWell, Event Eventstrip and the toolstrip.
-								exceptionRet = Events.updateActiveEventImage();
-								if (exceptionRet) {
+							// 	// Call off to Events to change the image in the EventWell, Event Eventstrip and the toolstrip.
+							// 	exceptionRet = Events.updateActiveEventImage();
+							// 	if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+							// 		throw exceptionRet;
+							// 	}
 
-							} else {
+							// } else {
 
-								throw new Error("Bad ResourceId received from ImageSoundDialog chain.");
-							}
+							// 	throw new Error("Bad ResourceId received from ImageSoundDialog chain.");
+							// }
 						} catch (e) {
 
 							errorHelper.show(e);

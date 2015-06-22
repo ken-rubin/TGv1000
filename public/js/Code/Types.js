@@ -315,6 +315,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						}
 					}
 
+					// For delete confirmation or renaming or editing.
+					self.getActiveClType = function () {
+
+						return m_clTypeActive;
+					}
+
 					///////////////////////////////////
 					// Private methods.
 
@@ -328,7 +334,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								$("#TWtypeName").val(m_clTypeActive.data.name);
 								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
 
-								if (m_clTypeActive.isApp) {
+								if (m_clTypeActive.data.isApp) {
 
 									$("#TWdeleteTypeBtn").prop("disabled", true);
 
@@ -584,7 +590,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 						try {
 
-							var exceptionRet = client.showDeleteConfirmDialog('type', m_ActiveTypeIndex);
+							var exceptionRet = client.showDeleteConfirmDialog('type', -1);
 							if (exceptionRet) {
 
 								throw exceptionRet;
