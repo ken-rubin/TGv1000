@@ -329,7 +329,7 @@ define(["Core/errorHelper",
 
 					self.addMethodToType = function (clMethod) {}
 
-					self.showMethodSearchDialog = function () {
+					self.showMethodSearchDialog = function (functionOK) {
 
 						try {
 
