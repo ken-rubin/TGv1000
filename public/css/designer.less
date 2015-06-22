@@ -11,6 +11,14 @@
 	margin:2px;
 }
 
+#toolstripcol
+{
+	top:200px;
+	height:2000px;
+	overflow:hidden;
+	margin:2px;
+}
+
 // This is the scrollable part of the tool-strip.
 #toolstrip
 {
@@ -21,6 +29,21 @@
 	bottom:0px;
 	left:60px;	// Leave room for the controller.
 	right:60px;	// Leave room for the controller.
+
+	overflow:hidden;
+	//overflow-x:scroll;
+}
+
+// This is the scrollable part of the vertical tool-strip.
+#toolstripv
+{
+	position:fixed;
+	display:inline-block;
+
+	top:260px;	// Leave room for the controller.
+	bottom:1880px;	// Leave room for the controller.
+	left:0px;
+	right:120px;
 
 	overflow:hidden;
 	//overflow-x:scroll;

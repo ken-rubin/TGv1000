@@ -5,7 +5,7 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHelper"],
+define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelper"],
 	function (errorHelper, Type, ScrollRegion, resourceHelper) {
 
 		try {

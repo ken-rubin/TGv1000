@@ -1,0 +1,111 @@
+// Styles for the vertical ScrollRegionVs.
+//
+
+.ScrollRegionV
+{
+    position:fixed;
+    left:0px;
+    width:120px;
+    color:white;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: rgb(127,127,163);
+}
+
+.ScrollRegionVSliderContainer
+{
+    position:fixed;
+    left:5px;
+    right:5px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: rgb(64,64,64);
+
+    overflow: hidden;
+}
+
+.ScrollRegionVSlider
+{
+    position:fixed;
+    left:0px;
+    width:0px;
+    top:0px;
+    bottom:0px;
+    background: black;
+
+    overflow: hidden;
+}
+
+.ScrollRegionVLeft
+{
+    position:fixed;
+    top:5px;
+    height:30px;
+    left:5px;
+    width:120px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: rgba(0,0,100,0.5);
+    text-align: center;
+    line-height: 190px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.ScrollRegionVLeft:hover
+{
+    box-shadow: 0px 0px 60px white;
+    font-size:20px;
+}
+
+.ScrollRegionVRight
+{
+    position:fixed;
+    bottom:5px;
+    height:30px;
+    left:5px;
+    width:120px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: rgba(0,0,100,0.5);
+    text-align: center;
+    line-height: 190px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.ScrollRegionVRight:hover
+{
+    box-shadow: 0px 0px 60px white;
+    font-size:20px;
+}
+
+.ScrollRegionVImage:hover
+{
+    opacity: 1;
+}
+
+.ScrollRegionVImage
+{
+    position:absolute;
+    opacity: 0.85;
+}
+
+.ScrollRegionVButtonDown
+{
+    color:red;
+}
+
+.ScrollRegionVTooltip
+{
+    position:fixed;
+    display:none;
+    z-index:10000;
+    background:#ebb8b8;
+    color:#333333;
+    border:1px solid #333333;
+    border-radius:4px;
+    padding:4px;
+    font-size:11px;
+}
+

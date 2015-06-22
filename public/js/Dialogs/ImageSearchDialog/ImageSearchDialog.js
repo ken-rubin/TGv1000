@@ -5,7 +5,7 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion2"], 
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"], 
 	function (snippetHelper, errorHelper, resourceHelper, ScrollRegion) {
 
 		try {

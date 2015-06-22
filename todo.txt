@@ -4,7 +4,7 @@ Either of us
 Ken
 
 - Navbar menu highlight color
-- Get ScrollRegion2 tooltip to position better. It now works EXCEPT when the scroll region is in a dialog.
+- Get ScrollRegion tooltip to position better. It now works EXCEPT when the scroll region is in a dialog.
 - Vertical scrollregion
 - Finish Coder
 - Integrate Coder
