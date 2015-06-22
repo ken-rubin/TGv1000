@@ -378,9 +378,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 								for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 									var m = m_clTypeActive.data.events[i];
-									strBuild = '<tr><td>' + m.name + '</td><td><a id="eventedit_' + i + '" href="#">edit</a></td><td><a id="eventdelete_' + i + '" href="#">delete</a></td></tr>';
+									strBuild = '<tr><td>' + m.name + '</td><td><a id="eventrename_' + i + '" href="#">rename</a></td><td><a id="eventdelete_' + i + '" href="#">delete</a></td></tr>';
 									$("#TWeventsTbody").append(strBuild);
-									$("#eventedit_" + i).click(m_functionEventEditClicked);
+									$("#eventrename_" + i).click(m_functionEventRenameClicked);
 									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
 								};
 
@@ -439,7 +439,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 
 							var index = m_functionParseOutIndex(e);
 
-							var exceptionRet = client.showRenameMethodDialog(index);
+							var exceptionRet = client.showGenericRenameDialog('method', index);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -501,13 +501,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion2", "Core/resourceHel
 						}
 					}
 
-					var m_functionEventEditClicked = function(e) {
+					var m_functionEventRenameClicked = function(e) {
 						
 						try {
 
 							var index = m_functionParseOutIndex(e);
 
-							var exceptionRet = client.showEditEventDialog(index);
+							var exceptionRet = client.showGenericRenameDialog('event', index);
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -350,14 +350,12 @@ define(["Core/errorHelper",
 
 					self.addMethodToTypeFromDB = function (iMethodId) {}
 
-					self.showRenameMethodDialog = function (index) {}
-
 					self.showNewPropertyDialog = function () {
 
 						try {
 
 							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create('new', 0);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -373,7 +371,24 @@ define(["Core/errorHelper",
 
 					self.addPropertyToType = function (clProperty) {}
 
-					self.showEditPropertyDialog = function (index) {}
+					self.showEditPropertyDialog = function (index) {
+
+						try {
+
+							m_openDialog = new NewPropertyDialog();
+							var exceptionRet = m_openDialog.create('edit', index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					self.showNewEventDialog = function () {
 
@@ -396,18 +411,41 @@ define(["Core/errorHelper",
 
 					self.addEventToType = function (clEvent) {}
 
-					self.showEditEventDialog = function (index) {}
+					self.showGenericRenameDialog = function (itemType, index) {
+
+						try {
+
+							m_openDialog = new GenericRenameDialog();
+							var exceptionRet = m_openDialog.create(itemType, index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					self.showDeleteConfirmationDialog = function (objectType, index) {
 
-						if (objectType === 'type') {
+						try {
 
-						} else if (objectType === 'method') {
+							m_openDialog = new DeleteConfirmDialog();
+							var exceptionRet = m_openDialog.create(objectType, index);
+							if (exceptionRet) {
 
-						} else if (objectType === 'property') {
+								throw exceptionRet;
+							}
 
-						} else if (objectType === 'event') {
-							
+							return null;
+
+						} catch (e) {
+
+							return e;
 						}
 					}
 

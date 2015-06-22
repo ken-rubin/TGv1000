@@ -1,0 +1,43 @@
+//- Jade DOM for the New Method dialog. 
+//-
+.well
+  .row
+    .col-xs-12
+      h4 
+        | A TechGroms Method has a <em>name</em>, an identifying <em>image</em> and a number of <em>tags</em> that will help you or others search for it later.
+        | You may also enter a longer description of your method.
+  .row
+    .col-xs-12
+        .col-xs-2
+            label.control-label(for="MethodName", style="margin-top:6px;") Name
+        .col-xs-4
+            input.form-control#MethodName(type="text", placeholder="Enter method name.")
+        br
+        br
+        .col-xs-2
+            label.control-label(for="MethodDescription", style="margin-top:6px;") Description
+        .col-xs-10
+            textarea.form-control#MethodDescription(spellcheck=true cols=40 rows=2 placeholder="Optional method description.")
+        br
+        br
+        br
+        .col-xs-2
+            label.control-label(for="MethodTags", style="margin-top:6px;") Search tags
+        .col-xs-10
+            textarea#MethodTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Optionally enter words to help you search for this method later.")
+  .row
+    br
+    .col-xs-12
+      .col-xs-2
+        label.control-label(for="ProjectImage", style="margin-top:6px;")  Method image
+      .col-xs-2
+        img#MethodImage.pull-left(style="height:120px;width=120px;")
+      .col-xs-8
+        br
+        a#ImageSearchLink(href="#") Search for a Method Image
+        br
+        br
+        a#NewImageURLLink(href="#") Load a new Method Image using a URL
+        br
+        br
+        a#NewImageDiskLink(href="#") Load a new Method Image that's already on your computer

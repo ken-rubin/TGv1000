@@ -1,0 +1,18 @@
+//- Jade DOM for the New Property dialog. 
+//-
+.well
+  .row
+    .col-xs-12
+      h4 
+        | A TechGroms Property requires only a <em>name</em>.
+  .row
+    .col-xs-12
+        .col-xs-2
+            label.control-label(for="PropertyName", style="margin-top:6px;") Name
+        .col-xs-4
+            input.form-control#PropertyName(type="text", placeholder="Enter Property name.")
+  .row
+    | Add type, optional initial value(s)
+    br
+    | Also handle add or edit mode
+    
