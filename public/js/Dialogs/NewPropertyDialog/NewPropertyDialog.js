@@ -1,17 +1,17 @@
 ////////////////////////////////////
-// NewEventDialog module.
+// NewPropertyDialog module.
 // 
 // Return constructor function.
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Event"], 
-	function (snippetHelper, errorHelper, resourceHelper, Event) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Property"], 
+	function (snippetHelper, errorHelper, resourceHelper, Property) {
 
 		try {
 
-			// Define the NewEventDialog constructor function.
-			var functionNewEventDialog = function () {
+			// Define the NewPropertyDialog constructor function.
+			var functionNewPropertyDialog = function () {
 
 				try {
 
@@ -31,9 +31,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/E
 								cache: false,
 								data: { 
 
-									templateFile: "Dialogs/NewEventDialog/newEventDialog"
+									templateFile: "Dialogs/NewPropertyDialog/newPropertyDialog"
 								}, 
-								dataEvent: "HTML",
+								dataProperty: "HTML",
 								method: "POST",
 								url: "/renderJadeSnippet"
 							}).done(m_functionRenderJadeSnippetResponse).error(errorHelper.show);
@@ -59,20 +59,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/E
 						try {
 
 							// Show the dialog--load the content from 
-							// the EventsDialog jade HTML-snippet.
+							// the PropertysDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "New Event",
+								title: "New Property",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Event",
-					            		id: 'CreateEventBtn',
+					            		label: "Create Property",
+					            		id: 'CreatePropertyBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionCreateEvent();
+					            			m_functionCreateProperty();
 					            		}
 					            	},
 					            	{
@@ -94,16 +94,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/E
 						}
 					};
 
-					// Wire up event handlers to dialog controls.
+					// Wire up Property handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {
 
 						try {
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							$("#EventName").focus();
+							$("#PropertyName").focus();
 
-							$("#EventName").blur(m_functionBlurEventName);
+							$("#PropertyName").blur(m_functionBlurPropertyName);
 
 							m_setStateCreateBtn();
 
@@ -113,54 +113,54 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/E
 						}
 					};
 
-					var m_functionBlurEventName = function() {
+					var m_functionBlurPropertyName = function() {
 
 							m_setStateCreateBtn();
 					}
 
 					var m_setStateCreateBtn = function() {
 
-						var nameStatus = $("#EventName").val().trim().length > 0;
+						var nameStatus = $("#PropertyName").val().trim().length > 0;
 
 						if (!nameStatus) {
-							$("#CreateEventBtn").addClass("disabled");
+							$("#CreatePropertyBtn").addClass("disabled");
 						} else {
-							$("#CreateEventBtn").removeClass("disabled");
+							$("#CreatePropertyBtn").removeClass("disabled");
 						}
 					}
 
-					var m_functionCreateEvent = function () {
+					var m_functionCreateProperty = function () {
 
 						try {
 
-							var EventName = $("#EventName").val().trim();
+							var PropertyName = $("#PropertyName").val().trim();
 							
-							// if (!client.isEventNameAvailableInActiveComic(EventName)) {
+							// if (!client.isPropertyNameAvailableInActiveComic(PropertyName)) {
 
 							// 	errorHelper.show("That name is already used. Please enter another.");
 							// 	return;
 							// }
 
-							// // Create minimal Event based on the dialog's fields--or lack thereof.
+							// // Create minimal Property based on the dialog's fields--or lack thereof.
 							// // Call client to inject it throughout.
-							// var EventJO = 
+							// var PropertyJO = 
 							// {
 							// 	isApp: false,
 							// 	id: 0,
-							// 	ordinal: client.getNumberOfEventsInActiveComic(),
-							// 	tags: $("#EventTags").val() || "",
+							// 	ordinal: client.getNumberOfPropertysInActiveComic(),
+							// 	tags: $("#PropertyTags").val() || "",
 							// 	properties: [],
 							// 	methods: [],
-							// 	events: [],
+							// 	Propertys: [],
 							// 	dependencies: [],
-							// 	name: EventName,
+							// 	name: PropertyName,
 							// 	imageResourceId: m_imageResourceId
 							// };
 
-							// var clEvent = new Event();
-							// clEvent.load(EventJO);
+							// var clProperty = new Property();
+							// clProperty.load(PropertyJO);
 
-							// var exceptionRet = client.addEventToProject(clEvent);
+							// var exceptionRet = client.addPropertyToProject(clProperty);
 							// if (exceptionRet) {
 
 							// 	throw exceptionRet;
@@ -224,7 +224,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/E
 					var m_functionSetImageSrc = function (imageResourceId) {
 
 						m_imageResourceId = imageResourceId;
-						$("#EventImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						$("#PropertyImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
 						m_setStateCreateBtn();
 					}
 				} catch (e) {
@@ -241,7 +241,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/E
 			};
 
 			// Return the constructor function as the module object.
-			return functionNewEventDialog;
+			return functionNewPropertyDialog;
 
 		} catch (e) {
 
