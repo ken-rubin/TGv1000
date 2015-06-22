@@ -4,11 +4,30 @@
   .row
     .col-xs-12
       h4 
-        | A TechGroms Property requires only a <em>name</em>.
+        | A TechGroms Property requires a <em>name</em>, a data type and, optionally, and initial value.
+      br
   .row
-    .col-xs-12
         .col-xs-2
             label.control-label(for="PropertyName", style="margin-top:6px;") Name
         .col-xs-4
             input.form-control#PropertyName(type="text", placeholder="Enter Property name.")
+        br
+        br
+        .col-xs-2
+            label.control-label(for="PropertyDataType", style="margin-top:6px;") Data type
+        .col-xs-6
+            select.form-control
+              option(value=1) Number
+              option(value=2) Number range (e.g., 3-27)
+              option(value=3) String
+              option(value=4) Boolean (e.g., true or false)
+              option(value=5) Picklist (e.g., 'John' or 'Jim' or 'Paul' or 'Henry')
+              option(value=6) Type
+        br
+        br
+        .col-xs-2
+            label.control-label(for='PropertyInitial', style="margin-top:6px;") Initial value(s)
+        .col-xs-8
+            textarea.form-control#PropertyInitial(cols=40 rows=2 placeholder='optional initial value')
+
 
