@@ -37,17 +37,17 @@
               .row(style='margin-left:0px;margin-right:0px;')
                   img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;")
                   .list-group.pull-right(style="width:290px; margin-right:35px; margin-top:15px;")
-                    a#TWimageSearchLink.list-group-item(href="#") Search for a new Type image
-                    a#TWnewImageURLLink.list-group-item(href="#") Load a new Type image using a URL
-                    a#TWnewImageDiskLink.list-group-item(href="#") Load a new Type image from your computer
+                    button#TWimageSearchLink.button-as-link.list-group-item(href="#") Search for a new Type image
+                    button#TWnewImageURLLink.button-as-link.list-group-item(href="#") Load a new Type image using a URL
+                    button#TWnewImageDiskLink.button-as-link.list-group-item(href="#") Load a new Type image from your computer
               .row(style='text-align: center;')
                     br
                     br
-                    button#TWdeleteTypeBtn Delete this Type
+                    button#TWdeleteTypeBtn.button-as-link Delete this Type
                     | &nbsp;&nbsp;&nbsp;
-                    button#TWnewTypeBtn Add a new Type
+                    button#TWnewTypeBtn.button-as-link Add a new Type
                     | &nbsp;&nbsp;&nbsp;
-                    button#TWsearchTypeBtn Search for a new Type
+                    button#TWsearchTypeBtn.button-as-link Search for a new Type
             .col-sm-3
               .row(style='text-align: center;')
                 | Methods
@@ -59,9 +59,9 @@
                 | Click on a Method name to work with it.
               .row(style='text-align: center;')
                 br
-                button#TWaddMethodBtn Add a new Method
+                button#TWaddMethodBtn.button-as-link Add a new Method
                 | &nbsp;&nbsp;&nbsp;
-                button#TWsearchMethodBtn Search for a new Method
+                button#TWsearchMethodBtn.button-as-link Search for a new Method
             .col-sm-3
               .row(style='text-align: center;')
                 | Properties
@@ -70,7 +70,7 @@
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWpropertiesTbody
               .row(style='text-align: center;')
-                button#TWaddPropertyBtn Add a new Property
+                button#TWaddPropertyBtn.button-as-link Add a new Property
             .col-sm-3
               .row(style='text-align: center;')
                 | Events
@@ -79,7 +79,7 @@
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWeventsTbody
               .row(style='text-align: center;')
-                button#TWaddEventBtn Add a new Event
+                button#TWaddEventBtn.button-as-link Add a new Event
           .row
             #TypeWellMsg2.panel-body(style='text-align: center;')
 

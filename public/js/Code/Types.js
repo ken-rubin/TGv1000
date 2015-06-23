@@ -352,10 +352,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									haveAnyMethods = true;
 									var m = m_clTypeActive.data.methods[i];
 									if (m.name === 'initialize') {
-										strBuild = "<tr><td>" + m.name + "</td><td></td><td></td></tr>";
+										strBuild = '<tr><td><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td></td><td></td></tr>';
 										$("#TWmethodsTbody").append(strBuild);
+										$("#method_" + i).click(m_functionMethodClicked);
 									} else {
-										strBuild = '<tr><td><a id="method_' + i + '" href="#">' + m.name + '</a></td><td><a id="methodrename_' + i + '" href="#">rename</a></td><td><a id="methoddelete_' + i + '" href="#">delete</a></td></tr>';
+										strBuild = '<tr><td><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td><button class="button-as-link" id="methodrename_' + i + '" href="#">rename</button></td><td><button class="button-as-link" id="methoddelete_' + i + '" href="#">delete</button></td></tr>';
 										$("#TWmethodsTbody").append(strBuild);
 										$("#method_" + i).click(m_functionMethodClicked);
 										$("#methodrename_" + i).click(m_functionMethodRenameClicked);
@@ -373,7 +374,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 									var m = m_clTypeActive.data.properties[i];
-									strBuild = '<tr><td>' + m.name + '</td><td><a id="propertyedit_' + i + '" href="#">edit</a></td><td><a id="propertydelete_' + i + '" href="#">delete</a></td></tr>';
+									strBuild = '<tr><td>' + m.name + '</td><td><button class="button-as-link" id="propertyedit_' + i + '" href="#">edit</button></td><td><button class="button-as-link" id="propertydelete_' + i + '" href="#">delete</button></td></tr>';
 									$("#TWpropertiesTbody").append(strBuild);
 									$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
 									$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
@@ -384,7 +385,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 									var m = m_clTypeActive.data.events[i];
-									strBuild = '<tr><td>' + m.name + '</td><td><a id="eventrename_' + i + '" href="#">rename</a></td><td><a id="eventdelete_' + i + '" href="#">delete</a></td></tr>';
+									strBuild = '<tr><td>' + m.name + '</td><td><button class="button-as-link" id="eventrename_' + i + '" href="#">rename</button></td><td><button class="button-as-link" id="eventdelete_' + i + '" href="#">delete</button></td></tr>';
 									$("#TWeventsTbody").append(strBuild);
 									$("#eventrename_" + i).click(m_functionEventRenameClicked);
 									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);

@@ -27,3 +27,14 @@ a.list-group-item {
   top:130px;
 }
 
+.button-as-link {
+  background:none!important;
+  border:none; 
+  padding:0!important;
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  color:#069;
+  cursor:pointer;
+}
+.button-as-link:hover{
+  text-decoration:underline;
+}
