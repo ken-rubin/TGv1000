@@ -558,6 +558,58 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.deleteType = function(clType) {
+
+						try {
+
+
+							return null;
+
+						}  catch(e) {
+
+							return e;
+						}
+					}
+
+					self.deleteMethod = function(clMethod) {
+
+						try {
+
+
+							return null;
+
+						}  catch(e) {
+
+							return e;
+						}
+					}
+
+					self.deleteProperty = function(clProperty) {
+
+						try {
+
+
+							return null;
+
+						}  catch(e) {
+
+							return e;
+						}
+					}
+
+					self.deleteEvent = function(clEvent) {
+						
+						try {
+
+
+							return null;
+
+						}  catch(e) {
+
+							return e;
+						}
+					}
+
 					//////////////////////////////
 					// Non-dialog menu handlers
 					self.quickSaveProject = function () {

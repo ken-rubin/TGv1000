@@ -137,6 +137,38 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 
 					var m_functionDelete = function () {
 
+						try {
+
+							var exceptionRet = null;
+
+							if (m_strObjectType === 'type') {
+
+								exceptionRet = client.deleteType(types.getActiveClType());
+
+							} else if (m_strObjectType === 'method') {
+
+								exceptionRet = client.deleteMethod(types.getActiveClType().data.methods[m_iIndex]);
+
+							} else if (m_strObjectType === 'property') {
+
+								exceptionRet = client.deleteProperty(types.getActiveClType().data.properties[m_iIndex]);
+
+							} else if (m_strObjectType === 'event') {
+
+								exceptionRet = client.deleteEvent(types.getActiveClType().data.events[m_iIndex]);
+							}
+
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							self.closeYourself();
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
 					}
 
 				} catch (e) {
