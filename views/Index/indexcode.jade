@@ -24,30 +24,33 @@
     |   }
     |   return null;
     | }
+    | $(function(){$('[data-toggle="tooltip"]').tooltip();})
 
   //- The type editing area.
   .row.twsection
-          | Type name:&nbsp;&nbsp;&nbsp;
+          | Selected Type:&nbsp;&nbsp;&nbsp;
           input#TWtypeName
           | &nbsp;&nbsp;&nbsp;
-          a#TWRenameTypeLink(href="#") Rename
+          button#TWRenameTypeLink.edit-button(data-toggle="tooltip" title="Rename selected Type")
           .row.vdivide
             .col-sm-3
               br
               .row(style='margin-left:0px;margin-right:0px;')
-                  img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;")
-                  .list-group.pull-right(style="width:290px; margin-right:35px; margin-top:15px;")
-                    button#TWimageSearchLink.button-as-link.list-group-item(href="#") Search for a new Type image
-                    button#TWnewImageURLLink.button-as-link.list-group-item(href="#") Load a new Type image using a URL
-                    button#TWnewImageDiskLink.button-as-link.list-group-item(href="#") Load a new Type image from your computer
+                  img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;margin-top:15px;")
+                  .list-group.pull-right(style="width:50%; margin-top:1px;")
+                    button#TWimageSearchLink.search-button.list-group-item(data-toggle="tooltip" title="Search for a new image")
+                    br
+                    button#TWnewImageURLLink.internet-button.list-group-item(data-toggle="tooltip" title="Load a new image using a URL")
+                    br
+                    button#TWnewImageDiskLink.computer-button.list-group-item(data-toggle="tooltip" title="Load a new image that's on your computer")
               .row(style='text-align: center;')
                     br
                     br
-                    button#TWdeleteTypeBtn.button-as-link Delete this Type
+                    button#TWnewTypeBtn.add-button(data-toggle="tooltip" title="Add a new Type")
                     | &nbsp;&nbsp;&nbsp;
-                    button#TWnewTypeBtn.button-as-link Add a new Type
+                    button#TWsearchTypeBtn.search-button(data-toggle="tooltip" title="Search for a new Type")
                     | &nbsp;&nbsp;&nbsp;
-                    button#TWsearchTypeBtn.button-as-link Search for a new Type
+                    button#TWdeleteTypeBtn.delete-button(data-toggle="tooltip" title="Delete this Type")
             .col-sm-3
               .row(style='text-align: center;')
                 | Methods
@@ -55,13 +58,11 @@
                 .table-responsive
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWmethodsTbody
-              .row#TWclickMsg(style='text-align: center;display:block;')
-                | Click on a Method name to work with it.
               .row(style='text-align: center;')
                 br
-                button#TWaddMethodBtn.button-as-link Add a new Method
+                button#TWaddMethodBtn.add-button(data-toggle="tooltip" title="Add a new Method")
                 | &nbsp;&nbsp;&nbsp;
-                button#TWsearchMethodBtn.button-as-link Search for a new Method
+                button#TWsearchMethodBtn.search-button(data-toggle="tooltip" title="Search for a new Method")
             .col-sm-3
               .row(style='text-align: center;')
                 | Properties
@@ -70,7 +71,7 @@
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWpropertiesTbody
               .row(style='text-align: center;')
-                button#TWaddPropertyBtn.button-as-link Add a new Property
+                button#TWaddPropertyBtn.add-button(data-toggle="tooltip" title="Add a new Property")
             .col-sm-3
               .row(style='text-align: center;')
                 | Events
@@ -79,9 +80,7 @@
                   table.table.table-condensed.table-striped.table-bordered
                     tbody#TWeventsTbody
               .row(style='text-align: center;')
-                button#TWaddEventBtn.button-as-link Add a new Event
-          .row
-            #TypeWellMsg2.panel-body(style='text-align: center;')
+                button#TWaddEventBtn.add-button(data-toggle="tooltip" title="Add a new Event")
 
   //- Next the Method.
   //-.row#titlerow

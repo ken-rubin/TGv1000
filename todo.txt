@@ -31,6 +31,7 @@ Jerry
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is someone else's. Do we need to keep
 -    the original creator's user id? Probably a good idea.
 - After creating a new project scroll the window down so TW is at the top.
+- #TWRenameTypeLink has to be hooked up and programmed.
 
 
 
