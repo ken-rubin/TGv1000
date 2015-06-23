@@ -89,6 +89,8 @@ define(["Core/errorHelper",
 						}
 					};
 
+					//////////////////////////////
+					// Dialog creators/openers
 					self.showNewProjectDialog = function () {
 
 						try {
@@ -118,62 +120,6 @@ define(["Core/errorHelper",
 
 							m_openDialog = new OpenProjectDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.openProjectFromDB = function (iProjectId) {
-
-						try {
-
-							var posting = $.post("/BOL/ResourceBO/RetrieveProject", 
-								{
-									projectId: iProjectId,
-									userName: self.getTGCookie("userName")	// for tag elimination
-								},
-								'json');
-							posting.done(function(data){
-
-								if (data.success) {
-
-									m_clProject = new Project();
-									var exceptionRet = m_clProject.load(data.project);
-									if (exceptionRet) {
-
-										return exceptionRet;
-									}
-
-									return null;
-
-								} else {
-
-									// !data.success
-									return new Error(data.message);
-								}
-							});
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.quickSaveProject = function () {
-
-						try {
-
-							var exceptionRet = m_clProject.saveToDatabase();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -244,30 +190,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addTypeToProject = function(clType) {
-
-						try {
-
-							return m_clProject.addType(clType);
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.getNumberOfTypesInActiveComic = function () {
-
-						try {
-
-							return types.getLength();
-
-						} catch(e) {
-
-							throw e;
-						}
-					}
-
 					self.showTypeSearchDialog = function (functionOK) {
 
 						try {
@@ -280,6 +202,253 @@ define(["Core/errorHelper",
 							}
 
 							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showNewMethodDialog = function () {
+
+						try {
+
+							m_openDialog = new NewMethodDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showMethodSearchDialog = function (functionOK) {
+
+						try {
+
+							m_openDialog = new MethodSearchDialog();
+							var exceptionRet = m_openDialog.create(functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showNewPropertyDialog = function () {
+
+						try {
+
+							m_openDialog = new NewPropertyDialog();
+							var exceptionRet = m_openDialog.create('New', 0);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showEditPropertyDialog = function (index) {
+
+						try {
+
+							m_openDialog = new NewPropertyDialog();
+							var exceptionRet = m_openDialog.create('Edit', index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showNewEventDialog = function () {
+
+						try {
+
+							m_openDialog = new NewEventDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showGenericRenameDialog = function (itemType, index) {
+
+						try {
+
+							m_openDialog = new GenericRenameDialog();
+							var exceptionRet = m_openDialog.create(itemType, index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showDeleteConfirmDialog = function (objectType, index) {
+
+						try {
+
+							m_openDialog = new DeleteConfirmDialog();
+							var exceptionRet = m_openDialog.create(objectType, index);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showImageDiskDialog = function (bImage, functionOK) {
+
+						try {
+
+							// If image mode, show for images, otherwise, sounds....
+							m_openDialog2 = new ImageDiskDialog();
+							var exceptionRet = m_openDialog2.create(bImage,
+								functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					self.showImageSearchDialog = function (bImage, functionOK) {
+
+						try {
+
+							// If image mode, show for images, otherwise, sounds....
+							m_openDialog2 = new ImageSearchDialog();
+							var exceptionRet = m_openDialog2.create(bImage,
+								functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					self.showImageURLDialog = function (bImage, functionOK) {
+
+						try {
+
+							// If image mode, show for images, otherwise, sounds....
+							m_openDialog2 = new ImageURLDialog();
+							var exceptionRet = m_openDialog2.create(bImage,
+								functionOK);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					//////////////////////////////
+					// "functionOK" links.
+					// These are callbacks from, e.g., Select or Create buttons in dialogs.
+					// Not all of these come back through client. Some places handle the processing internally.
+					self.openProjectFromDB = function (iProjectId) {
+
+						try {
+
+							var posting = $.post("/BOL/ResourceBO/RetrieveProject", 
+								{
+									projectId: iProjectId,
+									userName: self.getTGCookie("userName")	// for tag elimination
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									m_clProject = new Project();
+									var exceptionRet = m_clProject.load(data.project);
+									if (exceptionRet) {
+
+										return exceptionRet;
+									}
+
+									return null;
+
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addTypeToProject = function(clType) {
+
+						try {
+
+							return m_clProject.addType(clType);
 
 						} catch (e) {
 
@@ -320,12 +489,82 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showNewMethodDialog = function () {
+					self.addMethodToType = function (clMethod) {
 
 						try {
 
-							m_openDialog = new NewMethodDialog();
-							var exceptionRet = m_openDialog.create();
+							return types.getActiveClType.addMethod(clMethod);
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addMethodToTypeFromDB = function (iMethodId) {
+
+						try {
+
+							var posting = $.post("/BOL/ResourceBO/RetrieveMethod", 
+								{
+									methodId: iMethodId,
+									userName: self.getTGCookie("userName")	// for tag elimination
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									var clMethod = new Method();
+									clMethod.load(data.method);
+									return types.getActiveClType.addMethod(clMethod);
+
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addPropertyToType = function (clProperty) {
+
+						try {
+
+							return types.getActiveClType.addProperty(clProperty);
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addEventToType = function (clEvent) {
+
+						try {
+
+							return types.getActiveClType.addEvent(clEvent);
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					//////////////////////////////
+					// Non-dialog menu handlers
+					self.quickSaveProject = function () {
+
+						try {
+
+							var exceptionRet = m_clProject.saveToDatabase();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -339,20 +578,11 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addMethodToType = function (clMethod) {}
-
-					self.showMethodSearchDialog = function (functionOK) {
+					self.navToAdminzone = function() {
 
 						try {
 
-							m_openDialog = new MethodSearchDialog();
-							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
+							location.href = "/adminzone"
 
 						} catch (e) {
 
@@ -360,104 +590,17 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addMethodToTypeFromDB = function (iMethodId) {}
-
-					self.showNewPropertyDialog = function () {
-
-						try {
-
-							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('New', 0);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.addPropertyToType = function (clProperty) {}
-
-					self.showEditPropertyDialog = function (index) {
+					//////////////////////////////
+					// Miscellaneous helpers.
+					self.getNumberOfTypesInActiveComic = function () {
 
 						try {
 
-							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('Edit', index);
-							if (exceptionRet) {
+							return types.getLength();
 
-								throw exceptionRet;
-							}
+						} catch(e) {
 
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.showNewEventDialog = function () {
-
-						try {
-
-							m_openDialog = new NewEventDialog();
-							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.addEventToType = function (clEvent) {}
-
-					self.showGenericRenameDialog = function (itemType, index) {
-
-						try {
-
-							m_openDialog = new GenericRenameDialog();
-							var exceptionRet = m_openDialog.create(itemType, index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.showDeleteConfirmDialog = function (objectType, index) {
-
-						try {
-
-							m_openDialog = new DeleteConfirmDialog();
-							var exceptionRet = m_openDialog.create(objectType, index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
+							throw e;
 						}
 					}
 
@@ -487,84 +630,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-					// Open popup--map callbacks to private functions.
-					// Upon successfull resolution, call functionOK(resourceId).
-					self.showImageDiskDialog = function (bImage, functionOK) {
-
-						try {
-
-							// If image mode, show for images, otherwise, sounds....
-							m_openDialog2 = new ImageDiskDialog();
-							var exceptionRet = m_openDialog2.create(bImage,
-								functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Open popup--map callbacks to private functions.
-					// Upon successfull resolution, call functionOK(resourceId).
-					self.showImageSearchDialog = function (bImage, functionOK) {
-
-						try {
-
-							// If image mode, show for images, otherwise, sounds....
-							m_openDialog2 = new ImageSearchDialog();
-							var exceptionRet = m_openDialog2.create(bImage,
-								functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Open popup--map callbacks to private functions.
-					// Upon successfull resolution, call functionOK(resourceId).
-					self.showImageURLDialog = function (bImage, functionOK) {
-
-						try {
-
-							// If image mode, show for images, otherwise, sounds....
-							m_openDialog2 = new ImageURLDialog();
-							var exceptionRet = m_openDialog2.create(bImage,
-								functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					self.navToAdminzone = function() {
-
-						try {
-
-							location.href = "/adminzone"
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
 					self.getTGCookie = function (name) {
 
 					    var value = "; " + document.cookie;
@@ -581,7 +646,8 @@ define(["Core/errorHelper",
 						return strPossiblyWithSpaces.replace(/ /g, '_');
 					};
 
-					// Project methods.
+					//////////////////////////////
+					// Project helper methods.
 					self.setProjectDirtyBool = function (bVal) {
 
 						if (m_clProject) {
@@ -696,6 +762,7 @@ define(["Core/errorHelper",
 
 			// Return constructor function.
 			return functionConstructor;
+
 		} catch (e) {
 
 			errorHelper.show(e);

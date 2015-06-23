@@ -1,19 +1,21 @@
 Either of us
 
+- ScrollRegionV
+
 
 Ken
 
-- Navbar menu highlight color
-- Get ScrollRegion tooltip to position better. It now works EXCEPT when the scroll region is in a dialog.
-- Vertical scrollregion
+- Navbar menu highlight problem.
+- Get ScrollRegion tooltip to position better. It now works EXCEPT when the scroll region is in a dialog. And who knows what it will do when vertical?
 - Finish Coder
 - Integrate Coder
+
 
 Jerry
 
 - Finish Save Project (as opposed to Save As).
 - Hungarian notation- m_setXxx -> m_functionSetXxx
-- Consider adding paging to search results; like 100 at a time. See code below.
+- Consider adding paging to (all?) search results; like 100 at a time. See code below.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
@@ -21,22 +23,20 @@ Jerry
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
 - Start saving methods, properties and events to their own tables.
-- Disable  Delete this Type button for type isApp--make sure not to look for type named 'app'; instead look for type where isApp = 1
-- Add click handler to method names in table
-- Make tables scrollable; fix col width
+- Make tables in TW scrollable; fix col width
 - Smaller Type image in TW
-- Implement TW Delete this Type.
 - Test that Types are saved correctly to DB and then test Search for Type.
 - Blockly code sizing and window positioning
 - Use function to check if type name is available--where? Write similar functions for methods, properties and events in active type
-- On exit or close project or new project, if project is dirty, ask if they want to save/save as.
-- Are properties and events Resources? I don't believe we'll search for them. So they're not. But Methods are.
+- On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is someone else's. Do we need to keep
+-    the original creator's user id? Probably a good idea.
+- After creating a new project scroll the window down so TW is at the top.
 
 
 
 To discuss
 
-
+- If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?
 
 
 

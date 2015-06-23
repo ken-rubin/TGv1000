@@ -88,6 +88,75 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					};
 
+					self.addMethod = function(clMethod) {
+
+						try {
+
+							clMethod.data.ordinal = self.data.methods.length;
+							self.data.methods.push(clMethod.data);
+
+							// Add the method to code.
+							var exceptionRet = code.addMethod(self.data, 
+								clMethod.data);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
+					self.addProperty = function(clProperty) {
+
+						try {
+
+							clProperty.data.ordinal = self.data.properties.length;
+							self.data.properties.push(clProperty.data);
+
+							// Add the property to code.
+							var exceptionRet = code.addProperty(self.data, 
+								clProperty);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
+					self.addEvent = function(clEvent) {
+
+						try {
+
+							clEvent.data.ordinal = self.data.events.length;
+							self.data.events.push(clEvent.data);
+
+							// Add the event to code.
+							var exceptionRet = code.addEvent(self.data, 
+								clEvent);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Return the DOM element representing a prototypical item.
 					self.generateDOM = function () {
 

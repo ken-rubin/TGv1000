@@ -52,10 +52,79 @@ module.exports = function ResourceBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+    self.routeRetrieveMethod = function (req, res) {
+
+        console.log("Entered ResourceBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
+        // req.body.typeId
+        // req.body.userName
+
+        try {
+
+            var method =
+            {
+
+            };
+
+            var exceptionRet = sql.execute("select * from " + self.dbname + "methods where id=" + req.body.methodId+ ";",
+                function(rows){
+
+                    if (rows.length !== 1) {
+
+                        res.json({
+                            success: false,
+                            message: 'Could not retrieve type from database.'
+                        });
+                    } else {
+
+                        var row = rows[0];
+
+
+
+
+
+
+
+                        m_functionFetchTags(type.id, 7, req.body.userName, function(tags){
+
+                            type.tags = tags;
+
+                            res.json({
+                                success: true,
+                                method: method
+                            });
+                        });
+                    }
+                },
+                function(strError){
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                    return;
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+                return;
+            }
+        } catch(e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeRetrieveType = function (req, res) {
 
         console.log("Entered ResourceBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
-        // req.body.typeId
+        // req.body.methodId
         // req.body.userName
 
         try {
