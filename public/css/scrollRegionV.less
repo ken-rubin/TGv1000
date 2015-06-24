@@ -1,11 +1,12 @@
-// Styles for the vertical ScrollRegionVs.
+// Styles for the ScrollRegionV.
 //
 
 .ScrollRegionV
 {
-    position:fixed;
-    left:0px;
-    width:120px;
+    position:absolute;
+    left:5%;
+    width:90%;
+//    height:100px;
     color:white;
     border: 1px solid black;
     border-radius: 4px;
@@ -14,9 +15,11 @@
 
 .ScrollRegionVSliderContainer
 {
-    position:fixed;
-    left:5px;
-    right:5px;
+    position:absolute;
+    left:40px;
+    right:40px;
+    top:5px;
+    bottom:5px;
     border: 1px solid black;
     border-radius: 4px;
     background: rgb(64,64,64);
@@ -26,7 +29,7 @@
 
 .ScrollRegionVSlider
 {
-    position:fixed;
+    position:absolute;
     left:0px;
     width:0px;
     top:0px;
@@ -38,11 +41,11 @@
 
 .ScrollRegionVLeft
 {
-    position:fixed;
-    top:5px;
-    height:30px;
+    position:absolute;
     left:5px;
-    width:120px;
+    width:30px;
+    top:5px;
+    bottom:5px;
     border: 1px solid black;
     border-radius: 4px;
     background: rgba(0,0,100,0.5);
@@ -60,11 +63,11 @@
 
 .ScrollRegionVRight
 {
-    position:fixed;
+    position:absolute;
+    right:5px;
+    width:30px;
+    top:5px;
     bottom:5px;
-    height:30px;
-    left:5px;
-    width:120px;
     border: 1px solid black;
     border-radius: 4px;
     background: rgba(0,0,100,0.5);
@@ -108,4 +111,3 @@
     padding:4px;
     font-size:11px;
 }
-

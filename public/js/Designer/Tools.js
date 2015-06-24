@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion", "Core/resourceHelper"],
-	function (errorHelper, Tool, ScrollRegion, resourceHelper) {
+define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourceHelper"],
+	function (errorHelper, Tool, ScrollRegionV, resourceHelper) {
 
 		try {
 
@@ -27,8 +27,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion", "Core/resource
 						try {
 
 							// Attach scrollableregion.
-							m_srToolStrip = new ScrollRegion();
-							var exceptionRet = m_srToolStrip.create(
+							m_srToolStripV = new ScrollRegionV();
+							var exceptionRet = m_srToolStripV.create(
 								"#toolstrip",		// inner row selector
 								55,					// item width
 								function() {}		// functionClick
@@ -46,7 +46,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion", "Core/resource
 					// Remove old items for project switch or whatever.
 					self.empty = function () {
 
-						m_srToolStrip.empty();
+						m_srToolStripV.empty();
 					}
 
 					// Add tool to strip.
@@ -63,7 +63,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion", "Core/resource
 
 							// Add to the DOM.
 							var jItem = null;
-							var exceptionRet = m_srToolStrip.addImage(
+							var exceptionRet = m_srToolStripV.addImage(
 								"tool-" + client.removeSpaces(clType.data.name),		// id
 								clType.data.name, "",		// name + description for tooltip
 								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image'), // url
@@ -165,7 +165,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion", "Core/resource
 
 							var strSelector = "#tool-" + clType.data.name;
 							var strUrl = resourceHelper.toURL("resources", clType.data.imageResourceId, 'image', '');
-							var exceptionRet = m_srToolStrip.updateImage(strSelector,
+							var exceptionRet = m_srToolStripV.updateImage(strSelector,
 								strUrl);
 							if (exceptionRet) {
 
@@ -184,7 +184,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegion", "Core/resource
 					// Private fields.
 
 					// Scroll object.
-					var m_srToolStrip = null;
+					var m_srToolStripV = null;
 					// Collection of tool items.
 					var m_arrayTools = [];
 				} catch (e) {

@@ -20,8 +20,16 @@ html
     .container-fluid
 
       .row-fluid
+
+        //- Would like .col-xs-.5, but....
         .col-xs-1
-          #VertSR(style="top:180px; left:0px; width:80px; position:fixed; background-color:#00ff00;")
+
+          //- Define a scrolling column.
+          #toolstripcol(style="top:180px; left:0px; width:80px; position:fixed; background-color:#00ff00; margin-left:2%;")
+
+            //- Scrollable region.
+            #toolstrip.ScrollRegionV
+
         .col-xs-11
 
           //- Include the designer element DOM.

@@ -394,9 +394,9 @@ define(["Core/errorHelper"],
 									var iBordersAndSpacingPadding = 70;
 
 									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.
-									var iVertSRtop = $("#VertSR").position().top;
-									$("#VertSR").height(iViewportHeight - 
-										iVertSRtop*2);
+									var iToolstripcolTop = $("#toolstripcol").position().top;
+									$("#toolstripcol").height(iViewportHeight - 
+										iToolstripcolTop*2);
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
 										iTypeWellHeight -
