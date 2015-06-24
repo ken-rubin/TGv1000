@@ -19,11 +19,16 @@ html
 
     .container-fluid
 
-      //- Include the designer element DOM.
-      include ./indexdesigner.jade
+      .row-fluid
+        .col-xs-1
+          #VertSR(style="top:180px; left:0px; width:80px; position:fixed; background-color:#00ff00;")
+        .col-xs-11
 
-      //- Include the code element DOM.
-      include ./indexcode.jade
+          //- Include the designer element DOM.
+          include ./indexdesigner.jade
+
+          //- Include the code element DOM.
+          include ./indexcode.jade
 
     //- Inlcude the list of scripts.
     include ./indexscripts.jade

@@ -26,89 +26,91 @@
     | }
 
   //- The type editing area.
-  .row.twsection
-    .row(style="border-bottom: 1px solid #000")
-      .col-sm-2.col-sm-offset-5
-        span(style="font-size:20px;font-weight:bold;")
-          | Current Object:&nbsp;&nbsp;&nbsp;
-        span#TWtypeName(style="font-size:20px;font-weight:bold;")
-    .row
-            .col-sm-3(style="border-right: 1px solid #000;")
-                br
-                .row(style='text-align: center;')
-                    div(style='font-weight:bold;')
-                      | Object Actions
-                    button#TWnewTypeBtn.add-button(data-toggle="tooltip" data-placement="bottom" title="Add a new Type")
-                    | &nbsp;&nbsp;&nbsp;
-                    button#TWsearchTypeBtn.search-button(data-toggle="tooltip" data-placement="bottom" title="Search for a new Type")
-                    | &nbsp;&nbsp;&nbsp;
-                    button#TWdeleteTypeBtn.delete-button(data-toggle="tooltip" data-placement="bottom" title="Delete this Type")
-                    | &nbsp;&nbsp;&nbsp;
-                    button#TWRenameTypeLink.edit-button(data-toggle="tooltip" data-placement="bottom" title="Rename this Type")
-                .row
+  .row
+   .col-xs-12
+     .row.twsection#TypeWell
+      .row(style="border-bottom: 1px solid #000")
+        .col-sm-2.col-sm-offset-5
+          span(style="font-size:20px;font-weight:bold;")
+            | Current Object:&nbsp;&nbsp;&nbsp;
+          span#TWtypeName(style="font-size:20px;font-weight:bold;")
+      .row
+              .col-sm-3(style="border-right: 1px solid #000;")
                   br
-                  .col-xs-1.col-xs-offset-3
+                  .row(style='text-align: center;')
+                      div(style='font-weight:bold;')
+                        | Object Actions
+                      button#TWnewTypeBtn.add-button(data-toggle="tooltip" data-placement="bottom" title="Add a new Type")
+                      | &nbsp;&nbsp;&nbsp;
+                      button#TWsearchTypeBtn.search-button(data-toggle="tooltip" data-placement="bottom" title="Search for a new Type")
+                      | &nbsp;&nbsp;&nbsp;
+                      button#TWdeleteTypeBtn.delete-button(data-toggle="tooltip" data-placement="bottom" title="Delete this Type")
+                      | &nbsp;&nbsp;&nbsp;
+                      button#TWRenameTypeLink.edit-button(data-toggle="tooltip" data-placement="bottom" title="Rename this Type")
+                  .row
                     br
+                    .col-xs-1.col-xs-offset-3
+                      br
+                      br
+                      | Image:
+                    .col-xs-4
+                      img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;margin-top:15px;")
+                    .col-xs-4
+                        br
+                        button#TWimageSearchLink.search-button(data-toggle="tooltip" title="Search for a new image")
+                        br
+                        button#TWnewImageURLLink.internet-button(data-toggle="tooltip" title="Load a new image using a URL")
+                        br
+                        button#TWnewImageDiskLink.computer-button(data-toggle="tooltip" title="Load a new image that's on your computer")
+                  .row
                     br
-                    | Image:
-                  .col-xs-4
-                    img#TWimage.pull-left(style="height:100px;width=100px;margin-left:20px;margin-top:15px;")
-                  .col-xs-4
-                      br
-                      button#TWimageSearchLink.search-button(data-toggle="tooltip" title="Search for a new image")
-                      br
-                      button#TWnewImageURLLink.internet-button(data-toggle="tooltip" title="Load a new image using a URL")
-                      br
-                      button#TWnewImageDiskLink.computer-button(data-toggle="tooltip" title="Load a new image that's on your computer")
-                .row
+              .col-sm-3(style="border-right: 1px solid #000;")
                   br
-            .col-sm-3(style="border-right: 1px solid #000;")
+                  .row(style='text-align: center;font-weight:bold;')
+                    | Methods
+                  .row
+                    .col-xs-10
+                      .table-responsive
+                        table.table.table-condensed.table-striped.table-bordered
+                          tbody#TWmethodsTbody(style="display:block; overflow:auto; height: 180px;")
+                    .col-xs-1
+                      br
+                      br
+                      button#TWaddMethodBtn.add-button(data-toggle="tooltip" title="Add a new Method")
+                      br
+                      br
+                      button#TWsearchMethodBtn.search-button(data-toggle="tooltip" title="Search for a new Method")
+                    .col-xs-1
+              .col-sm-3(style="border-right: 1px solid #000;")
                 br
                 .row(style='text-align: center;font-weight:bold;')
-                  | Methods
+                  | Properties
                 .row
                   .col-xs-10
                     .table-responsive
                       table.table.table-condensed.table-striped.table-bordered
-                        tbody#TWmethodsTbody(style="display:block; overflow:auto; height: 180px;")
+                        tbody#TWpropertiesTbody(style="display:block; overflow:auto; height: 180px;")
                   .col-xs-1
                     br
                     br
-                    button#TWaddMethodBtn.add-button(data-toggle="tooltip" title="Add a new Method")
                     br
-                    br
-                    button#TWsearchMethodBtn.search-button(data-toggle="tooltip" title="Search for a new Method")
+                    button#TWaddPropertyBtn.add-button(data-toggle="tooltip" title="Add a new Property")
                   .col-xs-1
-            .col-sm-3(style="border-right: 1px solid #000;")
-              br
-              .row(style='text-align: center;font-weight:bold;')
-                | Properties
-              .row
-                .col-xs-10
-                  .table-responsive
-                    table.table.table-condensed.table-striped.table-bordered
-                      tbody#TWpropertiesTbody(style="display:block; overflow:auto; height: 180px;")
-                .col-xs-1
-                  br
-                  br
-                  br
-                  button#TWaddPropertyBtn.add-button(data-toggle="tooltip" title="Add a new Property")
-                .col-xs-1
-            .col-sm-3
-              br
-              .row(style='text-align: center;font-weight:bold;')
-                | Events
-              .row
-                .col-xs-10
-                  .table-responsive
-                    table.table.table-condensed.table-striped.table-bordered
-                      tbody#TWeventsTbody(style="display:block; overflow:auto; height: 180px;")
-                .col-xs-1
-                  br
-                  br
-                  br
-                  button#TWaddEventBtn.add-button(data-toggle="tooltip" title="Add a new Event")
-                .col-xs-1
+              .col-sm-3
+                br
+                .row(style='text-align: center;font-weight:bold;')
+                  | Events
+                .row
+                  .col-xs-10
+                    .table-responsive
+                      table.table.table-condensed.table-striped.table-bordered
+                        tbody#TWeventsTbody(style="display:block; overflow:auto; height: 180px;")
+                  .col-xs-1
+                    br
+                    br
+                    br
+                    button#TWaddEventBtn.add-button(data-toggle="tooltip" title="Add a new Event")
+                  .col-xs-1
 
   //- Next the Blockly frame.
   .row

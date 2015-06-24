@@ -389,17 +389,19 @@ define(["Core/errorHelper"],
 								try {
 
 									var iViewportHeight = $(window).height();
+									var iTypeWellHeight = $("#TypeWell").height();
 
-									var iTitleHeight = $("#titlerow").height();
-									var iProjectItemHeight = $("#typestriprow").height();
-									var iNavbarHeight = $(".navbar").height();
-									var iBordersAndSpacingPadding = 48;
+									var iBordersAndSpacingPadding = 70;
+
+									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.
+									var iVertSRtop = $("#VertSR").position().top;
+									$("#VertSR").height(iViewportHeight - 
+										iVertSRtop*2);
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
-										iTitleHeight -
-										iProjectItemHeight -
-										iNavbarHeight -
+										iTypeWellHeight -
 										iBordersAndSpacingPadding);
+
 								} catch (e) {
 
 									errorHelper.show(e);
