@@ -1,6 +1,16 @@
 // Styles for the ScrollRegionV.
 //
 
+.ScrollRegionVcol   // this outer div holds .ScrollRegionVTop, .ScrollRegionV and .ScrollRegionVBottom
+{
+    top:180px;
+    left:0px;
+    width:80px;
+    position:fixed;
+    background-color:#00ff00;
+    margin-left:2%;
+}
+
 .ScrollRegionV
 {
     position:absolute;
@@ -39,13 +49,13 @@
     overflow: hidden;
 }
 
-.ScrollRegionVLeft
+.ScrollRegionVTop
 {
     position:absolute;
-    left:5px;
-    width:30px;
     top:5px;
-    bottom:5px;
+    height:30px;
+    right:5px;
+    left:5px;
     border: 1px solid black;
     border-radius: 4px;
     background: rgba(0,0,100,0.5);
@@ -55,19 +65,19 @@
     cursor: pointer;
 }
 
-.ScrollRegionVLeft:hover
+.ScrollRegionVTop:hover
 {
     box-shadow: 0px 0px 60px white;
     font-size:20px;
 }
 
-.ScrollRegionVRight
+.ScrollRegionVBottom
 {
     position:absolute;
-    right:5px;
-    width:30px;
-    top:5px;
     bottom:5px;
+    height:30px;
+    right:5px;
+    left:5px;
     border: 1px solid black;
     border-radius: 4px;
     background: rgba(0,0,100,0.5);
@@ -77,7 +87,7 @@
     cursor: pointer;
 }
 
-.ScrollRegionVRight:hover
+.ScrollRegionVBottom:hover
 {
     box-shadow: 0px 0px 60px white;
     font-size:20px;

@@ -28,14 +28,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             //
             // strRootElementSelector - selector for DOM element.
             self.create = function (strRootElementSelector,
-                dWidth,
+                dHeight,
                 functionClick) {
 
                 try {
 
                     // Save state.
-                    m_dWidth = dWidth;
-                    m_dEffectiveHeight = dWidth;    // everything's a square.
+                    m_dHeight = dHeight;
+                    m_dEffectiveHeight = dHeight;    // everything's a square.
                     self.click = functionClick;
 
                     // Get j-reference to root element.
@@ -44,24 +44,24 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionVSliderContainer' />");
                     m_jSlider = $("<div class='ScrollRegionVSlider' />");
-                    m_jLeft = $("<div class='ScrollRegionVLeft'>&lt;&lt;</div>");
-                    m_jRight = $("<div class='ScrollRegionVRight'>&gt;&gt;</div>");
+                    m_jTop = $("<div class='ScrollRegionVTop'>Top</div>");
+                    m_jBottom = $("<div class='ScrollRegionVBottom'>Bot</div>");
 
                     m_jSliderContainer.append(m_jSlider);
                     m_jRoot.append(m_jSliderContainer);
-                    m_jRoot.append(m_jLeft);
-                    m_jRoot.append(m_jRight);
+                    m_jRoot.append(m_jTop);
+                    m_jRoot.append(m_jBottom);
 
                     // Install size handler to position the left and right glyphs.
                     $(window).resize(m_functionResize);
 
                     // Hook up the "buttons".
-                    m_jLeft.mousedown(m_functionLeftDown);
-                    m_jLeft.mouseup(m_functionLeftUp);
-                    m_jLeft.mouseout(m_functionLeftUp);
-                    m_jRight.mousedown(m_functionRightDown);
-                    m_jRight.mouseup(m_functionRightUp);
-                    m_jRight.mouseout(m_functionRightUp);
+                    m_jTop.mousedown(m_functionLeftDown);
+                    m_jTop.mouseup(m_functionLeftUp);
+                    m_jTop.mouseout(m_functionLeftUp);
+                    m_jBottom.mousedown(m_functionRightDown);
+                    m_jBottom.mouseup(m_functionRightUp);
+                    m_jBottom.mouseout(m_functionRightUp);
 
                     // Cause the resize functionality to kick in.
                     m_functionResize();
@@ -96,80 +96,80 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Wire the click.
                     jItem.click(m_functionImageClick);
 
-                    if (strName.length > 0 || strDescription.length > 0) {  // no tooltip if no name and no description (i.e., for images).
+                    // if (strName.length > 0 || strDescription.length > 0) {  // no tooltip if no name and no description (i.e., for images).
 
-                        // Wire the hover to enable tooltip
-                        jItem.mousemove(function (e) {
+                    //     // Wire the hover to enable tooltip
+                    //     jItem.mousemove(function (e) {
 
-                            try {
+                    //         try {
 
-                                // Show tooltip on mouse move over image.
+                    //             // Show tooltip on mouse move over image.
 
-                                // Define function which is invoked either
-                                // immediately or after a short delay depending
-                                // on whether the tooltip is already visible.
-                                var functionCallback = function () {
+                    //             // Define function which is invoked either
+                    //             // immediately or after a short delay depending
+                    //             // on whether the tooltip is already visible.
+                    //             var functionCallback = function () {
 
-                                    try {
+                    //                 try {
 
-                                        // Get the location of the cursor relative to the page.
-                                        // var pos = m_jRoot.position();
-                                        // var dLeft = e.pageX - pos.left + m_dTooltipWidthOffset;
-                                        // var dTop = e.pageY - pos.top + m_dTooltipHeightOffset;
-                                        // var pos = m_jRoot.position();
-                                        var dLeft = e.pageX - $(window).scrollLeft() + m_dTooltipWidthOffset;
-                                        var dTop = e.pageY - $(window).scrollTop() + m_dTooltipHeightOffset;
+                    //                     // Get the location of the cursor relative to the page.
+                    //                     // var pos = m_jRoot.position();
+                    //                     // var dLeft = e.pageX - pos.left + m_dTooltipWidthOffset;
+                    //                     // var dTop = e.pageY - pos.top + m_dTooltipHeightOffset;
+                    //                     // var pos = m_jRoot.position();
+                    //                     var dLeft = e.pageX - $(window).scrollLeft() + m_dTooltipWidthOffset;
+                    //                     var dTop = e.pageY - $(window).scrollTop() + m_dTooltipHeightOffset;
 
-                                        // If I'm in a dialog, I also have to subtract the top left corner of the dialog.
+                    //                     // If I'm in a dialog, I also have to subtract the top left corner of the dialog.
                                         
 
-                                        // Configure and show the tooltip.
-                                        m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));
-                                        m_jTooltip.css("left",
-                                            dLeft.toString() + "px");
-                                        m_jTooltip.css("top",
-                                            dTop.toString() + "px");
-                                        m_jTooltip.css("display", 
-                                            "inherit");
-                                    } catch (e) {
+                    //                     // Configure and show the tooltip.
+                    //                     m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));
+                    //                     m_jTooltip.css("left",
+                    //                         dLeft.toString() + "px");
+                    //                     m_jTooltip.css("top",
+                    //                         dTop.toString() + "px");
+                    //                     m_jTooltip.css("display", 
+                    //                         "inherit");
+                    //                 } catch (e) {
 
-                                        errorHelper.show(e);
-                                    }
-                                };
+                    //                     errorHelper.show(e);
+                    //                 }
+                    //             };
 
-                                // If the tooltip is currently hidden, then 
-                                // only show it after a pause, otherwise
-                                // just update its position right now.
-                                if (m_jTooltip.css("display").toUpperCase() === "NONE")
-                                {
-                                    if (m_cookieTooltip) {
+                    //             // If the tooltip is currently hidden, then 
+                    //             // only show it after a pause, otherwise
+                    //             // just update its position right now.
+                    //             if (m_jTooltip.css("display").toUpperCase() === "NONE")
+                    //             {
+                    //                 if (m_cookieTooltip) {
 
-                                        clearTimeout(m_cookieTooltip);
-                                        // m_cookieTooltip = null; // Would be needed, but we're about to set it.
-                                    }
-                                    m_cookieTooltip = setTimeout(functionCallback,
-                                        400);
-                                }
-                                else
-                                {
-                                    functionCallback();
-                                }
-                            } catch (e) {
+                    //                     clearTimeout(m_cookieTooltip);
+                    //                     // m_cookieTooltip = null; // Would be needed, but we're about to set it.
+                    //                 }
+                    //                 m_cookieTooltip = setTimeout(functionCallback,
+                    //                     400);
+                    //             }
+                    //             else
+                    //             {
+                    //                 functionCallback();
+                    //             }
+                    //         } catch (e) {
 
-                                errorHelper.show(e);
-                            }
-                        });
-                        jItem.mouseout(function (e) {
+                    //             errorHelper.show(e);
+                    //         }
+                    //     });
+                    //     jItem.mouseout(function (e) {
 
-                            if (m_cookieTooltip) {
+                    //         if (m_cookieTooltip) {
 
-                                clearTimeout(m_cookieTooltip);
-                                m_cookieTooltip = null;
-                            }
-                            m_jTooltip.css("display", 
-                                "none");
-                        });
-                    }
+                    //             clearTimeout(m_cookieTooltip);
+                    //             m_cookieTooltip = null;
+                    //         }
+                    //         m_jTooltip.css("display", 
+                    //             "none");
+                    //     });
+                    // }
 
                     // Cause the load to be called.
                     // Load is called whether or not
@@ -257,7 +257,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Last, add to DOM, ...
                     m_jSlider.append(jItem);
                     // ...and make room in the slider.
-                    m_jSlider.width((iBase + 1) * m_dWidth);
+                    m_jSlider.height((iBase + 1) * m_dHeight);
 
                 } catch (e) {
 
@@ -302,30 +302,30 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     var dHeight = jItem[0].naturalHeight;
 
                     // Position item and make room in slider.
-                    if (dHeight > dWidth) {
-
-                        // Position across whole height and center on width.
-                        jItem.css("top",
-                            "0px");
-                        jItem.css("height",
-                            m_dEffectiveHeight.toString() + "px");
-                        var dItemWidth = m_dWidth * dWidth / dHeight;
-                        jItem.css("width",
-                            dItemWidth.toString() + "px");
-                        jItem.css("left",
-                            (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
-                    } else {
+                    if (dWidth > dHeight) {
 
                         // Position across whole width and center on height.
-                        jItem.css("left",
-                            (iBase * m_dWidth).toString() + "px");
+                        jItem.css("right",
+                            "0px");
                         jItem.css("width",
-                            m_dWidth.toString() + "px");
-                        var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
+                            m_dEffectiveHeight.toString() + "px");
+                        var dItemHeight = m_dHeight * dHeight / dWidth;
                         jItem.css("height",
                             dItemHeight.toString() + "px");
                         jItem.css("top",
-                            ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
+                            (iBase * m_dHeight + (m_dHeight - dItemHeight) / 2).toString() + "px");
+                    } else {
+
+                        // Position down whole height and center on width.
+                        jItem.css("top",
+                            (iBase * m_dHeight).toString() + "px");
+                        jItem.css("height",
+                            m_dHeight.toString() + "px");
+                        var dItemWidth = m_dEffectiveHeight * dWidth / dHeight;
+                        jItem.css("Width",
+                            dItemWidth.toString() + "px");
+                        jItem.css("left",
+                            ((m_dEffectiveHeight - dItemWidth) / 2).toString() + "px");
                     }
 
                     return null;
@@ -360,10 +360,10 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     // Adjust the line-heights of the "buttons".
                     // This keeps the "direction"-glyphs centered.
-                    m_jLeft.css("line-height",
-                        m_jLeft.height() + "px");
-                    m_jRight.css("line-height",
-                        m_jLeft.height() + "px");
+                    m_jTop.css("line-height",
+                        m_jTop.height() + "px");
+                    m_jBottom.css("line-height",
+                        m_jTop.height() + "px");
 
                     // Test if have to slide the slider over because 
                     // a gap has opened up due to resizing the browser.
@@ -488,7 +488,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         m_dScrollRefreshMS);
 
                     // Indicate in the DOM that the button is depressed.
-                    m_jLeft.addClass("ScrollRegionVButtonDown");
+                    m_jTop.addClass("ScrollRegionVButtonDown");
                 } catch (e) {
 
                     errorHelper.show(e);
@@ -519,7 +519,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                             }
 
                             // Reset GUI and increment.
-                            m_jLeft.removeClass("ScrollRegionVButtonDown");
+                            m_jTop.removeClass("ScrollRegionVButtonDown");
                             m_dIncr = m_dIncrRoot;
                         } else {
 
@@ -555,7 +555,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         m_dScrollRefreshMS);
 
                     // Indicate in the DOM that the button is depressed.
-                    m_jRight.addClass("ScrollRegionVButtonDown");
+                    m_jBottom.addClass("ScrollRegionVButtonDown");
 
                 } catch (e) {
 
@@ -587,7 +587,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                             }
 
                             // Reset GUI and increment.
-                            m_jRight.removeClass("ScrollRegionVButtonDown");
+                            m_jBottom.removeClass("ScrollRegionVButtonDown");
                             m_dIncr = m_dIncrRoot;
                         } else {
 
@@ -617,15 +617,15 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // The slider.
             var m_jSlider = null;
             // The "move the items to the left" button.
-            var m_jLeft = null;
+            var m_jTop = null;
             // The "move the items to the right" button.
-            var m_jRight = null;
+            var m_jBottom = null;
             // The tooltip.
             var m_jTooltip = null;
             // Collection of items.
             var m_arrayItems = [];
             // Width of item.
-            var m_dWidth = 100;
+            var m_dHeight = 100;
             // Height of item.
             var m_dEffectiveHeight = 88;
             // Initial scroll distance per step.
