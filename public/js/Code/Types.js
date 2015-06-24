@@ -350,11 +350,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 									var m = m_clTypeActive.data.methods[i];
 									if (m.name === 'initialize') {
-										strBuild = '<tr><td><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td></td><td></td></tr>';
+										strBuild = '<tr><td class="col-xs-10"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td class="col-xs-1"></td><td class="col-xs-1"></td></tr>';
 										$("#TWmethodsTbody").append(strBuild);
 										$("#method_" + i).click(m_functionMethodClicked);
 									} else {
-										strBuild = '<tr><td><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td><button class="edit-button" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '" /></td><td><button class="delete-button" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '" /></td></tr>';
+										strBuild = '<tr><td class="col-xs-10;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td class="col-xs-1"><button class="edit-button" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '" /></td><td class="col-xs-1"><button class="delete-button" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '" /></td></tr>';
 										$("#TWmethodsTbody").append(strBuild);
 										$("#method_" + i).click(m_functionMethodClicked);
 										$("#methodrename_" + i).click(m_functionMethodRenameClicked);
@@ -367,7 +367,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 									var m = m_clTypeActive.data.properties[i];
-									strBuild = '<tr><td>' + m.name + '</td><td><button class="edit-button" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '" /></td><td><button class="delete-button" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '" /></td></tr>';
+									strBuild = '<tr><td class="col-xs-10">' + m.name + '</td><td class="col-xs-1"><button class="edit-button" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '" /></td><td class="col-xs-1"><button class="delete-button" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '" /></td></tr>';
 									$("#TWpropertiesTbody").append(strBuild);
 									$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
 									$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
@@ -378,7 +378,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 									var m = m_clTypeActive.data.events[i];
-									strBuild = '<tr><td>' + m.name + '</td><td><button class="edit-button" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '" /></td><td><button class="delete-button" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '" /></td></tr>';
+									strBuild = '<tr><td class="col-xs-10">' + m.name + '</td><td class="col-xs-1"><button class="edit-button" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '" /></td><td class="col-xs-1"><button class="delete-button" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '" /></td></tr>';
 									$("#TWeventsTbody").append(strBuild);
 									$("#eventrename_" + i).click(m_functionEventRenameClicked);
 									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);

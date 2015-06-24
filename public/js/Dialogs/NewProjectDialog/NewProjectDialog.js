@@ -142,9 +142,34 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 													id: 0,
 													ordinal: 0,
 													tags: 'tagType',
-													properties: [{name: "property1", propType: "number", initialValue: "0"}],
-													methods: [{ name: "initialize", workspace: "", method: "" },{ name: "method1", workspace: "", method: "" },{ name: "method2", workspace: "", method: "" },{ name: "method3", workspace: "", method: "" }],
-													events: [{name: "event1", handler: "method1"}],
+													properties: [
+														{name: "property1", propType: "number", initialValue: "0"},
+														{name: "property2", propType: "number", initialValue: "0"},
+														{name: "property3", propType: "number", initialValue: "0"},
+														{name: "property4", propType: "number", initialValue: "0"},
+														{name: "property5", propType: "number", initialValue: "0"},
+														{name: "property6", propType: "number", initialValue: "0"},
+														{name: "property7", propType: "number", initialValue: "0"},
+														{name: "property8", propType: "number", initialValue: "0"},
+														{name: "property9", propType: "number", initialValue: "0"}
+													],
+													methods: [
+														{ name: "initialize", workspace: "", method: "" },
+														{ name: "method1", workspace: "", method: "" },
+														{ name: "method2a", workspace: "", method: "" },
+														{ name: "method2b", workspace: "", method: "" },
+														{ name: "method2c", workspace: "", method: "" },
+														{ name: "method2d", workspace: "", method: "" },
+														{ name: "method2e", workspace: "", method: "" },
+														{ name: "method2f", workspace: "", method: "" },
+														{ name: "method3g", workspace: "", method: "" }
+													],
+													events: [
+														{name: "event1", handler: "method1"},
+														{name: "event12", handler: "method1"},
+														{name: "event123", handler: "method1"},
+														{name: "event1234", handler: "method1"}
+													],
 													dependencies: [],
 													name: "app",
 													imageResourceId: 0

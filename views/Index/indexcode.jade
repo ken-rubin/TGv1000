@@ -36,6 +36,8 @@
             .col-sm-3(style="border-right: 1px solid #000;")
                 br
                 .row(style='text-align: center;')
+                    div(style='font-weight:bold;')
+                      | Object Actions
                     button#TWnewTypeBtn.add-button(data-toggle="tooltip" data-placement="bottom" title="Add a new Type")
                     | &nbsp;&nbsp;&nbsp;
                     button#TWsearchTypeBtn.search-button(data-toggle="tooltip" data-placement="bottom" title="Search for a new Type")
@@ -68,7 +70,7 @@
                   .col-xs-10
                     .table-responsive
                       table.table.table-condensed.table-striped.table-bordered
-                        tbody#TWmethodsTbody
+                        tbody#TWmethodsTbody(style="display:block; overflow:auto; height: 180px;")
                   .col-xs-1
                     br
                     br
@@ -85,7 +87,7 @@
                 .col-xs-10
                   .table-responsive
                     table.table.table-condensed.table-striped.table-bordered
-                      tbody#TWpropertiesTbody
+                      tbody#TWpropertiesTbody(style="display:block; overflow:auto; height: 180px;")
                 .col-xs-1
                   br
                   br
@@ -100,7 +102,7 @@
                 .col-xs-10
                   .table-responsive
                     table.table.table-condensed.table-striped.table-bordered
-                      tbody#TWeventsTbody
+                      tbody#TWeventsTbody(style="display:block; overflow:auto; height: 180px;")
                 .col-xs-1
                   br
                   br
