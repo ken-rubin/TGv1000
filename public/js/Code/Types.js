@@ -329,9 +329,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
-							if (m_clTypeActive) {	// There will always be an active type.
+							if (m_clTypeActive) {	// There will actually always be an active type.
 
-								$("#TWtypeName").val(m_clTypeActive.data.name);
+								$("#TWtypeName").text(m_clTypeActive.data.name);
 								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
 
 								if (m_clTypeActive.data.isApp) {
