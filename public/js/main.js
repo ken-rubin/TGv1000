@@ -80,6 +80,9 @@ $(document).ready(function () {
 					throw exceptionRet;
 				}
 
+				// Fire the bootstrap tooltip opt-in
+				dtt();
+
 				// Cause the code and designer panels to size themselves.
 				$(window).resize();
 

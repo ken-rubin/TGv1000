@@ -165,7 +165,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 							var strSelector = "#tool-" + clType.data.name;
 							var strUrl = resourceHelper.toURL("resources", clType.data.imageResourceId, 'image', '');
-							var exceptionRet = m_srToolStripV.updateImage(strSelector,
+							var exceptionRet = m_srToolStripV.updateImage(strSelector, clType.data.name, "",
 								strUrl);
 							if (exceptionRet) {
 

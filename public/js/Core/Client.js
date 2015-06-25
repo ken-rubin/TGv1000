@@ -427,6 +427,9 @@ define(["Core/errorHelper",
 										return exceptionRet;
 									}
 
+									// Fire bootstrap tooltip opt-in.
+									dtt();
+
 									return null;
 
 								} else {
@@ -729,7 +732,16 @@ define(["Core/errorHelper",
 
 				    		// Allocate project.
 				    		m_clProject = new Project();
-				    		return m_clProject.load(project);
+				    		var exceptionRet = m_clProject.load(project);
+				    		if (exceptionRet) {
+
+				    			return exceptionRet;
+				    		}
+
+							// Fire bootstrap tooltip opt-in.
+							dtt();
+
+							return null;
 
 						} catch (e) {
 

@@ -35,7 +35,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     // Save state.
                     m_dHeight = dHeight;
-                    m_dEffectiveHeight = dHeight;    // everything's a square.
+                    m_dWidth = dHeight;    // everything's a square.
                     self.click = functionClick;
 
                     // Get j-reference to root element.
@@ -44,8 +44,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionVSliderContainer' />");
                     m_jSlider = $("<div class='ScrollRegionVSlider' />");
-                    m_jTop = $("<div class='ScrollRegionVTop'>Top</div>");
-                    m_jBottom = $("<div class='ScrollRegionVBottom'>Bot</div>");
+                    m_jTop = $("<div class='ScrollRegionVTop'><img src='/media/images/uparrow.png' /></div>");
+                    m_jBottom = $("<div class='ScrollRegionVBottom'><img src='/media/images/downarrow.png' /></div>");
 
                     m_jSliderContainer.append(m_jSlider);
                     m_jRoot.append(m_jSliderContainer);
@@ -82,7 +82,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     // Build the item.
-                    var jItem = $("<img style='position:absolute;' id='" + 
+                    var jItem = $("<img data-toggle='tooltip' data-placement='bottom' title='" + strName + "' style='position:absolute;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>");
 
@@ -109,13 +109,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             };
 
             // Update scroll region image.
-            self.updateImage = function(selector, strUrl) {
+            self.updateImage = function(selector, strName, strDescription, strUrl) {
 
                 try {
 
                     var jItem = $(selector);
                     jItem.off('load');  // unbind the previous event handler or they'll all fire.
                     jItem.on('load', m_functionOnUpdatedImageLoaded);
+                    jItem.attr("title", strName);   // for the updated tooltip
                     jItem.attr("src", strUrl);
 
                     return null;
@@ -226,12 +227,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         jItem.css("right",
                             "0px");
                         jItem.css("width",
-                            m_dEffectiveHeight.toString() + "px");
+                            m_dWidth.toString() + "px");
                         var dItemHeight = m_dHeight * dHeight / dWidth;
                         jItem.css("height",
                             dItemHeight.toString() + "px");
+                        var dWork = (iBase * m_dHeight + (m_dHeight - dItemHeight) / 2);
                         jItem.css("top",
-                            (iBase * m_dHeight + (m_dHeight - dItemHeight) / 2).toString() + "px");
+                            dWork.toString() + "px");
                     } else {
 
                         // Position down whole height and center on width.
@@ -239,19 +241,16 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                             (iBase * m_dHeight).toString() + "px");
                         jItem.css("height",
                             m_dHeight.toString() + "px");
-                        var dItemWidth = m_dEffectiveHeight * dWidth / dHeight;
+                        var dItemWidth = m_dWidth * dWidth / dHeight;
                         jItem.css("Width",
                             dItemWidth.toString() + "px");
+                        var dWork = ((m_dWidth - dItemWidth) / 2);
                         jItem.css("left",
-                            ((m_dEffectiveHeight - dItemWidth) / 2).toString() + "px");
+                            dWork.toString() + "px");
                     }
 
-
-                    // temp code
-                    // jItem.css("top", (iBase*55).toString() + "px");
-                    // jItem.css("left", "0px");
-                    // jItem.css("width", "55px");
-                    // jItem.css("height", "55px");
+                    // Fire bootstrap tooltip opt-in.
+                    dtt();
 
                     return null;
                 
@@ -551,7 +550,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Width of item.
             var m_dHeight = 100;
             // Height of item.
-            var m_dEffectiveHeight = 88;
+            var m_dWidth = 88;
             // Initial scroll distance per step.
             var m_dIncrRoot = 0.8;
             // Scroll distance per step.
