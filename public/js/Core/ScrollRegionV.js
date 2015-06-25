@@ -53,7 +53,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jRoot.append(m_jBottom);
 
                     // Install size handler to position the left and right glyphs.
-                    $(window).resize(m_functionResize);
+                    // $(window).resize(m_functionResize);
 
                     // Hook up the "buttons".
                     m_jTop.mousedown(m_functionLeftDown);
@@ -64,7 +64,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jBottom.mouseout(m_functionRightUp);
 
                     // Cause the resize functionality to kick in.
-                    m_functionResize();
+                    // m_functionResize();
 
                     // Create tooltip.
                     m_jTooltip = $("<div class='ScrollRegionVTooltip' />");
