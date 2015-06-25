@@ -25,10 +25,10 @@
 .ScrollRegionVSliderContainer
 {
     position:absolute;
-    left:40px;
-    right:40px;
-    top:5px;
-    bottom:5px;
+    top:40px;
+    bottom:40px;
+    left:5px;
+    right:5px;
     border: 1px solid black;
     border-radius: 4px;
     background: rgb(64,64,64);
@@ -40,7 +40,7 @@
 {
     position:absolute;
     left:0px;
-    width:0px;
+    width:80px;
     top:0px;
     bottom:0px;
     background: black;
@@ -102,15 +102,23 @@
     color:red;
 }
 
-.ScrollRegionVTooltip
+// The tool item is a single, draggable tool.
+.toolstripitem
 {
-    position:fixed;
-    display:none;
-    z-index:10000;
-    background:#ebb8b8;
-    color:#333333;
-    border:1px solid #333333;
-    border-radius:4px;
-    padding:4px;
-    font-size:11px;
+    position:absolute;
+
+    // Total height of 80.
+    top:15px;
+    height:50px;
+    width:50px;
+
+    border:1px solid white;
+    border-radius:5px;
+    background:rgba(155,0,0,0.5);
+
+    &:hover
+    {
+        background:rgba(255,255,100,0.5);
+    }
 }
+

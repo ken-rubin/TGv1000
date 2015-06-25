@@ -53,22 +53,18 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jRoot.append(m_jBottom);
 
                     // Install size handler to position the left and right glyphs.
-                    // $(window).resize(m_functionResize);
+                    $(window).resize(m_functionResize);
 
                     // Hook up the "buttons".
-                    m_jTop.mousedown(m_functionLeftDown);
-                    m_jTop.mouseup(m_functionLeftUp);
-                    m_jTop.mouseout(m_functionLeftUp);
-                    m_jBottom.mousedown(m_functionRightDown);
-                    m_jBottom.mouseup(m_functionRightUp);
-                    m_jBottom.mouseout(m_functionRightUp);
+                    m_jTop.mousedown(m_functionTopDown);
+                    m_jTop.mouseup(m_functionTopUp);
+                    m_jTop.mouseout(m_functionTopUp);
+                    m_jBottom.mousedown(m_functionBotDown);
+                    m_jBottom.mouseup(m_functionBotUp);
+                    m_jBottom.mouseout(m_functionBotUp);
 
                     // Cause the resize functionality to kick in.
-                    // m_functionResize();
-
-                    // Create tooltip.
-                    m_jTooltip = $("<div class='ScrollRegionVTooltip' />");
-                    m_jRoot.append(m_jTooltip);
+                    m_functionResize();
 
                     return null;
                     
@@ -86,7 +82,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     // Build the item.
-                    var jItem = $("<img id='" + 
+                    var jItem = $("<img style='position:absolute;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>");
 
@@ -96,84 +92,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Wire the click.
                     jItem.click(m_functionImageClick);
 
-                    // if (strName.length > 0 || strDescription.length > 0) {  // no tooltip if no name and no description (i.e., for images).
-
-                    //     // Wire the hover to enable tooltip
-                    //     jItem.mousemove(function (e) {
-
-                    //         try {
-
-                    //             // Show tooltip on mouse move over image.
-
-                    //             // Define function which is invoked either
-                    //             // immediately or after a short delay depending
-                    //             // on whether the tooltip is already visible.
-                    //             var functionCallback = function () {
-
-                    //                 try {
-
-                    //                     // Get the location of the cursor relative to the page.
-                    //                     // var pos = m_jRoot.position();
-                    //                     // var dLeft = e.pageX - pos.left + m_dTooltipWidthOffset;
-                    //                     // var dTop = e.pageY - pos.top + m_dTooltipHeightOffset;
-                    //                     // var pos = m_jRoot.position();
-                    //                     var dLeft = e.pageX - $(window).scrollLeft() + m_dTooltipWidthOffset;
-                    //                     var dTop = e.pageY - $(window).scrollTop() + m_dTooltipHeightOffset;
-
-                    //                     // If I'm in a dialog, I also have to subtract the top left corner of the dialog.
-                                        
-
-                    //                     // Configure and show the tooltip.
-                    //                     m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));
-                    //                     m_jTooltip.css("left",
-                    //                         dLeft.toString() + "px");
-                    //                     m_jTooltip.css("top",
-                    //                         dTop.toString() + "px");
-                    //                     m_jTooltip.css("display", 
-                    //                         "inherit");
-                    //                 } catch (e) {
-
-                    //                     errorHelper.show(e);
-                    //                 }
-                    //             };
-
-                    //             // If the tooltip is currently hidden, then 
-                    //             // only show it after a pause, otherwise
-                    //             // just update its position right now.
-                    //             if (m_jTooltip.css("display").toUpperCase() === "NONE")
-                    //             {
-                    //                 if (m_cookieTooltip) {
-
-                    //                     clearTimeout(m_cookieTooltip);
-                    //                     // m_cookieTooltip = null; // Would be needed, but we're about to set it.
-                    //                 }
-                    //                 m_cookieTooltip = setTimeout(functionCallback,
-                    //                     400);
-                    //             }
-                    //             else
-                    //             {
-                    //                 functionCallback();
-                    //             }
-                    //         } catch (e) {
-
-                    //             errorHelper.show(e);
-                    //         }
-                    //     });
-                    //     jItem.mouseout(function (e) {
-
-                    //         if (m_cookieTooltip) {
-
-                    //             clearTimeout(m_cookieTooltip);
-                    //             m_cookieTooltip = null;
-                    //         }
-                    //         m_jTooltip.css("display", 
-                    //             "none");
-                    //     });
-                    // }
-
-                    // Cause the load to be called.
-                    // Load is called whether or not
-                    // the image resource is cached.
                     jItem.attr("src",
                         strResourceUrl);
 
@@ -328,6 +246,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                             ((m_dEffectiveHeight - dItemWidth) / 2).toString() + "px");
                     }
 
+
+                    // temp code
+                    // jItem.css("top", (iBase*55).toString() + "px");
+                    // jItem.css("left", "0px");
+                    // jItem.css("width", "55px");
+                    // jItem.css("height", "55px");
+
                     return null;
                 
                 } catch (e) {
@@ -365,30 +290,30 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jBottom.css("line-height",
                         m_jTop.height() + "px");
 
-                    // Test if have to slide the slider over because 
+                    // Test if have to slide the slider up because 
                     // a gap has opened up due to resizing the browser.
-                    var iW1 = m_jSliderContainer.width();
-                    var iW2 = m_jSlider.width();
+                    var iW1 = m_jSliderContainer.height();
+                    var iW2 = m_jSlider.height();
 
-                    // If the "right" (the left plus the width) is  
-                    // less than the width of the container, then 
-                    // move the slider over--up to the point that  
-                    // it would leave the left-hand side of container.
-                    var dLeft = parseFloat(m_jSlider.css("left"));
-                    if (dLeft + iW2 < iW1) {
+                    // If the "bottom" (the top plus the height) is  
+                    // less than the height of the container, then 
+                    // move the slider up--up to the point that  
+                    // it would leave the top side of container.
+                    var dTop = parseFloat(m_jSlider.css("top"));
+                    if (dTop + iW2 < iW1) {
 
                         // Position it to take as much space as allowed...
-                        dLeft = iW1 - iW2;
+                        dTop = iW1 - iW2;
 
                         // Unless it were to leave the edge...
-                        if (dLeft > 0) {
+                        if (dTop > 0) {
 
-                            dLeft = 0;
+                            dTop = 0;
                         }
 
                         // And update.
-                        m_jSlider.css("left",
-                            dLeft.toString() + "px");
+                        m_jSlider.css("top",
+                            dTop.toString() + "px");
                     }
                 } catch (e) {
 
@@ -396,34 +321,34 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
-            // Scroll left.
-            var m_functionScrollLeft = function () {
+            // Scroll up.
+            var m_functionScrollUp = function () {
 
                 try {
 
-                    // Scroll left, if there is still space to do so.
-                    var iW1 = m_jSliderContainer.width();
-                    var iW2 = m_jSlider.width();
+                    // Scroll up, if there is still space to do so.
+                    var iW1 = m_jSliderContainer.height();
+                    var iW2 = m_jSlider.height();
 
-                    // If the "right" (the left plus the width) is greater than
-                    // the width of the container, then allow scrolling to left.
-                    var dLeft = parseFloat(m_jSlider.css("left"));
-                    if (dLeft + iW2 > iW1) {
+                    // If the "bottom" (the top plus the height) is greater than
+                    // the height of the container, then allow scrolling to top.
+                    var dTop = parseFloat(m_jSlider.css("top"));
+                    if (dTop + iW2 > iW1) {
 
                         // Scroll back by one increment.
-                        dLeft -= m_dIncr;
+                        dTop -= m_dIncr;
 
                         // Stop when get to end--so that the end of the slider
-                        // is only visible if the container is wider than it is.
-                        if (dLeft < -iW2 + iW1) {
+                        // is only visible if the container is higher/taller than it is.
+                        if (dTop < -iW2 + iW1) {
 
-                            dLeft = -iW2 + iW1;
+                            dTop = -iW2 + iW1;
                         }
                     }
 
-                    // Update the left.
-                    m_jSlider.css("left",
-                        dLeft.toString() + "px");
+                    // Update the top.
+                    m_jSlider.css("top",
+                        dTop.toString() + "px");
 
                     // Also update the increment a little bit if it is less than the max.
                     if (m_dIncr < m_dMaxIncr) {
@@ -437,29 +362,29 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
-            // Scroll right.
-            var m_functionScrollRight = function () {
+            // Scroll down.
+            var m_functionScrollDown = function () {
 
                 try {
 
-                    // Scroll to the right, if the left is off the view-port.
-                    var dLeft = parseFloat(m_jSlider.css("left"));
-                    if (dLeft < 0) {
+                    // Scroll to the bottom, if the top is off the view-port.
+                    var dTop = parseFloat(m_jSlider.css("top"));
+                    if (dTop < 0) {
 
                         // Add the increment.
-                        dLeft += m_dIncr;
+                        dTop += m_dIncr;
 
                         // If gone too far...
-                        if (dLeft > 0) {
+                        if (dTop > 0) {
 
                             // Adjust back to max.
-                            dLeft = 0;
+                            dTop = 0;
                         }
                     }
 
-                    // Set the left.
-                    m_jSlider.css("left",
-                        dLeft.toString() + "px");
+                    // Set the top.
+                    m_jSlider.css("top",
+                        dTop.toString() + "px");
 
                     // Increment the increment if less than the max.
                     if (m_dIncr < m_dMaxIncr) {
@@ -473,7 +398,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             };
 
             // Handle left button down.
-            var m_functionLeftDown = function (e) {
+            var m_functionTopDown = function (e) {
 
                 try {
 
@@ -484,11 +409,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     }
 
                     // Set up the new scroll.
-                    m_cookieInterval = setInterval(m_functionScrollRight,
+                    m_cookieInterval = setInterval(m_functionScrollDown,
                         m_dScrollRefreshMS);
 
                     // Indicate in the DOM that the button is depressed.
                     m_jTop.addClass("ScrollRegionVButtonDown");
+
                 } catch (e) {
 
                     errorHelper.show(e);
@@ -496,7 +422,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             };
 
             // Handle left button up.
-            var m_functionLeftUp = function (e) {
+            var m_functionTopUp = function (e) {
 
                 try {
 
@@ -540,7 +466,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             };
 
             // Handle right button down.
-            var m_functionRightDown = function (e) {
+            var m_functionBotDown = function (e) {
 
                 try {
 
@@ -551,7 +477,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     }
 
                     // Set up the new scroll.
-                    m_cookieInterval = setInterval(m_functionScrollLeft,
+                    m_cookieInterval = setInterval(m_functionScrollUp,
                         m_dScrollRefreshMS);
 
                     // Indicate in the DOM that the button is depressed.
@@ -564,7 +490,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             };
 
             // Handle right button up.
-            var m_functionRightUp = function (e) {
+            var m_functionBotUp = function (e) {
 
                 try {
 
@@ -620,8 +546,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             var m_jTop = null;
             // The "move the items to the right" button.
             var m_jBottom = null;
-            // The tooltip.
-            var m_jTooltip = null;
             // Collection of items.
             var m_arrayItems = [];
             // Width of item.
