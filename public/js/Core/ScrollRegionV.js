@@ -168,10 +168,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_arrayItems.push(jItem);
 
                     var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
-                    if (exceptionRet) {
-
-                        throw exceptionRet;
-                    }
+                    if (exceptionRet) { throw exceptionRet; }
 
                     // Last, add to DOM, ...
                     m_jSlider.append(jItem);
@@ -197,10 +194,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         if (m_arrayItems[iBase][0].id === jItem[0].id) {
 
                             var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
+                            if (exceptionRet) { throw exceptionRet; }
 
                             break;
                         }

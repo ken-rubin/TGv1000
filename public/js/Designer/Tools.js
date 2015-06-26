@@ -30,13 +30,10 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 							m_srToolStripV = new ScrollRegionV();
 							var exceptionRet = m_srToolStripV.create(
 								"#toolstrip",		// inner row selector
-								55,					// item width
+								55,					// item height
 								function() {}		// functionClick
 							);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 						} catch (e) {
 
 							return e;
@@ -56,27 +53,23 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 							var clTool = new Tool();
 							var exceptionRet = clTool.load(clType);
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
+							if (exceptionRet) { return exceptionRet; }
 
 							// Add to the DOM.
 							var jItem = null;
 							var exceptionRet = m_srToolStripV.addImage(
-								"tool-" + client.removeSpaces(clType.data.name),		// id
-								clType.data.name, "",		// name + description for tooltip
-								resourceHelper.toURL('resources', clType.data.imageResourceId, 'image'), // url
-								'toolstripitem',
-								function (jItemAdded) {
-
-									jItem = jItemAdded;
-								}
+								"tool-" + client.removeSpaces(clType.data.name),	// id
+								clType.data.name,									// name for tooltip
+								"",													// no description--at this time
+								resourceHelper.toURL(								// image url
+									'resources', 
+									clType.data.imageResourceId, 
+									'image'
+								),
+								'toolstripitem',									// item class
+								function (jItemAdded) {	jItem = jItemAdded }		// post creation callback so we can use jItem (see below)
 							);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) {	throw exceptionRet; }
 
 							// Also add to the collection of comics.
 							m_arrayTools.push(clTool);
@@ -121,10 +114,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 									// Remove form GUI.
 									var exceptionRet = clToolIth.destroy();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
+									if (exceptionRet) {	throw exceptionRet; }
 
 									// Remove from collection.
 									m_arrayTools.splice(i, 1);
@@ -144,33 +134,15 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 						try {
 
-							// Loop over all tools, ask each if it wraps the type which was 
-							// just updated and passed into this method.  If so, update image.
-							// for (var i = 0; i < m_arrayTools.length; i++) {
-
-							// 	// Extract the ith tool.
-							// 	var toolIth = m_arrayTools[i];
-
-							// 	// If the id's match...
-							// 	if (toolIth.type.name === clType.data.name) {
-
-							// 		// ...ask the tool to update its display.
-							// 		var exceptionRet = toolIth.updateImage();
-							// 		if (exceptionRet) {
-
-							// 			throw exceptionRet;
-							// 		}
-							// 	}
-							// }
-
 							var strSelector = "#tool-" + clType.data.name;
 							var strUrl = resourceHelper.toURL("resources", clType.data.imageResourceId, 'image', '');
-							var exceptionRet = m_srToolStripV.updateImage(strSelector, clType.data.name, "",
-								strUrl);
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
+							var exceptionRet = m_srToolStripV.updateImage(
+								strSelector, 
+								clType.data.name, 
+								"",
+								strUrl
+							);
+							if (exceptionRet) {	return exceptionRet; }
 
 							return null;
 						
@@ -187,6 +159,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 					var m_srToolStripV = null;
 					// Collection of tool items.
 					var m_arrayTools = [];
+
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -195,6 +168,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 			// Return the constructor function.
 			return functionConstructor;
+			
 		} catch (e) {
 
 			errorHelper.show(e);
