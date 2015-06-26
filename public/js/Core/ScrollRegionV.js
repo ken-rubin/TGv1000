@@ -171,7 +171,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     if (index > -1) {
 
-                        return m_functionScrollImageIntoView(strSearchId);
+                        return m_functionAssureImageIsVisible(strSearchId);
                     }
 
                     return null;
@@ -227,6 +227,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         if (m_arrayItems[iBase][0].id === jItem[0].id) {
 
                             var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
+                            if (exceptionRet) { throw exceptionRet; }
+
+                            // User may have selected a type for the TypeWell, scrolled it out of sight and then changed its image.
+                            // I want it to be seen in the toolstrip.
+                            exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
                             if (exceptionRet) { throw exceptionRet; }
 
                             break;
@@ -397,7 +402,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
-            var m_functionScrollImageIntoView = function(strSearchId) {
+            // jItem with id strSearchId may or may not be visible. If not, scroll to make sure it is.
+            // This could involve scrolling up or down since it happens on new Type or updated type image. 
+            var m_functionAssureImageIsVisible = function(strSearchId) {
 
                 try {
 
