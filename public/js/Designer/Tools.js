@@ -152,6 +152,19 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 						}
 					};
 
+					// Coming from types.select. Make sure a new Type is visible.
+					self.functionMakeSureToolIsVisible = function(clType) {
+
+						try {
+
+							return m_srToolStripV.functionMakeSureToolIsVisible(clType);
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////////
 					// Private fields.
 

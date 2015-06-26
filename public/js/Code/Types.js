@@ -136,17 +136,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								}
 							}
 
-							// Somehow scroll toolstrip so this one is visible.
+							// Scroll toolstrip so this one is visible.
+							// Only time it wouldn't be (since we most likely just clicked on it or the top one-app-was selected at project load)
+							// is when a new Type was added and activated/selected.
+							var exceptionRet = tools.functionMakeSureToolIsVisible(clType);
+							if (exceptionRet) { return exceptionRet; }
 
-
-
-							
-
-							var exceptionRet = m_functionSetUpTheWell();
-							if (exceptionRet) {
-
-								return exceptionRet;
-							}
+							exceptionRet = m_functionSetUpTheWell();
+							if (exceptionRet) { return exceptionRet; }
 
 							return null;
 

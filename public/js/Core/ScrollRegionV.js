@@ -149,6 +149,39 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
+            // If a new type/tool was just added, it may be overflow-hidden.
+            self.functionMakeSureToolIsVisible = function(clType) {
+
+                try {
+
+                    var iPxVisible = m_jSliderContainer.height();
+                    var iNumVisible = Math.floor(iPxVisible / m_dHeight);
+
+                    // Find index of clType in m_arrayItems.
+                    var index = -1;
+                    var strSearchId = "tool-" + client.removeSpaces(clType.data.name);
+                    for (var i = 0; i < m_arrayItems.length; i++) {
+
+                        if (m_arrayItems[i][0].id === strSearchId) {
+
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index > -1) {
+
+                        return m_functionScrollImageIntoView(strSearchId);
+                    }
+
+                    return null;
+
+                } catch(e) {
+
+                    return e;
+                }
+            }
+
             ///////////////////////////
             // Private methods.
 
@@ -363,6 +396,21 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     errorHelper.show(e);
                 }
             };
+
+            var m_functionScrollImageIntoView = function(strSearchId) {
+
+                try {
+
+
+
+
+                    return null;
+
+                } catch(e) {
+
+                    return e;
+                }
+            }
 
             // Scroll down.
             var m_functionScrollDown = function () {
