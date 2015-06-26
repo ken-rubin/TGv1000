@@ -130,11 +130,11 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         if (req.body.resourceTypeId < "3") {  // Non-FKs.
 
-                            sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                            sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
 
                         } else {    // Projects, etc. -- a totally different query.
 
-                            sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s" + " p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
 
                         console.log(' ');

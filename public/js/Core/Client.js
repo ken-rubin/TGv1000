@@ -420,6 +420,10 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
+									// Enable the TypeWell icons that are disabled if no project is loaded.
+									// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
+									$(".disabledifnoproj").prop("disabled", false);
+
 									m_clProject = new Project();
 									var exceptionRet = m_clProject.load(data.project);
 									if (exceptionRet) {
@@ -428,7 +432,15 @@ define(["Core/errorHelper",
 									}
 
 									// Fire bootstrap tooltip opt-in.
-									dtt();
+									$(".disabledifnoproj").tooltip();
+
+
+
+
+
+
+
+
 
 									return null;
 
@@ -661,13 +673,15 @@ define(["Core/errorHelper",
 
 					self.unloadProject = function () {
 
-						// Warn if project is dirty.
-
-
-
-
 
 						try {
+
+							// Warn if project is dirty.
+
+
+
+
+
 
 							var exceptionRet = m_clProject.unload();
 							if (exceptionRet) {
@@ -676,6 +690,15 @@ define(["Core/errorHelper",
 							}
 
 							m_clProject = null;
+
+							// Disable the TypeWell icons that are enabled if a project is loaded.
+							$(".disabledifnoproj").prop("disabled", true);
+
+							// Remove tooltip functionality from TypeWell icons.
+							$(".disabledifnoproj").tooltip("destroy");
+
+							// Empty the toolstrip, designer and comicstrip.
+							tools.empty();
 
 							return null;
 
@@ -730,6 +753,10 @@ define(["Core/errorHelper",
 
 						try {
 
+							// Enable the TypeWell icons that are disabled if no project is loaded.
+							// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
+							$(".disabledifnoproj").prop("disabled", false);
+
 				    		// Allocate project.
 				    		m_clProject = new Project();
 				    		var exceptionRet = m_clProject.load(project);
@@ -739,7 +766,15 @@ define(["Core/errorHelper",
 				    		}
 
 							// Fire bootstrap tooltip opt-in.
-							dtt();
+							$(".disabledifnoproj").tooltip();
+
+
+
+
+
+
+
+
 
 							return null;
 

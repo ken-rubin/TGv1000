@@ -244,7 +244,16 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     }
 
                     // Fire bootstrap tooltip opt-in.
-                    dtt();
+
+
+
+
+
+
+
+
+
+
 
                     return null;
                 

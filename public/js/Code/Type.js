@@ -33,11 +33,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// resourceId -- the resource id.
 					self.data = null;
 
-					// Height of a line in the GUI in pixlels.
-					self.lineHeight = 30;
-					// Height of a button in the GUI in pixlels.
-					self.buttonHeight = 26;
-
 					/////////////////////////////
 					// Public methods.
 
@@ -777,42 +772,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							errorHelper.show(e);
 						}
-					};
-
-					// Invoked when a type image is right-clicked.
-					var m_functionTypeImageContextMenu = function (invokedOn, selectedMenu) {
-
-						// try {
-
-						// 	// Handle different menu items differently.
-						// 	if (selectedMenu.text() === "Search for a Type Image") {
-
-						// 		var exceptionRet = client.showImageSearchDialog(true, m_functionOnGotResourceId);
-						// 		if (exceptionRet) {
-
-						// 			throw exceptionRet;
-						// 		}
-						// 	}
-						// 	if (selectedMenu.text() === "Load a new Type Image using a URL") {
-
-						// 		var exceptionRet = client.showImageURLDialog(true, m_functionOnGotResourceId);
-						// 		if (exceptionRet) {
-
-						// 			throw exceptionRet;
-						// 		}
-						// 	}
-						// 	if (selectedMenu.text() === "Load a new Type Image that's already on your computer") {
-
-						// 		var exceptionRet = client.showImageDiskDialog(true, m_functionOnGotResourceId);
-						// 		if (exceptionRet) {
-
-						// 			throw exceptionRet;
-						// 		}
-						// 	}
-						// } catch (e) {
-
-						// 	errorHelper.show(e);
-						// }
 					};
 
 					var m_functionOnGotResourceId = function (iResourceId) {

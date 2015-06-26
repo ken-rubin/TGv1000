@@ -1,6 +1,5 @@
 Either of us
 
-- ScrollRegionV
 
 
 Ken
@@ -23,22 +22,27 @@ Jerry
 - I show the current project in the upper tab, but not its image. And I'm not sure I clear it if a project is closed, etc. So tighten this up. The thing with the image is that it has to be an icon to
 -    show it in the browser tab--and it has to be fetched from the server like favicon (which it replaces) is--so we're unable to customize it for multiple users.
 - Start saving methods, properties and events to their own tables.
-- Make tables in TW scrollable; fix col width
-- Smaller Type image in TW
+- Smaller Type image in TW--or make it responsively better. When resolution is 100%, the 3 vertical icons next to the image are pushed to the next row. That's no good.
 - Test that Types are saved correctly to DB and then test Search for Type.
-- Blockly code sizing and window positioning
 - Use function to check if type name is available--where? Write similar functions for methods, properties and events in active type
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is someone else's. Do we need to keep
 -    the original creator's user id? Probably a good idea.
 - After creating a new project scroll the window down so TW is at the top.
 - #TWRenameTypeLink has to be hooked up and programmed.
+- Fix image positioning in ScrollRegion like I fixed it in ScrollRegionV. Most likely some hard-coded height, not the algorithm.
+- Fix Navbar. It shouldn't appear until I scroll near the top. Now it appears even if I scroll just a little from the bottom of the page.
+- New project is not clearing Designer.
+- New project dialog: image, if loaded, can overwrite the three links next to it. Also, change those links to icons, but still fix image sizing.
+- If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
+- When a Type is added, is gets selected into TypeWell, but toolstrip doesn't scroll to show it. It should.
 
 
 
 To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?
-
+- Tooltips: Bootstrap's or ours. I now get 2 tooltips in the toolstrip (only if I've updated the image), one black and one white.
+- When should I check that something is deletable? For example, for delete Type, why go to the dialog if deletion is going to be blocked because the Type is in the designer? What other entities does this apply to?
 
 
 

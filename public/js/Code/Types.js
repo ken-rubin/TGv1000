@@ -136,6 +136,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								}
 							}
 
+							// Somehow scroll toolstrip so this one is visible.
+
+
+
+							
+
 							var exceptionRet = m_functionSetUpTheWell();
 							if (exceptionRet) {
 

@@ -90,10 +90,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 							// First add to the global types.
 							var exceptionRet = types.addItem(clType);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Then add to self.data.
 							// This seems unnecessary--when debugging, I see it there already
@@ -101,10 +98,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 					        // Also add to the designer/tool strip.
 							exceptionRet = tools.addItem(clType);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
+							// Then select the created tool to fill the TypeWell
+							exceptionRet = types.select(clType);
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
