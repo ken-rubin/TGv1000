@@ -30,7 +30,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// dependencies -- collection of dependencies of type.
 					// id -- the DB id of type.
 					// name -- the name of type.
-					// resourceId -- the resource id.
+					// imageResourceId -- the resource id.
 					self.data = null;
 
 					/////////////////////////////

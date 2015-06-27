@@ -343,6 +343,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								$("#TWtypeName").text(m_clTypeActive.data.name);
 								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
+								$("#TWimage")
 
 								if (m_clTypeActive.data.isApp) {
 
@@ -394,6 +395,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
 								};
 							}
+
+							$("#TypeWell .edit-button").tooltip();
+							$("#TypeWell .delete-button").tooltip();
+							// var jqTWimage = $("#TWimage");
+							// jqTWimage.data("tooltip", false);
+							// jqTWimage.tooltip({title: m_clTypeActive.data.name});
+							// jqTWimage.tooltip();
 
 							return null;
 

@@ -86,90 +86,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     // Build the item.
-                    var jItem = $("<img id='" + 
-                        strId + 
-                        "' class='" + strImageClass + "'></img>");
+                    var jItem = $("<img id='" + strId + "' class='" + strImageClass + "' data-toggle='tooltip' data-placement='right' title='" + strName + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionOnNewImageLoaded);
 
                     // Wire the click.
                     jItem.click(m_functionImageClick);
-
-                    if (strName.length > 0 || strDescription.length > 0) {  // no tooltip if no name and no description (i.e., for images).
-
-                        // Wire the hover to enable tooltip
-                        jItem.mousemove(function (e) {
-
-                            try {
-
-                                // Show tooltip on mouse move over image.
-
-                                // Define function which is invoked either
-                                // immediately or after a short delay depending
-                                // on whether the tooltip is already visible.
-                                var functionCallback = function () {
-
-                                    try {
-
-                                        // Get the location of the cursor relative to the page.
-                                        // var pos = m_jRoot.position();
-                                        // var dLeft = e.pageX - pos.left + m_dTooltipWidthOffset;
-                                        // var dTop = e.pageY - pos.top + m_dTooltipHeightOffset;
-                                        // var pos = m_jRoot.position();
-                                        var dLeft = e.pageX - $(window).scrollLeft() + m_dTooltipWidthOffset;
-                                        var dTop = e.pageY - $(window).scrollTop() + m_dTooltipHeightOffset;
-
-                                        // If I'm in a dialog, I also have to subtract the top left corner of the dialog.
-                                        
-
-                                        // Configure and show the tooltip.
-                                        m_jTooltip.html("<span>" + strName + "</span>" + (strDescription.length > 0 ? "<br><span>" + strDescription + "</span>" : ""));
-                                        m_jTooltip.css("left",
-                                            dLeft.toString() + "px");
-                                        m_jTooltip.css("top",
-                                            dTop.toString() + "px");
-                                        m_jTooltip.css("display", 
-                                            "inherit");
-                                    } catch (e) {
-
-                                        errorHelper.show(e);
-                                    }
-                                };
-
-                                // If the tooltip is currently hidden, then 
-                                // only show it after a pause, otherwise
-                                // just update its position right now.
-                                if (m_jTooltip.css("display").toUpperCase() === "NONE")
-                                {
-                                    if (m_cookieTooltip) {
-
-                                        clearTimeout(m_cookieTooltip);
-                                        // m_cookieTooltip = null; // Would be needed, but we're about to set it.
-                                    }
-                                    m_cookieTooltip = setTimeout(functionCallback,
-                                        400);
-                                }
-                                else
-                                {
-                                    functionCallback();
-                                }
-                            } catch (e) {
-
-                                errorHelper.show(e);
-                            }
-                        });
-                        jItem.mouseout(function (e) {
-
-                            if (m_cookieTooltip) {
-
-                                clearTimeout(m_cookieTooltip);
-                                m_cookieTooltip = null;
-                            }
-                            m_jTooltip.css("display", 
-                                "none");
-                        });
-                    }
 
                     // Cause the load to be called.
                     // Load is called whether or not

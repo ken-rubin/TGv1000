@@ -79,6 +79,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								}
 							}
 
+							// Opt-in the comicstrip tooltips.
+							$(".comicstripitem").tooltip();
+
 							// Automatically allocate the first comic.
 							if (m_arrayClComics.length > 0) {
 
@@ -109,10 +112,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								resourceHelper.toURL('resources', clComic.data.imageResourceId, 'image', ''),		// url
 								'comicstripitem'	// image class
 							);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Also add to the collection of comics.
 							m_arrayClComics.push(clComic);
