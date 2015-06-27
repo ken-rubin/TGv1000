@@ -165,14 +165,15 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						var parts = strId.split('-');
 						if (parts.length === 2) {
 
-							m_arrayClTypes.some(function(clType) {
+							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
-								if (parts[1] === client.removeSpaces(clType.data.name)) {
+								var clTypeIth = m_arrayClTypes[i];
+								if (parts[1] === client.removeSpaces(clTypeIth.data.name)) {
 
-									self.select(clType);
-									return true;
+									self.select(clTypeIth);
+									break;
 								}
-							});
+							}
 						}
 					}
 

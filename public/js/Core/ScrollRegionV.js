@@ -428,8 +428,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                 try {
 
-                    var iIndexOfFirstFullyVisibleItem = Math.floor((-1 * parseFloat(m_jSlider.css("top"))) / m_dHeight);
-                    var iNumFullyVisibleItems = Math.floor(m_jSliderContainer.height() / m_dHeight) - 1;
+                    var iIndexOfFirstFullyVisibleItem = Math.ceil((-1 * parseFloat(m_jSlider.css("top"))) / m_dHeight);
+                    var iNumFullyVisibleItems = Math.floor(m_jSliderContainer.height() / m_dHeight);
                     var iIndexOfLastFullyVisibleItem = iIndexOfFirstFullyVisibleItem + iNumFullyVisibleItems - 1;
 
                     var iIndexOfStrSearchIdItem = -1;
@@ -452,8 +452,25 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         return null;    // item is already visible
                     }
 
-                    // Calculate top that displays iIndexOfStrSearchIdItem.
-                    m_jSlider.css("top", (m_jSliderContainer.height() - m_jSlider.height() /*- m_dHeight*/ ).toString() + "px");
+                    // Calculate top that displays iIndexOfStrSearchIdItem. It's guaranteed not visible now.
+
+                    // There are 3 cases to check for:
+                    // (1) If there are at least iNumFullyVisibleItems items beyond iIndexOfStrSearchIdItem, position to iIndexOfStrSearchIdItem.
+                    // (2) If iIndexOfStrSearchIdItem is < iNumFullyVisibleItems, position to 0.
+                    // (3) Otherwise, position to m_arrayItems.length - iNumFullyVisibleItems;
+
+                    var iPositionToIndex = m_arrayItems.length - iNumFullyVisibleItems;     // Fall through case.
+                    if (m_arrayItems.length - iIndexOfStrSearchIdItem >= iNumFullyVisibleItems) {
+
+                        iPositionToIndex = iIndexOfStrSearchIdItem;
+                    
+                    } else if (iIndexOfStrSearchIdItem < iNumFullyVisibleItems) {
+
+                        iPositionToIndex = 0;
+                    }
+
+                    var dNewTop = 0 - (m_dHeight * iPositionToIndex);
+                    m_jSlider.css("top", dNewTop.toString() + "px");
 
                     return null;
 
