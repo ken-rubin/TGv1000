@@ -77,9 +77,18 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addImage = function (strId, strName, strDescription, strResourceUrl, strImageClass, functionJItemCallBack) {
+            self.addImage = function (strId,                        // All parameters are required.
+                                        strName, 
+                                        strDescription, 
+                                        strResourceUrl, 
+                                        strImageClass, 
+                                        functionJItemCallBack, 
+                                        bInLoadLoop) 
+            {
 
                 try {
+
+                    m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
                     var jItem = $("<img data-toggle='tooltip' data-placement='bottom' title='" + strName + "' style='position:absolute;' id='" + 
@@ -209,8 +218,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jSlider.height((iBase + 1) * m_dHeight);
 
                     // Make sure toolstrip scrolls to show new image.
-                    exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
-                    if (exceptionRet) { throw exceptionRet; }
+                    if (!m_bInLoadLoop) {
+
+                        exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
+                        if (exceptionRet) { throw exceptionRet; }
+                    }
 
                 } catch (e) {
 
@@ -667,6 +679,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             var m_dTooltipHeightOffset = 2;
             // Cookie keeps track of tooltip callback staged on mouse move.
             var m_cookieTooltip = null;
+            // Used to prevent scrolling to bottom when loading an entire set of Types for a comic (ultimately a project).
+            var m_bInLoadLoop = false;
         };
 
         // Return constructor function.

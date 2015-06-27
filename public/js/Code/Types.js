@@ -77,7 +77,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								}
 
 						        // Also add to the designer/tool strip.
-								exceptionRet = tools.addItem(clType);
+								exceptionRet = tools.addItem(clType,
+									true);								// This parameter is used only here, when a project is opened or created or a comic is changed.
+																		// It disables scrolling the toolstrip so that the item being added can be seen, thus
+																		// starting off with the isApp type/tool at the top of the toolstrip.
 								if (exceptionRet) {
 
 									throw exceptionRet;

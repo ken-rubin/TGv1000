@@ -47,7 +47,10 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 					}
 
 					// Add tool to strip.
-					self.addItem = function (clType) {
+					self.addItem = function (clType,
+						bInLoadLoop													// See types.load for comment about bInLoadLoop.
+						) 
+					{
 
 						try {
 
@@ -67,7 +70,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 									'image'
 								),
 								'toolstripitem',									// item class
-								function (jItemAdded) {	jItem = jItemAdded }		// post creation callback so we can use jItem (see below)
+								function (jItemAdded) {	jItem = jItemAdded },		// post creation callback so we can use jItem (see below)
+								bInLoadLoop || false								// If it wasn't passed in (new Type added), then false. If in a Types.load loop, then true.
 							);
 							if (exceptionRet) {	throw exceptionRet; }
 
