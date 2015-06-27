@@ -208,6 +208,10 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // ...and make room in the slider.
                     m_jSlider.height((iBase + 1) * m_dHeight);
 
+                    // Make sure toolstrip scrolls to show new image.
+                    exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
+                    if (exceptionRet) { throw exceptionRet; }
+
                 } catch (e) {
 
                     errorHelper.show(e);
@@ -256,6 +260,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     if (dWidth > dHeight) {
 
                         // Position across whole width and center on height.
+                        // Remove left. It might have been left over from a previous image that was centered horizontally.
+                        jItem.css("left", "");
                         jItem.css("right",
                             "0px");
                         jItem.css("width",
@@ -269,12 +275,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     } else {
 
                         // Position down whole height and center on width.
+                        // Remove right. It might have been left over from a previous image that was centered horizontally.
+                        jItem.css("right", "");
                         jItem.css("top",
                             (iBase * m_dHeight).toString() + "px");
                         jItem.css("height",
                             m_dHeight.toString() + "px");
                         var dItemWidth = m_dWidth * dWidth / dHeight;
-                        jItem.css("Width",
+                        jItem.css("width",
                             dItemWidth.toString() + "px");
                         var dWork = ((m_dWidth - dItemWidth) / 2);
                         jItem.css("left",
@@ -408,8 +416,32 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                 try {
 
+                    var iIndexOfFirstFullyVisibleItem = Math.floor((-1 * parseFloat(m_jSlider.css("top"))) / m_dHeight);
+                    var iNumFullyVisibleItems = Math.floor(m_jSliderContainer.height() / m_dHeight) - 1;
+                    var iIndexOfLastFullyVisibleItem = iIndexOfFirstFullyVisibleItem + iNumFullyVisibleItems - 1;
 
+                    var iIndexOfStrSearchIdItem = -1;
+                    for (var i = 0; i < m_arrayItems.length; i++) {
 
+                        if (m_arrayItems[i][0].id === strSearchId) {
+
+                            iIndexOfStrSearchIdItem = i;
+                            break;
+                        }
+                    }
+
+                    if (iIndexOfStrSearchIdItem === -1) {
+
+                        return null;    // give up
+                    }
+
+                    if (iIndexOfStrSearchIdItem >= iIndexOfFirstFullyVisibleItem && iIndexOfStrSearchIdItem <= iIndexOfLastFullyVisibleItem) {
+
+                        return null;    // item is already visible
+                    }
+
+                    // Calculate top that displays iIndexOfStrSearchIdItem.
+                    m_jSlider.css("top", (m_jSliderContainer.height() - m_jSlider.height() /*- m_dHeight*/ ).toString() + "px");
 
                     return null;
 

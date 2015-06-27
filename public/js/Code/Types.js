@@ -137,8 +137,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							}
 
 							// Scroll toolstrip so this one is visible.
-							// Only time it wouldn't be (since we most likely just clicked on it or the top one-app-was selected at project load)
-							// is when a new Type was added and activated/selected.
+							// Only times it wouldn't be (since we most likely just clicked on it or the top one-app-was selected at project load) are:
+							// (1) when a new Type was added and activated/selected;
+							// (2) if a Type is deleted, depending on which type we then select. If app, then we might have to scroll. If next one down, we're probably good.
+							// The following doesn't work in case (1), since the image load/add to toolstrip is async, so it fails to find it.
+							// But we'll keep the call here AND do it in the ScrollRegion load handler, too.
 							var exceptionRet = tools.functionMakeSureToolIsVisible(clType);
 							if (exceptionRet) { return exceptionRet; }
 
