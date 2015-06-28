@@ -86,7 +86,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     // Build the item.
-                    var jItem = $("<img id='" + strId + "' class='" + strImageClass + "' data-toggle='tooltip' data-placement='right' title='" + strName + "'></img>");
+                    var jItem = $("<img id='" + strId + "' class='" + strImageClass + "' data-toggle='tooltip' data-placement='right auto' title='" + strName + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionOnNewImageLoaded);
@@ -181,6 +181,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jSlider.append(jItem);
                     // ...and make room in the slider.
                     m_jSlider.width((iBase + 1) * m_dWidth);
+                    // ...and opt-in on the tooltip.
+                    jItem.tooltip();
 
                 } catch (e) {
 

@@ -79,9 +79,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								}
 							}
 
-							// Opt-in the comicstrip tooltips.
-							$(".comicstripitem").tooltip();
-
 							// Automatically allocate the first comic.
 							if (m_arrayClComics.length > 0) {
 

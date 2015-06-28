@@ -128,223 +128,234 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								price: 0,
 								createdByUserId: client.getTGCookie('userId'),
 								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0 || m_imageResourceId > 0,
-								comics: {
-									items: [{
-										imageResourceId: 0,
-										id: 0,
-										name: 'default',
-										tags: 'tagComic',
-										ordinal: 0,
-										types: {
-											items: [
-												{
-													isApp: true,
-													id: 0,
-													ordinal: 0,
-													tags: 'tagType',
-													properties: [
-														{name: "property1", propType: "number", initialValue: "0"},
-														{name: "property2", propType: "number", initialValue: "0"},
-														{name: "property3", propType: "number", initialValue: "0"},
-														{name: "property4", propType: "number", initialValue: "0"},
-														{name: "property5", propType: "number", initialValue: "0"},
-														{name: "property6", propType: "number", initialValue: "0"},
-														{name: "property7", propType: "number", initialValue: "0"},
-														{name: "property8", propType: "number", initialValue: "0"},
-														{name: "property9", propType: "number", initialValue: "0"}
-													],
-													methods: [
-														{ name: "initialize", workspace: "", method: "" },
-														{ name: "method1", workspace: "", method: "" },
-														{ name: "method2a", workspace: "", method: "" },
-														{ name: "method2b", workspace: "", method: "" },
-														{ name: "method2c", workspace: "", method: "" },
-														{ name: "method2d", workspace: "", method: "" },
-														{ name: "method2e", workspace: "", method: "" },
-														{ name: "method2f", workspace: "", method: "" },
-														{ name: "method3g", workspace: "", method: "" }
-													],
-													events: [
-														{name: "event1", handler: "method1"},
-														{name: "event12", handler: "method1"},
-														{name: "event123", handler: "method1"},
-														{name: "event1234", handler: "method1"}
-													],
-													dependencies: [],
-													name: "app",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 1,
-													tags: 'tagType1',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type1",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 2,
-													tags: 'tagType2',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type2",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 3,
-													tags: 'tagType3',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type3",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 4,
-													tags: 'tagType4',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type4",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 5,
-													tags: 'tagType5',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type5",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 6,
-													tags: 'tagType6',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type6",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 7,
-													tags: 'tagType7',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type7",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 8,
-													tags: 'tagType8',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type8",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 9,
-													tags: 'tagType9',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type9",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 10,
-													tags: 'tagType10',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type10",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 11,
-													tags: 'tagType11',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type11",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 12,
-													tags: 'tagType12',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type12",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 13,
-													tags: 'tagType13',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type13",
-													imageResourceId: 0
-												},
-												{
-													isApp: false,
-													id: 0,
-													ordinal: 14,
-													tags: 'tagType14',
-													properties: [],
-													methods: [],
-													events: [],
-													dependencies: [],
-													name: "Type14",
-													imageResourceId: 0
-												}
-											]
+								comics: 
+								{
+									items: [
+										{
+											imageResourceId: 0,
+											id: 0,
+											name: 'comic1',
+											tags: 'tagComic',
+											ordinal: 0,
+											types: {
+												items: [
+													{
+														isApp: true,
+														id: 0,
+														ordinal: 0,
+														tags: 'tagType',
+														properties: [
+															{name: "property1", propType: "number", initialValue: "0"},
+															{name: "property2", propType: "number", initialValue: "0"},
+															{name: "property3", propType: "number", initialValue: "0"},
+															{name: "property4", propType: "number", initialValue: "0"},
+															{name: "property5", propType: "number", initialValue: "0"},
+															{name: "property6", propType: "number", initialValue: "0"},
+															{name: "property7", propType: "number", initialValue: "0"},
+															{name: "property8", propType: "number", initialValue: "0"},
+															{name: "property9", propType: "number", initialValue: "0"}
+														],
+														methods: [
+															{ name: "initialize", workspace: "", method: "" },
+															{ name: "method1", workspace: "", method: "" },
+															{ name: "method2a", workspace: "", method: "" },
+															{ name: "method2b", workspace: "", method: "" },
+															{ name: "method2c", workspace: "", method: "" },
+															{ name: "method2d", workspace: "", method: "" },
+															{ name: "method2e", workspace: "", method: "" },
+															{ name: "method2f", workspace: "", method: "" },
+															{ name: "method3g", workspace: "", method: "" }
+														],
+														events: [
+															{name: "event1", handler: "method1"},
+															{name: "event12", handler: "method1"},
+															{name: "event123", handler: "method1"},
+															{name: "event1234", handler: "method1"}
+														],
+														dependencies: [],
+														name: "app",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 1,
+														tags: 'tagType1',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type1",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 2,
+														tags: 'tagType2',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type2",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 3,
+														tags: 'tagType3',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type3",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 4,
+														tags: 'tagType4',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type4",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 5,
+														tags: 'tagType5',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type5",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 6,
+														tags: 'tagType6',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type6",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 7,
+														tags: 'tagType7',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type7",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 8,
+														tags: 'tagType8',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type8",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 9,
+														tags: 'tagType9',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type9",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 10,
+														tags: 'tagType10',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type10",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 11,
+														tags: 'tagType11',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type11",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 12,
+														tags: 'tagType12',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type12",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 13,
+														tags: 'tagType13',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type13",
+														imageResourceId: 0
+													},
+													{
+														isApp: false,
+														id: 0,
+														ordinal: 14,
+														tags: 'tagType14',
+														properties: [],
+														methods: [],
+														events: [],
+														dependencies: [],
+														name: "Type14",
+														imageResourceId: 0
+													}
+												]
+											}
+										},
+										{
+											imageResourceId: 0,
+											id: 0,
+											name: 'comic2',
+											tags: 'tagComic',
+											ordinal: 1,
+											types: { items: [] }
 										}
-									}]
+									]
 								}
 							};
 
