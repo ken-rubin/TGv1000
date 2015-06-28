@@ -86,7 +86,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     // Build the item.
-                    var jItem = $("<img id='" + strId + "' class='" + strImageClass + "' data-toggle='tooltip' data-placement='right auto' title='" + strName + "'></img>");
+                    var jItem = $("<img id='" + strId + "' class='" + strImageClass + "' data-container='body' data-placement='bottom' data-toggle='tooltip' title='" + strName + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionOnNewImageLoaded);

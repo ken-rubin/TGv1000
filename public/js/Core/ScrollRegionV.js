@@ -91,7 +91,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
-                    var jItem = $("<img data-toggle='tooltip' data-placement='bottom' title='" + strName + "' style='position:absolute;' id='" + 
+                    var jItem = $("<img data-toggle='tooltip' data-container='body' data-placement='right' title='" + strName + "' style='position:absolute;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>");
 
@@ -216,6 +216,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jSlider.append(jItem);
                     // ...and make room in the slider.
                     m_jSlider.height((iBase + 1) * m_dHeight);
+                    // ..and opt-in for the tooltip
+                    jItem.tooltip();
 
                     // Make sure toolstrip scrolls to show new image.
                     if (!m_bInLoadLoop) {
