@@ -343,7 +343,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								$("#TWtypeName").text(m_clTypeActive.data.name);
 								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
-								$("#TWimage")
 
 								if (m_clTypeActive.data.isApp) {
 

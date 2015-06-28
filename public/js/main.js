@@ -83,8 +83,6 @@ $(document).ready(function () {
 				// Disable all the TypeWell icons, since there is current no project loaded.
 				$(".disabledifnoproj").prop("disabled", true);
 
-				// Fire the bootstrap tooltip opt-in
-
 
 
 
