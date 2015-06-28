@@ -116,8 +116,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							// Create minimal project based on the new project dialog's fields--or lack thereof.
+							// Create project based on the new project dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
+							var strUserId = client.getTGCookie("userId");
+
 							var project = 
 							{
 								name: $("#ProjectName").val() || '',
@@ -126,7 +128,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								tags: $("#ProjectTags").val() || '',
 								imageResourceId: m_imageResourceId,
 								price: 0,
-								createdByUserId: client.getTGCookie('userId'),
+								createdByUserId: strUserId,
 								isDirty: $("#ProjectName").val().trim().length > 0 || $("#ProjectDescription").val().trim().length > 0 || $("#ProjectTags").val().trim().length > 0 || m_imageResourceId > 0,
 								comics: 
 								{
@@ -144,37 +146,37 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 														id: 0,
 														ordinal: 0,
 														tags: 'tagType',
-														properties: [
-															{name: "property1", propType: "number", initialValue: "0"},
-															{name: "property2", propType: "number", initialValue: "0"},
-															{name: "property3", propType: "number", initialValue: "0"},
-															{name: "property4", propType: "number", initialValue: "0"},
-															{name: "property5", propType: "number", initialValue: "0"},
-															{name: "property6", propType: "number", initialValue: "0"},
-															{name: "property7", propType: "number", initialValue: "0"},
-															{name: "property8", propType: "number", initialValue: "0"},
-															{name: "property9", propType: "number", initialValue: "0"}
-														],
-														methods: [
-															{ name: "initialize", workspace: "", method: "" },
-															{ name: "method1", workspace: "", method: "" },
-															{ name: "method2a", workspace: "", method: "" },
-															{ name: "method2b", workspace: "", method: "" },
-															{ name: "method2c", workspace: "", method: "" },
-															{ name: "method2d", workspace: "", method: "" },
-															{ name: "method2e", workspace: "", method: "" },
-															{ name: "method2f", workspace: "", method: "" },
-															{ name: "method3g", workspace: "", method: "" }
-														],
-														events: [
-															{name: "event1", handler: "method1"},
-															{name: "event12", handler: "method1"},
-															{name: "event123", handler: "method1"},
-															{name: "event1234", handler: "method1"}
-														],
 														dependencies: [],
 														name: "app",
-														imageResourceId: 0
+														imageResourceId: 0,
+														methods: [
+															{id: 0, name: "initialize", workspace: "", imageResourceId: 0, ordinal: 0, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method1", workspace: "", imageResourceId: 0, ordinal: 1, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2a", workspace: "", imageResourceId: 0, ordinal: 2, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2b", workspace: "", imageResourceId: 0, ordinal: 3, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2c", workspace: "", imageResourceId: 0, ordinal: 4, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2d", workspace: "", imageResourceId: 0, ordinal: 5, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2e", workspace: "", imageResourceId: 0, ordinal: 6, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2f", workspace: "", imageResourceId: 0, ordinal: 7, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method3g", workspace: "", imageResourceId: 0, ordinal: 8, tags: "", createdByUserId: strUserId, price: 0}
+														],
+														properties: [
+															{id: 0, name: "property1", propType: "number", initialValue: "0", ordinal: 0},
+															{id: 0, name: "property2", propType: "number", initialValue: "0", ordinal: 1},
+															{id: 0, name: "property3", propType: "number", initialValue: "0", ordinal: 2},
+															{id: 0, name: "property4", propType: "number", initialValue: "0", ordinal: 3},
+															{id: 0, name: "property5", propType: "number", initialValue: "0", ordinal: 4},
+															{id: 0, name: "property6", propType: "number", initialValue: "0", ordinal: 5},
+															{id: 0, name: "property7", propType: "number", initialValue: "0", ordinal: 6},
+															{id: 0, name: "property8", propType: "number", initialValue: "0", ordinal: 7},
+															{id: 0, name: "property9", propType: "number", initialValue: "0", ordinal: 8}
+														],
+														events: [
+															{id: 0, name: "event1", ordinal: 0},
+															{id: 0, name: "event12", ordinal: 1},
+															{id: 0, name: "event123", ordinal: 2},
+															{id: 0, name: "event1234", ordinal: 3}
+														]
 													},
 													{
 														isApp: false,
