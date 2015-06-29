@@ -1,27 +1,16 @@
 // Styles for the ScrollRegionV.
 //
 
-.ScrollRegionVcol   // this outer div holds .ScrollRegionVTop, .ScrollRegionV and .ScrollRegionVBottom
+.ScrollRegionVcol   // this outer div holds .ScrollRegionVTop, .ScrollRegionVSliderContainer and .ScrollRegionVBottom
 {
     top:180px;
 //    left:3%;
-    width:65px;
+//    width:65px;
     position:fixed;
     background-color:#00ff00;
 }
 
-.ScrollRegionV
-{
-    position:absolute;
-    left:5%;
-    width:90%;
-    color:white;
-    border: 1px solid black;
-    border-radius: 4px;
-    background: rgb(127,127,163);
-}
-
-.ScrollRegionVSliderContainer
+.ScrollRegionVSliderContainer   // this div holds .ScrollRegionVSlider
 {
     position:absolute;
     top:40px;
@@ -35,17 +24,29 @@
     overflow: hidden;
 }
 
-.ScrollRegionVSlider
+.ScrollRegionVSlider        // this div holds images
 {
     position:absolute;
     left:0px;
-    width:55px;
+//    width:55px;
     top:0px;
     bottom:0px;
     background: black;
 
     overflow: hidden;
 }
+
+// Following appears not to be used any more.
+//.ScrollRegionV
+//{
+//    position:absolute;
+//    left:5%;
+//    width:90%;
+//    color:white;
+//    border: 1px solid black;
+//    border-radius: 4px;
+//    background: rgb(127,127,163);
+//}
 
 .ScrollRegionVTop
 {
@@ -108,6 +109,22 @@
 // The tool item is a single, draggable tool.
 .toolstripitem
 {
+    width:55px;
+    height:55px;
+    border:1px solid white;
+    border-radius:5px;
+    background:rgba(155,0,0,0.5);
+
+    &:hover
+    {
+        background:rgba(255,255,100,0.5);
+    }
+}
+
+.comicspanelstripitem
+{
+    width:160px;
+    height:110px;
     border:1px solid white;
     border-radius:5px;
     background:rgba(155,0,0,0.5);

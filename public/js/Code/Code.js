@@ -390,17 +390,22 @@ define(["Core/errorHelper"],
 
 									var iViewportHeight = $(window).height();
 									var iTypeWellHeight = $("#TypeWell").height();
+									var iColXs1Width = $(".forgettingwidth").width();
 
 									var iBordersAndSpacingPadding = 70;
 
 									// Center the vertical toolstrip and panelstrip vertically in the viewport. It will remain fixed.
 									var iToolstripTop = $("#toolstrip").position().top;
-									$("#toolstrip").height(iViewportHeight - 
-										iToolstripTop*2);
+									$("#toolstrip").height(iViewportHeight - iToolstripTop * 2);
+									var iToolstripWidth = $("#toolstrip").width();
+									var strToolstripLeft = ((iColXs1Width - iToolstripWidth) / 2).toString() + "px";
+									$("#toolstrip").css("margin-left", strToolstripLeft);
 									
 									var iComicPanelstripTop = $("#comicpanelstrip").position().top;
-									$("#comicpanelstrip").height(iViewportHeight - 
-										iComicPanelstripTop*2);
+									$("#comicpanelstrip").height(iViewportHeight - iComicPanelstripTop * 2);
+									var iComicpanelstripWidth = $("#comicpanelstrip").width();
+									var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2).toString() + "px";
+									$("#comicpanelstrip").css("margin-left", strComicpanelstripLeft);
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
 										iTypeWellHeight -

@@ -33,7 +33,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 							m_srComicsPanelStrip = new ScrollRegionV();
 							var exceptionRet = m_srComicsPanelStrip.create(
 								"#comicpanelstrip",	// inner row selector
-								160,				// item width
+								110,				// width
+								80,					// height
 								function() {		// functionClick
 						    		var jq = this;
 						    		var parts = jq.context.id.split('-');
@@ -94,7 +95,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								panel.name,		// name
 								panel.description,		// description
 								resourceHelper.toURL('panels', null, null, panel.thumbnail),		// url
-								'toolstripitem'	// image class
+								'comicspanelstripitem',	// image class
+								null,
+								true
 							);
 							if (exceptionRet) { throw exceptionRet; }
 

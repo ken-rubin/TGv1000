@@ -30,6 +30,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 							m_srToolStripV = new ScrollRegionV();
 							var exceptionRet = m_srToolStripV.create(
 								"#toolstrip",		// inner row selector
+								55,					// item width
 								55,					// item height
 								function() {}		// functionClick
 							);

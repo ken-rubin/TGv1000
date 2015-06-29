@@ -28,22 +28,26 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             //
             // strRootElementSelector - selector for DOM element.
             self.create = function (strRootElementSelector,
-                dHeight,
-                functionClick) {
-
+                                    dWidth,
+                                    dHeight,
+                                    functionClick) 
+            {
                 try {
 
                     // Save state.
                     m_dHeight = dHeight;
-                    m_dWidth = dHeight;    // everything's a square.
+                    m_dWidth = dWidth;
                     self.click = functionClick;
 
                     // Get j-reference to root element.
                     m_jRoot = $(strRootElementSelector);
+                    var strVcolWidth = (m_dWidth + 10).toString() + "px";
+                    m_jRoot.css("width", strVcolWidth);
 
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionVSliderContainer' />");
-                    m_jSlider = $("<div class='ScrollRegionVSlider' />");
+                    var strSliderWidth = m_dWidth.toString() + "px";
+                    m_jSlider = $("<div class='ScrollRegionVSlider' style='width:" + strSliderWidth + "' />");
                     m_jTop = $("<div class='ScrollRegionVTop'><span class='glyphicon glyphicon-chevron-up'></span></div>");
                     m_jBottom = $("<div class='ScrollRegionVBottom'><span class='glyphicon glyphicon-chevron-down'></span></div>");
 
