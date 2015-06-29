@@ -33,7 +33,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 							m_srComicsPanelStrip = new ScrollRegionV();
 							var exceptionRet = m_srComicsPanelStrip.create(
 								"#comicpanelstrip",	// inner row selector
-								80,				// item width
+								160,				// item width
 								function() {		// functionClick
 						    		var jq = this;
 						    		var parts = jq.context.id.split('-');
