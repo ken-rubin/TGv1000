@@ -26,6 +26,7 @@ define(["Core/errorHelper"],
 						// strResourceSource:
 						//		resources: return "resources/" + iResourceId + (strResourceType === "image" ? ".png" : ".mp3")
 						//		images: return "media/images/" + strResourceFilename
+						//		panels: return "media/panels/" + strResourceFilename
 
 						if (strResourceSource === "resources")
 							if (iResourceId > 0)
@@ -34,6 +35,8 @@ define(["Core/errorHelper"],
 								return "media/images/clicktochange.png";
 						else if (strResourceSource === "images")
 							return "media/images/" + strResourceFilename;
+						else if (strResourceSource === "panels")
+							return "media/panels/" + strResourceFilename;
 						else
 							throw new Error("Invalid call to toURL");
 					};

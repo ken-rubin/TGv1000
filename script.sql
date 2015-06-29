@@ -447,6 +447,7 @@ begin
 		  `name` varchar(255) NOT NULL,
   		  `url` varchar(255) NOT NULL,
 		  `description` varchar(255) NOT NULL,
+		  `thumbnail` varchar(255) NOT NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

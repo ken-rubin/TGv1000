@@ -139,6 +139,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											name: 'comic1',
 											tags: 'tagComic',
 											ordinal: 0,
+											comicPanels: {
+												items: [
+													{name: "XYZ", url: "http://www.google.com", description: "descr", ordinal: 0, thumbnail: "tn1.png"}
+												]
+											},
 											types: {
 												items: [
 													{

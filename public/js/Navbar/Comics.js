@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceHelper"],
-	function (errorHelper, Comic, ScrollRegion, resourceHelper) {
+define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceHelper", "Designer/ComicsPanel"],
+	function (errorHelper, Comic, ScrollRegion, resourceHelper, ComicsPanel) {
 
 		try {
 
@@ -128,6 +128,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 						try {
 
 							m_clComicActive = clComic;
+							m_clComicsPanel = new ComicsPanel();
+							var exceptionRet = m_clComicsPanel.create();
+							if (exceptionRet) { return exceptionRet; }
+
+							exceptionRet = m_clComicsPanel.load(clComic.data.comicPanels);
+							if (exceptionRet) { return exceptionRet; }
+
 							return null;
 							
 						} catch (e) {
@@ -199,6 +206,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 					var m_arrayClComics = [];
 					// The active comic.
 					var m_clComicActive = null;
+					// The comics vertical toolstrip container class.
+					var m_clComicsPanel = null;
 					
 				} catch (e) {
 

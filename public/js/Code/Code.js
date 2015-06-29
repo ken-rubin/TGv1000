@@ -393,10 +393,14 @@ define(["Core/errorHelper"],
 
 									var iBordersAndSpacingPadding = 70;
 
-									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.
+									// Center the vertical toolstrip and panelstrip vertically in the viewport. It will remain fixed.
 									var iToolstripTop = $("#toolstrip").position().top;
 									$("#toolstrip").height(iViewportHeight - 
 										iToolstripTop*2);
+									
+									var iComicPanelstripTop = $("#comicpanelstrip").position().top;
+									$("#comicpanelstrip").height(iViewportHeight - 
+										iComicPanelstripTop*2);
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
 										iTypeWellHeight -
