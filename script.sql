@@ -406,6 +406,55 @@ begin
 		set @dbstate := 25.0;
     end if;
 
+    if @dbstate = 25.0 then
+    
+		DELETE FROM TGv1000.resourceTypes where id in (6,8);
+        ALTER TABLE `TGv1000`.`methods` 
+			CHANGE COLUMN `jsonCode` `workspace` MEDIUMTEXT NOT NULL ,
+			ADD COLUMN `imageResourceId` INT(11) NOT NULL AFTER `workspace`,
+			ADD COLUMN `createdByUserId` INT(11) NOT NULL AFTER `imageResourceId`,
+			ADD COLUMN `price` DECIMAL(5,2) NOT NULL DEFAULT 0.0 AFTER `createdByUserId`,
+            ADD COLUMN `description` VARCHAR(255) NULL AFTER `price`;
+		ALTER TABLE `TGv1000`.`propertys` 
+			CHANGE COLUMN `jsonCode` `propertyTypeId` INT(11) NOT NULL ,
+			ADD COLUMN `initialValue` MEDIUMTEXT NOT NULL AFTER `propertyTypeId`,
+			ADD COLUMN `ordinal` INT(11) NOT NULL AFTER `initialValue`;
+		ALTER TABLE `TGv1000`.`events` 
+			CHANGE COLUMN `jsonCode` `ordinal` INT(11) NOT NULL ;
+		CREATE TABLE `TGv1000`.`propertyTypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+		insert TGv1000.propertyTypes (id,description) values (1,'Number');
+		insert TGv1000.propertyTypes (id,description) values (2,'Number range (e.g., 3-27)');
+		insert TGv1000.propertyTypes (id,description) values (3,'String');
+		insert TGv1000.propertyTypes (id,description) values (4,'Boolean (e.g., true or false)');
+		insert TGv1000.propertyTypes (id,description) values (5,'Picklist (e.g., ''John'' or ''Jim'' or ''Paul'' or ''Henry'')');
+		insert TGv1000.propertyTypes (id,description) values (6,'Type');
+
+        UPDATE `TGv1000`.`control` set dbstate=26.0 where id=1;
+		set @dbstate := 26.0;
+    end if;
+
+    if @dbstate = 26.0 then
+    
+		CREATE TABLE TGv1000.comicPanels (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `comicId` INT(11) NOT NULL,
+		  `ordinal` INT(11) NOT NULL,
+		  `name` varchar(255) NOT NULL,
+  		  `url` varchar(255) NOT NULL,
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    
+        UPDATE `TGv1000`.`control` set dbstate=27.0 where id=1;
+		set @dbstate := 27.0;
+    end if;
+
 end;
 
 //
