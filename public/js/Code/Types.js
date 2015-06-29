@@ -364,7 +364,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 										$("#TWmethodsTbody").append(strBuild);
 										$("#method_" + i).click(m_functionMethodClicked);
 									} else {
-										strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="edit-button" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '" /></td><td style="width:8%;"><button class="delete-button" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '" /></td></tr>';
+										strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 										$("#TWmethodsTbody").append(strBuild);
 										$("#method_" + i).click(m_functionMethodClicked);
 										$("#methodrename_" + i).click(m_functionMethodRenameClicked);
@@ -395,8 +395,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								};
 							}
 
-							$("#TypeWell .edit-button").tooltip();
-							$("#TypeWell .delete-button").tooltip();
+							$("#TypeWell .btn-default").tooltip();
 							// var jqTWimage = $("#TWimage");
 							// jqTWimage.data("tooltip", false);
 							// jqTWimage.tooltip({title: m_clTypeActive.data.name});
