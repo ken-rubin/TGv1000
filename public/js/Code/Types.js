@@ -377,7 +377,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 									var m = m_clTypeActive.data.properties[i];
-									strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="edit-button" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '" /></td><td style="width:8%;"><button class="delete-button" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '" /></td></tr>';
+									strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 									$("#TWpropertiesTbody").append(strBuild);
 									$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
 									$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
@@ -388,7 +388,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 									var m = m_clTypeActive.data.events[i];
-									strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="edit-button" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '" /></td><td style="width:8%;"><button class="delete-button" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '" /></td></tr>';
+									strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 									$("#TWeventsTbody").append(strBuild);
 									$("#eventrename_" + i).click(m_functionEventRenameClicked);
 									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);

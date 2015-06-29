@@ -36,33 +36,33 @@
           span#TWtypeName(style="font-size:20px;font-weight:bold;")
       .row
               .col-sm-3(style="border-right: 1px solid #000;")
-                  .row
-                      div(style='font-weight:bold;')
+                  .row(style="margin-top:10px;")
+                    .col-xs-3
+                      span(style='font-weight:bold;')
                         | Type Actions
-                      row
-                        .col-xs-2
-                        .col-xs-7
+                    .col-xs-9
                             button#TWnewTypeBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Add a new Type" aria-label="Add a new Type")
                               span.glyphicon.glyphicon-plus(aria-hidden="true")
-                            | &nbsp;
+                            | &nbsp;&nbsp;&nbsp;
                             button#TWsearchTypeBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Search for a new Type" aria-label="Search for a new Type")
                               span.glyphicon.glyphicon-search(aria-hidden="true")
-                            | &nbsp;
+                            | &nbsp;&nbsp;&nbsp;
                             button#TWdeleteTypeBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Delete this Type" aria-label="Delete this Type")
                               span.glyphicon.glyphicon-trash(aria-hidden="true")
-                            | &nbsp;
+                            | &nbsp;&nbsp;&nbsp;
                             button#TWRenameTypeLink.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Rename this Type" aria-label="Rename this Type")
                               span.glyphicon.glyphicon-pencil(aria-hidden="true")
-                        .col-xs-3
-                  .row
-                    br
-                    .col-xs-2.col-xs-offset-2
+                  .row(style="margin-top:20px;")
+                    .col-xs-2
+                    .col-xs-2
+                      br
                       br
                       br
                       | Image:
                     .col-xs-3
                       br
-                      img#TWimage.pull-left.img-responsive(data-toggle="tooltip" title="xxx")
+                      br
+                      img#TWimage.img-responsive(data-toggle="tooltip" title="xxx")
                     .col-xs-4
                         button#TWimageSearchLink.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Search for a new image" aria-label="Search for a new image")
                           span.glyphicon.glyphicon-search(aria-hidden="true")
@@ -74,58 +74,56 @@
                         br
                         button#TWnewImageDiskLink.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Load a new image that's on your computer" aria-label="Load a new image that's on your computer")
                           span.glyphicon.glyphicon-hdd(aria-hidden="true")
-                      .col-xs-1
-              .col-sm-3(style="border-right: 1px solid #000;")
-                  .row(style='font-weight:bold;')
-                    | Methods
-                  .row
-                    .col-xs-10
-                      .table-responsive
-                        table.table.table-condensed.table-striped.table-bordered
-                          tbody#TWmethodsTbody(style="display:block; overflow:auto; height: 180px;")
                     .col-xs-1
-                      br
-                      br
+
+              .col-sm-3(style="border-right: 1px solid #000;")
+                  .row(style="margin-top:10px;")
+                    .col-xs-3
+                      span(style='font-weight:bold;')
+                        | Methods
+                    .col-xs-5.col-xs-offset-4
                       button#TWaddMethodBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Add a new Method" aria-label="Add a new Method")
                         span.glyphicon.glyphicon-plus(aria-hidden="true")
-                      br
-                      br
+                      | &nbsp;&nbsp;&nbsp;
                       button#TWsearchMethodBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Search for a new Method" aria-label="Search for a new Method")
                           span.glyphicon.glyphicon-search(aria-hidden="true")
-                    .col-xs-1
+                  .row
+                    .col-xs-12
+                      .table-responsive(style="margin-top:5px;")
+                        table.table.table-condensed.table-striped.table-bordered
+                          tbody#TWmethodsTbody(style="display:block; overflow:auto; height: 180px;")
+
               .col-sm-3(style="border-right: 1px solid #000;")
-                .row(style='font-weight:bold;')
-                  | Properties
-                .row
-                  .col-xs-10
-                    .table-responsive
+                  .row(style="margin-top:10px;")
+                    .col-xs-3
+                      span(style='font-weight:bold;')
+                        | Properties
+                    .col-xs-5.col-xs-offset-4
+                      button#TWaddPropertyBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Add a new Property" aria-label="Add a new Property")
+                        span.glyphicon.glyphicon-plus(aria-hidden="true")
+                  .row
+                   .col-xs-12
+                    .table-responsive(style="margin-top:5px;")
                       table.table.table-condensed.table-striped.table-bordered
                         tbody#TWpropertiesTbody(style="display:block; overflow:auto; height: 180px;")
-                  .col-xs-1
-                    br
-                    br
-                    br
-                    button#TWaddPropertyBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Add a new Property" aria-label="Add a new Property")
-                        span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  .col-xs-1
+
               .col-sm-3
-                .row(style='font-weight:bold;')
-                  | Events
-                .row
-                  .col-xs-10
-                    .table-responsive
+                  .row(style="margin-top:10px;")
+                    .col-xs-3
+                      span(style='font-weight:bold;')
+                        | Events
+                    .col-xs-5.col-xs-offset-4
+                      button#TWaddEventBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Add a new Event" aria-label="Add a new Event")
+                        span.glyphicon.glyphicon-plus(aria-hidden="true")
+                  .row
+                   .col-xs-12
+                    .table-responsive(style="margin-top:5px;")
                       table.table.table-condensed.table-striped.table-bordered
                         tbody#TWeventsTbody(style="display:block; overflow:auto; height: 180px;")
-                  .col-xs-1
-                    br
-                    br
-                    br
-                    button#TWaddEventBtn.btn.btn-default.disabledifnoproj(type="button" data-toggle="tooltip" title="Add a new Event" aria-label="Add a new Event")
-                        span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  .col-xs-1
 
   //- Next the Blockly frame.
   .row
     .col-xs-12
       iframe#BlocklyIFrame
+
 

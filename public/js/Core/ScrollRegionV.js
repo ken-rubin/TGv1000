@@ -44,8 +44,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionVSliderContainer' />");
                     m_jSlider = $("<div class='ScrollRegionVSlider' />");
-                    m_jTop = $("<div class='ScrollRegionVTop'><img src='/media/images/uparrow.png' /></div>");
-                    m_jBottom = $("<div class='ScrollRegionVBottom'><img src='/media/images/downarrow.png' /></div>");
+                    m_jTop = $("<div class='ScrollRegionVTop'><span class='glyphicon glyphicon-chevron-up'></span></div>");
+                    m_jBottom = $("<div class='ScrollRegionVBottom'><span class='glyphicon glyphicon-chevron-down'></span></div>");
 
                     m_jSliderContainer.append(m_jSlider);
                     m_jRoot.append(m_jSliderContainer);
