@@ -82,7 +82,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addImage = function (strId,                        // All parameters are required.
+            self.addImage = function (  iBase,                       // All parameters are required.
+                                        strId,
                                         strName, 
                                         strDescription, 
                                         strResourceUrl, 
@@ -96,7 +97,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
-                    var jItem = $("<img data-toggle='tooltip' data-container='body' data-placement='right' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
+                    var jItem = $("<img data-ibase='" + iBase + "' data-toggle='tooltip' data-container='body' data-placement='right' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>"); // The 9999 z-index is so that a red div can be put behind an activated one, if desired.
 
@@ -216,6 +217,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
             // Invoked when an image is loaded.
             // Implemented to add image to DOM.
+            // The img has data-iBase to tell us where to position this, since we can come in in incorrect order due to asynchronicity.
             var m_functionOnNewImageLoaded = function () {
 
                 try {
@@ -224,10 +226,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     var jItem = $(this);
 
                     // Get position calculation base.
-                    var iBase = m_arrayItems.length;
+                    var iBase = parseInt(jItem.context.attributes['data-ibase'].value, 10);
 
-                    // Add to collection.
-                    m_arrayItems.push(jItem);
+                    // Add to collection--but we want it in position iBase.
+                    m_arrayItems.splice(iBase, 0, jItem);
+                    // m_arrayItems.push(jItem);
 
                     var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
                     if (exceptionRet) { throw exceptionRet; }
@@ -304,14 +307,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         jItem.css("height",
                             dItemHeight.toString() + "px");
                         var dWork = (iBase * m_dHeight + (m_dHeight - dItemHeight) / 2);
-                        jItem.css("top",
+                        jItem.css("margin-top",
                             dWork.toString() + "px");
                     } else {
 
                         // Position down whole height and center on width.
                         // Remove right. It might have been left over from a previous image that was centered horizontally.
                         jItem.css("right", "");
-                        jItem.css("top",
+                        jItem.css("margin-top",
                             (iBase * m_dHeight).toString() + "px");
                         jItem.css("height",
                             m_dHeight.toString() + "px");

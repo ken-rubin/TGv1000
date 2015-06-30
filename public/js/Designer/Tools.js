@@ -49,6 +49,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 					// Add tool to strip.
 					self.addItem = function (clType,
+						iBase,
 						bInLoadLoop													// See types.load for comment about bInLoadLoop.
 						) 
 					{
@@ -62,6 +63,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 							// Add to the DOM.
 							var jItem = null;
 							var exceptionRet = m_srToolStripV.addImage(
+								iBase,
 								"tool-" + client.removeSpaces(clType.data.name),	// id
 								clType.data.name,									// name for tooltip
 								"",													// no description--at this time

@@ -73,7 +73,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								var panelIth = comicPanels.items[i];	// no class wrapper
 
 								// Add the panel.
-								var exceptionRet = self.addItem(panelIth);
+								var exceptionRet = self.addItem(panelIth, i);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -85,12 +85,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 					};
 
 					// Add frame to comic strip.
-					self.addItem = function (panel) {
+					self.addItem = function (panel, iBase) {
 
 						try {
 
 							// Add to the DOM.
 							var exceptionRet = m_srComicsPanelStrip.addImage(
+								iBase,
 								"panel-" + m_arrayPanels.length.toString(),		// id
 								panel.name,		// name
 								panel.description,		// description
