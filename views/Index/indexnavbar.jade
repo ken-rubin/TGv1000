@@ -28,9 +28,7 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
 
         //- Projects.
         li.active.dropdown
-          a.dropdown-toggle(href="#", data-toggle="dropdown")
-            |  Projects 
-            b.caret
+          a.dropdown-toggle(href="#", data-toggle="dropdown") Projects 
             ul.dropdown-menu
               li#NewProjectLI
                 a#NewProjectButton(href="#") New Project...
@@ -45,19 +43,13 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
               li#CloseProjectLI
                 a#CloseProjectButton(href="#") Close Project
 
-        //- Debug.
-        li.active
-          a#DebugButton Debug
-
         //- Themes.
         li.active.dropdown
-          a.dropdown-toggle(href="#", data-toggle="dropdown")
-            |  Themes 
-            b.caret
+          a.dropdown-toggle(href="#", data-toggle="dropdown") Themes 
             ul.dropdown-menu
-              li
+              li.enabled
                 a#UnicornButton(href="#") Unicorn
-              li
+              li.enabled
                 a#TechButton(href="#") Tech
         
         //- Adminzone will eventually be hidden to non-admin users

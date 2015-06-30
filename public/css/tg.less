@@ -108,83 +108,27 @@ body
 	}
 }
 
-// Special settings for navbar to make dropdowns look good.
-@bgDefault      : #352e37;
-@bgHighlight    : #352e37;
-@colDefault     : #ecf0f1;
-@colHighlight   : #e9e2f1;
-@dropDown       : true;
-.ddm() when (@dropDown) {
-  > .dropdown-menu {
-    background-color: @bgDefault;
-    > li > a {
-      color: @colDefault;
-      &:hover,  &:focus {
-        color: @colHighlight;
-        background-color: @bgHighlight; }}
-    .divider {
-      background-color: @bgHighlight;}}}
-.navbar-default {
-  background-color: @bgDefault;
-  border-color: @bgHighlight;
-  .navbar-brand {
-    color: @colDefault;
-    &:hover, &:focus { 
-      color: @colHighlight; }}
-  .navbar-text {
-    color: @colDefault; }
-  .navbar-nav {
-    > li {
-      > a {
-        color: @colDefault;
-        &:hover,  &:focus {
-          color: @colHighlight; }}
-      .ddm }
-    > .active {
-      > a, > a:hover, > a:focus {
-        color: @colHighlight;
-        background-color: @bgHighlight; }}
-    > .open {
-      > a, > a:hover, > a:focus {
-        color: @colHighlight;
-        background-color: @bgHighlight; }}}
-  .navbar-toggle {
-    border-color: @bgHighlight;
-    &:hover, &:focus {
-      background-color: @bgHighlight; }
-    .icon-bar {
-      background-color: @colDefault; }}
-  .navbar-collapse,
-  .navbar-form {
-    border-color: @colDefault; }
-  .navbar-link {
-    color: @colDefault;
-    &:hover {
-      color: @colHighlight; }}}
-@media (max-width: 767px) {
-  .navbar-default .navbar-nav .open .dropdown-menu {
-    > li > a {
-      color: @colDefault;
-      &:hover, &:focus {
-        color: @colHighlight; }}
-    > .active {
-      > a, > a:hover, > a:focus {
-        color: @colHighlight;
-        background-color: @bgHighlight; }}}
-}
+// Style navbar menu with a black background, 
+// light enabled items and dim disabled items 
+// with inverse highlighting on enabled items.
+.dropdown-menu
+{
+  background:black;
 
-// Disabled dropdown customization
-.dropdown-menu > .disabled{
- cursor: default; 
-}
-
-.dropdown-menu > .enabled{
-  &:hover
+  .enabled
   {
-    background:rgba(255,255,100,0.5);
+    a
+    {
+      color:#ccc !important;
+
+      &:hover
+      {
+        color:#444 !important;
+      }
+    }
+    a.dropdown-toggle
+    {
+      background:#000 !important;
+    }
   }
- }
- 
-.dropdown-menu > .disabled > a{
- pointer-events: none;
 }
