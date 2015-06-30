@@ -117,7 +117,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 
 						try {
 
-							window.open(url, 'Comic Panel', 'width=600,height=400,resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no');
+							var strParams = 'outerWidth=WWW,outerHeight=HHH,screenLeft=LLL,screenTop=TTT,resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no';
+							strParams = strParams.replace('WWW', (window.outerWidth - 100).toString()).replace('HHH', (window.outerHeight - 100).toString())
+								.replace('LLL',(window.screenLeft-50).toString()).replace('TTT',(window.screenTop-50).toString());
+
+							window.open(url, 'Comic Panel', strParams);
 
 							return null;
 							

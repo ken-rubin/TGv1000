@@ -99,6 +99,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						try {
 
+							$(".tt-selector .btn-default").tooltip();
+
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							m_functionSetImageSrc(0);
