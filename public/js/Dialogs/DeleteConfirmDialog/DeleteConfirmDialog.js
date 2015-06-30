@@ -143,19 +143,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/P
 
 							if (m_strObjectType === 'type') {
 
-								exceptionRet = client.deleteType(types.getActiveClType());
+								exceptionRet = client.deleteType();	//types.getActiveClType());
 
 							} else if (m_strObjectType === 'method') {
 
-								exceptionRet = client.deleteMethod(types.getActiveClType().data.methods[m_iIndex]);
+								exceptionRet = client.deleteMethod(m_iIndex);	//types.getActiveClType().data.methods[m_iIndex]);
 
 							} else if (m_strObjectType === 'property') {
 
-								exceptionRet = client.deleteProperty(types.getActiveClType().data.properties[m_iIndex]);
+								exceptionRet = client.deleteProperty(m_iIndex);	//types.getActiveClType().data.properties[m_iIndex]);
 
 							} else if (m_strObjectType === 'event') {
 
-								exceptionRet = client.deleteEvent(types.getActiveClType().data.events[m_iIndex]);
+								exceptionRet = client.deleteEvent(m_iIndex);	//types.getActiveClType().data.events[m_iIndex]);
 							}
 
 							if (exceptionRet) {

@@ -327,9 +327,42 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// For delete confirmation or renaming or editing.
-					self.getActiveClType = function () {
+					self.getActiveClType = function (bDeleting) {
 
-						return m_clTypeActive;
+						// Make a reference copy of the current active type to return from this function.
+						// If we're deleting, we'll make a non-referential copy, since we're about to reset to a new active.
+						var clType = m_clTypeActive;
+
+						// bDeleting means we're retrieving for purpose of deleting the active type. A new active type must be chosen.
+						if (bDeleting) {
+
+							// Make a true copy of the current active type, divorcing it, since we're about to reset it.
+							clType = JSON.parse(JSON.stringify(m_clTypeActive));
+
+							// The isApp type can never be deleted. 
+							// We will either make the type with the same index the new active type or,
+							// if the one being deleted was the last one, we'll go up one.
+							for (var i = 0; i < m_arrayClTypes.length; i++)	{
+
+								if (m_arrayClTypes[i].data.id === m_clTypeActive.data.id) {
+
+									if (i === m_arrayClTypes.length - 1) {
+
+										// Last one in the array.
+										self.select(m_arrayClTypes[i - 1]);
+
+									} else {
+
+										self.select(m_arrayClTypes[i + 1]);
+									}
+
+									m_arrayClTypes.splice(i, 1);
+								}
+							}
+						}
+
+						// Return our former active type for removal from everything.
+						return clType;
 					}
 
 					///////////////////////////////////

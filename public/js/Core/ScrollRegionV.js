@@ -237,8 +237,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     // Last, add to DOM, ...
                     m_jSlider.append(jItem);
-                    // ...and make room in the slider.
-                    m_jSlider.height((iBase + 1) * m_dHeight);
+                    // ...and make room in the slider if necessary. This is conditional, because we do things async so possibly out of order.
+                    // So it would otherwise be possible to shrink the slider height after it got big.
+                    var dSliderHeight = m_jSlider.height();
+                    var dSliderNewHeight = (iBase + 1) * m_dHeight;
+                    if (dSliderNewHeight > dSliderHeight) {
+
+                        m_jSlider.height(dSliderNewHeight);
+                    }
                     // ..and opt-in for the tooltip
                     jItem.tooltip();
 

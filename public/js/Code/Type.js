@@ -574,7 +574,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 								BootstrapDialog.alert({
 
 									title: "WARNING",
-									message: "Can not delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
+									message: "Cannot delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
 									type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
 									closable: true, // <-- Default value is false
 									draggable: true // <-- Default value is false

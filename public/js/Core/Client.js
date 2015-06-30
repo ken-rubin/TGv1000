@@ -573,7 +573,28 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.deleteType = function(clType) {
+					// Delete types.getActiveClType() from ???
+					// Remove from code, toolstrip, designer, etc.
+					self.deleteType = function(index) {
+
+						try {
+
+							var clType = types.getActiveClType(true);	// Param true tells method we're removing so a new active type needs assigning.
+							code.removeType(clType);
+
+							// The splice in getActiveClType should have deleted it from the active comic alreay. We're done.
+
+							return null;
+
+						}  catch(e) {
+
+							return e;
+						}
+					}
+
+					// Delete types.getActiveClType().data.methods[index].
+					// Remove from code.
+					self.deleteMethod = function(index) {
 
 						try {
 
@@ -586,7 +607,9 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.deleteMethod = function(clMethod) {
+					// Delete types.getActiveClType().data.properties[index].
+					// Remove from code.
+					self.deleteProperty = function(index) {
 
 						try {
 
@@ -599,20 +622,9 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.deleteProperty = function(clProperty) {
-
-						try {
-
-
-							return null;
-
-						}  catch(e) {
-
-							return e;
-						}
-					}
-
-					self.deleteEvent = function(clEvent) {
+					// Delete types.getActiveClType().data.events[index].
+					// Remove from code.
+					self.deleteEvent = function(index) {
 						
 						try {
 

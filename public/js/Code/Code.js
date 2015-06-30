@@ -135,22 +135,22 @@ define(["Core/errorHelper"],
 
 					// Remove type from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
-					self.removeType = function (type) {
+					self.removeType = function (clType) {
 
 						try {
 
 							// Remove the new.
-							var exceptionRet = m_functionRemove_Type_New(type);
+							var exceptionRet = m_functionRemove_Type_New(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 							// Remove properties.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < clType.data.properties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
-								var exceptionRet = m_functionRemove_Type_Property(type,
+								var propertyIth = clType.data.properties[i];
+								var exceptionRet = m_functionRemove_Type_Property(clType,
 									propertyIth);
 								if (exceptionRet) {
 
@@ -159,10 +159,10 @@ define(["Core/errorHelper"],
 							}
 
 							// Remove methods.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < clType.data.methods.length; i++) {
 
-								var methodIth = type.data.methods[i];
-								var exceptionRet = m_functionRemove_Type_Method(type,
+								var methodIth = clType.data.methods[i];
+								var exceptionRet = m_functionRemove_Type_Method(clType,
 									methodIth);
 								if (exceptionRet) {
 
@@ -181,7 +181,7 @@ define(["Core/errorHelper"],
 					};
 
 					// Return referencing method for the specified Type.
-					self.isTypeReferencedInWorkspace = function (type) {
+					self.isTypeReferencedInWorkspace = function (clType) {
 
 						try {
 
@@ -193,10 +193,10 @@ define(["Core/errorHelper"],
 							}
 
 							// Test if any of the properties are referenced.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < clType.data.properties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
-								var methodReferenced = m_functionIsReferenced_Type_Property(type,
+								var propertyIth = clType.data.properties[i];
+								var methodReferenced = m_functionIsReferenced_Type_Property(clType,
 									propertyIth);
 								if (methodReferenced) {
 
@@ -205,10 +205,10 @@ define(["Core/errorHelper"],
 							}
 
 							// Test if any of the methods are referenced.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < clType.data.methods.length; i++) {
 
-								var methodIth = type.data.methods[i];
-								var methodReferenced = m_functionIsReferenced_Type_Method(type,
+								var methodIth = clType.data.methods[i];
+								var methodReferenced = m_functionIsReferenced_Type_Method(clType,
 									methodIth);
 								if (methodReferenced) {
 
@@ -273,11 +273,11 @@ define(["Core/errorHelper"],
 
 					// Remove property from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
-					self.removeProperty = function (type, property) {
+					self.removeProperty = function (clType, property) {
 
 						try {
 
-							var exceptionRet = m_functionRemove_Type_Property(type,
+							var exceptionRet = m_functionRemove_Type_Property(clType,
 								property);
 							if (exceptionRet) {
 
@@ -350,11 +350,11 @@ define(["Core/errorHelper"],
 
 					// Remove method from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
-					self.removeMethod = function (type, method) {
+					self.removeMethod = function (clType, method) {
 
 						try {
 
-							var exceptionRet = m_functionRemove_Type_Method(type,
+							var exceptionRet = m_functionRemove_Type_Method(clType,
 								method);
 							if (exceptionRet) {
 
@@ -609,25 +609,25 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method removes a type's new_ constructor function.
-					var m_functionRemove_Type_New = function (type) {
+					var m_functionRemove_Type_New = function (clType) {
 
 						try {
 
 							////////////////////////
 							// Blocks.
 
-							delete self.blocks["new_" + type.data.name];
+							delete self.blocks["new_" + clType.data.name];
 
 							////////////////////////
 							// JavaScript.
-							delete self.javaScript["new_" + type.data.name];
+							delete self.javaScript["new_" + clType.data.name];
 
 							////////////////////////
 							// Schema.
 							if (self.schema &&
 								self.schema.Types) {
 
-								delete self.schema.Types[type.data.name];
+								delete self.schema.Types[clType.data.name];
 							}
 
 							return null;
@@ -774,12 +774,12 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method removes a type's new_ constructor function.
-					var m_functionRemove_Type_Property = function (type, property) {
+					var m_functionRemove_Type_Property = function (clType, property) {
 
 						try {
 
-							var strGet = type.data.name + "_get" + property.name;
-							var strSet = type.data.name + "_set" + property.name;
+							var strGet = clType.data.name + "_get" + property.name;
+							var strSet = clType.data.name + "_set" + property.name;
 
 							////////////////////////
 							// Blocks.
@@ -797,9 +797,9 @@ define(["Core/errorHelper"],
 							// Schema.
 							if (self.schema &&
 								self.schema.Types &&
-								self.schema.Types[type.data.name]) {
+								self.schema.Types[clType.data.name]) {
 
-								var objectType = self.schema.Types[type.data.name];
+								var objectType = self.schema.Types[clType.data.name];
 								delete objectType[strGet];
 								delete objectType[strSet];
 							}
@@ -967,11 +967,11 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method removes a type's new_ constructor function.
-					var m_functionRemove_Type_Method = function (type, method) {
+					var m_functionRemove_Type_Method = function (clType, method) {
 
 						try {
 
-							var strName = type.data.name + "_" + method.name;
+							var strName = clType.data.name + "_" + method.name;
 
 							////////////////////////
 							// Blocks.
@@ -987,9 +987,9 @@ define(["Core/errorHelper"],
 							// Schema.
 							if (self.schema &&
 								self.schema.Types &&
-								self.schema.Types[type.data.name]) {
+								self.schema.Types[clType.data.name]) {
 
-								var objectType = self.schema.Types[type.data.name];
+								var objectType = self.schema.Types[clType.data.name];
 								delete objectType[strName];
 							}
 
