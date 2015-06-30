@@ -39,7 +39,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 						    		var jq = this;
 						    		var parts = jq.context.id.split('-');
 						    		var j = parseInt(parts[1], 10);
-						    		self.activate(m_arrayPanels[j].url);
+						    		self.activate(m_arrayPanels[j].url, j);
 								}
 							);
 							if (exceptionRet) {
@@ -113,10 +113,15 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 					};
 
 					// Method sets the specified panel as the active panel and opens it in a new browser window.
-					self.activate = function (url) {
+					self.activate = function (url, index) {
 
 						try {
 
+							// Panel is strutured purposefully to size with small amount of black above and below the thumbnail.
+							// If any panel had already been selected, remove the red div from behind it and add a red div behind this activated one.
+							m_srComicsPanelStrip.repositionRedDivBehind(index);
+
+							// Open panel URL in new window (or same window if already open).
 							var strParams = 'outerWidth=WWW,outerHeight=HHH,screenLeft=LLL,screenTop=TTT,resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no';
 							strParams = strParams.replace('WWW', (window.outerWidth - 100).toString()).replace('HHH', (window.outerHeight - 100).toString())
 								.replace('LLL',(window.screenLeft-50).toString()).replace('TTT',(window.screenTop-50).toString());

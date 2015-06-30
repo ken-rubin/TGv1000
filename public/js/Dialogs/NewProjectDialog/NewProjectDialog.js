@@ -143,7 +143,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											ordinal: 0,
 											comicPanels: {
 												items: [
-													{name: "XYZ", url: "http://www.google.com", description: "descr", ordinal: 0, thumbnail: "tn1.png"}
+													{name: "XYZ", url: "http://www.google.com", description: "descr1", ordinal: 0, thumbnail: "tn1.png"},
+													{name: "ABC", url: "http://www.bing.com", description: "descr2", ordinal: 1, thumbnail: "tn2.jpg"}
 												]
 											},
 											types: {

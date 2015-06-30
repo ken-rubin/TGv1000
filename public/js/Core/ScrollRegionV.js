@@ -35,6 +35,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 try {
 
                     // Save state.
+                    m_strRootElementSelector = strRootElementSelector;
                     m_dHeight = dHeight;
                     m_dWidth = dWidth;
                     self.click = functionClick;
@@ -95,9 +96,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
-                    var jItem = $("<img data-toggle='tooltip' data-container='body' data-placement='right' title='" + strName + "' style='position:absolute;' id='" + 
+                    var jItem = $("<img data-toggle='tooltip' data-container='body' data-placement='right' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
-                        "' class='" + strImageClass + "'></img>");
+                        "' class='" + strImageClass + "'></img>"); // The 9999 z-index is so that a red div can be put behind an activated one, if desired.
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionOnNewImageLoaded);
@@ -120,6 +121,21 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     return e;
                 }
             };
+
+            //
+            self.repositionRedDivBehind = function (index) {
+
+                // If there already exists a red div, delete it.
+                $(m_strRootElementSelector + " #RedDiv").remove();
+
+                // Add a red div behind item[index]--which will have to be located.
+                // Height of div is m_dHeight. Width is m_dWidth.
+                var top = "top:" + (index * m_dHeight).toString() + "px;";
+                var height = "height:" + m_dHeight.toString() + "px;";
+                var width = "width:" + m_dWidth.toString() + "px;";
+                var jRedDiv = $("<div id='RedDiv' style='position:absolute;background-color:red;" + top + height + width + "z-index:100;' />");
+                m_jSlider.append(jRedDiv);
+            }
 
             // Update scroll region image.
             self.updateImage = function(selector, strName, strDescription, strUrl) {
@@ -660,6 +676,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             ///////////////////////////
             // Private fields.
 
+            // Save the outer selector.
+            var m_strRootElementSelector = null;
             // The base element--from the DOM.
             var m_jRoot = null;
             // The slider container.

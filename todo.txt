@@ -27,7 +27,6 @@ Jerry
 - Fix image positioning in ScrollRegion like I fixed it in ScrollRegionV. Most likely some hard-coded height, not the algorithm.
 - Fix Navbar. It shouldn't appear until I scroll near the top. Now it appears even if I scroll just a little from the bottom of the page.
 - New project is not clearing Designer or comic strip.
-- New project dialog: image, if loaded, can overwrite the three links next to it. Also, change those links to icons, but still fix image sizing.
 - If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
 
 
