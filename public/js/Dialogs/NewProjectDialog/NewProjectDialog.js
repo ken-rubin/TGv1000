@@ -365,10 +365,37 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											ordinal: 1,
 											comicPanels: {
 												items: [
-													{name: "XYZ", url: "http://www.techgroms.com", description: "descr1", ordinal: 0, thumbnail: "tn1.png"}
+													{name: "XYZ", url: "http://www.techgroms.com", description: "descr1", ordinal: 0, thumbnail: "tn3.png"}
 												]
 											},
-											types: { items: [] }
+											types: { 
+												items: [
+													{
+														isApp: true,
+														id: 0,
+														ordinal: 0,
+														tags: 'tagType',
+														dependencies: [],
+														name: "app",
+														imageResourceId: 0,
+														methods: [
+															{id: 0, name: "initialize", workspace: "", imageResourceId: 0, ordinal: 0, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method1", workspace: "", imageResourceId: 0, ordinal: 1, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2a", workspace: "", imageResourceId: 0, ordinal: 2, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2b", workspace: "", imageResourceId: 0, ordinal: 3, tags: "", createdByUserId: strUserId, price: 0},
+															{id: 0, name: "method2c", workspace: "", imageResourceId: 0, ordinal: 4, tags: "", createdByUserId: strUserId, price: 0}
+														],
+														properties: [
+															{id: 0, name: "property1", propType: "number", initialValue: "0", ordinal: 0},
+															{id: 0, name: "property2", propType: "number", initialValue: "0", ordinal: 1},
+															{id: 0, name: "property3", propType: "number", initialValue: "0", ordinal: 2}
+														],
+														events: [
+															{id: 0, name: "event1", ordinal: 0}
+														]
+													}
+												]
+											}
 										}
 									]
 								}

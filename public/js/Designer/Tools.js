@@ -45,6 +45,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 					self.empty = function () {
 
 						m_srToolStripV.empty();
+						m_arrayTools = [];
 					}
 
 					// Add tool to strip.
@@ -53,8 +54,13 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 						bInLoadLoop													// See types.load for comment about bInLoadLoop.
 						) 
 					{
-
 						try {
+
+							// For adding a single new Type (not in a load loop), we'll need to set iBase.
+							if (!bInLoadLoop && typeof iBase === 'undefined') {
+
+								iBase = m_arrayTools.length;
+							}
 
 							var clTool = new Tool();
 							var exceptionRet = clTool.load(clType);
