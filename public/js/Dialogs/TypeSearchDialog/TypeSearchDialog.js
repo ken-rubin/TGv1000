@@ -112,7 +112,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 
 							// Attach the region to the DOM.
 							m_scISImageStrip = new ScrollRegion();
-							var exceptionRet = m_scISImageStrip.create("#IStoolstrip",
+							var exceptionRet = m_scISImageStrip.create(
+								"#IStoolstrip",
 								100,
 								100,
 								function(){
@@ -213,11 +214,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 							        var rowIth = m_searchResultProcessedArray[i];
 
 							        // Add each processed image to the region.
-							        exceptionRet = m_scISImageStrip.addImage("carousel" + i.toString(),
+							        exceptionRet = m_scISImageStrip.addImage(
+							        	i,
+							        	"carousel" + i.toString(),
 							        	rowIth.name,
 							        	"",
 							        	rowIth.url,
-							        	'ScrollRegionImage');
+							        	'ScrollRegionImage',
+							        	null,
+							        	true);
 							        if (exceptionRet) {
 
 							        	throw exceptionRet;

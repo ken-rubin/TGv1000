@@ -78,7 +78,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								}
 
 								// Add the comic.
-								var exceptionRet = self.addItem(clComic);
+								var exceptionRet = self.addItem(clComic, i);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -103,17 +103,20 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 					};
 
 					// Add frame to comic strip.
-					self.addItem = function (clComic) {
+					self.addItem = function (clComic, iBase) {
 
 						try {
 
 							// Add to the DOM.
 							var exceptionRet = m_srComicStrip.addImage(
+								iBase,
 								"comicstp-" + m_arrayClComics.length.toString(),		// id
 								clComic.data.name,		// name
 								'',		// description
 								resourceHelper.toURL('comics', clComic.data.imageResourceId, '', ''),		// url
-								'comicstripitem'	// image class
+								'comicstripitem',	// image class
+								null,
+								true
 							);
 							if (exceptionRet) { throw exceptionRet; }
 

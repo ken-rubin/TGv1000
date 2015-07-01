@@ -1,19 +1,18 @@
 // Styles for the ScrollRegions.
 //
 
-.ScrollRegion
+.ScrollRegionRow                // This is the outer div. It holds .ScrollRegionLeft, .ScrollRegionSliderContainer and .ScrollRegionRight
 {
     position:absolute;
     left:5%;
     width:90%;
-//    height:100px;
     color:white;
     border: 1px solid black;
     border-radius: 4px;
     background: rgb(127,127,163);
 }
 
-.ScrollRegionSliderContainer
+.ScrollRegionSliderContainer    // this div holds .ScrollRegionSlider
 {
     position:absolute;
     left:40px;
@@ -27,7 +26,7 @@
     overflow: hidden;
 }
 
-.ScrollRegionSlider
+.ScrollRegionSlider             // this div holds images
 {
     position:absolute;
     left:0px;
