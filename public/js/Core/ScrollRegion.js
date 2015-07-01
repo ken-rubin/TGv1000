@@ -29,21 +29,26 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // strRootElementSelector - selector for DOM element.
             self.create = function (strRootElementSelector,
                 dWidth,
+                dHeight,
                 functionClick) {
 
                 try {
 
                     // Save state.
+                    m_strRootElementSelector = strRootElementSelector;
                     m_dWidth = dWidth;
-                    m_dEffectiveHeight = dWidth;    // everything's a square.
+                    m_dHeight = dHeight;
                     self.click = functionClick;
 
                     // Get j-reference to root element.
                     m_jRoot = $(strRootElementSelector);
+                    var strColHeight = (m_dHeight + 10).toString() + "px";
+                    m_jRoot.css("height", strColHeight);
 
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionSliderContainer' />");
-                    m_jSlider = $("<div class='ScrollRegionSlider' />");
+                    var strSliderHeight = m_dHeight.toString() + "px";
+                    m_jSlider = $("<div class='ScrollRegionSlider' style='height:" + strSliderHeight + "' />");
                     m_jLeft = $("<div class='ScrollRegionLeft'><span class='glyphicon glyphicon-chevron-left'></span></div>");
                     m_jRight = $("<div class='ScrollRegionRight'><span class='glyphicon glyphicon-chevron-right'></span></div>");
 
@@ -66,10 +71,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Cause the resize functionality to kick in.
                     m_functionResize();
 
-                    // Create tooltip.
-                    m_jTooltip = $("<div class='ScrollRegionTooltip' />");
-                    m_jRoot.append(m_jTooltip);
-
                     return null;
                     
                 } catch (e) {
@@ -81,12 +82,24 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Method adds new item to slider.
             //
             // jItem
-            self.addImage = function (strId, strName, strDescription, strResourceUrl, strImageClass, functionJItemCallBack) {
+            self.addImage = function (  iBase,                  // All params are required.
+                                        strId, 
+                                        strName, 
+                                        strDescription, 
+                                        strResourceUrl, 
+                                        strImageClass, 
+                                        functionJItemCallBack,
+                                        bInLoadLoop) 
+            {
 
                 try {
 
+                    m_bInLoadLoop = bInLoadLoop;
+
                     // Build the item.
-                    var jItem = $("<img id='" + strId + "' class='" + strImageClass + "' data-container='body' data-placement='bottom' data-toggle='tooltip' title='" + strName + "'></img>");
+                    var jItem = $("<img data-ibase='" + iBase + "' data-toggle='tooltip' data-container='body' data-placement='bottom' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
+                        strId + 
+                        "' class='" + strImageClass + "'></img>");
 
                     // Wire the load.  This is what adds the image to the DOM.
                     jItem.load(m_functionOnNewImageLoaded);
@@ -94,9 +107,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Wire the click.
                     jItem.click(m_functionImageClick);
 
-                    // Cause the load to be called.
-                    // Load is called whether or not
-                    // the image resource is cached.
                     jItem.attr("src",
                         strResourceUrl);
 
@@ -114,13 +124,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             };
 
             // Update scroll region image.
-            self.updateImage = function(selector, strUrl) {
+            self.updateImage = function(selector, strName, strDescription, strUrl) {
 
                 try {
 
                     var jItem = $(selector);
                     jItem.off('load');  // unbind the previous event handler or they'll all fire.
                     jItem.on('load', m_functionOnUpdatedImageLoaded);
+                    jItem.attr("title", strName);   // for the updated tooltip
                     jItem.attr("src", strUrl);
 
                     return null;
@@ -153,11 +164,44 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
+            // If a new Image was just added, it may be overflow-hidden.
+            self.functionMakeSureImageIsVisible = function(strSearchId) {
+
+                try {
+
+                    var iPxVisible = m_jSliderContainer.width();
+                    var iNumVisible = Math.floor(iPxVisible / m_dWidth);
+
+                    // Find index of image in m_arrayItems.
+                    var index = -1;
+                    for (var i = 0; i < m_arrayItems.length; i++) {
+
+                        if (m_arrayItems[i][0].id === strSearchId) {
+
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index > -1) {
+
+                        return m_functionAssureImageIsVisible(strSearchId);
+                    }
+
+                    return null;
+
+                } catch(e) {
+
+                    return e;
+                }
+            }
+
             ///////////////////////////
             // Private methods.
 
             // Invoked when an image is loaded.
             // Implemented to add image to DOM.
+            // The img has data-iBase to tell us where to position this, since we can come in in incorrect order due to asynchronicity.
             var m_functionOnNewImageLoaded = function () {
 
                 try {
@@ -166,24 +210,33 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     var jItem = $(this);
 
                     // Get position calculation base.
-                    var iBase = m_arrayItems.length;
+                    var iBase = parseInt(jItem.context.attributes['data-ibase'].value, 10);
 
-                    // Add to collection.
-                    m_arrayItems.push(jItem);
+                    // Add to collection--but we want it in position iBase.
+                    m_arrayItems.splice(iBase, 0, jItem);
 
                     var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
-                    if (exceptionRet) {
-
-                        throw exceptionRet;
-                    }
+                    if (exceptionRet) { throw exceptionRet; }
 
                     // Last, add to DOM, ...
                     m_jSlider.append(jItem);
-                    // ...and make room in the slider.
-                    m_jSlider.width((iBase + 1) * m_dWidth);
+                    // ...and make room in the slider if necessary. This is conditional, because we do things async so possibly out of order.
+                    // So it would otherwise be possible to shrink the slider width after it got big.
+                    var dSliderWidth = m_jSlider.width();
+                    var dSliderNewWidth = (iBase + 1) * m_dWidth;
+                    if (dSliderNewWidth > dSliderWidth) {
+
+                        m_jSlider.width(dSliderNewWidth);
+                    }
                     // ...and opt-in on the tooltip.
                     jItem.tooltip();
 
+                    // Make sure strip scrolls to show new image.
+                    if (!m_bInLoadLoop) {
+
+                        exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
+                        if (exceptionRet) { throw exceptionRet; }
+                    }
                 } catch (e) {
 
                     errorHelper.show(e);
@@ -203,10 +256,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         if (m_arrayItems[iBase][0].id === jItem[0].id) {
 
                             var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
-                            if (exceptionRet) {
+                            if (exceptionRet) { throw exceptionRet; }
 
-                                throw exceptionRet;
-                            }
+                            // Not sure if this applies in hor. scroll region like it does in vertical, but it should do no harm.
+                            // User may have selected an image, scrolled it out of sight and then changed it.
+                            // I want it to be seen in the strip.
+                            exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
+                            if (exceptionRet) { throw exceptionRet; }
 
                             break;
                         }
@@ -230,27 +286,33 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     if (dHeight > dWidth) {
 
                         // Position across whole height and center on width.
+                        // Remove bottom. It might have been left over from a previous image that was centered vertically.
+                        jItem.css("bottom", "");
                         jItem.css("top",
                             "0px");
                         jItem.css("height",
-                            m_dEffectiveHeight.toString() + "px");
+                            m_dHeight.toString() + "px");
                         var dItemWidth = m_dWidth * dWidth / dHeight;
                         jItem.css("width",
                             dItemWidth.toString() + "px");
-                        jItem.css("left",
-                            (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2).toString() + "px");
+                        var dWork = (iBase * m_dWidth + (m_dWidth - dItemWidth) / 2);
+                        jItem.css("margin-left",
+                            dWork.toString() + "px");
                     } else {
 
                         // Position across whole width and center on height.
-                        jItem.css("left",
+                        // Remove top. It might have been left over from a previous image that was centered vertically.
+                        jItem.css("top", "");
+                        jItem.css("margin-left",
                             (iBase * m_dWidth).toString() + "px");
                         jItem.css("width",
                             m_dWidth.toString() + "px");
-                        var dItemHeight = m_dEffectiveHeight * dHeight / dWidth;
+                        var dItemHeight = m_dHeight * dHeight / dWidth;
                         jItem.css("height",
                             dItemHeight.toString() + "px");
-                        jItem.css("top",
-                            ((m_dEffectiveHeight - dItemHeight) / 2).toString() + "px");
+                        var dWork = ((m_dHeight - dItemHeight) / 2);
+                        jItem.css("bottom",
+                            dWork.toString() + "px");
                     }
 
                     return null;
@@ -361,6 +423,64 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     errorHelper.show(e);
                 }
             };
+
+            // jItem with id strSearchId may or may not be visible. If not, scroll to make sure it is.
+            // This could involve scrolling left or right since it happens on new or updated image. 
+            var m_functionAssureImageIsVisible = function(strSearchId) {
+
+                try {
+
+                    var iIndexOfFirstFullyVisibleItem = Math.ceil((-1 * parseFloat(m_jSlider.css("left"))) / m_dWidth);
+                    var iNumFullyVisibleItems = Math.floor(m_jSliderContainer.width() / m_dWidth);
+                    var iIndexOfLastFullyVisibleItem = iIndexOfFirstFullyVisibleItem + iNumFullyVisibleItems - 1;
+
+                    var iIndexOfStrSearchIdItem = -1;
+                    for (var i = 0; i < m_arrayItems.length; i++) {
+
+                        if (m_arrayItems[i][0].id === strSearchId) {
+
+                            iIndexOfStrSearchIdItem = i;
+                            break;
+                        }
+                    }
+
+                    if (iIndexOfStrSearchIdItem === -1) {
+
+                        return null;    // give up
+                    }
+
+                    if (iIndexOfStrSearchIdItem >= iIndexOfFirstFullyVisibleItem && iIndexOfStrSearchIdItem <= iIndexOfLastFullyVisibleItem) {
+
+                        return null;    // item is already visible
+                    }
+
+                    // Calculate left that displays iIndexOfStrSearchIdItem. It's guaranteed not visible now.
+
+                    // There are 3 cases to check for:
+                    // (1) If there are at least iNumFullyVisibleItems items beyond iIndexOfStrSearchIdItem, position to iIndexOfStrSearchIdItem.
+                    // (2) If iIndexOfStrSearchIdItem is < iNumFullyVisibleItems, position to 0.
+                    // (3) Otherwise, position to m_arrayItems.length - iNumFullyVisibleItems;
+
+                    var iPositionToIndex = m_arrayItems.length - iNumFullyVisibleItems;     // Fall through case.
+                    if (m_arrayItems.length - iIndexOfStrSearchIdItem >= iNumFullyVisibleItems) {
+
+                        iPositionToIndex = iIndexOfStrSearchIdItem;
+                    
+                    } else if (iIndexOfStrSearchIdItem < iNumFullyVisibleItems) {
+
+                        iPositionToIndex = 0;
+                    }
+
+                    var dNewLeft = 0 - (m_dWidth * iPositionToIndex);
+                    m_jSlider.css("left", dNewLeft.toString() + "px");
+
+                    return null;
+
+                } catch(e) {
+
+                    return e;
+                }
+            }
 
             // Scroll right.
             var m_functionScrollRight = function () {
@@ -535,6 +655,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             ///////////////////////////
             // Private fields.
 
+            // Save the outer selector.
+            var m_strRootElementSelector = null;
             // The base element--from the DOM.
             var m_jRoot = null;
             // The slider container.
@@ -552,7 +674,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Width of item.
             var m_dWidth = 100;
             // Height of item.
-            var m_dEffectiveHeight = 88;
+            var m_dHeight = 88;
             // Initial scroll distance per step.
             var m_dIncrRoot = 0.8;
             // Scroll distance per step.
@@ -579,6 +701,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             var m_dTooltipHeightOffset = 2;
             // Cookie keeps track of tooltip callback staged on mouse move.
             var m_cookieTooltip = null;
+            // Used to prevent scrolling to right when loading an entire set images.
+            var m_bInLoadLoop = false;
         };
 
         // Return constructor function.

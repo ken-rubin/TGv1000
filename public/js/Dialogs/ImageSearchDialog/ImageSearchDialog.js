@@ -117,6 +117,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 							m_scISImageStrip = new ScrollRegion();
 							var exceptionRet = m_scISImageStrip.create("#IStoolstrip",
 								100,
+								100,
 								function(){
 
 						    		var jq = this;

@@ -34,6 +34,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 							var exceptionRet = m_srComicStrip.create(
 								"#comicstrip",		// inner row selector
 								80,					// item width
+								80,					// height
 								function() {		// functionClick
 						    		var jq = this;
 						    		var parts = jq.context.id.split('-');

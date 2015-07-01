@@ -10,7 +10,9 @@ Ken
 
 Jerry
 
-- Finish Save Project (as opposed to Save As).
+- Important: Make ScrollRegion use same logic as ScrollRegionV (i.e., specify h, w; drop outer div; do the iBase fix)
+- Maybe move comicstrip to a dialog and open on menu click.
+- Catch up on loading and saving project to DB.
 - Hungarian notation- m_setXxx -> m_functionSetXxx
 - Consider adding paging to (all?) search results; like 100 at a time. See code below.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 

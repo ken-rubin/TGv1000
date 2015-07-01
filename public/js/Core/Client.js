@@ -743,15 +743,12 @@ define(["Core/errorHelper",
 						if (m_clProject) {
 
 							m_clProject.setDirtyBool(bVal);
+							document.title = "TechGroms";
 							if (m_clProject.data.name.length > 0) {
 
-								document.title = m_clProject.data.name;
+								document.title = document.title + " / " + m_clProject.data.name;
 
-							} else {
-
-								document.title = "TechGroms";
 							}
-
 						} else {
 
 							document.title = "TechGroms";

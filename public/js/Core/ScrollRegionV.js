@@ -230,7 +230,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     // Add to collection--but we want it in position iBase.
                     m_arrayItems.splice(iBase, 0, jItem);
-                    // m_arrayItems.push(jItem);
 
                     var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
                     if (exceptionRet) { throw exceptionRet; }
@@ -254,7 +253,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
                         if (exceptionRet) { throw exceptionRet; }
                     }
-
                 } catch (e) {
 
                     errorHelper.show(e);
@@ -331,18 +329,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         jItem.css("left",
                             dWork.toString() + "px");
                     }
-
-                    // Fire bootstrap tooltip opt-in.
-
-
-
-
-
-
-
-
-
-
 
                     return null;
                 
