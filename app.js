@@ -8,6 +8,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var morgan = require("morgan");
 var lessMiddleware = require("less-middleware");
+var favicon = require('serve-favicon');
 
 /////////////////////////////////////
 console.log("Allocate application (express).");
@@ -26,6 +27,10 @@ app.use(bodyParser.json());
 console.log("Configure view folder (views) and view engine (jade).");
 app.set("views", __dirname + "/views");
 app.set("view engine", "jade");
+
+/////////////////////////////////////
+console.log("Configure favicon.");
+app.use(favicon(__dirname + '/public/favicon.ico'));
 
 /////////////////////////////////////
 console.log("Configure logger (morgan).");
