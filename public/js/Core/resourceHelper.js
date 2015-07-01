@@ -27,6 +27,7 @@ define(["Core/errorHelper"],
 						//		resources: return "resources/" + iResourceId + (strResourceType === "image" ? ".png" : ".mp3")
 						//		images: return "media/images/" + strResourceFilename
 						//		panels: return "media/panels/" + strResourceFilename
+						//		comics: return "media/comics/" + iResourceId + ".png" 
 
 						if (strResourceSource === "resources")
 							if (iResourceId > 0)
@@ -37,6 +38,8 @@ define(["Core/errorHelper"],
 							return "media/images/" + strResourceFilename;
 						else if (strResourceSource === "panels")
 							return "media/panels/" + strResourceFilename;
+						else if (strResourceSource === "comics")
+							return "media/comics/" + iResourceId + ".png";
 						else
 							throw new Error("Invalid call to toURL");
 					};

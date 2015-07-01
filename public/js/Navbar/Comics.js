@@ -34,7 +34,12 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 							var exceptionRet = m_srComicStrip.create(
 								"#comicstrip",		// inner row selector
 								80,					// item width
-								function() {}		// functionClick
+								function() {		// functionClick
+						    		var jq = this;
+						    		var parts = jq.context.id.split('-');
+						    		var j = parseInt(parts[1], 10);
+						    		m_arrayClComics[j].activate();
+								}
 							);
 							if (exceptionRet) {
 
@@ -103,10 +108,10 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 
 							// Add to the DOM.
 							var exceptionRet = m_srComicStrip.addImage(
-								"comicstp" + m_arrayClComics.length.toString(),		// id
+								"comicstp-" + m_arrayClComics.length.toString(),		// id
 								clComic.data.name,		// name
 								'',		// description
-								resourceHelper.toURL('resources', clComic.data.imageResourceId, 'image', ''),		// url
+								resourceHelper.toURL('comics', clComic.data.imageResourceId, '', ''),		// url
 								'comicstripitem'	// image class
 							);
 							if (exceptionRet) { throw exceptionRet; }
