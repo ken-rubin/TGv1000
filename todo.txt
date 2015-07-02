@@ -6,6 +6,7 @@ Ken
 
 - Finish Coder
 - Integrate Coder
+- I've screwed something up: when you drop a tool on the designer it draws it offset upwards by the distance down the toolstrip it was at.
 
 
 Jerry

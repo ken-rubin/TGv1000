@@ -42,8 +42,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                     // Get j-reference to root element.
                     m_jRoot = $(strRootElementSelector);
-                    var strColHeight = (m_dHeight + 10).toString() + "px";
-                    m_jRoot.css("height", strColHeight);
+                    var strRowHeight = (m_dHeight + 10).toString() + "px";  // Typically 100 + 10 for images.
+                    m_jRoot.css("height", strRowHeight);
 
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionSliderContainer' />");
