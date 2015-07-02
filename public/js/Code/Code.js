@@ -383,7 +383,13 @@ define(["Core/errorHelper"],
 
 						try {
 
-							// Wire up resize to resize the code window when the browser is.
+							// Wire up to reposition elements in the main window when the browser is resized.
+							// The main window has the following items:
+							//    (1) Vertical toolstrip on the left in a .col-xs-1. This is fixed in place (vertically) when scrolling.
+							//    (2) Designer and code .gzsections in the middle in a .col-xs-10.
+							//    (3) A .col-xs-1 on the right with two elements that also remain fixed vertically when scrolling:
+							//        (a) The narrow horizontal scrolling comicstrip
+							//        (b) The vertical comicpanelsstrip taking up most of the remaining height of the visible column.
 							$(window).resize(function () {
 
 								try {
@@ -394,15 +400,25 @@ define(["Core/errorHelper"],
 
 									var iBordersAndSpacingPadding = 70;
 
-									// Center the vertical toolstrip and panelstrip vertically in the viewport. It will remain fixed.
-									var iToolstripTop = $("#toolstrip").position().top;
-									$("#toolstrip").height(iViewportHeight - iToolstripTop * 2);
+									// Center the horizontal comicstrip in the viewport. It will remain vertically fixed.
+									$("#comicstrip").css("position", "fixed");
+									var iComicstripTop = 80;
+									$("#comicstrip").css("top", iComicstripTop.toString() + "px");
+									$("#comicstrip").width((iColXs1Width + 80).toString() + "px");
+									$("#comicstrip").css("margin-left", "-60px");
+
+									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.
+									var iToolstripTop = 80;
+									$("#toolstrip").css("top", iToolstripTop.toString() + "px");
+									$("#toolstrip").height((iViewportHeight - iToolstripTop - 60).toString() + "px");
 									var iToolstripWidth = $("#toolstrip").width();
 									var strToolstripLeft = ((iColXs1Width - iToolstripWidth) / 2).toString() + "px";
 									$("#toolstrip").css("margin-left", strToolstripLeft);
 									
-									var iComicPanelstripTop = $("#comicpanelstrip").position().top;
-									$("#comicpanelstrip").height(iViewportHeight - iComicPanelstripTop * 2);
+									// Position the fixed comicpanelstrip.
+									var iComicPanelstripTop = $("#comicstrip").position().top + $("#comicstrip").height() + 40;
+									$("#comicpanelstrip").css("top", iComicPanelstripTop.toString() + "px");
+									$("#comicpanelstrip").height((iViewportHeight - iComicPanelstripTop - 60 ).toString() + "px");
 									var iComicpanelstripWidth = $("#comicpanelstrip").width();
 									var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2).toString() + "px";
 									$("#comicpanelstrip").css("margin-left", strComicpanelstripLeft);

@@ -64,9 +64,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 								try {
 
 									var iViewportHeight = $(window).height();
-
 									var iNavbarHeight = $(".navbar").height();
-									var iBordersAndSpacingPadding = 26;
+									var iBordersAndSpacingPadding = 54;
 
 									var canvas = m_jCanvas[0];
 									m_jWrapper.height(iViewportHeight - 
