@@ -12,8 +12,11 @@ script(src="frameworks/miscellaneous/headroom.min.js")
 script(src="frameworks/miscellaneous/jQuery.headroom.min.js")
 script
     | var headroom = new Headroom(document.querySelector(".navbar-fixed-top"), {
-    |   "offset": 105,
-    |   "tolerance": 5
+    |   offset: 105,
+    |   tolerance: {
+    |        up: 100,
+    |        down: 5
+    |   }
     | });
     | headroom.init();
 script(src="frameworks/require/2.1.15/require.min.js", data-main="js/main.js")
