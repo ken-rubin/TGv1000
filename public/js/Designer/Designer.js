@@ -560,7 +560,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 		                    var strId = jHelper.attr("id");
 		                    var strSrc = jHelper.attr("src");
-		                    var strType = jHelper.attr("data-type");
+		                    var strType = jHelper.attr("data-type");	// This seems not to have been defined, but also it seems not to be used. Have Ken check.
 
 		                    // Allocate a new type.
 		                    var tiNew = new ToolInstance(strId,
