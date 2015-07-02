@@ -8,6 +8,10 @@ Ken
 - Integrate Coder
 - I've screwed something up: when you drop a tool on the designer it draws it offset upwards by the distance down the toolstrip it was at.
 - Related to the one above??? Check comment in Designer.js#m_functionDrop and fix/remove/whatever.
+- CLick on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
+     Will this be needed with Properties, Events?
+- Is the Dependencies array still needed in Type? In Type.js#self.load you have a comment: // process properties methods events and dependencies collections but no code to do so. At least not there.
+
 
 
 Jerry
@@ -28,6 +32,7 @@ Jerry
 - New project is not clearing Designer or comic strip. And more?
 - If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
 - When should I check that something is deletable? For example, for delete Type, why go to the dialog if deletion is going to be blocked because the Type is in the designer? What other entities does this apply to?
+- Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
 
 
 
@@ -35,7 +40,6 @@ To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?
 - After creating a new project, should we scroll the window down so TypeWell fills the window? Another option would be to scroll down if a tool is clicked (actually mouse-downed), but not dragged.
-
 
 
 

@@ -46,6 +46,15 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// process properties methods events and dependencies collections.
 
+
+
+
+
+
+
+
+							
+
 							return null;
 
 						} catch (e) {
