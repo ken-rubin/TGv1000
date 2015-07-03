@@ -92,16 +92,17 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					};
 
-					self.addMethod = function(clMethod) {
+//used
+					self.addMethod = function(method) {
 
 						try {
 
-							clMethod.data.ordinal = self.data.methods.length;
-							self.data.methods.push(clMethod.data);
+							method.ordinal = self.data.methods.length;
+							self.data.methods.push(method);
 
 							// Add the method to code.
-							var exceptionRet = code.addMethod(self.data, 
-								clMethod.data);
+							var exceptionRet = code.addMethod(self, 
+								method);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -115,16 +116,17 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					}
 
-					self.addProperty = function(clProperty) {
+//used
+					self.addProperty = function(property) {
 
 						try {
 
-							clProperty.data.ordinal = self.data.properties.length;
-							self.data.properties.push(clProperty.data);
+							property.ordinal = self.data.properties.length;
+							self.data.properties.push(property);
 
 							// Add the property to code.
-							var exceptionRet = code.addProperty(self.data, 
-								clProperty);
+							var exceptionRet = code.addProperty(self, 
+								property);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -138,16 +140,17 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					}
 
-					self.addEvent = function(clEvent) {
+//used
+					self.addEvent = function(event) {
 
 						try {
 
-							clEvent.data.ordinal = self.data.events.length;
-							self.data.events.push(clEvent.data);
+							event.ordinal = self.data.events.length;
+							self.data.events.push(event);
 
 							// Add the event to code.
-							var exceptionRet = code.addEvent(self.data, 
-								clEvent);
+							var exceptionRet = code.addEvent(self, 
+								event);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -162,6 +165,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					}
 
 					// Return the DOM element representing a prototypical item.
+//not used					
 					self.generateDOM = function () {
 
 						// Allocate the type.
@@ -309,6 +313,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// Private methods
 
 					// Helper method builds or rebuilds the type contents and replaces the types contents.
+//not used					
 					var m_functionGenerateTypeContents = function () {
 
 						// try {
@@ -515,12 +520,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						return null;
 					};
 
+//not used
 					var m_functionMainTGActionBtnClick = function() {
 
 						alert('got click on main TGAction btn');
 					}
 
 					// General handler to process a selection of a member.
+//not used					
 					var m_functionSelect = function (arrayActive, jMember) {
 
 						try {
@@ -557,6 +564,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Helper shows the delete dialog.
+//not used					
 					var m_functionDeleteDialogHelper = function (strType, arrayCollection, iIndex, objectMember) {
 
 						try {
@@ -675,6 +683,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Helper shows the rename dialog.
+//not used					
 					var m_functionRenameDialogHelper = function (strType, objectMember, bNew) {
 
 						try {
@@ -748,6 +757,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a type name is right-clicked.
+//not used					
 					var m_functionTypeContextMenu = function (invokedOn, selectedMenu) {
 
 						try {
@@ -783,6 +793,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					};
 
+//used
 					var m_functionOnGotResourceId = function (iResourceId) {
 
 						try {
@@ -791,13 +802,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 								// Save off the new resource in state.
 								self.data.imageResourceId = iResourceId;
-
-								// Cause type to regenerate.
-								// var exceptionRet = m_functionGenerateTypeContents();
-								// if (exceptionRet) {
-
-								// 	throw exceptionRet;
-								// }
 
 								// Call off to the designer to update the picture in the designer surface.
 								var exceptionRet = designer.updateImage(self);
@@ -824,6 +828,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when the add property button is clicked in this type.
+//not used					
 					var m_functionAddPropertyClick = function (e) {
 
 						try {
@@ -864,6 +869,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a property button is clicked in this type.
+//not used					
 					var m_functionPropertyClick = function (e) {
 
 						try {
@@ -876,6 +882,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a property button is right-clicked.
+//not used					
 					var m_functionPropertyContextMenu = function (invokedOn, selectedMenu) {
 
 						try {
@@ -923,6 +930,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when the add method button is clicked in this type.
+//not used					
 					var m_functionAddMethodClick = function (e) {
 
 						try {
@@ -950,6 +958,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a method button is clicked in this type.
+//not used					
 					var m_functionMethodClick = function (e) {
 
 						try {
@@ -971,6 +980,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a method button is right-clicked.
+//not used					
 					var m_functionMethodContextMenu = function (invokedOn, selectedMenu) {
 
 						try {
@@ -1018,6 +1028,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when the add event button is clicked in this type.
+//not used					
 					var m_functionAddEventClick = function (e) {
 
 						try {
@@ -1037,6 +1048,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a event button is clicked in this type.
+//not used					
 					var m_functionEventClick = function (e) {
 
 						try {
@@ -1058,6 +1070,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Invoked when a event button is right-clicked.
+//not used					
 					var m_functionEventContextMenu = function (invokedOn, selectedMenu) {
 
 						try {

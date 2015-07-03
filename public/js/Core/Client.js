@@ -327,6 +327,40 @@ define(["Core/errorHelper",
 
 						try {
 
+							// Figure out if this item is referenced anywhere
+							var methodReference = null;
+							var clActiveType = m_clProject.getActiveClType();
+							if (objectType === "type") {
+
+								methodReference = code.isTypeReferencedInWorkspace(clActiveType);
+
+							} else if (objectType === "property") {
+
+								methodReference = code.isPropertyReferencedInWorkspace(clActiveType, clActiveType.data.properties[index]);
+
+							} else if (objectType === "method") {
+
+								methodReference = code.isMethodReferencedInWorkspace(clActiveType, clActiveType.data.methods[index]);
+
+							} else if (objectType === "event") {
+
+								methodReference = code.isEventReferencedInWorkspace(clActiveType, clActiveType.data.events[index]);
+							}
+
+							// If a reference was found, report it and drop out.
+							if (methodReference) {
+
+								BootstrapDialog.alert({
+
+									title: "WARNING",
+									message: "Cannot delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
+									type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+									closable: true, // <-- Default value is false
+									draggable: true // <-- Default value is false
+								});
+								return;
+       						}
+
 							m_openDialog = new DeleteConfirmDialog();
 							var exceptionRet = m_openDialog.create(objectType, index);
 							if (exceptionRet) {
@@ -549,11 +583,11 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addPropertyToType = function (clProperty) {
+					self.addPropertyToType = function (property) {
 
 						try {
 
-							return types.getActiveClType.addProperty(clProperty);
+							return types.getActiveClType.addProperty(property);
 
 						} catch (e) {
 
@@ -561,11 +595,11 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addEventToType = function (clEvent) {
+					self.addEventToType = function (event) {
 
 						try {
 
-							return types.getActiveClType.addEvent(clEvent);
+							return types.getActiveClType.addEvent(event);
 
 						} catch (e) {
 

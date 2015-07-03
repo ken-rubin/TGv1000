@@ -181,15 +181,16 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					// Loop over all Types, indicate if the specified
 					// string is found in any of their workspaces.
 					// Returns the method referenced or null.
+//used					
 					self.isReferencedInWorkspace = function (strTest) {
 
 						// Loop over the collection of types.
 						for (var i = 0; i < m_arrayClTypes.length; i++) {
 
-							var typeIth = m_arrayClTypes[i];
+							var clTypeIth = m_arrayClTypes[i];
 
 							// Get the method which references the string, if any.
-							var methodReferenced = typeIth.isReferencedInWorkspace(strTest);
+							var methodReferenced = clTypeIth.isReferencedInWorkspace(strTest);
 							if (methodReferenced) {
 
 								return methodReferenced;

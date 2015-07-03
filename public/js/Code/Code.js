@@ -37,6 +37,7 @@ define(["Core/errorHelper"],
 					// Pulbic methods.
 
 					// Method adds a type to blockly.
+//used					
 					self.addType = function (clType) {
 
 						try {
@@ -181,12 +182,13 @@ define(["Core/errorHelper"],
 					};
 
 					// Return referencing method for the specified Type.
+//used
 					self.isTypeReferencedInWorkspace = function (clType) {
 
 						try {
 
 							// Test if the type-new function is referenced.
-							var methodReferenced = m_functionIsReferenced_Type_New(type);
+							var methodReferenced = m_functionIsReferenced_Type_New(clType);
 							if (methodReferenced) {
 
 								return methodReferenced;
@@ -216,6 +218,18 @@ define(["Core/errorHelper"],
 								}
 							}
 
+							// Test if any of the events are referenced.
+							for (var i = 0; i < clType.data.events.length; i++) {
+
+								var eventIth = clType.data.events[i];
+								var methodReferenced = m_functionIsReferenced_Type_Event(clType,
+									eventIth);
+								if (methodReferenced) {
+
+									return methodReferenced;
+								}
+							}
+
 							return null;
 						} catch (e) {
 
@@ -225,12 +239,13 @@ define(["Core/errorHelper"],
 					};
 
 					// Method adds a property to a type to blockly.
-					self.addProperty = function (type, property) {
+//used					
+					self.addProperty = function (clType, property) {
 
 						try {
 
 							// Add a new for the type.
-							var exceptionRet = m_functionAdd_Type_Property(type,
+							var exceptionRet = m_functionAdd_Type_Property(clType,
 								property);
 							if (exceptionRet) {
 
@@ -294,20 +309,29 @@ define(["Core/errorHelper"],
 						}
 					};
 
-					// Return referencing method for the specified property.
-					self.isPropertyReferencedInWorkspace = function (type, property) {
+					// Generic name reference checker
+//used - needs to be written					
+					self.isReferencedInWorkspace = function(strTest) {
 
-						return m_functionIsReferenced_Type_Property(type,
+						return null;
+					}
+
+					// Return referencing method for the specified property.
+//used
+					self.isPropertyReferencedInWorkspace = function (clType, property) {
+
+						return m_functionIsReferenced_Type_Property(clType,
 							property);
 					};
 
 					// Method adds a method to a type to blockly.
-					self.addMethod = function (type, method) {
+//used					
+					self.addMethod = function (clType, method) {
 
 						try {
 
 							// Add method for the type.
-							var exceptionRet = m_functionAdd_Type_Method(type,
+							var exceptionRet = m_functionAdd_Type_Method(clType,
 								method);
 							if (exceptionRet) {
 
@@ -372,11 +396,19 @@ define(["Core/errorHelper"],
 					};
 
 					// Return referencing method for the specified property.
-					self.isMethodReferencedInWorkspace = function (type, method) {
+//used
+					self.isMethodReferencedInWorkspace = function (clType, method) {
 
-						return m_functionIsReferenced_Type_Method(type,
+						return m_functionIsReferenced_Type_Method(clType,
 							method);
 					};
+
+//used
+					self.isEventReferencedInWorkspace = function (clType, event) {
+
+						return m_functionIsReferenced_Type_Event(clType,
+							event);
+					}
 
 					// Attach instance to DOM.
 					self.create = function () {
@@ -714,12 +746,13 @@ define(["Core/errorHelper"],
 
 					// Helper method determines if the type's new is referenced 
 					// anywhere.  Returns the referencing method if found.
-					var m_functionIsReferenced_Type_New = function (type) {
+//used					
+					var m_functionIsReferenced_Type_New = function (clType) {
 
 						try {
 
 							// Look for this:
-							var strLookFor = "new_" + type.data.name;
+							var strLookFor = "new_" + clType.data.name;
 
 							return types.isReferencedInWorkspace(strLookFor);
 						} catch (e) {
@@ -729,7 +762,8 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method adds a type's property accessor functions.
-					var m_functionAdd_Type_Property = function (type, property) {
+//used					
+					var m_functionAdd_Type_Property = function (clType, property) {
 
 						try {
 
@@ -740,7 +774,7 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strGetName = type.data.name + "_get" + property.name;
+							var strGetName = clType.data.name + "_get" + property.name;
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
 							////////////////////////
@@ -754,7 +788,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[clType.data.name];
 							objectType[strGetName] = true;
 
 
@@ -765,7 +799,7 @@ define(["Core/errorHelper"],
 
 							////////////////////////
 							// Blocks.
-							var strSetName = type.data.name + "_set" + property.name;
+							var strSetName = clType.data.name + "_set" + property.name;
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
 							////////////////////////
@@ -779,7 +813,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[clType.data.name];
 							objectType[strSetName] = true;
 
 							return null;
@@ -929,15 +963,16 @@ define(["Core/errorHelper"],
 						}
 					};
 
+//used
 					// Helper method determines if the type's new is referenced 
 					// anywhere.  Returns the referencing method if found.
-					var m_functionIsReferenced_Type_Property = function (type, property) {
+					var m_functionIsReferenced_Type_Property = function (clType, property) {
 
 						try {
 
 							// Look for this:
-							var strGetName = type.data.name + "_get" + property.name;
-							var strSetName = type.data.name + "_set" + property.name;
+							var strGetName = clType.data.name + "_get" + property.name;
+							var strSetName = clType.data.name + "_set" + property.name;
 
 							var methodReferenced = types.isReferencedInWorkspace(strGetName);
 							if (methodReferenced) {
@@ -945,6 +980,7 @@ define(["Core/errorHelper"],
 								return methodReferenced;
 							}
 							return types.isReferencedInWorkspace(strSetName);
+
 						} catch (e) {
 
 							return e;
@@ -952,13 +988,14 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method adds a type's method accessor functions.
-					var m_functionAdd_Type_Method = function (type, method) {
+//used					
+					var m_functionAdd_Type_Method = function (clType, method) {
 
 						try {
 
 							////////////////////////
 							// Blocks.
-							var strName = type.data.name + "_" + method.name;
+							var strName = clType.data.name + "_" + method.name;
 							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
 
 							////////////////////////
@@ -972,7 +1009,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[clType.data.name];
 							objectType[strName] = true;
 
 							return null;
@@ -1073,12 +1110,28 @@ define(["Core/errorHelper"],
 
 					// Helper method determines if the type's new is referenced 
 					// anywhere.  Returns the referencing method if found.
-					var m_functionIsReferenced_Type_Method = function (type, method) {
+//used					
+					var m_functionIsReferenced_Type_Method = function (clType, method) {
 
 						try {
 
 							// Look for this:
-							var strName = type.data.name + "_" + method.name;
+							var strName = clType.data.name + "_" + method.name;
+
+							return types.isReferencedInWorkspace(strName);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+//used					
+					var m_functionIsReferenced_Type_Event = function (clType, event) {
+
+						try {
+
+							// Look for this:
+							var strName = clType.data.name + "_" + event.name;
 
 							return types.isReferencedInWorkspace(strName);
 						} catch (e) {
