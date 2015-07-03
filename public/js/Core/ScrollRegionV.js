@@ -212,6 +212,39 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             }
 
+            self.removeImage = function (strName, index) {
+
+                try {
+
+                    // Delete the image.
+                    $("#tool-" + client.removeSpaces(strName)).remove();
+
+                    if (index < m_arrayItems.length - 1) {
+
+                        // Go through the remaining (lower) images and reduce top of each by m_dHeight.
+                        for (var i = index + 1; i < m_arrayItems.length; i++) {
+
+                            var jItemIth = m_arrayItems[i];
+                            var dTop = jItemIth.position().top - m_dHeight;
+                            jItemIth.css("top", dTop.toString() + "px");
+                        }
+                    }
+
+                    // Shorten m_jSlider
+                    var curHeight = m_jSlider.height();
+                    m_jSlider.height(curHeight - m_dHeight);
+
+                    // Remove from array
+                    m_arrayItems.splice(index, 1);
+
+                    return null;
+                
+                } catch(e) {
+
+                    return e;
+                }
+            }
+
             ///////////////////////////
             // Private methods.
 

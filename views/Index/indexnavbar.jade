@@ -16,7 +16,7 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand(href="/") #{title}
+      a.navbar-brand(href="/" style='color:white;') #{title}
 
     //- Main project buttons.
     .collapse.navbar-collapse#navbarCollapse
@@ -24,7 +24,9 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
 
         //- Projects.
         li.active.dropdown
-          a.dropdown-toggle(href="#", data-toggle="dropdown") Projects 
+          a.dropdown-toggle(href="#", data-toggle="dropdown")
+            span.glyphicon.glyphicon-list-alt
+            | &nbsp;Projects 
             ul.dropdown-menu
               li#NewProjectLI
                 a#NewProjectButton(href="#") New Project...
@@ -41,7 +43,9 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
 
         //- Themes.
         li.active.dropdown
-          a.dropdown-toggle(href="#", data-toggle="dropdown") Themes 
+          a.dropdown-toggle(href="#", data-toggle="dropdown") 
+            span.glyphicon.glyphicon-picture
+            | &nbsp;Themes 
             ul.dropdown-menu
               li.enabled
                 a#UnicornButton(href="#") Unicorn
@@ -50,4 +54,6 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
         
         //- Adminzone will eventually be hidden to non-admin users
         li.active
-          a#AdminzoneButton Adminzone
+          a#AdminzoneButton
+            span.glyphicon.glyphicon-cog
+            | &nbsp;Adminzone

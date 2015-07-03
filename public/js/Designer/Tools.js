@@ -62,8 +62,8 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 								iBase = m_arrayTools.length;
 							}
 
-							var clTool = new Tool();
-							var exceptionRet = clTool.load(clType);
+							var tool = new Tool();
+							var exceptionRet = tool.load(clType);
 							if (exceptionRet) { return exceptionRet; }
 
 							// Add to the DOM.
@@ -85,7 +85,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 							if (exceptionRet) {	throw exceptionRet; }
 
 							// Also add to the collection of comics.
-							m_arrayTools.push(clTool);
+							m_arrayTools.push(tool);
 
 							// Wire up the dragability of the tool.
 		                    jItem.draggable({
@@ -112,7 +112,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 					};
 
 					// Remove item from DOM and state.
-					self.removeItem = function (type) {
+					self.removeItem = function (clType) {
 
 						try {
 
@@ -120,13 +120,13 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 							for (var i = 0; i < m_arrayTools.length; i++) {
 
 								// Splice on match.
-								if (m_arrayTools[i].data.type === type) {
+								if (m_arrayTools[i].type.name === clType.data.name) {
 
 									// Get the tool.
-									var clToolIth = m_arrayTools[i];
+									var toolIth = m_arrayTools[i];
 
 									// Remove form GUI.
-									var exceptionRet = clToolIth.destroy();
+									var exceptionRet = m_srToolStripV.removeImage(clType.data.name, i);
 									if (exceptionRet) {	throw exceptionRet; }
 
 									// Remove from collection.
@@ -134,6 +134,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 									break;
 								}
 							}
+
 							return null;
 
 						} catch (e) {

@@ -329,7 +329,7 @@ define(["Core/errorHelper",
 
 							// Figure out if this item is referenced anywhere
 							var methodReference = null;
-							var clActiveType = m_clProject.getActiveClType();
+							var clActiveType = types.getActiveClType();
 							if (objectType === "type") {
 
 								methodReference = code.isTypeReferencedInWorkspace(clActiveType);
@@ -538,11 +538,11 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addMethodToType = function (clMethod) {
+					self.addMethodToType = function (method) {
 
 						try {
 
-							return types.getActiveClType.addMethod(clMethod);
+							return types.getActiveClType().addMethod(method);
 
 						} catch (e) {
 
@@ -564,9 +564,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var clMethod = new Method();
-									clMethod.load(data.method);
-									return types.getActiveClType.addMethod(clMethod);
+									return types.getActiveClType().addMethod(data.method);
 
 								} else {
 
@@ -587,7 +585,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							return types.getActiveClType.addProperty(property);
+							return types.getActiveClType().addProperty(property);
 
 						} catch (e) {
 
@@ -599,7 +597,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							return types.getActiveClType.addEvent(event);
+							return types.getActiveClType().addEvent(event);
 
 						} catch (e) {
 
@@ -609,14 +607,18 @@ define(["Core/errorHelper",
 
 					// Delete types.getActiveClType() from ???
 					// Remove from code, toolstrip, designer, etc.
-					self.deleteType = function(index) {
+					self.deleteType = function() {
 
 						try {
 
 							var clType = types.getActiveClType(true);	// Param true tells method we're removing so a new active type needs assigning.
-							code.removeType(clType);
+							var exceptionRet = code.removeType(clType);
+							if (exceptionRet) { return exceptionRet; }
 
-							// The splice in getActiveClType should have deleted it from the active comic alreay. We're done.
+							// clType has been returned so we can now remove it from tools. It has already been spliced out of project.comic.types.
+							// This will remove it from the tools strip and tidy that up (height of Slider, etc.).
+							exceptionRet = tools.removeItem(clType);
+							if (exceptionRet) { return exceptionRet; }
 
 							return null;
 

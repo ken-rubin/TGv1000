@@ -78,6 +78,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Destroy this instance.
+//not used					
 					self.destroy = function () {
 
 						try {

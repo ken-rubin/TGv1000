@@ -27,21 +27,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Load up tool.
-					self.destroy = function () {
-
-						try {
-
-							// Remove from GUI/DOM.
-							m_jTool.remove();
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Load up tool.
 					self.load = function (clType) {
 
 						try {
@@ -55,21 +40,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							return e;
 						}
 					};
-
-					// Return the DOM element representing a prototypical tool item.
-					// self.generateDOM = function () {
-
-					// 	m_jTool = $("<img class='toolstripitem' id='" + 
-					// 		client.removeSpaces(self.type.data.name) + 
-					// 		"' src='" +
-					// 	 	resourceHelper.toURL('resources', self.type.data.imageResourceId, 'image') + 
-					// 	 	"' data-resourceid='" +
-					// 	 	self.type.data.imageResourceId+ 
-					// 	 	"' data-type='" + 
-					// 	 	self.type.data.name + "' style='width:55px;'></img>");
-
-					// 	return m_jTool;
-					// };
 
 					// Type image has changed, update tool.
 					self.updateImage = function () {
@@ -87,8 +57,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							// Update the resourceId and src attributes on the DOM.
-							//jToolDOM.attr("data-resourceid",
-							//	self.type.imageResourceId);
 							jToolDOM.attr("src",
 							 	resourceHelper.toURL('resources', self.type.imageResourceId, 'image'));
 

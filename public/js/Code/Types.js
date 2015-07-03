@@ -228,7 +228,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					};
 
 					// Remove item from DOM and state.
-					self.removeItem = function (type) {
+					self.removeItem = function (clType) {
 
 						try {
 
@@ -236,7 +236,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
 								// Splice on match.
-								if (m_arrayClTypes[i] === type) {
+								if (m_arrayClTypes[i] === clType) {
 
 									m_arrayClTypes.splice(i, 1);
 									break;
@@ -244,14 +244,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							}
 
 							// Remove form GUI.
-							var exceptionRet = type.destroy();
+							var exceptionRet = clType.destroy();
 							if (exceptionRet) {
 
 								throw exceptionRet;
 							}
 
 							// Remove from tools.
-							return tools.removeItem(type);
+							return tools.removeItem(clType);
 
 						} catch (e) {
 
@@ -345,7 +345,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// if the one being deleted was the last one, we'll go up one.
 							for (var i = 0; i < m_arrayClTypes.length; i++)	{
 
-								if (m_arrayClTypes[i].data.id === m_clTypeActive.data.id) {
+								if (m_arrayClTypes[i].data.name === m_clTypeActive.data.name) {
 
 									if (i === m_arrayClTypes.length - 1) {
 

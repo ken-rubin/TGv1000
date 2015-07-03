@@ -136,6 +136,7 @@ define(["Core/errorHelper"],
 
 					// Remove type from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
+//used					
 					self.removeType = function (clType) {
 
 						try {
@@ -165,6 +166,18 @@ define(["Core/errorHelper"],
 								var methodIth = clType.data.methods[i];
 								var exceptionRet = m_functionRemove_Type_Method(clType,
 									methodIth);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+							}
+
+							// Remove events.
+							for (var i = 0; i < clType.data.events.length; i++) {
+
+								var eventIth = clType.data.events[i];
+								var exceptionRet = m_functionRemove_Type_Event(clType,
+									eventIth);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -452,7 +465,7 @@ define(["Core/errorHelper"],
 									$("#comicpanelstrip").css("top", iComicPanelstripTop.toString() + "px");
 									$("#comicpanelstrip").height((iViewportHeight - iComicPanelstripTop - 60 ).toString() + "px");
 									var iComicpanelstripWidth = $("#comicpanelstrip").width();
-									var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2).toString() + "px";
+									var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2 - 40).toString() + "px";
 									$("#comicpanelstrip").css("margin-left", strComicpanelstripLeft);
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
@@ -824,6 +837,7 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method removes a type's new_ constructor function.
+//used					
 					var m_functionRemove_Type_Property = function (clType, property) {
 
 						try {
@@ -1119,6 +1133,45 @@ define(["Core/errorHelper"],
 							var strName = clType.data.name + "_" + method.name;
 
 							return types.isReferencedInWorkspace(strName);
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method removes a type's new_ constructor function.
+//used					
+					var m_functionRemove_Type_Event = function (clType, event) {
+
+						try {
+
+							// var strGet = clType.data.name + "_get" + property.name;
+							// var strSet = clType.data.name + "_set" + property.name;
+
+							// ////////////////////////
+							// // Blocks.
+
+							// delete self.blocks[strGet];
+							// delete self.blocks[strSet];
+
+							// ////////////////////////
+							// // JavaScript.
+
+							// delete self.javaScript[strGet];
+							// delete self.javaScript[strSet];
+
+							// ////////////////////////
+							// // Schema.
+							// if (self.schema &&
+							// 	self.schema.Types &&
+							// 	self.schema.Types[clType.data.name]) {
+
+							// 	var objectType = self.schema.Types[clType.data.name];
+							// 	delete objectType[strGet];
+							// 	delete objectType[strSet];
+							// }
+
+							return null;
 						} catch (e) {
 
 							return e;
