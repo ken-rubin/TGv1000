@@ -143,7 +143,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							if (m_strObjectType === 'type') {
 
-								exceptionRet = client.deleteType();	//types.getActiveClType());
+								exceptionRet = client.deleteType();				//types.getActiveClType());
 
 							} else if (m_strObjectType === 'method') {
 

@@ -228,6 +228,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					};
 
 					// Remove item from DOM and state.
+//not used					
 					self.removeItem = function (clType) {
 
 						try {
@@ -366,6 +367,51 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						return clType;
 					}
 
+					// Called by client after confirmation by user.
+//used
+					self.deleteMethod = function (index) {
+
+						try {
+
+							m_clTypeActive.data.methods.splice(index, 1);
+							return m_functionRegenTWMethodsTable();
+						
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					// Called by client after confirmation by user.
+//used
+					self.deleteProperty = function (index) {
+
+						try {
+
+							m_clTypeActive.data.properties.splice(index, 1);
+							return m_functionRegenTWPropertiesTable();
+						
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					// Called by client after confirmation by user.
+//used
+					self.deleteEvent = function (index) {
+
+						try {
+
+							m_clTypeActive.data.events.splice(index, 1);
+							return m_functionRegenTWEventsTable();
+						
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////////
 					// Private methods.
 
@@ -374,63 +420,27 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
-							if (m_clTypeActive) {	// There will actually always be an active type.
+							$("#TWtypeName").text(m_clTypeActive.data.name);
+							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
 
-								$("#TWtypeName").text(m_clTypeActive.data.name);
-								$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
+							if (m_clTypeActive.data.isApp) {
 
-								if (m_clTypeActive.data.isApp) {
+								$("#TWdeleteTypeBtn").prop("disabled", true);
 
-									$("#TWdeleteTypeBtn").prop("disabled", true);
+							} else {
 
-								} else {
-
-									$("#TWdeleteTypeBtn").prop("disabled", false);
-								}
-
-								var strBuild;
-								// Methods
-								$("#TWmethodsTbody").empty();
-								for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
-
-									var m = m_clTypeActive.data.methods[i];
-									if (m.name === 'initialize') {
-										strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"></td><td style="width:8%;"></td></tr>';
-										$("#TWmethodsTbody").append(strBuild);
-										$("#method_" + i).click(m_functionMethodClicked);
-									} else {
-										strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
-										$("#TWmethodsTbody").append(strBuild);
-										$("#method_" + i).click(m_functionMethodClicked);
-										$("#methodrename_" + i).click(m_functionMethodRenameClicked);
-										$("#methoddelete_" + i).click(m_functionMethodDeleteClicked);
-									}
-								};
-
-								// Properties
-								$("#TWpropertiesTbody").empty();
-								for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
-
-									var m = m_clTypeActive.data.properties[i];
-									strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
-									$("#TWpropertiesTbody").append(strBuild);
-									$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
-									$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
-								};
-
-								// Events
-								$("#TWeventsTbody").empty();
-								for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
-
-									var m = m_clTypeActive.data.events[i];
-									strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
-									$("#TWeventsTbody").append(strBuild);
-									$("#eventrename_" + i).click(m_functionEventRenameClicked);
-									$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
-								};
+								$("#TWdeleteTypeBtn").prop("disabled", false);
 							}
 
-							$("#TypeWell .btn-default").tooltip();
+							var exceptionRet = m_functionRegenTWMethodsTable();
+							if (exceptionRet) { return exceptionRet; }
+
+							var exceptionRet = m_functionRegenTWPropertiesTable();
+							if (exceptionRet) { return exceptionRet; }
+
+							var exceptionRet = m_functionRegenTWEventsTable();
+							if (exceptionRet) { return exceptionRet; }
+
 							// var jqTWimage = $("#TWimage");
 							// jqTWimage.data("tooltip", false);
 							// jqTWimage.tooltip({title: m_clTypeActive.data.name});
@@ -441,6 +451,82 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						} catch(e) {
 
 							return e;
+						}
+					}
+
+//used
+					var m_functionRegenTWMethodsTable = function () {
+
+						try {
+
+							var strBuild;
+							$("#TWmethodsTbody").empty();
+							for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
+
+								var m = m_clTypeActive.data.methods[i];
+								if (m.name === 'initialize') {
+									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"></td><td style="width:8%;"></td></tr>';
+									$("#TWmethodsTbody").append(strBuild);
+									$("#method_" + i).click(m_functionMethodClicked);
+								} else {
+									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+									$("#TWmethodsTbody").append(strBuild);
+									$("#method_" + i).click(m_functionMethodClicked);
+									$("#methodrename_" + i).click(m_functionMethodRenameClicked);
+									$("#methoddelete_" + i).click(m_functionMethodDeleteClicked);
+								}
+							};
+							$("#TWmethodsTbody .btn-default").tooltip();
+
+						} catch (e) { 
+
+							return e; 
+						}
+					}
+
+//used
+					var m_functionRegenTWPropertiesTable = function () {
+
+						try {
+
+							var strBuild;
+							$("#TWpropertiesTbody").empty();
+							for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
+
+								var m = m_clTypeActive.data.properties[i];
+								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+								$("#TWpropertiesTbody").append(strBuild);
+								$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
+								$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
+							};
+							$("#TWpropertiesTbody .btn-default").tooltip();
+
+						} catch (e) { 
+
+							return e; 
+						}
+					}
+
+//used
+					var m_functionRegenTWEventsTable = function () {
+
+						try {
+
+							var strBuild;
+							$("#TWeventsTbody").empty();
+							for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
+
+								var m = m_clTypeActive.data.events[i];
+								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+								$("#TWeventsTbody").append(strBuild);
+								$("#eventrename_" + i).click(m_functionEventRenameClicked);
+								$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
+							};
+							$("#TWeventsTbody .btn-default").tooltip();
+
+						} catch (e) { 
+
+							return e; 
 						}
 					}
 

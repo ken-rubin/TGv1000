@@ -607,6 +607,7 @@ define(["Core/errorHelper",
 
 					// Delete types.getActiveClType() from ???
 					// Remove from code, toolstrip, designer, etc.
+//used					
 					self.deleteType = function() {
 
 						try {
@@ -630,12 +631,12 @@ define(["Core/errorHelper",
 
 					// Delete types.getActiveClType().data.methods[index].
 					// Remove from code.
+//used					
 					self.deleteMethod = function(index) {
 
 						try {
 
-
-							return null;
+							return types.deleteMethod(index);
 
 						}  catch(e) {
 
@@ -645,12 +646,12 @@ define(["Core/errorHelper",
 
 					// Delete types.getActiveClType().data.properties[index].
 					// Remove from code.
+//used					
 					self.deleteProperty = function(index) {
 
 						try {
 
-
-							return null;
+							return types.deleteProperty(index);
 
 						}  catch(e) {
 
@@ -660,12 +661,12 @@ define(["Core/errorHelper",
 
 					// Delete types.getActiveClType().data.events[index].
 					// Remove from code.
+//used					
 					self.deleteEvent = function(index) {
 						
 						try {
 
-
-							return null;
+							return types.deleteEvent(index);
 
 						}  catch(e) {
 
