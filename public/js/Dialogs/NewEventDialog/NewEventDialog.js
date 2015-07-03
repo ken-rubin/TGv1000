@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Event"], 
-	function (snippetHelper, errorHelper, resourceHelper, Event) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
 
