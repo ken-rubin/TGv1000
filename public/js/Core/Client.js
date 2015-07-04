@@ -538,11 +538,24 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.addMethodToType = function (method) {
+//used
+					self.addMethodToActiveType = function (method) {
 
 						try {
 
-							return types.getActiveClType().addMethod(method);
+							var activeClMethod = types.getActiveClType();
+							method.ordinal = activeClMethod.data.methods.length;
+							activeClMethod.data.methods.push(method);
+
+							// Add the method to code.
+							var exceptionRet = code.addMethod(activeClMethod, 
+								method);
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = types.regenTWMethodsTable();
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Now do something to scroll the methods grid to the bottom.
 
 						} catch (e) {
 

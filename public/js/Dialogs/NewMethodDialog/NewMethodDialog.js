@@ -68,6 +68,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            buttons: [
 					            	{
 					            		label: "Create Method",
+					            		id: 'CreateMethodBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
@@ -108,74 +109,57 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 							$("#MethodName").focus();
 
+							$("#MethodName").blur(m_functionBlurMethodName);
+
+							m_setStateCreateBtn();
+
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
 
+					var m_functionBlurMethodName = function() {
+
+							m_setStateCreateBtn();
+					}
+
+					var m_setStateCreateBtn = function() {
+
+						var nameStatus = $("#MethodName").val().trim().length > 0;
+						var imgStatus = m_imageResourceId > 0;
+
+						if (!nameStatus || !imgStatus) {
+							$("#CreateMethodBtn").addClass("disabled");
+						} else {
+							$("#CreateMethodBtn").removeClass("disabled");
+						}
+					}
+
 					var m_functionCreateMethod = function () {
 
 						try {
 
-							// Create minimal Method based on the new Method dialog's fields--or lack thereof.
-							// Call client to inject it throughout.
-							// var Method = 
-							// {
-							// 	name: $("#MethodName").val() || '',
-							// 	id: 0,
-							// 	description: $("#MethodDescription").val() || '',
-							// 	tags: $("#MethodTags").val() || '',
-							// 	imageResourceId: m_imageResourceId,
-							// 	price: 0,
-							// 	createdByUserId: client.getTGCookie('userId'),
-							// 	isDirty: $("#MethodName").val().trim().length > 0 || $("#MethodDescription").val().trim().length > 0 || $("#MethodTags").val().trim().length > 0 || m_imageResourceId > 0,
-							// 	comics: {
-							// 		items: [{
-							// 			imageResourceId: 0,
-							// 			id: 0,
-							// 			name: 'default',
-							// 			tags: 'tagComic',
-							// 			ordinal: 0,
-							// 			types: {
-							// 				items: [
-							// 					{
-							// 						isApp: true,
-							// 						id: 0,
-							// 						ordinal: 0,
-							// 						tags: 'tagType',
-							// 						properties: [{name: "property1", propType: "number", initialValue: "0"}],
-							// 						methods: [{ name: "initialize", workspace: "", method: "" },{ name: "method1", workspace: "", method: "" },{ name: "method2", workspace: "", method: "" },{ name: "method3", workspace: "", method: "" }],
-							// 						events: [{name: "event1", handler: "method1"}],
-							// 						dependencies: [],
-							// 						name: "app",
-							// 						imageResourceId: 0
-							// 					},
-							// 					{
-							// 						isApp: false,
-							// 						id: 0,
-							// 						ordinal: 1,
-							// 						tags: 'tagType1',
-							// 						properties: [],
-							// 						methods: [],
-							// 						events: [],
-							// 						dependencies: [],
-							// 						name: "Type1",
-							// 						imageResourceId: 0
-							// 					}
-							// 				]
-							// 			}
-							// 		}]
-							// 	}
-							// };
+							// Create Method based on the new Method dialog's fields--or lack thereof.
+							// Call client to inject it.
+							var method = 
+							{
+								name: $("#MethodName").val() || '',
+								workspace: "",
+								method: "",
+								imageResourceId: m_imageResourceId,
+								ordinal: 0,
+								price: 0.0,
+								description: $("#MethodDescription").val() || ''
+							};
 
-							// var exceptionRet = client.functionNewMethod(Method);
-							// if (exceptionRet) {
+							var exceptionRet = client.addMethodToActiveType(method);
+							if (exceptionRet) {
 
-							// 	throw exceptionRet;
-							// }
+								throw exceptionRet;
+							}
 
-							// m_dialog.close();
+							m_dialog.close();
 
 						} catch (e) {
 
@@ -234,6 +218,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						m_imageResourceId = imageResourceId;
 						$("#MethodImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						m_setStateCreateBtn();
 					}
 				} catch (e) {
 

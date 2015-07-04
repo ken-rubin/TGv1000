@@ -94,30 +94,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 //used
-					self.addMethod = function(method) {
-
-						try {
-
-							method.ordinal = self.data.methods.length;
-							self.data.methods.push(method);
-
-							// Add the method to code.
-							var exceptionRet = code.addMethod(self, 
-								method);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}
-
-//used
 					self.addProperty = function(property) {
 
 						try {

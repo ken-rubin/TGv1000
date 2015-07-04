@@ -33,6 +33,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							$("#TWdeleteTypeBtn").click(m_functionClickTWdeleteTypeLink);
 							$("#TWnewTypeBtn").click(m_functionClickTWnewTypeLink);
 							$("#TWsearchTypeBtn").click(m_functionClickTWsearchTypeLink);
+							$("#TWRenameTypeLink").click(m_functionClickTWrenameTypeLink);
 							$("#TWaddMethodBtn").click(m_functionClickTWnewMethod);
 							$("#TWsearchMethodBtn").click(m_functionClickTWsearchMethod);
 							$("#TWaddPropertyBtn").click(m_functionClickTWnewProperty);
@@ -412,6 +413,48 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
+					// Called by client after adding.
+//used
+					self.regenTWMethodsTable = function () {
+
+						try {
+
+							return m_functionRegenTWMethodsTable();
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					// Called by client after adding.
+//used
+					self.regenTWPropertiesTable = function () {
+
+						try {
+
+							return m_functionRegenTWPropertiesTable();
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					// Called by client after adding.
+//used
+					self.regenTWEventsTable = function () {
+
+						try {
+
+							return m_functionRegenTWEventsTable();
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////////
 					// Private methods.
 
@@ -419,6 +462,17 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionSetUpTheWell = function() {
 
 						try {
+
+							//////////////////////////////////////////////////////////////////
+							// The following will be removed as I implement the functionality:
+
+							$("#TWsearchTypeBtn").prop("disabled", true);
+							$("#TWRenameTypeLink").prop("disabled", true);
+							$("#TWsearchMethodBtn").prop("disabled", true);
+							$("#TWaddPropertyBtn").prop("disabled", true);
+							$("#TWaddEventBtn").prop("disabled", true);
+
+							//////////////////////////////////////////////////////////////////
 
 							$("#TWtypeName").text(m_clTypeActive.data.name);
 							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
@@ -469,7 +523,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									$("#TWmethodsTbody").append(strBuild);
 									$("#method_" + i).click(m_functionMethodClicked);
 								} else {
-									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+									// Remove 'disabled' in following when Rename Method is implemented.
+									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button disabled class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 									$("#TWmethodsTbody").append(strBuild);
 									$("#method_" + i).click(m_functionMethodClicked);
 									$("#methodrename_" + i).click(m_functionMethodRenameClicked);
@@ -494,7 +549,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 								var m = m_clTypeActive.data.properties[i];
-								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+								// Remove 'disabled' in following when Edit Property is implemented.
+								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button disabled class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 								$("#TWpropertiesTbody").append(strBuild);
 								$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
 								$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
@@ -517,7 +573,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 								var m = m_clTypeActive.data.events[i];
-								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+								// Remove 'disabled' in following when Rename Event is implemented.
+								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button disabled class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 								$("#TWeventsTbody").append(strBuild);
 								$("#eventrename_" + i).click(m_functionEventRenameClicked);
 								$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
@@ -766,6 +823,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							errorHelper.show(e);
 						}
 					}
+
+					var m_functionClickTWrenameTypeLink = function () {}
 
 					var m_functionClickTWnewMethod = function () {
 
