@@ -6,12 +6,10 @@ Ken
 
 - Finish Coder
 - Integrate Coder
-- I've screwed something up: when you drop a tool on the designer it draws it offset upwards by the distance down the toolstrip it was at.
-- Related to the one above??? Check comment in Designer.js#m_functionDrop and fix/remove/whatever.
+- Check comment in Designer.js#m_functionDrop and fix/remove/whatever.
 - CLick on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
      Will this be needed with Properties, Events?
 - Is the Dependencies array still needed in Type? In Type.js#self.load you have a comment: // process properties methods events and dependencies collections but no code to do so. At least not there.
-- Did dialogs always go screen-wide? If not, let's try and prevent. Must be a row-fluid thing.
 
 
 
@@ -36,6 +34,8 @@ Jerry
 - Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
 - When I delete Type, Method, Property or Event, should I change ordinals in memory or when writing to DB? I think the latter.
 - See Client.js#self.addMethodToActiveType. I need to scroll the grid to the bottom.
+- Did dialogs always go screen-wide? If not, let's try and prevent. Must be a row-fluid thing.
+
 
 
 To discuss
