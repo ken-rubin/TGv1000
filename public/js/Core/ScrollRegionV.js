@@ -344,14 +344,14 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         jItem.css("height",
                             dItemHeight.toString() + "px");
                         var dWork = (iBase * m_dHeight + (m_dHeight - dItemHeight) / 2);
-                        jItem.css("margin-top",
+                        jItem.css("top",
                             dWork.toString() + "px");
                     } else {
 
                         // Position down whole height and center on width.
                         // Remove right. It might have been left over from a previous image that was centered horizontally.
                         jItem.css("right", "");
-                        jItem.css("margin-top",
+                        jItem.css("top",
                             (iBase * m_dHeight).toString() + "px");
                         jItem.css("height",
                             m_dHeight.toString() + "px");
