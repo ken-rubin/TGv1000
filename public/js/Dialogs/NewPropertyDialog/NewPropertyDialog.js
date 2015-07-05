@@ -181,7 +181,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_functionHandleDataTypeSelectChange = function(event) {
 
-						var m_iDataType = parseInt($("#DataType option:selected").val(), 10);
+						m_iDataType = parseInt($("#DataType option:selected").val(), 10);
 
 						$("#InitialContainer").css("display", "none");
 						$("#PropertyInitial").css("display", "none");
@@ -239,11 +239,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						if (nameStatus && ((m_iDataType === 5 && initialValueStatus) || (m_iDataType !== 5 && m_iDataType > 0))) {
 
-							$("#CreatePropertyBtn").removeClass("disabled");
+							$("#SavePropertyBtn").removeClass("disabled");
 						
 						} else {
 
-							$("#CreatePropertyBtn").addClass("disabled");
+							$("#SavePropertyBtn").addClass("disabled");
 						}
 					}
 
