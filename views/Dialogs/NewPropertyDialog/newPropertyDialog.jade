@@ -27,18 +27,21 @@
         br
         br
         .col-xs-2#InitialContainer(style='display:none;')
-            label.control-label(for='PropertyInitial', style="margin-top:6px;") Initial value(s)
+            label.control-label(for='PropertyInitial', style="margin-top:6px;") Initial value
         .col-xs-8#PropertyInitial
           div#NumberOrStringValue(style='display:none;')
             //- for Number, String we give user a textbox
+            | Enter a default value or set the Property's value when you use it.
             input.form-control#NumberOrStringInitial(type='text')
           div#NumberRangeValue(style='display:none;')              
             //- for Number range we give user two textboxes with - between. Entries must be numeric and first < last.
+            | Enter the bounds for this Property or set them when you use it.
             input.form-control#RangeFromInitial(type='text')
             | &nbsp;-&nbsp;
             input.form-control#RangeThruInitial(type='text')
           div#BooleanValue(style='display:none;')              
             //- for Boolean we give two radio buttons: true and false
+            | Choose the default value or set the Property's value when you use it.
             input.form-control#TrueRadio(type='radio' name='bools' value='true')
             span
               | true
@@ -48,8 +51,10 @@
               | false
           div#PicklistValue(style='display:none;')              
             //- for Picklist we give user a textarea
+            | Enter values to choose from, separated by a space--just like with search tags.
             textarea.form-control#PicklistInitial(cols=40 rows=2 placeholder='full set of values')
           div#TypeValue(style='display:none')
             //- for Type there is no initialization
+            | This Property cannot be initialized until you use it.
 
 

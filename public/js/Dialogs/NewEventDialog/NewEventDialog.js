@@ -135,11 +135,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var eventName = $("#EventName").val().trim();
 							
-							// if (!client.isEventNameAvailableInActiveType(eventName)) {
+							if (!client.isEventNameAvailableInActiveType(eventName)) {
 
-							// 	errorHelper.show("That name is already used. Please enter another.");
-							// 	return;
-							// }
+								errorHelper.show("That name is already used. Please enter another.");
+								return;
+							}
 
 							// // Create Event based on the dialog's fields.
 							// // Call client to inject it throughout.

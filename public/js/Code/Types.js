@@ -458,6 +458,60 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
+//used
+					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
+
+						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
+
+							if (i !== myIndex) {
+
+								var eventIth = m_clTypeActive.data.events[i];
+								if (eventIth.name === strName) {
+
+									return false;
+								}
+							}
+						}
+
+						return true;
+					}
+
+//used
+					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
+
+						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
+
+							if (i !== myIndex) {
+
+								var methodIth = m_clTypeActive.data.methods[i];
+								if (methodIth.name === strName) {
+
+									return false;
+								}
+							}
+						}
+
+						return true;
+					}
+
+//used
+					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
+
+						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
+
+							if (i !== myIndex) {
+
+								var propertyIth = m_clTypeActive.data.properties[i];
+								if (propertyIth.name === strName) {
+
+									return false;
+								}
+							}
+						}
+
+						return true;
+					}
+
 					///////////////////////////////////
 					// Private methods.
 

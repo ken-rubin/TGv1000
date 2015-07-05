@@ -189,14 +189,20 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 						}
 					}
 
-					self.isTypeNameAvailableInActiveComic = function(strName) {
+					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
+
+						// myIndex === -1 for adds, but index of item for edits/renames.
+						// So, if > -1, skip it. Or, backward, if i !== myIndex, do it.
 
 						for (var i = 0; i < m_clComicActive.data.types.items; i++) {
 
-							var typeIth = m_clComicActive.data.types.items[i];
-							if (typeIth.name === strName) {
+							if (i !== myIndex) {
 
-								return false;
+								var clTypeIth = m_clComicActive.data.types.items[i];
+								if (clTypeIth.data.name === strName) {
+
+									return false;
+								}
 							}
 						}
 

@@ -169,15 +169,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 															{id: 0, name: "method3g", workspace: "", imageResourceId: 0, ordinal: 8, tags: "", createdByUserId: strUserId, price: 0}
 														],
 														properties: [
-															{id: 0, name: "property1", propType: "number", initialValue: "0", ordinal: 0},
-															{id: 0, name: "property2", propType: "number", initialValue: "0", ordinal: 1},
-															{id: 0, name: "property3", propType: "number", initialValue: "0", ordinal: 2},
-															{id: 0, name: "property4", propType: "number", initialValue: "0", ordinal: 3},
-															{id: 0, name: "property5", propType: "number", initialValue: "0", ordinal: 4},
-															{id: 0, name: "property6", propType: "number", initialValue: "0", ordinal: 5},
-															{id: 0, name: "property7", propType: "number", initialValue: "0", ordinal: 6},
-															{id: 0, name: "property8", propType: "number", initialValue: "0", ordinal: 7},
-															{id: 0, name: "property9", propType: "number", initialValue: "0", ordinal: 8}
+															{id: 0, name: "property1", propertyTypeId: 1, initialValue: "3.14", ordinal: 0},
+															{id: 0, name: "property2", propertyTypeId: 2, initialValue: "1-10", ordinal: 1},
+															{id: 0, name: "property3", propertyTypeId: 3, initialValue: "Jerry", ordinal: 2},
+															{id: 0, name: "property4", propertyTypeId: 4, initialValue: "true", ordinal: 3},
+															{id: 0, name: "property5", propertyTypeId: 4, initialValue: "false", ordinal: 4},
+															{id: 0, name: "property6", propertyTypeId: 5, initialValue: "jerry john ken", ordinal: 5},
+															{id: 0, name: "property7", propertyTypeId: 6, initialValue: "", ordinal: 6},
+															{id: 0, name: "property8", propertyTypeId: 2, initialValue: "1000-1999", ordinal: 7},
+															{id: 0, name: "property9", propertyTypeId: 3, initialValue: "Hello to you", ordinal: 8}
 														],
 														events: [
 															{id: 0, name: "event1", ordinal: 0},
@@ -386,9 +386,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 															{id: 0, name: "method2c", workspace: "", imageResourceId: 0, ordinal: 4, tags: "", createdByUserId: strUserId, price: 0}
 														],
 														properties: [
-															{id: 0, name: "property1", propType: "number", initialValue: "0", ordinal: 0},
-															{id: 0, name: "property2", propType: "number", initialValue: "0", ordinal: 1},
-															{id: 0, name: "property3", propType: "number", initialValue: "0", ordinal: 2}
+															{id: 0, name: "property1", propertyTypeId: 1, initialValue: "123", ordinal: 0},
+															{id: 0, name: "property2", propertyTypeId: 2, initialValue: "7-11", ordinal: 1},
+															{id: 0, name: "property3", propertyTypeId: 5, initialValue: "1 2 3 4 5 6 7 8 9", ordinal: 2}
 														],
 														events: [
 															{id: 0, name: "event1", ordinal: 0}

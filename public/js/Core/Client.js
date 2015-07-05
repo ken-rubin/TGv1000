@@ -943,14 +943,24 @@ define(["Core/errorHelper",
 						return false;
 					}
 
-					self.isTypeNameAvailableInActiveComic = function(strName) {
+					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
-						if (m_clProject) {
+						return comics.isTypeNameAvailableInActiveComic(strName, myIndex);
+					}
 
-							return comics.isTypeNameAvailableInActiveComic(strName);
-						}
+					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
 
-						return false;
+						return types.isEventNameAvailableInActiveType(strName, myIndex);
+					}
+
+					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
+
+						return types.isMethodNameAvailableInActiveType(strName, myIndex);
+					}
+
+					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
+
+						return types.isPropertyNameAvailableInActiveType(strName, myIndex);
 					}
 
 					// Private methods
@@ -962,10 +972,7 @@ define(["Core/errorHelper",
 					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.
 					var m_openDialog2 = null;
 
-				} catch (e) {
-
-					errorHelper.show(e);
-				}
+				} catch (e) { errorHelper.show(e); }
 			};
 
 			// Return constructor function.

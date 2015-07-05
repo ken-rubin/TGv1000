@@ -110,11 +110,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (m_strNewOrEdit === 'New') {
 
+								$("#DataType").val("0");
+
 							} else {
 
 								// Edit mode for properties[m_iIndexIfEdit].
 								m_property = types.getActiveClType().data.properties[m_iIndexIfEdit];
 								$("#PropertyName").val(m_property.name);
+								
+								$("#DataType").val(m_property.propertyTypeId.toString());
 
 								if (m_property.propertyTypeId === 1 || m_property.propertyTypeId === 3) {
 
@@ -124,7 +128,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								
 								} else if (m_property.propertyTypeId === 2) {
 
-									var parts = m_project.split("-");
+									var parts = m_property.initialValue.split("-");
 									if (parts.length === 2) {
 
 										$("#RangeFromInitial").val(parts[0]);
@@ -152,9 +156,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									$("#PicklistInitial").val(m_property.initialValue);
 									$("#PicklistValue").css("display", "block");
 									$("#InitialContainer").css("display", "block");
-								}
+								
+								} else {
 
-								// No initial value for type 'Type'
+									$("#TypeValue").css("display", "block");
+									$("#InitialContainer").css("display", "block");
+								}
 							}
 
 							m_setStateCreateBtn();
@@ -171,6 +178,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					}
 
 					var m_functionHandleDataTypeSelectChange = function(event) {
+
+						var selVal = $("#DataType option:selected").val();	// numeric
+
+
+
+
+
+
 
 					}
 
@@ -189,40 +204,31 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							var PropertyName = $("#PropertyName").val().trim();
+							var propertyName = $("#PropertyName").val().trim();
 							
-							// if (!client.isPropertyNameAvailableInActiveComic(PropertyName)) {
+							if (!client.isPropertyNameAvailableInActiveType(propertyName)) {
 
-							// 	errorHelper.show("That name is already used. Please enter another.");
-							// 	return;
-							// }
+								errorHelper.show("That name is already used. Please enter another.");
+								return;
+							}
 
-							// // Create minimal Property based on the dialog's fields--or lack thereof.
-							// // Call client to inject it throughout.
-							// var PropertyJO = 
-							// {
-							// 	isApp: false,
-							// 	id: 0,
-							// 	ordinal: client.getNumberOfPropertysInActiveComic(),
-							// 	tags: $("#PropertyTags").val() || "",
-							// 	properties: [],
-							// 	methods: [],
-							// 	Propertys: [],
-							// 	dependencies: [],
-							// 	name: PropertyName,
-							// 	imageResourceId: m_imageResourceId
-							// };
+							// Create Property based on the dialog's fields.
+							// Call client to inject it throughout.
+							var property = 
+							{
+								id: 0,
 
-							// var clProperty = new Property();
-							// clProperty.load(PropertyJO);
 
-							// var exceptionRet = client.addPropertyToProject(clProperty);
-							// if (exceptionRet) {
 
-							// 	throw exceptionRet;
-							// }
 
-							// m_dialog.close();
+
+
+							};
+
+							var exceptionRet = client.addPropertyToActiveType(property);
+							if (exceptionRet) { throw exceptionRet; }
+
+							m_dialog.close();
 
 						} catch (e) {
 

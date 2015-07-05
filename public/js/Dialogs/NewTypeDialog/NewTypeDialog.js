@@ -141,7 +141,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 							var typeName = $("#TypeName").val().trim();
-							if (!client.isTypeNameAvailableInActiveComic(typeName)) {
+							if (!client.isTypeNameAvailableInActiveComic(typeName, -1)) {
 
 								errorHelper.show("That name is already used. Please enter another.");
 								return;
