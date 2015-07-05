@@ -105,8 +105,57 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							$("#PropertyName").focus();
-
 							$("#PropertyName").blur(m_functionBlurPropertyName);
+							$("#DataType").change(m_functionHandleDataTypeSelectChange);
+
+							if (m_strNewOrEdit === 'New') {
+
+							} else {
+
+								// Edit mode for properties[m_iIndexIfEdit].
+								m_property = types.getActiveClType().data.properties[m_iIndexIfEdit];
+								$("#PropertyName").val(m_property.name);
+
+								if (m_property.propertyTypeId === 1 || m_property.propertyTypeId === 3) {
+
+									$("#NumberOrStringInitial").val(m_property.initialValue);
+									$("#NumberOrStringValue").css("display", "block");
+									$("#InitialContainer").css("display", "block");
+								
+								} else if (m_property.propertyTypeId === 2) {
+
+									var parts = m_project.split("-");
+									if (parts.length === 2) {
+
+										$("#RangeFromInitial").val(parts[0]);
+										$("#RangeThruInitial").val(parts[1]);
+										$("#NumberRangeValue").css("display", "block");
+										$("#InitialContainer").css("display", "block");
+									}
+								} else if (m_property.propertyTypeId === 4) {
+
+									if (m_property.initialValue === 'true') {
+
+										$("#TrueRadio").prop("checked", true);
+
+									} else {
+
+										$("#FalseRadio").prop("checked", true);
+
+									}
+									$("#BooleanValue").css("display", "block");
+									$("#InitialContainer").css("display", "block");
+
+								} else if (m_property.propertyTypeId === 5) {
+
+
+									$("#PicklistInitial").val(m_property.initialValue);
+									$("#PicklistValue").css("display", "block");
+									$("#InitialContainer").css("display", "block");
+								}
+
+								// No initial value for type 'Type'
+							}
 
 							m_setStateCreateBtn();
 
@@ -119,6 +168,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionBlurPropertyName = function() {
 
 							m_setStateCreateBtn();
+					}
+
+					var m_functionHandleDataTypeSelectChange = function(event) {
+
 					}
 
 					var m_setStateCreateBtn = function() {
@@ -188,6 +241,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_strNewOrEdit = "";
 				var m_iIndexIfEdit = -1;
+				var m_property = null;
 			};
 
 			// Return the constructor function as the module object.

@@ -4,7 +4,7 @@
   .row
     .col-xs-12
       h4 
-        | A TechGroms Property requires a <em>name</em>, a data type and, optionally, and initial value.
+        | A TechGroms Property requires a <em>name</em>, a data type and, sometimes, initial value(s).
       br
   .row
         .col-xs-2
@@ -16,7 +16,8 @@
         .col-xs-2
             label.control-label(for="PropertyDataType", style="margin-top:6px;") Data type
         .col-xs-6
-            select.form-control
+            select.form-control#DataType
+              option(value=0) Select type...
               option(value=1) Number
               option(value=2) Number range (e.g., 3-27)
               option(value=3) String
@@ -25,9 +26,30 @@
               option(value=6) Type
         br
         br
-        .col-xs-2
+        .col-xs-2#InitialContainer(style='display:none;')
             label.control-label(for='PropertyInitial', style="margin-top:6px;") Initial value(s)
-        .col-xs-8
-            textarea.form-control#PropertyInitial(cols=40 rows=2 placeholder='optional initial value')
+        .col-xs-8#PropertyInitial
+          div#NumberOrStringValue(style='display:none;')
+            //- for Number, String we give user a textbox
+            input.form-control#NumberOrStringInitial(type='text')
+          div#NumberRangeValue(style='display:none;')              
+            //- for Number range we give user two textboxes with - between. Entries must be numeric and first < last.
+            input.form-control#RangeFromInitial(type='text')
+            | &nbsp;-&nbsp;
+            input.form-control#RangeThruInitial(type='text')
+          div#BooleanValue(style='display:none;')              
+            //- for Boolean we give two radio buttons: true and false
+            input.form-control#TrueRadio(type='radio' name='bools' value='true')
+            span
+              | true
+            | &nbsp;
+            input.form-control#FalseRadio(type='radio' name='bools' value='true')
+            span
+              | false
+          div#PicklistValue(style='display:none;')              
+            //- for Picklist we give user a textarea
+            textarea.form-control#PicklistInitial(cols=40 rows=2 placeholder='full set of values')
+          div#TypeValue(style='display:none')
+            //- for Type there is no initialization
 
 

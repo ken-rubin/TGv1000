@@ -472,7 +472,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							$("#TWsearchTypeBtn").prop("disabled", true);
 							$("#TWRenameTypeLink").prop("disabled", true);
 							$("#TWsearchMethodBtn").prop("disabled", true);
-							$("#TWaddPropertyBtn").prop("disabled", true);
 
 							//////////////////////////////////////////////////////////////////
 
@@ -551,8 +550,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 								var m = m_clTypeActive.data.properties[i];
-								// Remove 'disabled' in following when Edit Property is implemented.
-								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button disabled class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 								$("#TWpropertiesTbody").append(strBuild);
 								$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
 								$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
