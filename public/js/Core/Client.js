@@ -555,6 +555,7 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Now do something to scroll the methods grid to the bottom.
+							$("#methodrename_" + (activeClType.data.methods.length - 1).toString()).scrollintoview();
 
 						} catch (e) {
 
@@ -579,6 +580,7 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Now do something to scroll the events grid to the bottom.
+							$("#eventrename_" + (activeClType.data.events.length - 1).toString()).scrollintoview();
 
 						} catch (e) {
 
@@ -603,6 +605,7 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Now do something to scroll the props grid to the bottom.
+							$("#propertyedit_" + (activeClType.data.properties.length - 1).toString()).scrollintoview();
 
 						} catch (e) {
 

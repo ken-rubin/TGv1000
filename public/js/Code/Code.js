@@ -858,59 +858,59 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method adds a type's event accessor functions.
-//used					
+//used - Ken has to decide what gets done here			
 					var m_functionAdd_Type_Event = function (clType, event) {
 
 						try {
 
-							////////////////////////
-							////////////////////////
-							////////////////////////
-							// Get
+							// ////////////////////////
+							// ////////////////////////
+							// ////////////////////////
+							// // Get
 
-							////////////////////////
-							// Blocks.
-							var strGetName = clType.data.name + "_get" + event.name;
-							self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);
+							// ////////////////////////
+							// // Blocks.
+							// var strGetName = clType.data.name + "_get" + event.name;
+							// self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);
 
-							////////////////////////
-							// JavaScript.
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);
+							// ////////////////////////
+							// // JavaScript.
+							// self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);
 
-							////////////////////////
-							// Schema.
-							if (!self.schema.Types) {
+							// ////////////////////////
+							// // Schema.
+							// if (!self.schema.Types) {
 
-								self.schema.Types = {};
-							}
-							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[clType.data.name];
-							objectType[strGetName] = true;
+							// 	self.schema.Types = {};
+							// }
+							// var objectTypes = self.schema.Types;
+							// var objectType = objectTypes[clType.data.name];
+							// objectType[strGetName] = true;
 
 
-							////////////////////////
-							////////////////////////
-							////////////////////////
-							// Set
+							// ////////////////////////
+							// ////////////////////////
+							// ////////////////////////
+							// // Set
 
-							////////////////////////
-							// Blocks.
-							var strSetName = clType.data.name + "_set" + property.name;
-							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+							// ////////////////////////
+							// // Blocks.
+							// var strSetName = clType.data.name + "_set" + property.name;
+							// self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
-							////////////////////////
-							// JavaScript.
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							// ////////////////////////
+							// // JavaScript.
+							// self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
 
-							////////////////////////
-							// Schema.
-							if (!self.schema.Types) {
+							// ////////////////////////
+							// // Schema.
+							// if (!self.schema.Types) {
 
-								self.schema.Types = {};
-							}
-							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[clType.data.name];
-							objectType[strSetName] = true;
+							// 	self.schema.Types = {};
+							// }
+							// var objectTypes = self.schema.Types;
+							// var objectType = objectTypes[clType.data.name];
+							// objectType[strSetName] = true;
 
 							return null;
 						} catch (e) {

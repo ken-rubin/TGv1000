@@ -141,7 +141,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// 	return;
 							// }
 
-							// // Create minimal Event based on the dialog's fields--or lack thereof.
+							// // Create Event based on the dialog's fields.
 							// // Call client to inject it throughout.
 							var event = 
 							{
@@ -160,6 +160,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							errorHelper.show(e);
 						}
 					}
+				} catch (e) {
+
+					errorHelper.show(e);
+				}
 
 				/////////////////////////////////
 				// Private fields.

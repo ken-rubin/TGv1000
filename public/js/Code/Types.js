@@ -369,7 +369,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Called by client after confirmation by user.
-//used
+//used - need to write & call code.
 					self.deleteMethod = function (index) {
 
 						try {
@@ -384,7 +384,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Called by client after confirmation by user.
-//used
+//used - need to write & call code.
 					self.deleteProperty = function (index) {
 
 						try {
@@ -399,12 +399,15 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Called by client after confirmation by user.
-//used
+//used - need to write & call code.
 					self.deleteEvent = function (index) {
 
 						try {
 
 							m_clTypeActive.data.events.splice(index, 1);
+
+							// Something has to be done in code, I'd bet.
+
 							return m_functionRegenTWEventsTable();
 						
 						} catch (e) {
@@ -470,7 +473,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							$("#TWRenameTypeLink").prop("disabled", true);
 							$("#TWsearchMethodBtn").prop("disabled", true);
 							$("#TWaddPropertyBtn").prop("disabled", true);
-							$("#TWaddEventBtn").prop("disabled", true);
 
 							//////////////////////////////////////////////////////////////////
 

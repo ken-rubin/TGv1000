@@ -126,10 +126,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						    		var resourceId = m_searchResultRawArray[j].id;
 						    		self.callFunctionOK(resourceId);
 						    	});
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
+							// Click the Search button for them.
+							m_functionSearchBtnClicked();
+
 						} catch (e) {
 
 							errorHelper.show(e.message);

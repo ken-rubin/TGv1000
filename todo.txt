@@ -32,9 +32,8 @@ Jerry
 - If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
 - When should I check that something is deletable? For example, for delete Type, why go to the dialog if deletion is going to be blocked because the Type is in the designer? What other entities does this apply to?
 - Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
-- When I delete Type, Method, Property or Event, should I change ordinals in memory or when writing to DB? I think the latter.
-- See Client.js#self.addMethodToActiveType. I need to scroll the grid to the bottom.
 - Did dialogs always go screen-wide? If not, let's try and prevent. Must be a row-fluid thing.
+- Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 
 
 
