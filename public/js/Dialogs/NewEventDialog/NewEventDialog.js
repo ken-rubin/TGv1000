@@ -133,9 +133,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							var EventName = $("#EventName").val().trim();
+							var eventName = $("#EventName").val().trim();
 							
-							// if (!client.isEventNameAvailableInActiveComic(EventName)) {
+							// if (!client.isEventNameAvailableInActiveType(eventName)) {
 
 							// 	errorHelper.show("That name is already used. Please enter another.");
 							// 	return;
@@ -143,30 +143,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// // Create minimal Event based on the dialog's fields--or lack thereof.
 							// // Call client to inject it throughout.
-							// var EventJO = 
-							// {
-							// 	isApp: false,
-							// 	id: 0,
-							// 	ordinal: client.getNumberOfEventsInActiveComic(),
-							// 	tags: $("#EventTags").val() || "",
-							// 	properties: [],
-							// 	methods: [],
-							// 	events: [],
-							// 	dependencies: [],
-							// 	name: EventName,
-							// 	imageResourceId: m_imageResourceId
-							// };
+							var event = 
+							{
+								id: 0,
+								ordinal: 0,
+								name: eventName
+							};
 
-							// var clEvent = new Event();
-							// clEvent.load(EventJO);
+							var exceptionRet = client.addEventToActiveType(event);
+							if (exceptionRet) { throw exceptionRet; }
 
-							// var exceptionRet = client.addEventToProject(clEvent);
-							// if (exceptionRet) {
-
-							// 	throw exceptionRet;
-							// }
-
-							// m_dialog.close();
+							m_dialog.close();
 
 						} catch (e) {
 
@@ -174,70 +161,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					// 3 functions to handle the Image changing link clicks.
-					var m_functionSearchClick = function () {
-
-						try {
-
-							var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-					
-					var m_functionURLClick = function () {
-
-						try {
-
-							var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-					
-					var m_functionDiskClick = function () {
-
-						try {
-
-							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					// Display the chosen image.
-					var m_functionSetImageSrc = function (imageResourceId) {
-
-						m_imageResourceId = imageResourceId;
-						$("#EventImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
-						m_setStateCreateBtn();
-					}
-				} catch (e) {
-
-					errorHelper.show(e);
-				}
-
 				/////////////////////////////////
 				// Private fields.
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_imageResourceId = 0;
 			};
 
 			// Return the constructor function as the module object.

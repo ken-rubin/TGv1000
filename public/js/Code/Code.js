@@ -275,6 +275,27 @@ define(["Core/errorHelper"],
 						}
 					};
 
+					// Method adds an event to a type to blockly.
+//used					
+					self.addEvent = function (clType, event) {
+
+						try {
+
+							// Add a new for the type.
+							var exceptionRet = m_functionAdd_Type_Event(clType,
+								event);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Method renmes a property of a type to blockly.
 					self.renameProperty = function (type, property, strOriginalName) {
 
@@ -793,6 +814,68 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// JavaScript.
 							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
+
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+							var objectType = objectTypes[clType.data.name];
+							objectType[strGetName] = true;
+
+
+							////////////////////////
+							////////////////////////
+							////////////////////////
+							// Set
+
+							////////////////////////
+							// Blocks.
+							var strSetName = clType.data.name + "_set" + property.name;
+							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+
+							////////////////////////
+							// JavaScript.
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
+
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+							var objectType = objectTypes[clType.data.name];
+							objectType[strSetName] = true;
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					// Helper method adds a type's event accessor functions.
+//used					
+					var m_functionAdd_Type_Event = function (clType, event) {
+
+						try {
+
+							////////////////////////
+							////////////////////////
+							////////////////////////
+							// Get
+
+							////////////////////////
+							// Blocks.
+							var strGetName = clType.data.name + "_get" + event.name;
+							self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);
+
+							////////////////////////
+							// JavaScript.
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);
 
 							////////////////////////
 							// Schema.

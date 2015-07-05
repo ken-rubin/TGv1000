@@ -543,12 +543,11 @@ define(["Core/errorHelper",
 
 						try {
 
-							var activeClMethod = types.getActiveClType();
-							method.ordinal = activeClMethod.data.methods.length;
-							activeClMethod.data.methods.push(method);
+							var activeClType = types.getActiveClType();
+							activeClType.data.methods.push(method);
 
 							// Add the method to code.
-							var exceptionRet = code.addMethod(activeClMethod, 
+							var exceptionRet = code.addMethod(activeClType, 
 								method);
 							if (exceptionRet) { throw exceptionRet; }
 
@@ -556,6 +555,54 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Now do something to scroll the methods grid to the bottom.
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+//used
+					self.addEventToActiveType = function (event) {
+
+						try {
+
+							var activeClType = types.getActiveClType();
+							activeClType.data.events.push(event);
+
+							// Add the method to code.
+							var exceptionRet = code.addEvent(activeClType, 
+								event);
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = types.regenTWEventsTable();
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Now do something to scroll the events grid to the bottom.
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+//used
+					self.addPropertyToActiveType = function (property) {
+
+						try {
+
+							var activeClType = types.getActiveClType();
+							activeClType.data.properties.push(property);
+
+							// Add the property to code.
+							var exceptionRet = code.addProperty(activeClType, 
+								property);
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = types.regenTWPropertiesTable();
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Now do something to scroll the props grid to the bottom.
 
 						} catch (e) {
 

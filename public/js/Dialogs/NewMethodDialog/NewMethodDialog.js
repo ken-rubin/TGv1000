@@ -140,13 +140,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							var methodName = $("#MethodName").val().trim();
+
+
+							// if (!client.isMethodNameAvailableInActiveType(methodName)) {
+
+							// 	errorHelper.show("That name is already used. Please enter another.");
+							// 	return;
+							// }
+
 							// Create Method based on the new Method dialog's fields--or lack thereof.
 							// Call client to inject it.
 							var method = 
 							{
-								name: $("#MethodName").val() || '',
+								id: 0,
+								name: methodName,
 								workspace: "",
 								method: "",
+								tags: $("#MethodTags").val().trim(),
 								imageResourceId: m_imageResourceId,
 								ordinal: 0,
 								price: 0.0,
