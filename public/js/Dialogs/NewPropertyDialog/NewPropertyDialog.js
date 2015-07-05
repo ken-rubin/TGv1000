@@ -111,22 +111,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (m_strNewOrEdit === 'New') {
 
 								$("#DataType").val("0");
+								m_iDataType = 0;
 
 							} else {
 
 								// Edit mode for properties[m_iIndexIfEdit].
 								m_property = types.getActiveClType().data.properties[m_iIndexIfEdit];
-								$("#PropertyName").val(m_property.name);
-								
-								$("#DataType").val(m_property.propertyTypeId.toString());
+								m_strOriginalNameIfEdit = m_property.name;
+								$("#PropertyName").val(m_strOriginalNameIfEdit);
+								m_iDataType = m_property.propertyTypeId;
+								$("#DataType").val(m_iDataType.toString());
 
-								if (m_property.propertyTypeId === 1 || m_property.propertyTypeId === 3) {
+								if (m_iDataType === 1 || m_iDataType === 3) {
 
 									$("#NumberOrStringInitial").val(m_property.initialValue);
 									$("#NumberOrStringValue").css("display", "block");
 									$("#InitialContainer").css("display", "block");
 								
-								} else if (m_property.propertyTypeId === 2) {
+								} else if (m_iDataType === 2) {
 
 									var parts = m_property.initialValue.split("-");
 									if (parts.length === 2) {
@@ -136,7 +138,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										$("#NumberRangeValue").css("display", "block");
 										$("#InitialContainer").css("display", "block");
 									}
-								} else if (m_property.propertyTypeId === 4) {
+								} else if (m_iDataType === 4) {
 
 									if (m_property.initialValue === 'true') {
 
@@ -150,7 +152,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									$("#BooleanValue").css("display", "block");
 									$("#InitialContainer").css("display", "block");
 
-								} else if (m_property.propertyTypeId === 5) {
+								} else if (m_iDataType === 5) {
 
 
 									$("#PicklistInitial").val(m_property.initialValue);
@@ -179,24 +181,69 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_functionHandleDataTypeSelectChange = function(event) {
 
-						var selVal = $("#DataType option:selected").val();	// numeric
+						var m_iDataType = parseInt($("#DataType option:selected").val(), 10);
+
+						$("#InitialContainer").css("display", "none");
+						$("#PropertyInitial").css("display", "none");
+						$("#NumberOrStringValue").css("display", "none");
+						$("#NumberRangeValue").css("display", "none");
+						$("#BooleanValue").css("display", "none");
+						$("#PicklistValue").css("display", "none");
+						$("#TypeValue").css("display", "none");
+
+						if (m_iDataType === 0) {
+
+						} else {
+
+							if (m_iDataType === 1 || m_iDataType === 3) {
+
+								$("#NumberOrStringInitial").val("");
+								$("#NumberOrStringValue").css("display", "block");
+								$("#InitialContainer").css("display", "block");
+							
+							} else if (m_iDataType === 2) {
+
+								$("#RangeFromInitial").val("");
+								$("#RangeThruInitial").val("");
+								$("#NumberRangeValue").css("display", "block");
+								$("#InitialContainer").css("display", "block");
+
+							} else if (m_iDataType === 4) {
+
+								$("#BooleanValue").css("display", "block");
+								$("#InitialContainer").css("display", "block");
+
+							} else if (m_iDataType === 5) {
 
 
+								$("#PicklistInitial").val("");
+								$("#PicklistValue").css("display", "block");
+								$("#InitialContainer").css("display", "block");
+							
+							} else {
 
+								$("#TypeValue").css("display", "block");
+								$("#InitialContainer").css("display", "block");
+							}
 
+							$("#PropertyInitial").css("display", "block");
+						}
 
-
-
+						m_setStateCreateBtn();
 					}
 
 					var m_setStateCreateBtn = function() {
 
 						var nameStatus = $("#PropertyName").val().trim().length > 0;
+						var initialValueStatus = $("#PicklistValue").val().trim().length > 0;			// Required only for picklist (m_iDataType === 5)
 
-						if (!nameStatus) {
-							$("#CreatePropertyBtn").addClass("disabled");
-						} else {
+						if (nameStatus && ((m_iDataType === 5 && initialValueStatus) || (m_iDataType !== 5 && m_iDataType > 0))) {
+
 							$("#CreatePropertyBtn").removeClass("disabled");
+						
+						} else {
+
+							$("#CreatePropertyBtn").addClass("disabled");
 						}
 					}
 
@@ -225,8 +272,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							};
 
-							var exceptionRet = client.addPropertyToActiveType(property);
-							if (exceptionRet) { throw exceptionRet; }
+							if (m_strNewOrEdit === 'New') {
+
+								var exceptionRet = client.addPropertyToActiveType(property);
+								if (exceptionRet) { throw exceptionRet; }
+
+							} else {
+
+								var exceptionRet = client.updatePropertyInActiveType(property, m_iIndexIfEdit, m_strOriginalNameIfEdit);
+								if (exceptionRet) { throw exceptionRet; }
+							}
 
 							m_dialog.close();
 
@@ -248,6 +303,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_strNewOrEdit = "";
 				var m_iIndexIfEdit = -1;
 				var m_property = null;
+				var m_strOriginalNameIfEdit = "";
+				var m_iDataType = 0;
 			};
 
 			// Return the constructor function as the module object.

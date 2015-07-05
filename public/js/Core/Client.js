@@ -613,6 +613,31 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
+					self.updatePropertyInActiveType	= function (property, index, strOriginalName) {
+
+						try {
+
+							var activeClType = types.getActiveClType();
+							activeClType.data.properties[index] = property;
+
+							// Add the property to code.
+							var exceptionRet = code.updateProperty(activeClType, 
+								property,
+								strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = types.regenTWPropertiesTable();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.addMethodToTypeFromDB = function (iMethodId) {
 
 						try {

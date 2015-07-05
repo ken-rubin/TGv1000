@@ -275,6 +275,21 @@ define(["Core/errorHelper"],
 						}
 					};
 
+//used -  not finished
+					self.updateProperty = function (clType, property, strOriginalName) {
+
+						try {
+
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}					
+
 					// Method adds an event to a type to blockly.
 //used					
 					self.addEvent = function (clType, event) {
@@ -959,13 +974,13 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method renames a type's property accessor functions.
-					var m_functionRename_Type_Property = function (type, property, strOriginal, strOriginalTypeName) {
+					var m_functionRename_Type_Property = function (clType, property, strOriginal, strOriginalTypeName) {
 
 						try {
 
 							if (!strOriginalTypeName) {
 
-								strOriginalTypeName = type.data.name;
+								strOriginalTypeName = clType.data.name;
 							}
 							////////////////////////
 							////////////////////////
@@ -975,7 +990,7 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strOriginalName = strOriginalTypeName + "_get" + strOriginal;
-							var strGetName = type.data.name + "_get" + property.name;
+							var strGetName = clType.data.name + "_get" + property.name;
 							delete self.blocks[strOriginalName];
 							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
 
@@ -1006,7 +1021,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[clType.data.name];
 							objectType[strGetName] = true;
 							delete objectType[strOriginalName];
 
@@ -1018,7 +1033,7 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strOriginalSetName = strOriginalTypeName + "_set" + strOriginal;
-							var strSetName = type.data.name + "_set" + property.name;
+							var strSetName = clType.data.name + "_set" + property.name;
 							delete self.blocks[strOriginalSetName];
 							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
 
@@ -1049,7 +1064,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[clType.data.name];
 							objectType[strSetName] = true;
 							delete objectType[strOriginalSetName];
 
