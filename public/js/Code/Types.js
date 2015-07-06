@@ -524,7 +524,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// The following will be removed as I implement the functionality:
 
 							$("#TWsearchTypeBtn").prop("disabled", true);
-							$("#TWRenameTypeLink").prop("disabled", true);
 							$("#TWsearchMethodBtn").prop("disabled", true);
 
 							//////////////////////////////////////////////////////////////////
@@ -578,8 +577,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									$("#TWmethodsTbody").append(strBuild);
 									$("#method_" + i).click(m_functionMethodClicked);
 								} else {
-									// Remove 'disabled' in following when Rename Method is implemented.
-									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button disabled class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 									$("#TWmethodsTbody").append(strBuild);
 									$("#method_" + i).click(m_functionMethodClicked);
 									$("#methodrename_" + i).click(m_functionMethodRenameClicked);
@@ -627,8 +625,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 								var m = m_clTypeActive.data.events[i];
-								// Remove 'disabled' in following when Rename Event is implemented.
-								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button disabled class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+								strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 								$("#TWeventsTbody").append(strBuild);
 								$("#eventrename_" + i).click(m_functionEventRenameClicked);
 								$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
@@ -672,68 +669,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
-					var m_functionMethodRenameClicked = function(e) {
-						
+					var m_functionClickTWrenameTypeLink = function () {
+
 						try {
 
-							var index = m_functionParseOutIndex(e);
-
-							var exceptionRet = client.showGenericRenameDialog('method', index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					var m_functionMethodDeleteClicked = function(e) {
-						
-						try {
-
-							var index = m_functionParseOutIndex(e);
-
-							var exceptionRet = client.showDeleteConfirmDialog('method', index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					var m_functionPropertyEditClicked = function(e) {
-						
-						try {
-
-							var index = m_functionParseOutIndex(e);
-
-							var exceptionRet = client.showEditPropertyDialog(index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					var m_functionPropertyDeleteClicked = function(e) {
-						
-						try {
-
-							var index = m_functionParseOutIndex(e);
-
-							var exceptionRet = client.showDeleteConfirmDialog('property', index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							var exceptionRet = client.showGenericRenameDialog('type', -1);
+							if (exceptionRet) { throw exceptionRet; }
+							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -747,10 +689,68 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var index = m_functionParseOutIndex(e);
 
 							var exceptionRet = client.showGenericRenameDialog('event', index);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
+							
+						} catch (e) {
 
-								throw exceptionRet;
-							}
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionMethodRenameClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showGenericRenameDialog('method', index);
+							if (exceptionRet) { throw exceptionRet; }
+							
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionMethodDeleteClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showDeleteConfirmDialog('method', index);
+							if (exceptionRet) { throw exceptionRet; }
+							
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionPropertyEditClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showEditPropertyDialog(index);
+							if (exceptionRet) { throw exceptionRet; }
+							
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionPropertyDeleteClicked = function(e) {
+						
+						try {
+
+							var index = m_functionParseOutIndex(e);
+
+							var exceptionRet = client.showDeleteConfirmDialog('property', index);
+							if (exceptionRet) { throw exceptionRet; }
+							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -764,10 +764,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var index = m_functionParseOutIndex(e);
 
 							var exceptionRet = client.showDeleteConfirmDialog('event', index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
+							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -779,10 +777,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							var exceptionRet = m_clTypeActive.imageSearch();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
+							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -794,10 +790,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							var exceptionRet = m_clTypeActive.imageFromURL();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
+							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -877,8 +871,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							errorHelper.show(e);
 						}
 					}
-
-					var m_functionClickTWrenameTypeLink = function () {}
 
 					var m_functionClickTWnewMethod = function () {
 

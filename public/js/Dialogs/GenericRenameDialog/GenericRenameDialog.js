@@ -115,10 +115,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
                 strName = types.getActiveClType().data.methods[m_iIndex].name;
 
-              } else if (m_strObjectType === 'property') {
-
-                strName = types.getActiveClType().data.properties[m_iIndex].name;
-
               } else if (m_strObjectType === 'event') {
 
                 strName = types.getActiveClType().data.events[m_iIndex].name;

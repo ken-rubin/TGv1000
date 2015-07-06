@@ -310,11 +310,8 @@ define(["Core/errorHelper",
 
 							m_openDialog = new GenericRenameDialog();
 							var exceptionRet = m_openDialog.create(itemType, index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
+							if (exceptionRet) { throw exceptionRet; }
+							
 							return null;
 
 						} catch (e) {
