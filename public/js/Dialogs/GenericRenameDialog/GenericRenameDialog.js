@@ -124,7 +124,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
                 throw new Error('Invalid objectType passed to Rename Dialog.');
               }
 
-              $("#RenameLabel").text(strType);
+              $("#RenameLabel").text("Enter a new name for the " + strType + ":");
               $("#RenameInput").val(strName);
 
             } catch (e) {
@@ -138,7 +138,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
           errorHelper.show(e);
         }
 
-        var m_functionRename = function () {}
+        var m_functionRename = function () {
+
+          
+        }
 
         /////////////////////////////////
         // Private fields.
