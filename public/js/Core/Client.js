@@ -636,9 +636,29 @@ define(["Core/errorHelper",
 					}
 
 //used
-					self.renameTypeInActiveComic = function (strName, index) {
+					self.renameTypeInActiveComic = function (strNewName, index, strOriginalName) {
 
 						try {
+
+							var activeClType = types.getActiveClType();
+							activeClType.data.name = strNewName;
+							activeClType.data.types[index] = activeClType;
+
+							// Call Code.js#renameType(clType, strOriginalName).
+							var exceptionRet = code.renameType(activeClType, strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Need to call someone to update the tooltip of the correct tool in toolstrip.
+							// Everything else should be handled.
+
+
+
+
+
+
+
+
+							
 
 
 							return null;
@@ -650,12 +670,20 @@ define(["Core/errorHelper",
 					}
 
 //used
-					self.renameMethodInActiveType = function (strName, index) {
+					self.renameMethodInActiveType = function (strNewName, index, strOriginalName) {
 
 						try {
 
+							var activeClType = types.getActiveClType();
+							var oldMethod = activeClType.data.methods[index];
+							oldMethod.name = strNewName;
+							activeClType.data.methods[index] = oldMethod;
 
-							return null;
+							// Call Code.js#renameMethod(clType, method, strOriginalName).
+							var exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							return types.regenTWMethodsTable();
 
 						} catch(e) {
 
@@ -664,12 +692,20 @@ define(["Core/errorHelper",
 					}
 
 //used
-					self.renameEventInActiveType = function (strName, index) {
+					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {
 
 						try {
 
+							var activeClType = types.getActiveClType();
+							var oldEvent = activeClType.data.events[index];
+							oldEvent.name = strNewName;
+							activeClType.data.events[index] = oldEvent;
 
-							return null;
+							// Call Code.js#renameEvent(clType, event, strOriginalName).
+							var exceptionRet = code.renameEvent(activeClType, oldEvent, strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							return types.regenTWEventsTable();
 
 						} catch(e) {
 

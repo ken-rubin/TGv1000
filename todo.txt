@@ -29,8 +29,7 @@ Jerry
 - If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
 - Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
-- Test NewPropertyDialog.js and on.
-- Check out the duplicate name checking code, especially for Type. Not sure about it.
+- In Client.js, see self.renameTypeInActiveComic. The toolstrip tooltip needs to be updated.
 
 
 

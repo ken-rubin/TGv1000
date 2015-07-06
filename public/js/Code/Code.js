@@ -84,12 +84,12 @@ define(["Core/errorHelper"],
 					};
 
 					// Method renames a type in blockly.
-					self.renameType = function (type, strOriginalName) {
+					self.renameType = function (clType, strOriginalName) {
 
 						try {
 
 							// Rename type.
-							var exceptionRet = m_functionRename_Type_New(type, 
+							var exceptionRet = m_functionRename_Type_New(clType, 
 								strOriginalName);
 							if (exceptionRet) {
 
@@ -97,10 +97,10 @@ define(["Core/errorHelper"],
 							}
 
 							// Rename properties.
-							for (var i = 0; i < type.data.properties.length; i++) {
+							for (var i = 0; i < clType.data.properties.length; i++) {
 
-								var propertyIth = type.data.properties[i];
-								var exceptionRet = m_functionRename_Type_Property(type,
+								var propertyIth = clType.data.properties[i];
+								var exceptionRet = m_functionRename_Type_Property(clType,
 									propertyIth,
 									propertyIth.name, 
 									strOriginalName);
@@ -111,10 +111,10 @@ define(["Core/errorHelper"],
 							}
 
 							// Rename methods.
-							for (var i = 0; i < type.data.methods.length; i++) {
+							for (var i = 0; i < clType.data.methods.length; i++) {
 
-								var methodIth = type.data.methods[i];
-								var exceptionRet = m_functionRename_Type_Method(type,
+								var methodIth = clType.data.methods[i];
+								var exceptionRet = m_functionRename_Type_Method(clType,
 									methodIth,
 									methodIth.name, 
 									strOriginalName);
@@ -311,13 +311,13 @@ define(["Core/errorHelper"],
 						}
 					};
 
-					// Method renmes a property of a type to blockly.
-					self.renameProperty = function (type, property, strOriginalName) {
+					// Method renames a property of a type to blockly.
+					self.renameProperty = function (clType, property, strOriginalName) {
 
 						try {
 
 							// Rename a property for the type.
-							var exceptionRet = m_functionRename_Type_Property(type,
+							var exceptionRet = m_functionRename_Type_Property(clType,
 								property,
 								strOriginalName);
 							if (exceptionRet) {
@@ -397,13 +397,26 @@ define(["Core/errorHelper"],
 						}
 					};
 
+					self.renameEvent = function (clType, event, strOriginalName) {
+
+						try {
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Method renmes a method of a type to blockly.
-					self.renameMethod = function (type, method, strOriginalName) {
+					self.renameMethod = function (clType, method, strOriginalName) {
 
 						try {
 
 							// Rename a method for the type.
-							var exceptionRet = m_functionRename_Type_Method(type,
+							var exceptionRet = m_functionRename_Type_Method(clType,
 								method,
 								strOriginalName);
 							if (exceptionRet) {
@@ -737,7 +750,7 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method renames a type's new_ constructor function.
-					var m_functionRename_Type_New = function (type, strOriginalName) {
+					var m_functionRename_Type_New = function (clType, strOriginalName) {
 
 						try {
 
@@ -745,12 +758,12 @@ define(["Core/errorHelper"],
 							// Blocks.
 
 							delete self.blocks["new_" + strOriginalName];
-							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
+							self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript["new_" + strOriginalName];
-							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
+							self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
 
 							////////////////////////
 							// Workspace.
@@ -758,9 +771,9 @@ define(["Core/errorHelper"],
 
 								var re = new RegExp("new_" + strOriginalName,"g");
 								self.workspace = self.workspace.replace(re,
-									"new_" + type.data.name);
+									"new_" + clType.data.name);
 								var exceptionRet = types.replaceInWorkspaces("new_" + strOriginalName,
-									"new_" + type.data.name);
+									"new_" + clType.data.name);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -776,7 +789,7 @@ define(["Core/errorHelper"],
 							var objectTypes = self.schema.Types;
 
 							// Bet the type.
-							var typeNew = objectTypes[type.data.name];
+							var typeNew = objectTypes[clType.data.name];
 
 							// Remove the old name.
 							delete objectTypes[strOriginalName];
@@ -785,8 +798,8 @@ define(["Core/errorHelper"],
 
 								typeNew = {};
 							}
-							typeNew["new_" + type.data.name] = true
-							objectTypes[type.data.name] = typeNew;
+							typeNew["new_" + clType.data.name] = true
+							objectTypes[clType.data.name] = typeNew;
 
 							return null;
 						} catch (e) {
@@ -1168,19 +1181,19 @@ define(["Core/errorHelper"],
 					};
 
 					// Helper method renames a type's method accessor functions.
-					var m_functionRename_Type_Method = function (type, method, strOriginal, strOriginalTypeName) {
+					var m_functionRename_Type_Method = function (clType, method, strOriginal, strOriginalTypeName) {
 
 						try {
 
 							if (!strOriginalTypeName) {
 
-								strOriginalTypeName = type.data.name;
+								strOriginalTypeName = clType.data.name;
 							}
 
 							////////////////////////
 							// Blocks.
 							var strOriginalName = strOriginalTypeName + "_" + strOriginal;
-							var strName = type.data.name + "_" + method.name;
+							var strName = clType.data.name + "_" + method.name;
 							delete self.blocks[strOriginalName];
 							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
 
@@ -1211,7 +1224,7 @@ define(["Core/errorHelper"],
 								self.schema.Types = {};
 							}
 							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[type.data.name];
+							var objectType = objectTypes[clType.data.name];
 							objectType[strName] = true;
 							delete objectType[strOriginalName];
 
