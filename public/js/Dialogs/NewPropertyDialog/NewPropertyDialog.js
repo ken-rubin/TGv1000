@@ -259,7 +259,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var propertyName = $("#PropertyName").val().trim();
 							
-							if (!client.isPropertyNameAvailableInActiveType(propertyName)) {
+							if (!client.isPropertyNameAvailableInActiveType(propertyName, m_iIndexIfEdit)) {
 
 								errorHelper.show("That name is already used. Please enter another.");
 								return;

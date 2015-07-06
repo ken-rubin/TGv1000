@@ -139,6 +139,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					try {
 
+						var exceptionRet = null;
+
 						// Check for empty.
 						var strName = $("#RenameInput").val().trim();
 						if (strName.length === 0) {
@@ -156,8 +158,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								return;
 							}
 
-
-
+							exceptionRet = client.renameTypeInActiveComic(strName, m_iIndex);
+							if (exceptionRet) { throw exceptionRet; }
 
 						} else if (m_strObjectType === 'method') {
 
@@ -167,10 +169,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								errorHelper.show('That name is already in use. Please try another.');
 								return;
 							}
-							
 
+							exceptionRet = client.renameMethodInActiveType(strName, m_iIndex);
+							if (exceptionRet) { throw exceptionRet; }
 
-							
 						} else if (m_strObjectType === 'event') {
 
 
@@ -180,8 +182,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								return;
 							}
 
-
-
+							exceptionRet = client.renameEventInActiveType(strName, m_iIndex);
+							if (exceptionRet) { throw exceptionRet; }
 							
 						} else {
 

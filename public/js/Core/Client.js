@@ -635,6 +635,48 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
+					self.renameTypeInActiveComic = function (strName, index) {
+
+						try {
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
+//used
+					self.renameMethodInActiveType = function (strName, index) {
+
+						try {
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
+//used
+					self.renameEventInActiveType = function (strName, index) {
+
+						try {
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					self.addMethodToTypeFromDB = function (iMethodId) {
 
 						try {

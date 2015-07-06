@@ -461,6 +461,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 //used
 					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
 
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
 						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 							if (i !== myIndex) {
@@ -479,6 +481,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 //used
 					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
 
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
 						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
 
 							if (i !== myIndex) {
@@ -497,6 +501,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 //used
 					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
 
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
 						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 							if (i !== myIndex) {

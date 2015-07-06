@@ -92,10 +92,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							var exceptionRet = types.addItem(clType);
 							if (exceptionRet) { throw exceptionRet; }
 
-							// Then add to self.data.
-							// This seems unnecessary--when debugging, I see it there already
-							// self.data.types.items.push(type.data);
-
 					        // Also add to the designer/tool strip.
 							exceptionRet = tools.addItem(clType);
 							if (exceptionRet) { throw exceptionRet; }

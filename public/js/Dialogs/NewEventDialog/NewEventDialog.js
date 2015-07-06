@@ -135,7 +135,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var eventName = $("#EventName").val().trim();
 							
-							if (!client.isEventNameAvailableInActiveType(eventName)) {
+							if (!client.isEventNameAvailableInActiveType(eventName, -1)) {
 
 								errorHelper.show("That name is already used. Please enter another.");
 								return;
