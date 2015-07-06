@@ -650,18 +650,7 @@ define(["Core/errorHelper",
 
 							// Need to call someone to update the tooltip of the correct tool in toolstrip.
 							// Everything else should be handled.
-
-
-
-
-
-
-
-
-							
-
-
-							return null;
+							return tools.changeTooltipAndId(strOriginalName, strNewName);
 
 						} catch(e) {
 

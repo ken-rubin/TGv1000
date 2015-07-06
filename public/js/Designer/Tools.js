@@ -179,6 +179,23 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 						}
 					}
 
+					// A Type has been renamed. Change the corresponding tool's tooltip in m_srToolStripV.
+					self.changeTooltipAndId = function(strOriginalName, strNewName) {
+
+						try {
+
+							var jItem = $("#tool-" + strOriginalName);
+							jItem.tooltip('destroy');
+							jItem.attr({title: strNewName});
+							jItem.tooltip();
+							jItem.attr("id", "tool-" + strNewName);
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////////
 					// Private fields.
 
