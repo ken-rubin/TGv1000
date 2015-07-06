@@ -478,6 +478,7 @@ define(["Core/errorHelper"],
 									var iViewportHeight = $(window).height();
 									var iTypeWellHeight = $("#TypeWell").height();
 									var iColXs1Width = $(".forgettingwidth").width();
+									var iNavbarHeight = $(".navbar").height();
 
 									var iBordersAndSpacingPadding = 70;
 
@@ -506,7 +507,8 @@ define(["Core/errorHelper"],
 
 									$("#BlocklyIFrame").height(iViewportHeight - 
 										iTypeWellHeight -
-										iBordersAndSpacingPadding);
+										iBordersAndSpacingPadding -
+										iNavbarHeight);
 
 								} catch (e) {
 

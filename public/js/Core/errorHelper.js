@@ -47,13 +47,6 @@ define(function () {
 				                    dialogItself.close();
 				                }
 				            }]
-				            // ,
-				            // onshow: function() {
-
-				            // 	var jQ = $(".navbar-fixed-top");
-				            // 	jQ.removeClass("headroom--top");
-				            // 	jQ.addClass("headroom--not-top headroom--unpinned");
-				            // }
 				        });
 					} catch (e) {
 

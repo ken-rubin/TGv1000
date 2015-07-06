@@ -25,20 +25,17 @@ Jerry
 - I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up.
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is someone else's. Do we need to keep
 -    the original creator's user id? Probably a good idea.
-- #TWRenameTypeLink has to be hooked up and programmed.
 - New project is not clearing Designer or comic strip. And more?
 - If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
-- When should I check that something is deletable? For example, for delete Type, why go to the dialog if deletion is going to be blocked because the Type is in the designer? What other entities does this apply to?
 - Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
-- Did dialogs always go screen-wide? If not, let's try and prevent. Must be a row-fluid thing.
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
+- Test NewPropertyDialog.js and on.
 
 
 
 To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?
-- After creating a new project, should we scroll the window down so TypeWell fills the window? Another option would be to scroll down if a tool is clicked (actually mouse-downed), but not dragged.
 
 
 

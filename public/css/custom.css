@@ -22,10 +22,14 @@ a.list-group-item {
   color:black;
 }
 
+/*
 .bootstrap-dialog {
   top:130px;
 }
-
+*/
+.modal {
+  top: 50px;
+}
 .button-as-link {
   background:none!important;
   border:none; 

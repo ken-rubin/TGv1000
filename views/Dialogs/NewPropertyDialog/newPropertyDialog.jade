@@ -35,38 +35,44 @@
         //- for Number, String we give user a textbox
         | Enter a default value or set the Property's value when you use it.
         br
+        br
         input.form-control#NumberOrStringInitial(type='text' style='width:200px;')
       div#NumberRangeValue(style='display:none;')              
         //- for Number range we give user two textboxes with - between. Entries must be numeric and first < last.
         | Enter the bounds for this Property or set them when you use it.
         br
+        br
         .row
-          .col-xs-12
-            input.form-control#RangeFromInitial(type='text' style='width:100px;')
-            span 
-              | &nbsp;-&nbsp;
-            input.form-control#RangeThruInitial(type='text' style='width:100px;')
+          .col-xs-1
+            input#RangeFromInitial(type='text' style='width:50px;')
+          .col-xs-1
+            span(style="text-align:center;")
+              | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;
+          .col-xs-1
+            input#RangeThruInitial(type='text' style='width:50px;')
       div#BooleanValue(style='display:none;')              
         //- for Boolean we give two radio buttons: true and false
         | Choose the default value or set the Property's value when you use it.
         br
+        br
         .row
-          .col-xs-12
-            input.form-control#TrueRadio(type='radio' name='bools' value=1)
-            span 
-              | true
-            span 
-              | &nbsp;
-            input.form-control#FalseRadio(type='radio' name='bools' value=0)
-            span 
-              | false
+          .col-xs-2
+              input#TrueRadio(type='radio' name='bools' value="1" style="width:25px;")
+              span
+                | true
+          .col-xs-2
+              input#FalseRadio(type='radio' name='bools' value="0" style="width:25px;")
+              span
+                | false
       div#PicklistValue(style='display:none;')              
         //- for Picklist we give user a textarea
         | Enter values to choose from, separated by a space--just like with search tags.
+        br
         br
         textarea.form-control#PicklistInitial(cols=40 rows=2 placeholder='full set of values')
       div#TypeValue(style='display:none')
         //- for Type there is no initialization
         | This Property cannot be initialized until you use it.
-
+      br
+      br
 
