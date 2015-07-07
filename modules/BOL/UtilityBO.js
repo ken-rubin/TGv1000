@@ -53,9 +53,9 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Router handler functions.
     self.routeSearch = function (req, res) {
 
-        // This is a search for something based on tags. There are 8 knds of something whose descriptions have been loaded into m_resourceTypes above.
-        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others use a different query. This is because images and sounds have no
-        // FK table relationship, but the other do.
+        // This is a search for something based on tags. There are 6 kinds of things whose descriptions have been loaded into m_resourceTypes above.
+        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (excluding 4, comic, which isn't search for or saved yet) use a different query. This is because images and sounds have no
+        // FK table relationship, but the others do.
 
         try {
 
@@ -132,7 +132,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                             sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
 
-                        } else {    // Projects, etc. -- a totally different query.
+                        } else {    // Project, Type, Method -- a totally different query.
 
                             sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }

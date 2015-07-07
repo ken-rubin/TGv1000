@@ -26,6 +26,7 @@ Jerry
 - Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Images in toolstrip now have spaces in id replaced by _. Might have to catch this elsewhere.
+- Before saving picklist initialvalue, uniquify.
 
 
 

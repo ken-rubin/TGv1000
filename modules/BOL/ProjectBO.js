@@ -50,156 +50,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
-    self.routeRetrieveMethod = function (req, res) {
-
-        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
-        // req.body.typeId
-        // req.body.userName
-
-        try {
-
-            var method =
-            {
-
-            };
-
-            var exceptionRet = sql.execute("select * from " + self.dbname + "methods where id=" + req.body.methodId+ ";",
-                function(rows){
-
-                    if (rows.length !== 1) {
-
-                        res.json({
-                            success: false,
-                            message: 'Could not retrieve type from database.'
-                        });
-                    } else {
-
-                        var row = rows[0];
-
-
-
-
-
-
-
-                        m_functionFetchTags(type.id, 7, req.body.userName, function(tags){
-
-                            type.tags = tags;
-
-                            res.json({
-                                success: true,
-                                method: method
-                            });
-                        });
-                    }
-                },
-                function(strError){
-
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
-                    return;
-                }
-            );
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-                return;
-            }
-        } catch(e) {
-
-            res.json({
-                success: false,
-                message: e.message
-            });
-        }
-    }
-
-    self.routeRetrieveType = function (req, res) {
-
-        console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
-        // req.body.methodId
-        // req.body.userName
-
-        try {
-
-            var type =
-            {
-                isApp: true,
-                id: 0,
-                ordinal: 0,
-                tags: '',
-                properties: [],
-                methods: [{ name: "initialize", workspace: "", method: "" }],
-                events: [],
-                dependencies: [],
-                name: "",
-                imageResourceId: 0
-            };
-
-            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId+ ";",
-                function(rows){
-
-                    if (rows.length !== 1) {
-
-                        res.json({
-                            success: false,
-                            message: 'Could not retrieve type from database.'
-                        });
-                    } else {
-
-                        var row = rows[0];
-                        type.isApp = row.isApp;
-                        type.id = row.id;
-                        type.ordinal = row.ordinal;
-                        type.name = row.name;
-                        type.imageResourceId = row.imageResourceId;
-                        var code = JSON.parse(row.jsonCode);
-                        type.properties = code.properties;
-                        type.methods = code.methods;
-                        type.events = code.events;
-                        type.dependencies = code.dependencies;
-                        m_functionFetchTags(type.id, 5, req.body.userName, function(tags){
-
-                            type.tags = tags;
-
-                            res.json({
-                                success: true,
-                                type: type
-                            });
-                        });
-                    }
-                },
-                function(strError){
-
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
-                    return;
-                }
-            );
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-                return;
-            }
-        } catch(e) {
-
-            res.json({
-                success: false,
-                message: e.message
-            });
-        }
-    }
-
     self.routeRetrieveProject = function (req, res) {
 
         console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
@@ -207,9 +57,10 @@ module.exports = function ProjectBO(app, sql, logger) {
         // req.body.userName
 
         // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
-        // read all types with matching comicId. And return the project javascript object.
+        // read all types with matching comicId. For each type we'll read methods, properties and events with matching typeId.
+        // Then we'll return the complete project javascript object.
 
-        try{
+        try {
 
             var project = 
             {
@@ -246,11 +97,37 @@ module.exports = function ProjectBO(app, sql, logger) {
                 ordinal: 0,
                 tags: '',
                 properties: [],
-                methods: [{ name: "initialize", workspace: "", method: "" }],
+                methods: [],
                 events: [],
                 dependencies: [],
                 name: "",
                 imageResourceId: 0
+            };
+
+            var method = 
+            { 
+                name: "", 
+                workspace: "", 
+                method: "",
+                id: 0,
+                imageResourceId: 0,
+                ordinal: 0
+            };
+
+            var property = 
+            {
+                name: "",
+                id: 0,
+                ordinal: 0,
+                propertyTypeId: 0,
+                initialValue: ""
+            };
+
+            var event = 
+            {
+                name: "",
+                id: 0,
+                ordinal: 0
             };
 
             var ex = sql.execute("select count(t.id) as cnt from " + self.dbname + "types t where t.comicId in (select id from " + self.dbname + "comics where projectId=" + req.body.projectId + ");",
@@ -420,41 +297,153 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_functionFetchTags = function(thingId, resourceTypeId, userName, callback) {
+    self.routeRetrieveType = function (req, res) {
+
+        console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
+        // req.body.methodId
+        // req.body.userName
 
         try {
 
-            // Retireve and set project.tags, skipping "project" and req.body.userName.
-            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
+            var type =
+            {
+                isApp: true,
+                id: 0,
+                ordinal: 0,
+                tags: '',
+                properties: [],
+                methods: [{ name: "initialize", workspace: "", method: "" }],
+                events: [],
+                dependencies: [],
+                name: "",
+                imageResourceId: 0
+            };
+
+            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId+ ";",
                 function(rows){
 
-                    var tags = "";
-                    if (rows.length > 0) {
+                    if (rows.length !== 1) {
 
-                        rows.forEach(function(row) {
+                        res.json({
+                            success: false,
+                            message: 'Could not retrieve type from database.'
+                        });
+                    } else {
 
-                            if (row.description !== m_resourceTypes[resourceTypeId] && row.description !== userName) {    // Add filtering out all valid e-mail addresses (in case e-mail addresses are used as userNames in the future).
+                        var row = rows[0];
+                        type.isApp = row.isApp;
+                        type.id = row.id;
+                        type.ordinal = row.ordinal;
+                        type.name = row.name;
+                        type.imageResourceId = row.imageResourceId;
+                        var code = JSON.parse(row.jsonCode);
+                        type.properties = code.properties;
+                        type.methods = code.methods;
+                        type.events = code.events;
+                        type.dependencies = code.dependencies;
+                        m_functionFetchTags(type.id, 5, req.body.userName, function(tags){
 
-                                tags += row.description + ' ';
-                            }
+                            type.tags = tags;
+
+                            res.json({
+                                success: true,
+                                type: type
+                            });
                         });
                     }
-
-                    callback(tags);
-                    return;
                 },
                 function(strError){
 
-                    throw new Error(strError);
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                    return;
                 }
             );
-            if (exceptionRet){
+            if (exceptionRet) {
 
-                throw exceptionRet;
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+                return;
             }
         } catch(e) {
 
-            throw e;
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    self.routeRetrieveMethod = function (req, res) {
+
+        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
+        // req.body.typeId
+        // req.body.userName
+
+        try {
+
+            var method =
+            {
+
+            };
+
+            var exceptionRet = sql.execute("select * from " + self.dbname + "methods where id=" + req.body.methodId+ ";",
+                function(rows){
+
+                    if (rows.length !== 1) {
+
+                        res.json({
+                            success: false,
+                            message: 'Could not retrieve type from database.'
+                        });
+                    } else {
+
+                        var row = rows[0];
+
+
+
+
+
+
+
+                        m_functionFetchTags(method.id, 7, req.body.userName, function(tags){
+
+                            method.tags = tags;
+
+                            res.json({
+                                success: true,
+                                method: method
+                            });
+                        });
+                    }
+                },
+                function(strError){
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                    return;
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+                return;
+            }
+        } catch(e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
         }
     }
 
@@ -852,6 +841,44 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             callback(err);   
             return;
+        }
+    }
+
+    var m_functionFetchTags = function(thingId, resourceTypeId, userName, callback) {
+
+        try {
+
+            // Retireve and set project.tags, skipping "project" and req.body.userName.
+            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
+                function(rows){
+
+                    var tags = "";
+                    if (rows.length > 0) {
+
+                        rows.forEach(function(row) {
+
+                            if (row.description !== m_resourceTypes[resourceTypeId] && row.description !== userName) {    // Add filtering out all valid e-mail addresses (in case e-mail addresses are used as userNames in the future).
+
+                                tags += row.description + ' ';
+                            }
+                        });
+                    }
+
+                    callback(tags);
+                    return;
+                },
+                function(strError){
+
+                    throw new Error(strError);
+                }
+            );
+            if (exceptionRet){
+
+                throw exceptionRet;
+            }
+        } catch(e) {
+
+            throw e;
         }
     }
 
