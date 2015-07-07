@@ -184,12 +184,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							exceptionRet = client.renameEventInActiveType(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
-							
+
 						} else {
 
 							throw new Error("Invalid objectType passed to Rename Dialog.")
 						}
 
+						m_dialog.close();
+
+						errorHelper.show("The rename succeeded.", 2000);
+							
 					} catch (e) {
 
 						errorHelper.show(e);

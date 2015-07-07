@@ -68,16 +68,11 @@ $(document).ready(function () {
 				// Disable all the TypeWell icons, since there is current no project loaded.
 				$(".disabledifnoproj").prop("disabled", true);
 
-
-
-
-
-
-
-
-
 				// Cause the code and designer panels to size themselves.
 				$(window).resize();
+
+				exceptionRet = client.makeAnEmptyProject();
+				if (exceptionRet) { throw exceptionRet; }
 
 			} catch (e) {
 

@@ -185,9 +185,9 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 						try {
 
 							var jItem = $("#tool-" + strOriginalName);
-							jItem.tooltip('destroy');
-							jItem.attr({title: strNewName});
-							jItem.tooltip();
+							// jItem.tooltip('destroy');
+							// jItem.tooltip();
+							jItem.attr({"data-original-title": strNewName});
 							jItem.attr("id", "tool-" + strNewName);
 
 						} catch(e) {

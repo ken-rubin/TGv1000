@@ -21,9 +21,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(bCreateProjectAutomatically) {
 
 						try {
+
+							m_bCreateProjectAutomatically = bCreateProjectAutomatically || false;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -68,6 +70,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            buttons: [
 					            	{
 					            		label: "Create Project",
+					            		id: "createProjectBtn",
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
@@ -107,6 +110,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 							$("#ProjectName").focus();
+
+							if (m_bCreateProjectAutomatically) {
+
+								// Click the Create Project Button automatically
+								$("#createProjectBtn").click();
+							}
 
 						} catch (e) {
 
@@ -409,6 +418,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_dialog.close();
 
+							if (m_bCreateProjectAutomatically) {
+
+								errorHelper.show("A default project has been created for you. This is just for our convenience while testing.", 3500);
+							}
+
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -480,6 +494,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_comicName = '';
 				var m_comicTags = '';
 				var m_imageResourceId = 0;
+				var m_bCreateProjectAutomatically = false;
 			};
 
 			// Return the constructor function as the module object.

@@ -110,6 +110,26 @@ define(["Core/errorHelper",
 						}
 					}
 
+					self.makeAnEmptyProject = function () {
+
+						try {
+
+							m_openDialog = new NewProjectDialog();
+							var exceptionRet = m_openDialog.create(true);	// This is to tell the dialog to create a project automatically
+																			// and then close its dialog and use errorHelper to tell the user.
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.showOpenProjectDialog = function (functionOK) {
 
 						try {
@@ -641,11 +661,14 @@ define(["Core/errorHelper",
 						try {
 
 							var activeClType = types.getActiveClType();
-							activeClType.data.name = strNewName;
-							activeClType.data.types[index] = activeClType;
+							activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
 
 							// Call Code.js#renameType(clType, strOriginalName).
 							var exceptionRet = code.renameType(activeClType, strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Have types.js change header of TypeWell.
+							exceptionRet = types.changeTypeWellHeader(strNewName);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Need to call someone to update the tooltip of the correct tool in toolstrip.

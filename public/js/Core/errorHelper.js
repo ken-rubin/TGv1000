@@ -19,14 +19,17 @@ define(function () {
 				// Expose method which displays an error to the user.
 				// Parameters:
 				// Error to display.
-				self.show = function (error) {
+				self.show = function (error, autoCloseMS) {
 
 					try {
+
+						m_autoCloseMS = autoCloseMS || 0;
 
 						// Possibly convert from various objects to string.
 						if (error.responseText) {
 
 							error = error.responseText;
+
 						} else if (error.message) {
 
 							error = error.message;
@@ -35,7 +38,7 @@ define(function () {
 						// Show the dialog.
 						BootstrapDialog.show({
 
-				            title: "error",
+				            title: m_autoCloseMS === 0 ? "Error" : "Note",
 				            message: error,
 				            buttons: [{
 
@@ -46,7 +49,8 @@ define(function () {
 
 				                    dialogItself.close();
 				                }
-				            }]
+				            }],
+				            onshown: m_functionOnShownDialog
 				        });
 					} catch (e) {
 
@@ -57,10 +61,30 @@ define(function () {
 
 				alert(e.message);
 			}
+
+			var m_functionOnShownDialog = function(dialogItself) {
+
+				m_dialog = dialogItself;
+
+				if (m_autoCloseMS > 0) {
+
+					setTimeout(
+						function(){ 
+									m_dialog.close(); 
+								}, 
+						m_autoCloseMS
+					);
+				}
+			}
+
+			var m_autoCloseMS = 0;
+			var m_dialog = null;
 		}
 
 		// Allocate and return singleton.
 		return new functionErrorHelper();
+
+
 	} catch (e) {
 
 		alert(e.message);

@@ -518,6 +518,19 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						return true;
 					}
 
+//used
+					self.changeTypeWellHeader = function (strNewTypeName) {
+
+						try {
+
+							return m_functionSetTypewellHeader(strNewTypeName);
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////////
 					// Private methods.
 
@@ -534,7 +547,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							//////////////////////////////////////////////////////////////////
 
-							$("#TWtypeName").text(m_clTypeActive.data.name);
+							m_functionSetTypewellHeader(m_clTypeActive.data.name);
 							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
 
 							if (m_clTypeActive.data.isApp) {
@@ -567,6 +580,24 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							return e;
 						}
 					}
+
+					// Called if Type is renamed.
+//used
+					var m_functionSetTypewellHeader = function (strNewTypeName) {
+
+						try {
+
+							$("#TWtypeName").text(strNewTypeName);
+
+							return null;
+						
+						} catch(e) {
+
+							return e;
+						}
+
+					}
+
 
 //used
 					var m_functionRegenTWMethodsTable = function () {
@@ -679,7 +710,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
-							var exceptionRet = client.showGenericRenameDialog('type', -1);
+							var exceptionRet = client.showGenericRenameDialog('type', m_ActiveTypeIndex);
 							if (exceptionRet) { throw exceptionRet; }
 							
 						} catch (e) {
