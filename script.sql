@@ -456,6 +456,17 @@ begin
 		set @dbstate := 27.0;
     end if;
 
+    if @dbstate = 27.0 then
+    
+		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/RetrieveMethod' where method='routeRetrieveMethod';
+		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/RetrieveType' where method='routeRetrieveType';
+		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/RetrieveProject' where method='routeRetrieveProject';
+		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/SaveProject' where method='routeSaveProject';
+    
+        UPDATE `TGv1000`.`control` set dbstate=28.0 where id=1;
+		set @dbstate := 28.0;
+    end if;
+
 end;
 
 //

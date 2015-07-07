@@ -461,7 +461,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/ResourceBO/RetrieveProject", 
+							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
 									projectId: iProjectId,
 									userName: self.getTGCookie("userName")	// for tag elimination
@@ -526,7 +526,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/ResourceBO/RetrieveType", 
+							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
 								{
 									typeId: iTypeId,
 									userName: self.getTGCookie("userName")	// for tag elimination
@@ -729,7 +729,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/ResourceBO/RetrieveMethod", 
+							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
 								{
 									methodId: iMethodId,
 									userName: self.getTGCookie("userName")	// for tag elimination

@@ -93,7 +93,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							$.ajax({
 
 								type: 'POST',
-								url: '/BOL/ResourceBO/SaveProject',
+								url: '/BOL/ProjectBO/SaveProject',
 								contentType: 'application/json',
 								data: JSON.stringify(data),
 								dataType: 'json',

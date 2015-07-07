@@ -184,11 +184,10 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 						try {
 
-							var jItem = $("#tool-" + strOriginalName);
-							// jItem.tooltip('destroy');
-							// jItem.tooltip();
+							var jItem = $("#tool-" + client.removeSpaces(strOriginalName));
+							// No need to destroy and re-establish tooltip. We'll do it manually. It works better.
 							jItem.attr({"data-original-title": strNewName});
-							jItem.attr("id", "tool-" + strNewName);
+							jItem.attr("id", "tool-" + client.removeSpaces(strNewName));
 
 						} catch(e) {
 
