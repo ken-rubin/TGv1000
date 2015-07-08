@@ -94,24 +94,26 @@ module.exports = function ProjectBO(app, sql, logger) {
             {
                 isApp: true,
                 id: 0,
+                name: "",
                 ordinal: 0,
                 tags: '',
+                imageResourceId: 0,
                 properties: [],
                 methods: [],
-                events: [],
-                dependencies: [],
-                name: "",
-                imageResourceId: 0
+                events: []
             };
 
             var method = 
             { 
                 name: "", 
                 workspace: "", 
-                method: "",
                 id: 0,
+                tags: '',
                 imageResourceId: 0,
-                ordinal: 0
+                createdByUserId: 0,
+                price: 0,
+                ordinal: 0,
+                description: ""
             };
 
             var property = 
