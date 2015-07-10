@@ -31,6 +31,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							self.data = project;
+							client.setComicBasedFlag(self.data.isComicBased);
 							client.setProjectDirtyBool(true);
 
 							return comics.load(self.data.comics);	// the global object

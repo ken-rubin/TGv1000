@@ -467,6 +467,15 @@ begin
 		set @dbstate := 28.0;
     end if;
 
+    if @dbstate = 28.0 then
+    
+		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
+			VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveCountUsersProjects',1);
+    
+        UPDATE `TGv1000`.`control` set dbstate=29.0 where id=1;
+		set @dbstate := 29.0;
+    end if;
+
 end;
 
 //

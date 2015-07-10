@@ -73,6 +73,17 @@ define(["Core/errorHelper"],
 								}
 							}
 
+							// Add events.
+
+
+
+
+
+
+
+
+							
+
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
@@ -490,7 +501,7 @@ define(["Core/errorHelper"],
 
 									var iViewportHeight = $(window).height();
 									var iTypeWellHeight = $("#TypeWell").height();
-									var iColXs1Width = $(".forgettingwidth").width();
+									var iColXs1Width = $(".toGetLeftCol").width();
 									var iNavbarHeight = $(".navbar").height();
 
 									var iBordersAndSpacingPadding = 70;

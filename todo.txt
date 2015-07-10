@@ -21,12 +21,14 @@ Jerry
 - I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up.
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is someone else's. Do we need to keep
 -    the original creator's user id? Probably a good idea.
-- New project is not clearing Designer or comic strip. And more?
+- New project is not clearing Designer.
+- Close project is not clearing Designer or comicpanels strip.
 - If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
 - Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Images in toolstrip now have spaces in id replaced by _. Might have to catch this elsewhere.
 - Before saving picklist initialvalue, uniquify.
+- Write event loader in Code.js#self.addType.
 
 
 

@@ -13,6 +13,7 @@ var tools = null;
 var code = null;
 var types = null;
 var comicsPanel = null;
+var bProjectIsComicBased = false;
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
@@ -70,9 +71,6 @@ $(document).ready(function () {
 
 				// Cause the code and designer panels to size themselves.
 				$(window).resize();
-
-				exceptionRet = client.makeAnEmptyProject();
-				if (exceptionRet) { throw exceptionRet; }
 
 			} catch (e) {
 

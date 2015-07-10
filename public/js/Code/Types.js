@@ -562,10 +562,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var exceptionRet = m_functionRegenTWMethodsTable();
 							if (exceptionRet) { return exceptionRet; }
 
-							var exceptionRet = m_functionRegenTWPropertiesTable();
+							exceptionRet = m_functionRegenTWPropertiesTable();
 							if (exceptionRet) { return exceptionRet; }
 
-							var exceptionRet = m_functionRegenTWEventsTable();
+							exceptionRet = m_functionRegenTWEventsTable();
 							if (exceptionRet) { return exceptionRet; }
 
 							// var jqTWimage = $("#TWimage");
@@ -623,6 +623,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							};
 							$("#TWmethodsTbody .btn-default").tooltip();
 
+							return null;
+
 						} catch (e) { 
 
 							return e; 
@@ -646,6 +648,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							};
 							$("#TWpropertiesTbody .btn-default").tooltip();
 
+							return null;
+
 						} catch (e) { 
 
 							return e; 
@@ -668,6 +672,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
 							};
 							$("#TWeventsTbody .btn-default").tooltip();
+
+							return null;
 
 						} catch (e) { 
 

@@ -110,26 +110,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.makeAnEmptyProject = function () {
-
-						try {
-
-							m_openDialog = new NewProjectDialog();
-							var exceptionRet = m_openDialog.create(true);	// This is to tell the dialog to create a project automatically
-																			// and then close its dialog and use errorHelper to tell the user.
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
 					self.showOpenProjectDialog = function (functionOK) {
 
 						try {
@@ -970,6 +950,14 @@ define(["Core/errorHelper",
 						navbar.enableDisableProjectsMenuItems();
 					}
 
+					// This saves the project's isComicBased field to a global var.
+					// Drawing and resizing will consult the bool to see (1) see if comicstrip and comicpanelsstrip should be displayed; 
+					// and (2) if the right-hand .col-xs-1 should be eliminated and the middle col-xs-10 should be changed to .col-xs-11.
+					self.setComicBasedFlag = function (bIsComicBased) {
+
+						bProjectIsComicBased = bIsComicBased;
+					}
+
 					self.functionNewProject = function (project) {
 
 						try {
@@ -981,21 +969,10 @@ define(["Core/errorHelper",
 				    		// Allocate project.
 				    		m_clProject = new Project();
 				    		var exceptionRet = m_clProject.load(project);
-				    		if (exceptionRet) {
-
-				    			return exceptionRet;
-				    		}
+				    		if (exceptionRet) { return exceptionRet; }
 
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").tooltip();
-
-
-
-
-
-
-
-
 
 							return null;
 
