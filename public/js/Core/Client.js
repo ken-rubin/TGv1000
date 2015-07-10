@@ -969,9 +969,8 @@ define(["Core/errorHelper",
 							// Use project data and user history to determine initial display settings for comic and panels strips (along with width of designer and code sections).
 							if (m_clProject.data.comics.items.length > 1) {
 
-								// Set globael var so comic stuff will be displayed on resize.
-								m_functionSetBDisplayComics(true);
-								$(window).resize();
+								// Set globael var so comic stuff will be displayed on resize and force a resize.
+								self.functionSetBDisplayComics(true);
 
 							} else {
 
@@ -988,15 +987,15 @@ define(["Core/errorHelper",
 
 										if (data.cnt > 5) {
 
-											m_functionSetBDisplayComics(false);
+											self.functionSetBDisplayComics(false);
 
 										} else if (data.cnt < 4) {
 
-											m_functionSetBDisplayComics(true);
+											self.functionSetBDisplayComics(true);
 
 										} else {
 
-											m_functionSetBDisplayComics(false);
+											self.functionSetBDisplayComics(false);
 											errorHelper.show("Based on your experience level, Help is turned off. You may turn it back on with the Show Help menu item.", 7500);
 										}
 
@@ -1004,11 +1003,9 @@ define(["Core/errorHelper",
 
 										// !data.success
 										// This can't be good. We'll just turn help on.
-										m_functionSetBDisplayComics(true);
+										self.functionSetBDisplayComics(true);
 									}
 								});
-
-								$(window).resize();
 							}
 
 							return null;
@@ -1089,22 +1086,23 @@ define(["Core/errorHelper",
 						return types.isPropertyNameAvailableInActiveType(strName, myIndex);
 					}
 
-					// Private methods
 					// Set global var governing display of comic and panels strips and Show/Hide Help menu item.
-					var m_functionSetBDisplayComics = function(bDisplayComicsStuff) {
+					self.functionSetBDisplayComics = function(bDisplayComicsStuff) {
 
 						bDisplayComics = bDisplayComicsStuff;
 
 						if (bDisplayComics) {
 
-							$("#ComicsOnButton").css("display", "none");
-							$("#ComicsOffButton").css("display", "block");
+							$("#ComicsOn").css("display", "none");
+							$("#ComicsOff").css("display", "block");
 
 						} else {
 
-							$("#ComicsOnButton").css("display", "block");
-							$("#ComicsOffButton").css("display", "none");
+							$("#ComicsOn").css("display", "block");
+							$("#ComicsOff").css("display", "none");
 						}
+
+						$(window).resize();
 					}
 
 					// Private variables.

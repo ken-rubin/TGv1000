@@ -495,6 +495,7 @@ define(["Core/errorHelper"],
 							//    (3) A .col-xs-1 on the right with two elements that also remain fixed vertically when scrolling:
 							//        (a) The narrow horizontal scrolling comicstrip
 							//        (b) The vertical comicpanelsstrip taking up most of the remaining height of the visible column.
+
 							$(window).resize(function () {
 
 								try {
@@ -506,29 +507,41 @@ define(["Core/errorHelper"],
 
 									var iBordersAndSpacingPadding = 70;
 
-									// Center the horizontal comicstrip in the viewport. It will remain vertically fixed.
-									$("#comicstrip").css("position", "fixed");
-									var iComicstripTop = iNavbarHeight + 10;
-									$("#comicstrip").css("top", iComicstripTop.toString() + "px");
-									$("#comicstrip").width((iColXs1Width + 80).toString() + "px");
-									$("#comicstrip").css("margin-left", "-60px");
+									if (bDisplayComics) {
+
+										// The comicstrip and comicpanelstrip WILL be displayed.
+										// Designer and code sections shoudl take care of themselves.
+
+										// Center the horizontal comicstrip in the viewport. It will remain vertically fixed.
+										$("#comicstrip").css("position", "fixed");
+										var iComicstripTop = iNavbarHeight + 10;
+										$("#comicstrip").css("top", iComicstripTop.toString() + "px");
+										$("#comicstrip").width((iColXs1Width + 80).toString() + "px");
+										$("#comicstrip").css("margin-left", "-60px");
+
+										// Position the fixed comicpanelstrip.
+										var iComicPanelstripTop = iComicstripTop + $("#comicstrip").height() + 40;
+										$("#comicpanelstrip").css("top", iComicPanelstripTop.toString() + "px");
+										$("#comicpanelstrip").height((iViewportHeight - iComicPanelstripTop - 60 ).toString() + "px");
+										var iComicpanelstripWidth = $("#comicpanelstrip").width();
+										var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2 - 40).toString() + "px";
+										$("#comicpanelstrip").css("margin-left", strComicpanelstripLeft);
+
+									} else {
+
+										// comicstrip and comicpanelstrip WILL NOT be displayed.
+										// Designer and code sections shoudl take care of themselves.
+										$(".toGetRightCol").width(0);
+									}
 
 									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.
-									var iToolstripTop = iComicstripTop;
+									var iToolstripTop = iNavbarHeight + 10;
 									$("#toolstrip").css("top", iToolstripTop.toString() + "px");
 									$("#toolstrip").height((iViewportHeight - iToolstripTop - 60).toString() + "px");
 									var iToolstripWidth = $("#toolstrip").width();
 									var strToolstripLeft = ((iColXs1Width - iToolstripWidth) / 2).toString() + "px";
 									$("#toolstrip").css("margin-left", strToolstripLeft);
 									
-									// Position the fixed comicpanelstrip.
-									var iComicPanelstripTop = iComicstripTop + $("#comicstrip").height() + 40;
-									$("#comicpanelstrip").css("top", iComicPanelstripTop.toString() + "px");
-									$("#comicpanelstrip").height((iViewportHeight - iComicPanelstripTop - 60 ).toString() + "px");
-									var iComicpanelstripWidth = $("#comicpanelstrip").width();
-									var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2 - 40).toString() + "px";
-									$("#comicpanelstrip").css("margin-left", strComicpanelstripLeft);
-
 									$("#BlocklyIFrame").height(iViewportHeight - 
 										iTypeWellHeight -
 										iBordersAndSpacingPadding -
