@@ -510,7 +510,10 @@ define(["Core/errorHelper"],
 									if (bDisplayComics) {
 
 										// The comicstrip and comicpanelstrip WILL be displayed.
-										// Designer and code sections shoudl take care of themselves.
+										// Designer and code sections should take care of themselves.
+										$(".toGetRightCol").removeClass("hidden");
+										$(".toGetMiddleCol").removeClass("col-xs-11");
+										$(".toGetMiddleCol").addClass("col-xs-10");
 
 										// Center the horizontal comicstrip in the viewport. It will remain vertically fixed.
 										$("#comicstrip").css("position", "fixed");
@@ -530,8 +533,10 @@ define(["Core/errorHelper"],
 									} else {
 
 										// comicstrip and comicpanelstrip WILL NOT be displayed.
-										// Designer and code sections shoudl take care of themselves.
-										$(".toGetRightCol").width(0);
+										// Designer and code sections should take care of themselves.
+										$(".toGetRightCol").addClass("hidden");
+										$(".toGetMiddleCol").removeClass("col-xs-10");
+										$(".toGetMiddleCol").addClass("col-xs-11");
 									}
 
 									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.

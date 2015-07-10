@@ -70,7 +70,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         res.json({
                             success: true,
-                            cnt: rows[0].cnt
+                            cnt: 4//rows[0].cnt
                         });
                     }
                 },

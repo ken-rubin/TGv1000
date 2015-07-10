@@ -59,6 +59,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 							});
 
 							// Handle resize to fit the designer to the visible height of the designer.
+							// And now that comics are optional, let's handle the width here, too.
 							$(window).resize(function () {
 
 								try {

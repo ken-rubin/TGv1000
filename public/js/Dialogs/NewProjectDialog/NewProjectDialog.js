@@ -792,6 +792,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						{
 							items: [
 								{
+									imageResourceId: 1,
+									id: 0,
+									name: 'comic0',
+									tags: 'tagComic',
+									ordinal: 0,
+									comicPanels: {
+										items: [
+											{name: "XYZ", url: "http://www.techgroms.com", description: "descr1", ordinal: 0, thumbnail: "tn3.png"}
+										]
+									},
 									types: { 
 										items: [
 											{
