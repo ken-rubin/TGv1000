@@ -470,10 +470,47 @@ begin
     if @dbstate = 28.0 then
     
 		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveCountUsersProjects',1);
-    
+			VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveCountUsersProjects','post','routeRetrieveCountUsersProjects',1);
+		
+        CREATE TABLE `TGv1000`.`classOrProduct` (
+		  `id` INT NOT NULL AUTO_INCREMENT,
+		  `name` VARCHAR(255) NOT NULL,
+		  `isProduct` BIT(1) NOT NULL DEFAULT 0,
+		  `price` DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+		  `createdByUserId` INT NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE INDEX `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		ALTER TABLE `TGv1000`.`comics` 
+			CHANGE COLUMN `projectId` `classOrProductId` INT(11) NOT NULL ;
+            
+		ALTER TABLE `TGv1000`.`projects` 
+			ADD COLUMN `ownedByUserId` INT(11) NOT NULL AFTER `description`,
+			ADD COLUMN `classOrProductId` INT(11) NOT NULL AFTER `ownedByUserId`;
+            
+		ALTER TABLE `TGv1000`.`types` 
+			DROP COLUMN `comicId`,
+			CHANGE COLUMN `jsonCode` `comicId` INT(11) NOT NULL ,
+			ADD COLUMN `projectId` INT(11) NOT NULL AFTER `comicId`;
+        
         UPDATE `TGv1000`.`control` set dbstate=29.0 where id=1;
 		set @dbstate := 29.0;
+    end if;
+
+    if @dbstate = 29.0 then
+    
+		INSERT INTO TGv1000.classOrProduct (id, `name`, isProduct, price, createdByUserId)
+			VALUES (1, 'New project help',0,0.00,1);
+            
+		INSERT INTO TGv1000.comics (id, classOrProductId, ordinal, imageResourceId, `name`)
+			VALUES (1,1,0,1,'Help');
+            
+		INSERT INTO TGv1000.comicPanels (id, comicId, ordinal, name, url, description, thumbnail)
+			VALUES (1,1,0,'Help panel 1','http://www.techgroms.com','','tn1.png');
+		
+        UPDATE `TGv1000`.`control` set dbstate=30.0 where id=1;
+		set @dbstate := 30.0;
     end if;
 
 end;

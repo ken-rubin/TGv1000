@@ -13,7 +13,7 @@ var tools = null;
 var code = null;
 var types = null;
 var comicsPanel = null;
-var bProjectIsComicBased = false;
+var bDisplayComics = false;
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
@@ -69,7 +69,7 @@ $(document).ready(function () {
 				// Disable all the TypeWell icons, since there is current no project loaded.
 				$(".disabledifnoproj").prop("disabled", true);
 
-				// Cause the code and designer panels to size themselves.
+				// Cause the code and designer panels to size themselves. Initially, there will be no comic or panels strips because of bDisplayComics setting.
 				$(window).resize();
 
 			} catch (e) {

@@ -50,6 +50,55 @@ module.exports = function ProjectBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+    self.routeRetrieveCountUsersProjects = function (req, res) {
+
+        console.log("Entered ProjectBO/routeRetrieveCountUsersProjects with req.body=" + JSON.stringify(req.body));
+        // req.body.userId
+
+        try {
+
+            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId,
+                function(rows){
+
+                    if (rows.length !== 1) {
+
+                        res.json({
+                            success: false,
+                            message: "Could not retrieve project."
+                        });
+                    } else {
+
+                        res.json({
+                            success: true,
+                            cnt: rows[0].cnt
+                        });
+                    }
+                },
+                function(strError){
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
+
+        } catch(e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeRetrieveProject = function (req, res) {
 
         console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));

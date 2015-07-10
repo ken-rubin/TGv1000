@@ -244,7 +244,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						price: 0,
 						createdByUserId: m_strUserId,
 						isDirty: true,
-						isComicBased: true,
 						comics: 
 						{
 							items: [
@@ -523,7 +522,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						price: 0,
 						createdByUserId: m_strUserId,
 						isDirty: true,
-						isComicBased: true,
 						comics: 
 						{
 							items: [
@@ -790,7 +788,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						price: 0,
 						createdByUserId: m_strUserId,
 						isDirty: true,
-						isComicBased: false,
 						comics: 
 						{
 							items: [

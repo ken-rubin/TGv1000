@@ -950,14 +950,6 @@ define(["Core/errorHelper",
 						navbar.enableDisableProjectsMenuItems();
 					}
 
-					// This saves the project's isComicBased field to a global var.
-					// Drawing and resizing will consult the bool to see (1) see if comicstrip and comicpanelsstrip should be displayed; 
-					// and (2) if the right-hand .col-xs-1 should be eliminated and the middle col-xs-10 should be changed to .col-xs-11.
-					self.setComicBasedFlag = function (bIsComicBased) {
-
-						bProjectIsComicBased = bIsComicBased;
-					}
-
 					self.functionNewProject = function (project) {
 
 						try {
@@ -973,6 +965,51 @@ define(["Core/errorHelper",
 
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").tooltip();
+
+							// Use project data and user history to determine initial display settings for comic and panels strips (along with width of designer and code sections).
+							if (m_clProject.data.comics.items.length > 1) {
+
+								// Set globael var so comic stuff will be displayed on resize.
+								m_functionSetBDisplayComics(true);
+								$(window).resize();
+
+							} else {
+
+								// If project has only 1 comic, it means it's a project a user started with New Project.
+								// Determine if showing help (comic) based on number of projects user has played with.
+								var posting = $.post("/BOL/ProjectBO/RetrieveCountUsersProjects", 
+									{
+										userId: self.getTGCookie("userId")
+									},
+									'json');
+								posting.done(function(data){
+
+									if (data.success) {
+
+										if (data.cnt > 5) {
+
+											m_functionSetBDisplayComics(false);
+
+										} else if (data.cnt < 4) {
+
+											m_functionSetBDisplayComics(true);
+
+										} else {
+
+											m_functionSetBDisplayComics(false);
+											errorHelper.show("Based on your experience level, Help is turned off. You may turn it back on with the Show Help menu item.", 7500);
+										}
+
+									} else {
+
+										// !data.success
+										// This can't be good. We'll just turn help on.
+										m_functionSetBDisplayComics(true);
+									}
+								});
+
+								$(window).resize();
+							}
 
 							return null;
 
@@ -1053,6 +1090,22 @@ define(["Core/errorHelper",
 					}
 
 					// Private methods
+					// Set global var governing display of comic and panels strips and Show/Hide Help menu item.
+					var m_functionSetBDisplayComics = function(bDisplayComicsStuff) {
+
+						bDisplayComics = bDisplayComicsStuff;
+
+						if (bDisplayComics) {
+
+							$("#ComicsOnButton").css("display", "none");
+							$("#ComicsOffButton").css("display", "block");
+
+						} else {
+
+							$("#ComicsOnButton").css("display", "block");
+							$("#ComicsOffButton").css("display", "none");
+						}
+					}
 
 					// Private variables.
 					var m_clProject = null;
