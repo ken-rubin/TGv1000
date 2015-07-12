@@ -513,6 +513,32 @@ begin
 		set @dbstate := 30.0;
     end if;
 
+
+    if @dbstate = 30.0 then
+    
+		CREATE TABLE `TGv1000`.`logitems` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+		  `logtypeId` int(11) NOT NULL,
+		  `jsoncontext` longtext NOT NULL,
+		  `processed` datetime DEFAULT NULL,
+		  `processedbyUserId` int(11) DEFAULT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=988 DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`logtypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
+		  `severity` tinyint(4) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        UPDATE `TGv1000`.`control` set dbstate=31.0 where id=1;
+		set @dbstate := 31.0;
+    end if;
+
 end;
 
 //

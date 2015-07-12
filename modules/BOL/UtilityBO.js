@@ -54,7 +54,7 @@ module.exports = function UtilityBO(app, sql, logger) {
     self.routeSearch = function (req, res) {
 
         // This is a search for something based on tags. There are 6 kinds of things whose descriptions have been loaded into m_resourceTypes above.
-        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (excluding 4, comic, which isn't search for or saved yet) use a different query. This is because images and sounds have no
+        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (excluding 4, comic, which isn't searched for or saved yet) use a different query. This is because images and sounds have no
         // FK table relationship, but the others do.
 
         try {
@@ -210,56 +210,6 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
-    // self.routeFetchCompiledJadeFile = function (req, res) {
-
-    //     try {
-
-    //         var jadeFilename = "public/adminzone/source/" + req.body.jadeFilename + ".jade";
-    //         m_fsInstance.readFile(jadeFilename, {encoding: "utf-8"}, function (err, jadeFile) {
-
-    //             if (err) {
-
-    //                 res.json({
-                        
-    //                     success: false,
-    //                     message: err
-    //                 });
-    //             }
-
-    //             var html = "";
-
-    //             try {
-
-    //                 var fn = m_jadeInstance.compile(jadeFile,
-    //                     {
-    //                         basedir: __dirname,
-    //                         pretty: true
-    //                     });                
-    //                 html = fn({});
-
-    //             } catch (f) {
-
-    //                 console.log("Error on jade.compile: " + f.message);
-    //             }
-
-    //             res.json({
-
-    //                 success: true,
-    //                 html: html
-    //             });
-    //         });
-
-    //     } catch (e) {
-
-    //          // Return success: false
-    //         res.json({
-                
-    //             success: false,
-    //             message: e.message
-    //         });
-    //     }
-    // }
-
     // self.routeGetDashboardFuncs = function (req, res) {
 
     //     console.log("Entered UtilityBO/routeGetDashboardFuncs");
@@ -347,8 +297,5 @@ module.exports = function UtilityBO(app, sql, logger) {
     // };
     
     // Private fields
-    // var m_sqlInstance = sql;
-    // var m_fsInstance = fs;
-    // var m_jadeInstance = jade;
 };
 
