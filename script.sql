@@ -572,13 +572,13 @@ begin
             
 		INSERT INTO TGv1000.comicPanels (id, comicId, ordinal, `name`, url, description, thumbnail)
 			VALUES 
-				(1,1,0,'FAQs','','',''),
-				(2,2,0,'FAQs','','',''),
-				(3,3,0,'Step 1','','',''),
-				(4,3,1,'Step 2','','',''),
-				(5,4,0,'Step 1','','',''),
-				(6,4,1,'Step 2','','',''),
-				(7,4,2,'Step 3','','','')
+				(1,1,0,'FAQs','http://www.techgroms.com','TechGroms FAQs','tn3.png'),
+				(2,2,0,'FAQs','http://www.techgroms.com','TechGroms FAQs','tn3.png'),
+				(3,3,0,'Step 1','http://www.bing.com','Session 1 Step 1','tn1.png'),
+				(4,3,1,'Step 2','http://www.microsoft.com','Session 1 Step 2','tn2.jpg'),
+				(5,4,0,'Step 1','http://www.google.com','Session 2 Step 1','tn4.png'),
+				(6,4,1,'Step 2','http://www.github.com','Session 2 Step 2','tn5.png'),
+				(7,4,2,'Step 3','http://www.sourcetree.com','Session 2 Step 3','tn6.png')
 			;
             
 		insert into TGv1000.`types` (id,`name`,isApp,imageResourceId,ordinal,comicId,projectId)

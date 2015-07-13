@@ -105,238 +105,157 @@ module.exports = function ProjectBO(app, sql, logger) {
         // req.body.projectId
         // req.body.userName
 
-        // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
-        // read all types with matching comicId. For each type we'll read methods, properties and events with matching typeId.
-        // Then we'll return the complete project javascript object.
+        // (1) We were given projectId. Read in that project's table row.
+        //  (1.1) Retrieve the project's tags.
+        // (2) Read in comics[] with comics[i].classOrProductId === project.classOrProductId. 
+        // (3) For each comic in comics read comicPanels[] with comicPanels[j].comicId === comics[i].id. Add to each comic in comics. This is basically a side step.
+        // (4) For each comic in comics read types[] with types[k].comicId === comics[i].id && types[k].projectId === project.id.
+        //  (4.1) For each Type read its tags
+        // (5-7) Read each type's methods, properties and events.
+        //  (5.1) For each method read its tags.
+        // (8) Then return the complete project javascript object.
 
         try {
 
-            var project = 
-            {
-                name: 'Fake project',
-                id: req.body.projectId,
-                description: 'Fake description',
-                tags: 'a b c',
-                imageResourceId: 0,
-                price: 0,
-                createdByUserId: req.body.userId,
-                isDirty: 1,
-                comics: 
-                {
-                    items: []
-                }
-            };
-
-            var comic = 
-            {
-                imageResourceId: 0,
-                id: 0,
-                name: '',
-                tags: '',
-                ordinal: 0,
-                types: {
-                    items: []
-                }
-            };
-
-            var type =
-            {
-                isApp: true,
-                id: 0,
-                name: "",
-                ordinal: 0,
-                tags: '',
-                imageResourceId: 0,
-                properties: [],
-                methods: [],
-                events: []
-            };
-
-            var method = 
-            { 
-                name: "", 
-                workspace: "", 
-                id: 0,
-                tags: '',
-                imageResourceId: 0,
-                createdByUserId: 0,
-                price: 0,
-                ordinal: 0,
-                description: ""
-            };
-
-            var property = 
-            {
-                name: "",
-                id: 0,
-                ordinal: 0,
-                propertyTypeId: 0,
-                initialValue: ""
-            };
-
-            var event = 
-            {
-                name: "",
-                id: 0,
-                ordinal: 0
-            };
-
-            var ex = sql.execute("select count(t.id) as cnt from " + self.dbname + "types t where t.comicId in (select id from " + self.dbname + "comics where projectId=" + req.body.projectId + ");",
-                function(rows){
-
+        // (1)
+            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
+                function(rows) {
                     if (rows.length !== 1) {
-
-                        res.json({
-                            success: false,
-                            message: "Could not retrieve project."
-                        });
+                        res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
                     } else {
 
-                        typesCtr = rows[0].cnt;
+                        var row = row[0];
+                        var project = 
+                        {
+                            id: row.id,
+                            name: row.name,
+                            createdByUserId: row.createdByUserId,
+                            price: row.price,
+                            imageResourceId: row.imageResourceId,
+                            description: row.description,
+                            ownedByUserId: row.ownedByUserId,
+                            classOrProductId: row.classOrProductId,
+                            tags: '',
+                            isDirty: 1,
+                            comics:
+                            {
+                                items: []
+                            }
+                        };
+        // (1.1)
+                        m_functionFetchTags(
+                            project.id, 
+                            3, 
+                            req.body.userName, 
+                            function(tags)  {
 
-                        var exceptionRet = sql.execute("select * from " + self.dbname + "projects where id=" + req.body.projectId + ";",
-                            function(rows){
+                                project.tags = tags;
+        // (2)
+                                ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
+                                    function(rows){
 
-                                if (rows.length !== 1) {
+                                        if (rows.length === 0) {
+                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                        } else {
 
-                                    res.json({
-                                        success: false,
-                                        message: 'Could not retrieve project from database.'
-                                    });
-                                } else {
+                                            rows.forEach(
+                                                function(row){
 
-                                    project.name = rows[0].name;
-                                    project.id = rows[0].id;
-                                    project.description = rows[0].description;
-                                    project.imageResourceId = rows[0].imageResourceId;
-                                    project.price = rows[0].price;
-                                    project.createdByUserId = rows[0].createdByUserId;
-                                    project.isDirty = false;
-                                    m_functionFetchTags(project.id, 3, req.body.userName, function(tags){
-
-                                        project.tags = tags;
-
-                                        // Now comics.
-                                        exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.id + " order by ordinal asc;",
-                                            function(rows){
-
-                                                rows.forEach(function(row) {
-
-                                                    var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
-                                                    comicItem.imageResourceId = row.imageResourceId;
-                                                    comicItem.id = row.id;
-                                                    comicItem.name = row.name;
-                                                    comicItem.ordinal = row.ordinal;
-                                                    m_functionFetchTags(comicItem.id, 4, req.body.userName, function(tags){
-
-                                                        comicItem.tags = tags;
-
-                                                        // Now types.
-                                                        exceptionRet = sql.execute("select * from " + self.dbname + "types where comicId=" + comicItem.id + " order by ordinal asc;",
-                                                            function(rows){
-
-                                                                rows.forEach(function(row) {
-
-                                                                    var typeItem = JSON.parse(JSON.stringify(type));    // clone type.
-                                                                    typeItem.isApp = row.isApp;
-                                                                    typeItem.id = row.id;
-                                                                    typeItem.ordinal = row.ordinal;
-                                                                    typeItem.name = row.name;
-                                                                    typeItem.imageResourceId = row.imageResourceId;
-                                                                    var code = JSON.parse(row.jsonCode);
-                                                                    typeItem.properties = code.properties;
-                                                                    typeItem.methods = code.methods;
-                                                                    typeItem.events = code.events;
-                                                                    typeItem.dependencies = code.dependencies;
-                                                                    m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
-
-                                                                        typeItem.tags = tags;
-                                                                        
-                                                                        comicItem.types.items.push(typeItem);
-
-                                                                        if (--typesCtr === 0) {
-
-                                                                            res.json({
-                                                                                success: true,
-                                                                                project: project
-                                                                            });
-                                                                            return;
-                                                                        }
-                                                                    });
-                                                                });
-                                                            },
-                                                            function(strError){
-
-                                                                res.json({
-                                                                    success: false,
-                                                                    message: strError
-                                                                });
-                                                                return;
-                                                            }
-                                                        );
-                                                        if (exceptionRet) {
-
-                                                            res.json({
-                                                                success: false,
-                                                                message: exceptionRet.message
-                                                            });
-                                                            return;
+                                                    var comic = 
+                                                    {
+                                                        id: row.id,
+                                                        classOrProductId: row.classOrProductId,
+                                                        ordinal: row.ordinal,
+                                                        imageResourceId: row.imageResourceId,
+                                                        name: row.name,
+                                                        comicPanels: [],
+                                                        types: 
+                                                        {
+                                                            items: []
                                                         }
-                                                    });
-                                                    project.comics.items.push(comicItem);
-                                                });
-                                            },
-                                            function(strError){
+                                                    };
+        // (3-4)
+                                                    ex = sql.execute("select * from comicPanels where comicId = " + comic.id + " order by ordinal asc; select * from types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
+                                                        function(rows){
 
-                                                res.json({
-                                                    success: false,
-                                                    message: strError
-                                                });
-                                                return;
-                                            }
-                                        );
-                                        if (exceptionRet) {
+                                                            // Result of comicPanels select comes back in rows[0]; result of types query comes back in rows[1].
+                                                            if (rows.length !== 2 || rows[0].length === 0 || rows[1].length === 0) {
+                                                                res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                            } else {
 
-                                            res.json({
-                                                success: false,
-                                                message: exceptionRet.message
-                                            });
-                                            return;
+                                                                rows[0].forEach(
+                                                                    function(row){
+
+                                                                        var comicPanel =
+                                                                        {
+                                                                            id: row.id,
+                                                                            ordinal: row.ordinal,
+                                                                            name: row.name,
+                                                                            url: row.url,
+                                                                            description: row.description,
+                                                                            thumbnail: row.thumbnail
+                                                                        };
+                                                                        comic.comicPanels.push(comicPanel);
+                                                                    }
+                                                                );
+                                                                    
+                                                                rows[1].forEach(
+                                                                    function(row){
+
+                                                                        var type = 
+                                                                        {
+                                                                            id: row.id,
+                                                                            name: row.name,
+                                                                            isApp: row.isApp,
+                                                                            imageResourceId: row.imageResourceId,
+                                                                            ordinal: row.ordinal,
+                                                                            tags: '',
+                                                                            properties: [],
+                                                                            methods: [],
+                                                                            events: []
+                                                                        };
+        // (4.1)
+                                                                        m_functionFetchTags(
+                                                                            type.id,
+                                                                            5,
+                                                                            req.body.userName,
+                                                                            function(tags) {
+
+                                                                                type.tags = tags;
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                );
+                                                            }
+                                                        },
+                                                        function(strError){
+                                                            res.json( {success: false, message: strError} );
+                                                        }
+                                                    );
+                                                    if (ex) {
+                                                        res.json({ success: false, message: ex.message });
+                                                    }
+                                                }
+                                            );
                                         }
-                                    });
+                                    },
+                                    function(strError){
+                                        res.json( {success:false, message: strError} );
+                                    }
+                                );
+                                if (ex) {
+                                    res.json({ success: false, message: ex.message });
                                 }
-                            },
-                            function(strError){
-
-                                res.json({
-                                    success: false,
-                                    message: strError
-                                });
                             }
                         );
-                        if (exceptionRet) {
-
-                            res.json({
-                                success: false,
-                                message: exceptionRet.message
-                            });
-                        }
                     }
                 },
                 function(strError){
-
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
+                    res.json( {success:false, message: strError} );
                 }
             );
             if (ex) {
-
-                res.json({
-                    success: false,
-                    message: ex.message
-                });
+                res.json({ success: false, message: ex.message });
             }
 
         } catch(e) {
@@ -347,6 +266,193 @@ module.exports = function ProjectBO(app, sql, logger) {
             });
         }
     }
+
+
+
+
+            // var type =
+            // {
+            // };
+
+            // var method = 
+            // { 
+            //     name: "", 
+            //     workspace: "", 
+            //     id: 0,
+            //     tags: '',
+            //     imageResourceId: 0,
+            //     createdByUserId: 0,
+            //     price: 0,
+            //     ordinal: 0,
+            //     description: ""
+            // };
+
+            // var property = 
+            // {
+            //     name: "",
+            //     id: 0,
+            //     ordinal: 0,
+            //     propertyTypeId: 0,
+            //     initialValue: ""
+            // };
+
+            // var event = 
+            // {
+            //     name: "",
+            //     id: 0,
+            //     ordinal: 0
+            // };
+
+            // var ex = sql.execute("select count(t.id) as cnt from " + self.dbname + "types t where t.comicId in (select id from " + self.dbname + "comics where projectId=" + req.body.projectId + ");",
+            //     function(rows){
+
+            //         if (rows.length !== 1) {
+
+            //             res.json({
+            //                 success: false,
+            //                 message: "Could not retrieve project."
+            //             });
+            //         } else {
+
+            //             typesCtr = rows[0].cnt;
+
+            //             var exceptionRet = sql.execute("select * from " + self.dbname + "projects where id=" + req.body.projectId + ";",
+            //                 function(rows){
+
+            //                     if (rows.length !== 1) {
+
+            //                         res.json({
+            //                             success: false,
+            //                             message: 'Could not retrieve project from database.'
+            //                         });
+            //                     } else {
+
+            //                         project.name = rows[0].name;
+            //                         project.id = rows[0].id;
+            //                         project.description = rows[0].description;
+            //                         project.imageResourceId = rows[0].imageResourceId;
+            //                         project.price = rows[0].price;
+            //                         project.createdByUserId = rows[0].createdByUserId;
+            //                         project.isDirty = false;
+            //                         m_functionFetchTags(project.id, 3, req.body.userName, function(tags){
+
+            //                             project.tags = tags;
+
+            //                             // Now comics.
+            //                             exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.id + " order by ordinal asc;",
+            //                                 function(rows){
+
+            //                                     rows.forEach(function(row) {
+
+            //                                         var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
+            //                                         comicItem.imageResourceId = row.imageResourceId;
+            //                                         comicItem.id = row.id;
+            //                                         comicItem.name = row.name;
+            //                                         comicItem.ordinal = row.ordinal;
+            //                                         m_functionFetchTags(comicItem.id, 4, req.body.userName, function(tags){
+
+            //                                             comicItem.tags = tags;
+
+            //                                             // Now types.
+            //                                             exceptionRet = sql.execute("select * from " + self.dbname + "types where comicId=" + comicItem.id + " order by ordinal asc;",
+            //                                                 function(rows){
+
+            //                                                     rows.forEach(function(row) {
+
+            //                                                         var typeItem = JSON.parse(JSON.stringify(type));    // clone type.
+            //                                                         typeItem.isApp = row.isApp;
+            //                                                         typeItem.id = row.id;
+            //                                                         typeItem.ordinal = row.ordinal;
+            //                                                         typeItem.name = row.name;
+            //                                                         typeItem.imageResourceId = row.imageResourceId;
+            //                                                         var code = JSON.parse(row.jsonCode);
+            //                                                         typeItem.properties = code.properties;
+            //                                                         typeItem.methods = code.methods;
+            //                                                         typeItem.events = code.events;
+            //                                                         typeItem.dependencies = code.dependencies;
+            //                                                         m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
+
+            //                                                             typeItem.tags = tags;
+                                                                        
+            //                                                             comicItem.types.items.push(typeItem);
+
+            //                                                             if (--typesCtr === 0) {
+
+            //                                                                 res.json({
+            //                                                                     success: true,
+            //                                                                     project: project
+            //                                                                 });
+            //                                                                 return;
+            //                                                             }
+            //                                                         });
+            //                                                     });
+            //                                                 },
+            //                                                 function(strError){
+
+            //                                                     res.json({
+            //                                                         success: false,
+            //                                                         message: strError
+            //                                                     });
+            //                                                     return;
+            //                                                 }
+            //                                             );
+            //                                             if (exceptionRet) {
+
+            //                                                 res.json({
+            //                                                     success: false,
+            //                                                     message: exceptionRet.message
+            //                                                 });
+            //                                                 return;
+            //                                             }
+            //                                         });
+            //                                         project.comics.items.push(comicItem);
+            //                                     });
+            //                                 },
+            //                                 function(strError){
+
+            //                                     res.json({
+            //                                         success: false,
+            //                                         message: strError
+            //                                     });
+            //                                     return;
+            //                                 }
+            //                             );
+            //                             if (exceptionRet) {
+
+            //                                 res.json({
+            //                                     success: false,
+            //                                     message: exceptionRet.message
+            //                                 });
+            //                                 return;
+            //                             }
+            //                         });
+            //                     }
+            //                 },
+            //                 function(strError){
+
+            //                     res.json({
+            //                         success: false,
+            //                         message: strError
+            //                     });
+            //                 }
+            //             );
+            //             if (exceptionRet) {
+
+            //                 res.json({
+            //                     success: false,
+            //                     message: exceptionRet.message
+            //                 });
+            //             }
+            //         }
+            //     },
+            //     function(strError){
+
+            //         res.json({
+            //             success: false,
+            //             message: strError
+            //         });
+            //     }
+            // );
 
     self.routeRetrieveType = function (req, res) {
 
