@@ -451,27 +451,8 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									// Enable the TypeWell icons that are disabled if no project is loaded.
-									// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
-									$(".disabledifnoproj").prop("disabled", false);
-
-									m_clProject = new Project();
-									var exceptionRet = m_clProject.load(data.project);
-									if (exceptionRet) {
-
-										return exceptionRet;
-									}
-
-									// Fire bootstrap tooltip opt-in.
-									$(".disabledifnoproj").tooltip();
-
-
-
-
-
-
-
-
+									var exceptionRet = self.functionNewProject(data.project);
+									if (exceptionRet) { return exceptionRet; }
 
 									return null;
 
@@ -950,6 +931,9 @@ define(["Core/errorHelper",
 						navbar.enableDisableProjectsMenuItems();
 					}
 
+					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1 from the DB),
+					// the following method is called after saving a project, since it needs to be reloaded following the setting of probably
+					// new id's for all of the parts of the project.
 					self.functionNewProject = function (project) {
 
 						try {
