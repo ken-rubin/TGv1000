@@ -539,6 +539,94 @@ begin
 		set @dbstate := 31.0;
     end if;
 
+    if @dbstate = 31.0 then
+    
+		-- The work being done here will prepare the test data to support three projects being loaded from the database:
+        -- (1) A single-comic project that will be opened for New Project.
+        -- (2) A multiple-comic project that is meant to be a Master Product.
+        -- (3) A project based on the same set of classOrProduct, comics and comicPanels records as in case (2), but
+        --     as modified and enhanced by a user.
+    
+		UPDATE TGv1000.resourceTypes SET description='classOrProduct' WHERE id=0;
+		
+		INSERT INTO TGv1000.classOrProduct (id, `name`, isProduct, price, createdByUserId)
+			VALUES 
+				()
+            ;
+            
+		INSERT INTO TGv1000.comics (id, classOrProductId, ordinal, imageResourceId, `name`)
+			VALUES 
+				()
+			;
+            
+		INSERT INTO TGv1000.comicPanels (id, comicId, ordinal, `name`, url, description, thumbnail)
+			VALUES 
+				()
+			;
+            
+		insert into TGv1000.`types` (id,`name`,isApp,imageResourceId,ordinal,comicId,projectId)
+			VALUES
+				(1,'App',1,0,0,1,1),
+				(2,'App',1,0,0,2,2),
+				(3,'App',1,0,0,3,3),
+				(4,'Type1',0,0,1,3,3),
+				(5,'Type2',0,0,2,3,3),
+				(6,'App',1,0,0,4,3)
+			;
+            
+		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
+			VALUES
+				(0,1,1,1,0,NULL,'default'),
+				(1,1,4,1,0,2,'Mission_to_Mars'),
+				(3,1,3,1,0,2,'Mission_to_Mars'),
+				(4,1,3,1,0,3,'mine'),
+				(5,1,5,1,0,1,'a'),
+				(6,1,5,1,0,2,'b'),
+				(7,1,5,1,0,3,'c'),
+				(8,1,5,1,0,4,'d'),
+				(9,1,5,1,0,5,'e'),
+				(10,1,5,2,0,6,'f')
+			;
+            
+		insert TGv100.projects (id,`name`,createdByUserId,price,imageResourceId,description,ownedByUserId,classOrProductId)
+			VALUES
+				()
+			;
+            
+		insert TGv1000.resources_tags (resourceId,tagId)
+			VALUES
+				()
+			;
+		
+        insert TGv1000.tags (id,description)
+			VALUES
+				(1,'jerry'),
+				(2,'product'),
+				(3,'mission_to_mars'),
+				(4,'image'),
+				(5,'project'),
+				(6,'type')
+			;
+            
+--		insert TGv1000.propertys (id,typeId,`name`,propertyTypeId,initialValue,ordinal)
+--			VALUES
+--				()
+--			;
+            
+--		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageResourceId,createdByUserId,price,description)
+--			VALUES
+--				()
+--			;
+            
+--		insert TGv1000.events (id,typeId,`name`,ordinal)
+--			VALUES
+--				()
+--			;
+            
+        UPDATE `TGv1000`.`control` set dbstate=32.0 where id=1;
+		set @dbstate := 32.0;
+    end if;
+
 end;
 
 //

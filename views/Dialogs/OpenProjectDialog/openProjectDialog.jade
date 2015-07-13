@@ -14,11 +14,15 @@
         button.btn.btn-info#ISInnerSearchButton Search
       br
     .row
-      .col-xs-3
-      .col-xs-9
+      .col-xs-1
+      .col-xs-10(style='margin-left:25px;')
         label.checkbox
           input#cb1(type='checkbox')
           | Limit retrieved projects to those I created
+        label.checkbox
+          input#cb2(type='checkbox')
+          | I want to search only <em>master</em> projects, not other users' projects derived from master projects.
+      .col-xs-1
     br
     .row
       .well#ISWellMsg(style="display:none;")
