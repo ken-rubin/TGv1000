@@ -548,20 +548,37 @@ begin
         --     as modified and enhanced by a user.
     
 		UPDATE TGv1000.resourceTypes SET description='classOrProduct' WHERE id=0;
+        
+        -- Clean up from step 29.
+  		DELETE FROM TGv1000.classOrProduct;
+            
+		DELETE FROM TGv1000.comics;
+            
+		DELETE FROM TGv1000.comicPanels;
 		
 		INSERT INTO TGv1000.classOrProduct (id, `name`, isProduct, price, createdByUserId)
 			VALUES 
-				()
+				(1,'New Project Help',0,0,1),
+				(2,'Mission to Maars',1,13.99,1)
             ;
             
 		INSERT INTO TGv1000.comics (id, classOrProductId, ordinal, imageResourceId, `name`)
 			VALUES 
-				()
+				(1,1,0,1,'TechGroms Help'),
+				(2,2,0,2,'MtM: How to TechGrom'),
+				(3,2,1,3,'MTM: Sessopm 1'),
+				(4,2,2,4,'MTM: Sessopm 2')
 			;
             
 		INSERT INTO TGv1000.comicPanels (id, comicId, ordinal, `name`, url, description, thumbnail)
 			VALUES 
-				()
+				(1,1,0,'FAQs','','',''),
+				(2,2,0,'FAQs','','',''),
+				(3,3,0,'Step 1','','',''),
+				(4,3,1,'Step 2','','',''),
+				(5,4,0,'Step 1','','',''),
+				(6,4,1,'Step 2','','',''),
+				(7,4,2,'Step 3','','','')
 			;
             
 		insert into TGv1000.`types` (id,`name`,isApp,imageResourceId,ordinal,comicId,projectId)
@@ -588,14 +605,35 @@ begin
 				(10,1,5,2,0,6,'f')
 			;
             
-		insert TGv100.projects (id,`name`,createdByUserId,price,imageResourceId,description,ownedByUserId,classOrProductId)
+		insert TGv1000.projects (id,`name`,createdByUserId,price,imageResourceId,description,ownedByUserId,classOrProductId)
 			VALUES
-				()
+				(1,'New Project',1,0,0,NULL,1,1),
+				(2,'Mission to Mars',1,13.99,0,'In this project you will create....',1,2),
+				(3,'Mission to Mars',1,13.99,0,'Did some work on MtM.',1,2)
 			;
             
 		insert TGv1000.resources_tags (resourceId,tagId)
 			VALUES
-				()
+				(1,1),
+				(1,2),
+				(1,3),
+				(3,1),
+				(3,3),
+				(3,5),
+				(4,1),
+				(4,5),
+				(5,1),
+				(5,6),
+				(6,1),
+				(6,6),
+				(7,1),
+				(7,6),
+				(8,1),
+				(8,6),
+				(9,1),
+				(9,6),
+				(10,1),
+				(10,6)
 			;
 		
         insert TGv1000.tags (id,description)
