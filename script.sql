@@ -547,7 +547,7 @@ begin
         -- (3) A project based on the same set of classOrProduct, comics and comicPanels records as in case (2), but
         --     as modified and enhanced by a user.
     
-		UPDATE TGv1000.resourceTypes SET description='classOrProduct' WHERE id=0;
+		UPDATE TGv1000.resourceTypes SET description='classOrProduct' WHERE id=4;
         
         -- Clean up from step 29.
   		DELETE FROM TGv1000.classOrProduct;

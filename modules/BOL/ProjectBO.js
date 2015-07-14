@@ -70,7 +70,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         res.json({
                             success: true,
-                            cnt: 4//rows[0].cnt
+                            cnt: rows[0].cnt
                         });
                     }
                 },
@@ -118,13 +118,16 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
         // (1)
-            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
+            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + "; select count(*) as cnt from " + self.dbname + "types where projectId = " + req.body.projectId + ";",
                 function(rows) {
-                    if (rows.length !== 1) {
-                        res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-                    } else {
 
-                        var row = row[0];
+                    if (rows.length !== 2 || rows[0].length != 1 || rows[1].length !== 1) {
+
+                        res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
+                    } else {
+console.log('Got Project');
+                        var row = rows[0][0];
                         var project = 
                         {
                             id: row.id,
@@ -142,6 +145,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 items: []
                             }
                         };
+
+                        var typesCounter = rows[1][0].cnt;
+console.log('Set typesCounter=' + typesCounter);
         // (1.1)
                         m_functionFetchTags(
                             project.id, 
@@ -150,14 +156,18 @@ module.exports = function ProjectBO(app, sql, logger) {
                             function(tags)  {
 
                                 project.tags = tags;
+console.log('Got Project tags: "' + tags + '"');
         // (2)
                                 ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
                                     function(rows){
 
                                         if (rows.length === 0) {
+
                                             res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
                                         } else {
 
+console.log('Got ' + rows.length + ' comics');
                                             rows.forEach(
                                                 function(row){
 
@@ -168,21 +178,29 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                         ordinal: row.ordinal,
                                                         imageResourceId: row.imageResourceId,
                                                         name: row.name,
-                                                        comicPanels: [],
+                                                        comicPanels: 
+                                                        {
+                                                            items: []
+                                                        },
                                                         types: 
                                                         {
                                                             items: []
                                                         }
                                                     };
+
+                                                    project.comics.items.push(comic);
         // (3-4)
                                                     ex = sql.execute("select * from comicPanels where comicId = " + comic.id + " order by ordinal asc; select * from types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
                                                         function(rows){
 
-                                                            // Result of comicPanels select comes back in rows[0]; result of types query comes back in rows[1].
+                                                            // Result of comicPanels select comes back in rows[0][]; result of types query comes back in rows[1][].
                                                             if (rows.length !== 2 || rows[0].length === 0 || rows[1].length === 0) {
+
                                                                 res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
                                                             } else {
 
+console.log('Got ' + rows[0].length + ' comicPanels');
                                                                 rows[0].forEach(
                                                                     function(row){
 
@@ -195,10 +213,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                             description: row.description,
                                                                             thumbnail: row.thumbnail
                                                                         };
-                                                                        comic.comicPanels.push(comicPanel);
+                                                                        comic.comicPanels.items.push(comicPanel);
                                                                     }
                                                                 );
                                                                     
+console.log('Got ' + rows[1].length + ' types');
                                                                 rows[1].forEach(
                                                                     function(row){
 
@@ -206,7 +225,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                         {
                                                                             id: row.id,
                                                                             name: row.name,
-                                                                            isApp: row.isApp,
+                                                                            isApp: row.isApp === 1 ? true : false,
                                                                             imageResourceId: row.imageResourceId,
                                                                             ordinal: row.ordinal,
                                                                             tags: '',
@@ -222,6 +241,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                             function(tags) {
 
                                                                                 type.tags = tags;
+console.log('type=' + JSON.stringify(type));
+
+                                                                                // methods, etc. go here.
+
+                                                                                comic.types.items.push(type);
+console.log('project=' + JSON.stringify(project));
+
+                                                                                if (--typesCounter === 0) {
+console.log('Returning project');
+
+                                                                                    res.json({
+                                                                                        success: true,
+                                                                                        project: project
+                                                                                    });
+
+                                                                                    return;
+                                                                                }
                                                                             }
                                                                         );
                                                                     }
@@ -229,10 +265,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                             }
                                                         },
                                                         function(strError){
+
                                                             res.json( {success: false, message: strError} );
+
                                                         }
                                                     );
                                                     if (ex) {
+
                                                         res.json({ success: false, message: ex.message });
                                                     }
                                                 }
@@ -240,10 +279,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     },
                                     function(strError){
+
                                         res.json( {success:false, message: strError} );
                                     }
                                 );
                                 if (ex) {
+
                                     res.json({ success: false, message: ex.message });
                                 }
                             }
@@ -251,13 +292,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                     }
                 },
                 function(strError){
+
                     res.json( {success:false, message: strError} );
                 }
             );
             if (ex) {
+
                 res.json({ success: false, message: ex.message });
             }
-
         } catch(e) {
 
             res.json({
@@ -266,13 +308,6 @@ module.exports = function ProjectBO(app, sql, logger) {
             });
         }
     }
-
-
-
-
-            // var type =
-            // {
-            // };
 
             // var method = 
             // { 
@@ -1005,7 +1040,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // Retireve and set project.tags, skipping "project" and req.body.userName.
+            // Retireve and set project.tags, skipping resourceType.description and req.body.userName.
             exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
                 function(rows){
 
