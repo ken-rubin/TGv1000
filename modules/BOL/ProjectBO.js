@@ -101,33 +101,22 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     self.routeRetrieveProject = function (req, res) {
 
-        console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
-        // req.body.projectId
-        // req.body.userName
-
-        // (1) We were given projectId. Read in that project's table row.
-        //  (1.1) Retrieve the project's tags.
-        // (2) Read in comics[] with comics[i].classOrProductId === project.classOrProductId. 
-        // (3) For each comic in comics read comicPanels[] with comicPanels[j].comicId === comics[i].id. Add to each comic in comics. This is basically a side step.
-        // (4) For each comic in comics read types[] with types[k].comicId === comics[i].id && types[k].projectId === project.id.
-        //  (4.1) For each Type read its tags
-        // (5-7) Read each type's methods, properties and events.
-        //  (5.1) For each method read its tags.
-        // (8) Then return the complete project javascript object.
-
         try {
 
-        // (1)
-            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + "; select count(*) as cnt from " + self.dbname + "types where projectId = " + req.body.projectId + ";",
+            console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+            // req.body.projectId
+            // req.body.userName
+
+            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
                 function(rows) {
 
-                    if (rows.length !== 2 || rows[0].length != 1 || rows[1].length !== 1) {
+                    if (rows.length !== 1) {
 
                         res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
 
                     } else {
-console.log('Got Project');
-                        var row = rows[0][0];
+
+                        var row = rows[0];
                         var project = 
                         {
                             id: row.id,
@@ -146,9 +135,6 @@ console.log('Got Project');
                             }
                         };
 
-                        var typesCounter = rows[1][0].cnt;
-console.log('Set typesCounter=' + typesCounter);
-        // (1.1)
                         m_functionFetchTags(
                             project.id, 
                             3, 
@@ -156,158 +142,487 @@ console.log('Set typesCounter=' + typesCounter);
                             function(tags)  {
 
                                 project.tags = tags;
-console.log('Got Project tags: "' + tags + '"');
-        // (2)
-                                ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
-                                    function(rows){
-
-                                        if (rows.length === 0) {
-
-                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-
-                                        } else {
-
-console.log('Got ' + rows.length + ' comics');
-                                            rows.forEach(
-                                                function(row){
-
-                                                    var comic = 
-                                                    {
-                                                        id: row.id,
-                                                        classOrProductId: row.classOrProductId,
-                                                        ordinal: row.ordinal,
-                                                        imageResourceId: row.imageResourceId,
-                                                        name: row.name,
-                                                        comicPanels: 
-                                                        {
-                                                            items: []
-                                                        },
-                                                        types: 
-                                                        {
-                                                            items: []
-                                                        }
-                                                    };
-
-                                                    project.comics.items.push(comic);
-        // (3-4)
-                                                    ex = sql.execute("select * from comicPanels where comicId = " + comic.id + " order by ordinal asc; select * from types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
-                                                        function(rows){
-
-                                                            // Result of comicPanels select comes back in rows[0][]; result of types query comes back in rows[1][].
-                                                            if (rows.length !== 2 || rows[0].length === 0 || rows[1].length === 0) {
-
-                                                                res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-
-                                                            } else {
-
-console.log('Got ' + rows[0].length + ' comicPanels');
-                                                                rows[0].forEach(
-                                                                    function(row){
-
-                                                                        var comicPanel =
-                                                                        {
-                                                                            id: row.id,
-                                                                            ordinal: row.ordinal,
-                                                                            name: row.name,
-                                                                            url: row.url,
-                                                                            description: row.description,
-                                                                            thumbnail: row.thumbnail
-                                                                        };
-                                                                        comic.comicPanels.items.push(comicPanel);
-                                                                    }
-                                                                );
-                                                                    
-console.log('Got ' + rows[1].length + ' types');
-                                                                rows[1].forEach(
-                                                                    function(row){
-
-                                                                        var type = 
-                                                                        {
-                                                                            id: row.id,
-                                                                            name: row.name,
-                                                                            isApp: row.isApp === 1 ? true : false,
-                                                                            imageResourceId: row.imageResourceId,
-                                                                            ordinal: row.ordinal,
-                                                                            tags: '',
-                                                                            properties: [],
-                                                                            methods: [],
-                                                                            events: []
-                                                                        };
-        // (4.1)
-                                                                        m_functionFetchTags(
-                                                                            type.id,
-                                                                            5,
-                                                                            req.body.userName,
-                                                                            function(tags) {
-
-                                                                                type.tags = tags;
-console.log('type=' + JSON.stringify(type));
-
-                                                                                // methods, etc. go here.
-
-                                                                                comic.types.items.push(type);
-console.log('project=' + JSON.stringify(project));
-
-                                                                                if (--typesCounter === 0) {
-console.log('Returning project');
-
-                                                                                    res.json({
-                                                                                        success: true,
-                                                                                        project: project
-                                                                                    });
-
-                                                                                    return;
-                                                                                }
-                                                                            }
-                                                                        );
-                                                                    }
-                                                                );
-                                                            }
-                                                        },
-                                                        function(strError){
-
-                                                            res.json( {success: false, message: strError} );
-
-                                                        }
-                                                    );
-                                                    if (ex) {
-
-                                                        res.json({ success: false, message: ex.message });
-                                                    }
-                                                }
-                                            );
-                                        }
-                                    },
-                                    function(strError){
-
-                                        res.json( {success:false, message: strError} );
-                                    }
-                                );
-                                if (ex) {
-
-                                    res.json({ success: false, message: ex.message });
-                                }
+                                m_functionRetProjDoComics(req, res, project);
                             }
                         );
                     }
                 },
-                function(strError){
+                function(strError) {
 
                     res.json( {success:false, message: strError} );
                 }
             );
+
             if (ex) {
 
-                res.json({ success: false, message: ex.message });
+                res.json({success: false, message: e.message});
             }
         } catch(e) {
 
-            res.json({
-                success: false,
-                message: e.message
-            });
+            res.json({success: false, message: e.message});
         }
     }
+
+    var m_functionRetProjDoComics = function(req, res, project) {
+
+        try {
+
+            console.log('In m_functionRetProjDoComics');
+
+            var ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
+                function(rows)
+                {
+
+                    if (rows.length === 0) {
+
+                        res.json({success: false, message: "Could not retrieve project with id=" + req.body.id});
+                        return;
+
+                    } 
+
+                    var comicsCounter = rows.length;
+                    console.log('Got ' + comicsCounter + ' comics.');
+                    var strComicIds = '';
+
+                    rows.forEach(
+                        function(row)
+                        {
+
+                            var comic = 
+                            {
+                                id: row.id,
+                                classOrProductId: row.classOrProductId,
+                                ordinal: row.ordinal,
+                                imageResourceId: row.imageResourceId,
+                                name: row.name,
+                                comicPanels: 
+                                {
+                                    items: []
+                                },
+                                types: 
+                                {
+                                    items: []
+                                }
+                            };
+
+                            if (strComicIds.length === 0)
+                                strComicIds = comic.id.toString();
+                            else
+                                strComicIds = strComicIds + ',' + comic.id;
+
+                            project.comics.items.push(comic);
+
+                            if (--comicsCounter === 0) {
+
+                                console.log('strComicIds = "' + strComicIds + '"');
+                                var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "comicPanels where comicId in (" + strComicIds + ");",
+                                    function(rows){
+
+                                        if (rows.length !== 1) {
+
+                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                            return;
+                                        }
+
+                                        m_functionRetProjDoComicPanels(req, res, project, rows[0].cnt);
+                                    },
+                                    function(strError) {
+
+                                    }
+                                );
+                            }
+                        }
+                    );
+                },
+                function(strError) {
+
+                    res.json( {success:false, message: strError} );
+                }
+            );
+
+            if (ex) {
+
+                res.json({success: false, message: e.message});
+            }
+        } catch(e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionRetProjDoComicPanels = function(req, res, project, comicPanelsCount) {
+
+        try {
+
+            console.log('In m_functionRetProjDoComicPanels with comicPanelsCount=' + comicPanelsCount);
+
+            project.comics.items.forEach(
+                function(comic) {
+
+                    var ex = sql.execute("select * from " + self.dbname + "comicPanels where comicId = " + comic.id + " order by ordinal asc;",
+                        function(rows) {
+
+                            if (rows.length === 0) {
+
+                                res.json({
+                                    success: false,
+                                    message: 'Unable to retrieve selected project.'
+                                });
+                                return;
+                            }
+
+                            rows.forEach(
+                                function(row) {
+
+                                    var comicPanel =
+                                    {
+                                        id: row.id,
+                                        ordinal: row.ordinal,
+                                        name: row.name,
+                                        url: row.url,
+                                        description: row.description,
+                                        thumbnail: row.thumbnail
+                                    };
+                                    comic.comicPanels.items.push(comicPanel);
+                                    
+                                    if (--comicPanelsCount === 0) {
+
+                                        var ex2 = sql.execute("select count(8) as cnt from " + self.dbname + "types where projectId = " + project.id + ";",
+                                            function(rows) {
+
+                                                if (rows.length !== 1) {
+
+                                                    res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                    return;
+                                                }
+
+                                                m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
+                                            },
+                                            function(strError){
+
+                                            });
+                                    }
+                                }
+                            );
+                        },
+                        function(strError) {
+                            res.json({
+                                success: false,
+                                message: strError
+                            });
+                            return;
+                        }
+                    );
+                    if (ex) {
+                        res.json({
+                            success: false,
+                            message: ex.message
+                        });
+                        return;
+                    }
+                }
+            );
+        } catch(e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
+
+        try {
+
+            console.log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
+
+            project.comics.items.forEach(
+                function(comic) {
+
+                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
+                        function(rows) {
+
+                            if (rows.length === 0) {
+
+                                res.json({
+                                    success: false,
+                                    message: 'Unable to retrieve selected project.'
+                                });
+                                return;
+                            }
+
+                            rows.forEach(
+                                function(row) {
+
+                                    var type = 
+                                    {
+                                        id: row.id,
+                                        name: row.name,
+                                        isApp: row.isApp === 1 ? true : false,
+                                        imageResourceId: row.imageResourceId,
+                                        ordinal: row.ordinal,
+                                        tags: '',
+                                        properties: [],
+                                        methods: [],
+                                        events: []
+                                    };
+
+                                    // m_functionFetchTags(
+                                    //     type.id,
+                                    //     5,
+                                    //     req.body.userName,
+                                    //     function(tags) {
+
+                                    //         type.tags = tags;
+
+                                    //         // methods, etc. go here.
+
+                                            // comic.types.items.push(type);
+                                    //     }
+                                    // );
+
+                                    comic.types.items.push(type);
+                                    if (--typesCount === 0) {
+
+                                        res.json({
+                                            success: true,
+                                            project: project
+                                        });
+                                        return;
+                                    }
+                                }
+                            );
+                        },
+                        function(strError) {
+
+                            res.json({
+                                success: false,
+                                message: strError
+                            });
+                            return;
+                        }
+                    );
+                    if (ex) {
+                        res.json({
+                            success: false,
+                            message: ex.message
+                        });
+                        return;
+                    }
+                }
+            );
+        } catch(e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+//     self.routeRetrieveProject = function (req, res) {
+
+//         console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+//         // req.body.projectId
+//         // req.body.userName
+
+//         // (1) We were given projectId. Read in that project's table row.
+//         //  (1.1) Retrieve the project's tags.
+//         // (2) Read in comics[] with comics[i].classOrProductId === project.classOrProductId. 
+//         // (3) For each comic in comics read comicPanels[] with comicPanels[j].comicId === comics[i].id. Add to each comic in comics. This is basically a side step.
+//         // (4) For each comic in comics read types[] with types[k].comicId === comics[i].id && types[k].projectId === project.id.
+//         //  (4.1) For each Type read its tags
+//         // (5-7) Read each type's methods, properties and events.
+//         //  (5.1) For each method read its tags.
+//         // (8) Then return the complete project javascript object.
+
+//         try {
+
+//         // (1)
+//             var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
+//                 function(rows) {
+
+//                     if (rows.length !== 1) {
+
+//                         res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
+//                     } else {
+// console.log('Got Project');
+//                         var row = rows[0];
+//                         var project = 
+//                         {
+//                             id: row.id,
+//                             name: row.name,
+//                             createdByUserId: row.createdByUserId,
+//                             price: row.price,
+//                             imageResourceId: row.imageResourceId,
+//                             description: row.description,
+//                             ownedByUserId: row.ownedByUserId,
+//                             classOrProductId: row.classOrProductId,
+//                             tags: '',
+//                             isDirty: 1,
+//                             comics:
+//                             {
+//                                 items: []
+//                             }
+//                         };
+
+//         // (1.1)
+//                         m_functionFetchTags(
+//                             project.id, 
+//                             3, 
+//                             req.body.userName, 
+//                             function(tags)  {
+
+//                                 project.tags = tags;
+// console.log('Got Project tags: "' + tags + '"');
+//         // (2)
+//                                 ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
+//                                     function(rows)
+//                                     {
+
+//                                         if (rows.length === 0) {
+
+//                                             res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
+//                                         } else {
+
+//                                             var comicsCounter = rows.length;
+
+// console.log('Got ' + rows.length + ' comics');
+//                                             rows.forEach(
+//                                                 function(row)
+//                                                 {
+
+//                                                     var comic = 
+//                                                     {
+//                                                         id: row.id,
+//                                                         classOrProductId: row.classOrProductId,
+//                                                         ordinal: row.ordinal,
+//                                                         imageResourceId: row.imageResourceId,
+//                                                         name: row.name,
+//                                                         comicPanels: 
+//                                                         {
+//                                                             items: []
+//                                                         },
+//                                                         types: 
+//                                                         {
+//                                                             items: []
+//                                                         }
+//                                                     };
+
+//                                                     project.comics.items.push(comic);
+//         // (3-4)
+//                                                     ex = sql.execute("select * from comicPanels where comicId = " + comic.id + " order by ordinal asc; select * from types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
+//                                                         function(rows){
+
+//                                                             // Result of comicPanels select comes back in rows[0][]; result of types query comes back in rows[1][].
+//                                                             if (rows.length !== 2 || rows[0].length === 0 || rows[1].length === 0) {
+
+//                                                                 res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
+//                                                             } else {
+
+// console.log('Got ' + rows[0].length + ' comicPanels');
+//                                                                 rows[0].forEach(
+//                                                                     function(row){
+
+//                                                                         var comicPanel =
+//                                                                         {
+//                                                                             id: row.id,
+//                                                                             ordinal: row.ordinal,
+//                                                                             name: row.name,
+//                                                                             url: row.url,
+//                                                                             description: row.description,
+//                                                                             thumbnail: row.thumbnail
+//                                                                         };
+//                                                                         comic.comicPanels.items.push(comicPanel);
+//                                                                     }
+//                                                                 );
+                                                                
+//                                                                 var typesCounter = rows[1].length;                    
+// console.log('Got ' + rows[1].length + ' types');
+//                                                                 rows[1].forEach(
+//                                                                     function(row){
+
+//                                                                         var type = 
+//                                                                         {
+//                                                                             id: row.id,
+//                                                                             name: row.name,
+//                                                                             isApp: row.isApp === 1 ? true : false,
+//                                                                             imageResourceId: row.imageResourceId,
+//                                                                             ordinal: row.ordinal,
+//                                                                             tags: '',
+//                                                                             properties: [],
+//                                                                             methods: [],
+//                                                                             events: []
+//                                                                         };
+//         // (4.1)
+//                                                                         m_functionFetchTags(
+//                                                                             type.id,
+//                                                                             5,
+//                                                                             req.body.userName,
+//                                                                             function(tags) {
+
+//                                                                                 type.tags = tags;
+// console.log('type=' + JSON.stringify(type));
+
+//                                                                                 // methods, etc. go here.
+
+//                                                                                 comic.types.items.push(type);
+//                                                                             }
+//                                                                         );
+//                                                                     }
+//                                                                 );
+//                                                             }
+//                                                         },
+//                                                         function(strError){
+
+//                                                             res.json( {success: false, message: strError} );
+
+//                                                         }
+//                                                     );
+//                                                     if (ex) {
+
+//                                                         res.json({ success: false, message: ex.message });
+//                                                     }
+
+//                                                     if (--comicsCounter === 0) {
+
+//                                                         res.json({
+//                                                             success: true,
+//                                                             project: project
+//                                                         });
+//                                                     }
+//                                                 }
+//                                             );
+//                                         }
+//                                     },
+//                                     function(strError){
+
+//                                         res.json( {success:false, message: strError} );
+//                                     }
+//                                 );
+//                                 if (ex) {
+
+//                                     res.json({ success: false, message: ex.message });
+//                                 }
+//                             }
+//                         );
+//                     }
+//                 },
+//                 function(strError){
+
+//                     res.json( {success:false, message: strError} );
+//                 }
+//             );
+//             if (ex) {
+
+//                 res.json({ success: false, message: ex.message });
+//             }
+//         } catch(e) {
+
+//             res.json({
+//                 success: false,
+//                 message: e.message
+//             });
+//         }
+//     }
 
             // var method = 
             // { 
