@@ -57,7 +57,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId,
+            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + ";",
                 function(rows){
 
                     if (rows.length !== 1) {

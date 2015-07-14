@@ -437,7 +437,7 @@ define(["Core/errorHelper",
 					// "functionOK" links.
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
 					// Not all of these come back through client. Some places handle the processing internally.
-					self.openProjectFromDB = function (iProjectId) {
+					self.openProjectFromDB = function (iProjectId, callback) {
 
 						try {
 
@@ -451,7 +451,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var exceptionRet = self.functionNewProject(data.project);
+									var exceptionRet = self.functionNewProject(data.project, callback);
 									if (exceptionRet) { return exceptionRet; }
 
 									return null;
@@ -462,9 +462,6 @@ define(["Core/errorHelper",
 									return new Error(data.message);
 								}
 							});
-
-							return null;
-
 						} catch (e) {
 
 							return e;
@@ -934,7 +931,7 @@ define(["Core/errorHelper",
 					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1 from the DB),
 					// the following method is called after saving a project, since it needs to be reloaded following the setting of probably
 					// new id's for all of the parts of the project.
-					self.functionNewProject = function (project) {
+					self.functionNewProject = function (project, callback) {
 
 						try {
 
@@ -990,6 +987,11 @@ define(["Core/errorHelper",
 										self.functionSetBDisplayComics(true);
 									}
 								});
+							}
+
+							if ($.isFunction(callback)) {
+
+								callback(m_clProject);
 							}
 
 							return null;

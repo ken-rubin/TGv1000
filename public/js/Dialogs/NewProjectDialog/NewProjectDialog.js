@@ -129,15 +129,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var strProjectDescription = $("#ProjectDescription").val().trim();
 							var strProjectTags = $("#ProjectTags").val().trim();
 
-							var exceptionRet = client.openProjectFromDB(1);
+							var exceptionRet = client.openProjectFromDB(1, function(clProject){
+
+								clProject.data.name = strProjectName;
+								clProject.data.tags = strProjectTags;
+								clProject.data.description = strProjectDescription;
+								clProject.data.imageResourceId = m_imageResourceId;
+							});
 							if (exceptionRet) { throw exceptionRet; }
-
-							var clProject = client.getProject();
-
-							clProject.data.name = strProjectName;
-							clProject.data.tags = strProjectTags;
-							clProject.data.description = strProjectDescription;
-							clProject.data.imageResourceId = m_imageResourceId;
 
 							m_dialog.close();
 
