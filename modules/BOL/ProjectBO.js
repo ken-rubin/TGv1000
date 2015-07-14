@@ -228,6 +228,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     },
                                     function(strError) {
 
+                                        res.json({success: false, message: strError});
+                                        return;
                                     }
                                 );
                             }
@@ -287,7 +289,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     
                                     if (--comicPanelsCount === 0) {
 
-                                        var ex2 = sql.execute("select count(8) as cnt from " + self.dbname + "types where projectId = " + project.id + ";",
+                                        var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where projectId = " + project.id + ";",
                                             function(rows) {
 
                                                 if (rows.length !== 1) {
@@ -299,8 +301,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
                                             },
                                             function(strError){
-
-                                            });
+                                                res.json({success: false, message: strError});
+                                                return;
+                                            }
+                                        );
                                     }
                                 }
                             );
@@ -340,14 +344,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                     var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
                         function(rows) {
 
-                            if (rows.length === 0) {
+                            // At least for now there can be no types in a comic:
+                            // if (rows.length === 0) {
 
-                                res.json({
-                                    success: false,
-                                    message: 'Unable to retrieve selected project.'
-                                });
-                                return;
-                            }
+                            //     res.json({
+                            //         success: false,
+                            //         message: 'Unable to retrieve selected project.'
+                            //     });
+                            //     return;
+                            // }
 
                             rows.forEach(
                                 function(row) {
