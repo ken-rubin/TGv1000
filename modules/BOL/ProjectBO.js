@@ -388,6 +388,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             if (--typesCount === 0) {
 
+                                                console.log('typesCount has reached 0');
                                                 var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
                                                     function(rows) {
 
@@ -397,7 +398,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                             return;
                                                         }
 
-                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0].mcnt, rows[1].pcnt, rows[2].ecnt);
+                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
                                                     },
                                                     function(strError){
                                                         res.json({success: false, message: strError});
@@ -438,17 +439,26 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
+            console.log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
             project.comics.items.forEach(
                 function(comic) {
-
+                    console.log('in comic ' + JSON.stringify(comic));
                     comic.types.items.forEach(
                         function(type) {
-
+                            console.log('in type ' + JSON.stringify(type));
                             var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + " order by ordinal asc; select * from " + self.dbname + "propertys where typeId =" + type.id + " order by ordinal asc; select * from " + self.dbname + "events where typeId =" + type.id + " order by ordinal asc;",
                                 function(rows){
 
-                                    if (rows.length !== 3) {
+                                    console.log(' ');
+                                    console.log('************** Start of triple select ******************');
+                                    console.log(' ');
+                                    console.log(JSON.stringify(rows));
+                                    console.log(' ');
+                                    console.log('************** Start of triple select ******************');
+                                    console.log(' ');
 
+                                    if (rows.length !== 3) {
+                                        console.log('The triple select did not return rows.length === 3');
                                         res.json({
                                             success: false,
                                             message: 'Unable to retrieve selected project.'
@@ -459,18 +469,18 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // methods
                                     rows[0].forEach(
                                         function(row) {
-
+                                            console.log('method row: ' + JSON.stringify(row));
                                             var method = 
                                             { 
-                                                name: "", 
-                                                workspace: "", 
-                                                id: 0,
+                                                id: row.id,
+                                                name: row.name, 
+                                                ordinal: row.ordinal,
+                                                workspace: row.workspace, 
                                                 tags: '',
-                                                imageResourceId: 0,
-                                                createdByUserId: 0,
-                                                price: 0,
-                                                ordinal: 0,
-                                                description: ""
+                                                imageResourceId: row.imageResourceId,
+                                                createdByUserId: row.createdByUserId,
+                                                price: row.price,
+                                                description: row.description
                                             };
 
                                             m_functionFetchTags(
@@ -482,8 +492,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     method.tags = tags;
                                                     type.methods.push(method);
 
-                                                    if (--mcnt === 0 && pcnt === 0 && ecnt === 0) {
+                                                    mcnt--;
+                                                    if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
 
+                                                        console.log('They have all reached 0. Returning project.');
                                                         res.json({
                                                             success: true,
                                                             project: project
@@ -496,22 +508,24 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     );
 
                                     // properties
-                                    rows[0].forEach(
+                                    rows[1].forEach(
                                         function(row) {
-
+                                            console.log('property row: ' + JSON.stringify(row));
                                             var property = 
                                             {
-                                                name: "",
-                                                id: 0,
-                                                ordinal: 0,
-                                                propertyTypeId: 0,
-                                                initialValue: ""
+                                                id: row.id,
+                                                name: row.name,
+                                                propertyTypeId: row.propertyTypeId,
+                                                initialValue: row.initialValue,
+                                                ordinal: row.ordinal
                                             };
 
                                             type.properties.push(property);
 
-                                            if (mcnt === 0 && --pcnt === 0 && ecnt === 0) {
+                                            pcnt--;
+                                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
 
+                                                console.log('They have all reached 0. Returning project.');
                                                 res.json({
                                                     success: true,
                                                     project: project
@@ -522,20 +536,22 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     );
 
                                     // events
-                                    rows[0].forEach(
+                                    rows[2].forEach(
                                         function(row) {
-
+                                            console.log('event row: ' + JSON.stringify(row));
                                             var event = 
                                             {
-                                                name: "",
-                                                id: 0,
-                                                ordinal: 0
+                                                id: row.id,
+                                                name: row.name,
+                                                ordinal: row.ordinal
                                             };
 
                                             type.events.push(event);
 
-                                            if (mcnt === 0 && pcnt === 0 && --ecnt === 0) {
+                                            ecnt--;
+                                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
 
+                                                console.log('They have all reached 0. Returning project.');
                                                 res.json({
                                                     success: true,
                                                     project: project
