@@ -89,15 +89,21 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                                         strResourceUrl, 
                                         strImageClass, 
                                         functionJItemCallBack, 
-                                        bInLoadLoop) 
-            {
+                                        bInLoadLoop,
+                                        strDataDashAttributeString) {
 
                 try {
 
                     m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
-                    var jItem = $("<img data-ibase='" + iBase + "' data-toggle='tooltip' data-container='body' data-placement='right' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
+                    var jItem = $("<img " + 
+                        strDataDashAttributeString + 
+                        " data-ibase='" + 
+                        iBase + 
+                        "' data-toggle='tooltip' data-container='body' data-placement='right' title='" + 
+                        strName + 
+                        "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>"); // The 9999 z-index is so that a red div can be put behind an activated one, if desired.
 
@@ -107,9 +113,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     // Wire the click.
                     jItem.click(m_functionImageClick);
 
+                    // .
                     jItem.attr("src",
                         strResourceUrl);
 
+                    // .
                     if ($.isFunction(functionJItemCallBack)) {
 
                         functionJItemCallBack(jItem);

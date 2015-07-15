@@ -75,13 +75,6 @@ define(["Core/errorHelper"],
 
 							// Add events.
 
-
-
-
-
-
-
-
 							
 
 							// Rebuild.
@@ -558,7 +551,9 @@ define(["Core/errorHelper"],
 								}
 							});
 
-							return null;
+							// Allocate and create the scanner.
+							//m_scanner = new Scanner();
+							return null;//m_scanner.create();
 						} catch (e) {
 
 							return e;
@@ -635,6 +630,103 @@ define(["Core/errorHelper"],
 
                             	throw exceptionRet;
                             }
+
+                            // If the current type is app, and the current method is initialize, then
+                            // need to play changes into the designer incase anything changes here.
+
+                            var bAppInitializeActive = types.isAppInitializeActive();
+                            if (!bAppInitializeActive) {
+
+                            	return;
+                            }
+
+		                    // .
+		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    if (!objectWorkspace) {
+
+		                        throw { messgage: "Failed to get the workspace object." };
+		                    }
+
+		                    // Get the block with which to work.
+		                    var objectPrimaryBlockChain = processor.getPrimaryBlockChain(objectWorkspace);
+
+		            		// Clear designer.
+		            		var objectResult = {};
+
+		            		// Scan.
+			                var objectCursor = objectPrimaryBlockChain;
+			                if (objectCursor) {
+
+			    	            do {
+
+				            		//	Look for "new_" and "set_".
+				            		//	Set in designer.
+				            		var arrayMatches = objectCursor.type.match(/App_set(.+?)Instance/);
+				            		if (arrayMatches &&
+				            			arrayMatches.length > 1) {
+
+				            			objectResult[arrayMatches[1]] = {};
+				            		} else {
+
+					            		if (objectCursor.type.match(/_setX/)) {
+
+					            			// Get the thing to set.
+					            			var objectToSet = objectCursor.children[0].children[0];
+					            			var strTypeToSet = objectToSet.type;
+					            			var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+					            			var strTheType = arrayTypes[1];
+
+					            			var objectValue = objectCursor.children[1].children[0].children[0];
+					            			var strValue = objectValue.contents;
+
+					            			objectResult[strTheType]["X"] = strValue;
+		                                } else if (objectCursor.type.match(/_setY/)) {
+
+		                                    // Get the thing to set.
+		                                    var objectToSet = objectCursor.children[0].children[0];
+		                                    var strTypeToSet = objectToSet.type;
+		                                    var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+		                                    var strTheType = arrayTypes[1];
+
+		                                    var objectValue = objectCursor.children[1].children[0].children[0];
+		                                    var strValue = objectValue.contents;
+
+		                                    objectResult[strTheType]["Y"] = strValue;
+		                                } else if (objectCursor.type.match(/_setWidth/)) {
+
+		                                    // Get the thing to set.
+		                                    var objectToSet = objectCursor.children[0].children[0];
+		                                    var strTypeToSet = objectToSet.type;
+		                                    var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+		                                    var strTheType = arrayTypes[1];
+
+		                                    var objectValue = objectCursor.children[1].children[0].children[0];
+		                                    var strValue = objectValue.contents;
+
+		                                    objectResult[strTheType]["Width"] = strValue;
+		                                } else if (objectCursor.type.match(/_setHeight/)) {
+
+		                                    // Get the thing to set.
+		                                    var objectToSet = objectCursor.children[0].children[0];
+		                                    var strTypeToSet = objectToSet.type;
+		                                    var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+		                                    var strTheType = arrayTypes[1];
+
+		                                    var objectValue = objectCursor.children[1].children[0].children[0];
+		                                    var strValue = objectValue.contents;
+
+		                                    objectResult[strTheType]["Height"] = strValue;
+		                                }
+				            		}
+
+			        	            objectCursor = objectCursor.next
+			            	    } while (objectCursor)
+			            	}
+
+			            	document.title = JSON.stringify(objectResult);
+
+
+
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -697,6 +789,41 @@ define(["Core/errorHelper"],
 						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
 					        'var strValue = Blockly.JavaScript.valueToCode(block, "VALUE",Blockly.JavaScript.ORDER_ADDITION) || "";' +
 					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
+					};
+
+					// Helper method generates the function string for a app property get function.
+					var m_functionGenerateBlocksAppPropertyGetFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.setColour(20);" +
+							"this.setOutput(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a property get function.
+					var m_functionGenerateJavaScriptAppPropertyGetFunctionString = function (strName) {
+
+						return 'return [" self.app[\'' + strName + '\'] ", Blockly.JavaScript.ORDER_MEMBER];';
+					};
+
+					// Helper method generates the function string for a property set function.
+					var m_functionGenerateBlocksAppPropertySetFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('VALUE').appendField('to');" +
+							"this.setColour(30);" +
+							"this.setPreviousStatement(true);" +
+							"this.setNextStatement(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a property set function.
+					var m_functionGenerateJavaScriptAppPropertySetFunctionString = function (strName) {
+
+						return 'var strValue = Blockly.JavaScript.valueToCode(block, "VALUE",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'return " self.app[\'' + strName + '\'] = " + strValue + "; "';
 					};
 
 					// Helper method generates the function string for a method function.
@@ -868,11 +995,24 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strGetName = clType.data.name + "_get" + property.name;
-							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
+
+							if (property.isApp) {
+
+								self.blocks[strGetName] = m_functionGenerateBlocksAppPropertyGetFunctionString(strGetName);
+							} else {
+
+								self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
+							}
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+							if (property.isApp) {
+
+								self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+							} else {
+
+								self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+							}
 
 							////////////////////////
 							// Schema.
@@ -893,11 +1033,24 @@ define(["Core/errorHelper"],
 							////////////////////////
 							// Blocks.
 							var strSetName = clType.data.name + "_set" + property.name;
-							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+
+							if (property.isApp) {
+
+								self.blocks[strSetName] = m_functionGenerateBlocksAppPropertySetFunctionString(strSetName);
+							} else {
+
+								self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+							}
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							if (property.isApp) {
+
+								self.javaScript[strSetName] = m_functionGenerateJavaScriptAppPropertySetFunctionString(property.name);
+							} else {
+
+								self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							}
 
 							////////////////////////
 							// Schema.
@@ -1036,12 +1189,26 @@ define(["Core/errorHelper"],
 							var strOriginalName = strOriginalTypeName + "_get" + strOriginal;
 							var strGetName = clType.data.name + "_get" + property.name;
 							delete self.blocks[strOriginalName];
-							self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
+
+							if (property.isApp) {
+
+								self.blocks[strGetName] = m_functionGenerateBlocksAppPropertyGetFunctionString(strGetName);
+							} else {
+
+								self.blocks[strGetName] = m_functionGenerateBlocksPropertyGetFunctionString(strGetName);
+							}
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalName];
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+
+							if (property.isApp) {
+
+								self.javaScript[strGetName] = m_functionGenerateJavaScriptAppPropertyGetFunctionString(property.name);
+							} else {
+
+								self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+							}
 
 							////////////////////////
 							// Workspace.
@@ -1079,12 +1246,26 @@ define(["Core/errorHelper"],
 							var strOriginalSetName = strOriginalTypeName + "_set" + strOriginal;
 							var strSetName = clType.data.name + "_set" + property.name;
 							delete self.blocks[strOriginalSetName];
-							self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+
+							if (property.isApp) {
+
+								self.blocks[strSetName] = m_functionGenerateBlocksAppPropertySetFunctionString(strSetName);
+							} else {
+
+								self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+							}
 
 							////////////////////////
 							// JavaScript.
 							delete self.javaScript[strOriginalSetName];
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+
+							if (property.isApp) {
+
+								self.javaScript[strSetName] = m_functionGenerateJavaScriptAppPropertySetFunctionString(property.name);
+							} else {
+
+								self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							}
 
 							////////////////////////
 							// Workspace.
@@ -1344,6 +1525,8 @@ define(["Core/errorHelper"],
 					var m_bDirty = false;
 					// Indicates load has been called on this instance.
 					var m_bLoaded = false;
+					// The code scanner, updates the designer when the app initialize code is modified.
+					var m_scanner = null;
 				} catch (e) {
 
 					errorHelper.show(e);

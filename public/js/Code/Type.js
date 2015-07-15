@@ -160,6 +160,24 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						return m_jType;
 					};
 
+					// Helper method returns the specified method.
+					self.getMethod = function (strMethod) {
+
+						// Loop over and add the methods.
+						for (var i = 0; i < self.data.methods.length; i++) {
+
+							// Get the method and test it for name.
+							var methodIth = self.data.methods[i];
+							if (methodIth.name === strMethod) {
+
+								// Return the specified method.
+								return methodIth;
+							}
+						}
+
+						return null;
+					};
+
 					// Loop over all methods, indicate if the specified
 					// string is found in any of their workspaces.
 					// Returns the method referenced or null.

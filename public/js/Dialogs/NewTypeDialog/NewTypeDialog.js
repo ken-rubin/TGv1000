@@ -155,7 +155,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								id: 0,
 								ordinal: client.getNumberOfTypesInActiveComic(),
 								tags: $("#TypeTags").val() || "",
-								properties: [],
+								properties: [{ 
+
+										name: "X", type: 1, initialValue: 0 
+									}, { 
+
+										name: "Y", type: 1, initialValue: 0 
+									}, { 
+
+										name: "Width", type: 1, initialValue: 0  
+									}, { 
+
+										name: "Height", type: 1, initialValue: 0  
+								}],
 								methods: [],
 								events: [],
 								dependencies: [],

@@ -125,6 +125,39 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
+					// Add Type to strip.
+					self.getType = function (strType) {
+
+						// Loop over types.
+						for (var i = 0; i < m_arrayClTypes.length; i++) {
+
+							var typeIth = m_arrayClTypes[i];
+							if (typeIth.data.name === strType) {
+
+								return typeIth;
+							}
+						}
+
+						// Failed.
+						return null;							
+					};
+
+					// Return true of the app's initialize is active.
+					self.isAppInitializeActive = function () {
+
+						if (m_clTypeActive.data.name !== "app") {
+
+							return false;
+						}
+
+						if (m_methodActive.name !== "initialize") {
+
+							return false;
+						}
+
+						return true;
+					};
+
 					// Specify the active type.  Called from 
 					// a type when its image is clicked in the tool strip.
 					self.select = function (clType) {
@@ -700,6 +733,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							var index = m_functionParseOutIndex(e);
 
+							// Save the active method.
+							m_methodActive = m_clTypeActive.data.methods[index];
+
 							var exceptionRet = code.load(m_clTypeActive, m_clTypeActive.data.methods[index], m_clTypeActive.data.methods[index].workspace);
 							if (exceptionRet) {
 
@@ -1091,6 +1127,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					// Active item.
 					var m_clTypeActive = null;
 					var m_ActiveTypeIndex = -1;
+					var m_methodActive = null;
 
 				} catch (e) {
 

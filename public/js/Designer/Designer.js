@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"], 
-	function (errorHelper, resourceHelper, ToolInstance) {
+define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "SourceScanner/coder"], 
+	function (errorHelper, resourceHelper, ToolInstance, coder) {
 
 		try {
 
@@ -51,6 +51,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 		                    	m_functionMouseUp);
 		                    m_jCanvas.bind("mouseout",
 		                    	m_functionMouseOut);
+		                    m_jCanvas.bind("mouseenter",
+		                    	m_functionHandleResize);
 		                    m_jCanvas.contextMenu({
 
 								menuSelector: "#DesignerContextMenu",
@@ -60,44 +62,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 							// Handle resize to fit the designer to the visible height of the designer.
 							// And now that comics are optional, let's handle the width here, too.
-							$(window).resize(function () {
+							$(window).resize(m_functionHandleResize);
 
-								try {
-
-									var iViewportHeight = $(window).height();
-									var iNavbarHeight = $(".navbar").height();
-									var iBordersAndSpacingPadding = 34;
-
-									var canvas = m_jCanvas[0];
-									m_jWrapper.height(iViewportHeight - 
-										iNavbarHeight -
-										iBordersAndSpacingPadding);
-
-									m_dWidth = m_jWrapper.width();
-									m_dHeight = m_jWrapper.height();
-									m_jWrapper.attr("width",
-										m_dWidth);
-									m_jWrapper.attr("height",
-										m_dHeight);
-									m_jCanvas.attr("width",
-										m_dWidth);
-									m_jCanvas.attr("height",
-										m_dHeight);
-
-									// Get context.
-									m_context = canvas.getContext("2d");
-
-									// Render canvas.
-									var exceptionRet = m_functionRender();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
+							// Call once to initialize the sizing.
+							//setTimeout(functionHandleResize, 1000);
 
 							return null;
 						} catch (e) {
@@ -113,7 +81,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 							// Just call to helper method.
 							return m_functionRender();
-							
 						} catch (e) {
 
 							return e;
@@ -173,6 +140,46 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 					///////////////////////////////
 					// Private functions.
+
+					// Method resizes and repositions the canvas.
+					var m_functionHandleResize = function () {
+
+						try {
+
+							var iViewportHeight = $(window).height();
+							var iNavbarHeight = $(".navbar").height();
+							var iBordersAndSpacingPadding = 34;
+
+							var canvas = m_jCanvas[0];
+							m_jWrapper.height(iViewportHeight - 
+								iNavbarHeight -
+								iBordersAndSpacingPadding);
+
+							m_dWidth = m_jWrapper.width();
+							m_dHeight = m_jWrapper.height();
+							m_jWrapper.attr("width",
+								m_dWidth);
+							m_jWrapper.attr("height",
+								m_dHeight);
+							m_jCanvas.attr("width",
+								m_dWidth);
+							m_jCanvas.attr("height",
+								m_dHeight);
+
+							// Get context.
+							m_context = canvas.getContext("2d");
+
+							// Render canvas.
+							var exceptionRet = m_functionRender();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
 
 					// Cause the specified item to be in front of all other items.
 					var m_functionBringItemToFront = function (item) {
@@ -545,6 +552,48 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 						}
 					};
 
+					// Helper method loops over all instances 
+					// and generates a new name for the type.
+					var m_functionGetUniqueInstanceName = function (strType) {
+
+						var strName = strType;
+
+						var strSuffix = "";
+
+						var bContinueLooking = true;
+						while (bContinueLooking) {
+
+							var bFound = false;
+							for (var i = 0; i < m_arrayItems.length; i++) {
+
+								var tiIth = m_arrayItems[i];
+								if (tiIth.id === strName) {
+
+									var iSuffix = parseInt(strSuffix);
+									if (isNaN(iSuffix)) {
+
+										iSuffix = 1;
+									}
+									iSuffix++;
+									strSuffix = iSuffix.toString();
+									bFound = true;
+
+									break;
+								}
+							}
+
+							if (bFound) {
+
+								strName = strType + strSuffix;
+							} else {
+
+								bContinueLooking = false;
+							}
+						}
+
+						return strName;
+					};
+
 					// Event invoked when a drop operation occurs in the parent element.
 		            var m_functionDrop = function (event, ui) {
 
@@ -563,8 +612,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 		                    var strSrc = jHelper.attr("src");
 		                    var strType = jHelper.attr("data-type");	// This seems not to have been defined, but also it seems not to be used. Have Ken check.
 
+		                    // Get an unique instance name for the type.
+		                    var strInstanceName = m_functionGetUniqueInstanceName(strType);
+
 		                    // Allocate a new type.
-		                    var tiNew = new ToolInstance(strId,
+		                    var tiNew = new ToolInstance(strInstanceName,
 		                    	strType,
 		                    	strSrc,
 		                    	iLeft,
@@ -579,6 +631,66 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance"],
 
 								throw exceptionRet;
 							}
+
+							// Add type-property to app.  Also update
+							// app menu schema for the type-property. 
+							exceptionRet = code.addProperty({
+
+									data: {
+
+										name: "app"
+									}
+								}, {
+
+									name: strInstanceName,
+									isApp: true
+								});
+		                    if (exceptionRet) {
+
+		                        throw exceptionRet;
+		                    }
+
+							// Add item to app initialize.
+		                    exceptionRet = coder.add_AllocateType(strType, 
+		                    	strInstanceName);
+		                    if (exceptionRet) {
+
+		                        throw exceptionRet;
+		                    }
+
+		                    // Set location.
+		                    exceptionRet = coder.add_SetPropertyValue(strType, 
+		                    	"X",
+		                    	iLeft,
+		                    	strInstanceName);
+		                    if (exceptionRet) {
+
+		                        throw exceptionRet;
+		                    }
+		                    exceptionRet = coder.add_SetPropertyValue(strType, 
+		                    	"Y",
+		                    	iTop,
+		                    	strInstanceName);
+		                    if (exceptionRet) {
+
+		                        throw exceptionRet;
+		                    }
+		                    exceptionRet = coder.add_SetPropertyValue(strType, 
+		                    	"Width",
+		                    	iWidth,
+		                    	strInstanceName);
+		                    if (exceptionRet) {
+
+		                        throw exceptionRet;
+		                    }
+		                    exceptionRet = coder.add_SetPropertyValue(strType, 
+		                    	"Height",
+		                    	iHeight,
+		                    	strInstanceName);
+		                    if (exceptionRet) {
+
+		                        throw exceptionRet;
+		                    }
 		                } catch (e) {
 
 		                    // Do nothing.
