@@ -572,14 +572,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
-							//////////////////////////////////////////////////////////////////
-							// The following will be removed as I implement the functionality:
-
-							$("#TWsearchTypeBtn").prop("disabled", true);
-							$("#TWsearchMethodBtn").prop("disabled", true);
-
-							//////////////////////////////////////////////////////////////////
-
 							m_functionSetTypewellHeader(m_clTypeActive.data.name);
 							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
 
@@ -938,7 +930,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									}
 								} else {
 
-									throw new Error("Invalid project id returned.")
+									throw new Error("Invalid type id returned.")
 								}
 							});
 							if (exceptionRet) {

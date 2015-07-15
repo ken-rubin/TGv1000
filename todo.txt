@@ -29,12 +29,18 @@ Jerry
 - Images in toolstrip now have spaces in id replaced by _. Might have to catch this elsewhere.
 - Before saving picklist initialvalue, uniquify.
 - Write event loader in Code.js#self.addType.
+- When I "select ... order by ordinal asc", items might come back in random order anyway. Check this. If so, sort.
 
 
 
 To discuss
 
-- If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?
+- If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
+- What does one search for when looking for a class, product or other project to open? classOrProject or project? There will initially be a 1-1 correspondance between classOrProduct and project, but, as people start using a classOrProduct,
+-    they'll save clone projects that will still point back to the same classOrProduct, so that relationship will become 1-many. Someone "buying" a product will want to search classOrProduct. Someone cloning a project should be able to search at that level.
+-    I think this could be handled with checkboxes in the Open/Search for Project dialog. It does imply that classOrProduct does have a resource pointing back to it and tags associated with that resource. There is currently a resourceType for "comic". I'm going to
+-    change that to classOrProduct.
+- When I search for a Type, I think I maybe should not return app Types. Discuss.
 
 
 

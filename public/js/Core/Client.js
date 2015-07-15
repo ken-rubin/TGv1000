@@ -437,7 +437,7 @@ define(["Core/errorHelper",
 					// "functionOK" links.
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
 					// Not all of these come back through client. Some places handle the processing internally.
-					self.openProjectFromDB = function (iProjectId) {
+					self.openProjectFromDB = function (iProjectId, callback) {
 
 						try {
 
@@ -451,27 +451,8 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									// Enable the TypeWell icons that are disabled if no project is loaded.
-									// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
-									$(".disabledifnoproj").prop("disabled", false);
-
-									m_clProject = new Project();
-									var exceptionRet = m_clProject.load(data.project);
-									if (exceptionRet) {
-
-										return exceptionRet;
-									}
-
-									// Fire bootstrap tooltip opt-in.
-									$(".disabledifnoproj").tooltip();
-
-
-
-
-
-
-
-
+									var exceptionRet = self.functionNewProject(data.project, callback);
+									if (exceptionRet) { return exceptionRet; }
 
 									return null;
 
@@ -481,15 +462,13 @@ define(["Core/errorHelper",
 									return new Error(data.message);
 								}
 							});
-
-							return null;
-
 						} catch (e) {
 
 							return e;
 						}
 					}
 
+//used
 					self.addTypeToProject = function(clType) {
 
 						try {
@@ -502,6 +481,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addTypeToProjectFromDB = function (iTypeId) {
 
 						try {
@@ -705,6 +685,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addMethodToTypeFromDB = function (iMethodId) {
 
 						try {
@@ -719,7 +700,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									return types.getActiveClType().addMethod(data.method);
+									return self.addMethodToActiveType(data.method);
 
 								} else {
 
@@ -729,30 +710,6 @@ define(["Core/errorHelper",
 							});
 
 							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.addPropertyToType = function (property) {
-
-						try {
-
-							return types.getActiveClType().addProperty(property);
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.addEventToType = function (event) {
-
-						try {
-
-							return types.getActiveClType().addEvent(event);
 
 						} catch (e) {
 
@@ -950,7 +907,10 @@ define(["Core/errorHelper",
 						navbar.enableDisableProjectsMenuItems();
 					}
 
-					self.functionNewProject = function (project) {
+					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1 from the DB),
+					// the following method is called after saving a project, since it needs to be reloaded following the setting of probably
+					// new id's for all of the parts of the project.
+					self.functionNewProject = function (project, callback) {
 
 						try {
 
@@ -1006,6 +966,11 @@ define(["Core/errorHelper",
 										self.functionSetBDisplayComics(true);
 									}
 								});
+							}
+
+							if ($.isFunction(callback)) {
+
+								callback(m_clProject);
 							}
 
 							return null;

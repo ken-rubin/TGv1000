@@ -539,6 +539,188 @@ begin
 		set @dbstate := 31.0;
     end if;
 
+    if @dbstate = 31.0 then
+    
+		-- The work being done here will prepare the test data to support three projects being loaded from the database:
+        -- (1) A single-comic project that will be opened for New Project.
+        -- (2) A multiple-comic project that is meant to be a Master Product.
+        -- (3) A project based on the same set of classOrProduct, comics and comicPanels records as in case (2), but
+        --     as modified and enhanced by a user.
+    
+		UPDATE TGv1000.resourceTypes SET description='classOrProduct' WHERE id=4;
+        
+        -- Clean up from step 29.
+  		DELETE FROM TGv1000.classOrProduct;
+            
+		DELETE FROM TGv1000.comics;
+            
+		DELETE FROM TGv1000.comicPanels;
+		
+		INSERT INTO TGv1000.classOrProduct (id, `name`, isProduct, price, createdByUserId)
+			VALUES 
+				(1,'New Project Help',0,0,1),
+				(2,'Mission to Maars',1,13.99,1)
+            ;
+            
+		INSERT INTO TGv1000.comics (id, classOrProductId, ordinal, imageResourceId, `name`)
+			VALUES 
+				(1,1,0,1,'TechGroms Help'),
+				(2,2,0,2,'MtM: How to TechGrom'),
+				(3,2,1,3,'MTM: Sessopm 1'),
+				(4,2,2,4,'MTM: Sessopm 2')
+			;
+            
+		INSERT INTO TGv1000.comicPanels (id, comicId, ordinal, `name`, url, description, thumbnail)
+			VALUES 
+				(1,1,0,'FAQs','http://www.techgroms.com','TechGroms FAQs','tn3.png'),
+				(2,2,0,'FAQs','http://www.techgroms.com','TechGroms FAQs','tn3.png'),
+				(3,3,0,'Step 1','http://www.bing.com','Session 1 Step 1','tn1.png'),
+				(4,3,1,'Step 2','http://www.microsoft.com','Session 1 Step 2','tn2.jpg'),
+				(5,4,0,'Step 1','http://www.google.com','Session 2 Step 1','tn4.png'),
+				(6,4,1,'Step 2','http://www.github.com','Session 2 Step 2','tn5.png'),
+				(7,4,2,'Step 3','http://www.sourcetree.com','Session 2 Step 3','tn6.png')
+			;
+            
+		insert into TGv1000.`types` (id,`name`,isApp,imageResourceId,ordinal,comicId,projectId)
+			VALUES
+				(1,'App',1,0,0,1,1),
+				(2,'App',1,0,0,2,2),
+				(3,'App',1,0,0,3,3),
+				(4,'Type1',0,0,1,3,3),
+				(5,'Type2',0,0,2,3,3),
+				(6,'App',1,0,0,4,3)
+			;
+            
+		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
+			VALUES
+				(1,1,1,1,0,NULL,'default'),
+				(2,1,4,1,0,2,'Mission_to_Mars'),
+				(3,1,3,1,0,2,'Mission_to_Mars'),
+				(4,1,3,1,0,3,'mine'),
+				(5,1,5,1,0,1,'a'),
+				(6,1,5,1,0,2,'b'),
+				(7,1,5,1,0,3,'c'),
+				(8,1,5,1,0,4,'d'),
+				(9,1,5,1,0,5,'e'),
+				(10,1,5,2,0,6,'f')
+			;
+            
+		insert TGv1000.projects (id,`name`,createdByUserId,price,imageResourceId,description,ownedByUserId,classOrProductId)
+			VALUES
+				(1,'New Project',1,0,0,NULL,1,1),
+				(2,'Mission to Mars',1,13.99,0,'In this project you will create....',1,2),
+				(3,'Mission to Mars',1,13.99,0,'Did some work on MtM.',1,2)
+			;
+            
+		insert TGv1000.resources_tags (resourceId,tagId)
+			VALUES
+				(1,1),
+				(1,2),
+				(1,3),
+				(3,1),
+				(3,3),
+				(3,5),
+				(4,1),
+				(4,5),
+				(5,1),
+				(5,6),
+				(6,1),
+				(6,6),
+				(7,1),
+				(7,6),
+				(8,1),
+				(8,6),
+				(9,1),
+				(9,6),
+				(10,1),
+				(10,6)
+			;
+		
+        insert TGv1000.tags (id,description)
+			VALUES
+				(1,'jerry'),
+				(2,'product'),
+				(3,'mission_to_mars'),
+				(4,'image'),
+				(5,'project'),
+				(6,'type')
+			;
+            
+        UPDATE `TGv1000`.`control` set dbstate=32.0 where id=1;
+		set @dbstate := 32.0;
+    end if;
+
+    if @dbstate = 32.0 then
+    
+		insert TGv1000.propertys (id,typeId,`name`,propertyTypeId,initialValue,ordinal)
+			VALUES
+				(1,1,'X',1,'0',0),
+				(2,1,'Y',1,'0',0),
+				(3,1,'Width',1,'0',0),
+				(4,1,'Height',1,'0',0),
+				(5,2,'X',1,'0',0),
+				(6,2,'Y',1,'0',0),
+				(7,2,'Width',1,'0',0),
+				(8,2,'Height',1,'0',0),
+				(9,3,'X',1,'0',0),
+				(10,3,'Y',1,'0',0),
+				(11,3,'Width',1,'0',0),
+				(12,3,'Height',1,'0',0),
+				(13,4,'X',1,'0',0),
+				(14,4,'Y',1,'0',0),
+				(15,4,'Width',1,'0',0),
+				(16,4,'Height',1,'0',0),
+				(17,5,'X',1,'0',0),
+				(18,5,'Y',1,'0',0),
+				(19,5,'Width',1,'0',0),
+				(20,5,'Height',1,'0',0),
+				(21,6,'X',1,'0',0),
+				(22,6,'Y',1,'0',0),
+				(23,6,'Width',1,'0',0),
+				(24,6,'Height',1,'0',0)
+			;
+            
+		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageResourceId,createdByUserId,price,description)
+			VALUES
+				(1,3,'method1',0,'',0,1,0,'')
+			;
+            
+		insert TGv1000.events (id,typeId,`name`,ordinal)
+			VALUES
+				(1,3,'event1',0)
+			;
+            
+		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
+			VALUES
+				(11,1,7,1,0,1,'g')
+			;
+            
+        insert TGv1000.tags (id,description)
+			VALUES
+				(7,'method')
+			;
+            
+		insert TGv1000.resources_tags (resourceId,tagId)
+			VALUES
+				(11,1),
+                (11,7)
+			;
+            
+        UPDATE `TGv1000`.`control` set dbstate=33.0 where id=1;
+		set @dbstate := 33.0;
+    end if;
+
+    if @dbstate = 33.0 then
+    
+		insert TGv1000.resourceTypes
+			VALUES
+                (6,'unused')
+			;
+    
+        UPDATE `TGv1000`.`control` set dbstate=34.0 where id=1;
+		set @dbstate := 34.0;
+    end if;
+
 end;
 
 //

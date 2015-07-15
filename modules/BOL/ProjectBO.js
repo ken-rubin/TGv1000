@@ -25,6 +25,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 } else {
 
+                    // Make sure rows are sorted by id.
+                    rows.sort(function(a,b){return a.id - b.id;})
                     for (var i = 0; i < rows.length; i++) {
 
                         m_resourceTypes.push(rows[i].description);
@@ -57,7 +59,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId,
+            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + ";",
                 function(rows){
 
                     if (rows.length !== 1) {
@@ -70,7 +72,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         res.json({
                             success: true,
-                            cnt: 4//rows[0].cnt
+                            cnt: rows[0].cnt
                         });
                     }
                 },
@@ -101,274 +103,499 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     self.routeRetrieveProject = function (req, res) {
 
-        console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
-        // req.body.projectId
-        // req.body.userName
-
-        // We gonna read the project from projects. Read all comics with correct projectId from comics. For each of them we're going to 
-        // read all types with matching comicId. For each type we'll read methods, properties and events with matching typeId.
-        // Then we'll return the complete project javascript object.
-
         try {
 
-            var project = 
-            {
-                name: 'Fake project',
-                id: req.body.projectId,
-                description: 'Fake description',
-                tags: 'a b c',
-                imageResourceId: 0,
-                price: 0,
-                createdByUserId: req.body.userId,
-                isDirty: 1,
-                comics: 
-                {
-                    items: []
-                }
-            };
+            console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+            // req.body.projectId
+            // req.body.userName
 
-            var comic = 
-            {
-                imageResourceId: 0,
-                id: 0,
-                name: '',
-                tags: '',
-                ordinal: 0,
-                types: {
-                    items: []
-                }
-            };
-
-            var type =
-            {
-                isApp: true,
-                id: 0,
-                name: "",
-                ordinal: 0,
-                tags: '',
-                imageResourceId: 0,
-                properties: [],
-                methods: [],
-                events: []
-            };
-
-            var method = 
-            { 
-                name: "", 
-                workspace: "", 
-                id: 0,
-                tags: '',
-                imageResourceId: 0,
-                createdByUserId: 0,
-                price: 0,
-                ordinal: 0,
-                description: ""
-            };
-
-            var property = 
-            {
-                name: "",
-                id: 0,
-                ordinal: 0,
-                propertyTypeId: 0,
-                initialValue: ""
-            };
-
-            var event = 
-            {
-                name: "",
-                id: 0,
-                ordinal: 0
-            };
-
-            var ex = sql.execute("select count(t.id) as cnt from " + self.dbname + "types t where t.comicId in (select id from " + self.dbname + "comics where projectId=" + req.body.projectId + ");",
-                function(rows){
+            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
+                function(rows) {
 
                     if (rows.length !== 1) {
 
-                        res.json({
-                            success: false,
-                            message: "Could not retrieve project."
-                        });
+                        res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+
                     } else {
 
-                        typesCtr = rows[0].cnt;
+                        var row = rows[0];
+                        var project = 
+                        {
+                            id: row.id,
+                            name: row.name,
+                            createdByUserId: row.createdByUserId,
+                            price: row.price,
+                            imageResourceId: row.imageResourceId,
+                            description: row.description,
+                            ownedByUserId: row.ownedByUserId,
+                            classOrProductId: row.classOrProductId,
+                            tags: '',
+                            isDirty: 1,
+                            comics:
+                            {
+                                items: []
+                            }
+                        };
 
-                        var exceptionRet = sql.execute("select * from " + self.dbname + "projects where id=" + req.body.projectId + ";",
-                            function(rows){
+                        m_functionFetchTags(
+                            project.id, 
+                            3, 
+                            req.body.userName, 
+                            function(tags)  {
 
-                                if (rows.length !== 1) {
+                                project.tags = tags;
+                                m_functionRetProjDoComics(req, res, project);
+                            }
+                        );
+                    }
+                },
+                function(strError) {
 
-                                    res.json({
-                                        success: false,
-                                        message: 'Could not retrieve project from database.'
-                                    });
-                                } else {
+                    res.json( {success:false, message: strError} );
+                }
+            );
 
-                                    project.name = rows[0].name;
-                                    project.id = rows[0].id;
-                                    project.description = rows[0].description;
-                                    project.imageResourceId = rows[0].imageResourceId;
-                                    project.price = rows[0].price;
-                                    project.createdByUserId = rows[0].createdByUserId;
-                                    project.isDirty = false;
-                                    m_functionFetchTags(project.id, 3, req.body.userName, function(tags){
+            if (ex) {
 
-                                        project.tags = tags;
+                res.json({success: false, message: e.message});
+            }
+        } catch(e) {
 
-                                        // Now comics.
-                                        exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.id + " order by ordinal asc;",
-                                            function(rows){
+            res.json({success: false, message: e.message});
+        }
+    }
 
-                                                rows.forEach(function(row) {
+    var m_functionRetProjDoComics = function(req, res, project) {
 
-                                                    var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
-                                                    comicItem.imageResourceId = row.imageResourceId;
-                                                    comicItem.id = row.id;
-                                                    comicItem.name = row.name;
-                                                    comicItem.ordinal = row.ordinal;
-                                                    m_functionFetchTags(comicItem.id, 4, req.body.userName, function(tags){
+        try {
 
-                                                        comicItem.tags = tags;
+            console.log('In m_functionRetProjDoComics');
 
-                                                        // Now types.
-                                                        exceptionRet = sql.execute("select * from " + self.dbname + "types where comicId=" + comicItem.id + " order by ordinal asc;",
-                                                            function(rows){
+            var ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + ";",
+                function(rows)
+                {
 
-                                                                rows.forEach(function(row) {
+                    if (rows.length === 0) {
 
-                                                                    var typeItem = JSON.parse(JSON.stringify(type));    // clone type.
-                                                                    typeItem.isApp = row.isApp;
-                                                                    typeItem.id = row.id;
-                                                                    typeItem.ordinal = row.ordinal;
-                                                                    typeItem.name = row.name;
-                                                                    typeItem.imageResourceId = row.imageResourceId;
-                                                                    var code = JSON.parse(row.jsonCode);
-                                                                    typeItem.properties = code.properties;
-                                                                    typeItem.methods = code.methods;
-                                                                    typeItem.events = code.events;
-                                                                    typeItem.dependencies = code.dependencies;
-                                                                    m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
+                        res.json({success: false, message: "Could not retrieve project with id=" + req.body.id});
+                        return;
 
-                                                                        typeItem.tags = tags;
-                                                                        
-                                                                        comicItem.types.items.push(typeItem);
+                    } 
 
-                                                                        if (--typesCtr === 0) {
+                    var comicsCounter = rows.length;
+                    console.log('Got ' + comicsCounter + ' comics.');
+                    var strComicIds = '';
 
-                                                                            res.json({
-                                                                                success: true,
-                                                                                project: project
-                                                                            });
-                                                                            return;
-                                                                        }
-                                                                    });
-                                                                });
-                                                            },
-                                                            function(strError){
+                    rows.forEach(
+                        function(row)
+                        {
 
-                                                                res.json({
-                                                                    success: false,
-                                                                    message: strError
-                                                                });
-                                                                return;
-                                                            }
-                                                        );
-                                                        if (exceptionRet) {
+                            var comic = 
+                            {
+                                id: row.id,
+                                classOrProductId: row.classOrProductId,
+                                ordinal: row.ordinal,
+                                imageResourceId: row.imageResourceId,
+                                name: row.name,
+                                comicPanels: 
+                                {
+                                    items: []
+                                },
+                                types: 
+                                {
+                                    items: []
+                                }
+                            };
 
-                                                            res.json({
-                                                                success: false,
-                                                                message: exceptionRet.message
-                                                            });
-                                                            return;
-                                                        }
-                                                    });
-                                                    project.comics.items.push(comicItem);
-                                                });
-                                            },
-                                            function(strError){
+                            if (strComicIds.length === 0)
+                                strComicIds = comic.id.toString();
+                            else
+                                strComicIds = strComicIds + ',' + comic.id;
 
-                                                res.json({
-                                                    success: false,
-                                                    message: strError
-                                                });
-                                                return;
-                                            }
-                                        );
-                                        if (exceptionRet) {
+                            project.comics.items.push(comic);
 
-                                            res.json({
-                                                success: false,
-                                                message: exceptionRet.message
-                                            });
+                            if (--comicsCounter === 0) {
+
+                                console.log('strComicIds = "' + strComicIds + '"');
+                                var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "comicPanels where comicId in (" + strComicIds + ");",
+                                    function(rows){
+
+                                        if (rows.length !== 1) {
+
+                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
                                             return;
                                         }
-                                    });
-                                }
-                            },
-                            function(strError){
+
+                                        m_functionRetProjDoComicPanels(req, res, project, rows[0].cnt);
+                                    },
+                                    function(strError) {
+
+                                        res.json({success: false, message: strError});
+                                        return;
+                                    }
+                                );
+                            }
+                        }
+                    );
+                },
+                function(strError) {
+
+                    res.json( {success:false, message: strError} );
+                }
+            );
+
+            if (ex) {
+
+                res.json({success: false, message: e.message});
+            }
+        } catch(e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionRetProjDoComicPanels = function(req, res, project, comicPanelsCount) {
+
+        try {
+
+            console.log('In m_functionRetProjDoComicPanels with comicPanelsCount=' + comicPanelsCount);
+
+            project.comics.items.forEach(
+                function(comic) {
+
+                    var ex = sql.execute("select * from " + self.dbname + "comicPanels where comicId = " + comic.id + ";",
+                        function(rows) {
+
+                            if (rows.length === 0) {
 
                                 res.json({
                                     success: false,
-                                    message: strError
+                                    message: 'Unable to retrieve selected project.'
                                 });
+                                return;
                             }
-                        );
-                        if (exceptionRet) {
+
+                            rows.forEach(
+                                function(row) {
+
+                                    var comicPanel =
+                                    {
+                                        id: row.id,
+                                        ordinal: row.ordinal,
+                                        name: row.name,
+                                        url: row.url,
+                                        description: row.description,
+                                        thumbnail: row.thumbnail
+                                    };
+                                    comic.comicPanels.items.push(comicPanel);
+                                    
+                                    if (--comicPanelsCount === 0) {
+
+                                        var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where projectId = " + project.id + ";",
+                                            function(rows) {
+
+                                                if (rows.length !== 1) {
+
+                                                    res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                    return;
+                                                }
+
+                                                m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
+                                            },
+                                            function(strError){
+                                                res.json({success: false, message: strError});
+                                                return;
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                        },
+                        function(strError) {
+                            res.json({
+                                success: false,
+                                message: strError
+                            });
+                            return;
+                        }
+                    );
+                    if (ex) {
+                        res.json({
+                            success: false,
+                            message: ex.message
+                        });
+                        return;
+                    }
+                }
+            );
+        } catch(e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
+
+        try {
+
+            console.log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
+
+            var strTypeIds = '';    // Will be used for a count(*) query.
+
+            project.comics.items.forEach(
+                function(comic) {
+
+                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + ";",
+                        function(rows) {
+
+                            // At least for now there can be comics with no types, so we disable the following test:
+                            // if (rows.length === 0) {
+
+                            //     res.json({
+                            //         success: false,
+                            //         message: 'Unable to retrieve selected project.'
+                            //     });
+                            //     return;
+                            // }
+
+                            rows.forEach(
+                                function(row) {
+
+                                    var type = 
+                                    {
+                                        id: row.id,
+                                        name: row.name,
+                                        isApp: row.isApp === 1 ? true : false,
+                                        imageResourceId: row.imageResourceId,
+                                        ordinal: row.ordinal,
+                                        tags: '',
+                                        properties: [],
+                                        methods: [],
+                                        events: []
+                                    };
+
+                                    if (strTypeIds.length === 0)
+                                        strTypeIds = type.id.toString();
+                                    else
+                                        strTypeIds = strTypeIds + ',' + type.id;
+
+                                    m_functionFetchTags(
+                                        type.id,
+                                        5,
+                                        req.body.userName,
+                                        function(tags) {
+
+                                            type.tags = tags;
+                                            comic.types.items.push(type);
+
+                                            if (--typesCount === 0) {
+
+                                                console.log('typesCount has reached 0');
+                                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
+                                                    function(rows) {
+
+                                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                            return;
+                                                        }
+
+                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                                    },
+                                                    function(strError){
+                                                        res.json({success: false, message: strError});
+                                                        return;
+                                                    }
+                                                );
+                                            }
+                                        }
+                                    );
+                                }
+                            );
+                        },
+                        function(strError) {
 
                             res.json({
                                 success: false,
-                                message: exceptionRet.message
+                                message: strError
                             });
+                            return;
                         }
+                    );
+                    if (ex) {
+                        res.json({
+                            success: false,
+                            message: ex.message
+                        });
+                        return;
                     }
-                },
-                function(strError){
-
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
                 }
             );
-            if (ex) {
-
-                res.json({
-                    success: false,
-                    message: ex.message
-                });
-            }
-
         } catch(e) {
 
-            res.json({
-                success: false,
-                message: e.message
-            });
+            res.json({success: false, message: e.message});
         }
+    }
+
+    var m_functionRetProjDoMethodsPropertiesEvents = function(req, res, project, mcnt, pcnt, ecnt) {
+
+        try {
+
+            console.log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            project.comics.items.forEach(
+                function(comic) {
+                    // console.log('in comic ' + JSON.stringify(comic));
+                    comic.types.items.forEach(
+                        function(type) {
+                            // console.log('in type ' + JSON.stringify(type));
+                            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + "; select * from " + self.dbname + "propertys where typeId =" + type.id + "; select * from " + self.dbname + "events where typeId =" + type.id + ";",
+                                function(rows){
+
+                                    // console.log(' ');
+                                    // console.log('************** Start of triple select ******************');
+                                    // console.log(' ');
+                                    // console.log(JSON.stringify(rows));
+                                    // console.log(' ');
+                                    // console.log('************** Start of triple select ******************');
+                                    // console.log(' ');
+
+                                    if (rows.length !== 3) {
+                                        console.log('The triple select did not return rows.length === 3');
+                                        res.json({
+                                            success: false,
+                                            message: 'Unable to retrieve selected project.'
+                                        });
+                                        return;
+                                    }
+
+                                    // methods
+                                    rows[0].forEach(
+                                        function(row) {
+                                            // console.log('method row: ' + JSON.stringify(row));
+                                            var method = 
+                                            { 
+                                                id: row.id,
+                                                name: row.name, 
+                                                ordinal: row.ordinal,
+                                                workspace: row.workspace, 
+                                                tags: '',
+                                                imageResourceId: row.imageResourceId,
+                                                createdByUserId: row.createdByUserId,
+                                                price: row.price,
+                                                description: row.description
+                                            };
+
+                                            m_functionFetchTags(
+                                                method.id,
+                                                7,
+                                                req.body.userName,
+                                                function(tags) {
+
+                                                    method.tags = tags;
+                                                    type.methods.push(method);
+
+                                                    mcnt--;
+                                                    if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                                        m_functionSetSuccessProjectReturn(res, project);
+                                                        return;
+                                                    }
+                                                }
+                                            );
+                                        }
+                                    );
+
+                                    // properties
+                                    rows[1].forEach(
+                                        function(row) {
+                                            // console.log('property row: ' + JSON.stringify(row));
+                                            var property = 
+                                            {
+                                                id: row.id,
+                                                name: row.name,
+                                                propertyTypeId: row.propertyTypeId,
+                                                initialValue: row.initialValue,
+                                                ordinal: row.ordinal
+                                            };
+
+                                            type.properties.push(property);
+
+                                            pcnt--;
+                                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                                m_functionSetSuccessProjectReturn(res, project);
+                                                return;
+                                            }
+                                        }
+                                    );
+
+                                    // events
+                                    rows[2].forEach(
+                                        function(row) {
+                                            // console.log('event row: ' + JSON.stringify(row));
+                                            var event = 
+                                            {
+                                                id: row.id,
+                                                name: row.name,
+                                                ordinal: row.ordinal
+                                            };
+
+                                            type.events.push(event);
+
+                                            ecnt--;
+                                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                                m_functionSetSuccessProjectReturn(res, project);
+                                                return;
+                                            }
+                                        }
+                                    );
+                                },
+                                function(strError){
+                                    res.json({success: false, message: strError});
+                                    return;
+                                }
+                            );
+                        }
+                    );
+                }
+            );
+        } catch (e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionSetSuccessProjectReturn = function(res, project) {
+
+        console.log('They have all reached 0. Returning project after sorting array by ordinal.');
+        project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+        project.comics.items.forEach(
+            function(comic) {
+
+                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                comic.types.items.forEach(
+                    function(type) {
+                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                    }
+                );
+            }
+        );
+        res.json({
+            success: true,
+            project: project
+        });
     }
 
     self.routeRetrieveType = function (req, res) {
 
         console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
-        // req.body.methodId
+        // req.body.typeId
         // req.body.userName
 
         try {
-
-            var type =
-            {
-                isApp: true,
-                id: 0,
-                ordinal: 0,
-                tags: '',
-                properties: [],
-                methods: [{ name: "initialize", workspace: "", method: "" }],
-                events: [],
-                dependencies: [],
-                name: "",
-                imageResourceId: 0
-            };
 
             var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId+ ";",
                 function(rows){
@@ -382,25 +609,45 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } else {
 
                         var row = rows[0];
-                        type.isApp = row.isApp;
-                        type.id = row.id;
-                        type.ordinal = row.ordinal;
-                        type.name = row.name;
-                        type.imageResourceId = row.imageResourceId;
-                        var code = JSON.parse(row.jsonCode);
-                        type.properties = code.properties;
-                        type.methods = code.methods;
-                        type.events = code.events;
-                        type.dependencies = code.dependencies;
-                        m_functionFetchTags(type.id, 5, req.body.userName, function(tags){
+                        var type = 
+                        {
+                            id: row.id,
+                            name: row.name,
+                            isApp: row.isApp === 1 ? true : false,
+                            imageResourceId: row.imageResourceId,
+                            ordinal: row.ordinal,
+                            tags: '',
+                            properties: [],
+                            methods: [],
+                            events: []
+                        };
 
-                            type.tags = tags;
+                        m_functionFetchTags(
+                            type.id,
+                            5,
+                            req.body.userName,
+                            function(tags) {
 
-                            res.json({
-                                success: true,
-                                type: type
-                            });
-                        });
+                                type.tags = tags;
+
+                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.id + "; select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.id + "; select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.id + ";",
+                                    function(rows) {
+
+                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                            res.json({success:false, message: "Could not retrieve type with id=" + type.id});
+                                            return;
+                                        }
+
+                                        m_functionRetTypeDoMethodsPropertiesEvents(req, res, type, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                    },
+                                    function(strError){
+                                        res.json({success: false, message: strError});
+                                        return;
+                                    }
+                                );
+                            }
+                        );
                     }
                 },
                 function(strError){
@@ -429,18 +676,145 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    self.routeRetrieveMethod = function (req, res) {
-
-        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
-        // req.body.typeId
-        // req.body.userName
+    var m_functionRetTypeDoMethodsPropertiesEvents = function(req, res, type, mcnt, pcnt, ecnt) {
 
         try {
 
-            var method =
-            {
+            console.log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + "; select * from " + self.dbname + "propertys where typeId =" + type.id + "; select * from " + self.dbname + "events where typeId =" + type.id + ";",
+                function(rows){
 
-            };
+                    // console.log(' ');
+                    // console.log('************** Start of triple select ******************');
+                    // console.log(' ');
+                    // console.log(JSON.stringify(rows));
+                    // console.log(' ');
+                    // console.log('************** Start of triple select ******************');
+                    // console.log(' ');
+
+                    if (rows.length !== 3) {
+                        console.log('The triple select did not return rows.length === 3');
+                        res.json({
+                            success: false,
+                            message: 'Unable to retrieve selected type.'
+                        });
+                        return;
+                    }
+
+                    // methods
+                    rows[0].forEach(
+                        function(row) {
+                            // console.log('method row: ' + JSON.stringify(row));
+                            var method = 
+                            { 
+                                id: row.id,
+                                name: row.name, 
+                                ordinal: row.ordinal,
+                                workspace: row.workspace, 
+                                tags: '',
+                                imageResourceId: row.imageResourceId,
+                                createdByUserId: row.createdByUserId,
+                                price: row.price,
+                                description: row.description
+                            };
+
+                            m_functionFetchTags(
+                                method.id,
+                                7,
+                                req.body.userName,
+                                function(tags) {
+
+                                    method.tags = tags;
+                                    type.methods.push(method);
+
+                                    mcnt--;
+                                    if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                        m_functionSetSuccessTypeReturn(res, type);
+                                        return;
+                                    }
+                                }
+                            );
+                        }
+                    );
+
+                    // properties
+                    rows[1].forEach(
+                        function(row) {
+                            // console.log('property row: ' + JSON.stringify(row));
+                            var property = 
+                            {
+                                id: row.id,
+                                name: row.name,
+                                propertyTypeId: row.propertyTypeId,
+                                initialValue: row.initialValue,
+                                ordinal: row.ordinal
+                            };
+
+                            type.properties.push(property);
+
+                            pcnt--;
+                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                m_functionSetSuccessTypeReturn(res, type);
+                                return;
+                            }
+                        }
+                    );
+
+                    // events
+                    rows[2].forEach(
+                        function(row) {
+                            // console.log('event row: ' + JSON.stringify(row));
+                            var event = 
+                            {
+                                id: row.id,
+                                name: row.name,
+                                ordinal: row.ordinal
+                            };
+
+                            type.events.push(event);
+
+                            ecnt--;
+                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                m_functionSetSuccessTypeReturn(res, type);
+                                return;
+                            }
+                        }
+                    );
+                },
+                function(strError){
+                    res.json({success: false, message: strError});
+                    return;
+                }
+            );
+        } catch (e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionSetSuccessTypeReturn = function(res, type) {
+
+        console.log('They have all reached 0. Returning type after sorting arrays by ordinal.');
+        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+
+        res.json({
+            success: true,
+            type: type
+        });
+    }
+
+    self.routeRetrieveMethod = function (req, res) {
+
+        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
+        // req.body.methodId
+        // req.body.userName
+
+        try {
 
             var exceptionRet = sql.execute("select * from " + self.dbname + "methods where id=" + req.body.methodId+ ";",
                 function(rows){
@@ -449,27 +823,40 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         res.json({
                             success: false,
-                            message: 'Could not retrieve type from database.'
+                            message: 'Could not retrieve method from database.'
                         });
                     } else {
 
                         var row = rows[0];
+                        var method = 
+                        { 
+                            id: row.id,
+                            name: row.name, 
+                            ordinal: row.ordinal,
+                            workspace: row.workspace, 
+                            tags: '',
+                            imageResourceId: row.imageResourceId,
+                            createdByUserId: row.createdByUserId,
+                            price: row.price,
+                            description: row.description
+                        };
 
+                        m_functionFetchTags(
+                            method.id,
+                            7,
+                            req.body.userName,
+                            function(tags) {
 
+                                method.tags = tags;
 
+                                res.json({
+                                    success:true,
+                                    method:method
+                                });
 
-
-
-
-                        m_functionFetchTags(method.id, 7, req.body.userName, function(tags){
-
-                            method.tags = tags;
-
-                            res.json({
-                                success: true,
-                                method: method
-                            });
-                        });
+                                return;
+                            }
+                        );
                     }
                 },
                 function(strError){
@@ -513,79 +900,10 @@ module.exports = function ProjectBO(app, sql, logger) {
             // This doesn't have to be checked for a typeOfSave === 'save'.
 
             var project = req.body.projectJson;
-            var typeOfSave = (project.id === 0) ? 'saveNew' : (req.body.userId === project.createdByUserId) ? 'saveAs' : 'save';
-            // typeOfSave info:
-            //  saveNew INSERTs and has to insert id's into project, comics and types. And into their resources.
-            //  saveAs does that and has to replace project.createdByUserId with req.body.userId.
-            //  save does an UPDATE of the project, but comics and types may have been added, deleted or modified. They'll take more work.
+         
 
-            // 1. Add row to projects table. Save id in projectId. Add 'project' row to resources table pointing back to projectId. Save id in resourceId. Associate projectTags with resourceId.
-            // 2. Loop (on i) through items in comics and for each:
-            //      2a. Add row to comics table. Save id in comicId. Add 'comic' row to resources table pointing back to comicId. Save id in resourceId. Associate comicTags[i] with resourceId.
-            //      2b. Loop (on j) through items in types and for each:
-            //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
-
-            var whereclause = "", 
-                verb = "",
-                sqlStmt = "";
-
-            var guts = " SET name='" + project.name + "'"
-                + ",createdByUserId=" + req.body.userId
-                + ",price=" + project.price
-                + ",imageResourceId=" + project.imageResourceId
-                + ",description='" + project.description + "' ";
-
-            if (typeOfSave === "save"){
-
-                whereClause = " WHERE id=" + project.id;
-                verb = "UPDATE ";
-                
-                m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
-
-            } else {
-
-                verb = "INSERT ";
-
-                // Look for and reject an attempt to add a 2nd project for same user with same name.
-                var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where createdByUserId=" + req.body.userId + " and name='" + project.name + "';",
-                    function(rows) {
-
-                        if (rows.length === 0) {
-
-                            res.json({
-                                success:false,
-                                message:'Failed database action checking for duplicate project name.'
-                            });
-                        } else {
-
-                            if (rows[0].cnt > 0) {
-
-                                res.json({
-                                    success:false,
-                                    message:'You already have a project with that name.'
-                                });
-                            } else {
-                                
-                                m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
-                            }
-                        }
-                    },
-                    function(strError) {
-
-                        res.json({
-                            success:false,
-                            message:'Failed database action checking for duplicate project name.'
-                        });
-                    }
-                );
-                if (exceptionRet) {
-                    res.json({
-                        success:false,
-                        message:'Failed database action checking for duplicate project name.'
-                    });
-                }
-            }
-        } catch (e) {
+            
+        } catch(e) {
 
             res.json({
                 success: false,
@@ -594,312 +912,408 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_functionProjectSavePart2 = function (req,res,typeOfSave,project,verb,guts,whereclause) {
-
-        try {
-
-            var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
-            console.log(sqlStmt);
-
-            var exceptionRet = sql.execute(sqlStmt,
-                function(rows) {
-
-                    if (rows.length === 0) {
-
-                        res.json({
-                            success: false,
-                            message: "Error saving project to database."
-                        });
-                    } else {
-
-                        if (typeOfSave === 'save') {
-
-                            m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
-
-                                if (err) {
-
-                                    res.json({
-                                        success:false,
-                                        message: err.message
-                                    });
-                                } else {
-
-                                    // We're done.
-                                    res.json({
-                                        success: true,
-                                        project: project
-                                    });
-                                }
-                            });
-                        } else {
-
-                            project.id = rows[0].insertId;
-                            exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.id + ");",
-                                function(rows) {
-
-                                    if (rows.length === 0) {
-
-                                        res.json({
-                                            success: false,
-                                            message: "Error inserting project resource into database."
-                                        });
-                                    } else {
-
-                                        var resourceId = rows[0].insertId;
-                                        m_setUpAndDoTags(resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
-
-                                            if (err) {
-
-                                                res.json({
-                                                    success:false,
-                                                    message: err.message
-                                                });
-                                            } else {
-
-                                                m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
-
-                                                    if (err) {
-
-                                                        res.json({
-                                                            success:false,
-                                                            message: err.message
-                                                        });
-                                                    } else {
-
-                                                        // We're done.
-                                                        res.json({
-                                                            success: true,
-                                                            project: project
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                },
-                                function(strError) {
-
-                                    res.json({
-                                        success: false,
-                                        message: "Error inserting project resource into database: " + strError
-                                    });
-                                }
-                            );
-                            if (exceptionRet) {
-
-                                res.json({
-                                    success: false,
-                                    message: "Error inserting project resource into database: " + exceptionRet.message
-                                });
-                            }
-                        }
-                    }
-                },
-                function(strError) {
-
-                    res.json({
-                        success: false,
-                        message: "Error inserting project into database."
-                    });
-                }
-            );
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: "Error inserting project into database: " + exceptionRet.message
-                });
-            }
-        } catch(e) {
-
-            res.json({
-                success:false,
-                message:e.message
-            });
-        }
-    }
-
-    var m_doComicsPlusTypes = function(typeOfSave, project, req, callback) {
-
-        // If typeOfSave = 'save', then comics and types MIGHT exist already. The way to tell is if they have an id and if (for comics) comic.projectId === project.id or (for types) type.comicId => comic.projectId === project BEFORE the comic is saved.
-        // Otherwise, a new comic or type is being INSERTed.
-
-        // 1. Delete from types where comicId in (select id from comics where projectId=id); delete corr. rows from resources_tags
-        // 2. Delete from comics where projectId=id; delete corr. rows from resources_tags
-        // 3. For each comic in project, insert into comics, returning id as comicId. 
-        // 3a. With that comicId, insert into resources, setting optnlFK=comicId. (resourceTypeId=4)
-        // 3b. Also with that comicId, for each type in comic, insert into types, returning id as typeId.
-        // 3c. With that typeId, insert into resources, setting optnlFK=typeId. (resourceTypeId=5)
-
-        // Remember: comics and types have tags, too, that need to be added.
-
-        try {
-
-            var exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId = " + project.id + ")));" + "delete from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId=" + project.id +");",
-                function(rows){
-
-                    // error check needed
-                    exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "comics where projectId = " + project.id + "));" + "delete from " + self.dbname + "comics where projectId=" + project.id +";",
-                        function(rows){
-
-                            // error check needed
-                            var allTypesCtr = 0;
-
-                            project.comics.items.forEach(function(comicCth) {
-
-                                allTypesCtr += comicCth.types.items.length;
-                            });
-
-
-                            project.comics.items.forEach(function(comicCth) {
-
-                                console.log('*****inserting comic');
-                                exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId,name) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ",'" + comicCth.name + "');",
-                                    function(rows){
-
-                                        // error check needed
-                                        var comicId = rows[0].insertId;
-
-                                        console.log('**********inserting comic resource');
-                                        exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",4,0,0," + comicId + ");",
-                                            function(rows){
-
-                                                // error check needed
-                                                var resourceId = rows[0].insertId;
-                                                m_setUpAndDoTags(resourceId, '4', req.body.userName, comicCth.tags, comicCth.name, function(err) {
-
-                                                    if (err) {
-
-                                                        callback(err);
-                                                        return;
-
-                                                    } else {
-
-                                                        comicCth.types.items.forEach(function(typeTth) {
-
-                                                            var jsonCode = JSON.stringify({
-                                                                properties:typeTth.properties,
-                                                                methods:typeTth.methods,
-                                                                events:typeTth.events,
-                                                                dependencies:typeTth.dependencies
-                                                            });
-                                                            console.log('***************inserting type ' + typeTth.name);
-                                                            exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "');",
-                                                                function(rows){
-
-                                                                    // error check needed
-                                                                    var typeId = rows[0].insertId;
-
-                                                                    console.log('********************inserting type resource');
-                                                                    exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
-                                                                        function(rows){
-
-                                                                            // error check needed
-                                                                            var resourceId = rows[0].insertId;
-                                                                            m_setUpAndDoTags(resourceId, '5', req.body.userName, typeTth.tags, typeTth.name, function(err) {
-
-                                                                                if (err) {
-
-                                                                                    callback(err);
-                                                                                    return;
-
-                                                                                } else {
-
-                                                                                    if (--allTypesCtr === 0) {
-
-                                                                                        callback(null);
-                                                                                        return;
-                                                                                    }
-                                                                                }
-                                                                            });
-                                                                        },
-                                                                        function(strError){
-
-                                                                            callback(new Error(strError));
-                                                                            return;
-                                                                        }
-                                                                    );
-                                                                    if (exceptionRet) {
-
-                                                                        callback(exceptionRet);
-                                                                        return;
-                                                                    }
-                                                                },
-                                                                function(strError){
-
-                                                                    callback(new Error(strError));
-                                                                    return;
-                                                                }
-                                                            );
-                                                            if (exceptionRet) {
-
-                                                                callback(exceptionRet);
-                                                                return;
-                                                            }
-                                                        });   // comicCth.types.items,forEach(function(typeTth)
-                                                    }
-                                                });
-                                            },
-                                            function(strError){
-
-                                                callback(new Error(strError));
-                                                return;
-                                            }
-                                        );
-                                        if (exceptionRet) {
-
-                                            callback(exceptionRet);
-                                            return;
-                                        }
-                                    },
-                                    function(strError){
-
-                                        callback(new Error(strError));
-                                        return;
-                                    }
-                                );
-                                if (exceptionRet) {
-
-                                    callback(exceptionRet);
-                                    return;
-                                }
-                            });  // project.comics.items.forEach(function(comicCth) {
-                        },
-                        function(strError){
-
-                            callback(new Error(strError));
-                            return;
-                        }
-                    );
-                    if (exceptionRet) {
-
-                        callback(exceptionRet);
-                        return;
-                    }
-                },
-                function(strError){
-
-                    callback(new Error(strError));
-                    return;
-                }
-            );
-            if (exceptionRet) {
-
-                callback(exceptionRet);
-                return;
-            }
-        } catch (e) {
-
-            callback(err);   
-            return;
-        }
-    }
+    // self.routeSaveProject = function (req, res) {
+
+    //     try {
+
+    //         console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+    //         // req.body.userId
+    //         // req.body.userName
+    //         // req.body.projectJson : See NewProjectDialog.js for schema.
+
+    //         // Important: All image resources have already been created or selected for the project, its comics and their types. (Or their defaults exist.)
+
+    //         // Muis important: the project's name must be unique to within the user's projects, but can be the same as another user's project name.
+    //         // This doesn't have to be checked for a typeOfSave === 'save'.
+
+    //         var project = req.body.projectJson;
+    //         var typeOfSave = (project.id === 0) ? 'saveNew' : (req.body.userId === project.createdByUserId) ? 'saveAs' : 'save';
+    //         // typeOfSave info:
+    //         //  saveNew INSERTs and has to insert id's into project, comics and types. And into their resources.
+    //         //  saveAs does that and has to replace project.createdByUserId with req.body.userId.
+    //         //  save does an UPDATE of the project, but comics and types may have been added, deleted or modified. They'll take more work.
+
+    //         // 1. Add row to projects table. Save id in projectId. Add 'project' row to resources table pointing back to projectId. Save id in resourceId. Associate projectTags with resourceId.
+    //         // 2. Loop (on i) through items in comics and for each:
+    //         //      2a. Add row to comics table. Save id in comicId. Add 'comic' row to resources table pointing back to comicId. Save id in resourceId. Associate comicTags[i] with resourceId.
+    //         //      2b. Loop (on j) through items in types and for each:
+    //         //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
+
+    //         var whereclause = "", 
+    //             verb = "",
+    //             sqlStmt = "";
+
+    //         var guts = " SET name='" + project.name + "'"
+    //             + ",createdByUserId=" + req.body.userId
+    //             + ",price=" + project.price
+    //             + ",imageResourceId=" + project.imageResourceId
+    //             + ",description='" + project.description + "' ";
+
+    //         if (typeOfSave === "save"){
+
+    //             whereClause = " WHERE id=" + project.id;
+    //             verb = "UPDATE ";
+                
+    //             m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
+
+    //         } else {
+
+    //             verb = "INSERT ";
+
+    //             // Look for and reject an attempt to add a 2nd project for same user with same name.
+    //             var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where createdByUserId=" + req.body.userId + " and name='" + project.name + "';",
+    //                 function(rows) {
+
+    //                     if (rows.length === 0) {
+
+    //                         res.json({
+    //                             success:false,
+    //                             message:'Failed database action checking for duplicate project name.'
+    //                         });
+    //                     } else {
+
+    //                         if (rows[0].cnt > 0) {
+
+    //                             res.json({
+    //                                 success:false,
+    //                                 message:'You already have a project with that name.'
+    //                             });
+    //                         } else {
+                                
+    //                             m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
+    //                         }
+    //                     }
+    //                 },
+    //                 function(strError) {
+
+    //                     res.json({
+    //                         success:false,
+    //                         message:'Failed database action checking for duplicate project name.'
+    //                     });
+    //                 }
+    //             );
+    //             if (exceptionRet) {
+    //                 res.json({
+    //                     success:false,
+    //                     message:'Failed database action checking for duplicate project name.'
+    //                 });
+    //             }
+    //         }
+    //     } catch (e) {
+
+    //         res.json({
+    //             success: false,
+    //             message: e.message
+    //         });
+    //     }
+    // }
+
+    // var m_functionProjectSavePart2 = function (req,res,typeOfSave,project,verb,guts,whereclause) {
+
+    //     try {
+
+    //         var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
+    //         console.log(sqlStmt);
+
+    //         var exceptionRet = sql.execute(sqlStmt,
+    //             function(rows) {
+
+    //                 if (rows.length === 0) {
+
+    //                     res.json({
+    //                         success: false,
+    //                         message: "Error saving project to database."
+    //                     });
+    //                 } else {
+
+    //                     if (typeOfSave === 'save') {
+
+    //                         m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
+
+    //                             if (err) {
+
+    //                                 res.json({
+    //                                     success:false,
+    //                                     message: err.message
+    //                                 });
+    //                             } else {
+
+    //                                 // We're done.
+    //                                 res.json({
+    //                                     success: true,
+    //                                     project: project
+    //                                 });
+    //                             }
+    //                         });
+    //                     } else {
+
+    //                         project.id = rows[0].insertId;
+    //                         exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.id + ");",
+    //                             function(rows) {
+
+    //                                 if (rows.length === 0) {
+
+    //                                     res.json({
+    //                                         success: false,
+    //                                         message: "Error inserting project resource into database."
+    //                                     });
+    //                                 } else {
+
+    //                                     var resourceId = rows[0].insertId;
+    //                                     m_setUpAndDoTags(resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
+
+    //                                         if (err) {
+
+    //                                             res.json({
+    //                                                 success:false,
+    //                                                 message: err.message
+    //                                             });
+    //                                         } else {
+
+    //                                             m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
+
+    //                                                 if (err) {
+
+    //                                                     res.json({
+    //                                                         success:false,
+    //                                                         message: err.message
+    //                                                     });
+    //                                                 } else {
+
+    //                                                     // We're done.
+    //                                                     res.json({
+    //                                                         success: true,
+    //                                                         project: project
+    //                                                     });
+    //                                                 }
+    //                                             });
+    //                                         }
+    //                                     });
+    //                                 }
+    //                             },
+    //                             function(strError) {
+
+    //                                 res.json({
+    //                                     success: false,
+    //                                     message: "Error inserting project resource into database: " + strError
+    //                                 });
+    //                             }
+    //                         );
+    //                         if (exceptionRet) {
+
+    //                             res.json({
+    //                                 success: false,
+    //                                 message: "Error inserting project resource into database: " + exceptionRet.message
+    //                             });
+    //                         }
+    //                     }
+    //                 }
+    //             },
+    //             function(strError) {
+
+    //                 res.json({
+    //                     success: false,
+    //                     message: "Error inserting project into database."
+    //                 });
+    //             }
+    //         );
+    //         if (exceptionRet) {
+
+    //             res.json({
+    //                 success: false,
+    //                 message: "Error inserting project into database: " + exceptionRet.message
+    //             });
+    //         }
+    //     } catch(e) {
+
+    //         res.json({
+    //             success:false,
+    //             message:e.message
+    //         });
+    //     }
+    // }
+
+    // var m_doComicsPlusTypes = function(typeOfSave, project, req, callback) {
+
+    //     // If typeOfSave = 'save', then comics and types MIGHT exist already. The way to tell is if they have an id and if (for comics) comic.projectId === project.id or (for types) type.comicId => comic.projectId === project BEFORE the comic is saved.
+    //     // Otherwise, a new comic or type is being INSERTed.
+
+    //     // 1. Delete from types where comicId in (select id from comics where projectId=id); delete corr. rows from resources_tags
+    //     // 2. Delete from comics where projectId=id; delete corr. rows from resources_tags
+    //     // 3. For each comic in project, insert into comics, returning id as comicId. 
+    //     // 3a. With that comicId, insert into resources, setting optnlFK=comicId. (resourceTypeId=4)
+    //     // 3b. Also with that comicId, for each type in comic, insert into types, returning id as typeId.
+    //     // 3c. With that typeId, insert into resources, setting optnlFK=typeId. (resourceTypeId=5)
+
+    //     // Remember: comics and types have tags, too, that need to be added.
+
+    //     try {
+
+    //         var exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId = " + project.id + ")));" + "delete from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId=" + project.id +");",
+    //             function(rows){
+
+    //                 // error check needed
+    //                 exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "comics where projectId = " + project.id + "));" + "delete from " + self.dbname + "comics where projectId=" + project.id +";",
+    //                     function(rows){
+
+    //                         // error check needed
+    //                         var allTypesCtr = 0;
+
+    //                         project.comics.items.forEach(function(comicCth) {
+
+    //                             allTypesCtr += comicCth.types.items.length;
+    //                         });
+
+
+    //                         project.comics.items.forEach(function(comicCth) {
+
+    //                             console.log('*****inserting comic');
+    //                             exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId,name) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ",'" + comicCth.name + "');",
+    //                                 function(rows){
+
+    //                                     // error check needed
+    //                                     var comicId = rows[0].insertId;
+
+    //                                     console.log('**********inserting comic resource');
+    //                                     exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",4,0,0," + comicId + ");",
+    //                                         function(rows){
+
+    //                                             // error check needed
+    //                                             var resourceId = rows[0].insertId;
+    //                                             m_setUpAndDoTags(resourceId, '4', req.body.userName, comicCth.tags, comicCth.name, function(err) {
+
+    //                                                 if (err) {
+
+    //                                                     callback(err);
+    //                                                     return;
+
+    //                                                 } else {
+
+    //                                                     comicCth.types.items.forEach(function(typeTth) {
+
+    //                                                         var jsonCode = JSON.stringify({
+    //                                                             properties:typeTth.properties,
+    //                                                             methods:typeTth.methods,
+    //                                                             events:typeTth.events,
+    //                                                             dependencies:typeTth.dependencies
+    //                                                         });
+    //                                                         console.log('***************inserting type ' + typeTth.name);
+    //                                                         exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "');",
+    //                                                             function(rows){
+
+    //                                                                 // error check needed
+    //                                                                 var typeId = rows[0].insertId;
+
+    //                                                                 console.log('********************inserting type resource');
+    //                                                                 exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
+    //                                                                     function(rows){
+
+    //                                                                         // error check needed
+    //                                                                         var resourceId = rows[0].insertId;
+    //                                                                         m_setUpAndDoTags(resourceId, '5', req.body.userName, typeTth.tags, typeTth.name, function(err) {
+
+    //                                                                             if (err) {
+
+    //                                                                                 callback(err);
+    //                                                                                 return;
+
+    //                                                                             } else {
+
+    //                                                                                 if (--allTypesCtr === 0) {
+
+    //                                                                                     callback(null);
+    //                                                                                     return;
+    //                                                                                 }
+    //                                                                             }
+    //                                                                         });
+    //                                                                     },
+    //                                                                     function(strError){
+
+    //                                                                         callback(new Error(strError));
+    //                                                                         return;
+    //                                                                     }
+    //                                                                 );
+    //                                                                 if (exceptionRet) {
+
+    //                                                                     callback(exceptionRet);
+    //                                                                     return;
+    //                                                                 }
+    //                                                             },
+    //                                                             function(strError){
+
+    //                                                                 callback(new Error(strError));
+    //                                                                 return;
+    //                                                             }
+    //                                                         );
+    //                                                         if (exceptionRet) {
+
+    //                                                             callback(exceptionRet);
+    //                                                             return;
+    //                                                         }
+    //                                                     });   // comicCth.types.items,forEach(function(typeTth)
+    //                                                 }
+    //                                             });
+    //                                         },
+    //                                         function(strError){
+
+    //                                             callback(new Error(strError));
+    //                                             return;
+    //                                         }
+    //                                     );
+    //                                     if (exceptionRet) {
+
+    //                                         callback(exceptionRet);
+    //                                         return;
+    //                                     }
+    //                                 },
+    //                                 function(strError){
+
+    //                                     callback(new Error(strError));
+    //                                     return;
+    //                                 }
+    //                             );
+    //                             if (exceptionRet) {
+
+    //                                 callback(exceptionRet);
+    //                                 return;
+    //                             }
+    //                         });  // project.comics.items.forEach(function(comicCth) {
+    //                     },
+    //                     function(strError){
+
+    //                         callback(new Error(strError));
+    //                         return;
+    //                     }
+    //                 );
+    //                 if (exceptionRet) {
+
+    //                     callback(exceptionRet);
+    //                     return;
+    //                 }
+    //             },
+    //             function(strError){
+
+    //                 callback(new Error(strError));
+    //                 return;
+    //             }
+    //         );
+    //         if (exceptionRet) {
+
+    //             callback(exceptionRet);
+    //             return;
+    //         }
+    //     } catch (e) {
+
+    //         callback(err);   
+    //         return;
+    //     }
+    // }
 
     var m_functionFetchTags = function(thingId, resourceTypeId, userName, callback) {
 
         try {
 
-            // Retireve and set project.tags, skipping "project" and req.body.userName.
+            // Retireve and set project.tags, skipping resourceType.description and req.body.userName.
             exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
                 function(rows){
 

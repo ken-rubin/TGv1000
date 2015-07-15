@@ -17,7 +17,7 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Fill m_resourceTypes from database.
     try {
 
-        var exceptionRet = sql.execute("select * from " + self.dbname + "resourceTypes order by id asc",
+        var exceptionRet = sql.execute("select * from " + self.dbname + "resourceTypes;",
             function(rows) {
 
                 if (rows.length === 0) {
@@ -26,6 +26,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                 } else {
 
+                    // Make sure rows are sorted by id.
+                    rows.sort(function(a,b){return a.id - b.id;})
                     for (var i = 0; i < rows.length; i++) {
 
                         m_resourceTypes.push(rows[i].description);
@@ -54,8 +56,9 @@ module.exports = function UtilityBO(app, sql, logger) {
     self.routeSearch = function (req, res) {
 
         // This is a search for something based on tags. There are 6 kinds of things whose descriptions have been loaded into m_resourceTypes above.
-        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (excluding 4, comic, which isn't searched for or saved yet) use a different query. This is because images and sounds have no
+        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (3=project, 5=type, 7=method) use a different query. This is because images and sounds have no
         // FK table relationship, but the others do.
+        // One other thing: resourceTypeId=5 (type) needs to exclude all types where isApp===true.
 
         try {
 
@@ -63,8 +66,8 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.body.userId
             // req.body.userName
-            // req.body.resourceTypeId  1-8
-            // req.body.onlyCreatedByUser   0 or 1
+            // req.body.resourceTypeId  '1'-'7'
+            // req.body.onlyCreatedByUser   '0' or '1'
 
             var iResourceTypeId = parseInt(req.body.resourceTypeId,10);
             var resourceTypeDescr = m_resourceTypes[iResourceTypeId];
@@ -128,13 +131,17 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        if (req.body.resourceTypeId < "3") {  // Non-FKs.
+                        if (req.body.resourceTypeId < "3") {  // Non-FKs; e.g., image or sound
 
                             sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
 
-                        } else {    // Project, Type, Method -- a totally different query.
+                        } else if (req.body.resourceTypeId !== "5") {    // Project, Method -- a different query.
 
                             sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        
+                        } else { // Type ('5')
+
+                            sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optnlFK=p.id where p.isApp = 0 and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
 
                         console.log(' ');

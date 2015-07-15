@@ -44,7 +44,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// Save data.
 							self.data = typesItem;
 
-							// process properties methods events and dependencies collections.
+							// process properties, methods, events collections.
 
 
 
@@ -92,54 +92,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							return e;
 						}
 					};
-
-//used
-					self.addProperty = function(property) {
-
-						try {
-
-							property.ordinal = self.data.properties.length;
-							self.data.properties.push(property);
-
-							// Add the property to code.
-							var exceptionRet = code.addProperty(self, 
-								property);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}
-
-//used
-					self.addEvent = function(event) {
-
-						try {
-
-							event.ordinal = self.data.events.length;
-							self.data.events.push(event);
-
-							// Add the event to code.
-							var exceptionRet = code.addEvent(self, 
-								event);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}
 
 					// Return the DOM element representing a prototypical item.
 //not used					

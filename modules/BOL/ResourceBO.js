@@ -27,6 +27,8 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                 } else {
 
+                    // Make sure rows are sorted by id.
+                    rows.sort(function(a,b){return a.id - b.id;})
                     for (var i = 0; i < rows.length; i++) {
 
                         m_resourceTypes.push(rows[i].description);
