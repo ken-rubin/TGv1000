@@ -468,6 +468,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addTypeToProject = function(clType) {
 
 						try {
@@ -480,6 +481,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addTypeToProjectFromDB = function (iTypeId) {
 
 						try {
@@ -683,6 +685,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addMethodToTypeFromDB = function (iMethodId) {
 
 						try {
@@ -714,6 +717,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addPropertyToType = function (property) {
 
 						try {
@@ -726,6 +730,7 @@ define(["Core/errorHelper",
 						}
 					}
 
+//used
 					self.addEventToType = function (event) {
 
 						try {

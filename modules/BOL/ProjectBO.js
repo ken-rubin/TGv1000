@@ -25,6 +25,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 } else {
 
+                    // Make sure rows are sorted by id.
+                    rows.sort(function(a,b){return a.id - b.id;})
                     for (var i = 0; i < rows.length; i++) {
 
                         m_resourceTypes.push(rows[i].description);
@@ -590,24 +592,10 @@ module.exports = function ProjectBO(app, sql, logger) {
     self.routeRetrieveType = function (req, res) {
 
         console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
-        // req.body.methodId
+        // req.body.typeId
         // req.body.userName
 
         try {
-
-            var type =
-            {
-                isApp: true,
-                id: 0,
-                ordinal: 0,
-                tags: '',
-                properties: [],
-                methods: [{ name: "initialize", workspace: "", method: "" }],
-                events: [],
-                dependencies: [],
-                name: "",
-                imageResourceId: 0
-            };
 
             var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId+ ";",
                 function(rows){
@@ -621,25 +609,45 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } else {
 
                         var row = rows[0];
-                        type.isApp = row.isApp;
-                        type.id = row.id;
-                        type.ordinal = row.ordinal;
-                        type.name = row.name;
-                        type.imageResourceId = row.imageResourceId;
-                        var code = JSON.parse(row.jsonCode);
-                        type.properties = code.properties;
-                        type.methods = code.methods;
-                        type.events = code.events;
-                        type.dependencies = code.dependencies;
-                        m_functionFetchTags(type.id, 5, req.body.userName, function(tags){
+                        var type = 
+                        {
+                            id: row.id,
+                            name: row.name,
+                            isApp: row.isApp === 1 ? true : false,
+                            imageResourceId: row.imageResourceId,
+                            ordinal: row.ordinal,
+                            tags: '',
+                            properties: [],
+                            methods: [],
+                            events: []
+                        };
 
-                            type.tags = tags;
+                        m_functionFetchTags(
+                            type.id,
+                            5,
+                            req.body.userName,
+                            function(tags) {
 
-                            res.json({
-                                success: true,
-                                type: type
-                            });
-                        });
+                                type.tags = tags;
+
+                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.id + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.id + "); select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.id + ");",
+                                    function(rows) {
+
+                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                            res.json({success:false, message: "Could not retrieve type with id=" + type.id});
+                                            return;
+                                        }
+
+                                        m_functionRetTypeDoMethodsPropertiesEvents(req, res, type, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                    },
+                                    function(strError){
+                                        res.json({success: false, message: strError});
+                                        return;
+                                    }
+                                );
+                            }
+                        );
                     }
                 },
                 function(strError){
@@ -668,18 +676,145 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    self.routeRetrieveMethod = function (req, res) {
-
-        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
-        // req.body.typeId
-        // req.body.userName
+    var m_functionRetTypeDoMethodsPropertiesEvents = function(req, res, type, mcnt, pcnt, ecnt) {
 
         try {
 
-            var method =
-            {
+            console.log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + "; select * from " + self.dbname + "propertys where typeId =" + type.id + "; select * from " + self.dbname + "events where typeId =" + type.id + ";",
+                function(rows){
 
-            };
+                    // console.log(' ');
+                    // console.log('************** Start of triple select ******************');
+                    // console.log(' ');
+                    // console.log(JSON.stringify(rows));
+                    // console.log(' ');
+                    // console.log('************** Start of triple select ******************');
+                    // console.log(' ');
+
+                    if (rows.length !== 3) {
+                        console.log('The triple select did not return rows.length === 3');
+                        res.json({
+                            success: false,
+                            message: 'Unable to retrieve selected type.'
+                        });
+                        return;
+                    }
+
+                    // methods
+                    rows[0].forEach(
+                        function(row) {
+                            // console.log('method row: ' + JSON.stringify(row));
+                            var method = 
+                            { 
+                                id: row.id,
+                                name: row.name, 
+                                ordinal: row.ordinal,
+                                workspace: row.workspace, 
+                                tags: '',
+                                imageResourceId: row.imageResourceId,
+                                createdByUserId: row.createdByUserId,
+                                price: row.price,
+                                description: row.description
+                            };
+
+                            m_functionFetchTags(
+                                method.id,
+                                7,
+                                req.body.userName,
+                                function(tags) {
+
+                                    method.tags = tags;
+                                    type.methods.push(method);
+
+                                    mcnt--;
+                                    if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                        m_functionSetSuccessTypeReturn(res, type);
+                                        return;
+                                    }
+                                }
+                            );
+                        }
+                    );
+
+                    // properties
+                    rows[1].forEach(
+                        function(row) {
+                            // console.log('property row: ' + JSON.stringify(row));
+                            var property = 
+                            {
+                                id: row.id,
+                                name: row.name,
+                                propertyTypeId: row.propertyTypeId,
+                                initialValue: row.initialValue,
+                                ordinal: row.ordinal
+                            };
+
+                            type.properties.push(property);
+
+                            pcnt--;
+                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                m_functionSetSuccessTypeReturn(res, type);
+                                return;
+                            }
+                        }
+                    );
+
+                    // events
+                    rows[2].forEach(
+                        function(row) {
+                            // console.log('event row: ' + JSON.stringify(row));
+                            var event = 
+                            {
+                                id: row.id,
+                                name: row.name,
+                                ordinal: row.ordinal
+                            };
+
+                            type.events.push(event);
+
+                            ecnt--;
+                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                m_functionSetSuccessTypeReturn(res, type);
+                                return;
+                            }
+                        }
+                    );
+                },
+                function(strError){
+                    res.json({success: false, message: strError});
+                    return;
+                }
+            );
+        } catch (e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionSetSuccessTypeReturn = function(res, type) {
+
+        console.log('They have all reached 0. Returning type after sorting arrays by ordinal.');
+        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+
+        res.json({
+            success: true,
+            type: type
+        });
+    }
+
+    self.routeRetrieveMethod = function (req, res) {
+
+        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
+        // req.body.methodId
+        // req.body.userName
+
+        try {
 
             var exceptionRet = sql.execute("select * from " + self.dbname + "methods where id=" + req.body.methodId+ ";",
                 function(rows){
@@ -688,27 +823,40 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         res.json({
                             success: false,
-                            message: 'Could not retrieve type from database.'
+                            message: 'Could not retrieve method from database.'
                         });
                     } else {
 
                         var row = rows[0];
+                        var method = 
+                        { 
+                            id: row.id,
+                            name: row.name, 
+                            ordinal: row.ordinal,
+                            workspace: row.workspace, 
+                            tags: '',
+                            imageResourceId: row.imageResourceId,
+                            createdByUserId: row.createdByUserId,
+                            price: row.price,
+                            description: row.description
+                        };
 
+                        m_functionFetchTags(
+                            method.id,
+                            7,
+                            req.body.userName,
+                            function(tags) {
 
+                                method.tags = tags;
 
+                                res.json({
+                                    success:true,
+                                    method:method
+                                });
 
-
-
-
-                        m_functionFetchTags(method.id, 7, req.body.userName, function(tags){
-
-                            method.tags = tags;
-
-                            res.json({
-                                success: true,
-                                method: method
-                            });
-                        });
+                                return;
+                            }
+                        );
                     }
                 },
                 function(strError){

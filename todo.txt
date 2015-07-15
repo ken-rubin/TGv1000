@@ -29,6 +29,7 @@ Jerry
 - Images in toolstrip now have spaces in id replaced by _. Might have to catch this elsewhere.
 - Before saving picklist initialvalue, uniquify.
 - Write event loader in Code.js#self.addType.
+- When I "select ... order by ordinal asc", items might come back in random order anyway. Check this. If so, sort.
 
 
 

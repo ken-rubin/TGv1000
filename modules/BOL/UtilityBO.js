@@ -17,7 +17,7 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Fill m_resourceTypes from database.
     try {
 
-        var exceptionRet = sql.execute("select * from " + self.dbname + "resourceTypes order by id asc",
+        var exceptionRet = sql.execute("select * from " + self.dbname + "resourceTypes;",
             function(rows) {
 
                 if (rows.length === 0) {
@@ -26,6 +26,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                 } else {
 
+                    // Make sure rows are sorted by id.
+                    rows.sort(function(a,b){return a.id - b.id;})
                     for (var i = 0; i < rows.length; i++) {
 
                         m_resourceTypes.push(rows[i].description);

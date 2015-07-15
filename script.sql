@@ -709,6 +709,18 @@ begin
         UPDATE `TGv1000`.`control` set dbstate=33.0 where id=1;
 		set @dbstate := 33.0;
     end if;
+
+    if @dbstate = 33.0 then
+    
+		insert TGv1000.resourceTypes
+			VALUES
+                (6,'unused')
+			;
+    
+        UPDATE `TGv1000`.`control` set dbstate=34.0 where id=1;
+		set @dbstate := 34.0;
+    end if;
+
 end;
 
 //
