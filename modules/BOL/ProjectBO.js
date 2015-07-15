@@ -338,13 +338,15 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             console.log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
 
+            var strTypeIds = '';    // Will be used for a count(*) query.
+
             project.comics.items.forEach(
                 function(comic) {
 
                     var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
                         function(rows) {
 
-                            // At least for now there can be no types in a comic:
+                            // At least for now there can be comics with no types, so we disable the following test:
                             // if (rows.length === 0) {
 
                             //     res.json({
@@ -370,29 +372,41 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         events: []
                                     };
 
-                                    // m_functionFetchTags(
-                                    //     type.id,
-                                    //     5,
-                                    //     req.body.userName,
-                                    //     function(tags) {
+                                    if (strTypeIds.length === 0)
+                                        strTypeIds = type.id.toString();
+                                    else
+                                        strTypeIds = strTypeIds + ',' + type.id;
 
-                                    //         type.tags = tags;
+                                    m_functionFetchTags(
+                                        type.id,
+                                        5,
+                                        req.body.userName,
+                                        function(tags) {
 
-                                    //         // methods, etc. go here.
+                                            type.tags = tags;
+                                            comic.types.items.push(type);
 
-                                            // comic.types.items.push(type);
-                                    //     }
-                                    // );
+                                            if (--typesCount === 0) {
 
-                                    comic.types.items.push(type);
-                                    if (--typesCount === 0) {
+                                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
+                                                    function(rows) {
 
-                                        res.json({
-                                            success: true,
-                                            project: project
-                                        });
-                                        return;
-                                    }
+                                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                            return;
+                                                        }
+
+                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0].mcnt, rows[1].pcnt, rows[2].ecnt);
+                                                    },
+                                                    function(strError){
+                                                        res.json({success: false, message: strError});
+                                                        return;
+                                                    }
+                                                );
+                                            }
+                                        }
+                                    );
                                 }
                             );
                         },
@@ -420,394 +434,131 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-//     self.routeRetrieveProject = function (req, res) {
-
-//         console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
-//         // req.body.projectId
-//         // req.body.userName
-
-//         // (1) We were given projectId. Read in that project's table row.
-//         //  (1.1) Retrieve the project's tags.
-//         // (2) Read in comics[] with comics[i].classOrProductId === project.classOrProductId. 
-//         // (3) For each comic in comics read comicPanels[] with comicPanels[j].comicId === comics[i].id. Add to each comic in comics. This is basically a side step.
-//         // (4) For each comic in comics read types[] with types[k].comicId === comics[i].id && types[k].projectId === project.id.
-//         //  (4.1) For each Type read its tags
-//         // (5-7) Read each type's methods, properties and events.
-//         //  (5.1) For each method read its tags.
-//         // (8) Then return the complete project javascript object.
-
-//         try {
-
-//         // (1)
-//             var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
-//                 function(rows) {
-
-//                     if (rows.length !== 1) {
-
-//                         res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-
-//                     } else {
-// console.log('Got Project');
-//                         var row = rows[0];
-//                         var project = 
-//                         {
-//                             id: row.id,
-//                             name: row.name,
-//                             createdByUserId: row.createdByUserId,
-//                             price: row.price,
-//                             imageResourceId: row.imageResourceId,
-//                             description: row.description,
-//                             ownedByUserId: row.ownedByUserId,
-//                             classOrProductId: row.classOrProductId,
-//                             tags: '',
-//                             isDirty: 1,
-//                             comics:
-//                             {
-//                                 items: []
-//                             }
-//                         };
-
-//         // (1.1)
-//                         m_functionFetchTags(
-//                             project.id, 
-//                             3, 
-//                             req.body.userName, 
-//                             function(tags)  {
-
-//                                 project.tags = tags;
-// console.log('Got Project tags: "' + tags + '"');
-//         // (2)
-//                                 ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
-//                                     function(rows)
-//                                     {
-
-//                                         if (rows.length === 0) {
-
-//                                             res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-
-//                                         } else {
-
-//                                             var comicsCounter = rows.length;
-
-// console.log('Got ' + rows.length + ' comics');
-//                                             rows.forEach(
-//                                                 function(row)
-//                                                 {
-
-//                                                     var comic = 
-//                                                     {
-//                                                         id: row.id,
-//                                                         classOrProductId: row.classOrProductId,
-//                                                         ordinal: row.ordinal,
-//                                                         imageResourceId: row.imageResourceId,
-//                                                         name: row.name,
-//                                                         comicPanels: 
-//                                                         {
-//                                                             items: []
-//                                                         },
-//                                                         types: 
-//                                                         {
-//                                                             items: []
-//                                                         }
-//                                                     };
-
-//                                                     project.comics.items.push(comic);
-//         // (3-4)
-//                                                     ex = sql.execute("select * from comicPanels where comicId = " + comic.id + " order by ordinal asc; select * from types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
-//                                                         function(rows){
-
-//                                                             // Result of comicPanels select comes back in rows[0][]; result of types query comes back in rows[1][].
-//                                                             if (rows.length !== 2 || rows[0].length === 0 || rows[1].length === 0) {
-
-//                                                                 res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-
-//                                                             } else {
-
-// console.log('Got ' + rows[0].length + ' comicPanels');
-//                                                                 rows[0].forEach(
-//                                                                     function(row){
-
-//                                                                         var comicPanel =
-//                                                                         {
-//                                                                             id: row.id,
-//                                                                             ordinal: row.ordinal,
-//                                                                             name: row.name,
-//                                                                             url: row.url,
-//                                                                             description: row.description,
-//                                                                             thumbnail: row.thumbnail
-//                                                                         };
-//                                                                         comic.comicPanels.items.push(comicPanel);
-//                                                                     }
-//                                                                 );
-                                                                
-//                                                                 var typesCounter = rows[1].length;                    
-// console.log('Got ' + rows[1].length + ' types');
-//                                                                 rows[1].forEach(
-//                                                                     function(row){
-
-//                                                                         var type = 
-//                                                                         {
-//                                                                             id: row.id,
-//                                                                             name: row.name,
-//                                                                             isApp: row.isApp === 1 ? true : false,
-//                                                                             imageResourceId: row.imageResourceId,
-//                                                                             ordinal: row.ordinal,
-//                                                                             tags: '',
-//                                                                             properties: [],
-//                                                                             methods: [],
-//                                                                             events: []
-//                                                                         };
-//         // (4.1)
-//                                                                         m_functionFetchTags(
-//                                                                             type.id,
-//                                                                             5,
-//                                                                             req.body.userName,
-//                                                                             function(tags) {
-
-//                                                                                 type.tags = tags;
-// console.log('type=' + JSON.stringify(type));
-
-//                                                                                 // methods, etc. go here.
-
-//                                                                                 comic.types.items.push(type);
-//                                                                             }
-//                                                                         );
-//                                                                     }
-//                                                                 );
-//                                                             }
-//                                                         },
-//                                                         function(strError){
-
-//                                                             res.json( {success: false, message: strError} );
-
-//                                                         }
-//                                                     );
-//                                                     if (ex) {
-
-//                                                         res.json({ success: false, message: ex.message });
-//                                                     }
-
-//                                                     if (--comicsCounter === 0) {
-
-//                                                         res.json({
-//                                                             success: true,
-//                                                             project: project
-//                                                         });
-//                                                     }
-//                                                 }
-//                                             );
-//                                         }
-//                                     },
-//                                     function(strError){
-
-//                                         res.json( {success:false, message: strError} );
-//                                     }
-//                                 );
-//                                 if (ex) {
-
-//                                     res.json({ success: false, message: ex.message });
-//                                 }
-//                             }
-//                         );
-//                     }
-//                 },
-//                 function(strError){
-
-//                     res.json( {success:false, message: strError} );
-//                 }
-//             );
-//             if (ex) {
-
-//                 res.json({ success: false, message: ex.message });
-//             }
-//         } catch(e) {
-
-//             res.json({
-//                 success: false,
-//                 message: e.message
-//             });
-//         }
-//     }
-
-            // var method = 
-            // { 
-            //     name: "", 
-            //     workspace: "", 
-            //     id: 0,
-            //     tags: '',
-            //     imageResourceId: 0,
-            //     createdByUserId: 0,
-            //     price: 0,
-            //     ordinal: 0,
-            //     description: ""
-            // };
-
-            // var property = 
-            // {
-            //     name: "",
-            //     id: 0,
-            //     ordinal: 0,
-            //     propertyTypeId: 0,
-            //     initialValue: ""
-            // };
-
-            // var event = 
-            // {
-            //     name: "",
-            //     id: 0,
-            //     ordinal: 0
-            // };
-
-            // var ex = sql.execute("select count(t.id) as cnt from " + self.dbname + "types t where t.comicId in (select id from " + self.dbname + "comics where projectId=" + req.body.projectId + ");",
-            //     function(rows){
-
-            //         if (rows.length !== 1) {
-
-            //             res.json({
-            //                 success: false,
-            //                 message: "Could not retrieve project."
-            //             });
-            //         } else {
-
-            //             typesCtr = rows[0].cnt;
-
-            //             var exceptionRet = sql.execute("select * from " + self.dbname + "projects where id=" + req.body.projectId + ";",
-            //                 function(rows){
-
-            //                     if (rows.length !== 1) {
-
-            //                         res.json({
-            //                             success: false,
-            //                             message: 'Could not retrieve project from database.'
-            //                         });
-            //                     } else {
-
-            //                         project.name = rows[0].name;
-            //                         project.id = rows[0].id;
-            //                         project.description = rows[0].description;
-            //                         project.imageResourceId = rows[0].imageResourceId;
-            //                         project.price = rows[0].price;
-            //                         project.createdByUserId = rows[0].createdByUserId;
-            //                         project.isDirty = false;
-            //                         m_functionFetchTags(project.id, 3, req.body.userName, function(tags){
-
-            //                             project.tags = tags;
-
-            //                             // Now comics.
-            //                             exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.id + " order by ordinal asc;",
-            //                                 function(rows){
-
-            //                                     rows.forEach(function(row) {
-
-            //                                         var comicItem = JSON.parse(JSON.stringify(comic));  // clone comic.
-            //                                         comicItem.imageResourceId = row.imageResourceId;
-            //                                         comicItem.id = row.id;
-            //                                         comicItem.name = row.name;
-            //                                         comicItem.ordinal = row.ordinal;
-            //                                         m_functionFetchTags(comicItem.id, 4, req.body.userName, function(tags){
-
-            //                                             comicItem.tags = tags;
-
-            //                                             // Now types.
-            //                                             exceptionRet = sql.execute("select * from " + self.dbname + "types where comicId=" + comicItem.id + " order by ordinal asc;",
-            //                                                 function(rows){
-
-            //                                                     rows.forEach(function(row) {
-
-            //                                                         var typeItem = JSON.parse(JSON.stringify(type));    // clone type.
-            //                                                         typeItem.isApp = row.isApp;
-            //                                                         typeItem.id = row.id;
-            //                                                         typeItem.ordinal = row.ordinal;
-            //                                                         typeItem.name = row.name;
-            //                                                         typeItem.imageResourceId = row.imageResourceId;
-            //                                                         var code = JSON.parse(row.jsonCode);
-            //                                                         typeItem.properties = code.properties;
-            //                                                         typeItem.methods = code.methods;
-            //                                                         typeItem.events = code.events;
-            //                                                         typeItem.dependencies = code.dependencies;
-            //                                                         m_functionFetchTags(typeItem.id, 5, req.body.userName, function(tags){
-
-            //                                                             typeItem.tags = tags;
-                                                                        
-            //                                                             comicItem.types.items.push(typeItem);
-
-            //                                                             if (--typesCtr === 0) {
-
-            //                                                                 res.json({
-            //                                                                     success: true,
-            //                                                                     project: project
-            //                                                                 });
-            //                                                                 return;
-            //                                                             }
-            //                                                         });
-            //                                                     });
-            //                                                 },
-            //                                                 function(strError){
-
-            //                                                     res.json({
-            //                                                         success: false,
-            //                                                         message: strError
-            //                                                     });
-            //                                                     return;
-            //                                                 }
-            //                                             );
-            //                                             if (exceptionRet) {
-
-            //                                                 res.json({
-            //                                                     success: false,
-            //                                                     message: exceptionRet.message
-            //                                                 });
-            //                                                 return;
-            //                                             }
-            //                                         });
-            //                                         project.comics.items.push(comicItem);
-            //                                     });
-            //                                 },
-            //                                 function(strError){
-
-            //                                     res.json({
-            //                                         success: false,
-            //                                         message: strError
-            //                                     });
-            //                                     return;
-            //                                 }
-            //                             );
-            //                             if (exceptionRet) {
-
-            //                                 res.json({
-            //                                     success: false,
-            //                                     message: exceptionRet.message
-            //                                 });
-            //                                 return;
-            //                             }
-            //                         });
-            //                     }
-            //                 },
-            //                 function(strError){
-
-            //                     res.json({
-            //                         success: false,
-            //                         message: strError
-            //                     });
-            //                 }
-            //             );
-            //             if (exceptionRet) {
-
-            //                 res.json({
-            //                     success: false,
-            //                     message: exceptionRet.message
-            //                 });
-            //             }
-            //         }
-            //     },
-            //     function(strError){
-
-            //         res.json({
-            //             success: false,
-            //             message: strError
-            //         });
-            //     }
-            // );
+    var m_functionRetProjDoMethodsPropertiesEvents = function(req, res, project, mcnt, pcnt, ecnt) {
+
+        try {
+
+            project.comics.items.forEach(
+                function(comic) {
+
+                    comic.types.items.forEach(
+                        function(type) {
+
+                            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + " order by ordinal asc; select * from " + self.dbname + "propertys where typeId =" + type.id + " order by ordinal asc; select * from " + self.dbname + "events where typeId =" + type.id + " order by ordinal asc;",
+                                function(rows){
+
+                                    if (rows.length !== 3) {
+
+                                        res.json({
+                                            success: false,
+                                            message: 'Unable to retrieve selected project.'
+                                        });
+                                        return;
+                                    }
+
+                                    // methods
+                                    rows[0].forEach(
+                                        function(row) {
+
+                                            var method = 
+                                            { 
+                                                name: "", 
+                                                workspace: "", 
+                                                id: 0,
+                                                tags: '',
+                                                imageResourceId: 0,
+                                                createdByUserId: 0,
+                                                price: 0,
+                                                ordinal: 0,
+                                                description: ""
+                                            };
+
+                                            m_functionFetchTags(
+                                                method.id,
+                                                7,
+                                                req.body.userName,
+                                                function(tags) {
+
+                                                    method.tags = tags;
+                                                    type.methods.push(method);
+
+                                                    if (--mcnt === 0 && pcnt === 0 && ecnt === 0) {
+
+                                                        res.json({
+                                                            success: true,
+                                                            project: project
+                                                        });
+                                                        return;
+                                                    }
+                                                }
+                                            );
+                                        }
+                                    );
+
+                                    // properties
+                                    rows[0].forEach(
+                                        function(row) {
+
+                                            var property = 
+                                            {
+                                                name: "",
+                                                id: 0,
+                                                ordinal: 0,
+                                                propertyTypeId: 0,
+                                                initialValue: ""
+                                            };
+
+                                            type.properties.push(property);
+
+                                            if (mcnt === 0 && --pcnt === 0 && ecnt === 0) {
+
+                                                res.json({
+                                                    success: true,
+                                                    project: project
+                                                });
+                                                return;
+                                            }
+                                        }
+                                    );
+
+                                    // events
+                                    rows[0].forEach(
+                                        function(row) {
+
+                                            var event = 
+                                            {
+                                                name: "",
+                                                id: 0,
+                                                ordinal: 0
+                                            };
+
+                                            type.events.push(event);
+
+                                            if (mcnt === 0 && pcnt === 0 && --ecnt === 0) {
+
+                                                res.json({
+                                                    success: true,
+                                                    project: project
+                                                });
+                                                return;
+                                            }
+                                        }
+                                    );
+                                },
+                                function(strError){
+                                    res.json({success: false, message: strError});
+                                    return;
+                                }
+                            );
+                        }
+                    );
+                }
+            );
+        } catch (e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
 
     self.routeRetrieveType = function (req, res) {
 
