@@ -593,8 +593,8 @@ begin
             
 		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
 			VALUES
-				(0,1,1,1,0,NULL,'default'),
-				(1,1,4,1,0,2,'Mission_to_Mars'),
+				(1,1,1,1,0,NULL,'default'),
+				(2,1,4,1,0,2,'Mission_to_Mars'),
 				(3,1,3,1,0,2,'Mission_to_Mars'),
 				(4,1,3,1,0,3,'mine'),
 				(5,1,5,1,0,1,'a'),
@@ -646,25 +646,69 @@ begin
 				(6,'type')
 			;
             
---		insert TGv1000.propertys (id,typeId,`name`,propertyTypeId,initialValue,ordinal)
---			VALUES
---				()
---			;
-            
---		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageResourceId,createdByUserId,price,description)
---			VALUES
---				()
---			;
-            
---		insert TGv1000.events (id,typeId,`name`,ordinal)
---			VALUES
---				()
---			;
-            
         UPDATE `TGv1000`.`control` set dbstate=32.0 where id=1;
 		set @dbstate := 32.0;
     end if;
 
+    if @dbstate = 32.0 then
+    
+		insert TGv1000.propertys (id,typeId,`name`,propertyTypeId,initialValue,ordinal)
+			VALUES
+				(1,1,'X',1,'0',0),
+				(2,1,'Y',1,'0',0),
+				(3,1,'Width',1,'0',0),
+				(4,1,'Height',1,'0',0),
+				(5,2,'X',1,'0',0),
+				(6,2,'Y',1,'0',0),
+				(7,2,'Width',1,'0',0),
+				(8,2,'Height',1,'0',0),
+				(9,3,'X',1,'0',0),
+				(10,3,'Y',1,'0',0),
+				(11,3,'Width',1,'0',0),
+				(12,3,'Height',1,'0',0),
+				(13,4,'X',1,'0',0),
+				(14,4,'Y',1,'0',0),
+				(15,4,'Width',1,'0',0),
+				(16,4,'Height',1,'0',0),
+				(17,5,'X',1,'0',0),
+				(18,5,'Y',1,'0',0),
+				(19,5,'Width',1,'0',0),
+				(20,5,'Height',1,'0',0),
+				(21,6,'X',1,'0',0),
+				(22,6,'Y',1,'0',0),
+				(23,6,'Width',1,'0',0),
+				(24,6,'Height',1,'0',0)
+			;
+            
+		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageResourceId,createdByUserId,price,description)
+			VALUES
+				(1,3,'method1',0,'',0,1,0,'')
+			;
+            
+		insert TGv1000.events (id,typeId,`name`,ordinal)
+			VALUES
+				(1,3,'event1',0)
+			;
+            
+		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
+			VALUES
+				(11,1,7,1,0,1,'g')
+			;
+            
+        insert TGv1000.tags (id,description)
+			VALUES
+				(7,'method')
+			;
+            
+		insert TGv1000.resources_tags (resourceId,tagId)
+			VALUES
+				(11,1),
+                (11,7)
+			;
+            
+        UPDATE `TGv1000`.`control` set dbstate=33.0 where id=1;
+		set @dbstate := 33.0;
+    end if;
 end;
 
 //
