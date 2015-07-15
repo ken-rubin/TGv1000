@@ -169,7 +169,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             console.log('In m_functionRetProjDoComics');
 
-            var ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + " order by ordinal asc;",
+            var ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + ";",
                 function(rows)
                 {
 
@@ -261,7 +261,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(
                 function(comic) {
 
-                    var ex = sql.execute("select * from " + self.dbname + "comicPanels where comicId = " + comic.id + " order by ordinal asc;",
+                    var ex = sql.execute("select * from " + self.dbname + "comicPanels where comicId = " + comic.id + ";",
                         function(rows) {
 
                             if (rows.length === 0) {
@@ -343,7 +343,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(
                 function(comic) {
 
-                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + " order by ordinal asc;",
+                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + ";",
                         function(rows) {
 
                             // At least for now there can be comics with no types, so we disable the following test:
@@ -442,20 +442,20 @@ module.exports = function ProjectBO(app, sql, logger) {
             console.log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
             project.comics.items.forEach(
                 function(comic) {
-                    console.log('in comic ' + JSON.stringify(comic));
+                    // console.log('in comic ' + JSON.stringify(comic));
                     comic.types.items.forEach(
                         function(type) {
-                            console.log('in type ' + JSON.stringify(type));
-                            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + " order by ordinal asc; select * from " + self.dbname + "propertys where typeId =" + type.id + " order by ordinal asc; select * from " + self.dbname + "events where typeId =" + type.id + " order by ordinal asc;",
+                            // console.log('in type ' + JSON.stringify(type));
+                            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + "; select * from " + self.dbname + "propertys where typeId =" + type.id + "; select * from " + self.dbname + "events where typeId =" + type.id + ";",
                                 function(rows){
 
-                                    console.log(' ');
-                                    console.log('************** Start of triple select ******************');
-                                    console.log(' ');
-                                    console.log(JSON.stringify(rows));
-                                    console.log(' ');
-                                    console.log('************** Start of triple select ******************');
-                                    console.log(' ');
+                                    // console.log(' ');
+                                    // console.log('************** Start of triple select ******************');
+                                    // console.log(' ');
+                                    // console.log(JSON.stringify(rows));
+                                    // console.log(' ');
+                                    // console.log('************** Start of triple select ******************');
+                                    // console.log(' ');
 
                                     if (rows.length !== 3) {
                                         console.log('The triple select did not return rows.length === 3');
@@ -469,7 +469,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // methods
                                     rows[0].forEach(
                                         function(row) {
-                                            console.log('method row: ' + JSON.stringify(row));
+                                            // console.log('method row: ' + JSON.stringify(row));
                                             var method = 
                                             { 
                                                 id: row.id,
@@ -495,11 +495,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     mcnt--;
                                                     if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
 
-                                                        console.log('They have all reached 0. Returning project.');
-                                                        res.json({
-                                                            success: true,
-                                                            project: project
-                                                        });
+                                                        m_functionSetSuccessProjectReturn(res, project);
                                                         return;
                                                     }
                                                 }
@@ -510,7 +506,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // properties
                                     rows[1].forEach(
                                         function(row) {
-                                            console.log('property row: ' + JSON.stringify(row));
+                                            // console.log('property row: ' + JSON.stringify(row));
                                             var property = 
                                             {
                                                 id: row.id,
@@ -525,11 +521,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             pcnt--;
                                             if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
 
-                                                console.log('They have all reached 0. Returning project.');
-                                                res.json({
-                                                    success: true,
-                                                    project: project
-                                                });
+                                                m_functionSetSuccessProjectReturn(res, project);
                                                 return;
                                             }
                                         }
@@ -538,7 +530,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // events
                                     rows[2].forEach(
                                         function(row) {
-                                            console.log('event row: ' + JSON.stringify(row));
+                                            // console.log('event row: ' + JSON.stringify(row));
                                             var event = 
                                             {
                                                 id: row.id,
@@ -551,11 +543,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             ecnt--;
                                             if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
 
-                                                console.log('They have all reached 0. Returning project.');
-                                                res.json({
-                                                    success: true,
-                                                    project: project
-                                                });
+                                                m_functionSetSuccessProjectReturn(res, project);
                                                 return;
                                             }
                                         }
@@ -574,6 +562,29 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             res.json({success: false, message: e.message});
         }
+    }
+
+    var m_functionSetSuccessProjectReturn = function(res, project) {
+
+        console.log('They have all reached 0. Returning project after sorting array by ordinal.');
+        project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+        project.comics.items.forEach(
+            function(comic) {
+
+                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                comic.types.items.forEach(
+                    function(type) {
+                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                    }
+                );
+            }
+        );
+        res.json({
+            success: true,
+            project: project
+        });
     }
 
     self.routeRetrieveType = function (req, res) {
