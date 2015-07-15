@@ -630,7 +630,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 type.tags = tags;
 
-                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.id + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.id + "); select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.id + ");",
+                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.id + "; select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.id + "; select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.id + ";",
                                     function(rows) {
 
                                         if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {

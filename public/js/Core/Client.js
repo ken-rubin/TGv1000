@@ -700,7 +700,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									return types.getActiveClType().addMethod(data.method);
+									return self.addMethodToActiveType(data.method);
 
 								} else {
 
@@ -710,32 +710,6 @@ define(["Core/errorHelper",
 							});
 
 							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-//used
-					self.addPropertyToType = function (property) {
-
-						try {
-
-							return types.getActiveClType().addProperty(property);
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-//used
-					self.addEventToType = function (event) {
-
-						try {
-
-							return types.getActiveClType().addEvent(event);
 
 						} catch (e) {
 
