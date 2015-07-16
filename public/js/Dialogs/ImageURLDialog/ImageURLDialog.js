@@ -138,12 +138,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								return;
 							}
 
-						    var strUserIdResources = client.getTGCookie("userId");
-						    var strUserNameResources = client.getTGCookie("userName");
 							var posting = $.post("/BOL/ResourceBO/SaveURLResource", 
 								{
-									userId: strUserIdResources, 
-									userName: strUserNameResources,
+									userId: g_strUserId, 
+									userName: g_strUserName,
 									url: m_url,
 									tags: tags,
 									resourceTypeId: 1,

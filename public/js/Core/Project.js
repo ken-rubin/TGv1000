@@ -78,19 +78,17 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 					// The following will not be called with any gaps or errors in the Project's structure.
 					// All images are already resources with their id's in the items in the Project. Etc.
-					self.saveToDatabase = function () {
+					self.saveToDatabase = function (strSaveType) {
 
 						try {
 
 							errorHelper.show("We're not doing this yet", 4000);
 							return;
 
-							var strUserId = client.getTGCookie('userId');
-							var strUserName = client.getTGCookie('userName');
-
 							var data = {
-									userId: strUserId,
-									userName: strUserName,
+									userId: g_strUserId,
+									userName: g_strUserName,
+									saveType: strSaveType,
 									projectJson: self.data
 							};
 
@@ -152,10 +150,12 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 					self.getStatus = function () {
 
+
+						var test = parseInt(client.getTGCookie('userId'), 10);
 						return {
 
 							inDBAlready: (self.data.id > 0),
-							userOwnsProject: (self.data.createdByUserId === client.getTGCookie('userId')),
+							userOwnsProject: (self.data.createdByUserId === test),
 							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
 											&& self.data.imageResourceId > 0
 										),

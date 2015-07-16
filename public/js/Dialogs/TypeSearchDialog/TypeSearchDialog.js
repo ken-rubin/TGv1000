@@ -139,13 +139,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					    try {
 
 						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
-						    var strUserId = client.getTGCookie("userId");
-						    var strUserName = client.getTGCookie("userName");
 					        var posting = $.post("/BOL/UtilityBO/Search", 
 					        	{
 					        		tags: tags, 
-					        		userId: strUserId,
-					        		userName: strUserName,
+					        		userId: g_strUserId,
+					        		userName: g_strUserName,
 					        		resourceTypeId: 5,
 					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},

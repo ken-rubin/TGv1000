@@ -14,6 +14,8 @@ var code = null;
 var types = null;
 var comicsPanel = null;
 var bDisplayComics = false;
+var g_strUserId = '';
+var g_strUserName = '';
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {

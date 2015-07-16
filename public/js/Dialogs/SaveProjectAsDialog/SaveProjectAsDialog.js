@@ -108,16 +108,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							$("PlaceForProjectName").empty();
 
+							$("#SaveProjectBtn").click(m_functionSaveProject);
+
 							if (m_saveOrSaveAs === "save") {
 
-								$("#SaveProjectBtn").click(m_functionSaveProject);
 								$("#SaveAsH4").append("<span>Change project description or tags and click the <em>Save Project</em> button to save.</span>");
 								$("#PlaceForProjectName").append("<span>" + m_project.data.name + "</span>");
 
 							} else {
 
 								$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
-								$("#SaveProjectBtn").click(m_functionSaveProjectAs);
 								$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
 								$("#ProjectName").blur(m_functionNameBlur);
 								$("#ProjectName").val(m_project.data.name);
@@ -180,15 +180,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					var m_functionSaveProjectAs = function () {
+					var m_functionSaveProject = function () {
 
 						try {
 
-							exceptionRet = client.saveProjectAs();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							exceptionRet = client.saveProject(m_saveOrSaveAs);
+							if (exceptionRet) { throw exceptionRet; }
 
 							// m_dialog.close();
 
@@ -196,12 +193,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							errorHelper.show(e);
 						}
-					}
-
-					var m_functionSaveProject = function () {
-
-						// Is this any different from Save As????
-						
 					}
 
 					// 3 functions to handle the Image changing link clicks.

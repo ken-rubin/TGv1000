@@ -203,13 +203,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								return;
 							}
 
-						    var strUserIdResources = client.getTGCookie("userId");
-						    var strUserNameResources = client.getTGCookie("userName");
-
 						    var formData = new FormData();
 
-						    formData.append("userId", strUserIdResources);
-						    formData.append("userName", strUserNameResources);
+						    formData.append("userId", g_strUserId);
+						    formData.append("userName", g_strUserName);
 						    formData.append("tags", tags);
 						    formData.append("resourceTypeId", "1");
 						    formData.append("resourceName", strResourceName);

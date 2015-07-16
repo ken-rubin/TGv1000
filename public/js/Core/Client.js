@@ -64,8 +64,9 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Save.
-							m_iUserId = self.getTGCookie('userId');
+							// Set globals for everyone to use.
+							g_strUserId = self.getTGCookie('userId');
+							g_strUserName = self.getTGCookie('userName');
 
 							return null;
 						} catch (e) {
@@ -792,7 +793,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var exceptionRet = m_clProject.saveToDatabase();
+							var exceptionRet = m_clProject.saveToDatabase('save');
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -938,7 +939,7 @@ define(["Core/errorHelper",
 								// Determine if showing help (comic) based on number of projects user has played with.
 								var posting = $.post("/BOL/ProjectBO/RetrieveCountUsersProjects", 
 									{
-										userId: self.getTGCookie("userId")
+										userId: g_strUserId
 									},
 									'json');
 								posting.done(function(data){
@@ -973,6 +974,8 @@ define(["Core/errorHelper",
 								callback(m_clProject);
 							}
 
+							navbar.enableDisableProjectsMenuItems();
+
 							return null;
 
 						} catch (e) {
@@ -986,11 +989,11 @@ define(["Core/errorHelper",
 						return m_clProject;
 					};
 
-					self.saveProjectAs = function () {
+					self.saveProject = function (strSaveOrSaveAs) {
 
 						try {
 
-							return m_clProject.saveToDatabase();
+							return m_clProject.saveToDatabase(strSaveOrSaveAs);
 
 						} catch (e) {
 
