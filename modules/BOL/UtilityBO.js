@@ -97,9 +97,9 @@ module.exports = function UtilityBO(app, sql, logger) {
             }
 
             var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-            console.log(' ');
-            console.log('Query to get tag ids: ' + sqlString);
-            console.log(' ');
+            // console.log(' ');
+            // console.log('Query to get tag ids: ' + sqlString);
+            // console.log(' ');
 
             var exceptionRet = sql.execute(sqlString,
                 function (arrayRows) {
@@ -144,9 +144,9 @@ module.exports = function UtilityBO(app, sql, logger) {
                             sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optnlFK=p.id where p.isApp = 0 and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
 
-                        console.log(' ');
-                        console.log('Query: ' + sqlString);
-                        console.log(' ');
+                        // console.log(' ');
+                        // console.log('Query: ' + sqlString);
+                        // console.log(' ');
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
                                 res.json({

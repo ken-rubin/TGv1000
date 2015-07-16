@@ -682,7 +682,10 @@ begin
             
 		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageResourceId,createdByUserId,price,description)
 			VALUES
-				(1,3,'method1',0,'',0,1,0,'')
+				(1,1,'initialize',0,'',0,1,0,''),
+				(2,2,'initialize',0,'',0,1,0,''),
+				(3,3,'initialize',0,'',0,1,0,''),
+				(4,6,'initialize',0,'',0,1,0,'')
 			;
             
 		insert TGv1000.events (id,typeId,`name`,ordinal)
@@ -692,7 +695,10 @@ begin
             
 		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
 			VALUES
-				(11,1,7,1,0,1,'g')
+				(11,1,7,1,0,1,'g'),
+				(12,1,7,1,0,2,'h'),
+				(13,1,7,1,0,3,'i'),
+				(14,1,7,1,0,4,'j')
 			;
             
         insert TGv1000.tags (id,description)
@@ -703,7 +709,13 @@ begin
 		insert TGv1000.resources_tags (resourceId,tagId)
 			VALUES
 				(11,1),
-                (11,7)
+                (11,7),
+				(12,1),
+                (12,7),
+				(13,1),
+                (13,7),
+				(14,1),
+                (14,7)
 			;
             
         UPDATE `TGv1000`.`control` set dbstate=33.0 where id=1;
