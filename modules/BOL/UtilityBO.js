@@ -131,18 +131,24 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
+                        // SLightly different queries for the different resourceTypeIds.
                         if (req.body.resourceTypeId < "3") {  // Non-FKs; e.g., image or sound
 
                             sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
 
-                        } else if (req.body.resourceTypeId !== "5") {    // Project, Method -- a different query.
+                        } else if (req.body.resourceTypeId === "3") {    // Project
 
                             sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s p on r.optnlFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         
-                        } else { // Type ('5')
+                        } else if (req.body.resourceTypeId === "5") {   // Type - excludes types where isApp = 1
 
                             sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optnlFK=p.id where p.isApp = 0 and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        
+                        } else if (req.body.resourceTypeId === "7") {   // Method - excludes methods named 'initialize'
+
+                            sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "methods p on r.optnlFK=p.id where p.name <> 'initialize' and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
+
 
                         // console.log(' ');
                         // console.log('Query: ' + sqlString);

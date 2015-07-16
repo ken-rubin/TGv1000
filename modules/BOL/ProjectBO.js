@@ -892,14 +892,155 @@ module.exports = function ProjectBO(app, sql, logger) {
             console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
-            // req.body.projectJson : See NewProjectDialog.js for schema.
+            // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
+            // req.body.projectJson
 
-            // Important: All image resources have already been created or selected for the project, its comics and their types. (Or their defaults exist.)
+            // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
+            // So nothing to do image-wise.
+
+            // Also, comics don't get saved; just project, types, methods, properties and events.
 
             // Muis important: the project's name must be unique to within the user's projects, but can be the same as another user's project name.
-            // This doesn't have to be checked for a typeOfSave === 'save'.
+            // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
-            var project = req.body.projectJson;
+            var project = req.body.projectJson; // are we sure this doesn't need JSON.parse?
+
+            var typeOfSave = req.body.saveType;
+            if (typeOfSave === 'save') {
+
+                if (project.id === 0 || (project.id !== 0 && project.createdByUserId !== parseInt(req.body.userId, 10))) {
+
+                    typeOfSave = 'saveAs';
+                }
+            }
+
+            // typeOfSave info:
+            //  saveAs INSERTs new rows for everything.
+            //  save UPDATEs the project, but everything below should be deleted (if createdByUserId !== req.body.userId) and INSERTed.
+
+
+            // project looks like:
+            //      {
+            //          name: 'xxx',
+            //          id: 0,
+            //          description: 'xxx',
+            //          tags: 'xxx',
+            //          imageResourceId: nnn,
+            //          price: nn.nn,
+            //          createdByUserId: nn,
+            //          isDirty: true,
+            //          comics: 
+            //          {
+            //              items: [
+            //                  {
+            //                      imageResourceId: 0,
+            //                      id: 0,
+            //                      name: 'comic1',
+            //                      tags: 'tagComic',
+            //                      ordinal: 0,
+            //                      comicPanels: {
+            //                          items: [
+            //                              {name: "XYZ", url: "http://www.google.com", description: "descr1", ordinal: 0, thumbnail: "tn1.png"},
+            //                              {name: "ABC", url: "http://www.bing.com", description: "descr2", ordinal: 1, thumbnail: "tn2.jpg"}
+            //                          ]
+            //                      },
+            //                      types: {
+            //                          items: [
+            //                              {
+            //                                  isApp: true,
+            //                                  id: 0,
+            //                                  ordinal: 0,
+            //                                  tags: 'tagType',
+            //                                  dependencies: [],
+            //                                  name: "app",
+            //                                  imageResourceId: 0,
+            //                                  methods: [
+            //                                      {id: 0, name: "initialize", workspace: "", imageResourceId: 0, ordinal: 0, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method1", workspace: "", imageResourceId: 0, ordinal: 1, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2a", workspace: "", imageResourceId: 0, ordinal: 2, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2b", workspace: "", imageResourceId: 0, ordinal: 3, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2c", workspace: "", imageResourceId: 0, ordinal: 4, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2d", workspace: "", imageResourceId: 0, ordinal: 5, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2e", workspace: "", imageResourceId: 0, ordinal: 6, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2f", workspace: "", imageResourceId: 0, ordinal: 7, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method3g", workspace: "", imageResourceId: 0, ordinal: 8, tags: "", createdByUserId: m_strUserId, price: 0}
+            //                                  ],
+            //                                  properties: [
+            //                                      {id: 0, name: "property1", propertyTypeId: 1, initialValue: "3.14", ordinal: 0},
+            //                                      {id: 0, name: "property2", propertyTypeId: 2, initialValue: "1-10", ordinal: 1},
+            //                                      {id: 0, name: "property3", propertyTypeId: 3, initialValue: "Jerry", ordinal: 2},
+            //                                      {id: 0, name: "property4", propertyTypeId: 4, initialValue: "true", ordinal: 3},
+            //                                      {id: 0, name: "property5", propertyTypeId: 4, initialValue: "false", ordinal: 4},
+            //                                      {id: 0, name: "property6", propertyTypeId: 5, initialValue: "jerry john ken", ordinal: 5},
+            //                                      {id: 0, name: "property7", propertyTypeId: 6, initialValue: "", ordinal: 6},
+            //                                      {id: 0, name: "property8", propertyTypeId: 2, initialValue: "1000-1999", ordinal: 7},
+            //                                      {id: 0, name: "property9", propertyTypeId: 3, initialValue: "Hello to you", ordinal: 8}
+            //                                  ],
+            //                                  events: [
+            //                                      {id: 0, name: "event1", ordinal: 0},
+            //                                      {id: 0, name: "event12", ordinal: 1},
+            //                                      {id: 0, name: "event123", ordinal: 2},
+            //                                      {id: 0, name: "event1234", ordinal: 3}
+            //                                  ]
+            //                              },
+            //                              {
+            //                                  isApp: false,
+            //                                  id: 0,
+            //                                  ordinal: 1,
+            //                                  tags: 'tagType1',
+            //                                  properties: [],
+            //                                  methods: [],
+            //                                  events: [],
+            //                                  dependencies: [],
+            //                                  name: "Type1",
+            //                                  imageResourceId: 0
+            //                              }
+            //                          ]
+            //                      }
+            //                  },
+            //                  {
+            //                      imageResourceId: 1,
+            //                      id: 1,
+            //                      name: 'comic2',
+            //                      tags: 'tagComic',
+            //                      ordinal: 1,
+            //                      comicPanels: {
+            //                          items: [
+            //                              {name: "XYZ", url: "http://www.techgroms.com", description: "descr1", ordinal: 0, thumbnail: "tn3.png"}
+            //                          ]
+            //                      },
+            //                      types: { 
+            //                          items: [
+            //                              {
+            //                                  isApp: true,
+            //                                  id: 0,
+            //                                  ordinal: 0,
+            //                                  tags: 'tagType',
+            //                                  dependencies: [],
+            //                                  name: "app",
+            //                                  imageResourceId: 0,
+            //                                  methods: [
+            //                                      {id: 0, name: "initialize", workspace: "", imageResourceId: 0, ordinal: 0, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method1", workspace: "", imageResourceId: 0, ordinal: 1, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2a", workspace: "", imageResourceId: 0, ordinal: 2, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2b", workspace: "", imageResourceId: 0, ordinal: 3, tags: "", createdByUserId: m_strUserId, price: 0},
+            //                                      {id: 0, name: "method2c", workspace: "", imageResourceId: 0, ordinal: 4, tags: "", createdByUserId: m_strUserId, price: 0}
+            //                                  ],
+            //                                  properties: [
+            //                                      {id: 0, name: "property1", propertyTypeId: 1, initialValue: "123", ordinal: 0},
+            //                                      {id: 0, name: "property2", propertyTypeId: 2, initialValue: "7-11", ordinal: 1},
+            //                                      {id: 0, name: "property3", propertyTypeId: 5, initialValue: "1 2 3 4 5 6 7 8 9", ordinal: 2}
+            //                                  ],
+            //                                  events: [
+            //                                      {id: 0, name: "event1", ordinal: 0}
+            //                                  ]
+            //                              }
+            //                          ]
+            //                      }
+            //                  }
+            //              ]
+            //          }
+            //      }
          
 
             

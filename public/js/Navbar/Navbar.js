@@ -41,10 +41,8 @@ define(["Core/errorHelper"],
 								try {
 
 									var exceptionRet = client.showNewProjectDialog();
-									if (exceptionRet) {
+									if (exceptionRet) { throw exceptionRet; }
 
-										throw exceptionRet;
-									}
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -60,20 +58,15 @@ define(["Core/errorHelper"],
 										if (iProjectId > 0) {
 
 											exceptionRet = client.openProjectFromDB(iProjectId);
+											if (exceptionRet) { throw exceptionRet; }
 
-											if (exceptionRet) {
-
-												throw exceptionRet;
-											}
 										} else {
 
 											throw new Error("Invalid project id returned.")
 										}
 									});
-									if (exceptionRet) {
+									if (exceptionRet) { throw exceptionRet; }
 
-										throw exceptionRet;
-									}
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -85,10 +78,8 @@ define(["Core/errorHelper"],
 								try {
 
 									var exceptionRet = client.showSaveProjectDialog();
-									if (exceptionRet) {
+									if (exceptionRet) { throw exceptionRet; }
 
-										throw exceptionRet;
-									}
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -100,12 +91,11 @@ define(["Core/errorHelper"],
 								try {
 
 									var exceptionRet = client.quickSaveProject();
-									if (exceptionRet) {
+									if (exceptionRet) { throw exceptionRet; }
 
-										throw exceptionRet;
-									}
+									self.enableDisableProjectsMenuItems();
 
-									errorHelper.show("Project was saved.");
+									errorHelper.show("Project was saved.", 3000);
 
 								} catch (e) {
 
@@ -118,10 +108,8 @@ define(["Core/errorHelper"],
 								try {
 
 									var exceptionRet = client.showSaveProjectAsDialog();
-									if (exceptionRet) {
+									if (exceptionRet) { throw exceptionRet; }
 
-										throw exceptionRet;
-									}
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -133,10 +121,10 @@ define(["Core/errorHelper"],
 								try {
 
 									var exceptionRet = client.unloadProject();
-									if (exceptionRet) {
+									if (exceptionRet) { throw exceptionRet; }
 
-										throw exceptionRet;
-									}
+									self.enableDisableProjectsMenuItems();
+
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -210,35 +198,24 @@ define(["Core/errorHelper"],
 						m_functionDisable("SaveProjectAs");
 						m_functionDisable("QuickSaveProject");
 						m_functionDisable("CloseProject");
-						m_functionDisable("NewType");
-						m_functionDisable("TypeSearch");
 
 						if (project !== null) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 
-							// Any open project can have types added
-							m_functionEnable("NewType");
-							m_functionEnable("TypeSearch");
-
 							// See definition of status in Project.js method self.getStatus(). Of course.
 							var status = project.getStatus();
 
-							// User's own project or an opened-by-searching project can be saved as--even if not all fields are filled in yet,
-							// because Save As allows entering all fields and setting a project image.
+							// Any project can be saved as--even if not all fields are filled in yet,
+							// because Save As allows entering all fields and setting a project image, even changing the project's name.
 							m_functionEnable("SaveProjectAs");
 
-							if (status.isDirty && status.userOwnsProject && status.projectNameIsFilled) {
+							if (status.allRequiredFieldsFilled) {
 
-								// projectNameIsFilled is required, since project name cannot be changed in Save, just Save As.
+								// Since all fields are filled, one-click "quick" Save is enabled.
+								m_functionEnable("QuickSaveProject");
 								m_functionEnable("SaveProject");
-								
-								if (status.allRequiredFieldsFilled) {
-
-									// Since all fields are filled, one-click "quick" Save is enabled.
-									m_functionEnable("QuickSaveProject");
-								}
 							}
 						}
 					}

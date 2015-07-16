@@ -162,7 +162,7 @@ module.exports = function SQL(app) {
                                         if (rows.constructor === Array) {
 
                                             // Call the callback.
-                                            console.log("sql.execute result: " + rows.length + " item" + (rows.length === 1 ? "" : "s") + " returned.");
+                                            // console.log("sql.execute result: " + rows.length + " item" + (rows.length === 1 ? "" : "s") + " returned.");
                                             functionSuccess(rows);
                                         
                                         } else {
@@ -170,7 +170,7 @@ module.exports = function SQL(app) {
                                             // rows is a non-array js object. Turn it into an array.
                                             var newRows = [];
                                             newRows.push(rows);
-                                            console.log("sql.execute result: " + JSON.stringify(rows));
+                                            // console.log("sql.execute result: " + JSON.stringify(rows));
                                             functionSuccess(newRows);
                                         }
                                     }
