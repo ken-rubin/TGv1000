@@ -77,6 +77,22 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 						}
 					};
 
+					// Activate/select type instance.
+					self.setActive = function (iIndex,
+						arrayActive) {
+
+						try {
+
+							m_arrayActive = arrayActive;
+							m_iActiveIndex = iIndex;
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Destroy this instance.
 //not used					
 					self.destroy = function () {
@@ -223,6 +239,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							return e;
 						}
 					}
+
 					self.imageFromURL = function () {
 
 						try {
@@ -239,6 +256,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							return e;
 						}
 					}
+
 					self.imageFromDisk = function () {
 
 						try {

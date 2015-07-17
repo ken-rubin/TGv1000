@@ -25,17 +25,17 @@ define(["SourceScanner/converter"],
                 // Get the initialize method from the app type.
 
                 // First get the app type.
-                var typeApp = types.getType("app");
+                var typeApp = types.getType("App");
                 if (!typeApp) {
 
-                    throw { message: "Failed to find app type." };
+                    throw { message: "Failed to find App type." };
                 }
 
                 // Next get the initialize method.
                 var methodInitialize = typeApp.getMethod("initialize");
                 if (!methodInitialize) {
 
-                    throw { message: "Failed to find initialize method of app type." };
+                    throw { message: "Failed to find initialize method of App type." };
                 }
 
                 // Get the workspace.

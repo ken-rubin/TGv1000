@@ -145,7 +145,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					// Return true of the app's initialize is active.
 					self.isAppInitializeActive = function () {
 
-						if (m_clTypeActive.data.name !== "app") {
+						if (m_clTypeActive.data.name !== "App") {
 
 							return false;
 						}
@@ -728,7 +728,16 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// Save the active method.
 							m_methodActive = m_clTypeActive.data.methods[index];
 
-							var exceptionRet = code.load(m_clTypeActive, m_clTypeActive.data.methods[index], m_clTypeActive.data.methods[index].workspace);
+							var exceptionRet = m_clTypeActive.setActive(index,
+								m_clTypeActive.data.methods);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							exceptionRet = code.load(m_clTypeActive, 
+								m_clTypeActive.data.methods[index], 
+								m_clTypeActive.data.methods[index].workspace);
 							if (exceptionRet) {
 
 								throw exceptionRet;

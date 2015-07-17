@@ -87,6 +87,37 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						}
 					}
 
+					// Update the designer tool instances with the changes.
+					self.updateInstances = function (objectSettings) {
+
+						try {
+
+							var arrayKeys = Object.keys(objectSettings);
+							for (var i = 0; i < arrayKeys.length; i++) {
+
+								var strKeyIth = arrayKeys[i];
+								for (var j = 0; j < m_arrayItems.length; j++) {
+
+									var itemJth = m_arrayItems[j];
+									if (itemJth.id === strKeyIth) {
+
+										itemJth.left = objectSettings[strKeyIth].X;
+										itemJth.top = objectSettings[strKeyIth].Y;
+										itemJth.width = objectSettings[strKeyIth].Width;
+										itemJth.height = objectSettings[strKeyIth].Height;
+										break;
+									}
+								}
+							}
+
+							// Just call to helper method.
+							return m_functionRender();
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					// Type image has changed, update in designer.
 					self.updateImage  = function (clType) {
 
@@ -612,6 +643,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    var strSrc = jHelper.attr("src");
 		                    var strType = jHelper.attr("data-type");	// This seems not to have been defined, but also it seems not to be used. Have Ken check.
 
+		                    // Don't let the user drop an app on the designer.
+		                    if (strType === "App") {
+
+		                    	throw { message: "Cannot instantiate the App type." };
+		                    }
+
 		                    // Get an unique instance name for the type.
 		                    var strInstanceName = m_functionGetUniqueInstanceName(strType);
 
@@ -638,7 +675,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 									data: {
 
-										name: "app"
+										name: "App"
 									}
 								}, {
 

@@ -5,8 +5,8 @@
 // Return constructor function.
 
 // Define AMD module.
-define(["Core/errorHelper"], 
-	function (errorHelper) {
+define(["Core/errorHelper", "SourceScanner/processor"], 
+	function (errorHelper, processor) {
 
 		try {
 
@@ -661,7 +661,7 @@ define(["Core/errorHelper"],
 
 				            		//	Look for "new_" and "set_".
 				            		//	Set in designer.
-				            		var arrayMatches = objectCursor.type.match(/App_set(.+?)Instance/);
+				            		var arrayMatches = objectCursor.type.match(/App_set(.+)/);
 				            		if (arrayMatches &&
 				            			arrayMatches.length > 1) {
 
@@ -673,7 +673,7 @@ define(["Core/errorHelper"],
 					            			// Get the thing to set.
 					            			var objectToSet = objectCursor.children[0].children[0];
 					            			var strTypeToSet = objectToSet.type;
-					            			var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+					            			var arrayTypes = strTypeToSet.match(/App_get(.+)/);
 					            			var strTheType = arrayTypes[1];
 
 					            			var objectValue = objectCursor.children[1].children[0].children[0];
@@ -685,7 +685,7 @@ define(["Core/errorHelper"],
 		                                    // Get the thing to set.
 		                                    var objectToSet = objectCursor.children[0].children[0];
 		                                    var strTypeToSet = objectToSet.type;
-		                                    var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+		                                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
 		                                    var strTheType = arrayTypes[1];
 
 		                                    var objectValue = objectCursor.children[1].children[0].children[0];
@@ -697,7 +697,7 @@ define(["Core/errorHelper"],
 		                                    // Get the thing to set.
 		                                    var objectToSet = objectCursor.children[0].children[0];
 		                                    var strTypeToSet = objectToSet.type;
-		                                    var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+		                                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
 		                                    var strTheType = arrayTypes[1];
 
 		                                    var objectValue = objectCursor.children[1].children[0].children[0];
@@ -709,7 +709,7 @@ define(["Core/errorHelper"],
 		                                    // Get the thing to set.
 		                                    var objectToSet = objectCursor.children[0].children[0];
 		                                    var strTypeToSet = objectToSet.type;
-		                                    var arrayTypes = strTypeToSet.match(/App_get(.+?)Instance/);
+		                                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
 		                                    var strTheType = arrayTypes[1];
 
 		                                    var objectValue = objectCursor.children[1].children[0].children[0];
@@ -723,10 +723,12 @@ define(["Core/errorHelper"],
 			            	    } while (objectCursor)
 			            	}
 
-			            	document.title = JSON.stringify(objectResult);
+			            	// Load up the parsed data into the designer.
+		            		var exceptionRet = designer.updateInstances(objectResult);
+		            		if (exceptionRet) {
 
-
-
+		            			throw exceptionRet;
+		            		}
 						} catch (e) {
 
 							errorHelper.show(e);

@@ -58,7 +58,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                                     {
 
                                         nodeName: "block",
-                                        type: "app_get" + strInstance,
+                                        type: "App_get" + strInstance,
                                         id: m_functionGetNextId()
                                     }
                                 ]
@@ -111,7 +111,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     return m_functionAdd({
 
                         nodeName: "block",
-                        type: "app_set" + strId,
+                        type: "App_set" + strId,
                         id: m_functionGetNextId(),
                         inline: "true",
                         x: "150",
@@ -184,17 +184,17 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     }
 
                     // First get the app type.
-                    var typeApp = types.getType("app");
+                    var typeApp = types.getType("App");
                     if (!typeApp) {
 
-                        throw { message: "Failed to find app type." };
+                        throw { message: "Failed to find App type." };
                     }
 
                     // Next get the initialize method.
                     var methodInitialize = typeApp.getMethod("initialize");
                     if (!methodInitialize) {
 
-                        throw { message: "Failed to find initialize method of app type." };
+                        throw { message: "Failed to find initialize method of App type." };
                     }
 
                     // Get the workspace.
