@@ -733,6 +733,42 @@ begin
 		set @dbstate := 34.0;
     end if;
 
+    if @dbstate = 34.0 then
+    
+		ALTER TABLE `TGv1000`.`projects` 
+			DROP COLUMN `ownedByUserId`,
+			DROP COLUMN `price`,
+			ADD COLUMN `parentProjectId` INT(11) NULL AFTER `classOrProductId`,
+			ADD COLUMN `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `parentProjectId`,
+			ADD COLUMN `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `createdByUserId`,
+			CHANGE COLUMN `createdByUserId` `createdByUserId` INT(11) NULL AFTER `parentPrice`;
+    
+		ALTER TABLE `TGv1000`.`types` 
+			ADD COLUMN `parentTypeId` INT(11) NULL AFTER `projectId`,
+			ADD COLUMN `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `parentTypeId`,
+			ADD COLUMN `createdByUserId` INT(11) NULL AFTER `parentPrice`,
+			ADD COLUMN `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `createdByUserId`;
+    
+		ALTER TABLE `TGv1000`.`methods` 
+			CHANGE COLUMN `description` `description` VARCHAR(255) NULL DEFAULT NULL AFTER `imageResourceId`,
+			CHANGE COLUMN `price` `priceBump` DECIMAL(9,2) NOT NULL DEFAULT '0.00' ,
+			ADD COLUMN `parentMethodId` INT(11) NULL AFTER `description`,
+			ADD COLUMN `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00 AFTER `parentMethodId`;
+    
+        UPDATE `TGv1000`.`control` set dbstate=35.0 where id=1;
+		set @dbstate := 35.0;
+    end if;
+
+    if @dbstate = 35.0 then
+    
+		UPDATE `TGv1000`.`projects` set createdByUserId=NULL where id=2;
+		UPDATE `TGv1000`.`projects` set parentProjectId=2 where id=3;
+    
+        UPDATE `TGv1000`.`control` set dbstate=36.0 where id=1;
+		set @dbstate := 36.0;
+    end if;
+
+
 end;
 
 //

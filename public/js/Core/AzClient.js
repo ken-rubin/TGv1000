@@ -1,19 +1,19 @@
 ///////////////////////////////
-// ClientAdminzone module runs client state and manages gui/server interaction during Login view.
+// AzClient module runs client state and manages gui/server interaction during Login view.
 //
 // Return constructor function.
 //
 
 // Define module and require dependencies.
-define(["Core/errorHelper", 
-		"Dialogs/EnrollDialog/EnrollDialog"],
-	function (errorHelper, 
-				EnrollDialog) {
+define(["Core/errorHelper",
+		"Dialogs/NewAzProductClassDialog/NewAzProductClassDialog"],
+	function (errorHelper,
+				NewAzProductClassDialog) {
 
 		try {
 
 			// Define the client constructor function.
-			var functionConstructor = function ClientAdminzone() {
+			var functionConstructor = function AzClient() {
 
 				try {
 
@@ -33,7 +33,9 @@ define(["Core/errorHelper",
 					self.create = function () {
 
 						try {
-
+							// Set globals for everyone to use.
+							g_strUserId = self.getTGCookie('userId');
+							g_strUserName = self.getTGCookie('userName');
 
 							return null;
 						} catch (e) {
@@ -42,18 +44,38 @@ define(["Core/errorHelper",
 						}
 					};
 
-					// Start off the client.
-					self.debug = function () {
+					self.showNewProductClassDialog = function() {
 
 						try {
 
-							// 
+							m_openDialog = new NewAzProductClassDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
 							return null;
+
 						} catch (e) {
 
 							return e;
 						}
-					};
+					}
+
+					self.closeCurrentDialog = function () {
+
+						if (m_openDialog) {
+
+							m_openDialog.closeYourself();
+							m_openDialog = null;
+						
+						} else if (m_openDialog2) {
+
+							m_openDialog2.closeYourself();
+							m_openDialog2 = null;
+						}
+					}
 
 					self.getTGCookie = function (name) {
 
@@ -68,10 +90,11 @@ define(["Core/errorHelper",
 					///////////////////////////////
 					// Private functions.
 
-					// Invoked when the projects dialog exist newly.
-
 					/////////////////////////////////
 					// Private fields.
+					var m_openDialog = null;
+					// This second one is used for the dialogs that open over another open dialog.
+					var m_openDialog2 = null;
 
 				} catch (e) {
 

@@ -1189,7 +1189,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //                     } else {
 
     //                         project.id = rows[0].insertId;
-    //                         exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK) values (" + req.body.userId + ",3," + project.id + ");",
+    //                         exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK,public) values (" + req.body.userId + ",3," + project.id + ",0);",
     //                             function(rows) {
 
     //                                 if (rows.length === 0) {

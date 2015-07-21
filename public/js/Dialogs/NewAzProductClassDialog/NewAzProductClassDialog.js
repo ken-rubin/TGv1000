@@ -1,17 +1,17 @@
 ////////////////////////////////////
-// NewTypeDialog module.
+// NewAzProductClassDialog module.
 // 
 // Return constructor function.
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Type"], 
-	function (snippetHelper, errorHelper, resourceHelper, Type) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
 
-			// Define the NewTypeDialog constructor function.
-			var functionNewTypeDialog = function () {
+			// Define the NewAzProductClassDialog constructor function.
+			var functionNewAzProductClassDialog = function () {
 
 				try {
 
@@ -31,7 +31,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								cache: false,
 								data: { 
 
-									templateFile: "Dialogs/NewTypeDialog/newTypeDialog"
+									templateFile: "Dialogs/NewAzProductClassDialog/newAzProductClassDialog"
 								}, 
 								dataType: "HTML",
 								method: "POST",
@@ -60,19 +60,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							// Show the dialog--load the content from 
 							// the TypesDialog jade HTML-snippet.
+							//
+							// There will be buttons for creating different project configurations:
+							// (1) 
 							BootstrapDialog.show({
 
-								title: "New Type",
+								title: "New Product / Class",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Type",
-					            		id: 'CreateTypeBtn',
+					            		label: "Create Product",
+					            		id: 'createBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionCreateType();
+					            			m_functionCreateProject();
 					            		}
 					            	},
 					            	{
@@ -85,7 +88,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						                }
 					            	}
 					            ],
-					            draggable: true,
+					            draggable: false,
 					            onshown: m_functionOnShownDialog
 					        });
 						} catch (e) {
@@ -107,11 +110,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
-							$("#TypeName").focus();
-
-							$("#TypeName").blur(m_functionBlurTypeName);
-
-							m_setStateCreateBtn();
+							$("#ProjectName").focus();
 
 						} catch (e) {
 
@@ -119,63 +118,29 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						}
 					};
 
-					var m_functionBlurTypeName = function() {
-
-							m_setStateCreateBtn();
-					}
-
-					var m_setStateCreateBtn = function() {
-
-						var nameStatus = $("#TypeName").val().trim().length > 0;
-						var imgStatus = m_imageResourceId > 0;
-
-						if (!nameStatus || !imgStatus) {
-							$("#CreateTypeBtn").addClass("disabled");
-						} else {
-							$("#CreateTypeBtn").removeClass("disabled");
-						}
-					}
-
-					var m_functionCreateType = function () {
+					var m_functionCreateProject = function () {
 
 						try {
 
-							var typeName = $("#TypeName").val().trim();
-							if (!client.isTypeNameAvailableInActiveComic(typeName, -1)) {
-
-								errorHelper.show("That name is already used. Please enter another.");
-								return;
-							}
-
-							// Create minimal Type based on the dialog's fields--or lack thereof.
+							// Create project based on the new project dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
-							var typeJO = 
-							{
-								isApp: false,
-								id: 0,
-								ordinal: client.getNumberOfTypesInActiveComic(),
-								tags: $("#TypeTags").val() || "",
-								properties: [
-									{name: "X", propertyTypeId: 1, initialValue: "0", ordinal: 0},
-									{name: "Y", propertyTypeId: 1, initialValue: "0", ordinal: 1},
-									{name: "Width", propertyTypeId: 1, initialValue: "0", ordinal: 2},
-									{name: "Height", propertyTypeId: 1, initialValue: "0", ordinal: 3}
-								],
-								methods: [],
-								events: [],
-								dependencies: [],
-								name: typeName,
-								imageResourceId: m_imageResourceId
-							};
 
-							var clType = new Type();
-							clType.load(typeJO);
+							var strProjectName = $("#ProjectName").val().trim();
+							var strProjectDescription = $("#ProjectDescription").val().trim();
+							var strProjectTags = $("#ProjectTags").val().trim();
 
-							var exceptionRet = client.addTypeToProject(clType);
-							if (exceptionRet) {
+							var exceptionRet = client.openProjectFromDB(
+								1, 
+								function(clProject){	// callback is used to set fields after async fetch of empty-ish project from db.
 
-								throw exceptionRet;
-							}
+									clProject.data.name = strProjectName;
+									clProject.data.tags = strProjectTags;
+									clProject.data.description = strProjectDescription;
+									clProject.data.imageResourceId = m_imageResourceId;
+									clProject.data.createdByUserId = parseInt(g_strUserId, 10);
+								}
+							);
+							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
 
@@ -235,8 +200,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					var m_functionSetImageSrc = function (imageResourceId) {
 
 						m_imageResourceId = imageResourceId;
-						$("#TypeImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
-						m_setStateCreateBtn();
+						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
 					}
 				} catch (e) {
 
@@ -252,7 +216,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 			};
 
 			// Return the constructor function as the module object.
-			return functionNewTypeDialog;
+			return functionNewAzProductClassDialog;
 
 		} catch (e) {
 

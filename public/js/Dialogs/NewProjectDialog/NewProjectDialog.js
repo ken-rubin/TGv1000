@@ -128,14 +128,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var strProjectDescription = $("#ProjectDescription").val().trim();
 							var strProjectTags = $("#ProjectTags").val().trim();
 
-							var exceptionRet = client.openProjectFromDB(1, function(clProject){
+							var exceptionRet = client.openProjectFromDB(
+								1, 
+								function(clProject){	// callback is used to set fields after async fetch of empty-ish project from db.
 
-								clProject.data.name = strProjectName;
-								clProject.data.tags = strProjectTags;
-								clProject.data.description = strProjectDescription;
-								clProject.data.imageResourceId = m_imageResourceId;
-								clProject.data.createdByUserId = parseInt(g_strUserId);
-							});
+									clProject.data.name = strProjectName;
+									clProject.data.tags = strProjectTags;
+									clProject.data.description = strProjectDescription;
+									clProject.data.imageResourceId = m_imageResourceId;
+									clProject.data.createdByUserId = parseInt(g_strUserId, 10);
+								}
+							);
 							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();

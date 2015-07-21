@@ -1,0 +1,43 @@
+// Main style file.
+//
+// Defines site-wide styles.
+//
+
+@base: #fff;
+
+@NewColor: #aa0;
+@OpenColor: #a0a;
+@TemplatesColor: #0aa;
+@SearchColor: #a66;
+
+@HoverAdditive: #222;
+
+body
+{
+	background-color:@base;
+}
+
+// Style navbar menu with a black background, 
+// light enabled items and dim disabled items 
+// with inverse highlighting on enabled items.
+.dropdown-menu
+{
+  background:black;
+
+  .enabled
+  {
+    a
+    {
+      color:#ccc !important;
+
+      &:hover
+      {
+        color:#444 !important;
+      }
+    }
+    a.dropdown-toggle
+    {
+      background:#000 !important;
+    }
+  }
+}

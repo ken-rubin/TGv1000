@@ -507,7 +507,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Store module instance selection state.
 							var strIndex = jMember.attr("data-index");
-							var iIndex = parseInt(strIndex);
+							var iIndex = parseInt(strIndex, 10);
 							m_iActiveIndex = iIndex;
 							m_arrayActive = arrayActive;
 
@@ -854,7 +854,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Get the index of the item clicked.
 							var strIndex = invokedOn.attr("data-index");
-							var iIndex = parseInt(strIndex);
+							var iIndex = parseInt(strIndex, 10);
 
 							// Get the item clicked.
 							var propertyClicked = self.data.properties[iIndex];
@@ -952,7 +952,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Get the index of the item clicked.
 							var strIndex = invokedOn.attr("data-index");
-							var iIndex = parseInt(strIndex);
+							var iIndex = parseInt(strIndex, 10);
 
 							// Get the item clicked.
 							var methodClicked = self.data.methods[iIndex];
@@ -1042,7 +1042,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 							// Get the index of the item clicked.
 							var strIndex = invokedOn.attr("data-index");
-							var iIndex = parseInt(strIndex);
+							var iIndex = parseInt(strIndex, 10);
 
 							// Get the item clicked.
 							var eventClicked = self.data.events[iIndex];

@@ -600,7 +600,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								var tiIth = m_arrayItems[i];
 								if (tiIth.id === strName) {
 
-									var iSuffix = parseInt(strSuffix);
+									var iSuffix = parseInt(strSuffix, 10);
 									if (isNaN(iSuffix)) {
 
 										iSuffix = 1;
@@ -633,8 +633,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    // Extract data.
 		                    var iLeft = ui.offset.left - m_jCanvas.offset().left - m_dWidth / 2 + 1;
 		                    var iTop = ui.offset.top - m_jCanvas.offset().top - m_dHeight / 2 + 1;
-		                    var iWidth =  parseInt($(ui.helper[0]).width());
-		                    var iHeight = parseInt($(ui.helper[0]).height());
+		                    var iWidth =  parseInt($(ui.helper[0]).width(), 10);
+		                    var iHeight = parseInt($(ui.helper[0]).height(), 10);
 
 		                    // Extract the object that contains the attributes.
 		                    var jHelper = $(ui.helper.context);

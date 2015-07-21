@@ -27,7 +27,7 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
             span.glyphicon.glyphicon-user
             | &nbsp;Users
             ul.dropdown-menu
-              li#ChgPwdLI
+              li#ChgPwdLI.enabled
                 a#ChgPwdBtn(href="#") Change password
 
         li.active
@@ -35,7 +35,13 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
             span.glyphicon.glyphicon-th-list
             | &nbsp;Logitems
 
-        li.active
-          a(href="#")
+        li.active.dropdown
+          a.dropdown-toggle(href="#", data-toggle="dropdown")
             span.glyphicon.glyphicon-list-alt
-            | &nbsp; Projects
+            | &nbsp; Products/Classes
+            ul.dropdown-menu
+              li#NewProductClassLI.enabled
+                a#NewProductClassButton(href="#") New Product or Class...
+              li#EditProductClassLI.enabled
+                a#EditProductClassButton(href="#") Edit Product or Class...
+

@@ -1,0 +1,69 @@
+//- Jade DOM for the New AZ Product/Class dialog. 
+//-
+.well
+  .row
+    .col-xs-12
+      h5
+        | Before coming here you should have created a New Project and set its name, description, tags and (at least a temporary) image.
+        | No more than that. You will work on the comics and comic panels here and on project Types, etc. back in the Designer.
+        br
+        br
+        | The Project you created is private and will remain private, accessible only to you for development and to other admin users (at this time)
+        | for cloning. No one but you can or should assume that the Product template is being changed.
+  .row
+    br
+    .col-xs-6
+      | Select Project type (affects enrollment/purchase options):
+    .col-xs-2
+        input#ProductRadio(type='radio' name='types' value="1" style="width:25px;" checked)
+        span
+          | Product
+    .col-xs-2
+        input#ClassRadio(type='radio' name='types' value="0" style="width:25px;")
+        span
+          | Class
+  .row
+    br
+    .col-xs-4
+      | Select Project to turn into your&nbsp;
+      span#TypeText1 Product
+      | :
+    .col-xs-6
+      select.form-control#ProjectChoice
+        option(value=0) Select project...
+  .row
+    br
+    .col-xs-4
+      | Select number of comics to create:
+    .col-xs-1
+      input#Radio1(type='radio' name='cc' value='1' checked)
+      span
+        | 1
+    .col-xs-1
+      input#Radio2(type='radio' name='cc' value='2')
+      span
+        | 2
+    .col-xs-1
+      input#Radio3(type='radio' name='cc' value='3')
+      span
+        | 3
+    .col-xs-1
+      input#Radio4(type='radio' name='cc' value='4')
+      span
+        | 4
+    .col-xs-1
+      input#Radio5(type='radio' name='cc' value='5')
+      span
+        | 5
+    .col-xs-1
+      input#Radio6(type='radio' name='cc' value='6')
+      span
+        | 6
+    .col-xs-1
+      input#Radio7(type='radio' name='cc' value='7')
+      span
+        | 7
+    .col-xs-1
+      input#Radio8(type='radio' name='cc' value='8')
+      span
+        | 8
