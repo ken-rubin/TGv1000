@@ -32,7 +32,7 @@ $(document).ready(function () {
 
 					// Allocate and attach the navbar module.
 					azNavbar = new AzNavbar();
-					exceptionRet = azNavbar.create(azClient);
+					exceptionRet = azNavbar.create();
 					if (exceptionRet) { throw exceptionRet; }
 
 					// Cause the code and designer panels to size themselves.

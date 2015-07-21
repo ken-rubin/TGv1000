@@ -21,7 +21,7 @@ define(["Core/errorHelper"],
 					// Pulbic methods.
 
 					// Create instance to DOM.
-					self.create = function (client) {
+					self.create = function () {
 
 						try {
 

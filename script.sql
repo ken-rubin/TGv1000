@@ -31,6 +31,11 @@ begin
 		  UNIQUE KEY `id_UNIQUE` (id)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
+        INSERT INTO `TGv1000`.`user`
+			(`id`,`userName`,`pwHash`,`parentId`)
+			VALUES
+			(1,'techgroms@gmail.com','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',NULL);
+        
 		CREATE TABLE `TGv1000`.`routes` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `path` varchar(255) NOT NULL,

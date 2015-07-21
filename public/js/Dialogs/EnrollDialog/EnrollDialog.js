@@ -52,23 +52,34 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							// Initial validation. UserId not empty. E-mail address passes regexp test.
+							// Initial validation. emailChild not empty. E-mail address passes regexp test.
 							var errMsg = "";
-							var userId = $("#UserId").val().trim().toLowerCase();
-							var email = $("#Email").val().trim().toLowerCase();
-							if (userId.length === 0) {
+							var emailChild = $("#EmailChild").val().trim().toLowerCase();
+							var emailParent = $("#EmailParent").val().trim().toLowerCase();
+							if (emailChild.length === 0) {
 
-								errMsg = "You must enter a user Id. ";
+								errMsg = "You must enter an e-mail address for your child.";
 							}
-							if (email.length === 0) {
+							if (emailParent.length === 0) {
 
-								errMsg += "Your e-mail address is missing.";
+								errMsg += "You must enter an e-mail address for yourself.";
 							} else {
 
 								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-								if (!email.match(eReg)) {
+								var childOK = emailChild.match(eReg);
+								var parentOK = emailParent.match(eReg);
 
-									errMsg += "That doesn't appear to be a valid e-mail address.";
+								if (!childOK && !parentOK) {
+
+									errMsg += "Neither e-mail address appears valid.";
+
+								} else if (!childOK) {
+
+									errMsg += "The child's e-mail address appears invalid.";
+
+								} else if (!parentOK) {
+
+									errMsg += "The parent's e-mail address appears invalid.";
 								}
 							}
 
@@ -81,8 +92,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Things look good. Time to go to the server.
 							var posting = $.post("/BOL/ValidateBO/NewEnrollment", 
 												{
-													userName: userId, 
-													parentEmail: email
+													userName: emailChild,
+													parentEmail: emailParent
 												}, 
 												'json');
         					posting.done(function(data){
@@ -90,9 +101,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
             					if (data.success) {
 
                 					document.cookie = "userId=" + data.userId.toString();
-                					document.cookie = "userName=" + userId;
+                					document.cookie = "userName=" + emailChild;
 
-                					m_wellMessage("Your child has been enrolled. Please follow the e-mail just sent to you.", 
+                					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
                 									{waittime: 10000, callback: function(){	m_dialog.close(); location.href = '/';}});
             					} else {
 
