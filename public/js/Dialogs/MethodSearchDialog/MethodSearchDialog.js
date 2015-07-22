@@ -162,7 +162,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					                    	index: i,
 					                    	name: rowIth.name,
 					                    	url: resourceHelper.toURL('resources', 
-					                    		rowIth.imageResourceId, 
+					                    		rowIth.imageId, 
 					                    		'image', 
 					                    		''), 
 					                    	resourceMethodId: rowIth.resourceMethodId});

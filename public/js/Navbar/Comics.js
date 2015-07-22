@@ -113,7 +113,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								"comicstp-" + m_arrayClComics.length.toString(),		// id
 								clComic.data.name,		// name
 								'',		// description
-								resourceHelper.toURL('comics', clComic.data.imageResourceId, '', ''),		// url
+								resourceHelper.toURL('comics', clComic.data.imageId, '', ''),		// url
 								'comicstripitem',	// image class
 								null,
 								true

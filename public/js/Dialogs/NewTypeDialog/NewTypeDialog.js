@@ -127,7 +127,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					var m_setStateCreateBtn = function() {
 
 						var nameStatus = $("#TypeName").val().trim().length > 0;
-						var imgStatus = m_imageResourceId > 0;
+						var imgStatus = m_imageId > 0;
 
 						if (!nameStatus || !imgStatus) {
 							$("#CreateTypeBtn").addClass("disabled");
@@ -165,7 +165,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								events: [],
 								dependencies: [],
 								name: typeName,
-								imageResourceId: m_imageResourceId
+								imageId: m_imageId
 							};
 
 							var clType = new Type();
@@ -232,10 +232,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					}
 
 					// Display the chosen image.
-					var m_functionSetImageSrc = function (imageResourceId) {
+					var m_functionSetImageSrc = function (imageId) {
 
-						m_imageResourceId = imageResourceId;
-						$("#TypeImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						m_imageId = imageId;
+						$("#TypeImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
 						m_setStateCreateBtn();
 					}
 				} catch (e) {
@@ -248,7 +248,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_imageResourceId = 0;
+				var m_imageId = 0;
 			};
 
 			// Return the constructor function as the module object.

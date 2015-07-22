@@ -114,7 +114,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					// 	return $("<img class='comicstripitem' id='" + 
 					// 		self.data.name + 
 					// 		"' src='" +
-					// 	 	resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
+					// 	 	resourceHelper.toURL('resources', self.data.imageId, 'image', '') + 
 					// 	 	"'></img>");
 					// };
 				} catch (e) {

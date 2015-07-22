@@ -137,9 +137,9 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
-					self.setImageResourceId = function (imageResourceId) {
+					self.setImageId = function (imageId) {
 
-						self.data.imageResourceId = imageResourceId;
+						self.data.imageId = imageId;
 						self.setDirtyBool(true);
 					}
 
@@ -155,9 +155,9 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						return {
 
 							inDBAlready: (self.data.id > 0),
-							userOwnsProject: (self.data.createdByUserId === test),
+							userOwnsProject: (self.data.ownedByUserId === test),
 							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
-											&& self.data.imageResourceId > 0
+											&& self.data.imageId > 0
 										),
 							isDirty: self.data.isDirty,
 							projectNameIsFilled: (self.data.name.trim().length > 0)

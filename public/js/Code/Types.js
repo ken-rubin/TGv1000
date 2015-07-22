@@ -349,7 +349,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							// Note: the images have already been changed on the designer surface if any were there and in toolstrip.
 
-							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', '');
+							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', '');
 							
 							// Update the image in the TypeWell
 							$("#TWimage").attr("src", strUrl);
@@ -573,7 +573,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							m_functionSetTypewellHeader(m_clTypeActive.data.name);
-							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageResourceId, 'image', ''));
+							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
 							if (m_clTypeActive.data.isApp) {
 
@@ -639,7 +639,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									$("#TWmethodsTbody").append(strBuild);
 									$("#method_" + i).click(m_functionMethodClicked);
 								} else {
-									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageResourceId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
+									strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 									$("#TWmethodsTbody").append(strBuild);
 									$("#method_" + i).click(m_functionMethodClicked);
 									$("#methodrename_" + i).click(m_functionMethodRenameClicked);

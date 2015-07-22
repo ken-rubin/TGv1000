@@ -59,12 +59,12 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					// Type image has changed, update tool.
-					self.updateImage = function (iImageResourceId) {
+					self.updateImage = function (iImageId) {
 
 						try {
 
 							// Save state.
-							self.src = resourceHelper.toURL('resources', iImageResourceId, 'image');
+							self.src = resourceHelper.toURL('resources', iImageId, 'image');
 
 		                    // Load up the image.
 		                    self.imageRender.src = self.src;

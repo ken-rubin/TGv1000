@@ -75,7 +75,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 								"",													// no description--at this time
 								resourceHelper.toURL(								// image url
 									'resources', 
-									clType.data.imageResourceId, 
+									clType.data.imageId, 
 									'image'
 								),
 								'toolstripitem',									// item class
@@ -150,7 +150,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 						try {
 
 							var strSelector = "#tool-" + clType.data.name;
-							var strUrl = resourceHelper.toURL("resources", clType.data.imageResourceId, 'image', '');
+							var strUrl = resourceHelper.toURL("resources", clType.data.imageId, 'image', '');
 							var exceptionRet = m_srToolStripV.updateImage(
 								strSelector, 
 								clType.data.name, 

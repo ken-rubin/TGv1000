@@ -101,7 +101,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							m_project = client.getProject();
-							m_functionSetImageSrc(m_project.data.imageResourceId);
+							m_functionSetImageSrc(m_project.data.imageId);
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
@@ -242,10 +242,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					}
 
 					// Display the chosen image.
-					var m_functionSetImageSrc = function (imageResourceId) {
+					var m_functionSetImageSrc = function (imageId) {
 
-						m_project.setImageResourceId(imageResourceId);
-						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageResourceId, "image"));
+						m_project.setImageResourceId(imageId);
+						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}
 				} catch (e) {

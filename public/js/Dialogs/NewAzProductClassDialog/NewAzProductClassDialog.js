@@ -136,8 +136,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.name = strProjectName;
 									clProject.data.tags = strProjectTags;
 									clProject.data.description = strProjectDescription;
-									clProject.data.imageResourceId = m_imageResourceId;
-									clProject.data.createdByUserId = parseInt(g_strUserId, 10);
+									clProject.data.imageId = m_imageId;
+									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
 								}
 							);
 							if (exceptionRet) { throw exceptionRet; }
@@ -197,10 +197,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					}
 
 					// Display the chosen image.
-					var m_functionSetImageSrc = function (imageResourceId) {
+					var m_functionSetImageSrc = function (imageId) {
 
-						m_imageResourceId = imageResourceId;
-						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						m_imageId = imageId;
+						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
 					}
 				} catch (e) {
 
@@ -212,7 +212,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_imageResourceId = 0;
+				var m_imageId = 0;
 			};
 
 			// Return the constructor function as the module object.

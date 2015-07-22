@@ -135,8 +135,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.name = strProjectName;
 									clProject.data.tags = strProjectTags;
 									clProject.data.description = strProjectDescription;
-									clProject.data.imageResourceId = m_imageResourceId;
-									clProject.data.createdByUserId = parseInt(g_strUserId, 10);
+									clProject.data.imageId = m_imageId;
+									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
 								}
 							);
 							if (exceptionRet) { throw exceptionRet; }

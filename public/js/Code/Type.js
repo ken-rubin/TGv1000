@@ -30,7 +30,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// dependencies -- collection of dependencies of type.
 					// id -- the DB id of type.
 					// name -- the name of type.
-					// imageResourceId -- the resource id.
+					// imageId -- the image id.
 					self.data = null;
 
 					/////////////////////////////
@@ -308,7 +308,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 						// 	// Generate the image for the type.
 						// 	var jTypeImage = $("<img src='" + 
-						// 		resourceHelper.toURL('resources', self.data.imageResourceId, 'image', '') + 
+						// 		resourceHelper.toURL('resources', self.data.imageId, 'image', '') + 
 						// 		"' style='position:absolute;width:64px;top:8px;height:64px;right:8px'></img>");
 						// 	m_jType.append(jTypeImage);
 						// 	jTypeImage.contextMenu({
@@ -766,7 +766,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
 
 								// Save off the new resource in state.
-								self.data.imageResourceId = iResourceId;
+								self.data.imageId = iResourceId;
 
 								// Call off to the designer to update the picture in the designer surface.
 								var exceptionRet = designer.updateImage(self);

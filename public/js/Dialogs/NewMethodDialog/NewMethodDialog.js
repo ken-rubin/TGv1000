@@ -127,7 +127,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_setStateCreateBtn = function() {
 
 						var nameStatus = $("#MethodName").val().trim().length > 0;
-						var imgStatus = m_imageResourceId > 0;
+						var imgStatus = m_imageId > 0;
 
 						if (!nameStatus || !imgStatus) {
 							$("#CreateMethodBtn").addClass("disabled");
@@ -158,7 +158,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								workspace: "",
 								method: "",
 								tags: $("#MethodTags").val().trim(),
-								imageResourceId: m_imageResourceId,
+								imageId: m_imageId,
 								ordinal: 0,
 								price: 0.0,
 								description: $("#MethodDescription").val() || ''
@@ -225,10 +225,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					}
 
 					// Display the chosen image.
-					var m_functionSetImageSrc = function (imageResourceId) {
+					var m_functionSetImageSrc = function (imageId) {
 
-						m_imageResourceId = imageResourceId;
-						$("#MethodImage").attr("src", resourceHelper.toURL("resources", m_imageResourceId, "image"));
+						m_imageId = imageId;
+						$("#MethodImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
 						m_setStateCreateBtn();
 					}
 				} catch (e) {
@@ -243,7 +243,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_comicName = '';
 				var m_comicTags = '';
-				var m_imageResourceId = 0;
+				var m_imageId = 0;
 			};
 
 			// Return the constructor function as the module object.
