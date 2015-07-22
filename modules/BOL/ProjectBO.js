@@ -550,7 +550,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
         // req.body.typeId
-        // req.body.userName
+        // req.body.userId
 
         try {
 

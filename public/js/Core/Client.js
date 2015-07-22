@@ -490,7 +490,7 @@ define(["Core/errorHelper",
 							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
 								{
 									typeId: iTypeId,
-									userName: self.getTGCookie("userName")	// for tag elimination
+									userId: g_strUserId
 								},
 								'json');
 							posting.done(function(data){
@@ -694,7 +694,7 @@ define(["Core/errorHelper",
 							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
 								{
 									methodId: iMethodId,
-									userName: self.getTGCookie("userName")	// for tag elimination
+									userId: g_strUserId
 								},
 								'json');
 							posting.done(function(data){
