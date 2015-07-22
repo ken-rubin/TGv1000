@@ -445,7 +445,7 @@ define(["Core/errorHelper",
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
 									projectId: iProjectId,
-									userName: self.getTGCookie("userName")	// for tag elimination
+									userId: g_strUserId
 								},
 								'json');
 							posting.done(function(data){

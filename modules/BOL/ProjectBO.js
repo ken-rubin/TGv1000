@@ -107,7 +107,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
-            // req.body.userName
+            // req.body.userId
 
             var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
                 function(rows) {
@@ -122,13 +122,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                         var project = 
                         {
                             id: row.id,
+                            originalProjectId: row.id,
                             name: row.name,
-                            createdByUserId: row.createdByUserId,
-                            price: row.price,
-                            imageResourceId: row.imageResourceId,
-                            description: row.description,
                             ownedByUserId: row.ownedByUserId,
-                            classOrProductId: row.classOrProductId,
+                            description: row.description,
+                            imageId: row.imageId,
+                            isProduct: row.isProduct,
+                            parentProjectId: row.parentProjectId,
+                            parentPrice: row.parentPrice,
+                            priceBump: row.priceBump,
                             tags: '',
                             isDirty: 1,
                             comics:
@@ -137,10 +139,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         };
 
+                        // If the user is not editing his own project, then we will set project.id = 0 and project.ownedByUserId to so indicate.
+                        // We'll be able to check project.id for 0 during further processing for the same treatment.
+                        if (project.ownedByUserId != req.body.userId) {
+
+                            project.id = 0;
+                            project.ownedByUserId = parseInt(req.body.userId, 10);
+                        }
+
                         m_functionFetchTags(
-                            project.id, 
+                            project.originalProjectId, 
                             3, 
-                            req.body.userName, 
                             function(tags)  {
 
                                 project.tags = tags;
@@ -171,13 +180,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             console.log('In m_functionRetProjDoComics');
 
-            var ex = sql.execute("select * from " + self.dbname + "comics where classOrProductId = " + project.classOrProductId + ";",
+            var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.originalProjectId + ";",
                 function(rows)
                 {
 
                     if (rows.length === 0) {
 
-                        res.json({success: false, message: "Could not retrieve project with id=" + req.body.id});
+                        res.json({success: false, message: "Could not retrieve comics for project with id=" + req.body.id});
                         return;
 
                     } 
@@ -193,14 +202,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                             var comic = 
                             {
                                 id: row.id,
-                                classOrProductId: row.classOrProductId,
+                                originalComicId: row.id,
                                 ordinal: row.ordinal,
-                                imageResourceId: row.imageResourceId,
+                                thumbnail: row.thumbnail,
                                 name: row.name,
-                                comicPanels: 
-                                {
-                                    items: []
-                                },
+                                url: row.url,
                                 types: 
                                 {
                                     items: []
@@ -212,21 +218,26 @@ module.exports = function ProjectBO(app, sql, logger) {
                             else
                                 strComicIds = strComicIds + ',' + comic.id;
 
+                            if (project.id === 0) {
+
+                                comic.id = 0;   // So SaveProject will insert it.
+                            }
+
                             project.comics.items.push(comic);
 
                             if (--comicsCounter === 0) {
 
                                 console.log('strComicIds = "' + strComicIds + '"');
-                                var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "comicPanels where comicId in (" + strComicIds + ");",
+                                var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where comicId in (" + strComicIds + ");",
                                     function(rows){
 
                                         if (rows.length !== 1) {
 
-                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                            res.json({success:false, message: "Could not retrieve type count for project with id=" + req.body.id});
                                             return;
                                         }
 
-                                        m_functionRetProjDoComicPanels(req, res, project, rows[0].cnt);
+                                        m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
                                     },
                                     function(strError) {
 
@@ -254,86 +265,6 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_functionRetProjDoComicPanels = function(req, res, project, comicPanelsCount) {
-
-        try {
-
-            console.log('In m_functionRetProjDoComicPanels with comicPanelsCount=' + comicPanelsCount);
-
-            project.comics.items.forEach(
-                function(comic) {
-
-                    var ex = sql.execute("select * from " + self.dbname + "comicPanels where comicId = " + comic.id + ";",
-                        function(rows) {
-
-                            if (rows.length === 0) {
-
-                                res.json({
-                                    success: false,
-                                    message: 'Unable to retrieve selected project.'
-                                });
-                                return;
-                            }
-
-                            rows.forEach(
-                                function(row) {
-
-                                    var comicPanel =
-                                    {
-                                        id: row.id,
-                                        ordinal: row.ordinal,
-                                        name: row.name,
-                                        url: row.url,
-                                        description: row.description,
-                                        thumbnail: row.thumbnail
-                                    };
-                                    comic.comicPanels.items.push(comicPanel);
-                                    
-                                    if (--comicPanelsCount === 0) {
-
-                                        var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where projectId = " + project.id + ";",
-                                            function(rows) {
-
-                                                if (rows.length !== 1) {
-
-                                                    res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-                                                    return;
-                                                }
-
-                                                m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
-                                            },
-                                            function(strError){
-                                                res.json({success: false, message: strError});
-                                                return;
-                                            }
-                                        );
-                                    }
-                                }
-                            );
-                        },
-                        function(strError) {
-                            res.json({
-                                success: false,
-                                message: strError
-                            });
-                            return;
-                        }
-                    );
-                    if (ex) {
-                        res.json({
-                            success: false,
-                            message: ex.message
-                        });
-                        return;
-                    }
-                }
-            );
-        } catch(e) {
-
-            res.json({success: false, message: e.message});
-        }
-    }
-
     var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
 
         try {
@@ -345,7 +276,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(
                 function(comic) {
 
-                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.id + " and projectId = " + project.id + ";",
+                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.originalComicId + ";",
                         function(rows) {
 
                             // At least for now there can be comics with no types, so we disable the following test:
@@ -364,10 +295,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     var type = 
                                     {
                                         id: row.id,
+                                        originalTypeId: row.id,
                                         name: row.name,
                                         isApp: row.isApp === 1 ? true : false,
-                                        imageResourceId: row.imageResourceId,
+                                        imageId: row.imageId,
                                         ordinal: row.ordinal,
+                                        description: row.description,
+                                        parentTypeId: row.parentTypeId,
+                                        parentPrice: row.parentPrice,
+                                        priceBump: row.priceBump,
                                         tags: '',
                                         properties: [],
                                         methods: [],
@@ -379,10 +315,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     else
                                         strTypeIds = strTypeIds + ',' + type.id;
 
+                                    if (project.id === 0) {
+
+                                        type.id = 0;
+                                    }
+
                                     m_functionFetchTags(
-                                        type.id,
+                                        type.originalTypeId,
                                         5,
-                                        req.body.userName,
                                         function(tags) {
 
                                             type.tags = tags;
@@ -448,7 +388,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     comic.types.items.forEach(
                         function(type) {
                             // console.log('in type ' + JSON.stringify(type));
-                            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + "; select * from " + self.dbname + "propertys where typeId =" + type.id + "; select * from " + self.dbname + "events where typeId =" + type.id + ";",
+                            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
                                 function(rows){
 
                                     // console.log(' ');
@@ -475,20 +415,26 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             var method = 
                                             { 
                                                 id: row.id,
+                                                originalMethodId: row.id,
                                                 name: row.name, 
                                                 ordinal: row.ordinal,
                                                 workspace: row.workspace, 
+                                                imageId: row.imageId,
+                                                description: row.description,
+                                                parentMethodId: row.parentMethodId,
+                                                parentPrice: row.parentPrice,
+                                                priceBump: row.priceBump,
                                                 tags: '',
-                                                imageResourceId: row.imageResourceId,
-                                                createdByUserId: row.createdByUserId,
-                                                price: row.price,
-                                                description: row.description
                                             };
 
+                                            if (project.id === 0) {
+
+                                                method.id = 0;
+                                            }
+
                                             m_functionFetchTags(
-                                                method.id,
+                                                method.originalMethodId,
                                                 7,
-                                                req.body.userName,
                                                 function(tags) {
 
                                                     method.tags = tags;
@@ -512,11 +458,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             var property = 
                                             {
                                                 id: row.id,
+                                                originalPropertyId: row.id,
                                                 name: row.name,
-                                                propertyTypeId: row.propertyTypeId,
                                                 initialValue: row.initialValue,
                                                 ordinal: row.ordinal
                                             };
+
+                                            if (project.id === 0) {
+
+                                                property.id = 0;
+                                            }
 
                                             type.properties.push(property);
 
@@ -536,9 +487,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             var event = 
                                             {
                                                 id: row.id,
+                                                originalEventId: row.id,
                                                 name: row.name,
                                                 ordinal: row.ordinal
                                             };
+
+                                            if (project.id === 0) {
+
+                                                event.id = 0;
+                                            }
 
                                             type.events.push(event);
 
@@ -625,7 +582,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_functionFetchTags(
                             type.id,
                             5,
-                            req.body.userName,
                             function(tags) {
 
                                 type.tags = tags;
@@ -721,7 +677,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             m_functionFetchTags(
                                 method.id,
                                 7,
-                                req.body.userName,
                                 function(tags) {
 
                                     method.tags = tags;
@@ -844,7 +799,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_functionFetchTags(
                             method.id,
                             7,
-                            req.body.userName,
                             function(tags) {
 
                                 method.tags = tags;
@@ -1450,12 +1404,15 @@ module.exports = function ProjectBO(app, sql, logger) {
     //     }
     // }
 
-    var m_functionFetchTags = function(thingId, resourceTypeId, userName, callback) {
+    var m_functionFetchTags = function(thingId, resourceTypeId, callback) {
 
         try {
 
-            // Retireve and set project.tags, skipping resourceType.description and req.body.userName.
-            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optnlFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
+            // Retireve and set project.tags, skipping resourceType.description and any tag that matches the email-address-testing regexp.
+
+            var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+
+            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optionalFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
                 function(rows){
 
                     var tags = "";
@@ -1463,9 +1420,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         rows.forEach(function(row) {
 
-                            if (row.description !== m_resourceTypes[resourceTypeId] && row.description !== userName) {    // Add filtering out all valid e-mail addresses (in case e-mail addresses are used as userNames in the future).
+                            if (row.description !== m_resourceTypes[resourceTypeId]) {
 
-                                tags += row.description + ' ';
+                                if (!row.description.match(eReg)) {
+
+                                    tags += row.description + ' ';
+                                }
                             }
                         });
                     }
