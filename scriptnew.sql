@@ -1,49 +1,48 @@
-        CREATE TABLE `TGv1000`.`classOrProduct` (
-		  `id` INT NOT NULL AUTO_INCREMENT,
-		  `name` VARCHAR(255) NOT NULL,
-		  `isProduct` BIT(1) NOT NULL DEFAULT 0,
-		  `price` DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-		  `createdByUserId` INT NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE INDEX `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE SCHEMA IF NOT EXISTS `TGv1000`;
+USE TGv1000;
+
+delimiter //
+
+create procedure maintainDB()
+
+begin
+
+	set @cnt := (select count(*) from information_schema.tables where table_schema = 'TGv1000' and table_name = 'control');
+
+	if @cnt = 0 THEN
+
+		CREATE TABLE `TGv1000`.`control` (
+          `id` tinyint NOT NULL,
+		  `dbstate` decimal(5,2) NOT NULL
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		insert `TGv1000`.`control` (id, dbstate) values (1, 0.0);
         
-		CREATE TABLE TGv1000.comicPanels (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `comicId` INT(11) NOT NULL,
-		  `ordinal` INT(11) NOT NULL,
-		  `name` varchar(255) NOT NULL,
-  		  `url` varchar(255) NOT NULL,
-		  `description` varchar(255) NOT NULL,
-		  `thumbnail` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+	end if;
+    set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
+    
+    if @dbstate = 0.0 THEN
     
 		CREATE TABLE `TGv1000`.`comics` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `projectId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
+          `thumbnail` VARCHAR(255) NOT NULL,
+          `name` VARCHAR(255) NOT NULL,
+          `url` VARCHAR(255) NOT NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-   		ALTER TABLE `TGv1000`.`comics` 
-			ADD COLUMN `imageResourceId` INT(11) NOT NULL AFTER `ordinal`;
-		ALTER TABLE `TGv1000`.`comics` 
-			ADD COLUMN `name` VARCHAR(255) NOT NULL DEFAULT '' AFTER `imageResourceId`;
-		ALTER TABLE `TGv1000`.`comics` 
-			CHANGE COLUMN `projectId` `classOrProductId` INT(11) NOT NULL ;
 
 		CREATE TABLE `TGv1000`.`events` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
-          `jsonCode` mediumtext NOT NULL,
+          `ordinal` int(11) NOT NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-		ALTER TABLE `TGv1000`.`events` 
-			CHANGE COLUMN `jsonCode` `ordinal` INT(11) NOT NULL ;
 
 		CREATE TABLE `TGv1000`.`logitems` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -54,7 +53,7 @@
 		  `processedbyUserId` int(11) DEFAULT NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=988 DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 		CREATE TABLE `TGv1000`.`logtypes` (
 		  `id` int(11) NOT NULL,
@@ -68,23 +67,16 @@
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
-          `jsonCode` mediumtext NOT NULL,
+          `ordinal` int(11) NOT NULL,
+          `workspace` mediumtext NOT NULL,
+          `imageId` INT(11) NOT NULL,
+          `description` VARCHAR(255) NULL DEFAULT NULL,
+          `parentMethodId` INT(11) NULL,
+          `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00,
+          `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-		ALTER TABLE `TGv1000`.`methods` 
-			ADD COLUMN `ordinal` int(11) NOT NULL AFTER `name`;        
-        ALTER TABLE `TGv1000`.`methods` 
-			CHANGE COLUMN `jsonCode` `workspace` MEDIUMTEXT NOT NULL ,
-			ADD COLUMN `imageResourceId` INT(11) NOT NULL AFTER `workspace`,
-			ADD COLUMN `createdByUserId` INT(11) NOT NULL AFTER `imageResourceId`,
-			ADD COLUMN `price` DECIMAL(5,2) NOT NULL DEFAULT 0.0 AFTER `createdByUserId`,
-            ADD COLUMN `description` VARCHAR(255) NULL AFTER `price`;
-		ALTER TABLE `TGv1000`.`methods` 
-			CHANGE COLUMN `description` `description` VARCHAR(255) NULL DEFAULT NULL AFTER `imageResourceId`,
-			CHANGE COLUMN `price` `priceBump` DECIMAL(9,2) NOT NULL DEFAULT '0.00' ,
-			ADD COLUMN `parentMethodId` INT(11) NULL AFTER `description`,
-			ADD COLUMN `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00 AFTER `parentMethodId`;
 
 		CREATE TABLE `TGv1000`.`parent` (
 		  `id` INT NOT NULL AUTO_INCREMENT,
@@ -96,40 +88,26 @@
 		CREATE TABLE `TGv1000`.`projects` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `name` varchar(255) NOT NULL,
-          `createdByUserId` int(11) NOT NULL,
-          `template` tinyint(1) NOT NULL DEFAULT '0',
-		  `price` decimal(5,2) NOT NULL DEFAULT '0.00',
-          `imageResourceId` int(11) NOT NULL,
+          `ownedByUserId` int(11) NOT NULL,
+          `description` VARCHAR(255) NULL,
+          `imageId` int(11) NOT NULL,
+          `isProduct` TINYINT(1) NOT NULL,
+          `parentProjectId` INT(11) NULL,
+          `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-		ALTER TABLE `TGv1000`.`projects` 
-			ADD COLUMN `description` VARCHAR(255) NULL AFTER `imageResourceId`;
-		ALTER TABLE `TGv1000`.`projects` 
-			DROP COLUMN `template`;
-		ALTER TABLE `TGv1000`.`projects` 
-			ADD COLUMN `ownedByUserId` INT(11) NOT NULL AFTER `description`,
-			ADD COLUMN `classOrProductId` INT(11) NOT NULL AFTER `ownedByUserId`;
-		ALTER TABLE `TGv1000`.`projects` 
-			DROP COLUMN `ownedByUserId`,
-			DROP COLUMN `price`,
-			ADD COLUMN `parentProjectId` INT(11) NULL AFTER `classOrProductId`,
-			ADD COLUMN `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `parentProjectId`,
-			ADD COLUMN `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `createdByUserId`,
-			CHANGE COLUMN `createdByUserId` `createdByUserId` INT(11) NULL AFTER `parentPrice`;
         
 		CREATE TABLE `TGv1000`.`propertys` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
-          `jsonCode` mediumtext NOT NULL,
+          `initialValue` MEDIUMTEXT NOT NULL,
+          `ordinal` INT(11) NOT NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-		ALTER TABLE `TGv1000`.`propertys` 
-			CHANGE COLUMN `jsonCode` `propertyTypeId` INT(11) NOT NULL ,
-			ADD COLUMN `initialValue` MEDIUMTEXT NOT NULL AFTER `propertyTypeId`,
-			ADD COLUMN `ordinal` INT(11) NOT NULL AFTER `initialValue`;
 
 		CREATE TABLE `TGv1000`.`propertyTypes` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -140,24 +118,15 @@
         
 		CREATE TABLE `TGv1000`.`resources` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `name` VARCHAR(255) NOT NULL DEFAULT '',
 		  `createdByUserId` int(11) NOT NULL,
-		  `friendlyName` varchar(255) NOT NULL,
 		  `resourceTypeId` int(11) NOT NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
-		  `ext` varchar(5) NULL,
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
-		  `origext` varchar(5) DEFAULT NULL,
+		  `optionalFK` INT(11) NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-		ALTER TABLE `TGv1000`.`resources` 
-			AUTO_INCREMENT = 100 ,
-			DROP COLUMN `origext`,
-			DROP COLUMN `ext`,
-			DROP COLUMN `friendlyName`,
-			ADD COLUMN `optnlFK` INT(11) NULL AFTER `quarantined`;
-		ALTER TABLE `TGv1000`.`resources` 
-			ADD COLUMN `name` VARCHAR(255) NOT NULL DEFAULT '' AFTER `optnlFK`;        
 
 		CREATE TABLE `TGv1000`.`resources_tags` (
 		  `resourceId` int(11) NOT NULL,
@@ -182,7 +151,7 @@
 		  `inuse` tinyint(1) NOT NULL DEFAULT '1',
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 		CREATE TABLE `TGv1000`.`tags` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -193,25 +162,18 @@
         
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `comicId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
           `isApp` tinyint(1) NOT NULL DEFAULT '0',
-          `imageResourceId` int(11) NOT NULL,
+          `imageId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
+		  `comicId` int(11) NOT NULL,
+          `description` mediumtext NULL,
+          `parentTypeId` INT(11) NULL,
+          `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-   		ALTER TABLE `TGv1000`.`types` 
-			ADD COLUMN `jsonCode` MEDIUMTEXT NOT NULL ;
-		ALTER TABLE `TGv1000`.`types` 
-			DROP COLUMN `comicId`,
-			CHANGE COLUMN `jsonCode` `comicId` INT(11) NOT NULL ,
-			ADD COLUMN `projectId` INT(11) NOT NULL AFTER `comicId`;
-		ALTER TABLE `TGv1000`.`types` 
-			ADD COLUMN `parentTypeId` INT(11) NULL AFTER `projectId`,
-			ADD COLUMN `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `parentTypeId`,
-			ADD COLUMN `createdByUserId` INT(11) NULL AFTER `parentPrice`,
-			ADD COLUMN `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00 AFTER `createdByUserId`;
 
 		CREATE TABLE `TGv1000`.`user` (
 		  `id` INT NOT NULL AUTO_INCREMENT,
@@ -222,11 +184,10 @@
 		  UNIQUE KEY `id_UNIQUE` (id)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
-        INSERT INTO `TGv1000`.`user`
-			(`id`,`userName`,`pwHash`,`parentId`)
-			VALUES
-			(1,'techgroms@gmail.com','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',NULL);
+		INSERT INTO `TGv1000`.`parent` (id, email) VALUES (1,'techgroms@gmail.com');
         
+        INSERT INTO `TGv1000`.`user` (`id`,`userName`,`pwHash`,`parentId`) VALUES (1,'templates@techgroms.com','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1);
+            
 		insert TGv1000.propertyTypes (id,description) values (1,'Number');
 		insert TGv1000.propertyTypes (id,description) values (2,'Number range (e.g., 3-27)');
 		insert TGv1000.propertyTypes (id,description) values (3,'String');
@@ -242,30 +203,81 @@
         INSERT TGv1000.resourceTypes values (6, 'unused');
 		INSERT `TGv1000`.`resourceTypes` values (7,'method');
 
-		INSERT INTO TGv1000.routes VALUES (1,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
-		INSERT INTO TGv1000.routes VALUES (67,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
-		INSERT INTO TGv1000.routes VALUES (133,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/ForgotPassword','post','routeForgotPassword',1);        
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveResource','post','routeSaveResource',1);
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1);
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/Search','post','routeSearch',1);
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveProject','post','routeSaveProject',1);
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/RetrieveProject','post','routeRetrieveProject',1);
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/RetrieveType','post','routeRetrieveType',1);
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/RetrieveMethod','post','routeRetrieveMethod',1);
-		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/RetrieveMethod' where method='routeRetrieveMethod';
-		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/RetrieveType' where method='routeRetrieveType';
-		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/RetrieveProject' where method='routeRetrieveProject';
-		UPDATE `TGv1000`.`routes` set moduleName='ProjectBO', route='/BOL/ProjectBO/SaveProject' where method='routeSaveProject';
-		INSERT INTO TGv1000.routes (path, moduleName, route, verb, method, inuse)
-			VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveCountUsersProjects','post','routeRetrieveCountUsersProjects',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ForgotPassword','post','routeForgotPassword',1);        
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveResource','post','routeSaveResource',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/Search','post','routeSearch',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveProject','post','routeSaveProject',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveProject',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveType','post','routeRetrieveType',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveMethod','post','routeRetrieveMethod',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveCountUsersProjects','post','routeRetrieveCountUsersProjects',1);
 
+        UPDATE `TGv1000`.`control` set dbstate=1.0 where id=1;
+		set @dbstate := 1.0;
+    end if;
+
+    if @dbstate = 1.0 THEN
+    
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump)
+			VALUES (1,'New Project',1,'',0,0,0,0.00,0.00);
+            
+		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
+			VALUES (1,1,0,'tn3.png','TechGroms Help','http://www.techgroms.com');
+            
+		insert into TGv1000.`types` (id,`name`,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
+			VALUES (1,'App',1,0,0,1,'',0,0.00,0.00);
+            
+		insert TGv1000.resources (id,`name`,createdByUserId,resourceTypeId,public,quarantined,optionalFK)
+			VALUES 
+				(1,'New Project',1,3,1,0,1),
+                (2,'App',1,5,1,0,1),
+                (3,'initialize',1,7,1,0,1);
+            
+        insert TGv1000.tags (id,description)
+			VALUES
+				(1,'templates@techgroms.com'),
+				(2,'project'),
+				(3,'new_project'),
+                (4,'type'),
+                (5,'app'),
+                (6,'method'),
+                (7,'initialize')
+			;
+            
+		insert TGv1000.resources_tags (resourceId,tagId)
+			VALUES
+				(1,1),
+				(1,2),
+				(1,3),
+                (2,1),
+                (2,5),
+                (2,4),
+                (3,1),
+                (3,6),
+                (3,7);
+		
+		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
+			VALUES
+				(1,1,'X','0',0),
+				(2,1,'Y','0',1),
+				(3,1,'Width','0',2),
+				(4,1,'Height','0',3)
+			;
+            
+		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
+			VALUES
+				(1,1,'initialize',0,'',0,'',0,0.00,0.00)
+			;
+            
+        UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
+		set @dbstate := 2.0;
+    end if;
+
+    if @dbstate = 12.0 THEN
+    
 		INSERT INTO TGv1000.comics (id, classOrProductId, ordinal, imageResourceId, `name`)
 			VALUES 
 				(1,1,0,1,'TechGroms Help'),
@@ -417,4 +429,19 @@
 				(14,1),
                 (14,7)
 			;
-            
+
+        UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
+		set @dbstate := 3.0;
+    end if;
+
+end;
+
+//
+
+delimiter ;
+
+-- Execute the procedure
+call maintainDB();
+
+-- Drop the procedure.
+drop procedure maintainDB;

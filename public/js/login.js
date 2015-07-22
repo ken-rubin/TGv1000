@@ -39,6 +39,7 @@ $(document).ready(function () {
 
 	                    $("#inputName").val(strUserName);
 	                    $("#inputPassword").focus();
+
 	                } else {
 
 	                    $("#inputName").focus();
@@ -174,8 +175,11 @@ var m_functionSignInButtonClick = function(errorHelper) {
 
 	            if (data.success) {
 
-	                document.cookie = "userId=" + data.userId.toString();
-	                document.cookie = "userName=" + userName;
+					// These cookies don't expire, but they mau be overridden if a different user logs in.
+					var strDate = "; expires=Tue, 19 Jan 2038 03:14:07 GMT";
+
+	                document.cookie = "userId=" + data.userId.toString() + strDate;
+	                document.cookie = "userName=" + userName + strDate;
 
 	            	location.href = '/index';
 

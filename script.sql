@@ -27,6 +27,7 @@ begin
 		  `id` INT NOT NULL AUTO_INCREMENT,
 		  `userName` VARCHAR(45) NOT NULL,
 		  `pwHash` VARCHAR(16000) NOT NULL,
+          `parentId` INT(11) NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `id_UNIQUE` (id)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -64,9 +65,6 @@ begin
 		  UNIQUE KEY `id_UNIQUE` (id)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
-		ALTER TABLE `TGv1000`.`user` 
-		ADD COLUMN `parentId` INT(11) NULL AFTER `pwHash`;		
-
 		INSERT INTO TGv1000.routes VALUES (67,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
 		INSERT INTO TGv1000.routes VALUES (133,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/ForgotPassword','post','routeForgotPassword',1);        
 

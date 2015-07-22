@@ -111,13 +111,19 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                                 res.json({
                                     success: false,
-                                    message: "User Id " + req.body.userName + " is already in use."
+                                    message: "The e-mail address " + req.body.userName + " is already in use."
                                 });
                             } else {
 
                                 // userName is ok.
                                 // Generate and encrypt a password.
                                 var strPassword = (Math.random() * 10000).toFixed(0);
+
+                                // Change john, ken and jerry password to 'a'.
+                                var uName = req.body.userName.toLowerCase();
+                                if (req.body.userName === 'jerry@rubintech.com' || req.body.userName === 'ken.rubin@live.com' || req.body.userName === 'techgroms@gmail.com') {
+                                    strPassword = 'a';
+                                }
                                 bcrypt.hash(strPassword, null, null, function(err, hash){
 
                                     if (err) {

@@ -100,11 +100,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
             					if (data.success) {
 
-                					document.cookie = "userId=" + data.userId.toString();
-                					document.cookie = "userName=" + emailChild;
+            						// These cookies don't expire, but they mau be overridden if a different user logs in.
+            						var strDate = "; expires=Tue, 19 Jan 2038 03:14:07 GMT";
+
+                					document.cookie = "userId=" + data.userId.toString() + strDate;
+                					document.cookie = "userName=" + emailChild + strDate;
 
                 					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
-                									{waittime: 10000, callback: function(){	m_dialog.close(); location.href = '/';}});
+                									{waittime: 5000, callback: function(){	m_dialog.close(); location.href = '/';}});
             					} else {
 
                 					// !data.success
@@ -188,9 +191,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-
-							// Wire click events.
-							$("#EnrollButton").click(m_functionEnrollButtonClick);
 
 						} catch (e) {
 
