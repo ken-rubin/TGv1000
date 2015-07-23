@@ -34,12 +34,27 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 							var exceptionRet = m_srComicStrip.create(
 								"#comicstrip",		// inner row selector
 								110,					// item width
-								80,					// height
+								110,					// height
 								function() {		// functionClick
 						    		var jq = this;
 						    		var parts = jq.context.id.split('-');
 						    		var j = parseInt(parts[1], 10);
-						    		m_arrayClComics[j].activate();
+
+						    		// If m_arrayClComics[j] IS the active comic, open its url in a new window. Otherwise, just activate it.
+						    		// Cannot use clComic.data.id, since they could all be 0. But we CAN use originalComicId.
+						    		if (m_arrayClComics[j].data.originalComicId === m_clComicActive.data.originalComicId) {
+
+										// Open panel URL in new window (or same window if already open).
+										var strParams = 'outerWidth=WWW,outerHeight=HHH,screenLeft=LLL,screenTop=TTT,resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no';
+										strParams = strParams.replace('WWW', (window.outerWidth - 100).toString()).replace('HHH', (window.outerHeight - 100).toString())
+											.replace('LLL',(window.screenLeft-50).toString()).replace('TTT',(window.screenTop-50).toString());
+
+										window.open(m_clComicActive.data.url, 'Comic Panel', strParams);
+
+						    		} else {
+
+							    		m_arrayClComics[j].activate();
+						    		}
 								}
 							);
 							if (exceptionRet) { throw exceptionRet; }
@@ -134,6 +149,21 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						try {
 
 							m_clComicActive = clComic;
+
+							// Panel is strutured purposefully to size with small amount of black above and below the thumbnail.
+							// If any panel had already been selected, remove the red div from behind it and add a red div behind this activated one.
+							var index = -1;
+							for (var i = 0; i < m_arrayClComics.length; i++) {
+
+								if (m_arrayClComics[i].data.originalComicId === m_clComicActive.data.originalComicId) {
+
+									index = i;
+									break;
+								}
+							}
+
+							if (index > -1)
+								m_srComicStrip.repositionRedDivBehind(index);
 
 							return null;
 							

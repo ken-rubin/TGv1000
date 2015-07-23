@@ -508,13 +508,6 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 										$(".toGetMiddleCol").removeClass("col-xs-11");
 										$(".toGetMiddleCol").addClass("col-xs-10");
 
-										// Center the horizontal comicstrip in the viewport. It will remain vertically fixed.
-										// $("#comicstrip").css("position", "fixed");
-										// var iComicstripTop = iNavbarHeight + 10;
-										// $("#comicstrip").css("top", iComicstripTop.toString() + "px");
-										// $("#comicstrip").width((iColXs1Width + 80).toString() + "px");
-										// $("#comicstrip").css("margin-left", "-60px");
-
 										// Position the fixed comicstrip.
 										var iComicstripTop = iNavbarHeight + 10;
 										$("#comicstrip").css("top", iComicstripTop.toString() + "px");
