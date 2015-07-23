@@ -191,6 +191,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+							// focus
+							$("#EmailChild").focus();
 
 						} catch (e) {
 

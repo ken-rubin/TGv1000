@@ -105,7 +105,7 @@ module.exports = function ResourceBO(app, sql, logger) {
                     return;
                 } else {
 
-                    // The image if presumably ok. Set extension to png as described in notes above.
+                    // The image is presumably ok. Set extension to png as described in notes above.
                     ext = 'png';
                 }
             } else {

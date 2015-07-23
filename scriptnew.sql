@@ -279,7 +279,9 @@ begin
 
     if @dbstate = 2.0 THEN
 
-		/* adding 2 more projects: a multi-comic product and a user-owned enhanced version of it */    
+    	/* The project added in @dbstate = 1.0 is more or less permanent. What follows is test data. */
+
+		/* Adding 2 more projects: a multi-comic product and a user-owned enhanced version of it. */    
         /* start with id=2 */
 		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump)
 			VALUES
@@ -289,6 +291,7 @@ begin
             
         /* need same comics for project 2 and 3: 'how to' and 2 more */
         /* start with id=2 */
+        /* Using tn3.png for all, because its a nice aspect ratio. */
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
 			VALUES 
 				(2,2,0,'tn3.png','MtM: How to TechGrom','http://www.techgroms.com'),
@@ -308,46 +311,19 @@ begin
 				(4,'App',1,0,0,4,'App type',0,0,0),
 				(5,'App',1,0,0,5,'App type',0,0,0),
 				(6,'App',1,0,0,6,'App type',0,0,0),
-				(7,'App',1,0,0,7,'App type',0,0,0),
+				(7,'App',1,0,0,7,'App type',0,0,0)
 			;
             
-        /* need 4 properties for each type: X, Y, Width, Height */
-        /* start with id=5 */
-		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
-			VALUES
-				(5,2,'X',1,'0',0),
-				(6,2,'Y',1,'0',0),
-				(7,2,'Width',1,'0',0),
-				(8,2,'Height',1,'0',0),
-				(9,3,'X',1,'0',0),
-				(10,3,'Y',1,'0',0),
-				(11,3,'Width',1,'0',0),
-				(12,3,'Height',1,'0',0),
-				(13,4,'X',1,'0',0),
-				(14,4,'Y',1,'0',0),
-				(15,4,'Width',1,'0',0),
-				(16,4,'Height',1,'0',0),
-				(17,5,'X',1,'0',0),
-				(18,5,'Y',1,'0',0),
-				(19,5,'Width',1,'0',0),
-				(20,5,'Height',1,'0',0),
-				(21,6,'X',1,'0',0),
-				(22,6,'Y',1,'0',0),
-				(23,6,'Width',1,'0',0),
-				(24,6,'Height',1,'0',0)
-			;
-
-		/* need at least an 'initialize' method for eash type */
+		/* need at least an 'initialize' method for each App type */
 		/* start with id=2 */         
 		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
 			VALUES
-				(,,,,,,,,,),
-				(,,,,,,,,,),
-				(,,,,,,,,,),
-				(,,,,,,,,,),
-				(,,,,,,,,,),
-				(,,,,,,,,,),
-				(,,,,,,,,,),
+				(2,2,'initialize',0,'',0,'',0,0.00,0.00),
+				(3,3,'initialize',0,'',0,'',0,0.00,0.00),
+				(4,4,'initialize',0,'',0,'',0,0.00,0.00),
+				(5,5,'initialize',0,'',0,'',0,0.00,0.00),
+				(6,6,'initialize',0,'',0,'',0,0.00,0.00),
+				(7,7,'initialize',0,'',0,'',0,0.00,0.00)
 			;
             
 		/* need resources for every project, type and method */
@@ -356,15 +332,18 @@ begin
 			VALUES
 				(4,'Mission to Mars',1,3,1,0,2),
 				(5,'Mission to Mars enhanced',2,3,1,0,3),
-				(6,,,,,,),
-				(7,,,,,,),
-				(8,,,,,,),
-				(9,,,,,,),
-				(10,,,,,,),
-				(11,,,,,,),
-				(12,,,,,,),
-				(13,,,,,,),
-				(14,,,,,,),
+				(6,'a',1,5,1,0,2),
+				(7,'b',2,5,1,0,3),
+				(8,'c',2,5,1,0,4),
+				(9,'d',2,5,1,0,5),
+				(10,'e',2,5,1,0,6),
+				(11,'f',2,5,1,0,7),
+				(12,'g',1,7,1,0,2),
+				(13,'h',2,7,1,0,3),
+				(14,'i',2,7,1,0,4),
+				(15,'j',2,7,1,0,5),
+				(16,'k',2,7,1,0,6),
+				(17,'l',2,7,1,0,7)
 			;
             
         /* need tags to link to every resource: userName, resourceType, resource name + optional tags */
@@ -373,40 +352,75 @@ begin
         insert TGv1000.tags (id,description)
 			VALUES
 				(8,'jerry@rubintech.com'),
-				(,)
+				(9,'mission_to_mars'),
+				(10,'mission_to_mars_enhanced'),
+				(11,'a'),
+				(12,'b'),
+				(13,'c'),
+				(14,'d'),
+				(15,'e'),
+				(16,'f'),
+				(17,'g'),
+				(18,'h'),
+				(19,'i'),
+				(20,'j'),
+				(21,'k'),
+				(22,'l')
 			;
             
         /* connect resources and tags */
 		insert TGv1000.resources_tags (resourceId,tagId)
 			VALUES
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,),
-				(,)
+				(4,1),
+				(4,2),
+				(4,9),
+				(5,8),
+				(5,2),
+				(5,10),
+				(6,4),
+				(7,4),
+				(8,4),
+				(9,4),
+				(10,4),
+				(11,4),
+				(12,6),
+				(13,6),
+				(14,6),
+				(15,6),
+				(16,6),
+				(17,6)
 			;
 		
+        /* need 4 properties for each type: X, Y, Width, Height */
+        /* start with id=5 */
+		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
+			VALUES
+				(5,2,'X','0',0),
+				(6,2,'Y','0',1),
+				(7,2,'Width','0',2),
+				(8,2,'Height','0',3),
+				(9,3,'X','0',0),
+				(10,3,'Y','0',1),
+				(11,3,'Width','0',2),
+				(12,3,'Height','0',3),
+				(13,4,'X','0',0),
+				(14,4,'Y','0',1),
+				(15,4,'Width','0',2),
+				(16,4,'Height','0',3),
+				(17,5,'X','0',0),
+				(18,5,'Y','0',1),
+				(19,5,'Width','0',2),
+				(20,5,'Height','0',3),
+				(21,6,'X','0',0),
+				(22,6,'Y','0',1),
+				(23,6,'Width','0',2),
+				(24,6,'Height','0',3),
+				(25,7,'X','0',0),
+				(26,7,'Y','0',1),
+				(27,7,'Width','0',2),
+				(28,7,'Height','0',3)
+			;
+
 		/* add an event just for the heck of it */
 		/* start with id=1 since we didn't create one before */
 		insert TGv1000.events (id,typeId,`name`,ordinal)
