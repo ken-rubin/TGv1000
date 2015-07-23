@@ -843,6 +843,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
+
+
+
+// remmeber to save resource and tags if inserting
+
+
+
             console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName

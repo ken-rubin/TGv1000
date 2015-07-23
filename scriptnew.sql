@@ -198,7 +198,7 @@ begin
 		insert TGv1000.resourceTypes (id,description) values (1,'image');
 		insert TGv1000.resourceTypes (id,description) values (2,'sound');
 		insert TGv1000.resourceTypes (id,description) values (3,'project');
-        INSERT TGv1000.resourceTypes values (4, 'classOrProduct');
+        INSERT TGv1000.resourceTypes values (4, 'unused');
         INSERT TGv1000.resourceTypes values (5, 'type');
         INSERT TGv1000.resourceTypes values (6, 'unused');
 		INSERT `TGv1000`.`resourceTypes` values (7,'method');
@@ -230,6 +230,20 @@ begin
 		insert into TGv1000.`types` (id,`name`,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
 			VALUES (1,'App',1,0,0,1,'',0,0.00,0.00);
             
+		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
+			VALUES
+				(1,1,'initialize',0,'',0,'',0,0.00,0.00)
+			;
+            
+		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
+			VALUES
+				(1,1,'X','0',0),
+				(2,1,'Y','0',1),
+				(3,1,'Width','0',2),
+				(4,1,'Height','0',3)
+			;
+            
+		/* need resources for every project, type and method */            
 		insert TGv1000.resources (id,`name`,createdByUserId,resourceTypeId,public,quarantined,optionalFK)
 			VALUES 
 				(1,'New Project',1,3,1,0,1),
@@ -259,117 +273,48 @@ begin
                 (3,6),
                 (3,7);
 		
-		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
-			VALUES
-				(1,1,'X','0',0),
-				(2,1,'Y','0',1),
-				(3,1,'Width','0',2),
-				(4,1,'Height','0',3)
-			;
-            
-		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
-			VALUES
-				(1,1,'initialize',0,'',0,'',0,0.00,0.00)
-			;
-            
         UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
 		set @dbstate := 2.0;
     end if;
 
-    if @dbstate = 12.0 THEN
-    
-		INSERT INTO TGv1000.comics (id, classOrProductId, ordinal, imageResourceId, `name`)
+    if @dbstate = 2.0 THEN
+
+		/* adding 2 more projects: a multi-comic product and a user-owned enhanced version of it */    
+        /* start with id=2 */
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump)
+			VALUES
+				(2,'Mission to Mars',1,'In this project you will create....',0,1,0,0.00,12.00),
+				(3,'Mission to Mars enhanced',2,'Did some work on MtM.',0,0,2,12.00,0.00)
+			;
+            
+        /* need same comics for project 2 and 3: 'how to' and 2 more */
+        /* start with id=2 */
+		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
 			VALUES 
-				(1,1,0,1,'TechGroms Help'),
-				(2,2,0,2,'MtM: How to TechGrom'),
-				(3,2,1,3,'MTM: Sessopm 1'),
-				(4,2,2,4,'MTM: Sessopm 2')
+				(2,2,0,'tn3.png','MtM: How to TechGrom','http://www.techgroms.com'),
+				(3,2,1,'tn3.png','MTM: Step 1','http://www.bing.com'),
+				(4,2,2,'tn3.png','MTM: Step 2','http://www.microsoft.com'),
+				(5,3,0,'tn3.png','MtM: How to TechGrom','http://www.techgroms.com'),
+				(6,3,1,'tn3.png','MTM: Step 1','http://www.bing.com'),
+				(7,3,2,'tn3.png','MTM: Step 2','http://www.microsoft.com')
 			;
             
-		INSERT INTO TGv1000.comicPanels (id, comicId, ordinal, `name`, url, description, thumbnail)
-			VALUES 
-				(1,1,0,'FAQs','http://www.techgroms.com','TechGroms FAQs','tn3.png'),
-				(2,2,0,'FAQs','http://www.techgroms.com','TechGroms FAQs','tn3.png'),
-				(3,3,0,'Step 1','http://www.bing.com','Session 1 Step 1','tn1.png'),
-				(4,3,1,'Step 2','http://www.microsoft.com','Session 1 Step 2','tn2.jpg'),
-				(5,4,0,'Step 1','http://www.google.com','Session 2 Step 1','tn4.png'),
-				(6,4,1,'Step 2','http://www.github.com','Session 2 Step 2','tn5.png'),
-				(7,4,2,'Step 3','http://www.sourcetree.com','Session 2 Step 3','tn6.png')
+        /* need at least an App type for each comic (although not sure about the 'how to' comic) */
+        /* start with id=2 */
+		insert into TGv1000.`types` (id,`name`,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
+			VALUES
+				(2,'App',1,0,0,2,'App type',0,0,0),
+				(3,'App',1,0,0,3,'App type',0,0,0),
+				(4,'App',1,0,0,4,'App type',0,0,0),
+				(5,'App',1,0,0,5,'App type',0,0,0),
+				(6,'App',1,0,0,6,'App type',0,0,0),
+				(7,'App',1,0,0,7,'App type',0,0,0),
 			;
             
-		insert into TGv1000.`types` (id,`name`,isApp,imageResourceId,ordinal,comicId,projectId)
+        /* need 4 properties for each type: X, Y, Width, Height */
+        /* start with id=5 */
+		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
 			VALUES
-				(1,'App',1,0,0,1,1),
-				(2,'App',1,0,0,2,2),
-				(3,'App',1,0,0,3,3),
-				(4,'Type1',0,0,1,3,3),
-				(5,'Type2',0,0,2,3,3),
-				(6,'App',1,0,0,4,3)
-			;
-            
-		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
-			VALUES
-				(1,1,1,1,0,NULL,'default'),
-				(2,1,4,1,0,2,'Mission_to_Mars'),
-				(3,1,3,1,0,2,'Mission_to_Mars'),
-				(4,1,3,1,0,3,'mine'),
-				(5,1,5,1,0,1,'a'),
-				(6,1,5,1,0,2,'b'),
-				(7,1,5,1,0,3,'c'),
-				(8,1,5,1,0,4,'d'),
-				(9,1,5,1,0,5,'e'),
-				(10,1,5,2,0,6,'f')
-			;
-            
-		insert TGv1000.projects (id,`name`,createdByUserId,price,imageResourceId,description,ownedByUserId,classOrProductId)
-			VALUES
-				(1,'New Project',1,0,0,NULL,1,1),
-				(2,'Mission to Mars',1,13.99,0,'In this project you will create....',1,2),
-				(3,'Mission to Mars',1,13.99,0,'Did some work on MtM.',1,2)
-			;
-		UPDATE `TGv1000`.`projects` set createdByUserId=NULL where id=2;
-		UPDATE `TGv1000`.`projects` set parentProjectId=2 where id=3;
-            
-		insert TGv1000.resources_tags (resourceId,tagId)
-			VALUES
-				(1,1),
-				(1,2),
-				(1,3),
-				(3,1),
-				(3,3),
-				(3,5),
-				(4,1),
-				(4,5),
-				(5,1),
-				(5,6),
-				(6,1),
-				(6,6),
-				(7,1),
-				(7,6),
-				(8,1),
-				(8,6),
-				(9,1),
-				(9,6),
-				(10,1),
-				(10,6)
-			;
-		
-        insert TGv1000.tags (id,description)
-			VALUES
-				(1,'jerry'),
-				(2,'product'),
-				(3,'mission_to_mars'),
-				(4,'image'),
-				(5,'project'),
-				(6,'type')
-			;
-            
-		insert TGv1000.propertys (id,typeId,`name`,propertyTypeId,initialValue,ordinal)
-			VALUES
-				(1,1,'X',1,'0',0),
-				(2,1,'Y',1,'0',0),
-				(3,1,'Width',1,'0',0),
-				(4,1,'Height',1,'0',0),
 				(5,2,'X',1,'0',0),
 				(6,2,'Y',1,'0',0),
 				(7,2,'Width',1,'0',0),
@@ -391,45 +336,84 @@ begin
 				(23,6,'Width',1,'0',0),
 				(24,6,'Height',1,'0',0)
 			;
-            
-		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageResourceId,createdByUserId,price,description)
+
+		/* need at least an 'initialize' method for eash type */
+		/* start with id=2 */         
+		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
 			VALUES
-				(1,1,'initialize',0,'',0,1,0,''),
-				(2,2,'initialize',0,'',0,1,0,''),
-				(3,3,'initialize',0,'',0,1,0,''),
-				(4,6,'initialize',0,'',0,1,0,'')
+				(,,,,,,,,,),
+				(,,,,,,,,,),
+				(,,,,,,,,,),
+				(,,,,,,,,,),
+				(,,,,,,,,,),
+				(,,,,,,,,,),
+				(,,,,,,,,,),
 			;
             
+		/* need resources for every project, type and method */
+		/* start with id=4 */
+		insert TGv1000.resources (id,`name`,createdByUserId,resourceTypeId,public,quarantined,optionalFK)
+			VALUES
+				(4,'Mission to Mars',1,3,1,0,2),
+				(5,'Mission to Mars enhanced',2,3,1,0,3),
+				(6,,,,,,),
+				(7,,,,,,),
+				(8,,,,,,),
+				(9,,,,,,),
+				(10,,,,,,),
+				(11,,,,,,),
+				(12,,,,,,),
+				(13,,,,,,),
+				(14,,,,,,),
+			;
+            
+        /* need tags to link to every resource: userName, resourceType, resource name + optional tags */
+        /* tags are all lower case and have spaces replaced by '_' */
+        /* start with id=8 */
+        insert TGv1000.tags (id,description)
+			VALUES
+				(8,'jerry@rubintech.com'),
+				(,)
+			;
+            
+        /* connect resources and tags */
+		insert TGv1000.resources_tags (resourceId,tagId)
+			VALUES
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,),
+				(,)
+			;
+		
+		/* add an event just for the heck of it */
+		/* start with id=1 since we didn't create one before */
 		insert TGv1000.events (id,typeId,`name`,ordinal)
 			VALUES
 				(1,3,'event1',0)
 			;
             
-		insert TGv1000.resources (id,createdByUserId,resourceTypeId,public,quarantined,optnlFK,`name`)
-			VALUES
-				(11,1,7,1,0,1,'g'),
-				(12,1,7,1,0,2,'h'),
-				(13,1,7,1,0,3,'i'),
-				(14,1,7,1,0,4,'j')
-			;
-            
-        insert TGv1000.tags (id,description)
-			VALUES
-				(7,'method')
-			;
-            
-		insert TGv1000.resources_tags (resourceId,tagId)
-			VALUES
-				(11,1),
-                (11,7),
-				(12,1),
-                (12,7),
-				(13,1),
-                (13,7),
-				(14,1),
-                (14,7)
-			;
-
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
     end if;

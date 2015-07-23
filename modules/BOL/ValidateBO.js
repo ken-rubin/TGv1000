@@ -23,6 +23,8 @@ module.exports = function ValidateBO(app, sql, logger) {
         
             console.log("Entered routeNewEnrollment with req.body=" + JSON.stringify(req.body));
 
+            var request = req;
+
             // 1. See if parent exists. If so, grab id. Otherwise, create parent; grab id.
             // 2. Gen password for user. Hash the password. Create the user. Grab the id as userId.
             // 3. Return success and userId.
@@ -49,19 +51,21 @@ module.exports = function ValidateBO(app, sql, logger) {
                     // setup e-mail data with unicode symbols
                     var mailOptions = null;
 
+                    var fullUrl = request.protocol + '://' + request.get('host'); // + request.originalUrl;
+
                     mailOptions = {
              
                         from: "TechGroms <techgroms@gmail.com>", // sender address
                         to: req.body.parentEmail, // list of receivers
                         subject: "TechGroms Registration ✔", // Subject line
                         text: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "\r\n\r\nWe have created a login user for your child. Your child will use the name you entered along with" +
-                        " this password: " + strPassword + ". Go to http://localhost to sign in." +
-                        "\r\n\r\nThank you for signing your child up for a class with TechGroms!\r\n\r\nWarm regards, The Grom Team",
+                        "\r\n\r\nWe have created a login user for your child. Your child will use the e-mail address you entered along with" +
+                        " this password: " + strPassword + ". Go to " + fullUrl + " to sign in." +
+                        "\r\n\r\nThank you for signing your child up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
                         html: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "<br><br>We have created a login user for your child. Your child will use the name you entered along with" +
-                        " this password: " + strPassword + ". Go to <a href='http://localhost'>http://localhost</a> to sign in." +
-                        "<br><br>Thank you for signing your child up for a class with TechGroms!<br><br>Warm regards, The Grom Team"
+                        "<br><br>We have created a login user for your child. Your child will use the e-mail address you entered along with" +
+                        " this password: " + strPassword + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
+                        "<br><br>Thank you for signing your child up with TechGroms!<br><br>Warm regards, The Grom Team"
                     };
 
                     // send mail with defined transport object
