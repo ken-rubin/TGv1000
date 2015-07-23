@@ -502,26 +502,26 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 
 									if (bDisplayComics) {
 
-										// The comicstrip and comicpanelstrip WILL be displayed.
+										// The comicstrip WILL be displayed.
 										// Designer and code sections should take care of themselves.
 										$(".toGetRightCol").removeClass("hidden");
 										$(".toGetMiddleCol").removeClass("col-xs-11");
 										$(".toGetMiddleCol").addClass("col-xs-10");
 
 										// Center the horizontal comicstrip in the viewport. It will remain vertically fixed.
-										$("#comicstrip").css("position", "fixed");
+										// $("#comicstrip").css("position", "fixed");
+										// var iComicstripTop = iNavbarHeight + 10;
+										// $("#comicstrip").css("top", iComicstripTop.toString() + "px");
+										// $("#comicstrip").width((iColXs1Width + 80).toString() + "px");
+										// $("#comicstrip").css("margin-left", "-60px");
+
+										// Position the fixed comicstrip.
 										var iComicstripTop = iNavbarHeight + 10;
 										$("#comicstrip").css("top", iComicstripTop.toString() + "px");
-										$("#comicstrip").width((iColXs1Width + 80).toString() + "px");
-										$("#comicstrip").css("margin-left", "-60px");
-
-										// Position the fixed comicpanelstrip.
-										var iComicPanelstripTop = iComicstripTop + $("#comicstrip").height() + 40;
-										$("#comicpanelstrip").css("top", iComicPanelstripTop.toString() + "px");
-										$("#comicpanelstrip").height((iViewportHeight - iComicPanelstripTop - 60 ).toString() + "px");
-										var iComicpanelstripWidth = $("#comicpanelstrip").width();
-										var strComicpanelstripLeft = ((iColXs1Width - iComicpanelstripWidth) / 2 - 40).toString() + "px";
-										$("#comicpanelstrip").css("margin-left", strComicpanelstripLeft);
+										$("#comicstrip").height((iViewportHeight - iComicstripTop - 60 ).toString() + "px");
+										var iComicstripWidth = $("#comicstrip").width();
+										var strComicstripLeft = ((iColXs1Width - iComicstripWidth) / 2 - 40).toString() + "px";
+										$("#comicstrip").css("margin-left", strComicstripLeft);
 
 									} else {
 

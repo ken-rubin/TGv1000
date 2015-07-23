@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceHelper", "Designer/ComicsPanel"],
-	function (errorHelper, Comic, ScrollRegion, resourceHelper, ComicsPanel) {
+define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resourceHelper", "Designer/ComicsPanel"],
+	function (errorHelper, Comic, ScrollRegionV, resourceHelper, ComicsPanel) {
 
 		try {
 
@@ -30,10 +30,10 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 						try {
 
 							// Attach scrollableregion.
-							m_srComicStrip = new ScrollRegion();
+							m_srComicStrip = new ScrollRegionV();
 							var exceptionRet = m_srComicStrip.create(
 								"#comicstrip",		// inner row selector
-								80,					// item width
+								110,					// item width
 								80,					// height
 								function() {		// functionClick
 						    		var jq = this;
@@ -42,10 +42,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 						    		m_arrayClComics[j].activate();
 								}
 							);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 						} catch (e) {
 
 							return e;
@@ -113,7 +110,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 								"comicstp-" + m_arrayClComics.length.toString(),		// id
 								clComic.data.name,		// name
 								'',		// description
-								resourceHelper.toURL('comics', clComic.data.imageId, '', ''),		// url
+								resourceHelper.toURL('panels', null, null, clComic.data.thumbnail),		// url
 								'comicstripitem',	// image class
 								null,
 								true
@@ -138,8 +135,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegion", "Core/resourceH
 
 							m_clComicActive = clComic;
 
-							exceptionRet = comicsPanel.load(clComic.data.comicPanels);
-							if (exceptionRet) { return exceptionRet; }
+							// exceptionRet = comicsPanel.load(clComic.data.comicPanels);
+							// if (exceptionRet) { return exceptionRet; }
 
 							return null;
 							
