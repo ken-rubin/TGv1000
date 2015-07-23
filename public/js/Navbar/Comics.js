@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resourceHelper", "Designer/ComicsPanel"],
-	function (errorHelper, Comic, ScrollRegionV, resourceHelper, ComicsPanel) {
+define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resourceHelper"],
+	function (errorHelper, Comic, ScrollRegionV, resourceHelper) {
 
 		try {
 
@@ -134,9 +134,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						try {
 
 							m_clComicActive = clComic;
-
-							// exceptionRet = comicsPanel.load(clComic.data.comicPanels);
-							// if (exceptionRet) { return exceptionRet; }
 
 							return null;
 							

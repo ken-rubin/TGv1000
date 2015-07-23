@@ -12,7 +12,6 @@ var designer = null;
 var tools = null;
 var code = null;
 var types = null;
-var comicsPanel = null;
 var bDisplayComics = false;
 var g_strUserId = '';
 var g_strUserName = '';
@@ -23,8 +22,8 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/Client", "Code/Code", "Code/Types", "Designer/Designer", "Designer/Tools", "Navbar/Navbar", "Navbar/Comics", "Designer/ComicsPanel"], 
-			function (errorHelper, Client, Code, Types, Designer, Tools, Navbar, Comics, ComicsPanel) {
+		require(["Core/errorHelper", "Core/Client", "Code/Code", "Code/Types", "Designer/Designer", "Designer/Tools", "Navbar/Navbar", "Navbar/Comics"], 
+			function (errorHelper, Client, Code, Types, Designer, Tools, Navbar, Comics) {
 
 			try {
 
@@ -61,11 +60,6 @@ $(document).ready(function () {
 				// Allocate the strips too.
 				types = new Types();
 				exceptionRet = types.create();
-				if (exceptionRet) { throw exceptionRet; }
-
-				// And one more global singleton.
-				comicsPanel = new ComicsPanel();
-				exceptionRet = comicsPanel.create();
 				if (exceptionRet) { throw exceptionRet; }
 
 				// Disable all the TypeWell icons, since there is current no project loaded.
