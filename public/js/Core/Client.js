@@ -489,8 +489,7 @@ define(["Core/errorHelper",
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
 								{
-									typeId: iTypeId,
-									userId: g_strUserId
+									typeId: iTypeId
 								},
 								'json');
 							posting.done(function(data){
@@ -693,8 +692,7 @@ define(["Core/errorHelper",
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
 								{
-									methodId: iMethodId,
-									userId: g_strUserId
+									methodId: iMethodId
 								},
 								'json');
 							posting.done(function(data){

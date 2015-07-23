@@ -424,7 +424,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 parentMethodId: row.parentMethodId,
                                                 parentPrice: row.parentPrice,
                                                 priceBump: row.priceBump,
-                                                tags: '',
+                                                tags: ''
                                             };
 
                                             if (project.id === 0) {
@@ -550,11 +550,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
         // req.body.typeId
-        // req.body.userId
 
         try {
 
-            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId+ ";",
+            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId + ";",
                 function(rows){
 
                     if (rows.length !== 1) {
@@ -569,24 +568,32 @@ module.exports = function ProjectBO(app, sql, logger) {
                         var type = 
                         {
                             id: row.id,
+                            originalTypeId: row.id,
                             name: row.name,
                             isApp: row.isApp === 1 ? true : false,
-                            imageResourceId: row.imageResourceId,
+                            imageId: row.imageId,
                             ordinal: row.ordinal,
+                            description: row.description,
+                            parentTypeId: row.parentTypeId,
+                            parentPrice: row.parentPrice,
+                            priceBump: row.priceBump,
                             tags: '',
                             properties: [],
                             methods: [],
                             events: []
                         };
 
+                        // Make like this isn't the user's type since it's so hard to determine.
+                        type.id = 0;
+
                         m_functionFetchTags(
-                            type.id,
+                            type.originalTypeId,
                             5,
                             function(tags) {
 
                                 type.tags = tags;
 
-                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.id + "; select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.id + "; select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.id + ";",
+                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.originalTypeId + "; select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.originalTypeId + "; select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.originalTypeId + ";",
                                     function(rows) {
 
                                         if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
@@ -637,7 +644,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             console.log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
-            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.id + "; select * from " + self.dbname + "propertys where typeId =" + type.id + "; select * from " + self.dbname + "events where typeId =" + type.id + ";",
+            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
                 function(rows){
 
                     // console.log(' ');
@@ -664,18 +671,22 @@ module.exports = function ProjectBO(app, sql, logger) {
                             var method = 
                             { 
                                 id: row.id,
+                                originalMethodId: row.id,
                                 name: row.name, 
                                 ordinal: row.ordinal,
                                 workspace: row.workspace, 
-                                tags: '',
-                                imageResourceId: row.imageResourceId,
-                                createdByUserId: row.createdByUserId,
-                                price: row.price,
-                                description: row.description
+                                imageId: row.imageId,
+                                description: row.description,
+                                parentMethodId: row.parentMethodId,
+                                parentPrice: row.parentPrice,
+                                priceBump: row.priceBump,
+                                tags: ''
                             };
 
+                            method.id = 0;
+
                             m_functionFetchTags(
-                                method.id,
+                                method.originalMethodId,
                                 7,
                                 function(tags) {
 
@@ -700,11 +711,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                             var property = 
                             {
                                 id: row.id,
+                                originalPropertyId: row.id,
                                 name: row.name,
-                                propertyTypeId: row.propertyTypeId,
                                 initialValue: row.initialValue,
                                 ordinal: row.ordinal
                             };
+
+                            property.id = 0;
 
                             type.properties.push(property);
 
@@ -724,9 +737,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                             var event = 
                             {
                                 id: row.id,
+                                originalEventId: row.id,
                                 name: row.name,
                                 ordinal: row.ordinal
                             };
+
+                            event.id = 0;
 
                             type.events.push(event);
 
@@ -767,7 +783,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
         // req.body.methodId
-        // req.body.userName
 
         try {
 
@@ -786,18 +801,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                         var method = 
                         { 
                             id: row.id,
+                            originalMethodId: row.id,
                             name: row.name, 
                             ordinal: row.ordinal,
                             workspace: row.workspace, 
-                            tags: '',
-                            imageResourceId: row.imageResourceId,
-                            createdByUserId: row.createdByUserId,
-                            price: row.price,
-                            description: row.description
+                            imageId: row.imageId,
+                            description: row.description,
+                            parentMethodId: row.parentMethodId,
+                            parentPrice: row.parentPrice,
+                            priceBump: row.priceBump,
+                            tags: ''
                         };
 
+                        // We don't know whose method this is (req.body.userId's or someone else's). So we're going to make like it's someone else's.
+                        method.id = 0;
+
                         m_functionFetchTags(
-                            method.id,
+                            method.originalMethodId,
                             7,
                             function(tags) {
 
