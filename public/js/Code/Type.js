@@ -45,16 +45,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							self.data = typesItem;
 
 							// process properties, methods, events collections.
-
-
-
-
-
-
-
-
-							
-
 							return null;
 
 						} catch (e) {
@@ -78,8 +68,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Activate/select type instance.
-					self.setActive = function (iIndex,
-						arrayActive) {
+					self.setActive = function (iIndex, arrayActive) {
 
 						try {
 
@@ -519,9 +508,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							}
 
 							// Load workspace string into blockly frame.
-							return code.load(self,
-								m_arrayActive[m_iActiveIndex],
-								m_arrayActive[m_iActiveIndex].workspace);
+							return code.load(m_arrayActive[m_iActiveIndex].workspace);
 						} catch (e) {
 
 							return e;

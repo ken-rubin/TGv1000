@@ -18,6 +18,77 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             ///////////////////////////
             // Public methods
 
+            self.update_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
+
+                try {
+
+                    // .
+                    var objectWorkspace = processor.getWorkspaceJSONObject();
+                    if (!objectWorkspace) {
+
+                        throw { messgage: "Failed to get the workspace object." };
+                    }
+
+                    // Get the block with which to work.
+                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+
+                    // Compose, "MyType_setX", for which to search.
+                    var strBlockType = strType + "_set" + strProperty;
+
+                    // Compose the get for the instance from the app for which to search.
+                    var strInstanceType = "App_get" + strInstance;
+
+                    // If there is a work block, add new block it it, otherwise
+                    while (blockWork) {
+
+                        // Look for a block whose type matches the composed.
+                        if (blockWork.type === strBlockType &&
+                            blockWork.children[0].children[0].type === strInstanceType) {
+
+                            // Found it.
+                            blockWork.children[1].children[0].children[0].contents = strValue;
+
+                            // Keep searching, for some reason, this property could occur more than once.
+                        }
+
+                        // Move to next statement in chain.
+                        blockWork = blockWork.next;
+                    }
+
+                    ///////////////////
+                    // Save:
+
+                    // Convert back to XML.
+                    var strXml = converter.toXML(objectWorkspace);
+                    if (!strXml) {
+
+                        throw new Error("Failed to convert workspace XML to JSON.");
+                    }
+
+                    // First get the app type.
+                    var typeApp = types.getType("App");
+                    if (!typeApp) {
+
+                        throw { message: "Failed to find App type." };
+                    }
+
+                    // Next get the initialize method.
+                    var methodInitialize = typeApp.getMethod("initialize");
+                    if (!methodInitialize) {
+
+                        throw { message: "Failed to find initialize method of App type." };
+                    }
+
+                    // Set the workspace.
+                    methodInitialize.workspace = strXml;
+
+                    return null;
+                } catch (e) {
+
+                    return e;
+                }
+            };
+
             // Method adds a "set property value" Blockly block to Blockly.
             self.add_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
 

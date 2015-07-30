@@ -101,10 +101,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 									var itemJth = m_arrayItems[j];
 									if (itemJth.id === strKeyIth) {
 
-										itemJth.left = objectSettings[strKeyIth].X;
-										itemJth.top = objectSettings[strKeyIth].Y;
-										itemJth.width = objectSettings[strKeyIth].Width;
-										itemJth.height = objectSettings[strKeyIth].Height;
+										itemJth.left = parseFloat(objectSettings[strKeyIth].X);
+										itemJth.top = parseFloat(objectSettings[strKeyIth].Y);
+										itemJth.width = parseFloat(objectSettings[strKeyIth].Width);
+										itemJth.height = parseFloat(objectSettings[strKeyIth].Height);
 										break;
 									}
 								}
@@ -338,6 +338,37 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								m_itemMove.left = m_objectMoveStartItemPosition.x + dDX;
 								m_itemMove.top = m_objectMoveStartItemPosition.y + dDY;
 
+								// Modify the app's initialize's workspace.
+								var exceptionRet = coder.update_SetPropertyValue(m_itemMove.type, 
+									"X", 
+									m_itemMove.left, 
+									m_itemMove.id);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+								exceptionRet = coder.update_SetPropertyValue(m_itemMove.type, 
+									"Y", 
+									m_itemMove.top, 
+									m_itemMove.id);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+								// If the app initialize method is active, 
+								// then must cause it to refresh itself.
+								var bAppInitializeActive = types.isAppInitializeActive();
+								if (bAppInitializeActive) {
+
+									// Force update.
+									exceptionRet = types.reloadActiveMethod();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								}
+
 								// Cause an update.
 								var exceptionRet = m_functionRender();
 								if (exceptionRet) {
@@ -360,6 +391,37 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								if (m_itemSize.height < 32) {
 	
 									m_itemSize.height = 32;
+								}
+
+								// Modify the app's initialize's workspace.
+								var exceptionRet = coder.update_SetPropertyValue(m_itemSize.type, 
+									"Width", 
+									m_itemSize.width, 
+									m_itemSize.id);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+								exceptionRet = coder.update_SetPropertyValue(m_itemSize.type, 
+									"Height", 
+									m_itemSize.height, 
+									m_itemSize.id);
+								if (exceptionRet) {
+
+									throw exceptionRet;
+								}
+
+								// If the app initialize method is active, 
+								// then must cause it to refresh itself.
+								var bAppInitializeActive = types.isAppInitializeActive();
+								if (bAppInitializeActive) {
+
+									// Force update.
+									exceptionRet = types.reloadActiveMethod();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
 								}
 
 								// Cause an update.

@@ -554,14 +554,9 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 					};
 
 					// Load code into frame.
-					self.load = function (clType,
-						method,
-						strCodeDOM) {
+					self.load = function (strCodeDOM) {
 
 						try {
-
-							// Set the title.
-							// $("#titlediv").text(clType.data.name + " :: " + method.name);
 
 							// Save off workspace string.
 							self.workspace = strCodeDOM;
