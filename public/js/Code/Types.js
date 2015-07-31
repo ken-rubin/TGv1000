@@ -145,17 +145,40 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					// Return true of the app's initialize is active.
 					self.isAppInitializeActive = function () {
 
+						if (!m_clTypeActive ||
+							m_iActiveMethodIndex === -1) {
+
+							return false;
+						}
 						if (m_clTypeActive.data.name !== "App") {
 
 							return false;
 						}
 
-						if (m_methodActive.name !== "initialize") {
+						if (m_clTypeActive.data.methods.length <= m_iActiveMethodIndex ||
+							m_clTypeActive.data.methods[m_iActiveMethodIndex].name !== "initialize") {
 
 							return false;
 						}
 
 						return true;
+					};
+
+					// Cause the code to reload the current type.
+					self.reloadActiveMethod = function () {
+
+						try {
+
+							if (!m_clTypeActive ||
+								m_iActiveMethodIndex === -1) {
+
+								return null;
+							}
+							return code.load(m_clTypeActive.data.methods[m_iActiveMethodIndex].workspace);
+						} catch (e) {
+
+							return e;
+						}
 					};
 
 					// Specify the active type.  Called from 
@@ -726,7 +749,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var index = m_functionParseOutIndex(e);
 
 							// Save the active method.
-							m_methodActive = m_clTypeActive.data.methods[index];
+							m_iActiveMethodIndex = index;
 
 							var exceptionRet = m_clTypeActive.setActive(index,
 								m_clTypeActive.data.methods);
@@ -735,9 +758,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								throw exceptionRet;
 							}
 
-							exceptionRet = code.load(m_clTypeActive, 
-								m_clTypeActive.data.methods[index], 
-								m_clTypeActive.data.methods[index].workspace);
+							exceptionRet = code.load(m_clTypeActive.data.methods[m_iActiveMethodIndex].workspace);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -1128,7 +1149,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					// Active item.
 					var m_clTypeActive = null;
 					var m_ActiveTypeIndex = -1;
-					var m_methodActive = null;
+					var m_iActiveMethodIndex = -1;
 
 				} catch (e) {
 
