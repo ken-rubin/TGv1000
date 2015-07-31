@@ -955,9 +955,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
 
-            // Also, comics don't get saved; just project, types, methods, properties and events.
-
-            // Muis important: the project's name must be unique to within the user's projects, but can be the same as another user's project name.
+            // Muis important: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
             var project = req.body.projectJson; // are we sure this doesn't need JSON.parse?
@@ -975,10 +973,20 @@ module.exports = function ProjectBO(app, sql, logger) {
             //  saveAs INSERTs new rows for everything.
             //  save UPDATEs the project, but everything below should be deleted (if ownedByUserId !== req.body.userId) and INSERTed.
 
+            var exceptionRet = null;
+            if (typeOfSave === 'save') {
 
-         
-
+                exceptionRet = m_functionSaveProject(req, res);
             
+            } else {
+
+                exceptionRet = m_functionSaveProjectAs(req, res);
+            }
+
+            if (exceptionRet) {
+
+                throw exceptionRet;
+            }
         } catch(e) {
 
             res.json({
@@ -986,6 +994,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                 message: e.message
             });
         }
+    }
+
+    var m_functionSaveProject = function (req, res) {
+        
+    }
+
+    var m_functionSaveProjectAs = function (req, res) {
+        
     }
 
     // self.routeSaveProject = function (req, res) {
