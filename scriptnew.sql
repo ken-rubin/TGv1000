@@ -432,6 +432,16 @@ begin
 		set @dbstate := 3.0;
     end if;
 
+    if @dbstate = 3.0 THEN
+
+    	/* Left propertyTypeId out of propertys table. */
+		ALTER TABLE `tgv1000`.`propertys` 
+			ADD COLUMN `propertyTypeId` INT(11) NOT NULL DEFAULT 1 COMMENT '' AFTER `typeId`;
+
+        UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
+		set @dbstate := 4.0;
+    end if;
+
 end;
 
 //

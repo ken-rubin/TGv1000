@@ -82,8 +82,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							errorHelper.show("We're not doing this yet", 4000);
-							return;
+							// errorHelper.show("We're not doing this yet", 4000);
+							// return;
 
 							var data = {
 									userId: g_strUserId,

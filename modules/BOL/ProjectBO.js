@@ -946,7 +946,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
 
 
-            console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            // console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
@@ -997,11 +997,21 @@ module.exports = function ProjectBO(app, sql, logger) {
     }
 
     var m_functionSaveProject = function (req, res) {
-        
+
+        console.log('In m_functionSaveProject with req.body=' + JSON.stringify(req.body));
+
+        res.json({success: false, message: 'Forced exit'});
+
+        return null;
     }
 
     var m_functionSaveProjectAs = function (req, res) {
         
+        console.log('In m_functionSaveProjectAs with req.body=' + JSON.stringify(req.body));
+
+        res.json({success: false, message: 'Forced exit'});
+
+        return null;
     }
 
     // self.routeSaveProject = function (req, res) {

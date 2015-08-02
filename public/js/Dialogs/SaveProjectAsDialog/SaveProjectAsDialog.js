@@ -244,7 +244,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						m_project.setImageResourceId(imageId);
+						m_project.setImageId(imageId);
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}

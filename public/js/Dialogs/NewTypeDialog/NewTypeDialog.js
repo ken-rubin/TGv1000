@@ -151,21 +151,25 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// Call client to inject it throughout.
 							var typeJO = 
 							{
-								isApp: false,
 								id: 0,
+								originalTypeId: 0,
+								name: typeName,
+								isApp: false,
+								imageId: m_imageId,
 								ordinal: client.getNumberOfTypesInActiveComic(),
+								description: '',
+								parentTypeId: 0,
+								parentPrice: 0.00,
+								priceBump: 0.00,
 								tags: $("#TypeTags").val() || "",
 								properties: [
-									{name: "X", propertyTypeId: 1, initialValue: "0", ordinal: 0},
-									{name: "Y", propertyTypeId: 1, initialValue: "0", ordinal: 1},
-									{name: "Width", propertyTypeId: 1, initialValue: "0", ordinal: 2},
-									{name: "Height", propertyTypeId: 1, initialValue: "0", ordinal: 3}
+									{id: 0, originalPropertyId: 0, name: "X", propertyTypeId: 1, initialValue: "0", ordinal: 0},
+									{id: 0, originalPropertyId: 0, name: "Y", propertyTypeId: 1, initialValue: "0", ordinal: 1},
+									{id: 0, originalPropertyId: 0, name: "Width", propertyTypeId: 1, initialValue: "0", ordinal: 2},
+									{id: 0, originalPropertyId: 0, name: "Height", propertyTypeId: 1, initialValue: "0", ordinal: 3}
 								],
 								methods: [],
-								events: [],
-								dependencies: [],
-								name: typeName,
-								imageId: m_imageId
+								events: []
 							};
 
 							var clType = new Type();

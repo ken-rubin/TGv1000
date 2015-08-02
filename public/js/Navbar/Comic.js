@@ -88,7 +88,10 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							// First add to the global types.
+							// First add clType.data to self.types.items.
+							self.data.types.items.push(clType.data);
+
+							// Then add to the global types.
 							var exceptionRet = types.addItem(clType);
 							if (exceptionRet) { throw exceptionRet; }
 
