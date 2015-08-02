@@ -17,19 +17,15 @@ Jerry
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
-- Add logitems table in preparation for logging (like for forgotten password). Means adminzone needs some fleshing out.
 - I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up.
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is someone else's. Do we need to keep
 -    the original creator's user id? Probably a good idea.
-- New project is not clearing Designer.
-- Close project is not clearing Designer or comicpanels strip.
-- If a project is closed, empty toolstrip, designer and comicstrip. I started in Client.js, but some cascading structure is already in place. Use that.
-- Is there a (minor) size issue with the comic images in comicstrip? The image could be scaled too tall for its slider.
+- New project and close project are not clearing things (Designer, more?).
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
-- Images in toolstrip now have spaces in id replaced by _. Might have to catch this elsewhere.
 - Before saving picklist initialvalue, uniquify.
 - Write event loader in Code.js#self.addType.
 - When I "select ... order by ordinal asc", items might come back in random order anyway. Check this. If so, sort.
+- Searching for a Type or Method, always sets id = 0 (like it's someone else's). I think this is ok even if it belongs to the user, because it's coming from another project. This implies that searching shouldn't return something already in your project.
 
 
 
@@ -40,7 +36,6 @@ To discuss
 -    they'll save clone projects that will still point back to the same classOrProduct, so that relationship will become 1-many. Someone "buying" a product will want to search classOrProduct. Someone cloning a project should be able to search at that level.
 -    I think this could be handled with checkboxes in the Open/Search for Project dialog. It does imply that classOrProduct does have a resource pointing back to it and tags associated with that resource. There is currently a resourceType for "comic". I'm going to
 -    change that to classOrProduct.
-- Should new Types (add new Type) be created with 'initialize' method? Ken thinks so.
 - Should I prevent dragging of the App tool onto the designer? Easy to do by just adding mousedown handler, not draggable, if name is 'tool-app'.
 
 
