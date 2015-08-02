@@ -836,6 +836,9 @@ define(["Core/errorHelper",
 
 						try {
 
+							if (!m_clProject)
+								return null;
+							
 							// Warn if project is dirty.
 
 
@@ -857,7 +860,7 @@ define(["Core/errorHelper",
 							// Remove tooltip functionality from TypeWell icons.
 							$(".disabledifnoproj").tooltip("destroy");
 
-							// Empty the toolstrip, designer and comicstrip.
+							// Empty the toolstrip, designer, comicstrip and typewell.
 							tools.empty();
 
 							return null;

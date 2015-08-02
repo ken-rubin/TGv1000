@@ -284,40 +284,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
-					// Remove item from DOM and state.
-//not used					
-					self.removeItem = function (clType) {
-
-						try {
-
-							// Remove the type from the collection of types.
-							for (var i = 0; i < m_arrayClTypes.length; i++) {
-
-								// Splice on match.
-								if (m_arrayClTypes[i] === clType) {
-
-									m_arrayClTypes.splice(i, 1);
-									break;
-								}
-							}
-
-							// Remove form GUI.
-							var exceptionRet = clType.destroy();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							// Remove from tools.
-							return tools.removeItem(clType);
-
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Unload.
+//used					
 					self.unload = function () {
 
 						try {
@@ -325,11 +293,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
 								var itemIth = m_arrayClTypes[i];
-								var exceptionRet = self.removeItem(itemIth);
+								var exceptionRet = m_functionRemoveItem(itemIth);
 							}
 
-							// m_srTypeStrip.empty();
 							m_arrayClTypes = [];
+							m_functionEmptyTheWell();
 
 							return null;
 
@@ -590,6 +558,49 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					///////////////////////////////////
 					// Private methods.
 
+					// Remove item from DOM and state.
+//used					
+					var m_functionRemoveItem = function (clType) {
+
+						try {
+
+							// Remove the type from the collection of types.
+							for (var i = 0; i < m_arrayClTypes.length; i++) {
+
+								// Splice on match.
+								if (m_arrayClTypes[i] === clType) {
+
+									m_arrayClTypes.splice(i, 1);
+									break;
+								}
+							}
+
+							// Remove form GUI.
+							var exceptionRet = clType.destroy();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							// Remove from tools.
+							return tools.removeItem(clType);
+
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					var m_functionEmptyTheWell = function() {
+
+						m_functionSetTypewellHeader('');
+						$("#TWimage").attr("src","");
+						$(".disabledifnoproj").prop("disabled", true);
+						$("#TWmethodsTbody").empty();
+						$("#TWpropertiesTbody").empty();
+						$("#TWeventsTbody").empty();
+					}
+
 					// Invoked when a type is activated, thus causing its representatrion in the type well for maintenance by the user.
 					var m_functionSetUpTheWell = function() {
 
@@ -643,9 +654,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							return e;
 						}
-
 					}
-
 
 //used
 					var m_functionRegenTWMethodsTable = function () {

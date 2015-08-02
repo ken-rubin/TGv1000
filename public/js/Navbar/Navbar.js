@@ -120,6 +120,9 @@ define(["Core/errorHelper"],
 
 								try {
 
+									if (!client.getProject())
+										return null;
+
 									var exceptionRet = client.unloadProject();
 									if (exceptionRet) { throw exceptionRet; }
 

@@ -87,6 +87,20 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						}
 					}
 
+					// Empty the designer when current project is closed.
+					self.unload = function () {
+
+						try {
+
+							m_arrayItems = [];
+							return self.refresh();
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					// Update the designer tool instances with the changes.
 					self.updateInstances = function (objectSettings) {
 

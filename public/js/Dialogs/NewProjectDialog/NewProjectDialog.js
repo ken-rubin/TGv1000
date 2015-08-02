@@ -121,6 +121,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							client.unloadProject();		// In case one exists. This will ask about saving.
+
 							// Create project based on the new project dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
 

@@ -68,7 +68,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 							self.data = null;
 
-							return null;
+							return designer.unload();
 
 						} catch(e) {
 

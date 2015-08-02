@@ -20,7 +20,7 @@ Jerry
 - I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up.
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is 
 	someone else's. Do we need to keep the original creator's user id? Probably a good idea.
-- New project and close project are not clearing things (Designer, TypeWell).
+- New project is not clearing Designer, TypeWell if doing it over an existing project.
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Before saving picklist initialvalue, uniquify.
 - Write event loader in Code.js#self.addType.
