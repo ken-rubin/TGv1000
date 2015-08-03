@@ -153,7 +153,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						if (txt !== m_project.data.name) {
 
 							m_project.data.name = txt;
-							client.setProjectDirtyBool(true);
+							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
 					}
@@ -164,7 +164,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						if (txt !== m_project.data.description) {
 
 							m_project.data.description = txt;
-							client.setProjectDirtyBool(true);
+							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
 					}
@@ -175,7 +175,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						if (txt !== m_project.data.tags) {
 
 							m_project.data.tags = txt;
-							client.setProjectDirtyBool(true);
+							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
 					}

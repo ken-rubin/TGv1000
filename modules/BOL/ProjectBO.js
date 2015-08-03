@@ -140,7 +140,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             tags: '',
-                            isDirty: 1,
                             comics:
                             {
                                 items: []

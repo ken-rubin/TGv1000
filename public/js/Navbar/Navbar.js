@@ -179,7 +179,7 @@ define(["Core/errorHelper"],
 								}
 							});
 
-							client.setProjectDirtyBool(false);
+							client.setBrowserTabAndBtns();
 
 							return null;
 

@@ -839,29 +839,27 @@ define(["Core/errorHelper",
 							if (!m_clProject)
 								return null;
 							
-							// Warn if project is dirty.
+							m_functionAbandonProjectDialog(function() {
 
+								// This callback will be called if the user wants to abandon the open project.
+								var exceptionRet = m_clProject.unload();
+								if (exceptionRet) {
 
+									throw exceptionRet;
+								}
 
+								m_clProject = null;
 
+								// Disable the TypeWell icons that are enabled if a project is loaded.
+								$(".disabledifnoproj").prop("disabled", true);
 
+								// Remove tooltip functionality from TypeWell icons.
+								$(".disabledifnoproj").tooltip("destroy");
 
-							var exceptionRet = m_clProject.unload();
-							if (exceptionRet) {
+								// Empty the toolstrip, designer, comicstrip and typewell.
+								tools.empty();
+							});
 
-								throw exceptionRet;
-							}
-
-							m_clProject = null;
-
-							// Disable the TypeWell icons that are enabled if a project is loaded.
-							$(".disabledifnoproj").prop("disabled", true);
-
-							// Remove tooltip functionality from TypeWell icons.
-							$(".disabledifnoproj").tooltip("destroy");
-
-							// Empty the toolstrip, designer, comicstrip and typewell.
-							tools.empty();
 
 							return null;
 
@@ -889,11 +887,10 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Project helper methods.
-					self.setProjectDirtyBool = function (bVal) {
+					self.setBrowserTabAndBtns = function () {
 
 						if (m_clProject) {
 
-							m_clProject.setDirtyBool(bVal);
 							document.title = "TechGroms";
 							if (m_clProject.data.name.length > 0) {
 
@@ -1072,6 +1069,32 @@ define(["Core/errorHelper",
 						}
 
 						$(window).resize();
+					}
+
+					var m_functionAbandonProjectDialog = function (abandonCallback) {
+
+						BootstrapDialog.show({
+							type: BootstrapDialog.TYPE_DANGER,
+							closable: false,
+							title: 'Please Confirm',
+							message: 'You have an open project. Are you sure you want to abandon it?',
+							buttons:
+							[
+								{
+									label: 'Yes, abandon it',
+									action: function(dialog) {
+										dialog.close();
+										abandonCallback();
+									}
+								},
+								{
+									label: 'No, let me save it first',
+									action: function(dialog) {
+										dialog.close();
+									}
+								}
+							]
+						});
 					}
 
 					// Private variables.

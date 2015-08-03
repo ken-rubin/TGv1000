@@ -18,6 +18,9 @@ Jerry
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up.
+- Places to show new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Ignore (eliminate)
+   project.isDirty. Show the dialog in these cases as long as client.getProject() returns non-null:
+   New Project; Close project; (temporarily, I hope) go to AdminZone; click logo to return to signin page; close window or browser (possible?)
 - On exit or close project or new project, if project is dirty, ask if they want to save/save as. Note: new items will have id=0; items added through searching should have id>0 if they belong to the user; otherwise, possibly -1 to indcate that this is 
 	someone else's. Do we need to keep the original creator's user id? Probably a good idea.
 - New project is not clearing Designer, TypeWell if doing it over an existing project.

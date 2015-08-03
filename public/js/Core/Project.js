@@ -32,7 +32,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 							self.data = project;
 
-							client.setProjectDirtyBool(true);
+							client.setBrowserTabAndBtns();
 
 							return comics.load(self.data.comics);	// the global object
 
@@ -127,7 +127,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 								}
 							});
 
-							client.setProjectDirtyBool(false);	// Reset menu items.
+							client.setBrowserTabAndBtns();
 
 							return null;
 						
@@ -140,12 +140,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 					self.setImageId = function (imageId) {
 
 						self.data.imageId = imageId;
-						self.setDirtyBool(true);
-					}
-
-					self.setDirtyBool = function (bVal) {
-
-						self.data.isDirty = bVal;
 					}
 
 					self.getStatus = function () {
@@ -159,7 +153,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
 											&& self.data.imageId > 0
 										),
-							isDirty: self.data.isDirty,
 							projectNameIsFilled: (self.data.name.trim().length > 0)
 						};
 					};
