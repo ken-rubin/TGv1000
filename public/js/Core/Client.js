@@ -831,41 +831,49 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.unloadProject = function () {
-
+					// If no active project, returns call unloadedCallback in order to proceed to New Project or whatever..
+					// If active project, displays BootstrapDialog asking user.
+					// If user says to abandon, it empties and clears project and returns null.
+					// If user says not to abandon, it returns project.
+					// On exception, it also returns project, but state may be compromised (i.e., partially removed)--needs further work.
+					self.unloadProject = function (unloadedCallback) {
 
 						try {
 
-							if (!m_clProject)
-								return null;
+							if (m_clProject) {
 							
-							m_functionAbandonProjectDialog(function() {
+								m_functionAbandonProjectDialog(function() {
 
-								// This callback will be called if the user wants to abandon the open project.
-								var exceptionRet = m_clProject.unload();
-								if (exceptionRet) {
+									// This callback will be called if the user wants to abandon the open project.
+									var exceptionRet = m_clProject.unload();
+									if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+										throw exceptionRet;
+									}
 
-								m_clProject = null;
+									m_clProject = null;
 
-								// Disable the TypeWell icons that are enabled if a project is loaded.
-								$(".disabledifnoproj").prop("disabled", true);
+									// Disable the TypeWell icons that are enabled if a project is loaded.
+									$(".disabledifnoproj").prop("disabled", true);
 
-								// Remove tooltip functionality from TypeWell icons.
-								$(".disabledifnoproj").tooltip("destroy");
+									// Remove tooltip functionality from TypeWell icons.
+									$(".disabledifnoproj").tooltip("destroy");
 
-								// Empty the toolstrip, designer, comicstrip and typewell.
-								tools.empty();
-							});
+									// Empty the toolstrip, designer, comicstrip and typewell.
+									tools.empty();
 
+									if ($.isFunction(unloadedCallback))
+										unloadedCallback();
+								});
+							} else {
 
-							return null;
-
+								if ($.isFunction(unloadedCallback))
+									unloadedCallback();
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
+
 						}
 					}
 
