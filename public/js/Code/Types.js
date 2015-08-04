@@ -169,6 +169,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							if (!m_clTypeActive ||
 								m_iActiveMethodIndex === -1) {
 
@@ -263,6 +265,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							// Loop over the collection of types.
 							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
@@ -323,6 +327,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								return null;
 							}
 
+							client.projectIsDirty();
+
 							// Else, update the type.
 							return m_clTypeActive.update(strWorkspace,
 								strMethod);
@@ -339,6 +345,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							// Note: the images have already been changed on the designer surface if any were there and in toolstrip.
+
+							client.projectIsDirty();
 
 							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', '');
 							
@@ -398,6 +406,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							m_clTypeActive.data.methods.splice(index, 1);
 							return m_functionRegenTWMethodsTable();
 						
@@ -413,6 +423,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							m_clTypeActive.data.properties.splice(index, 1);
 							return m_functionRegenTWPropertiesTable();
 						
@@ -427,6 +439,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					self.deleteEvent = function (index) {
 
 						try {
+
+							client.projectIsDirty();
 
 							m_clTypeActive.data.events.splice(index, 1);
 
@@ -446,6 +460,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							return m_functionRegenTWMethodsTable();
 
 						} catch (e) {
@@ -460,6 +476,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							return m_functionRegenTWPropertiesTable();
 
 						} catch (e) {
@@ -473,6 +491,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					self.regenTWEventsTable = function () {
 
 						try {
+
+							client.projectIsDirty();
 
 							return m_functionRegenTWEventsTable();
 
@@ -564,6 +584,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							// Remove the type from the collection of types.
 							for (var i = 0; i < m_arrayClTypes.length; i++) {
 
@@ -645,6 +667,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionSetTypewellHeader = function (strNewTypeName) {
 
 						try {
+
+							client.projectIsDirty();
 
 							$("#TWtypeName").text(strNewTypeName);
 
@@ -755,6 +779,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var index = m_functionParseOutIndex(e);
 
 							// Save the active method.
@@ -783,6 +809,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = client.showGenericRenameDialog('type', m_ActiveTypeIndex);
 							if (exceptionRet) { throw exceptionRet; }
 							
@@ -795,6 +823,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionEventRenameClicked = function(e) {
 						
 						try {
+
+							client.projectIsDirty();
 
 							var index = m_functionParseOutIndex(e);
 
@@ -811,6 +841,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						
 						try {
 
+							client.projectIsDirty();
+
 							var index = m_functionParseOutIndex(e);
 
 							var exceptionRet = client.showGenericRenameDialog('method', index);
@@ -825,6 +857,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionMethodDeleteClicked = function(e) {
 						
 						try {
+
+							client.projectIsDirty();
 
 							var index = m_functionParseOutIndex(e);
 
@@ -841,6 +875,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						
 						try {
 
+							client.projectIsDirty();
+
 							var index = m_functionParseOutIndex(e);
 
 							var exceptionRet = client.showEditPropertyDialog(index);
@@ -855,6 +891,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionPropertyDeleteClicked = function(e) {
 						
 						try {
+
+							client.projectIsDirty();
 
 							var index = m_functionParseOutIndex(e);
 
@@ -871,6 +909,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						
 						try {
 
+							client.projectIsDirty();
+
 							var index = m_functionParseOutIndex(e);
 
 							var exceptionRet = client.showDeleteConfirmDialog('event', index);
@@ -886,6 +926,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = m_clTypeActive.imageSearch();
 							if (exceptionRet) { throw exceptionRet; }
 							
@@ -899,6 +941,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = m_clTypeActive.imageFromURL();
 							if (exceptionRet) { throw exceptionRet; }
 							
@@ -911,6 +955,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionClickTWnewImageDiskLink = function () {
 
 						try {
+
+							client.projectIsDirty();
 
 							var exceptionRet = m_clTypeActive.imageFromDisk();
 							if (exceptionRet) {
@@ -927,6 +973,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = client.showDeleteConfirmDialog('type', -1);
 							if (exceptionRet) {
 
@@ -942,6 +990,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = client.showNewTypeDialog();
 							if (exceptionRet) {
 
@@ -956,6 +1006,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionClickTWsearchTypeLink = function () {
 
 						try {
+
+							client.projectIsDirty();
 
 							var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
 
@@ -986,6 +1038,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = client.showNewMethodDialog();
 							if (exceptionRet) {
 
@@ -1000,6 +1054,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionClickTWsearchMethod = function () {
 
 						try {
+
+							client.projectIsDirty();
 
 							var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
 
@@ -1030,6 +1086,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							client.projectIsDirty();
+
 							var exceptionRet = client.showNewPropertyDialog();
 							if (exceptionRet) {
 
@@ -1044,6 +1102,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					var m_functionClickTWnewEvent = function () {
 
 						try {
+
+							client.projectIsDirty();
 
 							var exceptionRet = client.showNewEventDialog();
 							if (exceptionRet) {
