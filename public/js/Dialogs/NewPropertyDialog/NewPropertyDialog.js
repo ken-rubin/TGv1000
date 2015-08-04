@@ -105,7 +105,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							$("#PropertyName").focus();
-							$("#PropertyName").blur(m_functionBlurPropertyName);
+							$("#PropertyName").blur(m_setStateCreateBtn);
+							$("#PicklistInitial").blur(m_setStateCreateBtn);
 							$("#DataType").change(m_functionHandleDataTypeSelectChange);
 
 							if (m_strNewOrEdit === 'New') {
@@ -174,11 +175,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					var m_functionBlurPropertyName = function() {
-
-							m_setStateCreateBtn();
-					}
-
 					var m_functionHandleDataTypeSelectChange = function(event) {
 
 						m_iDataType = parseInt($("#DataType option:selected").val(), 10);
@@ -215,7 +211,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							} else if (m_iDataType === 5) {
 
-
 								$("#PicklistInitial").val("");
 								$("#PicklistValue").css("display", "block");
 								$("#InitialContainer").css("display", "block");
@@ -235,7 +230,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_setStateCreateBtn = function() {
 
 						var nameStatus = $("#PropertyName").val().trim().length > 0;
-						var initialValueStatus = $("#PicklistValue").val().trim().length > 0;			// Required only for picklist (m_iDataType === 5)
+						var initialValueStatus = $("#PicklistInitial").val().trim().length > 0;			// Required only for picklist (m_iDataType === 5)
 
 						if (nameStatus && ((m_iDataType === 5 && initialValueStatus) || (m_iDataType !== 5 && m_iDataType > 0))) {
 
@@ -322,10 +317,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									break;
 								case 5:
 									var strCheck = $("#PicklistInitial").val().trim();
+
 									if (strCheck.length > 0) {
 
-										var picks = strCheck.match(/([\w\-]+)/g);
-										strInitialValue = picks.join(' ');
+										var inputArray = strCheck.match(/([\w\-]+)/g);
+
+										// Uniquify picks: there will be at least one....
+									    var outputArray = [];
+									    
+									    for (var i = 0; i < inputArray.length; i++)
+									    {
+									        if (($.inArray(inputArray[i], outputArray)) == -1)
+									        {
+									            outputArray.push(inputArray[i]);
+									        }
+									    }
+								
+										strInitialValue = outputArray.join(' ');
 									}
 									break;
 							}

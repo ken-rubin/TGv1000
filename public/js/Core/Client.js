@@ -840,7 +840,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							if (m_clProject) {
+							if (m_clProject && m_bProjectIsDirty) {
 							
 								m_functionAbandonProjectDialog(function() {
 
@@ -875,6 +875,21 @@ define(["Core/errorHelper",
 							errorHelper.show(e);
 
 						}
+					}
+
+					self.projectIsClean = function () {
+
+						m_bProjectIsDirty = false;
+					}
+
+					self.projectIsDirty = function () {
+
+						m_bProjectIsDirty = true;
+					}
+
+					self.isProjectDirty = function () {
+
+						return m_bProjectIsDirty;
 					}
 
 					self.getTGCookie = function (name) {
@@ -929,6 +944,8 @@ define(["Core/errorHelper",
 				    		m_clProject = new Project();
 				    		var exceptionRet = m_clProject.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
+
+				    		self.projectIsDirty();
 
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").tooltip();
@@ -1108,6 +1125,7 @@ define(["Core/errorHelper",
 					// Private variables.
 					var m_clProject = null;
 					var m_openDialog = null;
+					var m_bProjectIsDirty = false;
 
 					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.
 					var m_openDialog2 = null;

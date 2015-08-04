@@ -19,9 +19,9 @@ Jerry
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up.
 - Places to show new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: go to AdminZone; click "TGv1000" to return to signin page; close window or browser (possible?)
-- Revision to elimination of project.isDirty: Don't show Abandon dlg just after saving. Make new or newly opened project dirty. Set clean after Save or Save As. Set dirty after anything else the user does. Anything at all.
+- Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places???
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
-- Before saving picklist initialvalue, uniquify.
+- Close project isn't clearing tab name.
 - Write event loader in Code.js#self.addType.
 - When I "select ... order by ordinal asc", items might come back in random order anyway. Check this. If so, sort.
 - Searching for a Type or Method, always sets id = 0 (like it's someone else's). I think this is ok even if it belongs to the user, because it's coming from another project. This implies that searching shouldn't return something already in your project.
