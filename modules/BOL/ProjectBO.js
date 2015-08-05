@@ -941,7 +941,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
 
 
-// remmeber to save resource and tags if inserting
+            // remmeber to save resource and tags if inserting and to replace them if updating
+            
 
 
 
@@ -975,11 +976,11 @@ module.exports = function ProjectBO(app, sql, logger) {
             var exceptionRet = null;
             if (typeOfSave === 'save') {
 
-                exceptionRet = m_functionSaveProject(req, res);
+                exceptionRet = m_functionSaveProject(req, res, project);
             
-            } else {
+            } else {    // 'saveAs'
 
-                exceptionRet = m_functionSaveProjectAs(req, res);
+                exceptionRet = m_functionSaveProjectAs(req, res, project);
             }
 
             if (exceptionRet) {
@@ -995,22 +996,104 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_functionSaveProject = function (req, res) {
+    var m_functionSaveProject = function (req, res, project) {
 
         console.log('In m_functionSaveProject with req.body=' + JSON.stringify(req.body));
 
         res.json({success: false, message: 'Forced exit'});
 
         return null;
+
+        var whereclause = "", 
+            verb = "",
+            sqlStmt = "";
+
+        var guts = " SET name='" + project.name + "'"
+            + ",ownedByUserId=" + req.body.userId
+            + ",parentPrice=" + project.parentPrice
+            + ",parentProductId=" + project.parentProductId
+            + ",priceBump=" + project.priceBump
+            + ",imageId=" + project.imageId
+            + ",isProduct=" + project.isProduct
+            + ",description='" + project.description + "' ";
+
+        whereClause = " WHERE id=" + project.id;
+        verb = "UPDATE ";
+        
+        m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
     }
 
-    var m_functionSaveProjectAs = function (req, res) {
+    var m_functionProjectSavePart2 = function (req,res,project,verb,guts,whereclause) {
+
+
+    }
+
+    var m_functionSaveProjectAs = function (req, res, project) {
         
         console.log('In m_functionSaveProjectAs with req.body=' + JSON.stringify(req.body));
 
         res.json({success: false, message: 'Forced exit'});
 
         return null;
+
+        var whereclause = "", 
+            verb = "",
+            sqlStmt = "";
+
+        var guts = " SET name='" + project.name + "'"
+            + ",ownedByUserId=" + req.body.userId
+            + ",parentPrice=" + project.parentPrice
+            + ",parentProductId=" + project.parentProductId
+            + ",priceBump=" + project.priceBump
+            + ",imageId=" + project.imageId
+            + ",isProduct=" + project.isProduct
+            + ",description='" + project.description + "' ";
+
+        verb = "INSERT ";
+
+        // Look for and reject an attempt to add a 2nd project for same user with same name.
+        var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';",
+            function(rows) {
+
+                if (rows.length === 0) {
+
+                    res.json({
+                        success:false,
+                        message:'Failed database action checking for duplicate project name.'
+                    });
+                } else {
+
+                    if (rows[0].cnt > 0) {
+
+                        res.json({
+                            success:false,
+                            message:'You already have a project with that name.'
+                        });
+                    } else {
+                        
+                        m_functionProjectSaveAsPart2(req,res,project,verb,guts,whereclause);
+                    }
+                }
+            },
+            function(strError) {
+
+                res.json({
+                    success:false,
+                    message:'Failed database action checking for duplicate project name.'
+                });
+            }
+        );
+        if (exceptionRet) {
+            res.json({
+                success:false,
+                message:'Failed database action checking for duplicate project name.'
+            });
+        }
+    }
+
+    var m_functionProjectSaveAsPart2 = function (req,res,project,verb,guts,whereclause) {
+
+
     }
 
     // self.routeSaveProject = function (req, res) {
@@ -1040,66 +1123,17 @@ module.exports = function ProjectBO(app, sql, logger) {
     //         //      2b. Loop (on j) through items in types and for each:
     //         //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
 
-    //         var whereclause = "", 
-    //             verb = "",
-    //             sqlStmt = "";
 
-    //         var guts = " SET name='" + project.name + "'"
-    //             + ",createdByUserId=" + req.body.userId
-    //             + ",price=" + project.price
-    //             + ",imageResourceId=" + project.imageResourceId
-    //             + ",description='" + project.description + "' ";
+
+
+
+
 
     //         if (typeOfSave === "save"){
 
-    //             whereClause = " WHERE id=" + project.id;
-    //             verb = "UPDATE ";
-                
-    //             m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
 
     //         } else {
 
-    //             verb = "INSERT ";
-
-    //             // Look for and reject an attempt to add a 2nd project for same user with same name.
-    //             var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where createdByUserId=" + req.body.userId + " and name='" + project.name + "';",
-    //                 function(rows) {
-
-    //                     if (rows.length === 0) {
-
-    //                         res.json({
-    //                             success:false,
-    //                             message:'Failed database action checking for duplicate project name.'
-    //                         });
-    //                     } else {
-
-    //                         if (rows[0].cnt > 0) {
-
-    //                             res.json({
-    //                                 success:false,
-    //                                 message:'You already have a project with that name.'
-    //                             });
-    //                         } else {
-                                
-    //                             m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
-    //                         }
-    //                     }
-    //                 },
-    //                 function(strError) {
-
-    //                     res.json({
-    //                         success:false,
-    //                         message:'Failed database action checking for duplicate project name.'
-    //                     });
-    //                 }
-    //             );
-    //             if (exceptionRet) {
-    //                 res.json({
-    //                     success:false,
-    //                     message:'Failed database action checking for duplicate project name.'
-    //                 });
-    //             }
-    //         }
     //     } catch (e) {
 
     //         res.json({

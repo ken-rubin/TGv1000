@@ -17,11 +17,10 @@ Jerry
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), 
 -    backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prohibited.
 -    I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
-- I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up. TAB IS NOW SHOWING "TechGroms / New Project" even when I give the project a name. So it's setting the tab too early in the fetch process.
+- I show the current project in the upper tab. I'm not sure I clear it if a project is closed, etc. So tighten this up. Shows the project name, if entered, for New Project. Check the Search for Project case.
 - Places to show new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: go to AdminZone; click "TGv1000" to return to signin page; close window or browser (possible?)
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places???
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
-- Close project isn't clearing tab name.
 - Write event loader in Code.js#self.addType.
 - When I "select ... order by ordinal asc", items might come back in random order anyway. Check this. If so, sort.
 - Searching for a Type or Method, always sets id = 0 (like it's someone else's). I think this is ok even if it belongs to the user, because it's coming from another project. This implies that searching shouldn't return something already in your project.
@@ -61,7 +60,7 @@ The inside piece just uses the primary key. An explain plan shows us "using inde
 [code]
 SELECT id
 FROM customers
-ORDER BY name
+ORDER BY name25
 LIMIT 10 OFFSET 990;
 [/code]
 

@@ -995,9 +995,11 @@ define(["Core/errorHelper",
 							if ($.isFunction(callback)) {
 
 								callback(m_clProject);
-							}
+							
+							} else {
 
-							navbar.enableDisableProjectsMenuItems();
+								self.setBrowserTabAndBtns();
+							}
 
 							return null;
 

@@ -139,6 +139,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
+									client.setBrowserTabAndBtns();
 								}
 							);
 							if (exceptionRet) { throw exceptionRet; }
