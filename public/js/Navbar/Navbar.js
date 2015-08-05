@@ -40,9 +40,11 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showNewProjectDialog();
-									if (exceptionRet) { throw exceptionRet; }
+									client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
 
+										var exceptionRet = client.showNewProjectDialog();
+										if (exceptionRet) { throw exceptionRet; }
+									});
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -53,20 +55,22 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showOpenProjectDialog(function (iProjectId) {
+									client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
 
-										if (iProjectId > 0) {
+										var exceptionRet = client.showOpenProjectDialog(function (iProjectId) {
 
-											exceptionRet = client.openProjectFromDB(iProjectId);
-											if (exceptionRet) { throw exceptionRet; }
+											if (iProjectId > 0) {
 
-										} else {
+												exceptionRet = client.openProjectFromDB(iProjectId);
+												if (exceptionRet) { throw exceptionRet; }
 
-											throw new Error("Invalid project id returned.")
-										}
+											} else {
+
+												throw new Error("Invalid project id returned.")
+											}
+										});
+										if (exceptionRet) { throw exceptionRet; }
 									});
-									if (exceptionRet) { throw exceptionRet; }
-
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -118,20 +122,9 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
-								try {
+								client.unloadProject();
 
-									if (!client.getProject())
-										return null;
-
-									var exceptionRet = client.unloadProject();
-									if (exceptionRet) { throw exceptionRet; }
-
-									self.enableDisableProjectsMenuItems();
-
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
+								self.enableDisableProjectsMenuItems();
 							});
 
 							// Wire Help/Comics buttons

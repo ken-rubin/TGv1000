@@ -114,6 +114,9 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// Set up the modified project.
 										client.functionNewProject(objectData.project);
 
+										// Set dirty bool to false in client
+										client.projectIsClean();
+
 									} else {
 
 										// !objectData.success -- error message in objectData.message

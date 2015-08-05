@@ -831,42 +831,65 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.unloadProject = function () {
-
+					// If no active project, returns call unloadedCallback in order to proceed to New Project or whatever..
+					// If active project, displays BootstrapDialog asking user.
+					// If user says to abandon, it empties and clears project and returns null.
+					// If user says not to abandon, it returns project.
+					// On exception, it also returns project, but state may be compromised (i.e., partially removed)--needs further work.
+					self.unloadProject = function (unloadedCallback) {
 
 						try {
 
-							if (!m_clProject)
-								return null;
+							if (m_clProject && m_bProjectIsDirty) {
 							
-							m_functionAbandonProjectDialog(function() {
+								m_functionAbandonProjectDialog(function() {
 
-								// This callback will be called if the user wants to abandon the open project.
-								var exceptionRet = m_clProject.unload();
-								if (exceptionRet) {
+									// This callback will be called if the user wants to abandon the open project.
+									var exceptionRet = m_clProject.unload();
+									if (exceptionRet) {
 
-									throw exceptionRet;
-								}
+										throw exceptionRet;
+									}
 
-								m_clProject = null;
+									m_clProject = null;
 
-								// Disable the TypeWell icons that are enabled if a project is loaded.
-								$(".disabledifnoproj").prop("disabled", true);
+									// Disable the TypeWell icons that are enabled if a project is loaded.
+									$(".disabledifnoproj").prop("disabled", true);
 
-								// Remove tooltip functionality from TypeWell icons.
-								$(".disabledifnoproj").tooltip("destroy");
+									// Remove tooltip functionality from TypeWell icons.
+									$(".disabledifnoproj").tooltip("destroy");
 
-								// Empty the toolstrip, designer, comicstrip and typewell.
-								tools.empty();
-							});
+									// Empty the toolstrip, designer, comicstrip and typewell.
+									tools.empty();
 
+									if ($.isFunction(unloadedCallback))
+										unloadedCallback();
+								});
+							} else {
 
-							return null;
-
+								if ($.isFunction(unloadedCallback))
+									unloadedCallback();
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
+
 						}
+					}
+
+					self.projectIsClean = function () {
+
+						m_bProjectIsDirty = false;
+					}
+
+					self.projectIsDirty = function () {
+
+						m_bProjectIsDirty = true;
+					}
+
+					self.isProjectDirty = function () {
+
+						return m_bProjectIsDirty;
 					}
 
 					self.getTGCookie = function (name) {
@@ -921,6 +944,8 @@ define(["Core/errorHelper",
 				    		m_clProject = new Project();
 				    		var exceptionRet = m_clProject.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
+
+				    		self.projectIsDirty();
 
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").tooltip();
@@ -1100,6 +1125,7 @@ define(["Core/errorHelper",
 					// Private variables.
 					var m_clProject = null;
 					var m_openDialog = null;
+					var m_bProjectIsDirty = false;
 
 					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.
 					var m_openDialog2 = null;
