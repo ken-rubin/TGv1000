@@ -489,60 +489,8 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 							//        (a) The narrow horizontal scrolling comicstrip
 							//        (b) The vertical comicpanelsstrip taking up most of the remaining height of the visible column.
 
-							$(window).resize(function () {
-
-								try {
-
-									var iViewportHeight = $(window).height();
-									var iTypeWellHeight = $("#TypeWell").height();
-									var iColXs1Width = $(".toGetLeftCol").width();
-									var iNavbarHeight = $(".navbar").height();
-
-									var iBordersAndSpacingPadding = 70;
-
-									if (bDisplayComics) {
-
-										// The comicstrip WILL be displayed.
-										// Designer and code sections should take care of themselves.
-										$(".toGetRightCol").removeClass("hidden");
-										$(".toGetMiddleCol").removeClass("col-xs-11");
-										$(".toGetMiddleCol").addClass("col-xs-10");
-
-										// Position the fixed comicstrip.
-										var iComicstripTop = iNavbarHeight + 10;
-										$("#comicstrip").css("top", iComicstripTop.toString() + "px");
-										$("#comicstrip").height((iViewportHeight - iComicstripTop - 60 ).toString() + "px");
-										var iComicstripWidth = $("#comicstrip").width();
-										var strComicstripLeft = ((iColXs1Width - iComicstripWidth) / 2 - 40).toString() + "px";
-										$("#comicstrip").css("margin-left", strComicstripLeft);
-
-									} else {
-
-										// comicstrip and comicpanelstrip WILL NOT be displayed.
-										// Designer and code sections should take care of themselves.
-										$(".toGetRightCol").addClass("hidden");
-										$(".toGetMiddleCol").removeClass("col-xs-10");
-										$(".toGetMiddleCol").addClass("col-xs-11");
-									}
-
-									// Center the vertical toolstrip vertically in the viewport. It will remain fixed.
-									var iToolstripTop = iNavbarHeight + 10;
-									$("#toolstrip").css("top", iToolstripTop.toString() + "px");
-									$("#toolstrip").height((iViewportHeight - iToolstripTop - 60).toString() + "px");
-									var iToolstripWidth = $("#toolstrip").width();
-									var strToolstripLeft = ((iColXs1Width - iToolstripWidth) / 2).toString() + "px";
-									$("#toolstrip").css("margin-left", strToolstripLeft);
-									
-									$("#BlocklyIFrame").height(iViewportHeight - 
-										iTypeWellHeight -
-										iBordersAndSpacingPadding -
-										iNavbarHeight);
-
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
+							$(window).resize(m_functionHandleResize);
+							m_functionHandleResize();
 
 							// Allocate and create the scanner.
 							//m_scanner = new Scanner();
@@ -725,6 +673,26 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 
 					///////////////////////////////////////
 					// Private methods.
+
+					// Resize code components on window resize.
+					var m_functionHandleResize = function () {
+
+						try {
+
+							// Size the code-section and the whole middle column.
+							// The designer handler will handle only its own update.
+
+							var jLeft = $(".toGetLeftCol");
+							$(".toGetMiddleCol").height(jLeft.height() * 2);
+							$("#code").height(jLeft.height());
+
+							$("#BlocklyIFrame").height(jLeft.height() - 
+								$("#TypeWell").height() - 40); // 40 = borders and padding and such.
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
 
 					// Helper method generates the function string for a "new" type function.
 					var m_functionGenerateBlocksTypeNewFunctionString = function (strName) {

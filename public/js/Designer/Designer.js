@@ -21,7 +21,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 					// Pulbic properties.
 
 					// Selector.
-					self.selector = "#designerwrapper";
+					self.selector = "#designer";
 					self.selectorCanvas = "#surfacecanvas";
 
 					////////////////////////////////
@@ -65,7 +65,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 							$(window).resize(m_functionHandleResize);
 
 							// Call once to initialize the sizing.
-							//setTimeout(functionHandleResize, 1000);
+							m_functionHandleResize();
 
 							return null;
 						} catch (e) {
@@ -191,21 +191,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 						try {
 
-							var iViewportHeight = $(window).height();
-							var iNavbarHeight = $(".navbar").height();
-							var iBordersAndSpacingPadding = 34;
-
 							var canvas = m_jCanvas[0];
-							m_jWrapper.height(iViewportHeight - 
-								iNavbarHeight -
-								iBordersAndSpacingPadding);
+							m_jWrapper.height($(".toGetLeftCol").height());
 
 							m_dWidth = m_jWrapper.width();
 							m_dHeight = m_jWrapper.height();
-							m_jWrapper.attr("width",
-								m_dWidth);
-							m_jWrapper.attr("height",
-								m_dHeight);
 							m_jCanvas.attr("width",
 								m_dWidth);
 							m_jCanvas.attr("height",
@@ -632,11 +622,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 								iY += 50;
 							}
-							m_context.strokeStyle = "#ccc";
+/*							m_context.strokeStyle = "#ccc";
 							m_context.strokeRect(-m_dWidth / 2, 0, m_dWidth, 1);
 							m_context.strokeRect(0, -m_dHeight / 2, 1, m_dHeight);
 							m_context.strokeRect(-m_dWidth / 2, -m_dHeight / 2, m_dWidth, m_dHeight);
-
+*/
 							// Draw all items.
 							for (var i = 0; i < m_arrayItems.length; i++) {
 

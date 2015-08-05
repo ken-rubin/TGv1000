@@ -33,8 +33,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 							m_srComicStrip = new ScrollRegionV();
 							var exceptionRet = m_srComicStrip.create(
 								"#comicstrip",		// inner row selector
-								110,					// item width
-								110,					// height
+								100,					// item width
+								60,					// height
 								function() {		// functionClick
 						    		var jq = this;
 						    		var parts = jq.context.id.split('-');
@@ -55,8 +55,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 
 							    		m_arrayClComics[j].activate();
 						    		}
-								}
-							);
+								},
+								"left");
 							if (exceptionRet) { throw exceptionRet; }
 						} catch (e) {
 

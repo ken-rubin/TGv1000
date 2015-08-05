@@ -21,13 +21,7 @@ html
 
       .row-fluid
 
-        //- For toolstrip
-        .col-xs-1.toGetLeftCol
-
-          //- Define a scrolling column.
-          #toolstrip.ScrollRegionVCol
-
-        .col-xs-10.toGetMiddleCol
+        .toGetMiddleCol
 
           //- Include the designer element DOM.
           include ./indexdesigner.jade
@@ -35,7 +29,12 @@ html
           //- Include the code element DOM.
           include ./indexcode.jade
 
-        .col-xs-1.toGetRightCol
+        .toGetLeftCol
+
+          //- Define a scrolling column.
+          #toolstrip.ScrollRegionVCol
+
+        .toGetRightCol
 
           #comicstrip.ScrollRegionVCol
 

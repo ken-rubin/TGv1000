@@ -20,6 +20,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
             // Expose click handler.  Clicked item's Id passed as parameter to callback.
             self.click = null;
+            self.direction = "right";
 
             ///////////////////////////
             // Public methods
@@ -30,7 +31,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             self.create = function (strRootElementSelector,
                                     dWidth,
                                     dHeight,
-                                    functionClick) 
+                                    functionClick,
+                                    strDirection) 
             {
                 try {
 
@@ -39,6 +41,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_dHeight = dHeight;
                     m_dWidth = dWidth;
                     self.click = functionClick;
+                    self.direction = strDirection || "right";
 
                     // Get j-reference to root element.
                     m_jRoot = $(strRootElementSelector);
@@ -101,7 +104,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         strDataDashAttributeString + 
                         " data-ibase='" + 
                         iBase + 
-                        "' data-toggle='tooltip' data-container='body' data-placement='right' title='" + 
+                        "' data-toggle='tooltip' data-container='body' title='" + 
                         strName + 
                         "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 

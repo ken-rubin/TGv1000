@@ -3,18 +3,18 @@
 
 .ScrollRegionVCol   // this outer div holds .ScrollRegionVTop, .ScrollRegionVSliderContainer and .ScrollRegionVBottom
 {
-//    top:120px;
-    position:fixed;
     background-color:#00ff00;
 }
 
 .ScrollRegionVSliderContainer   // this div holds .ScrollRegionVSlider
 {
     position:absolute;
+
     top:40px;
     bottom:40px;
-    left:5px;
-    right:5px;
+    left:0px;
+    right:0px;
+
     border: 1px solid black;
     border-radius: 4px;
     background: rgb(64,64,64);
@@ -27,8 +27,9 @@
     position:absolute;
     left:0px;
     top:0px;
+    right:0px;
     bottom:0px;
-    background: black;
+    background: rgba(200,100,100,0.25);
 
     overflow: hidden;
 }
@@ -42,7 +43,7 @@
     left:5px;
     border: 1px solid black;
     border-radius: 4px;
-    background: rgba(0,0,100,0.5);
+    background: rgba(100,100,255,0.25);
     cursor: pointer;
     text-align: center;
     vertical-align: middle;
@@ -63,7 +64,7 @@
     left:5px;
     border: 1px solid black;
     border-radius: 4px;
-    background: rgba(0,0,100,0.5);
+    background: rgba(100,100,255,0.25);
     cursor: pointer;
     text-align: center;
     vertical-align: middle;
