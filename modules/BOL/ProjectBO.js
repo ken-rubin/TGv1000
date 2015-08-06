@@ -996,6 +996,12 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                      Save processing -- very similar to SaveAs (below)
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     var m_functionSaveProject = function (req, res, project) {
 
         console.log('In m_functionSaveProject with req.body=' + JSON.stringify(req.body));
@@ -1025,8 +1031,89 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionProjectSavePart2 = function (req,res,project,verb,guts,whereclause) {
 
+        // The components for the update statement have been set.
+        try {
+
+            var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
+            console.log(sqlStmt);
+
+            var exceptionRet = sql.execute(sqlStmt,
+                function(rows) {
+
+                    if (rows.length === 0) {
+
+                        res.json({
+                            success: false,
+                            message: "Error saving project to database."
+                        });
+                    } else {
+
+
+
+                        // TODO: Need to delete and re-insert or update the resource and then delete all previous tags and re-add them.
+
+
+
+
+                        m_doComicsPlusTypesForSave(typeOfSave, project, req, function(err) {
+
+                            if (err) {
+
+                                res.json({
+                                    success:false,
+                                    message: err.message
+                                });
+                            } else {
+
+                                // We're done.
+                                res.json({
+                                    success: true,
+                                    project: project
+                                });
+                            }
+                        });
+                    }
+                },
+                function(strError) {
+
+                    res.json({
+                        success: false,
+                        message: "Error inserting project into database."
+                    });
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: "Error inserting project into database: " + exceptionRet.message
+                });
+            }
+        } catch(e) {
+
+            res.json({
+                success:false,
+                message:e.message
+            });
+        }
+    }
+
+    var m_doComicsPlusTypesForSave = function (typeOfSave, project, req, callback) {
+
+        // The project, resource and tags have been updated.
+
+
+
+
 
     }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                      SaveAs processing -- very similar to Save (above)
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     var m_functionSaveProjectAs = function (req, res, project) {
         
@@ -1052,6 +1139,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         verb = "INSERT ";
 
         // Look for and reject an attempt to add a 2nd project for same user with same name.
+        // It is unnecessary to skip projects with same id in the DB, since project.id = 0.
         var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';",
             function(rows) {
 
@@ -1093,179 +1181,127 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionProjectSaveAsPart2 = function (req,res,project,verb,guts,whereclause) {
 
+        // So far we know that the name for this new project is unique to the user.
 
+        try {
+
+            var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
+            
+            console.log(sqlStmt);
+
+            var exceptionRet = sql.execute(sqlStmt,
+                function(rows) {
+
+                    if (rows.length === 0) {
+
+                        res.json({
+                            success: false,
+                            message: "Error saving project to database."
+                        });
+                    } else {
+
+                        project.id = rows[0].insertId;
+                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (name,createdByUserId,resourceTypeId,optionalFK) values ('" + project.name + "'," + req.body.userId + ",3," + project.id + ");",
+                            function(rows) {
+
+                                if (rows.length === 0) {
+
+                                    res.json({
+                                        success: false,
+                                        message: "Error inserting project resource into database."
+                                    });
+                                } else {
+
+                                    var resourceId = rows[0].insertId;
+                                    m_setUpAndDoTags(resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
+
+                                        if (err) {
+
+                                            res.json({
+                                                success:false,
+                                                message: err.message
+                                            });
+                                        } else {
+
+                                            m_doComicsPlusTypesForSaveAs(project, req, function(err) {
+
+                                                if (err) {
+
+                                                    res.json({
+                                                        success:false,
+                                                        message: err.message
+                                                    });
+                                                } else {
+
+                                                    // We're done.
+                                                    res.json({
+                                                        success: true,
+                                                        project: project
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            },
+                            function(strError) {
+
+                                res.json({
+                                    success: false,
+                                    message: "Error inserting project resource into database: " + strError
+                                });
+                            }
+                        );
+                        if (exceptionRet) {
+
+                            res.json({
+                                success: false,
+                                message: "Error inserting project resource into database: " + exceptionRet.message
+                            });
+                        }
+                    }
+                },
+                function(strError) {
+
+                    res.json({
+                        success: false,
+                        message: "Error inserting project into database."
+                    });
+                }
+            );
+            if (exceptionRet) {
+
+                res.json({
+                    success: false,
+                    message: "Error inserting project into database: " + exceptionRet.message
+                });
+            }
+        } catch(e) {
+
+            res.json({
+                success:false,
+                message:e.message
+            });
+        }
     }
 
-    // self.routeSaveProject = function (req, res) {
+    var m_doComicsPlusTypesForSaveAs = function (project, req, callback) {
 
-    //     try {
+        // Now the project has been inserted into the DB and its id is in project.id.
+        // Also, a row () has been added to resource and tags have been handled.
 
-    //         console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
-    //         // req.body.userId
-    //         // req.body.userName
-    //         // req.body.projectJson : See NewProjectDialog.js for schema.
 
-    //         // Important: All image resources have already been created or selected for the project, its comics and their types. (Or their defaults exist.)
 
-    //         // Muis important: the project's name must be unique to within the user's projects, but can be the same as another user's project name.
-    //         // This doesn't have to be checked for a typeOfSave === 'save'.
 
-    //         var project = req.body.projectJson;
-    //         var typeOfSave = (project.id === 0) ? 'saveNew' : (req.body.userId === project.createdByUserId) ? 'saveAs' : 'save';
-    //         // typeOfSave info:
-    //         //  saveNew INSERTs and has to insert id's into project, comics and types. And into their resources.
-    //         //  saveAs does that and has to replace project.createdByUserId with req.body.userId.
-    //         //  save does an UPDATE of the project, but comics and types may have been added, deleted or modified. They'll take more work.
-
-    //         // 1. Add row to projects table. Save id in projectId. Add 'project' row to resources table pointing back to projectId. Save id in resourceId. Associate projectTags with resourceId.
-    //         // 2. Loop (on i) through items in comics and for each:
-    //         //      2a. Add row to comics table. Save id in comicId. Add 'comic' row to resources table pointing back to comicId. Save id in resourceId. Associate comicTags[i] with resourceId.
-    //         //      2b. Loop (on j) through items in types and for each:
-    //         //          2b1. Add row to types table. Save id in typeId. Add 'type' row to resources table pointing back to typeId. Save id in resourceId. Associate comicTags[i] with resourceId.
+    } 
 
 
 
 
 
-
-
-    //         if (typeOfSave === "save"){
-
-
-    //         } else {
-
-    //     } catch (e) {
-
-    //         res.json({
-    //             success: false,
-    //             message: e.message
-    //         });
-    //     }
-    // }
 
     // var m_functionProjectSavePart2 = function (req,res,typeOfSave,project,verb,guts,whereclause) {
 
-    //     try {
-
-    //         var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
-    //         console.log(sqlStmt);
-
-    //         var exceptionRet = sql.execute(sqlStmt,
-    //             function(rows) {
-
-    //                 if (rows.length === 0) {
-
-    //                     res.json({
-    //                         success: false,
-    //                         message: "Error saving project to database."
-    //                     });
-    //                 } else {
-
-    //                     if (typeOfSave === 'save') {
-
-    //                         m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
-
-    //                             if (err) {
-
-    //                                 res.json({
-    //                                     success:false,
-    //                                     message: err.message
-    //                                 });
-    //                             } else {
-
-    //                                 // We're done.
-    //                                 res.json({
-    //                                     success: true,
-    //                                     project: project
-    //                                 });
-    //                             }
-    //                         });
-    //                     } else {
-
-    //                         project.id = rows[0].insertId;
-    //                         exceptionRet = sql.execute("insert into " + self.dbname + "resources (createdByUserId,resourceTypeId,optnlFK,public) values (" + req.body.userId + ",3," + project.id + ",0);",
-    //                             function(rows) {
-
-    //                                 if (rows.length === 0) {
-
-    //                                     res.json({
-    //                                         success: false,
-    //                                         message: "Error inserting project resource into database."
-    //                                     });
-    //                                 } else {
-
-    //                                     var resourceId = rows[0].insertId;
-    //                                     m_setUpAndDoTags(resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
-
-    //                                         if (err) {
-
-    //                                             res.json({
-    //                                                 success:false,
-    //                                                 message: err.message
-    //                                             });
-    //                                         } else {
-
-    //                                             m_doComicsPlusTypes(typeOfSave, project, req, function(err) {
-
-    //                                                 if (err) {
-
-    //                                                     res.json({
-    //                                                         success:false,
-    //                                                         message: err.message
-    //                                                     });
-    //                                                 } else {
-
-    //                                                     // We're done.
-    //                                                     res.json({
-    //                                                         success: true,
-    //                                                         project: project
-    //                                                     });
-    //                                                 }
-    //                                             });
-    //                                         }
-    //                                     });
-    //                                 }
-    //                             },
-    //                             function(strError) {
-
-    //                                 res.json({
-    //                                     success: false,
-    //                                     message: "Error inserting project resource into database: " + strError
-    //                                 });
-    //                             }
-    //                         );
-    //                         if (exceptionRet) {
-
-    //                             res.json({
-    //                                 success: false,
-    //                                 message: "Error inserting project resource into database: " + exceptionRet.message
-    //                             });
-    //                         }
-    //                     }
-    //                 }
-    //             },
-    //             function(strError) {
-
-    //                 res.json({
-    //                     success: false,
-    //                     message: "Error inserting project into database."
-    //                 });
-    //             }
-    //         );
-    //         if (exceptionRet) {
-
-    //             res.json({
-    //                 success: false,
-    //                 message: "Error inserting project into database: " + exceptionRet.message
-    //             });
-    //         }
-    //     } catch(e) {
-
-    //         res.json({
-    //             success:false,
-    //             message:e.message
-    //         });
-    //     }
     // }
 
     // var m_doComicsPlusTypes = function(typeOfSave, project, req, callback) {
