@@ -836,13 +836,13 @@ define(["Core/errorHelper",
 					// If user says to abandon, it empties and clears project and returns null.
 					// If user says not to abandon, it returns project.
 					// On exception, it also returns project, but state may be compromised (i.e., partially removed)--needs further work.
-					self.unloadProject = function (unloadedCallback) {
+					self.unloadProject = function (unloadedCallback, bShowAbandonDlg) {
 
 						try {
 
-							if (m_clProject && m_bProjectIsDirty) {
+							if (m_clProject && (m_bProjectIsDirty || bShowAbandonDlg)) {
 							
-								m_functionAbandonProjectDialog(function() {
+								m_functionAbandonProjectDialog(function() {	
 
 									// This callback will be called if the user wants to abandon the open project.
 									var exceptionRet = m_clProject.unload();
@@ -864,7 +864,8 @@ define(["Core/errorHelper",
 
 									if ($.isFunction(unloadedCallback))
 										unloadedCallback();
-								});
+								},
+								bShowAbandonDlg);	// If bShowAbandonDlg is false, will just return. No better way.
 							} else {
 
 								if ($.isFunction(unloadedCallback))
@@ -1098,7 +1099,11 @@ define(["Core/errorHelper",
 						$(window).resize();
 					}
 
-					var m_functionAbandonProjectDialog = function (abandonCallback) {
+					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
+
+						// The following seems stupid, but it may be the best way to prevent showing this dlg after a project save.
+						if (!bShowAbandonDlg)
+							return;
 
 						BootstrapDialog.show({
 							type: BootstrapDialog.TYPE_DANGER,

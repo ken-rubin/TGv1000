@@ -44,7 +44,8 @@ define(["Core/errorHelper"],
 
 										var exceptionRet = client.showNewProjectDialog();
 										if (exceptionRet) { throw exceptionRet; }
-									});
+									}, 
+									true);	// true means to show the Abandon dlg if applicable.
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -75,7 +76,8 @@ define(["Core/errorHelper"],
 
 									errorHelper.show(e);
 								}
-							});
+							},
+							true);	// true means to show the Abandon dlg if applicable.
 
 							$("#SaveProjectButton").click(function () {
 
@@ -122,7 +124,7 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
-								client.unloadProject();
+								client.unloadProject(null, true);	// No callback; show the Abandon dlg.
 
 								self.enableDisableProjectsMenuItems();
 							});

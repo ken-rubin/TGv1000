@@ -106,7 +106,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
 										
-										client.unloadProject();
+										client.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
 										
 										// cause whichever dialog was open to close.
 										client.closeCurrentDialog();
