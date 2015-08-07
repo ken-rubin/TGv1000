@@ -71,13 +71,13 @@ define(["Core/errorHelper"],
 											}
 										});
 										if (exceptionRet) { throw exceptionRet; }
-									});
+									},
+									true);	// true means to show the Abandon dlg if applicable.
 								} catch (e) {
 
 									errorHelper.show(e);
 								}
-							},
-							true);	// true means to show the Abandon dlg if applicable.
+							});
 
 							$("#SaveProjectButton").click(function () {
 
@@ -124,7 +124,7 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
-								client.unloadProject(null, true);	// No callback; show the Abandon dlg.
+								client.unloadProject(null, true);	// No callback; show the Abandon dlg if there's a project and it's dirty.
 
 								self.enableDisableProjectsMenuItems();
 							});
