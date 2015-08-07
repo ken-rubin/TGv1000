@@ -1055,7 +1055,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
 
 
-                        m_doComicsPlusTypesForSave(typeOfSave, project, req, function(err) {
+                        m_doComicsForSave(typeOfSave, project, req, function(err) {
 
                             if (err) {
 
@@ -1098,7 +1098,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doComicsPlusTypesForSave = function (typeOfSave, project, req, callback) {
+    var m_doComicsForSave = function (typeOfSave, project, req, callback) {
 
         // The project, resource and tags have been updated.
 
@@ -1187,7 +1187,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
             
-            console.log(sqlStmt);
+            // console.log(sqlStmt);
 
             var exceptionRet = sql.execute(sqlStmt,
                 function(rows) {
@@ -1223,7 +1223,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             });
                                         } else {
 
-                                            m_doComicsPlusTypesForSaveAs(project, req, function(err) {
+                                            m_doComicsForSaveAs(project, req, function(err) {
 
                                                 if (err) {
 
@@ -1285,200 +1285,155 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doComicsPlusTypesForSaveAs = function (project, req, callback) {
+    var m_doComicsForSaveAs = function (project, req, callback) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
-        // Also, a row () has been added to resource and tags have been handled.
+        // Also, a row has been added to resource and tags have been handled, too.
 
+        // This routine will loop through the project's comics, saving (inserting) each while counting down to 0.
+        // At that point it will call the Types routine.
 
+        try {
 
+            var comicsCountdown = project.comics.items.length;
 
+            project.comics.items.forEach(function(comicIth) {
+
+                var exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + project.id + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');",
+                    function(rows) {
+
+                        if (rows.length === 0) {
+
+                            callback(new Error("Error writing comic to database."));
+                            return;
+                        }
+
+                        comicIth.id = rows[0].insertId;
+
+                        if (--comicsCountdown === 0) {
+
+                            m_doTypesForSaveAs(project, req, callback);
+                        }
+                    },
+                    function(strError) {
+
+                        callback(new Error(strError));
+                        return;
+                    }
+                );
+                if (exceptionRet) {
+
+                    callback(exceptionRet);
+                    return;
+                }
+            });
+
+        } catch (e) {
+
+            callback(e);
+        }
     } 
 
+    var m_doTypesForSaveAs = function (project, req, callback) {
+
+        // All comics have now been inserted and their ids are set in project.
+        // Time to do types and then move on to type contents: methods, properties and events.
+        // Types will require resource, tags and resources_tags. (As will methods.)
+
+        try {
+
+            var typesCountdown = 0;
+            project.comics.items.forEach(function(comicIth) {
+
+                typesCountdown += comicIth.types.items.length;
+            });
+
+            project.comics.items.forEach(function(comicIth) {
+
+                comicIth.types.items.forEach(function(typeIth) {
+
+                    var ordinal = 0;
+                    var exceptionRet = sql.execute("insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump) values ('" + typeIth.name + "'," + typeIth.isApp + "," + typeIth.imageId + "," + ordinal++ + "," + comicIth.id + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + ");",
+                        function(rows) {
+
+                            if (rows.length === 0) {
+
+                                callback(new Error("Error writing type to database."));
+                                return;
+                            }
+
+                            typeIth.id = rows[0].insertId;
+                            exceptionRet = sql.execute("insert into " + self.dbname + "resources (name,createdByUserId,resourceTypeId,optionalFK) values ('" + typeIth.name + "'," + req.body.userId + ",5," + typeTth.id + ");",
+                                function(rows) {
+
+                                    if (rows.length === 0) {
+
+                                        callback(new Error("Error inserting type resource into database."));
+                                        return;
+
+                                    } else {
+
+                                        var resourceId = rows[0].insertId;
+                                        m_setUpAndDoTags(resourceId, '5', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+
+                                            if (err) {
+
+                                                callback(err);
+                                                return;
+
+                                            } else {
+
+                                                if (--typesCountdown === 0) {
+
+                                                    m_doTypeContentsForSaveAs(project, req, callback);
+                                                }
+                                            }
+                                        });
+                                    }
+                                },
+                                function(strError) {
+
+                                    callback(new Error("Error inserting type resource into database: " + strError));
+                                    return;
+                                }
+                            );
+                            if (exceptionRet) {
+
+                                callback(new Error("Error inserting project resource into database: " + exceptionRet.message));
+                                return;
+                            }
+                        },
+                        function(strError) {
+
+                            callback(new Error(strError));
+                            return;
+                        }
+                    );
+                    if (exceptionRet) {
+
+                        callback(exceptionRet);
+                        return;
+                    }
+                });
+            });
+
+        } catch (e) {
+
+            callback(e);
+        }
+    }
+
+    var m_doTypeContentsForSaveAs = function (project, req, callback) {
+
+        try {
+
+        } catch (e) {
+
+            callback(e);
+        }
+    }
 
 
-
-
-
-    // var m_functionProjectSavePart2 = function (req,res,typeOfSave,project,verb,guts,whereclause) {
-
-    // }
-
-    // var m_doComicsPlusTypes = function(typeOfSave, project, req, callback) {
-
-    //     // If typeOfSave = 'save', then comics and types MIGHT exist already. The way to tell is if they have an id and if (for comics) comic.projectId === project.id or (for types) type.comicId => comic.projectId === project BEFORE the comic is saved.
-    //     // Otherwise, a new comic or type is being INSERTed.
-
-    //     // 1. Delete from types where comicId in (select id from comics where projectId=id); delete corr. rows from resources_tags
-    //     // 2. Delete from comics where projectId=id; delete corr. rows from resources_tags
-    //     // 3. For each comic in project, insert into comics, returning id as comicId. 
-    //     // 3a. With that comicId, insert into resources, setting optnlFK=comicId. (resourceTypeId=4)
-    //     // 3b. Also with that comicId, for each type in comic, insert into types, returning id as typeId.
-    //     // 3c. With that typeId, insert into resources, setting optnlFK=typeId. (resourceTypeId=5)
-
-    //     // Remember: comics and types have tags, too, that need to be added.
-
-    //     try {
-
-    //         var exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId = " + project.id + ")));" + "delete from " + self.dbname + "types where comicId in (select id from " + self.dbname + "comics where projectId=" + project.id +");",
-    //             function(rows){
-
-    //                 // error check needed
-    //                 exceptionRet = sql.execute("delete from " + self.dbname + "resources_tags where resourceId in (select id from " + self.dbname + "resources where optnlFK in (select id from " + self.dbname + "comics where projectId = " + project.id + "));" + "delete from " + self.dbname + "comics where projectId=" + project.id +";",
-    //                     function(rows){
-
-    //                         // error check needed
-    //                         var allTypesCtr = 0;
-
-    //                         project.comics.items.forEach(function(comicCth) {
-
-    //                             allTypesCtr += comicCth.types.items.length;
-    //                         });
-
-
-    //                         project.comics.items.forEach(function(comicCth) {
-
-    //                             console.log('*****inserting comic');
-    //                             exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId,ordinal,imageResourceId,name) values (" + project.id + "," + comicCth.ordinal + "," + comicCth.imageResourceId + ",'" + comicCth.name + "');",
-    //                                 function(rows){
-
-    //                                     // error check needed
-    //                                     var comicId = rows[0].insertId;
-
-    //                                     console.log('**********inserting comic resource');
-    //                                     exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",4,0,0," + comicId + ");",
-    //                                         function(rows){
-
-    //                                             // error check needed
-    //                                             var resourceId = rows[0].insertId;
-    //                                             m_setUpAndDoTags(resourceId, '4', req.body.userName, comicCth.tags, comicCth.name, function(err) {
-
-    //                                                 if (err) {
-
-    //                                                     callback(err);
-    //                                                     return;
-
-    //                                                 } else {
-
-    //                                                     comicCth.types.items.forEach(function(typeTth) {
-
-    //                                                         var jsonCode = JSON.stringify({
-    //                                                             properties:typeTth.properties,
-    //                                                             methods:typeTth.methods,
-    //                                                             events:typeTth.events,
-    //                                                             dependencies:typeTth.dependencies
-    //                                                         });
-    //                                                         console.log('***************inserting type ' + typeTth.name);
-    //                                                         exceptionRet = sql.execute("insert " + self.dbname + "types (comicId,name,isApp,imageResourceId,ordinal,jsonCode) values (" + comicId + ",'" + typeTth.name + "'," + typeTth.isApp + "," + typeTth.imageResourceId + "," + typeTth.ordinal + ",'" + jsonCode + "');",
-    //                                                             function(rows){
-
-    //                                                                 // error check needed
-    //                                                                 var typeId = rows[0].insertId;
-
-    //                                                                 console.log('********************inserting type resource');
-    //                                                                 exceptionRet = sql.execute("insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,quarantined,optnlFK) values (" + req.body.userId + ",5,0,0," + typeId + ");",
-    //                                                                     function(rows){
-
-    //                                                                         // error check needed
-    //                                                                         var resourceId = rows[0].insertId;
-    //                                                                         m_setUpAndDoTags(resourceId, '5', req.body.userName, typeTth.tags, typeTth.name, function(err) {
-
-    //                                                                             if (err) {
-
-    //                                                                                 callback(err);
-    //                                                                                 return;
-
-    //                                                                             } else {
-
-    //                                                                                 if (--allTypesCtr === 0) {
-
-    //                                                                                     callback(null);
-    //                                                                                     return;
-    //                                                                                 }
-    //                                                                             }
-    //                                                                         });
-    //                                                                     },
-    //                                                                     function(strError){
-
-    //                                                                         callback(new Error(strError));
-    //                                                                         return;
-    //                                                                     }
-    //                                                                 );
-    //                                                                 if (exceptionRet) {
-
-    //                                                                     callback(exceptionRet);
-    //                                                                     return;
-    //                                                                 }
-    //                                                             },
-    //                                                             function(strError){
-
-    //                                                                 callback(new Error(strError));
-    //                                                                 return;
-    //                                                             }
-    //                                                         );
-    //                                                         if (exceptionRet) {
-
-    //                                                             callback(exceptionRet);
-    //                                                             return;
-    //                                                         }
-    //                                                     });   // comicCth.types.items,forEach(function(typeTth)
-    //                                                 }
-    //                                             });
-    //                                         },
-    //                                         function(strError){
-
-    //                                             callback(new Error(strError));
-    //                                             return;
-    //                                         }
-    //                                     );
-    //                                     if (exceptionRet) {
-
-    //                                         callback(exceptionRet);
-    //                                         return;
-    //                                     }
-    //                                 },
-    //                                 function(strError){
-
-    //                                     callback(new Error(strError));
-    //                                     return;
-    //                                 }
-    //                             );
-    //                             if (exceptionRet) {
-
-    //                                 callback(exceptionRet);
-    //                                 return;
-    //                             }
-    //                         });  // project.comics.items.forEach(function(comicCth) {
-    //                     },
-    //                     function(strError){
-
-    //                         callback(new Error(strError));
-    //                         return;
-    //                     }
-    //                 );
-    //                 if (exceptionRet) {
-
-    //                     callback(exceptionRet);
-    //                     return;
-    //                 }
-    //             },
-    //             function(strError){
-
-    //                 callback(new Error(strError));
-    //                 return;
-    //             }
-    //         );
-    //         if (exceptionRet) {
-
-    //             callback(exceptionRet);
-    //             return;
-    //         }
-    //     } catch (e) {
-
-    //         callback(err);   
-    //         return;
-    //     }
-    // }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
