@@ -466,6 +466,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             {
                                                 id: row.id,
                                                 originalPropertyId: row.id,
+                                                propertyTypeId: row.propertyTypeId,
                                                 name: row.name,
                                                 initialValue: row.initialValue,
                                                 ordinal: row.ordinal
@@ -725,6 +726,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             {
                                 id: row.id,
                                 originalPropertyId: row.id,
+                                propertyTypeId: row.propertyTypeId,
                                 name: row.name,
                                 initialValue: row.initialValue,
                                 ordinal: row.ordinal
@@ -998,7 +1000,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                      Save processing -- very similar to SaveAs (below)
+    //                      Save processing -- similar to SaveAs (below), but harder, since sometimes we update; sometimes we insert.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1017,7 +1019,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         var guts = " SET name='" + project.name + "'"
             + ",ownedByUserId=" + req.body.userId
             + ",parentPrice=" + project.parentPrice
-            + ",parentProductId=" + project.parentProductId
+            + ",parentProjectId=" + project.parentProjectId
             + ",priceBump=" + project.priceBump
             + ",imageId=" + project.imageId
             + ",isProduct=" + project.isProduct
@@ -1111,7 +1113,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                      SaveAs processing -- very similar to Save (above)
+    //                      SaveAs processing -- similar to Save (above), but easier, because everything is inserted, leaving the original project alone and inteact
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1119,9 +1121,9 @@ module.exports = function ProjectBO(app, sql, logger) {
         
         console.log('In m_functionSaveProjectAs with req.body=' + JSON.stringify(req.body));
 
-        res.json({success: false, message: 'Forced exit'});
+        // res.json({success: false, message: 'Forced exit'});
 
-        return null;
+        // return null;
 
         var whereclause = "", 
             verb = "",
@@ -1130,7 +1132,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         var guts = " SET name='" + project.name + "'"
             + ",ownedByUserId=" + req.body.userId
             + ",parentPrice=" + project.parentPrice
-            + ",parentProductId=" + project.parentProductId
+            + ",parentProjectId=" + project.parentProjectId
             + ",priceBump=" + project.priceBump
             + ",imageId=" + project.imageId
             + ",isProduct=" + project.isProduct
@@ -1186,8 +1188,10 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
-            
+
+            // console.log(' ');
             // console.log(sqlStmt);
+            // console.log(' ');
 
             var exceptionRet = sql.execute(sqlStmt,
                 function(rows) {
@@ -1374,7 +1378,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
 
                             typeIth.id = rows[0].insertId;
-                            exceptionRet = sql.execute("insert into " + self.dbname + "resources (name,createdByUserId,resourceTypeId,optionalFK) values ('" + typeIth.name + "'," + req.body.userId + ",5," + typeTth.id + ");",
+                            exceptionRet = sql.execute("insert into " + self.dbname + "resources (name,createdByUserId,resourceTypeId,optionalFK) values ('" + typeIth.name + "'," + req.body.userId + ",5," + typeIth.id + ");",
                                 function(rows) {
 
                                     if (rows.length === 0) {
@@ -1519,7 +1523,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.properties.forEach(function(property) {
 
                         property.typeId = typeIth.id;
-                        exceptionRet = sql.execute("insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");",
+                        var ss = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");";
+                        console.log(' ');
+                        console.log('*** property insert sql stmt ');
+                        console.log(ss);
+                        console.log(' ');
+                        exceptionRet = sql.execute(ss,
                             function(rows) {
 
                                 if (rows.length === 0) {
@@ -1532,7 +1541,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             function(strError) {
 
-                                callback(newError(strError));
+                                callback(new Error(strError));
                                 return;
                             }
                         );
