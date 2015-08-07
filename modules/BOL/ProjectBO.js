@@ -1299,7 +1299,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             project.comics.items.forEach(function(comicIth) {
 
-                var exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + project.id + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');",
+                comicIth.projectId = project.id;
+                var exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');",
                     function(rows) {
 
                         if (rows.length === 0) {
@@ -1348,12 +1349,22 @@ module.exports = function ProjectBO(app, sql, logger) {
                 typesCountdown += comicIth.types.items.length;
             });
 
+            // To pass into m_doTypeArraysForSaveAs to save some time by taking advantage of this loop.
+            // These will hold total counts across all comics/types.
+            var methodsCountdown = 0,
+                propertiesCountdown = 0,
+                eventsCountdown = 0;
             project.comics.items.forEach(function(comicIth) {
 
                 comicIth.types.items.forEach(function(typeIth) {
 
+                    methodsCountdown += typeIth.methods.length;
+                    propertiesCountdown += typeIth.properties.length;
+                    eventsCountdown += typeIth.events.length;
+
                     var ordinal = 0;
-                    var exceptionRet = sql.execute("insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump) values ('" + typeIth.name + "'," + typeIth.isApp + "," + typeIth.imageId + "," + ordinal++ + "," + comicIth.id + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + ");",
+                    typeIth.comicId = comicIth.id;
+                    var exceptionRet = sql.execute("insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump) values ('" + typeIth.name + "'," + typeIth.isApp + "," + typeIth.imageId + "," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + ");",
                         function(rows) {
 
                             if (rows.length === 0) {
@@ -1385,7 +1396,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 if (--typesCountdown === 0) {
 
-                                                    m_doTypeContentsForSaveAs(project, req, callback);
+                                                    m_doTypeArraysForSaveAs(project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
                                                 }
                                             }
                                         });
@@ -1399,7 +1410,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             );
                             if (exceptionRet) {
 
-                                callback(new Error("Error inserting project resource into database: " + exceptionRet.message));
+                                callback(new Error("Error inserting type resource into database: " + exceptionRet.message));
                                 return;
                             }
                         },
@@ -1423,10 +1434,158 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTypeContentsForSaveAs = function (project, req, callback) {
+    var m_doTypeArraysForSaveAs = function (project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback) {
 
         try {
 
+            var exceptionRet = null;
+            var ordinal;
+
+            project.comics.items.forEach(function(comicIth) {
+
+                comicIth.types.items.forEach(function(typeIth) {
+
+                    ordinal = 0;
+                    typeIth.methods.forEach(function(method) {
+
+                        method.typeId = typeIth.id;
+                        exceptionRet = sql.execute("insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump) values (" + method.typeId + ",'" + method.name + "'," + (ordinal++) + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + ");",
+                            function(rows) {
+
+                                if (rows.length === 0) {
+
+                                    callback(new Error("Error inserting method into database"));
+                                    return;
+                                }
+
+                                method.id = rows[0].insertId;
+
+                                // Now resource and tags.
+                                exceptionRet = sql.execute("insert into " + self.dbname + "resources (name,createdByUserId,resourceTypeId,optionalFK) values ('" + method.name + "'," + req.body.userId + ",7," + method.id + ");",
+                                    function(rows) {
+
+                                        if (rows.length === 0) {
+
+                                            callback(new Error("Error inserting method resource into database."));
+                                            return;
+
+                                        } else {
+
+                                            var resourceId = rows[0].insertId;
+                                            m_setUpAndDoTags(resourceId, '7', req.body.userName, method.tags, method.name, function(err) {
+
+                                                if (err) {
+
+                                                    callback(err);
+                                                    return;
+
+                                                }
+                                            });
+                                        }
+                                    },
+                                    function(strError) {
+
+                                        callback(new Error("Error inserting type resource into database: " + strError));
+                                        return;
+                                    }
+                                );
+                                if (exceptionRet) {
+
+                                    callback(new Error("Error inserting type resource into database: " + exceptionRet.message));
+                                    return;
+                                }
+                            },
+                            function(strError) {
+
+                                callback(newError(strError));
+                                return;
+                            }
+                        );
+                        if (exceptionRet) {
+
+                            callback(exceptionRet);
+                            return;
+                        }
+
+                        methodsCountdown--;
+                        if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+
+                            callback(null);
+                            return;
+                        }
+                    });
+
+                    ordinal = 0;
+                    typeIth.properties.forEach(function(property) {
+
+                        property.typeId = typeIth.id;
+                        exceptionRet = sql.execute("insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");",
+                            function(rows) {
+
+                                if (rows.length === 0) {
+
+                                    callback(new Error("Error inserting property into database"));
+                                    return;
+                                }
+
+                                property.id = rows[0].insertId;
+                            },
+                            function(strError) {
+
+                                callback(newError(strError));
+                                return;
+                            }
+                        );
+                        if (exceptionRet) {
+
+                            callback(exceptionRet);
+                            return;
+                        }
+
+                        propertiesCountdown--;
+                        if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+
+                            callback(null);
+                            return;
+                        }
+                    });
+
+                    ordinal = 0;
+                    typeIth.events.forEach(function(event) {
+
+                        event.typeId = typeIth.id;
+                        exceptionRet = sql.execute("insert " + self.dbname + "methods (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");",
+                            function(rows) {
+
+                                if (rows.length === 0) {
+
+                                    callback(new Error("Error inserting method into database"));
+                                    return;
+                                }
+
+                                event.id = rows[0].insertId;
+                            },
+                            function(strError) {
+
+                                callback(newError(strError));
+                                return;
+                            }
+                        );
+                        if (exceptionRet) {
+
+                            callback(exceptionRet);
+                            return;
+                        }
+
+                        eventsCountdown--;
+                        if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+
+                            callback(null);
+                            return;
+                        }
+                    });
+                });
+            });
         } catch (e) {
 
             callback(e);
