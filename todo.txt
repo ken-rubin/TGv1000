@@ -1,5 +1,5 @@
 Either of us
-
+- Resizing in the two vertical toolstrips seems to now lose aspect ratio.
 
 
 Ken
@@ -22,7 +22,6 @@ Jerry
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places???
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
-- When I "select ... order by ordinal asc", items might come back in random order anyway. Check this. If so, sort.
 - Searching for a Type or Method, always sets id = 0 (like it's someone else's). I think this is ok even if it belongs to the user, because it's coming from another project. This implies that searching shouldn't return something already in your project.
 
 
@@ -30,10 +29,6 @@ Jerry
 To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
-- What does one search for when looking for a class, product or other project to open? classOrProject or project? There will initially be a 1-1 correspondance between classOrProduct and project, but, as people start using a classOrProduct,
--    they'll save clone projects that will still point back to the same classOrProduct, so that relationship will become 1-many. Someone "buying" a product will want to search classOrProduct. Someone cloning a project should be able to search at that level.
--    I think this could be handled with checkboxes in the Open/Search for Project dialog. It does imply that classOrProduct does have a resource pointing back to it and tags associated with that resource. There is currently a resourceType for "comic". I'm going to
--    change that to classOrProduct.
 - Should I prevent dragging of the App tool onto the designer? Easy to do by just adding mousedown handler, not draggable, if name is 'tool-app'.
 - Uniquified picklist values are case sensitive. OK?
 

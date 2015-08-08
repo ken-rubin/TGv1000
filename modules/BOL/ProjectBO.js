@@ -1360,13 +1360,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                 eventsCountdown = 0;
             project.comics.items.forEach(function(comicIth) {
 
+                var ordinal = 0;
                 comicIth.types.items.forEach(function(typeIth) {
 
                     methodsCountdown += typeIth.methods.length;
                     propertiesCountdown += typeIth.properties.length;
                     eventsCountdown += typeIth.events.length;
 
-                    var ordinal = 0;
                     typeIth.comicId = comicIth.id;
                     var exceptionRet = sql.execute("insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump) values ('" + typeIth.name + "'," + typeIth.isApp + "," + typeIth.imageId + "," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + ");",
                         function(rows) {
