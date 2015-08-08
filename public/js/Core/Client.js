@@ -952,47 +952,47 @@ define(["Core/errorHelper",
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").tooltip();
 
-							// Use project data and user history to determine initial display settings for comic and panels strips (along with width of designer and code sections).
-							if (m_clProject.data.comics.items.length > 1) {
+							// // Use project data and user history to determine initial display settings for comic and panels strips (along with width of designer and code sections).
+							// if (m_clProject.data.comics.items.length > 1) {
 
-								// Set globael var so comic stuff will be displayed on resize and force a resize.
-								self.functionSetBDisplayComics(true);
+							// 	// Set globael var so comic stuff will be displayed on resize and force a resize.
+							// 	self.functionSetBDisplayComics(true);
 
-							} else {
+							// } else {
 
-								// If project has only 1 comic, it means it's a project a user started with New Project.
-								// Determine if showing help (comic) based on number of projects user has played with.
-								var posting = $.post("/BOL/ProjectBO/RetrieveCountUsersProjects", 
-									{
-										userId: g_strUserId
-									},
-									'json');
-								posting.done(function(data){
+							// 	// If project has only 1 comic, it means it's a project a user started with New Project.
+							// 	// Determine if showing help (comic) based on number of projects user has played with.
+							// 	var posting = $.post("/BOL/ProjectBO/RetrieveCountUsersProjects", 
+							// 		{
+							// 			userId: g_strUserId
+							// 		},
+							// 		'json');
+							// 	posting.done(function(data){
 
-									if (data.success) {
+							// 		if (data.success) {
 
-										if (data.cnt > 5) {
+							// 			if (data.cnt > 5) {
 
-											self.functionSetBDisplayComics(false);
+							// 				self.functionSetBDisplayComics(false);
 
-										} else if (data.cnt < 4) {
+							// 			} else if (data.cnt < 4) {
 
-											self.functionSetBDisplayComics(true);
+							// 				self.functionSetBDisplayComics(true);
 
-										} else {
+							// 			} else {
 
-											self.functionSetBDisplayComics(false);
-											errorHelper.show("Based on your experience level, Help is turned off. You may turn it back on with the Show Help menu item.", 7500);
-										}
+							// 				self.functionSetBDisplayComics(false);
+							// 				errorHelper.show("Based on your experience level, Help is turned off. You may turn it back on with the Show Help menu item.", 7500);
+							// 			}
 
-									} else {
+							// 		} else {
 
-										// !data.success
-										// This can't be good. We'll just turn help on.
-										self.functionSetBDisplayComics(true);
-									}
-								});
-							}
+							// 			// !data.success
+							// 			// This can't be good. We'll just turn help on.
+							// 			self.functionSetBDisplayComics(true);
+							// 		}
+							// 	});
+							// }
 
 							if ($.isFunction(callback)) {
 
@@ -1082,23 +1082,23 @@ define(["Core/errorHelper",
 					}
 
 					// Set global var governing display of comic and panels strips and Show/Hide Help menu item.
-					self.functionSetBDisplayComics = function(bDisplayComicsStuff) {
+					// self.functionSetBDisplayComics = function(bDisplayComicsStuff) {
 
-						bDisplayComics = bDisplayComicsStuff;
+					// 	bDisplayComics = bDisplayComicsStuff;
 
-						if (bDisplayComics) {
+					// 	if (bDisplayComics) {
 
-							$("#ComicsOn").css("display", "none");
-							$("#ComicsOff").css("display", "block");
+					// 		$("#ComicsOn").css("display", "none");
+					// 		$("#ComicsOff").css("display", "block");
 
-						} else {
+					// 	} else {
 
-							$("#ComicsOn").css("display", "block");
-							$("#ComicsOff").css("display", "none");
-						}
+					// 		$("#ComicsOn").css("display", "block");
+					// 		$("#ComicsOff").css("display", "none");
+					// 	}
 
-						$(window).resize();
-					}
+					// 	$(window).resize();
+					// }
 
 					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
 

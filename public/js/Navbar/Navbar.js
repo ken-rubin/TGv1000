@@ -130,15 +130,15 @@ define(["Core/errorHelper"],
 							});
 
 							// Wire Help/Comics buttons
-							$("#ComicsOnButton").click(function () {
+							// $("#ComicsOnButton").click(function () {
 
-								client.functionSetBDisplayComics(true);
-							});
+							// 	client.functionSetBDisplayComics(true);
+							// });
 
-							$("#ComicsOffButton").click(function () {
+							// $("#ComicsOffButton").click(function () {
 
-								client.functionSetBDisplayComics(false);
-							});
+							// 	client.functionSetBDisplayComics(false);
+							// });
 
 							// Wire Adminzone button click.
 							$("#AdminzoneButton").click(function () {

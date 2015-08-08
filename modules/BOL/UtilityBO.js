@@ -83,7 +83,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             console.log("tags massaged='" + tags + "'");
 
             // Turn tags into string with commas between tags and tags surrounded by single quotes.
-            var ccArray = tags.match(/([\w\-]+)/g);
+            var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
 
             var ccString = '';
             for (var i = 0; i < ccArray.length; i++) {
@@ -97,9 +97,10 @@ module.exports = function UtilityBO(app, sql, logger) {
             }
 
             var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-            // console.log(' ');
-            // console.log('Query to get tag ids: ' + sqlString);
-            // console.log(' ');
+
+            console.log(' ');
+            console.log('Query to get tag ids: ' + sqlString);
+            console.log(' ');
 
             var exceptionRet = sql.execute(sqlString,
                 function (arrayRows) {
@@ -138,7 +139,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         } else if (req.body.resourceTypeId === "3") {    // Project
 
-                            sqlString = "select distinct p.*," + req.body.resourceTypeId + " as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + resourceTypeDescr + "s p on r.optionalFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            sqlString = "select distinct p.*,3 as resourceTypeId from " + self.dbname + "resources r inner join projects p on r.optionalFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         
                         } else if (req.body.resourceTypeId === "5") {   // Type - excludes types where isApp = 1
 
@@ -146,13 +147,12 @@ module.exports = function UtilityBO(app, sql, logger) {
                         
                         } else if (req.body.resourceTypeId === "7") {   // Method - excludes methods named 'initialize'
 
-                            sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "methods p on r.optionalFK=p.id where p.name <> 'initialize' and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                            sqlString = "select distinct p.*,7 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "methods p on r.optionalFK=p.id where p.name <> 'initialize' and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
                         }
 
-
-                        // console.log(' ');
-                        // console.log('Query: ' + sqlString);
-                        // console.log(' ');
+                        console.log(' ');
+                        console.log('Query: ' + sqlString);
+                        console.log(' ');
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
                                 res.json({
