@@ -34,11 +34,12 @@ To discuss
 
 
 Save and Save As
-.SaveAs is for New Projects or Searched for template projects or Searched for projects owned by someone else. Save and Save As navbar buttons both do Save As. Probably Save shouldn't even be permitted.
-.Save is for when you opened your own project and want to overwrite its changes. SaveAs is available here, too, to save those (possible) changes under a new name.
-.SaveAs inserts new records for the Project on down. Everything.
+
+.SaveAs is for New Projects or Searched for template projects or Searched for projects owned by someone else. Save and Save As navbar buttons both do Save As. Probably Save shouldn't even be permitted. Recognize the need for SaveAs with project.id === 0.
+.Save is for when you opened your own project and want to overwrite its changes. SaveAs is available here, too, to save those (possible) changes under a new name. If the user tries a SaveAs on his own project without changing the name, report a "Name already exists" error.
+.SaveAs inserts new records for the Project on down. For everything.
 .Save should update anything that was already in the project and insert anything that wasn't. Recognize insertions by the fact that they have id === 0.
-.Exception to the previous line: For items being updated that have a resource (project, type, method), update the resource record but delete and replace tags and resources_tags.
+.Exception to the previous line: For items being updated that have a resource (project, type, method), update the resource record but delete and re-insert resources_tags. DO NOT delete tags. They may be being used for some other resource.
 
 
 
