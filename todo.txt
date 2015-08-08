@@ -1,5 +1,5 @@
 Either of us
-- Resizing in the two vertical toolstrips seems to now lose aspect ratio.
+- Resizing in the two vertical toolstrips seems to now lose aspect ratio. Toolstrip for sure.
 
 
 Ken
@@ -29,9 +29,16 @@ Jerry
 To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
-- Should I prevent dragging of the App tool onto the designer? Easy to do by just adding mousedown handler, not draggable, if name is 'tool-app'.
+- Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 - Uniquified picklist values are case sensitive. OK?
 
+
+Save and Save As
+.SaveAs is for New Projects or Searched for template projects or Searched for projects owned by someone else. Save and Save As navbar buttons both do Save As. Probably Save shouldn't even be permitted.
+.Save is for when you opened your own project and want to overwrite its changes. SaveAs is available here, too, to save those (possible) changes under a new name.
+.SaveAs inserts new records for the Project on down. Everything.
+.Save should update anything that was already in the project and insert anything that wasn't. Recognize insertions by the fact that they have id === 0.
+.Exception to the previous line: For items being updated that have a resource (project, type, method), update the resource record but delete and replace tags and resources_tags.
 
 
 
