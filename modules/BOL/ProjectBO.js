@@ -1119,69 +1119,65 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSaveProjectAs = function (req, res, project) {
         
-        console.log('In m_functionSaveProjectAs with req.body=' + JSON.stringify(req.body));
+        try {
 
-        // res.json({success: false, message: 'Forced exit'});
+            console.log('In m_functionSaveProjectAs with req.body=' + JSON.stringify(req.body));
 
-        // return null;
+            sql.getCxnFromPool(function(err, connection) {
 
-        var whereclause = "", 
-            verb = "",
-            sqlStmt = "";
+                if (err) { throw err; }
 
-        var guts = " SET name='" + project.name + "'"
-            + ",ownedByUserId=" + req.body.userId
-            + ",parentPrice=" + project.parentPrice
-            + ",parentProjectId=" + project.parentProjectId
-            + ",priceBump=" + project.priceBump
-            + ",imageId=" + project.imageId
-            + ",isProduct=" + project.isProduct
-            + ",description='" + project.description + "' ";
+                connection.beginTransaction(function(err) {
 
-        verb = "INSERT ";
+                    if (err) { throw err; }
 
-        // Look for and reject an attempt to add a 2nd project for same user with same name.
-        // It is unnecessary to skip projects with same id in the DB, since project.id = 0.
-        var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';",
-            function(rows) {
+                    var whereclause = "", 
+                        verb = "",
+                        sqlStmt = "";
 
-                if (rows.length === 0) {
+                    var guts = " SET name='" + project.name + "'"
+                        + ",ownedByUserId=" + req.body.userId
+                        + ",parentPrice=" + project.parentPrice
+                        + ",parentProjectId=" + project.parentProjectId
+                        + ",priceBump=" + project.priceBump
+                        + ",imageId=" + project.imageId
+                        + ",isProduct=" + project.isProduct
+                        + ",description='" + project.description + "' ";
 
-                    res.json({
-                        success:false,
-                        message:'Failed database action checking for duplicate project name.'
+                    verb = "INSERT ";
+
+                    // Look for and reject an attempt to add a 2nd project for same user with same name.
+                    // It is unnecessary to skip projects with same id in the DB, since project.id = 0.
+                    var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+                    sql.queryWithCxn(connection, strQuery, function(err, rows) {
+
+                        if (err) { throw err; }
+
+                        if (rows.length === 0) {
+
+                            throw new Error('Failed database action checking for duplicate project name.');
+
+                        } else {
+
+                            if (rows[0].cnt > 0) {
+
+                                throw new Error('You already have a project with that name.');
+
+                            } else {
+                                
+                                m_functionProjectSaveAsPart2(connection,req,res,project,verb,guts,whereclause);
+                            }
+                        }
                     });
-                } else {
-
-                    if (rows[0].cnt > 0) {
-
-                        res.json({
-                            success:false,
-                            message:'You already have a project with that name.'
-                        });
-                    } else {
-                        
-                        m_functionProjectSaveAsPart2(req,res,project,verb,guts,whereclause);
-                    }
-                }
-            },
-            function(strError) {
-
-                res.json({
-                    success:false,
-                    message:'Failed database action checking for duplicate project name.'
                 });
-            }
-        );
-        if (exceptionRet) {
-            res.json({
-                success:false,
-                message:'Failed database action checking for duplicate project name.'
             });
-        }
-    }
+        } catch (e) {
 
-    var m_functionProjectSaveAsPart2 = function (req,res,project,verb,guts,whereclause) {
+            return e;
+        }
+    };
+
+    var m_functionProjectSaveAsPart2 = function (connection,req,res,project,verb,guts,whereclause) {
 
         // So far we know that the name for this new project is unique to the user.
 
@@ -1217,7 +1213,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 } else {
 
                                     var resourceId = rows[0].insertId;
-                                    m_setUpAndDoTags(resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
+                                    m_setUpAndDoTagsWithCxn(connection, resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
 
                                         if (err) {
 
@@ -1227,7 +1223,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             });
                                         } else {
 
-                                            m_doComicsForSaveAs(project, req, function(err) {
+                                            m_doComicsForSaveAs(connection, project, req, function(err) {
 
                                                 if (err) {
 
@@ -1289,7 +1285,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doComicsForSaveAs = function (project, req, callback) {
+    var m_doComicsForSaveAs = function (connection, project, req, callback) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
         // Also, a row has been added to resource and tags have been handled, too.
@@ -1317,7 +1313,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         if (--comicsCountdown === 0) {
 
-                            m_doTypesForSaveAs(project, req, callback);
+                            m_doTypesForSaveAs(connection, project, req, callback);
                         }
                     },
                     function(strError) {
@@ -1339,7 +1335,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_doTypesForSaveAs = function (project, req, callback) {
+    var m_doTypesForSaveAs = function (connection, project, req, callback) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.
@@ -1389,7 +1385,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     } else {
 
                                         var resourceId = rows[0].insertId;
-                                        m_setUpAndDoTags(resourceId, '5', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+                                        m_setUpAndDoTagsWithCxn(connection, resourceId, '5', req.body.userName, typeIth.tags, typeIth.name, function(err) {
 
                                             if (err) {
 
@@ -1400,7 +1396,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 if (--typesCountdown === 0) {
 
-                                                    m_doTypeArraysForSaveAs(project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
+                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
                                                 }
                                             }
                                         });
@@ -1438,7 +1434,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTypeArraysForSaveAs = function (project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback) {
+    var m_doTypeArraysForSaveAs = function (connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback) {
 
         try {
 
@@ -1476,7 +1472,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         } else {
 
                                             var resourceId = rows[0].insertId;
-                                            m_setUpAndDoTags(resourceId, '7', req.body.userName, method.tags, method.name, function(err) {
+                                            m_setUpAndDoTagsWithCxn(connection, resourceId, '7', req.body.userName, method.tags, method.name, function(err) {
 
                                                 if (err) {
 
@@ -1608,6 +1604,142 @@ module.exports = function ProjectBO(app, sql, logger) {
     //                  Utility method(s) for save routes
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var m_setUpAndDoTagsWithCxn = function(connection, resourceId, strResourceTypeId, userName, strTags, strName, callback) {
+
+        try {
+            
+            console.log("In m_setUpAndDoTags with resourceId=" + resourceId);
+
+            // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
+            var tagArray = [];
+            tagArray.push(m_resourceTypes[parseInt(strResourceTypeId, 10)]);
+            tagArray.push(userName);
+            if (strName.length > 0) {
+
+                tagArray.push(strName.trim().replace(/\s/g, '_'));
+            }
+
+            // Get optional user-entered tags ready to combine with above three tags.
+            var ccArray = [];
+            if (strTags) {
+
+                ccArray = strTags.toLowerCase().match(/([\w\-]+)/g);
+
+                if (ccArray){
+                    tagArray = tagArray.concat(ccArray);
+                }
+            }
+
+            // Remove possible dups from tagArray.
+            var uniqueArray = [];
+            uniqueArray.push(tagArray[0]);
+            for (var i = 1; i < tagArray.length; i++) {
+                var compIth = tagArray[i];
+                var found = false;
+                for (var j = 0; j < uniqueArray.length; j++) {
+                    if (uniqueArray[j] === compIth){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    uniqueArray.push(compIth);
+                }
+            }
+
+            m_doTagsWithCxn(connection, uniqueArray, resourceId, callback);
+
+        } catch(e) {
+
+            callback(e);
+            return;
+        }
+    }
+
+    var m_doTagsWithCxn = function(connection, tagArray, resourceId, callback){
+
+        var tagIds = [];
+        var iCtr = tagArray.length;
+        // For each string in tagArry:
+        //      if it already exists in table tags, push its id onto tagIds.
+        //      else, add it and push the new array.
+        // Then write as many records to resources_tags using resourceId and tagIds[i] as called for.
+
+        tagArray.forEach(function(tag) {
+
+            var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+            sql.execute(strSql,
+                function(rows){
+
+                    if (rows.length > 0) {
+
+                        tagIds.push(rows[0].id);
+                        if (--iCtr === 0){
+
+                            callback(m_createTagJunctionsWithCxn(connection, resourceId, tagIds));
+                            return;
+                        }
+
+                    } else {
+
+                        strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
+                        sql.execute(strSql,
+                            function(rows){
+
+                                if (rows.length === 0) {
+
+                                    callback({message:'Could not insert tag into database.'});
+                                    return;
+                                
+                                } else {
+
+                                    tagIds.push(rows[0].insertId);
+                                    if (--iCtr === 0){
+
+                                        callback(m_createTagJunctions(resourceId, tagIds));
+                                        return;
+                                    }
+                                }
+                            },
+                            function(err){
+
+                                callback({message:err});
+                                return;
+                            });
+                    }
+                },
+                function(err){
+
+                    callback({message:err});
+                    return;
+                });
+        });
+    }
+
+    var m_createTagJunctionsWithCxn = function(connection, resourceId, tagIds) {
+
+        var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
+        for (var j = 0; j < tagIds.length; j++) {
+
+            strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
+            if (j !== tagIds.length - 1){
+
+                strSql = strSql + ",";
+            }
+        }
+        strSql = strSql + ";";
+        sql.execute(strSql,
+            function(rows){
+
+                return null;
+            },
+            function(strErr){
+
+                return {message:'Error received inserting into resources_tags: ' + strErr};
+            }
+        );
+    }
 
     var m_createTagJunctions = function(resourceId, tagIds) {
 

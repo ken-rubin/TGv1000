@@ -36,85 +36,109 @@ module.exports = function SQL(app) {
         console.log("Created pool for " + strUser + "/'" + strPassword + "' for database: " + self.dbname + ".");
         
     };
-    
-    // Router handler function.
-    // self.routeHandler = function (req, res, next) {
-    
-    //     try {
-        
-    //         // Execute sql if specified.
-    //         if (req.body &&
-    //             req.body.sql) {
 
-    //             console.log("Process sql: " + req.body.sql + ".");
-                
-    //             // Call execute pass the sql from the client request.
-    //             var exceptionRet = self.execute(req.body.sql,
-    //                 function (rows) {
-                    
-    //                     try {
-                        
-    //                         // Return success.
-    //                         res.json({
-                            
-    //                             success: true,
-    //                             result: rows
-    //                         });
-    //                     } catch (e) {
-                        
-    //                         // Return error.
-    //                         res.json({
-                            
-    //                             success: false,
-    //                             reason: e.message
-    //                         });
-    //                     }
-    //                 },
-    //                 function (strError) {
-                    
-    //                     try {
-                        
-    //                         // Return error.
-    //                         res.json({
-                            
-    //                             success: false,
-    //                             reason: strError
-    //                         });
-    //                     } catch (e) {
-                        
-    //                         // Return error.
-    //                         res.json({
-                            
-    //                             success: false,
-    //                             reason: e.message
-    //                         });
-    //                     }
-    //                 });
-                
-    //             if (exceptionRet !== null) {
-                
-    //                 // Return error.
-    //                 res.json({
-                    
-    //                     success: false,
-    //                     reason: exceptionRet.message
-    //                 });
-    //             }
-    //         } else {
-            
-    //             // Call the next route.
-    //             next();
-    //         }
-    //     } catch (e) {
-        
-    //         console.log("Error: " + e.message + ".");
-            
-    //         // Call the next route errorly.
-    //         next("Error: " + e.message + ".");
-    //     }
-    // };
+    self.getCxnFromPool = function (callback) {
 
+        try {
+
+            m_pool.getConnection(function(err, connection) {
+
+                callback(err, connection);
+            });
+
+        } catch (e) {
+
+            callback(new Error("Error getting database connection"), null);
+        }
+    }
+
+    self.queryWithCxn = function (connection, strQuery, callback) {
+
+        try {
+
+            connection.query(strQuery, function(err, rows) {
+
+                if (err) { throw err; }
+
+                // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
+                //          INSERT returns rows.insertId (primary key of inserted row)
+                //          UPDATE returns rows.changedRows (# of changed rows)
+                //          DELETE returns rows.affectedRows (# of deleted rows)
+                // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
+                if (rows.constructor === Array) {
+
+                    callback(null, rows);
+                
+                } else {
+
+                    // rows is a non-array js object. Turn it into an array.
+                    var newRows = [];
+                    newRows.push(rows);
+                    callback(null, newRows);
+                }
+            });
+        } catch (e) {
+
+            connection.rollback(function() { callback(e, null);});
+        }
+    }
+
+    self.commitCxn = function (connection, callback) {
+
+        try {
+
+            connection.commit(function (err) {
+
+                if (err) { throw err; }
+
+                callback(null);
+            });
+
+        } catch (e) {
+
+            connection.rollback(function() { callback(e, null);});
+        }
+    }
+    
     // Process sql query.
+
+    ///////////////////////////////////////////////////////////////////
+    //
+    // Incorporate optional transactioning like
+    //
+    // connection.beginTransaction(function(err) {
+    //   if (err) { throw err; }
+    //   connection.query('INSERT INTO posts SET title=?', title, function(err, result) {
+    //     if (err) {
+    //       return connection.rollback(function() {
+    //         throw err;
+    //       });
+    //     }
+     
+    //     var log = 'Post ' + result.insertId + ' added';
+     
+    //     connection.query('INSERT INTO log SET data=?', log, function(err, result) {
+    //       if (err) {
+    //         return connection.rollback(function() {
+    //           throw err;
+    //         });
+    //       }  
+    //       connection.commit(function(err) {
+    //         if (err) {
+    //           return connection.rollback(function() {
+    //             throw err;
+    //           });
+    //         }
+    //         console.log('success!');
+    //       });
+    //     });
+    //   });
+    // });
+
+    // Question: how should this work with a complex routine that calls sql.execute many times?
+    //
+    ///////////////////////////////////////////////////////////////////////
+
     self.execute = function (strSql, functionSuccess, functionError) {
     
         try {
