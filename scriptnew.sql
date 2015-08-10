@@ -24,65 +24,10 @@ begin
     
     if @dbstate = 0.0 THEN
     
-		CREATE TABLE `TGv1000`.`comics` (
+		CREATE TABLE `TGv1000`.`tags` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `projectId` int(11) NOT NULL,
-          `ordinal` int(11) NOT NULL,
-          `thumbnail` VARCHAR(255) NOT NULL,
-          `name` VARCHAR(255) NOT NULL,
-          `url` VARCHAR(255) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`events` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `typeId` int(11) NOT NULL,
-          `name` varchar(255) NOT NULL,
-          `ordinal` int(11) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`logitems` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-		  `logtypeId` int(11) NOT NULL,
-		  `jsoncontext` longtext NOT NULL,
-		  `processed` datetime DEFAULT NULL,
-		  `processedbyUserId` int(11) DEFAULT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`logtypes` (
-		  `id` int(11) NOT NULL,
-		  `description` varchar(100) NOT NULL,
-		  `severity` tinyint(4) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`methods` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `typeId` int(11) NOT NULL,
-          `name` varchar(255) NOT NULL,
-          `ordinal` int(11) NOT NULL,
-          `workspace` mediumtext NOT NULL,
-          `imageId` INT(11) NOT NULL,
-          `description` VARCHAR(255) NULL DEFAULT NULL,
-          `parentMethodId` INT(11) NULL,
-          `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00,
-          `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`parent` (
-		  `id` INT NOT NULL AUTO_INCREMENT,
-		  `email` VARCHAR(45) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (id)
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
 		CREATE TABLE `TGv1000`.`projects` (
@@ -96,70 +41,36 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
 		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
+          INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
-		CREATE TABLE `TGv1000`.`propertys` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `typeId` int(11) NOT NULL,
-          `name` varchar(255) NOT NULL,
-          `initialValue` MEDIUMTEXT NOT NULL,
-          `ordinal` INT(11) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`propertyTypes` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `description` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-        
-		CREATE TABLE `TGv1000`.`resources` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `name` VARCHAR(255) NOT NULL DEFAULT '',
-		  `createdByUserId` int(11) NOT NULL,
-		  `resourceTypeId` int(11) NOT NULL,
-		  `public` tinyint(1) NOT NULL DEFAULT '0',
-		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
-		  `optionalFK` INT(11) NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `TGv1000`.`resources_tags` (
-		  `resourceId` int(11) NOT NULL,
+		CREATE TABLE `TGv1000`.`project_tags` (
+		  `projectId` int(11) NOT NULL,
 		  `tagId` int(11) NOT NULL,
-		  PRIMARY KEY (`resourceId`,`tagId`)
+		  PRIMARY KEY (`projectId`,`tagId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
-		CREATE TABLE `TGv1000`.`resourceTypes` (
+        ALTER TABLE `TGv1000`.`project_tags`
+			ADD CONSTRAINT FK_project_tags
+            FOREIGN KEY (projectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+        
+		CREATE TABLE `TGv1000`.`comics` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `description` varchar(255) NOT NULL,
+		  `projectId` int(11) NOT NULL,
+          `ordinal` int(11) NOT NULL,
+          `thumbnail` VARCHAR(255) NOT NULL,
+          `name` VARCHAR(255) NOT NULL,
+          `url` VARCHAR(255) NOT NULL,
 		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
+          INDEX idx_projectId (projectId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
-		CREATE TABLE `TGv1000`.`routes` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `path` varchar(255) NOT NULL,
-		  `moduleName` varchar(255) NOT NULL,
-		  `route` varchar(255) NOT NULL,
-		  `verb` varchar(255) NOT NULL,
-		  `method` varchar(255) NOT NULL,
-		  `inuse` tinyint(1) NOT NULL DEFAULT '1',
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        ALTER TABLE `TGv1000`.`comics`
+			ADD CONSTRAINT FK_comics
+            FOREIGN KEY (projectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
 
-		CREATE TABLE `TGv1000`.`tags` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `description` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-        
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` varchar(255) NOT NULL,
@@ -172,7 +83,148 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
 		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
+          INDEX idx_comicId (comicId)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+        ALTER TABLE `TGv1000`.`types`
+			ADD CONSTRAINT FK_types
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+
+		CREATE TABLE `TGv1000`.`type_tags` (
+		  `typeId` int(11) NOT NULL,
+		  `tagId` int(11) NOT NULL,
+		  PRIMARY KEY (`typeId`,`tagId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        ALTER TABLE `TGv1000`.`type_tags`
+			ADD CONSTRAINT FK_type_tags
+            FOREIGN KEY (typeId) REFERENCES types(id)
+            ON DELETE CASCADE;
+        
+		CREATE TABLE `TGv1000`.`methods` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `typeId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `ordinal` int(11) NOT NULL,
+          `workspace` mediumtext NOT NULL,
+          `imageId` INT(11) NOT NULL,
+          `description` VARCHAR(255) NULL DEFAULT NULL,
+          `parentMethodId` INT(11) NULL,
+          `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00,
+          `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+		  PRIMARY KEY (`id`),
+          INDEX idx_typeId (typeId)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+        ALTER TABLE `TGv1000`.`methods`
+			ADD CONSTRAINT FK_methods
+            FOREIGN KEY (typeId) REFERENCES types(id)
+            ON DELETE CASCADE;
+
+		CREATE TABLE `TGv1000`.`method_tags` (
+		  `methodId` int(11) NOT NULL,
+		  `tagId` int(11) NOT NULL,
+		  PRIMARY KEY (`methodId`,`tagId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        ALTER TABLE `TGv1000`.`method_tags`
+			ADD CONSTRAINT FK_method_tags
+            FOREIGN KEY (methodId) REFERENCES methods(id)
+            ON DELETE CASCADE;
+        
+		CREATE TABLE `TGv1000`.`propertys` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `typeId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `initialValue` MEDIUMTEXT NOT NULL,
+          `ordinal` INT(11) NOT NULL,
+		  PRIMARY KEY (`id`),
+          INDEX idx_typeId (typeId)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+        ALTER TABLE `TGv1000`.`propertys`
+			ADD CONSTRAINT FK_propertys
+            FOREIGN KEY (typeId) REFERENCES types(id)
+            ON DELETE CASCADE;
+
+		CREATE TABLE `TGv1000`.`events` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `typeId` int(11) NOT NULL,
+          `name` varchar(255) NOT NULL,
+          `ordinal` int(11) NOT NULL,
+		  PRIMARY KEY (`id`),
+          INDEX idx_typeId (typeId)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+        ALTER TABLE `TGv1000`.`events`
+			ADD CONSTRAINT FK_events
+            FOREIGN KEY (typeId) REFERENCES types(id)
+            ON DELETE CASCADE;
+
+		CREATE TABLE `TGv1000`.`resources` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `name` VARCHAR(255) NOT NULL DEFAULT '',
+		  `createdByUserId` int(11) NOT NULL,
+		  `resourceTypeId` int(11) NOT NULL,
+		  `public` tinyint(1) NOT NULL DEFAULT '0',
+		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
+		  PRIMARY KEY (`id`),
+          INDEX idx_createdByUserId (createdByUserId),
+          INDEX idx_resourceTypeId (resourceTypeId)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`resources_tags` (
+		  `resourceId` int(11) NOT NULL,
+		  `tagId` int(11) NOT NULL,
+		  PRIMARY KEY (`resourceId`,`tagId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`logitems` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+		  `logtypeId` int(11) NOT NULL,
+		  `jsoncontext` longtext NOT NULL,
+		  `processed` datetime DEFAULT NULL,
+		  `processedbyUserId` int(11) DEFAULT NULL,
+		  PRIMARY KEY (`id`),
+          INDEX idx_logtypeId (logtypeId)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`logtypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
+		  `severity` tinyint(4) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`parent` (
+		  `id` INT NOT NULL AUTO_INCREMENT,
+		  `email` VARCHAR(45) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`propertyTypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`resourceTypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `description` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`routes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `path` varchar(255) NOT NULL,
+		  `moduleName` varchar(255) NOT NULL,
+		  `route` varchar(255) NOT NULL,
+		  `verb` varchar(255) NOT NULL,
+		  `method` varchar(255) NOT NULL,
+		  `inuse` tinyint(1) NOT NULL DEFAULT '1',
+		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 		CREATE TABLE `TGv1000`.`user` (
@@ -180,8 +232,7 @@ begin
 		  `userName` VARCHAR(45) NOT NULL,
 		  `pwHash` VARCHAR(16000) NOT NULL,
           `parentId` INT(11) NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (id)
+		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
 		INSERT INTO `TGv1000`.`parent` (id, email) VALUES (1,'techgroms@gmail.com');
@@ -197,11 +248,6 @@ begin
 
 		insert TGv1000.resourceTypes (id,description) values (1,'image');
 		insert TGv1000.resourceTypes (id,description) values (2,'sound');
-		insert TGv1000.resourceTypes (id,description) values (3,'project');
-        INSERT TGv1000.resourceTypes values (4, 'unused');
-        INSERT TGv1000.resourceTypes values (5, 'type');
-        INSERT TGv1000.resourceTypes values (6, 'unused');
-		INSERT `TGv1000`.`resourceTypes` values (7,'method');
 
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
@@ -243,13 +289,7 @@ begin
 				(4,1,'Height','0',3)
 			;
             
-		/* need resources for every project, type and method */            
-		insert TGv1000.resources (id,`name`,createdByUserId,resourceTypeId,public,quarantined,optionalFK)
-			VALUES 
-				(1,'New Project',1,3,1,0,1),
-                (2,'App',1,5,1,0,1),
-                (3,'initialize',1,7,1,0,1);
-            
+		/* need resources/tags for every project, type and method */            
         insert TGv1000.tags (id,description)
 			VALUES
 				(1,'templates@techgroms.com'),
@@ -261,14 +301,20 @@ begin
                 (7,'initialize')
 			;
             
-		insert TGv1000.resources_tags (resourceId,tagId)
+		insert TGv1000.project_tags (projectId,tagId)
 			VALUES
 				(1,1),
 				(1,2),
-				(1,3),
+				(1,3);
+            
+		insert TGv1000.type_tags (typeId,tagId)
+			VALUES
                 (2,1),
                 (2,5),
-                (2,4),
+                (2,4);
+            
+		insert TGv1000.method_tags (methodId,tagId)
+			VALUES
                 (3,1),
                 (3,6),
                 (3,7);
@@ -326,71 +372,6 @@ begin
 				(7,7,'initialize',0,'',0,'',0,0.00,0.00)
 			;
             
-		/* need resources for every project, type and method */
-		/* start with id=4 */
-		insert TGv1000.resources (id,`name`,createdByUserId,resourceTypeId,public,quarantined,optionalFK)
-			VALUES
-				(4,'Mission to Mars',1,3,1,0,2),
-				(5,'Mission to Mars enhanced',2,3,1,0,3),
-				(6,'a',1,5,1,0,2),
-				(7,'b',2,5,1,0,3),
-				(8,'c',2,5,1,0,4),
-				(9,'d',2,5,1,0,5),
-				(10,'e',2,5,1,0,6),
-				(11,'f',2,5,1,0,7),
-				(12,'g',1,7,1,0,2),
-				(13,'h',2,7,1,0,3),
-				(14,'i',2,7,1,0,4),
-				(15,'j',2,7,1,0,5),
-				(16,'k',2,7,1,0,6),
-				(17,'l',2,7,1,0,7)
-			;
-            
-        /* need tags to link to every resource: userName, resourceType, resource name + optional tags */
-        /* tags are all lower case and have spaces replaced by '_' */
-        /* start with id=8 */
-        insert TGv1000.tags (id,description)
-			VALUES
-				(8,'jerry@rubintech.com'),
-				(9,'mission_to_mars'),
-				(10,'mission_to_mars_enhanced'),
-				(11,'a'),
-				(12,'b'),
-				(13,'c'),
-				(14,'d'),
-				(15,'e'),
-				(16,'f'),
-				(17,'g'),
-				(18,'h'),
-				(19,'i'),
-				(20,'j'),
-				(21,'k'),
-				(22,'l')
-			;
-            
-        /* connect resources and tags */
-		insert TGv1000.resources_tags (resourceId,tagId)
-			VALUES
-				(4,1),
-				(4,2),
-				(4,9),
-				(5,8),
-				(5,2),
-				(5,10),
-				(6,4),
-				(7,4),
-				(8,4),
-				(9,4),
-				(10,4),
-				(11,4),
-				(12,6),
-				(13,6),
-				(14,6),
-				(15,6),
-				(16,6),
-				(17,6)
-			;
-		
         /* need 4 properties for each type: X, Y, Width, Height */
         /* start with id=5 */
 		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
@@ -428,6 +409,56 @@ begin
 				(1,3,'event1',0)
 			;
             
+        /* need tags to link to every resource: userName, resourceType, resource name + optional tags */
+        /* tags are all lower case and have spaces replaced by '_' */
+        /* start with id=8 */
+        insert TGv1000.tags (id,description)
+			VALUES
+				(8,'jerry@rubintech.com'),
+				(9,'mission_to_mars'),
+				(10,'mission_to_mars_enhanced'),
+				(11,'a'),
+				(12,'b'),
+				(13,'c'),
+				(14,'d'),
+				(15,'e'),
+				(16,'f'),
+				(17,'g'),
+				(18,'h'),
+				(19,'i'),
+				(20,'j'),
+				(21,'k'),
+				(22,'l')
+			;
+            
+		insert TGv1000.project_tags (projectId,tagId)
+			VALUES
+				(4,1),
+				(4,2),
+				(4,9),
+				(5,8),
+				(5,2),
+				(5,10),
+				(6,4);
+            
+		insert TGv1000.type_tags (typeId,tagId)
+			VALUES
+				(2,4),
+				(3,4),
+				(4,4),
+				(5,4),
+				(6,4),
+				(7,4);
+            
+		insert TGv1000.method_tags (methodId,tagId)
+			VALUES
+				(2,6),
+				(3,6),
+				(4,6),
+				(5,6),
+				(6,6),
+                (7,6);
+		
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
     end if;

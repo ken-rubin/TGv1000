@@ -960,7 +960,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // Muis important: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
-            var project = req.body.projectJson; // are we sure this doesn't need JSON.parse?
+            var project = req.body.projectJson;
 
             var typeOfSave = req.body.saveType;
             if (typeOfSave === 'save') {
