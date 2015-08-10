@@ -894,6 +894,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 
+            /* ' */
+
             exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optionalFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
                 function(rows){
 
@@ -940,15 +942,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-
-
-
-            // remmeber to save resource and tags if inserting and to replace them if updating
-            
-
-
-
-            // console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
@@ -973,22 +967,47 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // typeOfSave info:
             //  saveAs INSERTs new rows for everything.
-            //  save UPDATEs the project, but everything below should be deleted (if ownedByUserId !== req.body.userId) and INSERTed.
+            //  save DELETES (cascading the project from the database) and then calls SaveAs to re-insert it.
+            // Everything is done in a single transaction.
 
-            var exceptionRet = null;
-            if (typeOfSave === 'save') {
+            sql.getCxnFromPool(function(err, connection) {
 
-                exceptionRet = m_functionSaveProject(req, res, project);
-            
-            } else {    // 'saveAs'
+                if (err) {
 
-                exceptionRet = m_functionSaveProjectAs(req, res, project);
-            }
+                    // We have no connection to rollback. We can fail the old way.
+                    res.json({
+                        success: false,
+                        message: 'Could not get a database connection.'
+                    });
+                    return;
+                }
 
-            if (exceptionRet) {
+                connection.beginTransaction(function(err) {
 
-                throw exceptionRet;
-            }
+                    if (err) { throw err; }
+
+                    var exceptionRet = null;
+                    if (typeOfSave === 'save') {
+
+                        exceptionRet = m_functionSaveProject(connection, req, res, project);
+                    
+                    } else {    // 'saveAs'
+
+                        exceptionRet = m_functionSaveProjectAs(connection, req, res, project);
+                    }
+
+                    if (exceptionRet) {
+
+                        throw exceptionRet;
+                    }
+
+                    // Total success.
+                    res.json({
+                        success: true,
+                        project: project
+                    });
+                });
+            });
         } catch(e) {
 
             res.json({
@@ -1000,288 +1019,156 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                      Save processing -- similar to SaveAs (below), but harder, since sometimes we update; sometimes we insert.
+    //                      Save processing 
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProject = function (req, res, project) {
+    var m_functionSaveProject = function (connection, req, res, project) {
 
-        console.log('In m_functionSaveProject with req.body=' + JSON.stringify(req.body));
-
-        res.json({success: false, message: 'Forced exit'});
-
-        return null;
-
-        var whereclause = "", 
-            verb = "",
-            sqlStmt = "";
-
-        var guts = " SET name='" + project.name + "'"
-            + ",ownedByUserId=" + req.body.userId
-            + ",parentPrice=" + project.parentPrice
-            + ",parentProjectId=" + project.parentProjectId
-            + ",priceBump=" + project.priceBump
-            + ",imageId=" + project.imageId
-            + ",isProduct=" + project.isProduct
-            + ",description='" + project.description + "' ";
-
-        whereClause = " WHERE id=" + project.id;
-        verb = "UPDATE ";
-        
-        m_functionProjectSavePart2(req,res,typeOfSave,project,verb,guts,whereclause);
-    }
-
-    var m_functionProjectSavePart2 = function (req,res,project,verb,guts,whereclause) {
-
-        // The components for the update statement have been set.
         try {
 
-            var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
-            console.log(sqlStmt);
+            // The following will delete the former project completely from the database using cascading delete.
+            var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
+            sql.queryWithCxn(connection, strQuery, 
+                function(err, rows) {
 
-            var exceptionRet = sql.execute(sqlStmt,
-                function(rows) {
+                    if (err) { 
 
-                    if (rows.length === 0) {
-
-                        res.json({
-                            success: false,
-                            message: "Error saving project to database."
-                        });
-                    } else {
-
-
-
-                        // TODO: Need to delete and re-insert or update the resource and then delete all previous tags and re-add them.
-
-
-
-
-                        m_doComicsForSave(typeOfSave, project, req, function(err) {
-
-                            if (err) {
-
-                                res.json({
-                                    success:false,
-                                    message: err.message
-                                });
-                            } else {
-
-                                // We're done.
-                                res.json({
-                                    success: true,
-                                    project: project
-                                });
-                            }
-                        });
+                        // Rollback has happened already.
+                        throw err; 
                     }
-                },
-                function(strError) {
 
-                    res.json({
-                        success: false,
-                        message: "Error inserting project into database."
-                    });
+                    // Now we can just INSERT the project as passed from the client side.
+                    return m_functionProjectSaveAsPart2(connection, req, res, project);
                 }
             );
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: "Error inserting project into database: " + exceptionRet.message
-                });
-            }
-        } catch(e) {
-
-            res.json({
-                success:false,
-                message:e.message
-            });
-        }
-    }
-
-    var m_doComicsForSave = function (typeOfSave, project, req, callback) {
-
-        // The project, resource and tags have been updated.
-
-
-
-
-
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                      SaveAs processing -- similar to Save (above), but easier, because everything is inserted, leaving the original project alone and inteact
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var m_functionSaveProjectAs = function (req, res, project) {
-        
-        try {
-
-            console.log('In m_functionSaveProjectAs with req.body=' + JSON.stringify(req.body));
-
-            sql.getCxnFromPool(function(err, connection) {
-
-                if (err) { throw err; }
-
-                connection.beginTransaction(function(err) {
-
-                    if (err) { throw err; }
-
-                    var whereclause = "", 
-                        verb = "",
-                        sqlStmt = "";
-
-                    var guts = " SET name='" + project.name + "'"
-                        + ",ownedByUserId=" + req.body.userId
-                        + ",parentPrice=" + project.parentPrice
-                        + ",parentProjectId=" + project.parentProjectId
-                        + ",priceBump=" + project.priceBump
-                        + ",imageId=" + project.imageId
-                        + ",isProduct=" + project.isProduct
-                        + ",description='" + project.description + "' ";
-
-                    verb = "INSERT ";
-
-                    // Look for and reject an attempt to add a 2nd project for same user with same name.
-                    // It is unnecessary to skip projects with same id in the DB, since project.id = 0.
-                    var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
-                    sql.queryWithCxn(connection, strQuery, function(err, rows) {
-
-                        if (err) { throw err; }
-
-                        if (rows.length === 0) {
-
-                            throw new Error('Failed database action checking for duplicate project name.');
-
-                        } else {
-
-                            if (rows[0].cnt > 0) {
-
-                                throw new Error('You already have a project with that name.');
-
-                            } else {
-                                
-                                m_functionProjectSaveAsPart2(connection,req,res,project,verb,guts,whereclause);
-                            }
-                        }
-                    });
-                });
-            });
         } catch (e) {
 
             return e;
         }
-    };
+    }
 
-    var m_functionProjectSaveAsPart2 = function (connection,req,res,project,verb,guts,whereclause) {
 
-        // So far we know that the name for this new project is unique to the user.
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                      SaveAs processing 
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    var m_functionSaveProjectAs = function (connection, req, res, project) {
+        
+        // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction begun.
+        // Look for and reject an attempt to add a 2nd project for same user with same name.
 
         try {
 
-            var sqlStmt = verb + self.dbname + "projects" + guts + whereclause + ";";
+            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+            sql.queryWithCxn(connection, strQuery, 
+                function(err, rows) {
 
-            // console.log(' ');
-            // console.log(sqlStmt);
-            // console.log(' ');
-
-            var exceptionRet = sql.execute(sqlStmt,
-                function(rows) {
+                    if (err) { throw err; }
 
                     if (rows.length === 0) {
 
-                        res.json({
-                            success: false,
-                            message: "Error saving project to database."
-                        });
+                        throw new Error('Failed database action checking for duplicate project name.');
+
                     } else {
 
-                        project.id = rows[0].insertId;
-                        exceptionRet = sql.execute("insert into " + self.dbname + "resources (name,createdByUserId,resourceTypeId,optionalFK) values ('" + project.name + "'," + req.body.userId + ",3," + project.id + ");",
-                            function(rows) {
+                        if (rows[0].cnt > 0) {
 
-                                if (rows.length === 0) {
+                            throw new Error('You already have a project with that name.');
 
-                                    res.json({
-                                        success: false,
-                                        message: "Error inserting project resource into database."
-                                    });
-                                } else {
-
-                                    var resourceId = rows[0].insertId;
-                                    m_setUpAndDoTagsWithCxn(connection, resourceId, '3', req.body.userName, project.tags, project.name, function(err) {
-
-                                        if (err) {
-
-                                            res.json({
-                                                success:false,
-                                                message: err.message
-                                            });
-                                        } else {
-
-                                            m_doComicsForSaveAs(connection, project, req, function(err) {
-
-                                                if (err) {
-
-                                                    res.json({
-                                                        success:false,
-                                                        message: err.message
-                                                    });
-                                                } else {
-
-                                                    // We're done.
-                                                    res.json({
-                                                        success: true,
-                                                        project: project
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            },
-                            function(strError) {
-
-                                res.json({
-                                    success: false,
-                                    message: "Error inserting project resource into database: " + strError
-                                });
-                            }
-                        );
-                        if (exceptionRet) {
-
-                            res.json({
-                                success: false,
-                                message: "Error inserting project resource into database: " + exceptionRet.message
-                            });
+                        } else {
+                            
+                            var exceptionRet = m_functionProjectSaveAsPart2(connection,req,res,project);
+                            if (exceptionRet) { throw exceptionRet; }
                         }
-                    }
-                },
-                function(strError) {
 
-                    res.json({
-                        success: false,
-                        message: "Error inserting project into database."
-                    });
+                        return null;
+                    }
                 }
             );
-            if (exceptionRet) {
+        } catch (e) {
 
-                res.json({
-                    success: false,
-                    message: "Error inserting project into database: " + exceptionRet.message
-                });
-            }
+            return e;
+        }
+    }
+
+    var m_functionProjectSaveAsPart2 = function (connection,req,res,project) {
+
+        // If we came in doing a Save, we've deleted the old project and jumped in here to re-INSERT the project as sent from client-side.
+        // If we came in doing a SaveAs, we stopped off at m_functionSaveProjectAs to check for name uniqueness.
+
+        try {
+
+            var guts = " SET name='" + project.name + "'"
+                + ",ownedByUserId=" + req.body.userId
+                + ",parentPrice=" + project.parentPrice
+                + ",parentProjectId=" + project.parentProjectId
+                + ",priceBump=" + project.priceBump
+                + ",imageId=" + project.imageId
+                + ",isProduct=" + project.isProduct
+                + ",description='" + project.description + "' ";
+
+            verb = "INSERT ";
+
+            var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
+
+            // console.log(' ');
+            // console.log(strQuery);
+            // console.log(' ');
+
+            sql.queryWithCxn(connection, strQuery, 
+                function(err, rows) {
+
+                    if (err) { throw err; }
+
+                    if (rows.length === 0) {
+
+                        throw new Error('Error saving project to database.');
+                    }
+
+                    project.id = rows[0].insertId;
+
+
+
+
+
+
+
+
+
+
+
+
+                    // Handle tags and project_tags.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    m_doComicsForSaveAs(connection, project, req, function(err) {
+
+                        if (err) { throw err; }
+                    }
+                );
+
+                return null;
+
+            });
         } catch(e) {
 
-            res.json({
-                success:false,
-                message:e.message
-            });
+            return e;
         }
     }
 
@@ -1300,8 +1187,12 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(function(comicIth) {
 
                 comicIth.projectId = project.id;
-                var exceptionRet = sql.execute("insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');",
-                    function(rows) {
+
+                var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
+                sql.queryWithCxn(connection, strQuery,
+                    function(err, rows) {
+
+                        if (err) { throw err; }
 
                         if (rows.length === 0) {
 
@@ -1315,20 +1206,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             m_doTypesForSaveAs(connection, project, req, callback);
                         }
-                    },
-                    function(strError) {
-
-                        callback(new Error(strError));
-                        return;
                     }
                 );
-                if (exceptionRet) {
-
-                    callback(exceptionRet);
-                    return;
-                }
             });
-
         } catch (e) {
 
             callback(e);
