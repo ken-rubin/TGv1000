@@ -139,12 +139,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					    try {
 
 						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
-					        var posting = $.post("/BOL/UtilityBO/Search", 
+					        var posting = $.post("/BOL/UtilityBO/SearchMethods", 
 					        	{
 					        		tags: tags, 
 					        		userId: g_strUserId,
 					        		userName: g_strUserName,
-					        		resourceTypeId: 7,
 					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},
 					        	'json');

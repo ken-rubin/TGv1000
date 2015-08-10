@@ -143,7 +143,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					    try {
 
 						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
-					        var posting = $.post("/BOL/UtilityBO/Search", 
+					        var posting = $.post("/BOL/UtilityBO/SearchResources", 
 					        	{
 					        		tags: tags, 
 					        		userId: g_strUserId,

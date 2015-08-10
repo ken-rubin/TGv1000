@@ -53,7 +53,260 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
-    self.routeSearch = function (req, res) {
+    self.routeSearchResources = function (req, res) {
+
+        // This is a search for Images or Sounds (resourceTypeIds 1 and 2, respectively).
+
+        try {
+
+            console.log("Entered UtilityBO/routeSearchResources with req.body = " + JSON.stringify(req.body));
+            // req.body.tags
+            // req.body.userId
+            // req.body.userName
+            // req.body.resourceTypeId  1,2,
+            // req.body.onlyCreatedByUser   '0' or '1'
+
+            var iResourceTypeId = parseInt(req.body.resourceTypeId,10);
+            var resourceTypeDescr = m_resourceTypes[iResourceTypeId];
+
+            // Add resource type description to the tags the user (may have) entered.
+            var tags = req.body.tags + " " + resourceTypeDescr;
+
+            // If we're retrieving only items created by user, add userName to tags.
+            if (req.body.onlyCreatedByUser === "1") {
+
+                tags += " " + req.body.userName;
+            }
+            console.log("tags massaged='" + tags + "'");
+
+            // Turn tags into string with commas between tags and tags surrounded by single quotes.
+            var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
+
+            var ccString = '';
+            for (var i = 0; i < ccArray.length; i++) {
+
+                if (i > 0) {
+
+                    ccString = ccString + ',';
+                }
+
+                ccString = ccString + "'" + ccArray[i] + "'";
+            }
+
+            var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+
+            console.log(' ');
+            console.log('Query to get tag ids: ' + sqlString);
+            console.log(' ');
+
+            var exceptionRet = sql.execute(sqlString,
+                function (arrayRows) {
+                
+                    // We have to get the same number of rows back from the query as ccArray.length.
+                    if (arrayRows.length !== ccArray.length) {
+
+                        // Success as far as the function is concerned but no result array
+                        res.json({
+                            success:true,
+                            arrayRows: new Array()
+                        });
+                    } else {
+
+                        // We can proceed since all tags exist and their id's are in arrayRows.
+                        // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
+                        var idString = '';
+                        for (var i = 0; i < arrayRows.length; i++) {
+
+                            if (i > 0) {
+
+                                idString = idString + ',';
+                            }
+
+                            idString = idString + arrayRows[i].id.toString();
+                        }
+
+                        // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
+                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
+
+                        sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
+
+                        // console.log(' ');
+                        // console.log('Query: ' + sqlString);
+                        // console.log(' ');
+                        exceptionRet = sql.execute(sqlString,
+                            function(rows){
+                                res.json({
+                                    success:true,
+                                    arrayRows: rows
+                                });
+                            },
+                            function(err){
+                                res.json({
+                                    success:false,
+                                    message: err
+                                });
+                            }
+                        );
+                    }
+                },
+                function (strError) {
+                
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+            });
+            if (exceptionRet !== null) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    self.routeSearchProjects = function (req, res) {
+
+        // This is a search for projects based on tags.
+
+        try {
+
+            console.log("Entered UtilityBO/routeSearchProjects with req.body = " + JSON.stringify(req.body));
+            // req.body.tags
+            // req.body.userId
+            // req.body.userName
+            // req.body.onlyCreatedByUser   '0' or '1'
+
+            var resourceTypeDescr = m_resourceTypes[3];
+
+            // Add resource type description to the tags the user (may have) entered.
+            var tags = req.body.tags + " " + resourceTypeDescr;
+
+            // If we're retrieving only items created by user, add userName to tags.
+            if (req.body.onlyCreatedByUser === "1") {
+
+                tags += " " + req.body.userName;
+            }
+            console.log("tags massaged='" + tags + "'");
+
+            // Turn tags into string with commas between tags and tags surrounded by single quotes.
+            var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
+
+            var ccString = '';
+            for (var i = 0; i < ccArray.length; i++) {
+
+                if (i > 0) {
+
+                    ccString = ccString + ',';
+                }
+
+                ccString = ccString + "'" + ccArray[i] + "'";
+            }
+
+            var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+
+            console.log(' ');
+            console.log('Query to get tag ids: ' + sqlString);
+            console.log(' ');
+
+            var exceptionRet = sql.execute(sqlString,
+                function (arrayRows) {
+                
+                    // We have to get the same number of rows back from the query as ccArray.length.
+                    if (arrayRows.length !== ccArray.length) {
+
+                        // Success as far as the function is concerned but no result array
+                        res.json({
+                            success:true,
+                            arrayRows: new Array()
+                        });
+                    } else {
+
+                        // We can proceed since all tags exist and their id's are in arrayRows.
+                        // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
+                        var idString = '';
+                        for (var i = 0; i < arrayRows.length; i++) {
+
+                            if (i > 0) {
+
+                                idString = idString + ',';
+                            }
+
+                            idString = idString + arrayRows[i].id.toString();
+                        }
+
+                        // For non-FK retrievals (resourceTypeId = 1, 2) there's only one case.
+                        // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
+                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
+
+                        // SLightly different queries for the different resourceTypeIds.
+                        if (req.body.resourceTypeId < "3") {  // Non-FKs; e.g., image or sound
+
+                            sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
+
+                        } else if (req.body.resourceTypeId === "3") {    // Project
+
+                            sqlString = "select distinct p.*,3 as resourceTypeId from " + self.dbname + "resources r inner join projects p on r.optionalFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        
+                        } else if (req.body.resourceTypeId === "5") {   // Type - excludes types where isApp = 1
+
+                            sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optionalFK=p.id where p.isApp = 0 and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        
+                        } else if (req.body.resourceTypeId === "7") {   // Method - excludes methods named 'initialize'
+
+                            sqlString = "select distinct p.*,7 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "methods p on r.optionalFK=p.id where p.name <> 'initialize' and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        }
+
+                        console.log(' ');
+                        console.log('Query: ' + sqlString);
+                        console.log(' ');
+                        exceptionRet = sql.execute(sqlString,
+                            function(rows){
+                                res.json({
+                                    success:true,
+                                    arrayRows: rows
+                                });
+                            },
+                            function(err){
+                                res.json({
+                                    success:false,
+                                    message: err
+                                });
+                            }
+                        );
+                    }
+                },
+                function (strError) {
+                
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+            });
+            if (exceptionRet !== null) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    self.routeSearchTypes = function (req, res) {
 
         // This is a search for something based on tags. There are 6 kinds of things whose descriptions have been loaded into m_resourceTypes above.
         // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (3=project, 5=type, 7=method) use a different query. This is because images and sounds have no
@@ -66,7 +319,146 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.body.userId
             // req.body.userName
-            // req.body.resourceTypeId  '1'-'7'
+            // req.body.resourceTypeId  1,2,
+            // req.body.onlyCreatedByUser   '0' or '1'
+
+            var iResourceTypeId = parseInt(req.body.resourceTypeId,10);
+            var resourceTypeDescr = m_resourceTypes[iResourceTypeId];
+
+            // Add resource type description to the tags the user (may have) entered.
+            var tags = req.body.tags + " " + resourceTypeDescr;
+
+            // If we're retrieving only items created by user, add userName to tags.
+            if (req.body.onlyCreatedByUser === "1") {
+
+                tags += " " + req.body.userName;
+            }
+            console.log("tags massaged='" + tags + "'");
+
+            // Turn tags into string with commas between tags and tags surrounded by single quotes.
+            var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
+
+            var ccString = '';
+            for (var i = 0; i < ccArray.length; i++) {
+
+                if (i > 0) {
+
+                    ccString = ccString + ',';
+                }
+
+                ccString = ccString + "'" + ccArray[i] + "'";
+            }
+
+            var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+
+            console.log(' ');
+            console.log('Query to get tag ids: ' + sqlString);
+            console.log(' ');
+
+            var exceptionRet = sql.execute(sqlString,
+                function (arrayRows) {
+                
+                    // We have to get the same number of rows back from the query as ccArray.length.
+                    if (arrayRows.length !== ccArray.length) {
+
+                        // Success as far as the function is concerned but no result array
+                        res.json({
+                            success:true,
+                            arrayRows: new Array()
+                        });
+                    } else {
+
+                        // We can proceed since all tags exist and their id's are in arrayRows.
+                        // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
+                        var idString = '';
+                        for (var i = 0; i < arrayRows.length; i++) {
+
+                            if (i > 0) {
+
+                                idString = idString + ',';
+                            }
+
+                            idString = idString + arrayRows[i].id.toString();
+                        }
+
+                        // For non-FK retrievals (resourceTypeId = 1, 2) there's only one case.
+                        // By including userName in tags if req.body.onlyCreatedByUser, we automatically make the "only mine" and "choose all matching" work.
+                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
+
+                        // SLightly different queries for the different resourceTypeIds.
+                        if (req.body.resourceTypeId < "3") {  // Non-FKs; e.g., image or sound
+
+                            sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
+
+                        } else if (req.body.resourceTypeId === "3") {    // Project
+
+                            sqlString = "select distinct p.*,3 as resourceTypeId from " + self.dbname + "resources r inner join projects p on r.optionalFK=p.id where (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        
+                        } else if (req.body.resourceTypeId === "5") {   // Type - excludes types where isApp = 1
+
+                            sqlString = "select distinct p.*,5 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "types p on r.optionalFK=p.id where p.isApp = 0 and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        
+                        } else if (req.body.resourceTypeId === "7") {   // Method - excludes methods named 'initialize'
+
+                            sqlString = "select distinct p.*,7 as resourceTypeId from " + self.dbname + "resources r inner join " + self.dbname + "methods p on r.optionalFK=p.id where p.name <> 'initialize' and (r.createdByUserId=" + req.body.userId + " or r.public=1) and r.id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by p.name asc;";
+                        }
+
+                        console.log(' ');
+                        console.log('Query: ' + sqlString);
+                        console.log(' ');
+                        exceptionRet = sql.execute(sqlString,
+                            function(rows){
+                                res.json({
+                                    success:true,
+                                    arrayRows: rows
+                                });
+                            },
+                            function(err){
+                                res.json({
+                                    success:false,
+                                    message: err
+                                });
+                            }
+                        );
+                    }
+                },
+                function (strError) {
+                
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+            });
+            if (exceptionRet !== null) {
+
+                res.json({
+                    success: false,
+                    message: exceptionRet.message
+                });
+            }
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    self.routeSearchMethods = function (req, res) {
+
+        // This is a search for something based on tags. There are 6 kinds of things whose descriptions have been loaded into m_resourceTypes above.
+        // ResourceTypeIds 1 and 2 (image and sound) use one type of query while the others (3=project, 5=type, 7=method) use a different query. This is because images and sounds have no
+        // FK table relationship, but the others do.
+        // One other thing: resourceTypeId=5 (type) needs to exclude all types where isApp===true.
+
+        try {
+
+            console.log("Entered UtilityBO/routeSearch with req.body = " + JSON.stringify(req.body));
+            // req.body.tags
+            // req.body.userId
+            // req.body.userName
+            // req.body.resourceTypeId  1,2,
             // req.body.onlyCreatedByUser   '0' or '1'
 
             var iResourceTypeId = parseInt(req.body.resourceTypeId,10);

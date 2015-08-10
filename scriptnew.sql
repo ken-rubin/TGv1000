@@ -249,13 +249,20 @@ begin
 
 		insert TGv1000.resourceTypes (id,description) values (1,'image');
 		insert TGv1000.resourceTypes (id,description) values (2,'sound');
+        /* The following 3 don't exist in the resources table, but are used in searching */
+		insert TGv1000.resourceTypes (id,description) values (3,'project');
+		insert TGv1000.resourceTypes (id,description) values (4,'type');
+		insert TGv1000.resourceTypes (id,description) values (5,'method');
 
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ForgotPassword','post','routeForgotPassword',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveResource','post','routeSaveResource',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1);
-		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/Search','post','routeSearch',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchResources','post','routeSearchResources',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchProjects','post','routeSearchProjects',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchTypes','post','routeSearchTypes',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchMethods','post','routeSearchMethods',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveProject','post','routeSaveProject',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveProject',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveType','post','routeRetrieveType',1);
