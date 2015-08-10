@@ -137,7 +137,8 @@ begin
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
-          `initialValue` MEDIUMTEXT NOT NULL,
+		  `propertyTypeId` INT(11) NOT NULL DEFAULT 1,
+	      `initialValue` MEDIUMTEXT NOT NULL,
           `ordinal` INT(11) NOT NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_typeId (typeId)
@@ -309,15 +310,15 @@ begin
             
 		insert TGv1000.type_tags (typeId,tagId)
 			VALUES
-                (2,1),
-                (2,5),
-                (2,4);
+                (1,1),
+                (1,5),
+                (1,4);
             
 		insert TGv1000.method_tags (methodId,tagId)
 			VALUES
-                (3,1),
-                (3,6),
-                (3,7);
+                (1,1),
+                (1,6),
+                (1,7);
 		
         UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
 		set @dbstate := 2.0;
@@ -433,41 +434,37 @@ begin
             
 		insert TGv1000.project_tags (projectId,tagId)
 			VALUES
-				(4,1),
-				(4,2),
-				(4,9),
-				(5,8),
-				(5,2),
-				(5,10),
-				(6,4);
+				(2,1),
+				(2,2),
+				(2,9),
+				(3,8),
+				(3,2),
+				(3,10);
             
 		insert TGv1000.type_tags (typeId,tagId)
 			VALUES
-				(2,4),
-				(3,4),
-				(4,4),
-				(5,4),
-				(6,4),
-				(7,4);
+				(2,4),(2,1),(2,5),
+				(3,4),(3,1),(3,5),
+				(4,4),(4,1),(4,5),
+				(5,4),(5,8),(5,5),
+				(6,4),(6,8),(6,5),
+				(7,4),(7,8),(7,5);
             
 		insert TGv1000.method_tags (methodId,tagId)
 			VALUES
-				(2,6),
-				(3,6),
-				(4,6),
-				(5,6),
-				(6,6),
-                (7,6);
+				(2,6),(2,1),(2,7),
+				(3,6),(3,1),(3,7),
+				(4,6),(4,1),(4,7),
+				(5,6),(5,8),(5,7),
+				(6,6),(6,8),(6,7),
+                (7,6),(7,8),(7,7);
 		
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
     end if;
 
-    if @dbstate = 3.0 THEN
+    if @dbstate = 333.0 THEN
 
-    	/* Left propertyTypeId out of propertys table. */
-		ALTER TABLE `tgv1000`.`propertys` 
-			ADD COLUMN `propertyTypeId` INT(11) NOT NULL DEFAULT 1 COMMENT '' AFTER `typeId`;
 
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
