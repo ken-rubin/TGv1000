@@ -128,13 +128,24 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + "))) order by r.name asc;";
+                        sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
 
                         // console.log(' ');
                         // console.log('Query: ' + sqlString);
                         // console.log(' ');
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
+
+                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                rows.sort(function(a,b){
+
+                                    if (a.name > b.name)
+                                        return 1;
+                                    if (a.name < b.name)
+                                        return -1;
+                                    return 0;
+                                });
+
                                 res.json({
                                     success:true,
                                     arrayRows: rows
@@ -183,12 +194,13 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.userId
             // req.body.userName
             // req.body.onlyOwnedByUser   '0' or '1'
+            // req.body.includeProducts   '0' or '1' -- '1' retrieves projects where isProduct = 1
 
             // Add resource type description to the tags the user (may have) entered.
             var tags = req.body.tags + " project";
 
             // If we're retrieving only items created by user, add userName to tags.
-            if (req.body.onlyOwnedByUser === "1") {
+            if (req.body.onlyOwnedByUser === "1" && req.body.includeProducts === "0") {
 
                 tags += " " + req.body.userName;
             }
@@ -243,7 +255,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (ownedByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select distinct p.* from " + self.dbname + "projects p where (p.ownedByUserId=" + req.body.userId + " or p.public=1) and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + "))) order by p.name asc;";
+                        sqlString = "select distinct p.* from " + self.dbname + "projects p where (p.ownedByUserId=" + req.body.userId + " or p.public=1 or p.isProduct=" + req.body.includeProducts + ") and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);
@@ -251,6 +263,17 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
+
+                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                rows.sort(function(a,b){
+
+                                    if (a.name > b.name)
+                                        return 1;
+                                    if (a.name < b.name)
+                                        return -1;
+                                    return 0;
+                                });
+
                                 res.json({
                                     success:true,
                                     arrayRows: rows
@@ -359,7 +382,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (ownedByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select distinct t.* from " + self.dbname + "types t where (t.ownedByUserId=" + req.body.userId + " or t.public=1) and t.id in (select distinct typeId from " + self.dbname + "type_tags tt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "type_tags tt2 where tt2.typeId=tt.typeId and tagId in (" + idString + "))) order by t.name asc;";
+                        sqlString = "select distinct t.* from " + self.dbname + "types t where (t.ownedByUserId=" + req.body.userId + " or t.public=1) and t.id in (select distinct typeId from " + self.dbname + "type_tags tt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "type_tags tt2 where tt2.typeId=tt.typeId and tagId in (" + idString + ")));";
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);
@@ -367,6 +390,16 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
+
+                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                rows.sort(function(a,b){
+
+                                    if (a.name > b.name)
+                                        return 1;
+                                    if (a.name < b.name)
+                                        return -1;
+                                    return 0;
+                                });
                                 res.json({
                                     success:true,
                                     arrayRows: rows
@@ -475,7 +508,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (ownedByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select distinct m.* from " + self.dbname + "methods m where (m.ownedByUserId=" + req.body.userId + " or m.public=1) and m.id in (select distinct methodId from " + self.dbname + "method_tags mt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "method_tags mt2 where mt2.methodId=mt.methodId and tagId in (" + idString + "))) order by p.name asc;";
+                        sqlString = "select distinct m.* from " + self.dbname + "methods m where (m.ownedByUserId=" + req.body.userId + " or m.public=1) and m.id in (select distinct methodId from " + self.dbname + "method_tags mt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "method_tags mt2 where mt2.methodId=mt.methodId and tagId in (" + idString + ")));";
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);
@@ -483,6 +516,16 @@ module.exports = function UtilityBO(app, sql, logger) {
                         
                         exceptionRet = sql.execute(sqlString,
                             function(rows){
+
+                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                rows.sort(function(a,b){
+
+                                    if (a.name > b.name)
+                                        return 1;
+                                    if (a.name < b.name)
+                                        return -1;
+                                    return 0;
+                                });
                                 res.json({
                                     success:true,
                                     arrayRows: rows

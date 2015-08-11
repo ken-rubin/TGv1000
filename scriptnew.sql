@@ -279,18 +279,18 @@ begin
 
     if @dbstate = 1.0 THEN
     
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump)
-			VALUES (1,'New Project',1,'',0,0,0,0.00,0.00);
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump,public)
+			VALUES (1,'New Project',1,'',0,0,0,0.00,0.00,1);
             
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
 			VALUES (1,1,0,'tn3.png','TechGroms Help','http://www.techgroms.com');
             
-		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
-			VALUES (1,'App',1,1,0,0,1,'',0,0.00,0.00);
+		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public)
+			VALUES (1,'App',1,1,0,0,1,'',0,0.00,0.00,1);
             
-		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public)
 			VALUES
-				(1,1,1,'initialize',0,'',0,'',0,0.00,0.00)
+				(1,1,1,'initialize',0,'',0,'',0,0.00,0.00,1)
 			;
             
 		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
@@ -341,10 +341,11 @@ begin
 
 		/* Adding 2 more projects: a multi-comic product and a user-owned enhanced version of it. */    
         /* start with id=2 */
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump)
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump,public)
 			VALUES
-				(2,'Mission to Mars',1,'In this project you will create....',0,1,0,0.00,12.00),
-				(3,'Mission to Mars enhanced',2,'Did some work on MtM.',0,0,2,12.00,0.00)
+				(2,'Mission to Mars',1,'In this project you will create....',0,1,0,0.00,12.00,1),
+				(3,'Mission to Mars enhanced',2,'Did some work on MtM.',0,0,2,12.00,0.00,1),
+				(4,'Another enhanced MtM',3,'Other work on MtM.',0,0,2,12.00,0.00,1)
 			;
             
         /* need same comics for project 2 and 3: 'how to' and 2 more */
@@ -357,31 +358,40 @@ begin
 				(4,2,2,'tn3.png','MTM: Step 2','http://www.microsoft.com'),
 				(5,3,0,'tn3.png','MtM: How to TechGrom','http://www.techgroms.com'),
 				(6,3,1,'tn3.png','MTM: Step 1','http://www.bing.com'),
-				(7,3,2,'tn3.png','MTM: Step 2','http://www.microsoft.com')
+				(7,3,2,'tn3.png','MTM: Step 2','http://www.microsoft.com'),
+				(8,4,0,'tn3.png','MtM: How to TechGrom','http://www.techgroms.com'),
+				(9,4,1,'tn3.png','MTM: Step 1','http://www.bing.com'),
+				(10,4,2,'tn3.png','MTM: Step 2','http://www.microsoft.com')
 			;
             
         /* need at least an App type for each comic (although not sure about the 'how to' comic) */
         /* start with id=2 */
-		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
+		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public)
 			VALUES
-				(2,'App',1,1,0,0,2,'App type',0,0,0),
-				(3,'App',1,1,0,0,3,'App type',0,0,0),
-				(4,'App',1,1,0,0,4,'App type',0,0,0),
-				(5,'App',2,1,0,0,5,'App type',0,0,0),
-				(6,'App',2,1,0,0,6,'App type',0,0,0),
-				(7,'App',2,1,0,0,7,'App type',0,0,0)
+				(2,'App',1,1,0,0,2,'App type',0,0,0,1),
+				(3,'App',1,1,0,0,3,'App type',0,0,0,1),
+				(4,'App',1,1,0,0,4,'App type',0,0,0,1),
+				(5,'App',2,1,0,0,5,'App type',0,0,0,1),
+				(6,'App',2,1,0,0,6,'App type',0,0,0,1),
+				(7,'App',2,1,0,0,7,'App type',0,0,0,1),
+				(8,'App',3,1,0,0,8,'App type',0,0,0,1),
+				(9,'App',3,1,0,0,9,'App type',0,0,0,1),
+				(10,'App',3,1,0,0,10,'App type',0,0,0,1)
 			;
             
 		/* need at least an 'initialize' method for each App type */
 		/* start with id=2 */         
-		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public)
 			VALUES
-				(2,2,1,'initialize',0,'',0,'',0,0.00,0.00),
-				(3,3,1,'initialize',0,'',0,'',0,0.00,0.00),
-				(4,4,1,'initialize',0,'',0,'',0,0.00,0.00),
-				(5,5,2,'initialize',0,'',0,'',0,0.00,0.00),
-				(6,6,2,'initialize',0,'',0,'',0,0.00,0.00),
-				(7,7,2,'initialize',0,'',0,'',0,0.00,0.00)
+				(2,2,1,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(3,3,1,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(4,4,1,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(5,5,2,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(6,6,2,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(7,7,2,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(8,8,3,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(9,9,3,'initialize',0,'',0,'',0,0.00,0.00,1),
+				(10,10,3,'initialize',0,'',0,'',0,0.00,0.00,1)
 			;
             
         /* need 4 properties for each type: X, Y, Width, Height */
@@ -411,7 +421,19 @@ begin
 				(25,7,'X','0',0),
 				(26,7,'Y','0',1),
 				(27,7,'Width','0',2),
-				(28,7,'Height','0',3)
+				(28,7,'Height','0',3),
+				(29,8,'X','0',0),
+				(30,8,'Y','0',1),
+				(31,8,'Width','0',2),
+				(32,8,'Height','0',3),
+				(33,9,'X','0',0),
+				(34,9,'Y','0',1),
+				(35,9,'Width','0',2),
+				(36,9,'Height','0',3),
+				(37,10,'X','0',0),
+				(38,10,'Y','0',1),
+				(39,10,'Width','0',2),
+				(40,10,'Height','0',3)
 			;
 
 		/* add an event just for the heck of it */
@@ -440,7 +462,9 @@ begin
 				(19,'i'),
 				(20,'j'),
 				(21,'k'),
-				(22,'l')
+				(22,'l'),
+                (23,'misc@abc.com'),
+                (24,'another_enhanced_mtm')
 			;
             
 		insert TGv1000.project_tags (projectId,tagId)
@@ -450,7 +474,11 @@ begin
 				(2,9),
 				(3,8),
 				(3,2),
-				(3,10);
+				(3,10),
+                (4,23),
+                (4,2),
+                (4,24)
+                ;
             
 		insert TGv1000.type_tags (typeId,tagId)
 			VALUES
@@ -459,7 +487,11 @@ begin
 				(4,4),(4,1),(4,5),
 				(5,4),(5,8),(5,5),
 				(6,4),(6,8),(6,5),
-				(7,4),(7,8),(7,5);
+				(7,4),(7,8),(7,5),
+				(8,4),(8,23),(8,5),
+				(9,4),(9,23),(9,5),
+				(10,4),(10,23),(10,5)
+                ;
             
 		insert TGv1000.method_tags (methodId,tagId)
 			VALUES
@@ -468,7 +500,11 @@ begin
 				(4,6),(4,1),(4,7),
 				(5,6),(5,8),(5,7),
 				(6,6),(6,8),(6,7),
-                (7,6),(7,8),(7,7);
+                (7,6),(7,8),(7,7),
+				(8,6),(8,23),(8,7),
+				(9,6),(9,23),(9,7),
+                (10,6),(10,23),(10,7)
+                ;
 		
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;

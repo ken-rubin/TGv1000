@@ -143,7 +143,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        		tags: tags, 
 					        		userId: g_strUserId,
 					        		userName: g_strUserName,
-					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
+					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0,
+					        		includeProducts: $("#cb2").prop("checked") ? 1 : 0
 					        	}, 
 					        	'json');
 					        posting.done(function(data){

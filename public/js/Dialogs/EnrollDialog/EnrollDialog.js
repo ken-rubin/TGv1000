@@ -65,7 +65,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								errMsg += "You must enter an e-mail address for yourself.";
 							} else {
 
-								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
 								var childOK = emailChild.match(eReg);
 								var parentOK = emailParent.match(eReg);
 
@@ -107,7 +107,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
                 					document.cookie = "userName=" + emailChild + strDate;
 
                 					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
-                									{waittime: 5000, callback: function(){	m_dialog.close(); location.href = '/';}});
+                									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
             					} else {
 
                 					// !data.success
