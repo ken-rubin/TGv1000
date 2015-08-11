@@ -149,7 +149,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        		userId: g_strUserId,
 					        		userName: g_strUserName,
 					        		resourceTypeId: 1,
-					        		onlyCreatedByUser: $("#cb1").prop("checked") ? 1 : 0
+					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},
 					        	'json');
 					        posting.done(function(data){

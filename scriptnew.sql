@@ -34,6 +34,8 @@ begin
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `name` varchar(255) NOT NULL,
           `ownedByUserId` int(11) NOT NULL,
+		  `public` tinyint(1) NOT NULL DEFAULT '0',
+		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `description` VARCHAR(255) NULL,
           `imageId` int(11) NOT NULL,
           `isProduct` TINYINT(1) NOT NULL,
@@ -57,10 +59,10 @@ begin
         
 		CREATE TABLE `TGv1000`.`comics` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` VARCHAR(255) NOT NULL,
 		  `projectId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
           `thumbnail` VARCHAR(255) NOT NULL,
-          `name` VARCHAR(255) NOT NULL,
           `url` VARCHAR(255) NOT NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_projectId (projectId)
@@ -74,10 +76,13 @@ begin
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` varchar(255) NOT NULL,
+		  `comicId` int(11) NOT NULL,
+          `ordinal` int(11) NOT NULL,
+          `ownedByUserId` int(11) NOT NULL,
+		  `public` tinyint(1) NOT NULL DEFAULT '0',
+		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `isApp` tinyint(1) NOT NULL DEFAULT '0',
           `imageId` int(11) NOT NULL,
-          `ordinal` int(11) NOT NULL,
-		  `comicId` int(11) NOT NULL,
           `description` mediumtext NULL,
           `parentTypeId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
@@ -104,9 +109,12 @@ begin
         
 		CREATE TABLE `TGv1000`.`methods` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
+		  `typeId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
+          `ownedByUserId` int(11) NOT NULL,
+		  `public` tinyint(1) NOT NULL DEFAULT '0',
+		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `workspace` mediumtext NOT NULL,
           `imageId` INT(11) NOT NULL,
           `description` VARCHAR(255) NULL DEFAULT NULL,
@@ -135,11 +143,11 @@ begin
         
 		CREATE TABLE `TGv1000`.`propertys` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
+		  `typeId` int(11) NOT NULL,
+          `ordinal` INT(11) NOT NULL,
 		  `propertyTypeId` INT(11) NOT NULL DEFAULT 1,
 	      `initialValue` MEDIUMTEXT NOT NULL,
-          `ordinal` INT(11) NOT NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_typeId (typeId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -151,8 +159,8 @@ begin
 
 		CREATE TABLE `TGv1000`.`events` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `typeId` int(11) NOT NULL,
           `name` varchar(255) NOT NULL,
+		  `typeId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_typeId (typeId)
@@ -249,10 +257,6 @@ begin
 
 		insert TGv1000.resourceTypes (id,description) values (1,'image');
 		insert TGv1000.resourceTypes (id,description) values (2,'sound');
-        /* The following 3 don't exist in the resources table, but are used in searching */
-		insert TGv1000.resourceTypes (id,description) values (3,'project');
-		insert TGv1000.resourceTypes (id,description) values (4,'type');
-		insert TGv1000.resourceTypes (id,description) values (5,'method');
 
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
@@ -281,12 +285,12 @@ begin
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
 			VALUES (1,1,0,'tn3.png','TechGroms Help','http://www.techgroms.com');
             
-		insert into TGv1000.`types` (id,`name`,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
-			VALUES (1,'App',1,0,0,1,'',0,0.00,0.00);
+		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
+			VALUES (1,'App',1,1,0,0,1,'',0,0.00,0.00);
             
-		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
 			VALUES
-				(1,1,'initialize',0,'',0,'',0,0.00,0.00)
+				(1,1,1,'initialize',0,'',0,'',0,0.00,0.00)
 			;
             
 		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
@@ -358,26 +362,26 @@ begin
             
         /* need at least an App type for each comic (although not sure about the 'how to' comic) */
         /* start with id=2 */
-		insert into TGv1000.`types` (id,`name`,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
+		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump)
 			VALUES
-				(2,'App',1,0,0,2,'App type',0,0,0),
-				(3,'App',1,0,0,3,'App type',0,0,0),
-				(4,'App',1,0,0,4,'App type',0,0,0),
-				(5,'App',1,0,0,5,'App type',0,0,0),
-				(6,'App',1,0,0,6,'App type',0,0,0),
-				(7,'App',1,0,0,7,'App type',0,0,0)
+				(2,'App',1,1,0,0,2,'App type',0,0,0),
+				(3,'App',1,1,0,0,3,'App type',0,0,0),
+				(4,'App',1,1,0,0,4,'App type',0,0,0),
+				(5,'App',2,1,0,0,5,'App type',0,0,0),
+				(6,'App',2,1,0,0,6,'App type',0,0,0),
+				(7,'App',2,1,0,0,7,'App type',0,0,0)
 			;
             
 		/* need at least an 'initialize' method for each App type */
 		/* start with id=2 */         
-		insert TGv1000.methods (id,typeId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump)
 			VALUES
-				(2,2,'initialize',0,'',0,'',0,0.00,0.00),
-				(3,3,'initialize',0,'',0,'',0,0.00,0.00),
-				(4,4,'initialize',0,'',0,'',0,0.00,0.00),
-				(5,5,'initialize',0,'',0,'',0,0.00,0.00),
-				(6,6,'initialize',0,'',0,'',0,0.00,0.00),
-				(7,7,'initialize',0,'',0,'',0,0.00,0.00)
+				(2,2,1,'initialize',0,'',0,'',0,0.00,0.00),
+				(3,3,1,'initialize',0,'',0,'',0,0.00,0.00),
+				(4,4,1,'initialize',0,'',0,'',0,0.00,0.00),
+				(5,5,2,'initialize',0,'',0,'',0,0.00,0.00),
+				(6,6,2,'initialize',0,'',0,'',0,0.00,0.00),
+				(7,7,2,'initialize',0,'',0,'',0,0.00,0.00)
 			;
             
         /* need 4 properties for each type: X, Y, Width, Height */
