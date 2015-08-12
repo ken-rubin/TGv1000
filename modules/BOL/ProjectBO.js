@@ -50,61 +50,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                  RetrieveCountUsersProjects
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    self.routeRetrieveCountUsersProjects = function (req, res) {
-
-        console.log("Entered ProjectBO/routeRetrieveCountUsersProjects with req.body=" + JSON.stringify(req.body));
-        // req.body.userId
-
-        try {
-
-            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + ";",
-                function(rows){
-
-                    if (rows.length !== 1) {
-
-                        res.json({
-                            success: false,
-                            message: "Could not retrieve project."
-                        });
-                    } else {
-
-                        res.json({
-                            success: true,
-                            cnt: rows[0].cnt
-                        });
-                    }
-                },
-                function(strError){
-
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
-                }
-            );
-            if (exceptionRet) {
-
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-            }
-
-        } catch(e) {
-
-            res.json({
-                success: false,
-                message: e.message
-            });
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
     //                  RetrieveProject
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,6 +78,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             originalProjectId: row.id,
                             name: row.name,
                             ownedByUserId: row.ownedByUserId,
+                            public: row.public,
+                            quarantined: row.quarantined,
                             description: row.description,
                             imageId: row.imageId,
                             isProduct: row.isProduct,
@@ -156,7 +103,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         m_functionFetchTags(
                             project.originalProjectId, 
-                            3, 
+                            'project', 
                             function(tags)  {
 
                                 project.tags = tags;
@@ -304,6 +251,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         id: row.id,
                                         originalTypeId: row.id,
                                         name: row.name,
+                                        ownedByUserId: row.ownedByUserId,
+                                        public: row.public,
+                                        quarantined: row.quarantined,
                                         isApp: row.isApp === 1 ? true : false,
                                         imageId: row.imageId,
                                         ordinal: row.ordinal,
@@ -329,7 +279,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     m_functionFetchTags(
                                         type.originalTypeId,
-                                        5,
+                                        'type',
                                         function(tags) {
 
                                             type.tags = tags;
@@ -423,7 +373,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             { 
                                                 id: row.id,
                                                 originalMethodId: row.id,
-                                                name: row.name, 
+                                                name: row.name,
+                                                ownedByUserId: row.ownedByUserId,
+                                                public: row.public,
+                                                quarantined: row.quarantined,
                                                 ordinal: row.ordinal,
                                                 workspace: row.workspace, 
                                                 imageId: row.imageId,
@@ -441,7 +394,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             m_functionFetchTags(
                                                 method.originalMethodId,
-                                                7,
+                                                'method',
                                                 function(tags) {
 
                                                     method.tags = tags;
@@ -584,6 +537,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             id: row.id,
                             originalTypeId: row.id,
                             name: row.name,
+                            ownedByUserId: row.ownedByUserId,
+                            public: row.public,
+                            quarantined: row.quarantined,
                             isApp: row.isApp === 1 ? true : false,
                             imageId: row.imageId,
                             ordinal: row.ordinal,
@@ -602,7 +558,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         m_functionFetchTags(
                             type.originalTypeId,
-                            5,
+                            'type',
                             function(tags) {
 
                                 type.tags = tags;
@@ -687,6 +643,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 id: row.id,
                                 originalMethodId: row.id,
                                 name: row.name, 
+                                ownedByUserId: row.ownedByUserId,
+                                public: row.public,
+                                quarantined: row.quarantined,
                                 ordinal: row.ordinal,
                                 workspace: row.workspace, 
                                 imageId: row.imageId,
@@ -701,7 +660,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             m_functionFetchTags(
                                 method.originalMethodId,
-                                7,
+                                'method',
                                 function(tags) {
 
                                     method.tags = tags;
@@ -824,6 +783,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             id: row.id,
                             originalMethodId: row.id,
                             name: row.name, 
+                            ownedByUserId: row.ownedByUserId,
+                            public: row.public,
+                            quarantined: row.quarantined,
                             ordinal: row.ordinal,
                             workspace: row.workspace, 
                             imageId: row.imageId,
@@ -839,7 +801,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         m_functionFetchTags(
                             method.originalMethodId,
-                            7,
+                            'method',
                             function(tags) {
 
                                 method.tags = tags;
@@ -886,25 +848,27 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionFetchTags = function(thingId, resourceTypeId, callback) {
+    var m_functionFetchTags = function(thingId, strItemType, callback) {
 
         try {
 
-            // Retireve and set project.tags, skipping resourceType.description and any tag that matches the email-address-testing regexp.
+            // Retrieve and set tags, skipping strItemType and any tag that matches the email-address-testing regexp.
 
             var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 
             /* ' */
 
-            exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optionalFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
+            // exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optionalFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
+            var exceptionRet = sql.execute("select t.description from " + self.dbname + "tags t where id in (select tagId from " + self.dbname + strItemType + "_tags where " + strItemType + "Id = " + thingId + ");",
                 function(rows){
 
+                    // Concatenate tags while at the same time skipping strItemType and e-mail-like tags.
                     var tags = "";
                     if (rows.length > 0) {
 
                         rows.forEach(function(row) {
 
-                            if (row.description !== m_resourceTypes[resourceTypeId]) {
+                            if (row.description !== strItemType) {
 
                                 if (!row.description.match(eReg)) {
 

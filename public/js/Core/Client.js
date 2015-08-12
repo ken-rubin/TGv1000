@@ -952,48 +952,6 @@ define(["Core/errorHelper",
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").tooltip();
 
-							// // Use project data and user history to determine initial display settings for comic and panels strips (along with width of designer and code sections).
-							// if (m_clProject.data.comics.items.length > 1) {
-
-							// 	// Set globael var so comic stuff will be displayed on resize and force a resize.
-							// 	self.functionSetBDisplayComics(true);
-
-							// } else {
-
-							// 	// If project has only 1 comic, it means it's a project a user started with New Project.
-							// 	// Determine if showing help (comic) based on number of projects user has played with.
-							// 	var posting = $.post("/BOL/ProjectBO/RetrieveCountUsersProjects", 
-							// 		{
-							// 			userId: g_strUserId
-							// 		},
-							// 		'json');
-							// 	posting.done(function(data){
-
-							// 		if (data.success) {
-
-							// 			if (data.cnt > 5) {
-
-							// 				self.functionSetBDisplayComics(false);
-
-							// 			} else if (data.cnt < 4) {
-
-							// 				self.functionSetBDisplayComics(true);
-
-							// 			} else {
-
-							// 				self.functionSetBDisplayComics(false);
-							// 				errorHelper.show("Based on your experience level, Help is turned off. You may turn it back on with the Show Help menu item.", 7500);
-							// 			}
-
-							// 		} else {
-
-							// 			// !data.success
-							// 			// This can't be good. We'll just turn help on.
-							// 			self.functionSetBDisplayComics(true);
-							// 		}
-							// 	});
-							// }
-
 							if ($.isFunction(callback)) {
 
 								callback(m_clProject);
