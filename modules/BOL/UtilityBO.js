@@ -193,18 +193,13 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.body.userId
             // req.body.userName
-            // req.body.onlyOwnedByUser   '0' or '1'
-            // req.body.includeProducts   '0' or '1' -- '1' retrieves projects where isProduct = 1
+            // Exactly one of the following 3 will = "1"
+            // req.body.onlyOwnedByUser   
+            // req.body.onlyOthersProjects
+            // req.body.onlyProducts
 
             // Add resource type description to the tags the user (may have) entered.
             var tags = req.body.tags + " project";
-
-            // If we're retrieving only items created by user, add userName to tags.
-            if (req.body.onlyOwnedByUser === "1" && req.body.includeProducts === "0") {
-
-                tags += " " + req.body.userName;
-            }
-            // console.log("tags massaged='" + tags + "'");
 
             // Turn tags into string with commas between tags and tags surrounded by single quotes.
             var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
@@ -252,10 +247,18 @@ module.exports = function UtilityBO(app, sql, logger) {
                             idString = idString + arrayRows[i].id.toString();
                         }
 
-                        // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
-                        // But to do so, we need something like: (ownedByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
-
-                        sqlString = "select distinct p.* from " + self.dbname + "projects p where (p.ownedByUserId=" + req.body.userId + " or p.public=1 or p.isProduct=" + req.body.includeProducts + ") and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        if (req.body.onlyOwnedByUser === "1") {
+                        
+                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.body.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        
+                        } else if (req.body.onlyOthersProjects === "1") {
+                        
+                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.body.userId + " and p.public=1 and p.isProduct=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        
+                        } else {    // onlyProducts
+                        
+                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.isProduct=1 and p.id<>1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        }
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);

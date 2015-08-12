@@ -280,7 +280,7 @@ begin
     if @dbstate = 1.0 THEN
     
 		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump,public)
-			VALUES (1,'New Project',1,'',0,0,0,0.00,0.00,1);
+			VALUES (1,'New Project',1,'',0,1,0,0.00,0.00,1);
             
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
 			VALUES (1,1,0,'tn3.png','TechGroms Help','http://www.techgroms.com');

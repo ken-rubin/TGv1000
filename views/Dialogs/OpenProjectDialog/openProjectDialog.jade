@@ -14,14 +14,20 @@
         button.btn.btn-info#ISInnerSearchButton Search
       br
     .row
+      br
       .col-xs-1
       .col-xs-10(style='margin-left:25px;')
-        label.checkbox
-          input#cb1(type='checkbox')
-          | Limit retrieved projects to those I created.
-        label.checkbox
-          input#cb2(type='checkbox')
-          | Add <em>Products</em> and <em>Classes</em> to the results.
+          input#rad1(type='radio' name='sr' value='1' checked)
+          span
+            | &nbsp;Search only projects that I created.
+          br
+          input#rad2(type='radio' name='sr' value='2')
+          span
+            | &nbsp;Search others' public projects.
+          br
+          input#rad3(type='radio' name='sr' value='3')
+          span
+            | &nbsp;Search <em>Products</em> and <em>Classes</em>.
       .col-xs-1
     br
     .row
