@@ -905,7 +905,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
@@ -985,7 +985,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                         }
                     }
 
-                    m_log('Success');
+                    m_log('Success. Committing transaction.');
+
+                    sql.commitCxn(connection,
+                        function(err){
+
+                            res.json({
+                                success: false,
+                                message: 'Committing transaction failed with ' + err.message
+                            });
+                            return;
+                        }
+                    );
+
                     // Total success.
                     res.json({
                         success: true,
@@ -1021,7 +1033,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // The following will delete the former project completely from the database using cascading delete.
             var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
-            m_log('Save; deleting with ' + strQuery);
+            m_log('Save project step 1; deleting with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
@@ -1058,7 +1070,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // Look for and reject an attempt to add a 2nd project for same user with same name.
             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
-            m_log('in SaveAs with ' + strQuery);
+            m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
@@ -1167,7 +1179,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 comicIth.projectId = project.id;
 
                 var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
-                m_log('In m_doComicsForSaveAs for ' + strQuery);
+                m_log('In m_doComicsForSaveAs with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
                     function(err, rows) {
 
@@ -1226,6 +1238,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.comicId = comicIth.id;
 
                     var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + typeIth.isApp + "," + typeIth.imageId + "," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                    m_log('Inserting type with ' + strQuery);
                     sql.queryWithCxn(connection, strQuery,
                         function(err, rows) {
 
@@ -1238,7 +1251,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
 
                             typeIth.id = rows[0].insertId;
-
+                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
                             m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
 
                                 if (err) {
@@ -1250,6 +1263,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     if (--typesCountdown === 0) {
 
+                                        m_log('Going to m_doTypeArraysForSaveAs');
                                         m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
                                     }
                                 }
@@ -1281,6 +1295,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         method.typeId = typeIth.id;
 
                         var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined) values (" + method.typeId + ",'" + method.name + "'," + (ordinal++) + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + ");";
+                        m_log('Inserting method with ' + strQuery);
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
 
@@ -1297,7 +1312,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
 
                                 method.id = rows[0].insertId;
-
+                                m_log('Going to do method tags');
                                 m_setUpAndDoTagsWithCxn(connection, method.id, 'method', req.body.userName, method.tags, method.name, function(err) {
 
                                     if (err) {
@@ -1323,6 +1338,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         property.typeId = typeIth.id;
                         strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");";
                         
+                        m_log('Inserting property with ' + strQuery);
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
 
@@ -1354,7 +1370,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.events.forEach(function(event) {
 
                         event.typeId = typeIth.id;
-                        sql.queryWithCxn(connection, "insert " + self.dbname + "methods (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");",
+                        strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");";
+                        m_log('Inserting event with ' + strQuery);
+                        sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
 
                                 if (err) {
@@ -1398,7 +1416,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
             
-            console.log("In m_setUpAndDoTagsWithCxn with itemId=" + itemId);
+            m_log("In m_setUpAndDoTagsWithCxn with for type " + strItemType + " and itemId=" + itemId);
 
             // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
             var tagArray = [];
@@ -1406,7 +1424,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             tagArray.push(userName);
             if (strName.length > 0) {
 
-                tagArray.push(strName.trim().replace(/\s/g, '_'));
+                tagArray.push(strName.trim().replace(/\s/g, '_').toLowerCase());
             }
 
             // Get optional user-entered tags ready to combine with above three tags.
@@ -1454,6 +1472,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         //      else, add it and push the new array.
         // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
 
+        m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
         tagArray.forEach(function(tag) {
 
             var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
@@ -1474,7 +1493,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             callback(m_createTagJunctionsWithCxn(connection, itemId, strItemType, tagIds));
                             return;
                         }
-
                     } else {
 
                         strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
@@ -1522,6 +1540,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
 
         strSql = strSql + ";";
+        m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
         sql.queryWithCxn(connection, strSql,
             function(err, rows){
 
