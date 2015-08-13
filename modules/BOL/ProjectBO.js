@@ -858,7 +858,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             /* ' */
 
-            // exceptionRet = sql.execute("select t.description from " + self.dbname + "resources r inner join " + self.dbname + "resources_tags rt on r.id=rt.resourceId inner join " + self.dbname + "tags t on t.id=rt.tagId where r.optionalFK=" + thingId + " and r.resourceTypeId=" + resourceTypeId + ";",
             var exceptionRet = sql.execute("select t.description from " + self.dbname + "tags t where id in (select tagId from " + self.dbname + strItemType + "_tags where " + strItemType + "Id = " + thingId + ");",
                 function(rows){
 
@@ -938,33 +937,55 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 if (err) {
 
-                    // We have no connection to rollback. We can fail the old way.
                     res.json({
                         success: false,
-                        message: 'Could not get a database connection.'
+                        message: 'Could not get a database connection: ' + err.message
                     });
                     return;
                 }
 
+                m_log('Have a connection');
                 connection.beginTransaction(function(err) {
 
-                    if (err) { throw err; }
+                    if (err) {
 
+                        res.json({
+                            success: false,
+                            message: 'Could not "begin" database connection: ' + err.message
+                        });
+                        return;
+                    }
+
+                    m_log('Connection has a transaction');
                     var exceptionRet = null;
                     if (typeOfSave === 'save') {
 
+                        m_log('Going into m_functionSaveProject');
                         exceptionRet = m_functionSaveProject(connection, req, res, project);
+                        if (exceptionRet) {
+
+                            res.json({
+                                success: false,
+                                message: 'Save Project failed with error: ' + exceptionRet.message
+                            });
+                            return;
+                        }
                     
                     } else {    // 'saveAs'
 
+                        m_log('Going into m_functionSaveProjectAs');
                         exceptionRet = m_functionSaveProjectAs(connection, req, res, project);
+                        if (exceptionRet) {
+
+                            res.json({
+                                success: false,
+                                message: 'Save Project As failed with error: ' + exceptionRet.message
+                            });
+                            return;
+                        }
                     }
 
-                    if (exceptionRet) {
-
-                        throw exceptionRet;
-                    }
-
+                    m_log('Success');
                     // Total success.
                     res.json({
                         success: true,
@@ -974,11 +995,18 @@ module.exports = function ProjectBO(app, sql, logger) {
             });
         } catch(e) {
 
+            m_log('Save exception');
             res.json({
                 success: false,
-                message: e.message
+                message: 'Save failed. Error received: ' + e.message
             });
         }
+    }
+
+    var m_log = function(msg) {
+
+        console.log(' ');
+        console.log(msg);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -993,15 +1021,18 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // The following will delete the former project completely from the database using cascading delete.
             var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
+            m_log('Save; deleting with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
                     if (err) { 
 
+                        m_log('err back from delete project');
                         // Rollback has happened already.
                         throw err; 
                     }
 
+                    m_log('No error in delete; moving into SaveAs');
                     // Now we can just INSERT the project as passed from the client side.
                     return m_functionProjectSaveAsPart2(connection, req, res, project);
                 }
@@ -1021,12 +1052,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSaveProjectAs = function (connection, req, res, project) {
         
-        // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction begun.
-        // Look for and reject an attempt to add a 2nd project for same user with same name.
+        // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
 
         try {
 
+            // Look for and reject an attempt to add a 2nd project for same user with same name.
             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+            m_log('in SaveAs with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
@@ -1044,6 +1076,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         } else {
                             
+                            m_log('Name for SaveAs is good');
+                            project.public = 0;     // A saved-as project needs review by admins.
                             var exceptionRet = m_functionProjectSaveAsPart2(connection,req,res,project);
                             if (exceptionRet) { throw exceptionRet; }
                         }
@@ -1065,6 +1099,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
+            m_log('Continuing in m_functionProjectSaveAsPart2');
             var guts = " SET name='" + project.name + "'"
                 + ",ownedByUserId=" + req.body.userId
                 + ",public=" + project.public
@@ -1080,10 +1115,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
 
-            // console.log(' ');
-            // console.log(strQuery);
-            // console.log(' ');
-
+            m_log('Inserting project record with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
@@ -1097,16 +1129,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                     project.id = rows[0].insertId;
 
                     // Handle tags and project_tags.
-                    m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+                    m_log('Going to m_setUpAndDoTagsWithCxn for project');
+                    m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, project.tags, project.name, function(err) {
 
                         if (err) { throw err; }
-
-                        if (--typesCountdown === 0) {
-
-                            m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                        }
                     });
 
+                    m_log('Going to m_doComicsForSaveAs');
                     m_doComicsForSaveAs(connection, project, req, function(err) {
 
                         if (err) { throw err; }
@@ -1114,7 +1143,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                 );
 
                 return null;
-
             });
         } catch(e) {
 
@@ -1139,6 +1167,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 comicIth.projectId = project.id;
 
                 var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
+                m_log('In m_doComicsForSaveAs for ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
                     function(err, rows) {
 
@@ -1154,6 +1183,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         if (--comicsCountdown === 0) {
 
+                            m_log('Going to m_doTypesForSaveAs');
                             m_doTypesForSaveAs(connection, project, req, callback);
                         }
                     }
@@ -1254,6 +1284,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
 
+                                if (err) {
+
+                                    callback(err);
+                                    return;
+                                }
+
                                 if (rows.length === 0) {
 
                                     callback(new Error("Error inserting method into database"));
@@ -1262,7 +1298,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 method.id = rows[0].insertId;
 
-                                m_setUpAndDoTagsWithCxn(connection, method.id, 'method', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+                                m_setUpAndDoTagsWithCxn(connection, method.id, 'method', req.body.userName, method.tags, method.name, function(err) {
 
                                     if (err) {
 
@@ -1270,11 +1306,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         return;
                                     }
                                 });
-                            },
-                            function(strError) {
-
-                                callback(newError(strError));
-                                return;
                             }
                         );
 
@@ -1290,13 +1321,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.properties.forEach(function(property) {
 
                         property.typeId = typeIth.id;
-                        var ss = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");";
-                        console.log(' ');
-                        console.log('*** property insert sql stmt ');
-                        console.log(ss);
-                        console.log(' ');
-                        exceptionRet = sql.execute(ss,
-                            function(rows) {
+                        strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");";
+                        
+                        sql.queryWithCxn(connection, strQuery,
+                            function(err, rows) {
+
+                                if (err) {
+
+                                    callback(err);
+                                    return;
+                                }
 
                                 if (rows.length === 0) {
 
@@ -1305,18 +1339,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
 
                                 property.id = rows[0].insertId;
-                            },
-                            function(strError) {
-
-                                callback(new Error(strError));
-                                return;
                             }
                         );
-                        if (exceptionRet) {
-
-                            callback(exceptionRet);
-                            return;
-                        }
 
                         propertiesCountdown--;
                         if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
@@ -1330,8 +1354,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.events.forEach(function(event) {
 
                         event.typeId = typeIth.id;
-                        exceptionRet = sql.execute("insert " + self.dbname + "methods (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");",
-                            function(rows) {
+                        sql.queryWithCxn(connection, "insert " + self.dbname + "methods (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");",
+                            function(err, rows) {
+
+                                if (err) {
+
+                                    callback(err);
+                                    return;
+                                }
 
                                 if (rows.length === 0) {
 
@@ -1340,18 +1370,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
 
                                 event.id = rows[0].insertId;
-                            },
-                            function(strError) {
-
-                                callback(newError(strError));
-                                return;
                             }
                         );
-                        if (exceptionRet) {
-
-                            callback(exceptionRet);
-                            return;
-                        }
 
                         eventsCountdown--;
                         if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
@@ -1367,8 +1387,6 @@ module.exports = function ProjectBO(app, sql, logger) {
             callback(e);
         }
     }
-
-
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -1424,7 +1442,6 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch(e) {
 
             callback(e);
-            return;
         }
     }
 
@@ -1435,13 +1452,19 @@ module.exports = function ProjectBO(app, sql, logger) {
         // For each string in tagArry:
         //      if it already exists in table tags, push its id onto tagIds.
         //      else, add it and push the new array.
-        // Then write as many records to resources_tags using resourceId and tagIds[i] as called for.
+        // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
 
         tagArray.forEach(function(tag) {
 
             var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
-            sql.execute(strSql,
-                function(rows){
+            sql.queryWithCxn(connection, strSql,
+                function(err, rows){
+
+                    if (err) {
+
+                        callback(err);
+                        return;
+                    }
 
                     if (rows.length > 0) {
 
@@ -1455,8 +1478,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } else {
 
                         strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-                        sql.execute(strSql,
-                            function(rows){
+                        sql.queryWithCxn(connection, strSql,
+                            function(err, rows){
+
+                                if (err) {
+
+                                    callback(err);
+                                    return;
+                                }
 
                                 if (rows.length === 0) {
 
@@ -1468,183 +1497,36 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     tagIds.push(rows[0].insertId);
                                     if (--iCtr === 0){
 
-                                        callback(m_setUpAndDoTagsWithCxn(itemId, strItemType, tagIds));
+                                        callback(m_createTagJunctionsWithCxn(connection, itemId, strItemType, tagIds));
                                         return;
                                     }
                                 }
-                            },
-                            function(err){
-
-                                callback({message:err});
-                                return;
-                            });
+                            }
+                        );
                     }
-                },
-                function(err){
-
-                    callback({message:err});
-                    return;
-                });
+                }
+            );
         });
     }
 
     var m_createTagJunctionsWithCxn = function(connection, itemId, strItemType, tagIds) {
 
-        var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
+        var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
         for (var j = 0; j < tagIds.length; j++) {
 
-            strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
+            strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
             if (j !== tagIds.length - 1){
 
                 strSql = strSql + ",";
             }
         }
+
         strSql = strSql + ";";
-        sql.execute(strSql,
-            function(rows){
+        sql.queryWithCxn(connection, strSql,
+            function(err, rows){
 
-                return null;
-            },
-            function(strErr){
-
-                return {message:'Error received inserting into resources_tags: ' + strErr};
+                return err;
             }
         );
     }
-
-    // var m_createTagJunctions = function(resourceId, tagIds) {
-
-    //     var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
-    //     for (var j = 0; j < tagIds.length; j++) {
-
-    //         strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
-    //         if (j !== tagIds.length - 1){
-
-    //             strSql = strSql + ",";
-    //         }
-    //     }
-    //     strSql = strSql + ";";
-    //     sql.execute(strSql,
-    //         function(rows){
-
-    //             return null;
-    //         },
-    //         function(strErr){
-
-    //             return {message:'Error received inserting into resources_tags: ' + strErr};
-    //         }
-    //     );
-    // }
-
-    // var m_setUpAndDoTags = function(resourceId, strResourceTypeId, userName, strTags, strName, callback) {
-
-    //     try {
-            
-    //         console.log("In m_setUpAndDoTags with resourceId=" + resourceId);
-
-    //         // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
-    //         var tagArray = [];
-    //         tagArray.push(m_resourceTypes[parseInt(strResourceTypeId, 10)]);
-    //         tagArray.push(userName);
-    //         if (strName.length > 0) {
-
-    //             tagArray.push(strName.trim().replace(/\s/g, '_'));
-    //         }
-
-    //         // Get optional user-entered tags ready to combine with above three tags.
-    //         var ccArray = [];
-    //         if (strTags) {
-
-    //             ccArray = strTags.toLowerCase().match(/([\w\-]+)/g);
-
-    //             if (ccArray){
-    //                 tagArray = tagArray.concat(ccArray);
-    //             }
-    //         }
-
-    //         // Remove possible dups from tagArray.
-    //         var uniqueArray = [];
-    //         uniqueArray.push(tagArray[0]);
-    //         for (var i = 1; i < tagArray.length; i++) {
-    //             var compIth = tagArray[i];
-    //             var found = false;
-    //             for (var j = 0; j < uniqueArray.length; j++) {
-    //                 if (uniqueArray[j] === compIth){
-    //                     found = true;
-    //                     break;
-    //                 }
-    //             }
-    //             if (!found) {
-    //                 uniqueArray.push(compIth);
-    //             }
-    //         }
-
-    //         m_doTags(uniqueArray, resourceId, callback);
-
-    //     } catch(e) {
-
-    //         callback(e);
-    //         return;
-    //     }
-    // }
-
-    // var m_doTags = function(tagArray, resourceId, callback){
-
-    //     var tagIds = [];
-    //     var iCtr = tagArray.length;
-    //     // For each string in tagArry:
-    //     //      if it already exists in table tags, push its id onto tagIds.
-    //     //      else, add it and push the new array.
-    //     // Then write as many records to resources_tags using resourceId and tagIds[i] as called for.
-
-    //     tagArray.forEach(function(tag) {
-
-    //         var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
-    //         sql.execute(strSql,
-    //             function(rows){
-
-    //                 if (rows.length > 0) {
-
-    //                     tagIds.push(rows[0].id);
-    //                     if (--iCtr === 0){
-
-    //                         callback(m_createTagJunctions(resourceId, tagIds));
-    //                         return;
-    //                     }
-
-    //                 } else {
-
-    //                     strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-    //                     sql.execute(strSql,
-    //                         function(rows){
-
-    //                             if (rows.length === 0) {
-
-    //                                 callback({message:'Could not insert tag into database.'});
-    //                                 return;
-                                
-    //                             } else {
-
-    //                                 tagIds.push(rows[0].insertId);
-    //                                 if (--iCtr === 0){
-
-    //                                     callback(m_createTagJunctions(resourceId, tagIds));
-    //                                     return;
-    //                                 }
-    //                             }
-    //                         },
-    //                         function(err){
-
-    //                             callback({message:err});
-    //                             return;
-    //                         });
-    //                 }
-    //             },
-    //             function(err){
-
-    //                 callback({message:err});
-    //                 return;
-    //             });
-    //     });
-    // }
 };
