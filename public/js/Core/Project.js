@@ -103,6 +103,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 									if (objectData.success) {
 
+										errorHelper.show('Project was saved', 1000);
+
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
 										

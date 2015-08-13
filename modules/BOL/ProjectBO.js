@@ -1233,7 +1233,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     typeIth.comicId = comicIth.id;
 
-                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + typeIth.isApp + "," + typeIth.imageId + "," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + "," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
                     m_log('Inserting type with ' + strQuery);
                     sql.queryWithCxn(connection, strQuery,
                         function(err, rows) {
