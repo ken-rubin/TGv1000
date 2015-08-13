@@ -941,69 +941,33 @@ module.exports = function ProjectBO(app, sql, logger) {
                         success: false,
                         message: 'Could not get a database connection: ' + err.message
                     });
-                    return;
-                }
+                } else {
 
-                m_log('Have a connection');
-                connection.beginTransaction(function(err) {
+                    m_log('Have a connection');
+                    connection.beginTransaction(function(err) {
 
-                    if (err) {
-
-                        res.json({
-                            success: false,
-                            message: 'Could not "begin" database connection: ' + err.message
-                        });
-                        return;
-                    }
-
-                    m_log('Connection has a transaction');
-                    var exceptionRet = null;
-                    if (typeOfSave === 'save') {
-
-                        m_log('Going into m_functionSaveProject');
-                        exceptionRet = m_functionSaveProject(connection, req, res, project);
-                        if (exceptionRet) {
+                        if (err) {
 
                             res.json({
                                 success: false,
-                                message: 'Save Project failed with error: ' + exceptionRet.message
+                                message: 'Could not "begin" database connection: ' + err.message
                             });
                             return;
                         }
-                    
-                    } else {    // 'saveAs'
 
-                        m_log('Going into m_functionSaveProjectAs');
-                        exceptionRet = m_functionSaveProjectAs(connection, req, res, project);
-                        if (exceptionRet) {
+                        m_log('Connection has a transaction');
+                        if (typeOfSave === 'save') {
 
-                            res.json({
-                                success: false,
-                                message: 'Save Project As failed with error: ' + exceptionRet.message
-                            });
-                            return;
+                            m_log('Going into m_functionSaveProject');
+                            m_functionSaveProject(connection, req, res, project, m_functionFinalCallback);
+                        
+                        } else {    // 'saveAs'
+
+                            m_log('Going into m_functionSaveProjectAs');
+                            m_functionSaveProjectAs(connection, req, res, project, m_functionFinalCallback);
                         }
-                    }
-
-                    m_log('Success. Committing transaction.');
-
-                    sql.commitCxn(connection,
-                        function(err){
-
-                            res.json({
-                                success: false,
-                                message: 'Committing transaction failed with ' + err.message
-                            });
-                            return;
-                        }
-                    );
-
-                    // Total success.
-                    res.json({
-                        success: true,
-                        project: project
                     });
-                });
+                }
             });
         } catch(e) {
 
@@ -1013,6 +977,38 @@ module.exports = function ProjectBO(app, sql, logger) {
                 message: 'Save failed. Error received: ' + e.message
             });
         }
+    }
+
+    var m_functionFinalCallback = function (err, res, connection, project) {
+
+        if (err) {
+
+             res.json({
+                success: false,
+                message: 'Save Project failed with error: ' + err.message
+            });
+       } else {
+
+            m_log('Success. Committing transaction.');
+
+            sql.commitCxn(connection,
+                function(err){
+
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: 'Committing transaction failed with ' + err.message
+                        });
+                    } else {
+
+                        res.json({
+                            success: true,
+                            project: project
+                        });
+                    }
+                }
+            );
+       }
     }
 
     var m_log = function(msg) {
@@ -1027,7 +1023,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProject = function (connection, req, res, project) {
+    var m_functionSaveProject = function (connection, req, res, project, callback) {
 
         try {
 
@@ -1046,12 +1042,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     m_log('No error in delete; moving into SaveAs');
                     // Now we can just INSERT the project as passed from the client side.
-                    return m_functionProjectSaveAsPart2(connection, req, res, project);
+                    return callback(m_functionProjectSaveAsPart2(connection, req, res, project), res, connection, project);
                 }
             );
         } catch (e) {
 
-            return e;
+            callback(e, res, null, null);
         }
     }
 
@@ -1062,7 +1058,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProjectAs = function (connection, req, res, project) {
+    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
         
         // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
 
@@ -1094,13 +1090,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                             if (exceptionRet) { throw exceptionRet; }
                         }
 
-                        return null;
+                        callback(null, res, connection, project);
                     }
                 }
             );
         } catch (e) {
 
-            return e;
+            callback(e, res, null, null);
         }
     }
 
