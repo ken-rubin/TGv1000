@@ -82,7 +82,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             quarantined: row.quarantined,
                             description: row.description,
                             imageId: row.imageId,
-                            isProduct: row.isProduct,
+                            isProduct: 0,
                             parentProjectId: row.parentProjectId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
