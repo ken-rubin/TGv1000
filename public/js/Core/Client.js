@@ -20,6 +20,7 @@ define(["Core/errorHelper",
 		"Dialogs/NewEventDialog/NewEventDialog",
 		"Dialogs/NewMethodDialog/NewMethodDialog",
 		"Dialogs/NewPropertyDialog/NewPropertyDialog",
+		"Dialogs/PropertyGrid/PropertyGrid",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -37,6 +38,7 @@ define(["Core/errorHelper",
 				NewEventDialog,
 				NewMethodDialog,
 				NewPropertyDialog,
+				PropertyGrid,
 				Project,
 				Type) {
 
@@ -433,6 +435,22 @@ define(["Core/errorHelper",
 							return e;
 						}
 					};
+
+					self.showPropertyGrid = function(toolInstance, functionManipulate) {
+
+						try {
+
+							m_openDialog = new PropertyGrid();
+							var exceptionRet = m_openDialog.create(toolInstance, functionManipulate);
+							if (exceptionRet) { throw exceptionRet; }
+							
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					//////////////////////////////
 					// "functionOK" links.

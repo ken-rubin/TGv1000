@@ -1,5 +1,4 @@
 Either of us
-- Resizing in the two vertical toolstrips seems to now lose aspect ratio. Toolstrip for sure.
 
 
 Ken
@@ -8,6 +7,7 @@ Ken
 - Integrate Coder
 - CLick on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
      Will this be needed with Properties, Events?
+- Resizing in the two vertical toolstrips seems to now lose aspect ratio. Toolstrip for sure.
 
 
 
@@ -22,7 +22,6 @@ Jerry
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places???
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
-- Searching for a Type or Method, always sets id = 0 (like it's someone else's). I think this is ok even if it belongs to the user, because it's coming from another project. This implies that searching shouldn't return something already in your project.
 
 
 
@@ -33,13 +32,6 @@ To discuss
 - Uniquified picklist values are case sensitive. OK?
 
 
-Save and Save As
-
-.SaveAs is for New Projects or Searched for template projects or Searched for projects owned by someone else. Save and Save As navbar buttons both do Save As. Probably Save shouldn't even be permitted. Recognize the need for SaveAs with project.id === 0.
-.Save is for when you opened your own project and want to overwrite its changes. SaveAs is available here, too, to save those (possible) changes under a new name. If the user tries a SaveAs on his own project without changing the name, report a "Name already exists" error.
-.SaveAs inserts new records for the Project on down. For everything.
-.Save should update anything that was already in the project and insert anything that wasn't. Recognize insertions by the fact that they have id === 0.
-.Exception to the previous line: For items being updated that have a resource (project, type, method), update the resource record but delete and re-insert resources_tags. DO NOT delete tags. They may be being used for some other resource.
 
 
 

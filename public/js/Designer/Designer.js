@@ -53,12 +53,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    	m_functionMouseOut);
 		                    m_jCanvas.bind("mouseenter",
 		                    	m_functionHandleResize);
-		                    m_jCanvas.contextMenu({
+		                    m_jCanvas.bind("dblclick",
+		                    	m_functionHandleDClick)
+		     //                m_jCanvas.contextMenu({
 
-								menuSelector: "#DesignerContextMenu",
-								menuSelected: m_functionTypeContextMenu,
-								test: m_functionTestContextMenu
-							});
+							// 	menuSelector: "#DesignerContextMenu",
+							// 	menuSelected: m_functionTypeContextMenu,
+							// 	test: m_functionTestContextMenu
+							// });
 
 							// Handle resize to fit the designer to the visible height of the designer.
 							// And now that comics are optional, let's handle the width here, too.
@@ -451,6 +453,32 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 							errorHelper.show(e);
 						}
 					};
+
+					// Handled on mouse doubleclick over the canvas. What other events fire?
+					var m_functionHandleDClick = function(e) {
+
+						try {
+
+							// Get where the event occurred.
+							var objectPosition = m_functionPositionFromEvent(e);
+
+							// See if the mouse is over an item.
+							var item = m_functionItemFromPosition(objectPosition);
+							if (!item) {
+
+								return;
+							}
+
+							var exceptionRet = client.showPropertiesGrid(item, function(changedProperty){
+
+							});
+							if (exceptionRet) { throw exceptionRet; }
+
+						} catch (err) {
+
+							errorHelper.show(err);
+						}
+					}
 
 					// Invoked when the mouse is depressed over the canvas.
 					var m_functionMouseDown = function (e) {
