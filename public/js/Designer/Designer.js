@@ -469,7 +469,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								return;
 							}
 
-							var exceptionRet = client.showPropertyGrid(item, function(changedProperty){
+							var exceptionRet = client.showPropertyGrid(item, function(changedProperty, newvalue){
+
+								// Apply newvalue to changedProperty in item.type.
 
 							});
 							if (exceptionRet) { throw exceptionRet; }

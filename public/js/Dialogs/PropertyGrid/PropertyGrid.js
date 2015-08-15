@@ -21,7 +21,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function(toolInstance, functionManipulateCallback) {
+					self.create = function(toolInstance, functionManipulateCallback) {	// functionManipulateCallback(changedProperty, newvalue)
 
 						try {
 
