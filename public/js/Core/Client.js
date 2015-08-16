@@ -1057,25 +1057,6 @@ define(["Core/errorHelper",
 						return types.isPropertyNameAvailableInActiveType(strName, myIndex);
 					}
 
-					// Set global var governing display of comic and panels strips and Show/Hide Help menu item.
-					// self.functionSetBDisplayComics = function(bDisplayComicsStuff) {
-
-					// 	bDisplayComics = bDisplayComicsStuff;
-
-					// 	if (bDisplayComics) {
-
-					// 		$("#ComicsOn").css("display", "none");
-					// 		$("#ComicsOff").css("display", "block");
-
-					// 	} else {
-
-					// 		$("#ComicsOn").css("display", "block");
-					// 		$("#ComicsOff").css("display", "none");
-					// 	}
-
-					// 	$(window).resize();
-					// }
-
 					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
 
 						// The following seems stupid, but it may be the best way to prevent showing this dlg after a project save.

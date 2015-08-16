@@ -93,6 +93,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							// Build the table to display the tollinstance's properties.
+
+
+
+
+
+							
+
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 

@@ -12,7 +12,6 @@ var designer = null;
 var tools = null;
 var code = null;
 var types = null;
-var bDisplayComics = false;
 var g_strUserId = '';
 var g_strUserName = '';
 
