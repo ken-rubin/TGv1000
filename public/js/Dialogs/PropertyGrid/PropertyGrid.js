@@ -93,8 +93,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							// Build the table to display the tollinstance's properties.
-
+							// Build the table to display the toolinstance's properties.
+							// Use m_toolInstance to find the properties.
+							// Then use coder to get their current values.
+							var props = [];
+							
 
 
 
