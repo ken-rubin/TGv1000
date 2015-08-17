@@ -114,3 +114,75 @@ a.list-group-item {
   border:none;
   font-size:0;
 }
+.TWBody
+{
+    background:rgb(0,0,128);
+    font-size: 18px;
+    font-family: arial;
+    color:white;
+}
+.TWParent
+{
+    /* Must specify a definite height and overflow-y or the scrolling wont work. */ 
+    height:200px;
+    overflow-y:scroll;
+    /* The rest of this file is just display and essentially unimportant. */ 
+    background:rgb(128,0,0);
+    border-radius:10px;
+}
+.TWChild
+{
+    margin:5px;
+    padding:5px;
+    background:rgb(0,128,0);
+    border-radius:10px;
+    text-align: center;
+}
+.TWMethCol1
+{
+  width:10%;
+  float:left;
+}
+.TWMethCol2
+{
+  width:58%;
+  float:left;
+  margin-right:15px;
+}
+.TWMethCol3
+{
+  width:10%;
+  float:left;
+  margin-right:15px;
+}
+.TWMethCol4
+{
+}
+.TWPropCol1
+{
+  width:68%;
+  float:left;
+}
+.TWPropCol2
+{
+  width:10%;
+  float:left;
+  margin-right:15px;
+}
+.TWPropCol3
+{
+}
+.TWEvtCol1
+{
+  width:68%;
+  float:left;
+}
+.TWEvtCol2
+{
+  width:10%;
+  float:left;
+  margin-right:15px;
+}
+.TWEvtCol3
+{
+}
