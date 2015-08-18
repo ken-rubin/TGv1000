@@ -745,7 +745,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 		                    var strId = jHelper.attr("id");
 		                    var strSrc = jHelper.attr("src");
-		                    var strType = jHelper.attr("data-type");	// This seems not to have been defined, but also it seems not to be used. Have Ken check.
+		                    var strType = jHelper.attr("data-type");
 
 		                    // Don't let the user drop an app on the designer.
 		                    if (strType === "App") {

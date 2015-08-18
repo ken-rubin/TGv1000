@@ -186,3 +186,33 @@ a.list-group-item {
 .TWEvtCol3
 {
 }
+.PGParent
+{
+    /* Must specify a definite height and overflow-y or the scrolling wont work. */ 
+    height:400px;
+    overflow-y:scroll;
+    /* The rest of this file is just display and essentially unimportant. */ 
+    background:rgb(128,0,0);
+    border-radius:10px;
+}
+.PGChild
+{
+    margin:5px;
+    padding:5px;
+    background:rgb(0,128,0);
+    border-radius:10px;
+    text-align: center;
+}
+.PGPropCol1
+{
+  width:33%;
+  float:left;
+}
+.PGPropCol2
+{
+  width:33%;
+  float:left;
+}
+.PGPropCol3
+{
+}
