@@ -171,7 +171,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} else if (m.propertyTypeId === 6) {
 
 									strBuild += '<div class="PGPropCol2">Type</div>';
-									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'"><option value="0">Select type...</option>';
+									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" style="width: 80%;"><option value="0">Select type...</option>';
 
 									for (var j = 0; j < types.getLength(); j++) {
 
@@ -187,7 +187,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} else {
 
 									// We will only get here if someone adds a property type and forgets to handle the code here.
-
+									errorHelper.show('Fell thru the property type loop in PropertyGrid.js');
 								} 
 
 								strBuild += '</div>';	// close <div class="PGChild"
