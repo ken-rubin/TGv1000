@@ -171,7 +171,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} else if (m.propertyTypeId === 6) {
 
 									strBuild += '<div class="PGPropCol2">Type</div>';
-									strBuild += '<div class="PGPropCol3"></div>';
+									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'"><option value="0">Select type...</option>';
+
+									for (var j = 0; j < types.getLength(); j++) {
+
+										var clTypeIth = types.getTypeByIndex(j);
+										if (!clTypeIth.data.isApp && !(clTypeIth.data.name === m_toolInstance.type)) {
+
+											strBuild += '<option value="'+(j+1)+'">'+clTypeIth.data.name+'</option>';
+										}
+									}
+
+									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
 
 								} else {
 

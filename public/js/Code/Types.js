@@ -142,6 +142,18 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						return null;							
 					};
 
+					// Add Type to strip.
+					self.getTypeByIndex = function (index) {
+
+						if (index > -1 && index < m_arrayClTypes.length) {
+
+							return m_arrayClTypes[index];
+						}
+
+						// Failed.
+						return null;							
+					};
+
 					// Return true of the app's initialize is active.
 					self.isAppInitializeActive = function () {
 
