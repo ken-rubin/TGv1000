@@ -313,11 +313,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									strInitialValue = $("#NumberOrStringInitial").val().trim();
 									break;
 								case 4:
-									if ($('input[value=1').prop("checked")) {
+									if ($('input[value="1"').prop("checked")) {
 
 										strInitialValue = 'true';
 
-									} else if ($('input[value=0').prop("checked")) {
+									} else if ($('input[value="0"').prop("checked")) {
 
 										strInitialValue = 'false';
 									}

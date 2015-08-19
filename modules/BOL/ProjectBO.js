@@ -981,9 +981,11 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionFinalCallback = function (err, res, connection, project) {
 
+        m_log('Reached m_functionFinalCallback');
         if (err) {
 
-             res.json({
+            m_log('err is non-null: ' + err.message);
+            res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
@@ -1008,7 +1010,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     }
                 }
             );
-       }
+        }
     }
 
     var m_log = function(msg) {
@@ -1074,20 +1076,28 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     if (rows.length === 0) {
 
-                        throw new Error('Failed database action checking for duplicate project name.');
+                        // throw new Error('Failed database action checking for duplicate project name.');
+                        callback( new Error('Failed database action checking for duplicate project name.'), res, null, null);
+                        return;
 
                     } else {
 
                         if (rows[0].cnt > 0) {
 
-                            throw new Error('You already have a project with that name.');
+                            // throw new Error('You already have a project with that name.');
+                            callback( new Error('You already have a project with that name.'), res, null, null);
+                            return;
 
                         } else {
                             
                             m_log('Name for SaveAs is good');
                             project.public = 0;     // A saved-as project needs review by admins.
                             var exceptionRet = m_functionProjectSaveAsPart2(connection,req,res,project);
-                            if (exceptionRet) { throw exceptionRet; }
+                            if (exceptionRet) { 
+                                // throw exceptionRet; 
+                                callback( exceptionRet, res, null, null); 
+                                return;
+                            }
                         }
 
                         callback(null, res, connection, project);
@@ -1096,6 +1106,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             );
         } catch (e) {
 
+            m_log('In catch in m_functionSaveProjectAs');
             callback(e, res, null, null);
         }
     }
