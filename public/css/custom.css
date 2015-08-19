@@ -214,15 +214,20 @@ a.list-group-item {
 }
 .PGPropCol1
 {
-  width:20%;
+  width:15%;
   float:left;
 }
 .PGPropCol2
 {
-  width:30%;
+  width:20%;
   float:left;
 }
 .PGPropCol3
 {
-  width:50%;
+  width: 60%;
+  float:left;
+}
+.PGPropCol4
+{
+
 }

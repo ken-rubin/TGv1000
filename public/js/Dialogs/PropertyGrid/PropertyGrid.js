@@ -130,8 +130,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var m = m_properties[i];
 								strBuild += '<div class="PGChild"><div class="PGPropCol1">' + m.name + '</div>';
 
-								// Go get the current value for this property.
-
+								// Get the current value for this property.
+								// 
 
 								m.currentValue = '';
 
@@ -139,6 +139,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									strBuild += '<div class="PGPropCol2">Number</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t1-'+i+'" type="text" placeHolder="Enter number" style="width:30%;" value="' + m.currentValue + '"></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 2) {
 
@@ -152,26 +153,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										v2 = parts[1];
 									}
 									strBuild += '<div class="PGPropCol3" style="display:inline-block;"><input id="t2_1-'+i+'" type="text" style="width:40%;" placeHolder="From" value="' + v1 + '">&nbsp;-&nbsp;<input id="t2_2-'+i+'" type="text" style="width:40%;" placeHolder="Thru" value="' + v2 + '"></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 3) {
 
 									strBuild += '<div class="PGPropCol2">String</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t3-'+i+'" type="text" placeHolder="Enter string" style="width:90%;" value="' + m.currentValue + '"></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 4) {
 
 									strBuild += '<div class="PGPropCol2">True or false</div>';
 									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input id="t4_true-'+i+'" type="radio" name="b-'+i+'" value="1" style="width:25px;"><span>true</span><input id="t4_false-'+i+'" type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 5) {
 
 									strBuild += '<div class="PGPropCol2">Picklist</div>';
-									strBuild += '<div class="PGPropCol3"><textarea id="t5-'+i+'" cols="40" rows="2" style="height: 35px;" placeholder="Enter values separated by space" value="' + m.currentValue + '"></textarea></div>';
+									strBuild += '<div class="PGPropCol3"><textarea id="t5-'+i+'" cols="47" rows="2" style="height: 35px;" placeholder="Enter values separated by space" value="' + m.currentValue + '"></textarea></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b5-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 6) {
 
 									strBuild += '<div class="PGPropCol2">Type</div>';
-									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" style="width: 80%;"><option value="0">Select type...</option>';
+									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" style="width: 99%;" class="form-control"><option value="0">Select type...</option>';
 
 									for (var j = 0; j < types.getLength(); j++) {
 
@@ -183,6 +188,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									}
 
 									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
+									strBuild += '<div class="PGPropCol4"><button id="b6-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else {
 
