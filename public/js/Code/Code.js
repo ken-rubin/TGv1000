@@ -568,7 +568,7 @@ define(["Core/errorHelper", "SourceScanner/processor"],
                             }
 
                             // If the current type is app, and the current method is initialize, then
-                            // need to play changes into the designer incase anything changes here.
+                            // need to play changes into the designer in case anything changes here.
 
                             var bAppInitializeActive = types.isAppInitializeActive();
                             if (!bAppInitializeActive) {
@@ -670,6 +670,14 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 							errorHelper.show(e);
 						}
 					};
+
+					// Following is used to fetch current value of a property of a toolinstance.
+					// If not found, return ''.
+					// On error, throw and handle higher up.
+					self.getPropertyCurrentValue = function(strType, strProperty, strInstance) {
+
+						return '';
+					}
 
 					///////////////////////////////////////
 					// Private methods.
