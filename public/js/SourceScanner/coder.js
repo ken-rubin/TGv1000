@@ -18,6 +18,11 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             ///////////////////////////
             // Public methods
 
+            // Does property exist in app.initialize workspace for toolinstance with id = strInstance?
+            self.doesPropertyExist = function (strType, strProperty, strInstance) {
+
+            }
+
             self.update_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
 
                 try {
