@@ -139,7 +139,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									strBuild += '<div class="PGPropCol2">Number</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t1-'+i+'" type="text" placeHolder="Enter number" style="width:30%;" value="' + m.currentValue + '"></div>';
-									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									var strVal = "$('#t1-" + i + "').val()";
+									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_functionManipulateCallback(&apos;' + m.name + '&apos;,' + strVal + ');" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 2) {
 
@@ -203,6 +204,45 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#PropertiesTbody").empty();
 							$("#PropertiesTbody").append(strBuild);
 
+							// Styling
+							var jqInput = $("input");
+							jqInput.css("color", "blue");
+							jqInput.css("font-family", "Verdana");
+							jqInput.css("background-color", "aliceblue");
+
+							// Now attach all handlers
+							// for (var i = 0; i < m_properties.length; i++) {
+
+							// 	var m = m_properties[i];
+							// 	if (m.propertyTypeId === 1) {
+
+							// 		$("#b1-"+i).click(
+							// 			function() {
+
+							// 				m_functionManipulateCallback(m.name, $("#t1-"+i).val());
+							// 			}
+							// 		);
+
+							// 	} else if (m.propertyTypeId === 2) {
+
+							// 	} else if (m.propertyTypeId === 3) {
+
+							// 	} else if (m.propertyTypeId === 4) {
+
+							// 	} else if (m.propertyTypeId === 5) {
+
+							// 	} else if (m.propertyTypeId === 6) {
+
+							// 	} else {
+
+							// 	}
+
+
+							// }
+
+
+
+
 
 						} catch (e) {
 
@@ -219,7 +259,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 				// Reference to the dialog object instance.
 				var m_toolInstance = null;
-				var m_functionManipulateCallback = null;
 				var m_dialog = null;
 				var m_properties;
 			};
@@ -232,3 +271,4 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 			errorHelper.show(e);
 		}
 	});
+m_functionManipulateCallback = null;

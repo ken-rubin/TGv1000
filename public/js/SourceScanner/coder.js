@@ -21,11 +21,48 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             // Does property exist in app.initialize workspace for toolinstance with id = strInstance?
             self.doesPropertyExist = function (strType, strProperty, strInstance) {
 
+                var objectWorkspace = processor.getWorkspaceJSONObject();
+                if (!objectWorkspace) {
+
+                    throw { messgage: "Failed to get the workspace object." };
+                }
+
+                // Get the block with which to work.
+                var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+
+                // Compose, "MyType_setX", for which to search.
+                var strBlockType = strType + "_set" + strProperty;
+
+                // Compose the get for the instance from the app for which to search.
+                var strInstanceType = "App_get" + strInstance;
+
+                // If there is a work block, add new block it it, otherwise
+                while (blockWork) {
+
+                    // Look for a block whose type matches the composed.
+                    if (blockWork.type === strBlockType &&
+                        blockWork.children[0].children[0].type === strInstanceType) {
+
+                        // Found it.
+                        return true;
+                    }
+
+                    // Move to next statement in chain.
+                    blockWork = blockWork.next;
+                }
+
+                return false;
             }
 
             self.update_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
 
                 try {
+
+                    if (!self.doesPropertyExist(strType, strProperty, strInstance)) {
+
+                        // Need to add the property AND set its value.
+                        return self.add_SetPropertyValue(strType, strProperty, strValue, strInstance);
+                    }
 
                     // .
                     var objectWorkspace = processor.getWorkspaceJSONObject();
