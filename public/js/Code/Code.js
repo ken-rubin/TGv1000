@@ -676,7 +676,53 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 					// On error, throw and handle higher up.
 					self.getPropertyCurrentValue = function(strType, strProperty, strInstance) {
 
-						return '';
+						try {
+
+		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    if (!objectWorkspace) {
+
+		                        throw { messgage: "Failed to get the workspace object." };
+		                    }
+
+		                    // Get the block with which to work.
+		                    var objectPrimaryBlockChain = processor.getPrimaryBlockChain(objectWorkspace);
+
+			                var objectCursor = objectPrimaryBlockChain;
+
+			                var strLookForFirst = "App_set" + strInstance;
+			                var strLookForThen = strInstance + "_set" + strProperty;
+			                var bFoundFirst = false;
+
+			                if (objectCursor) {
+
+			    	            do {
+
+			    	            	if (!bFoundFirst) {
+
+			    	            		if (objectCursor.type === strLookForFirst) {
+
+			    	            			bFoundFirst = true;
+			    	            		}
+			    	            	} else {
+
+			    	            		if (objectCursor.type === strLookForThen) {
+
+			    	            			return objectCursor.children[1].children[0].children[0].contents;
+			    	            		}
+			    	            	}
+
+			        	            objectCursor = objectCursor.next
+
+			            	    } while (objectCursor)
+			            	}
+
+							// If no setter in app initialize, must return empty string.
+							return '';
+
+						} catch(e) {
+
+							throw e;
+						}
 					}
 
 					///////////////////////////////////////

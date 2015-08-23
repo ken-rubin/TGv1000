@@ -131,7 +131,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strBuild += '<div class="PGChild"><div class="PGPropCol1">' + m.name + '</div>';
 
 								// Get the current value for this property--if it exists.
-								m.currentValue = Code.getPropertyCurrentValue(m_toolInstance.type, m.name, m_toolInstance.id);	// May return empty string, but not null.
+								m.currentValue = code.getPropertyCurrentValue(m_toolInstance.type, m.name, m_toolInstance.id);	// May return empty string, but not null.
 
 								if (m.propertyTypeId === 1) {
 
