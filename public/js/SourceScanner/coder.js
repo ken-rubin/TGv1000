@@ -253,8 +253,73 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
+            self.blocklyChangeListener = function (objectPrimaryBlockChain) {
+
+                // Clear designer.
+                var objectResult = {};
+                var strValue = null;
+                var parts = [];
+
+                // Scan.
+                var objectCursor = objectPrimaryBlockChain;
+                if (objectCursor) {
+
+                    do {
+
+                        //  Look for "new_" and "set_".
+                        //  Set in designer.
+                        var arrayMatches = objectCursor.type.match(/App_set(.+)/);
+                        
+                        if (arrayMatches && arrayMatches.length > 1) {
+
+                            objectResult[arrayMatches[1]] = {};
+
+                        } else {
+
+                            var props = ["X", "Y", "Width", "Height"];
+                            for (var i = 0; i < props.length; i++) {
+
+                                var propIth = props[i];
+                                strValue = m_functionDoProperty(objectCursor, propIth);
+
+                                if (strValue) {
+
+                                    parts = strValue.split('~');
+                                    objectResult[parts[0]][propIth] = parts[1];
+                                    break;
+                                }                                
+                            }
+                        }
+
+                        objectCursor = objectCursor.next
+
+                    } while (objectCursor)
+                }
+
+                return objectResult;
+            }
+
             ///////////////////////////
             // Private methods.
+
+            //
+            var m_functionDoProperty = function (objectCursor, strProp) {
+
+                var re = new RegExp("_set" + strProp);
+                if (objectCursor.type.match(re)) {
+
+                    // Get the thing to set.
+                    var objectToSet = objectCursor.children[0].children[0];
+                    var strTypeToSet = objectToSet.type;
+                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
+                    var strTheType = arrayTypes[1];
+
+                    var objectValue = objectCursor.children[1].children[0].children[0];
+                    return strTheType + '~' + objectValue.contents;            
+                }
+
+                return null;
+            }
 
             // Return the next id as a string.
             var m_functionGetNextId = function () {

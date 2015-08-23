@@ -5,8 +5,8 @@
 // Return constructor function.
 
 // Define AMD module.
-define(["Core/errorHelper", "SourceScanner/processor"], 
-	function (errorHelper, processor) {
+define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"], 
+	function (errorHelper, processor, coder) {
 
 		try {
 
@@ -583,81 +583,8 @@ define(["Core/errorHelper", "SourceScanner/processor"],
 		                        throw { messgage: "Failed to get the workspace object." };
 		                    }
 
-		                    // Get the block with which to work.
-		                    var objectPrimaryBlockChain = processor.getPrimaryBlockChain(objectWorkspace);
-
-		            		// Clear designer.
-		            		var objectResult = {};
-
-		            		// Scan.
-			                var objectCursor = objectPrimaryBlockChain;
-			                if (objectCursor) {
-
-			    	            do {
-
-				            		//	Look for "new_" and "set_".
-				            		//	Set in designer.
-				            		var arrayMatches = objectCursor.type.match(/App_set(.+)/);
-				            		if (arrayMatches &&
-				            			arrayMatches.length > 1) {
-
-				            			objectResult[arrayMatches[1]] = {};
-				            		} else {
-
-					            		if (objectCursor.type.match(/_setX/)) {
-
-					            			// Get the thing to set.
-					            			var objectToSet = objectCursor.children[0].children[0];
-					            			var strTypeToSet = objectToSet.type;
-					            			var arrayTypes = strTypeToSet.match(/App_get(.+)/);
-					            			var strTheType = arrayTypes[1];
-
-					            			var objectValue = objectCursor.children[1].children[0].children[0];
-					            			var strValue = objectValue.contents;
-
-					            			objectResult[strTheType]["X"] = strValue;
-		                                } else if (objectCursor.type.match(/_setY/)) {
-
-		                                    // Get the thing to set.
-		                                    var objectToSet = objectCursor.children[0].children[0];
-		                                    var strTypeToSet = objectToSet.type;
-		                                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
-		                                    var strTheType = arrayTypes[1];
-
-		                                    var objectValue = objectCursor.children[1].children[0].children[0];
-		                                    var strValue = objectValue.contents;
-
-		                                    objectResult[strTheType]["Y"] = strValue;
-		                                } else if (objectCursor.type.match(/_setWidth/)) {
-
-		                                    // Get the thing to set.
-		                                    var objectToSet = objectCursor.children[0].children[0];
-		                                    var strTypeToSet = objectToSet.type;
-		                                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
-		                                    var strTheType = arrayTypes[1];
-
-		                                    var objectValue = objectCursor.children[1].children[0].children[0];
-		                                    var strValue = objectValue.contents;
-
-		                                    objectResult[strTheType]["Width"] = strValue;
-		                                } else if (objectCursor.type.match(/_setHeight/)) {
-
-		                                    // Get the thing to set.
-		                                    var objectToSet = objectCursor.children[0].children[0];
-		                                    var strTypeToSet = objectToSet.type;
-		                                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
-		                                    var strTheType = arrayTypes[1];
-
-		                                    var objectValue = objectCursor.children[1].children[0].children[0];
-		                                    var strValue = objectValue.contents;
-
-		                                    objectResult[strTheType]["Height"] = strValue;
-		                                }
-				            		}
-
-			        	            objectCursor = objectCursor.next
-			            	    } while (objectCursor)
-			            	}
+		                    // Get the block with which to work and pass
+		                    var objectResult = coder.blocklyChangeListener(processor.getPrimaryBlockChain(objectWorkspace));
 
 			            	// Load up the parsed data into the designer.
 		            		var exceptionRet = designer.updateInstances(objectResult);
