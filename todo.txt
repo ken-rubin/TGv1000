@@ -22,6 +22,12 @@ Jerry
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places???
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
+- Items needed to finish PropertyGrid:
+	- code is redrawn only if App Type is selected and initialize code is being shown. Need to redraw based ONLY on if initialize code is showing, since it's possible App type is not current when they're working with a tool instance. Need to discuss w/Ken.
+	- change number range to <select> list
+	- validate numbers (numeric) before applying
+	- potentially (most likely) apply value changes on each keystroke and remove the buttons
+	- add tool instance renaming capability
 
 
 

@@ -499,10 +499,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								// cause it to redraw with the new value. But only if it's showing now. This means
 								// that the user had at some point in the past selected App and clicked on the initialize
 								// method and it's STILL showing.
+								var bAppInitializeActive = types.isAppInitializeActive();
+								if (bAppInitializeActive) {
 
-
-								
-
+									// Force update.
+									ex = types.reloadActiveMethod();
+									if (ex) { throw ex; }
+								}
 							});
 							if (exceptionRet) { throw exceptionRet; }
 

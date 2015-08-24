@@ -601,7 +601,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// Following is used to fetch current value of a property of a toolinstance.
 					// If not found, return ''.
 					// On error, throw and handle higher up.
-					self.getPropertyCurrentValue = function(strType, strProperty, strInstance) {
+					self.getPropertyCurrentValue = function(strProperty, strInstance) {
 
 						try {
 
