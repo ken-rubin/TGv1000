@@ -398,6 +398,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function(tags) {
 
                                                     method.tags = tags;
+                                                    m_log('Method fetched: ' + JSON.stringify(method));
                                                     type.methods.push(method);
 
                                                     mcnt--;

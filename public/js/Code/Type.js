@@ -44,7 +44,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// Save data.
 							self.data = typesItem;
 
-							// process properties, methods, events collections.
 							return null;
 
 						} catch (e) {
