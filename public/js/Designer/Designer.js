@@ -478,9 +478,31 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 									newvalue,
 									item.id
 								);
-								if (ex) {
-									throw ex;
-								}
+								if (ex) { throw ex; }
+
+								// Check if changedProperty is one of X, Y, Width, Height and, if so,
+								// update it in item before calling m_functionRender.
+								var fNewvalue = parseFloat(newvalue);
+								if (changedProperty === 'X')
+									item.left = fNewvalue;
+								else if (changedProperty === 'Y')
+									item.top = fNewvalue;
+								else if (changedProperty === 'Width')
+									item.width = fNewvalue;
+								else if (changedProperty === 'Height')
+									item.height = fNewvalue;
+
+								ex = m_functionRender();
+								if (ex) { throw ex; }
+
+								// Finally, since the workspace has been updated, if it's open in the code window,
+								// cause it to redraw with the new value. But only if it's showing now. This means
+								// that the user had at some point in the past selected App and clicked on the initialize
+								// method and it's STILL showing.
+
+
+								
+
 							});
 							if (exceptionRet) { throw exceptionRet; }
 
