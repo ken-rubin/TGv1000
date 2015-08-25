@@ -470,7 +470,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var exceptionRet = self.functionNewProject(data.project, callback);
+									var exceptionRet = self.loadedProject(data.project, callback);
 									if (exceptionRet) { return exceptionRet; }
 
 									return null;
@@ -952,7 +952,7 @@ define(["Core/errorHelper",
 					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1 from the DB),
 					// the following method is called after saving a project, since it needs to be reloaded following the setting of probably
 					// new id's for all of the parts of the project.
-					self.functionNewProject = function (project, callback) {
+					self.loadedProject = function (project, callback) {
 
 						try {
 
@@ -964,6 +964,9 @@ define(["Core/errorHelper",
 				    		m_clProject = new Project();
 				    		var exceptionRet = m_clProject.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
+
+				    		// Play App Type's initialize Method to set the initial state of the designer frame
+		    				designer.initializeWithWorkspace();
 
 				    		self.projectIsDirty();
 

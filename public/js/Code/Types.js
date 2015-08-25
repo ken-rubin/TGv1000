@@ -677,7 +677,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// jqTWimage.tooltip();
 
 							// And clear out the code frame.
-							$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString('');
+							try {
+
+								$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString('');
+							
+							} catch(e) {}
 							
 							return null;
 

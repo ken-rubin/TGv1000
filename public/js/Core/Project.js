@@ -114,7 +114,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										client.closeCurrentDialog();
 
 										// Set up the modified project.
-										client.functionNewProject(objectData.project);
+										client.loadedProject(objectData.project);
 
 										// Set dirty bool to false in client
 										client.projectIsClean();

@@ -5,8 +5,8 @@
 //
 
 // Define AMD module.
-define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "SourceScanner/coder"], 
-	function (errorHelper, resourceHelper, ToolInstance, coder) {
+define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "SourceScanner/processor", "SourceScanner/coder"], 
+	function (errorHelper, resourceHelper, ToolInstance, processor, coder) {
 
 		try {
 
@@ -184,6 +184,57 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 							return e;
 						}
 					};
+
+					// Used to set initial state of designer frame on project load.
+					self.initializeWithWorkspace = function() {
+
+						try {
+
+		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    if (!objectWorkspace) {
+
+		                        throw { messgage: "Failed to get the workspace object." };
+		                    }
+
+		                    // Get the block with which to work.
+		                    var objectPrimaryBlockChain = processor.getPrimaryBlockChain(objectWorkspace);
+
+		                    var objectArray = coder.playThisInitializeWorkspace(objectPrimaryBlockChain);
+
+		                    m_arrayItems = [];
+		                    // Now create tool instance(s) and draw them.
+		                    for (var i = 0; i < objectArray.length; i++) {
+
+		                    	var obIth = objectArray[i];
+
+		                    	var X = parseFloat(obIth.X);
+		                    	var Y = parseFloat(obIth.Y);
+		                    	var Width = parseFloat(obIth.Width);
+		                    	var Height = parseFloat(obIth.Height);
+		                    	var strType = obIth.id;
+		                    	var strInstanceName = m_functionGetUniqueInstanceName(strType);
+		                    	var strSrc = resourceHelper.toURL("resources", types.getType(strType).data.imageId, "image", null);
+
+			                    var tiNew = new ToolInstance(strInstanceName,
+			                    	strType,
+			                    	strSrc,
+			                    	X,
+			                    	Y,
+			                    	Width,
+			                    	Height);
+			                    m_arrayItems.push(tiNew);
+			                    							// Render canvas.
+								var exceptionRet = m_functionRender();
+								if (exceptionRet) { throw exceptionRet; }
+		                    }
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					///////////////////////////////
 					// Private functions.
@@ -775,7 +826,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    // Don't let the user drop an app on the designer.
 		                    if (strType === "App") {
 
-		                    	throw { message: "Cannot instantiate the App type." };
+		                    	throw { message: "Not allowed to instantiate the App type." };
 		                    }
 
 		                    // Get an unique instance name for the type.

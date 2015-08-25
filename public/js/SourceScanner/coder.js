@@ -253,6 +253,69 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
+            self.playThisInitializeWorkspace = function(objectPrimaryBlockChain) {
+
+                // Clear designer.
+                var objectArray = [];
+                var strValue = null;
+                var parts = [];
+                var objectResult = null;
+
+                // Scan.
+                var objectCursor = objectPrimaryBlockChain;
+                if (objectCursor) {
+
+                    do {
+
+                        //  Look for "new_" and "set_".
+                        //  Set in designer.
+                        var arrayMatches = objectCursor.type.match(/App_set(.+)/);
+                        
+                        if (arrayMatches && arrayMatches.length > 1) {
+
+                            if (objectResult) {
+
+                                objectArray.push(objectResult);
+                            }
+
+                            objectResult = {
+                                id: arrayMatches[1],
+                                X: 0,
+                                Y: 0,
+                                Width: 0,
+                                Height: 0
+                            };
+
+                        } else {
+
+                            var props = ["X", "Y", "Width", "Height"];
+                            for (var i = 0; i < props.length; i++) {
+
+                                var propIth = props[i];
+                                strValue = m_functionDoProperty(objectCursor, propIth); // strValue comes back like "Type2~-373.987" -- we can now ignore the first part.
+
+                                if (strValue) {
+
+                                    parts = strValue.split('~');
+                                    objectResult[propIth] = parts[1];
+                                    break;
+                                }                                
+                            }
+                        }
+
+                        objectCursor = objectCursor.next
+
+                    } while (objectCursor)
+                }
+
+                // Get the last tool instance
+                if (objectResult) {
+
+                    objectArray.push(objectResult);
+                }
+                return objectArray;
+            }
+
             self.blocklyChangeListener = function (objectPrimaryBlockChain) {
 
                 // Clear designer.
