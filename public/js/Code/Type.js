@@ -182,7 +182,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Update the blockly data in the active member.
-					self.update = function (strWorkspace, strMethod) {
+					self.update = function (strWorkspace) {
 
 						try {
 
@@ -196,13 +196,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							// Get the item.
 							var itemActive = m_arrayActive[m_iActiveIndex];
 
-							// Splice the item at the array index.
-							m_arrayActive.splice(m_iActiveIndex, 1, { 
+							// Replace the workspace of the active method.
+							itemActive.workspace = strWorkspace;
 
-								name: itemActive.name,
-								workspace: strWorkspace,
-								method: strMethod
-							});
 							return null;
 						} catch (e) {
 
@@ -474,275 +470,275 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 //not used
-					var m_functionMainTGActionBtnClick = function() {
+					// var m_functionMainTGActionBtnClick = function() {
 
-						alert('got click on main TGAction btn');
-					}
+					// 	alert('got click on main TGAction btn');
+					// }
 
 					// General handler to process a selection of a member.
 //not used					
-					var m_functionSelect = function (arrayActive, jMember) {
+					// var m_functionSelect = function (arrayActive, jMember) {
 
-						try {
+					// 	try {
 
-							// Clear the existing selection, if set.
-							$(".SelectedType").removeClass("SelectedType");
-							$(".SelectedTypeMember").removeClass("SelectedTypeMember");
+					// 		// Clear the existing selection, if set.
+					// 		$(".SelectedType").removeClass("SelectedType");
+					// 		$(".SelectedTypeMember").removeClass("SelectedTypeMember");
 
-							// Set the selection to this item.
-							m_jType.addClass("SelectedType");
-							jMember.addClass("SelectedTypeMember");
+					// 		// Set the selection to this item.
+					// 		m_jType.addClass("SelectedType");
+					// 		jMember.addClass("SelectedTypeMember");
 
-							// Store module instance selection state.
-							var strIndex = jMember.attr("data-index");
-							var iIndex = parseInt(strIndex, 10);
-							m_iActiveIndex = iIndex;
-							m_arrayActive = arrayActive;
+					// 		// Store module instance selection state.
+					// 		var strIndex = jMember.attr("data-index");
+					// 		var iIndex = parseInt(strIndex, 10);
+					// 		m_iActiveIndex = iIndex;
+					// 		m_arrayActive = arrayActive;
 
-							// Tell the Types that "this" item was just selected.
-							var exceptionRet = types.select(self);
-							if (exceptionRet) {
+					// 		// Tell the Types that "this" item was just selected.
+					// 		var exceptionRet = types.select(self);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+					// 			throw exceptionRet;
+					// 		}
 
-							// Load workspace string into blockly frame.
-							return code.load(m_arrayActive[m_iActiveIndex].workspace);
-						} catch (e) {
+					// 		// Load workspace string into blockly frame.
+					// 		return code.load(m_arrayActive[m_iActiveIndex].workspace);
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					// Helper shows the delete dialog.
 //not used					
-					var m_functionDeleteDialogHelper = function (strType, arrayCollection, iIndex, objectMember) {
+					// var m_functionDeleteDialogHelper = function (strType, arrayCollection, iIndex, objectMember) {
 
-						try {
+					// 	try {
 
-							// Figure out if this type is referenced anywhere
-							var methodReference = null;
-							if (strType === "type") {
+					// 		// Figure out if this type is referenced anywhere
+					// 		var methodReference = null;
+					// 		if (strType === "type") {
 
-								methodReference = code.isTypeReferencedInWorkspace(self);
-							} else if (strType === "property") {
+					// 			methodReference = code.isTypeReferencedInWorkspace(self);
+					// 		} else if (strType === "property") {
 
-								methodReference = code.isPropertyReferencedInWorkspace(self, objectMember);
-							} else if (strType === "method") {
+					// 			methodReference = code.isPropertyReferencedInWorkspace(self, objectMember);
+					// 		} else if (strType === "method") {
 
-								methodReference = code.isMethodReferencedInWorkspace(self, objectMember);
-							} else if (strType === "event") {
+					// 			methodReference = code.isMethodReferencedInWorkspace(self, objectMember);
+					// 		} else if (strType === "event") {
 
 
-							}
+					// 		}
 
-							// If a reference was found, report it and drop out.
-							if (methodReference) {
+					// 		// If a reference was found, report it and drop out.
+					// 		if (methodReference) {
 
-								BootstrapDialog.alert({
+					// 			BootstrapDialog.alert({
 
-									title: "WARNING",
-									message: "Cannot delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
-									type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-									closable: true, // <-- Default value is false
-									draggable: true // <-- Default value is false
-								});
-								return;
-       						}
+					// 				title: "WARNING",
+					// 				message: "Cannot delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
+					// 				type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+					// 				closable: true, // <-- Default value is false
+					// 				draggable: true // <-- Default value is false
+					// 			});
+					// 			return;
+     //   						}
 
-							BootstrapDialog.confirm({
+					// 		BootstrapDialog.confirm({
 
-							    title: 'WARNING',
-							    message: 'Warning! Confirm delete of ' + strType + ', ' + objectMember.name + '?',
-							    type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-							    closable: true, // <-- Default value is false
-							    draggable: true, // <-- Default value is false
-							    btnCancelLabel: 'Do not delete!', // <-- Default value is 'Cancel',
-							    btnOKLabel: 'Delete!', // <-- Default value is 'OK',
-							    btnOKClass: 'btn-warning', // <-- If you didn't specify it, dialog type will be used,
-							    callback: function(result) {
+					// 		    title: 'WARNING',
+					// 		    message: 'Warning! Confirm delete of ' + strType + ', ' + objectMember.name + '?',
+					// 		    type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+					// 		    closable: true, // <-- Default value is false
+					// 		    draggable: true, // <-- Default value is false
+					// 		    btnCancelLabel: 'Do not delete!', // <-- Default value is 'Cancel',
+					// 		    btnOKLabel: 'Delete!', // <-- Default value is 'OK',
+					// 		    btnOKClass: 'btn-warning', // <-- If you didn't specify it, dialog type will be used,
+					// 		    callback: function(result) {
 
-							        // result will be true if button was click, while it will be false if users close the dialog directly.
-							        if (result) {
+					// 		        // result will be true if button was click, while it will be false if users close the dialog directly.
+					// 		        if (result) {
 
-							        	if (strType === "type") {
+					// 		        	if (strType === "type") {
 
-							        		// Handle the type itself:
+					// 		        		// Handle the type itself:
 
-							        		// Remove from code/blockly.
-											var exceptionRet = code.removeType(self);
-											if (exceptionRet) {
+					// 		        		// Remove from code/blockly.
+					// 						var exceptionRet = code.removeType(self);
+					// 						if (exceptionRet) {
 
-												throw exceptionRet;
-											}
+					// 							throw exceptionRet;
+					// 						}
 
-							        		// Remove from the type.
-											exceptionRet = type.removeItem(self);
-											if (exceptionRet) {
+					// 		        		// Remove from the type.
+					// 						exceptionRet = type.removeItem(self);
+					// 						if (exceptionRet) {
 
-												throw exceptionRet;
-											}
-							        	} else {
+					// 							throw exceptionRet;
+					// 						}
+					// 		        	} else {
 
-											// Reset selection if just deleted selected item.
-											if (m_iActiveIndex === iIndex &&
-												m_arrayActive === arrayCollection) {
+					// 						// Reset selection if just deleted selected item.
+					// 						if (m_iActiveIndex === iIndex &&
+					// 							m_arrayActive === arrayCollection) {
 
-												m_iActiveIndex = -1;
-												m_arrayActive = null;
-											}
+					// 							m_iActiveIndex = -1;
+					// 							m_arrayActive = null;
+					// 						}
 
-							        		// Handle member:
+					// 		        		// Handle member:
 
-							        		// Remove from code/blockly.
-							        		if (strType === "property") {
+					// 		        		// Remove from code/blockly.
+					// 		        		if (strType === "property") {
 
-												var exceptionRet = code.removeProperty(self, 
-													objectMember);
-												if (exceptionRet) {
+					// 							var exceptionRet = code.removeProperty(self, 
+					// 								objectMember);
+					// 							if (exceptionRet) {
 
-													throw exceptionRet;
-												}
-											} else if (strType === "method") {
+					// 								throw exceptionRet;
+					// 							}
+					// 						} else if (strType === "method") {
 
-												var exceptionRet = code.removeMethod(self, 
-													objectMember);
-												if (exceptionRet) {
+					// 							var exceptionRet = code.removeMethod(self, 
+					// 								objectMember);
+					// 							if (exceptionRet) {
 
-													throw exceptionRet;
-												}
-											}
+					// 								throw exceptionRet;
+					// 							}
+					// 						}
 
-								        	// Actually delete it.
-								        	arrayCollection.splice(iIndex, 
-								        		1);
+					// 			        	// Actually delete it.
+					// 			        	arrayCollection.splice(iIndex, 
+					// 			        		1);
 
-											// Refresh display.
-											exceptionRet = m_functionGenerateTypeContents();
-											if (exceptionRet) {
+					// 						// Refresh display.
+					// 						exceptionRet = m_functionGenerateTypeContents();
+					// 						if (exceptionRet) {
 
-												throw exceptionRet;
-											}
-										}
-							        }
-							    }
-							});
-						} catch (e) {
+					// 							throw exceptionRet;
+					// 						}
+					// 					}
+					// 		        }
+					// 		    }
+					// 		});
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Helper shows the rename dialog.
 //not used					
-					var m_functionRenameDialogHelper = function (strType, objectMember, bNew) {
+					// var m_functionRenameDialogHelper = function (strType, objectMember, bNew) {
 
-						try {
+					// 	try {
 
-							// Build up the string defining the GUI for the rename dialog.
-							var strMessage = "<span>Specify " + (bNew ? "" : "a new ") + "name for " + 
-								strType +
-								":&nbsp;&nbsp;</span><input id='RenameDialogTextInput' type='text' value='" + 
-								objectMember.name + 
-								"'></input>";
+					// 		// Build up the string defining the GUI for the rename dialog.
+					// 		var strMessage = "<span>Specify " + (bNew ? "" : "a new ") + "name for " + 
+					// 			strType +
+					// 			":&nbsp;&nbsp;</span><input id='RenameDialogTextInput' type='text' value='" + 
+					// 			objectMember.name + 
+					// 			"'></input>";
 
-							BootstrapDialog.confirm({
+					// 		BootstrapDialog.confirm({
 
-							    title: (bNew ? 'Add' : 'Rename'),
-							    message: strMessage,
-							    closable: true, // <-- Default value is false
-							    draggable: true, // <-- Default value is false
-							    btnOKLabel: (bNew ? 'Add' : 'Rename'), // <-- Default value is 'OK',
-							    callback: function(result) {
+					// 		    title: (bNew ? 'Add' : 'Rename'),
+					// 		    message: strMessage,
+					// 		    closable: true, // <-- Default value is false
+					// 		    draggable: true, // <-- Default value is false
+					// 		    btnOKLabel: (bNew ? 'Add' : 'Rename'), // <-- Default value is 'OK',
+					// 		    callback: function(result) {
 
-							        // result will be true if button was click, while it will be false if users close the dialog directly.
-							        if (result) {
+					// 		        // result will be true if button was click, while it will be false if users close the dialog directly.
+					// 		        if (result) {
 
-							        	// Rename.
-							        	objectMember.name = $("#RenameDialogTextInput").val();
+					// 		        	// Rename.
+					// 		        	objectMember.name = $("#RenameDialogTextInput").val();
 
-										// Refresh display.
-										var exceptionRet = m_functionGenerateTypeContents();
-										if (exceptionRet) {
+					// 					// Refresh display.
+					// 					var exceptionRet = m_functionGenerateTypeContents();
+					// 					if (exceptionRet) {
 
-											throw exceptionRet;
-										}
+					// 						throw exceptionRet;
+					// 					}
 
-										if (strType === "property") {
+					// 					if (strType === "property") {
 
-											// Update code module.
-											exceptionRet = code.renameProperty(self,
-												objectMember,
-												m_strOriginalName);
-											if (exceptionRet) {
+					// 						// Update code module.
+					// 						exceptionRet = code.renameProperty(self,
+					// 							objectMember,
+					// 							m_strOriginalName);
+					// 						if (exceptionRet) {
 
-												throw exceptionRet;
-											}
-										} else if (strType === "method") {
+					// 							throw exceptionRet;
+					// 						}
+					// 					} else if (strType === "method") {
 
-											// Update code module.
-											exceptionRet = code.renameMethod(self,
-												objectMember,
-												m_strOriginalName);
-											if (exceptionRet) {
+					// 						// Update code module.
+					// 						exceptionRet = code.renameMethod(self,
+					// 							objectMember,
+					// 							m_strOriginalName);
+					// 						if (exceptionRet) {
 
-												throw exceptionRet;
-											}
-										} else if (strType === "type") {
+					// 							throw exceptionRet;
+					// 						}
+					// 					} else if (strType === "type") {
 
-											// Update code module.
-											exceptionRet = code.renameType(self,
-												m_strOriginalName);
-											if (exceptionRet) {
+					// 						// Update code module.
+					// 						exceptionRet = code.renameType(self,
+					// 							m_strOriginalName);
+					// 						if (exceptionRet) {
 
-												throw exceptionRet;
-											}
-										}
-							        }
-							    }
-							});
-						} catch (e) {
+					// 							throw exceptionRet;
+					// 						}
+					// 					}
+					// 		        }
+					// 		    }
+					// 		});
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a type name is right-clicked.
 //not used					
-					var m_functionTypeContextMenu = function (invokedOn, selectedMenu) {
+					// var m_functionTypeContextMenu = function (invokedOn, selectedMenu) {
 
-						try {
+					// 	try {
 
-							// Handle different menu items differently.
-							if (selectedMenu.text() === "rename") {
+					// 		// Handle different menu items differently.
+					// 		if (selectedMenu.text() === "rename") {
 
-								// Save off original name.
-								m_strOriginalName = self.data.name;
+					// 			// Save off original name.
+					// 			m_strOriginalName = self.data.name;
 
-								// Show rename dialog.
-								var exceptionRet = m_functionRenameDialogHelper("type",
-									self.data);
-								if (exceptionRet) {
+					// 			// Show rename dialog.
+					// 			var exceptionRet = m_functionRenameDialogHelper("type",
+					// 				self.data);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							} else if (selectedMenu.text() === "delete") {
+					// 				throw exceptionRet;
+					// 			}
+					// 		} else if (selectedMenu.text() === "delete") {
 
-								// Show confirmation dialog.
-								var exceptionRet = m_functionDeleteDialogHelper("type",
-									null,
-									-1,
-									self.data);
-								if (exceptionRet) {
+					// 			// Show confirmation dialog.
+					// 			var exceptionRet = m_functionDeleteDialogHelper("type",
+					// 				null,
+					// 				-1,
+					// 				self.data);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-						} catch (e) {
+					// 				throw exceptionRet;
+					// 			}
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 //used
 					var m_functionOnGotResourceId = function (iResourceId) {
@@ -780,293 +776,293 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 					// Invoked when the add property button is clicked in this type.
 //not used					
-					var m_functionAddPropertyClick = function (e) {
+					// var m_functionAddPropertyClick = function (e) {
 
-						try {
+					// 	try {
 
-							var property = { 
+					// 		var property = { 
 
-								name: "new property", 
-								workspace: "", 
-								method: "" 
-							};
+					// 			name: "new property", 
+					// 			workspace: "", 
+					// 			method: "" 
+					// 		};
 
-							// Add a new, empty member.
-							self.data.properties.push(property);
+					// 		// Add a new, empty member.
+					// 		self.data.properties.push(property);
 
-							// Add the property to code.
-							var exceptionRet = code.addProperty(self, 
-								property);
-							if (exceptionRet) {
+					// 		// Add the property to code.
+					// 		var exceptionRet = code.addProperty(self, 
+					// 			property);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+					// 			throw exceptionRet;
+					// 		}
 
-							// Save original.
-							m_strOriginalName = property.name;
+					// 		// Save original.
+					// 		m_strOriginalName = property.name;
 
-							// Show rename dialog.
-							exceptionRet = m_functionRenameDialogHelper("property",
-								property,
-								true);
-							if (exceptionRet) {
+					// 		// Show rename dialog.
+					// 		exceptionRet = m_functionRenameDialogHelper("property",
+					// 			property,
+					// 			true);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a property button is clicked in this type.
 //not used					
-					var m_functionPropertyClick = function (e) {
+					// var m_functionPropertyClick = function (e) {
 
-						try {
+					// 	try {
 
-							// Take no action.
-						} catch (e) {
+					// 		// Take no action.
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a property button is right-clicked.
 //not used					
-					var m_functionPropertyContextMenu = function (invokedOn, selectedMenu) {
+					// var m_functionPropertyContextMenu = function (invokedOn, selectedMenu) {
 
-						try {
+					// 	try {
 
-							// Get the index of the item clicked.
-							var strIndex = invokedOn.attr("data-index");
-							var iIndex = parseInt(strIndex, 10);
+					// 		// Get the index of the item clicked.
+					// 		var strIndex = invokedOn.attr("data-index");
+					// 		var iIndex = parseInt(strIndex, 10);
 
-							// Get the item clicked.
-							var propertyClicked = self.data.properties[iIndex];
-							if (!propertyClicked) {
+					// 		// Get the item clicked.
+					// 		var propertyClicked = self.data.properties[iIndex];
+					// 		if (!propertyClicked) {
 
-								return;
-							}
+					// 			return;
+					// 		}
 
-							// Handle different menu items differently.
-							if (selectedMenu.text() === "rename") {
+					// 		// Handle different menu items differently.
+					// 		if (selectedMenu.text() === "rename") {
 
-								// Save original.
-								m_strOriginalName = propertyClicked.name;
+					// 			// Save original.
+					// 			m_strOriginalName = propertyClicked.name;
 
-								// Show rename dialog.
-								var exceptionRet = m_functionRenameDialogHelper("property",
-									propertyClicked);
-								if (exceptionRet) {
+					// 			// Show rename dialog.
+					// 			var exceptionRet = m_functionRenameDialogHelper("property",
+					// 				propertyClicked);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							} else if (selectedMenu.text() === "delete") {
+					// 				throw exceptionRet;
+					// 			}
+					// 		} else if (selectedMenu.text() === "delete") {
 
-								// Show confirmation dialog.
-								var exceptionRet = m_functionDeleteDialogHelper("property",
-									self.data.properties,
-									iIndex,
-									propertyClicked);
-								if (exceptionRet) {
+					// 			// Show confirmation dialog.
+					// 			var exceptionRet = m_functionDeleteDialogHelper("property",
+					// 				self.data.properties,
+					// 				iIndex,
+					// 				propertyClicked);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-						} catch (e) {
+					// 				throw exceptionRet;
+					// 			}
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when the add method button is clicked in this type.
 //not used					
-					var m_functionAddMethodClick = function (e) {
+					// var m_functionAddMethodClick = function (e) {
 
-						try {
+					// 	try {
 
-							self.data.methods.push({ name: "new method", codeDOM: "", workspace: "" });
+					// 		self.data.methods.push({ name: "new method", codeDOM: "", workspace: "" });
 
-							// Add the contents to the newly allocated type.
-							var exceptionRet = m_functionGenerateTypeContents();
-							if (exceptionRet) {
+					// 		// Add the contents to the newly allocated type.
+					// 		var exceptionRet = m_functionGenerateTypeContents();
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
+					// 			throw exceptionRet;
+					// 		}
 
-							// Add the method to code too.
-							exceptionRet = code.addMethod(self, 
-								self.data.methods[self.data.methods.length - 1]);
-							if (exceptionRet) {
+					// 		// Add the method to code too.
+					// 		exceptionRet = code.addMethod(self, 
+					// 			self.data.methods[self.data.methods.length - 1]);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a method button is clicked in this type.
 //not used					
-					var m_functionMethodClick = function (e) {
+					// var m_functionMethodClick = function (e) {
 
-						try {
+					// 	try {
 
-							// Get the type clicked.
-							var jMethodClicked = $(this);
+					// 		// Get the type clicked.
+					// 		var jMethodClicked = $(this);
 
-							// Call unified click handler.
-							var exceptionRet = m_functionSelect(self.data.methods,
-								jMethodClicked);
-							if (exceptionRet) {
+					// 		// Call unified click handler.
+					// 		var exceptionRet = m_functionSelect(self.data.methods,
+					// 			jMethodClicked);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a method button is right-clicked.
 //not used					
-					var m_functionMethodContextMenu = function (invokedOn, selectedMenu) {
+					// var m_functionMethodContextMenu = function (invokedOn, selectedMenu) {
 
-						try {
+					// 	try {
 
-							// Get the index of the item clicked.
-							var strIndex = invokedOn.attr("data-index");
-							var iIndex = parseInt(strIndex, 10);
+					// 		// Get the index of the item clicked.
+					// 		var strIndex = invokedOn.attr("data-index");
+					// 		var iIndex = parseInt(strIndex, 10);
 
-							// Get the item clicked.
-							var methodClicked = self.data.methods[iIndex];
-							if (!methodClicked) {
+					// 		// Get the item clicked.
+					// 		var methodClicked = self.data.methods[iIndex];
+					// 		if (!methodClicked) {
 
-								return;
-							}
+					// 			return;
+					// 		}
 
-							// Handle different menu items differently.
-							if (selectedMenu.text() === "rename") {
+					// 		// Handle different menu items differently.
+					// 		if (selectedMenu.text() === "rename") {
 
-								// Save off original name.
-								m_strOriginalName = methodClicked.name;
+					// 			// Save off original name.
+					// 			m_strOriginalName = methodClicked.name;
 
-								// Show rename dialog.
-								var exceptionRet = m_functionRenameDialogHelper("method",
-									methodClicked);
-								if (exceptionRet) {
+					// 			// Show rename dialog.
+					// 			var exceptionRet = m_functionRenameDialogHelper("method",
+					// 				methodClicked);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							} else if (selectedMenu.text() === "delete") {
+					// 				throw exceptionRet;
+					// 			}
+					// 		} else if (selectedMenu.text() === "delete") {
 
-								// Show confirmation dialog.
-								var exceptionRet = m_functionDeleteDialogHelper("method",
-									self.data.methods,
-									iIndex,
-									methodClicked);
-								if (exceptionRet) {
+					// 			// Show confirmation dialog.
+					// 			var exceptionRet = m_functionDeleteDialogHelper("method",
+					// 				self.data.methods,
+					// 				iIndex,
+					// 				methodClicked);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-						} catch (e) {
+					// 				throw exceptionRet;
+					// 			}
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when the add event button is clicked in this type.
 //not used					
-					var m_functionAddEventClick = function (e) {
+					// var m_functionAddEventClick = function (e) {
 
-						try {
+					// 	try {
 
-							self.data.events.push({ name: "new event", codeDOM: "" });
+					// 		self.data.events.push({ name: "new event", codeDOM: "" });
 
-							// Add the contents to the newly allocated type.
-							var exceptionRet = m_functionGenerateTypeContents();
-							if (exceptionRet) {
+					// 		// Add the contents to the newly allocated type.
+					// 		var exceptionRet = m_functionGenerateTypeContents();
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a event button is clicked in this type.
 //not used					
-					var m_functionEventClick = function (e) {
+					// var m_functionEventClick = function (e) {
 
-						try {
+					// 	try {
 
-							// Get the type clicked.
-							var jEventClicked = $(this);
+					// 		// Get the type clicked.
+					// 		var jEventClicked = $(this);
 
-							// Call unified click handler.
-							var exceptionRet = m_functionSelect(self.data.events,
-								jEventClicked);
-							if (exceptionRet) {
+					// 		// Call unified click handler.
+					// 		var exceptionRet = m_functionSelect(self.data.events,
+					// 			jEventClicked);
+					// 		if (exceptionRet) {
 
-								throw exceptionRet;
-							}
-						} catch (e) {
+					// 			throw exceptionRet;
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					// Invoked when a event button is right-clicked.
 //not used					
-					var m_functionEventContextMenu = function (invokedOn, selectedMenu) {
+					// var m_functionEventContextMenu = function (invokedOn, selectedMenu) {
 
-						try {
+					// 	try {
 
-							// Get the index of the item clicked.
-							var strIndex = invokedOn.attr("data-index");
-							var iIndex = parseInt(strIndex, 10);
+					// 		// Get the index of the item clicked.
+					// 		var strIndex = invokedOn.attr("data-index");
+					// 		var iIndex = parseInt(strIndex, 10);
 
-							// Get the item clicked.
-							var eventClicked = self.data.events[iIndex];
-							if (!eventClicked) {
+					// 		// Get the item clicked.
+					// 		var eventClicked = self.data.events[iIndex];
+					// 		if (!eventClicked) {
 
-								return;
-							}
+					// 			return;
+					// 		}
 
-							// Handle different menu items differently.
-							if (selectedMenu.text() === "rename") {
+					// 		// Handle different menu items differently.
+					// 		if (selectedMenu.text() === "rename") {
 
-								// Save off original name.
-								m_strOriginalName = eventClicked.name;
+					// 			// Save off original name.
+					// 			m_strOriginalName = eventClicked.name;
 
-								// Show rename dialog.
-								var exceptionRet = m_functionRenameDialogHelper("event",
-									eventClicked);
-								if (exceptionRet) {
+					// 			// Show rename dialog.
+					// 			var exceptionRet = m_functionRenameDialogHelper("event",
+					// 				eventClicked);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							} else if (selectedMenu.text() === "delete") {
+					// 				throw exceptionRet;
+					// 			}
+					// 		} else if (selectedMenu.text() === "delete") {
 
-								// Show confirmation dialog.
-								var exceptionRet = m_functionDeleteDialogHelper("event",
-									self.data.events,
-									iIndex,
-									eventClicked);
-								if (exceptionRet) {
+					// 			// Show confirmation dialog.
+					// 			var exceptionRet = m_functionDeleteDialogHelper("event",
+					// 				self.data.events,
+					// 				iIndex,
+					// 				eventClicked);
+					// 			if (exceptionRet) {
 
-									throw exceptionRet;
-								}
-							}
-						} catch (e) {
+					// 				throw exceptionRet;
+					// 			}
+					// 		}
+					// 	} catch (e) {
 
-							errorHelper.show(e);
-						}
-					};
+					// 		errorHelper.show(e);
+					// 	}
+					// };
 
 					///////////////////////////////////////
 					// Private fields.

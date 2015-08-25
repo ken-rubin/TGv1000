@@ -340,7 +340,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Update the blockly data in the active type/method.
-					self.update = function (strWorkspace, strMethod) {
+					self.update = function (strWorkspace) {
 
 						try {
 
@@ -353,8 +353,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							client.projectIsDirty();
 
 							// Else, update the type.
-							return m_clTypeActive.update(strWorkspace,
-								strMethod);
+							return m_clTypeActive.update(strWorkspace);
 
 						} catch (e) {
 
