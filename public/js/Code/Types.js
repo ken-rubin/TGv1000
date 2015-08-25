@@ -132,9 +132,20 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						for (var i = 0; i < m_arrayClTypes.length; i++) {
 
 							var typeIth = m_arrayClTypes[i];
-							if (typeIth.data.name === strType) {
+							if (strType === "App") {
 
-								return typeIth;
+								// Look by boolean.
+								if (typeIth.data.isApp) {
+
+									return typeIth;
+								}
+							} else {
+
+								// Look by name.
+								if (typeIth.data.name === strType) {
+
+									return typeIth;
+								}
 							}
 						}
 
