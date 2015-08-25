@@ -676,6 +676,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// jqTWimage.tooltip({title: m_clTypeActive.data.name});
 							// jqTWimage.tooltip();
 
+							// And clear out the code frame.
+							$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString('');
+							
 							return null;
 
 						} catch(e) {
@@ -829,18 +832,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// Save the active method.
 							m_iActiveMethodIndex = index;
 
-							var exceptionRet = m_clTypeActive.setActive(index,
-								m_clTypeActive.data.methods);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							var exceptionRet = m_clTypeActive.setActive(index, m_clTypeActive.data.methods);
+							if (exceptionRet) { throw exceptionRet; }
 
 							exceptionRet = code.load(m_clTypeActive.data.methods[m_iActiveMethodIndex].workspace);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 						} catch (e) {
 
