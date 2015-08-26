@@ -284,30 +284,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									var strFrom = $("#RangeFromInitial").val().trim();
 									var strThru = $("#RangeThruInitial").val().trim();
 									var num = (strFrom.length > 0 ? 1 : 0) + (strThru.length > 0 ? 1 : 0);
-									if (num > 0) {
 
-										if (num === 1) {
+									if (num < 2) {
 
-											errorHelper.show("A Number range requires both from and thru.");
-											return;
-										}
-
-										if (!$.isNumeric(strFrom) || !$.isNumeric(strThru)) {
-
-											errorHelper.show("Non-numeric values are not allowed for Number ranges.");
-											return;
-										}
-
-										var numFrom = parseFloat(strFrom);
-										var numThru = parseFloat(strThru);
-										if (numThru < numFrom) {
-
-											errorHelper.show("Please reverse your numbers. The first must be less than the second.");
-											return;
-										}
-
-										strInitialValue = strFrom + '-' + strThru;
+										errorHelper.show("A Number range requires entries for From and Thru.");
+										return;
 									}
+
+									if (!$.isNumeric(strFrom) || !$.isNumeric(strThru)) {
+
+										errorHelper.show("Non-numeric values are not allowed for Number ranges.");
+										return;
+									}
+
+									var numFrom = parseFloat(strFrom);
+									var numThru = parseFloat(strThru);
+									if (numThru < numFrom) {
+
+										errorHelper.show("Please reverse your numbers. The first must be less than the second.");
+										return;
+									}
+
+									strInitialValue = strFrom + '-' + strThru;
 									break;
 								case 3:
 									strInitialValue = $("#NumberOrStringInitial").val().trim();
@@ -341,6 +339,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									    }
 								
 										strInitialValue = outputArray.join(' ');
+									
+									} else {
+
+										errorHelper.show("Your Picklist must contain at least one choice.");
+										return;
 									}
 									break;
 							}

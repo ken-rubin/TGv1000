@@ -148,7 +148,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									// initialValue was mandatory (x-y)
 									strBuild += '<div class="PGPropCol2">Number in range&nbsp;'+m.initialValue+'</div>';
-									strBuild += '<div class="PGPropCol3" style="display:inline-block;"><input id="t2-'+i+'" type="text" style="width:40%;" placeHolder="Enter number in range" value="' + m.currentValue + '"></div>';
+									strBuild += '<div class="PGPropCol3" style="display:inline-block;"><input id="t2-'+i+'" type="text" style="width:40%;" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t2-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_functionManipulateCallback(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
