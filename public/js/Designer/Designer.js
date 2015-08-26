@@ -529,12 +529,49 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								// 4: 		true or false must be chosen
 								// 5: 		cannot be 'Select pick...'
 								// 6: 		cannot be 'Select type...'
+								switch (propertyTypeId) {
 
-
-
-
-
-
+									case 1:
+										if (!$.isNumeric(newvalue)) {
+											errorHelper.show(changedProperty + ' must be numeric.');
+											return;
+										}
+										break;
+									case 2:
+										var parts = helperValue.split('-');
+										var v1 = parseFloat(parts[0]);
+										var v2 = parseFloat(parts[1]);
+										var nv = parseFloat(newvalue);
+										if (nv < v1 || nv > v2) {
+											errorHelper.show('Your entry must be in this range: ' + helperValue);
+											return;
+										}
+										break;
+									case 3:
+										if (newvalue.length === 0) {
+											errorHelper.show('Your string for ' + changedProperty + ' may not be blank.');
+											return;
+										}
+										break;
+									case 4:
+										if (newvalue !== '0' && newvalue !== '1') {
+											errorHelper.show('You must select true or false for ' + changedProperty);
+											return;
+										}
+										break;
+									case 5:
+										if (newvalue === 'Select pick...') {
+											errorHelper.show('Please select an actual value for your picklist ' + changedProperty);
+											return;
+										}
+										break;
+									case 6:
+										if (newvalue === 'Select type...') {
+											errorHelper.show('Please select an actual type for ' + changedProperty);
+											return;
+										}
+										break;
+								}
 
 								// Apply newvalue to changedProperty in item.type.
 								var ex = coder.update_SetPropertyValue(
