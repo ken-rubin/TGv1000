@@ -24,10 +24,11 @@ Jerry
 - Write event loader in Code.js#self.addType.
 - Items needed to finish PropertyGrid:
 	- change number range to <select> list
-	- validate numbers (numeric) before applying
+	- validate numbers (numeric) before applying in m_functionManipulateCallback (callback in m_functionHandleDClick in Designer.js)
 	- potentially (most likely) apply value changes on each keystroke and remove the buttons
 	- add tool instance renaming capability
-- Project / Quick Save may save twice.
+- Project / Quick Save may save twice--it flashes Save is complete twise and it doesn't go away the second time.
+- NewPropertyDialog: number range initial value is required (x-y); x, y must be numberic; x<y; both required; number initial value must be numeric if entered; picklist is required to have at least 1 entry.
 
 
 

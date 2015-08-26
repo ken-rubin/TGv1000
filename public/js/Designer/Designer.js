@@ -520,7 +520,21 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								return;
 							}
 
-							var exceptionRet = client.showPropertyGrid(item, function(changedProperty, newvalue){
+							var exceptionRet = client.showPropertyGrid(item, function(propertyTypeId, changedProperty, newvalue, helperValue){
+
+								// Validate newvalue based on propertyTypeId.
+								// 1: 		mb numeric
+								// 2: 		mb numeric and in range in helperValue
+								// 3: 		mb length > 0 (maybe)
+								// 4: 		true or false must be chosen
+								// 5: 		cannot be 'Select pick...'
+								// 6: 		cannot be 'Select type...'
+
+
+
+
+
+
 
 								// Apply newvalue to changedProperty in item.type.
 								var ex = coder.update_SetPropertyValue(

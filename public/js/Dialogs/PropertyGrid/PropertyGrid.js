@@ -135,32 +135,33 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 								if (m.propertyTypeId === 1) {
 
+									if (m.currentValue === '' && m.initialValue !== '') {
+
+										m.currentValue = parseFloat(m.initialValue);
+									}
 									strBuild += '<div class="PGPropCol2">Number</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t1-'+i+'" type="text" placeHolder="Enter number" style="width:30%;" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t1-" + i + "').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_functionManipulateCallback(&apos;' + m.name + '&apos;,' + strVal + ');" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_functionManipulateCallback(1, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 2) {
 
-									strBuild += '<div class="PGPropCol2">Number range</div>';
-									var v1 = '';
-									var v2 = '';
-									if (m.currentValue.length > 0){
-
-										var parts = m.currentValue.split('-');
-										v1 = parts[0];
-										v2 = parts[1];
-									}
-									strBuild += '<div class="PGPropCol3" style="display:inline-block;"><input id="t2_1-'+i+'" type="text" style="width:40%;" placeHolder="From" value="' + v1 + '">&nbsp;-&nbsp;<input id="t2_2-'+i+'" type="text" style="width:40%;" placeHolder="Thru" value="' + v2 + '"></div>';
-									// onclick NOT DONE
-									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									// initialValue was mandatory (x-y)
+									strBuild += '<div class="PGPropCol2">Number in range&nbsp;'+m.initialValue+'</div>';
+									strBuild += '<div class="PGPropCol3" style="display:inline-block;"><input id="t2-'+i+'" type="text" style="width:40%;" placeHolder="Enter number in range" value="' + m.currentValue + '"></div>';
+									var strVal = "$('#t2-" + i + "').val()";
+									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_functionManipulateCallback(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 3) {
 
+									if (m.currentValue === '') {
+
+										m.currentValue = m.initialValue;
+									}
 									strBuild += '<div class="PGPropCol2">String</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t3-'+i+'" type="text" placeHolder="Enter string" style="width:90%;" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t3-" + i + "').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_functionManipulateCallback(&apos;' + m.name + '&apos;,' + strVal + ');" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_functionManipulateCallback(3, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 4) {
 
@@ -180,7 +181,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} else if (m.propertyTypeId === 6) {
 
 									strBuild += '<div class="PGPropCol2">Type</div>';
-									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" style="width: 99%;" class="form-control"><option value="0">Select type...</option>';
+									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" style="width: 99%;" class="form-control"><option value="0" selected>Select type...</option>';
 
 									for (var j = 0; j < types.getLength(); j++) {
 
@@ -213,40 +214,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							jqInput.css("color", "blue");
 							jqInput.css("font-family", "Verdana");
 							jqInput.css("background-color", "aliceblue");
-
-							// Now attach all handlers
-							// for (var i = 0; i < m_properties.length; i++) {
-
-							// 	var m = m_properties[i];
-							// 	if (m.propertyTypeId === 1) {
-
-							// 		$("#b1-"+i).click(
-							// 			function() {
-
-							// 				m_functionManipulateCallback(m.name, $("#t1-"+i).val());
-							// 			}
-							// 		);
-
-							// 	} else if (m.propertyTypeId === 2) {
-
-							// 	} else if (m.propertyTypeId === 3) {
-
-							// 	} else if (m.propertyTypeId === 4) {
-
-							// 	} else if (m.propertyTypeId === 5) {
-
-							// 	} else if (m.propertyTypeId === 6) {
-
-							// 	} else {
-
-							// 	}
-
-
-							// }
-
-
-
-
 
 						} catch (e) {
 
