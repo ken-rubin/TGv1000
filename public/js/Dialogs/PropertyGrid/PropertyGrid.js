@@ -140,7 +140,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										m.currentValue = parseFloat(m.initialValue);
 									}
 									strBuild += '<div class="PGPropCol2">Number</div>';
-									strBuild += '<div class="PGPropCol3"><input id="t1-'+i+'" type="text" placeHolder="Enter number" style="width:30%;" value="' + m.currentValue + '"></div>';
+									strBuild += '<div class="PGPropCol3"><input id="t1-'+i+'" type="text" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t1-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_functionManipulateCallback(1, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
@@ -148,7 +148,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									// initialValue was mandatory (x-y)
 									strBuild += '<div class="PGPropCol2">Number in range&nbsp;'+m.initialValue+'</div>';
-									strBuild += '<div class="PGPropCol3" style="display:inline-block;"><input id="t2-'+i+'" type="text" style="width:40%;" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
+									strBuild += '<div class="PGPropCol3"><input id="t2-'+i+'" type="text" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t2-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_functionManipulateCallback(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
@@ -159,14 +159,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										m.currentValue = m.initialValue;
 									}
 									strBuild += '<div class="PGPropCol2">String</div>';
-									strBuild += '<div class="PGPropCol3"><input id="t3-'+i+'" type="text" placeHolder="Enter string" style="width:90%;" value="' + m.currentValue + '"></div>';
+									strBuild += '<div class="PGPropCol3"><input id="t3-'+i+'" type="text" placeHolder="Enter string" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t3-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_functionManipulateCallback(3, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 4) {
 
 									strBuild += '<div class="PGPropCol2">True or false</div>';
-									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input id="t4_true-'+i+'" type="radio" name="b-'+i+'" value="1" style="width:25px;"><span>true</span><input id="t4_false-'+i+'" type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
+									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input id="t4_true-'+i+'" type="radio" name="b-'+i+'" value="1" ><span>true</span><input id="t4_false-'+i+'" type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
 									// onclick NOT DONE
 									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
@@ -174,14 +174,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									// Needs to change to <select>
 									strBuild += '<div class="PGPropCol2">Picklist</div>';
-									strBuild += '<div class="PGPropCol3"><textarea id="t5-'+i+'" cols="47" rows="2" style="height: 35px;" placeholder="Enter values separated by space" value="' + m.currentValue + '"></textarea></div>';
+									strBuild += '<div class="PGPropCol3"><select id="t5-'+i+'" class="form-control"><option value="0" selected>Select pick...</option>';
+
+									var pickArray = m.initialValue.match(/([\w\-]+)/g);
+									for (var j = 0; j < pickArray.length; j++) {
+
+										var pickIth = pickArray[j];
+										strBuild += '<option value="'+(j+1)+'">'+pickIth+'</option>';
+									}
+
+									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
 									// onclick NOT DONE
 									strBuild += '<div class="PGPropCol4"><button id="b5-'+i+'" type="button" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 6) {
 
 									strBuild += '<div class="PGPropCol2">Type</div>';
-									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" style="width: 99%;" class="form-control"><option value="0" selected>Select type...</option>';
+									strBuild += '<div class="PGPropCol3"><select id="t6-'+i+'" class="form-control"><option value="0" selected>Select type...</option>';
 
 									for (var j = 0; j < types.getLength(); j++) {
 
