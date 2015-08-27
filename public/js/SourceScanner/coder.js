@@ -263,14 +263,34 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 // Scan.
                 var objectCursor = objectPrimaryBlockChain;
+/*
+<xml xmlns="http://www.w3.org/1999/xhtml" >
+    <block type="App_setP1T1"                    id="100"                    inline="true"                    x="150"                    y="100" >
+        <value name="VALUE" >
+            <block type="new_P1T1"                    id="101" />
+        </value>
+        <next>
+            <block type="P1T1_setX"                   id="102"                   inline="true"                   x="100"                   y="100" >
+                <value name="SELF" >
+                    <block type="App_getP1T1"                   id="103" />
+                </value>
+                <value name="VALUE" >
+                    <block type="math_number"                   id="104" >
+                        <field name="NUM" >-603.65625</field>
+                    </block>
+                </value>
+                .
+                .
+                .
+*/                
                 if (objectCursor) {
 
                     do {
 
-                        //  Look for "new_" and "set_".
-                        //  Set in designer.
+                        // Use type="App_setXXX" to set id = XXX.
+                        // Use type="new_YYY" to set type = YYY.
+                        // Then set X, Y, Width, Height from children of type="YYY_set*"
                         var arrayMatches = objectCursor.type.match(/App_set(.+)/);
-                        
                         if (arrayMatches && arrayMatches.length > 1) {
 
                             if (objectResult) {
@@ -278,14 +298,16 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                                 objectArray.push(objectResult);
                             }
 
+                            var strType = objectCursor.children[0].children[0].type.substring(4);
+
                             objectResult = {
                                 id: arrayMatches[1],
+                                type: strType,
                                 X: 0,
                                 Y: 0,
                                 Width: 0,
                                 Height: 0
                             };
-
                         } else {
 
                             var props = ["X", "Y", "Width", "Height"];

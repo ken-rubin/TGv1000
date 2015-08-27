@@ -200,6 +200,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    var objectPrimaryBlockChain = processor.getPrimaryBlockChain(objectWorkspace);
 
 		                    var objectArray = coder.playThisInitializeWorkspace(objectPrimaryBlockChain);
+		                    // each object in objectArray looks like:
+		                    // {id:unique_toolInstanceId, type: realTypeName, X: ...}
 
 		                    m_arrayItems = [];
 		                    // Now create tool instance(s) and draw them.
@@ -211,12 +213,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    	var Y = parseFloat(obIth.Y);
 		                    	var Width = parseFloat(obIth.Width);
 		                    	var Height = parseFloat(obIth.Height);
-		                    	var strType = obIth.id;
-		                    	var strInstanceName = m_functionGetUniqueInstanceName(strType);
-		                    	var strSrc = resourceHelper.toURL("resources", types.getType(strType).data.imageId, "image", null);
+		                    	// var strType = obIth.id;
+		                    	// var strInstanceName = m_functionGetUniqueInstanceName(strType);
+		                    	var strSrc = resourceHelper.toURL("resources", types.getType(obIth.type).data.imageId, "image", null);
 
-			                    var tiNew = new ToolInstance(strInstanceName,
-			                    	strType,
+			                    var tiNew = new ToolInstance(obIth.id,
+			                    	obIth.type,
 			                    	strSrc,
 			                    	X,
 			                    	Y,
