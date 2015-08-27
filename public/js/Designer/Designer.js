@@ -584,16 +584,19 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 								// Check if changedProperty is one of X, Y, Width, Height and, if so,
 								// update it in item before calling m_functionRender.
-								var fNewvalue = parseFloat(newvalue);
-								if (changedProperty === 'X')
-									item.left = fNewvalue;
-								else if (changedProperty === 'Y')
-									item.top = fNewvalue;
-								else if (changedProperty === 'Width')
-									item.width = fNewvalue;
-								else if (changedProperty === 'Height')
-									item.height = fNewvalue;
+								if ($.isNumeric(newvalue)) {
 
+									var fNewvalue = parseFloat(newvalue);
+									if (changedProperty === 'X')
+										item.left = fNewvalue;
+									else if (changedProperty === 'Y')
+										item.top = fNewvalue;
+									else if (changedProperty === 'Width')
+										item.width = fNewvalue;
+									else if (changedProperty === 'Height')
+										item.height = fNewvalue;
+								}
+								
 								ex = m_functionRender();
 								if (ex) { throw ex; }
 

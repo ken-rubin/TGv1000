@@ -65,7 +65,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the PropertysDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: m_toolInstance.type + " Properties",
+								title: m_toolInstance.id + " Properties",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -95,6 +95,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+
+							$("#NewName").val(m_toolInstance.id);
 
 							m_properties = [];
 
@@ -168,7 +170,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									strBuild += '<div class="PGPropCol2">True or false</div>';
 									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input type="radio" name="b-'+i+'" value="1" style="width:25px;"><span>true</span>&nbsp;&nbsp;&nbsp;<input type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
 									var strVal = "$('input[name=b-"+i+"]:checked').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_functionManipulateCallback(4, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_functionManipulateCallback(4, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 5) {
 
