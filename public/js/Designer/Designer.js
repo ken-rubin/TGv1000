@@ -213,8 +213,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    	var Y = parseFloat(obIth.Y);
 		                    	var Width = parseFloat(obIth.Width);
 		                    	var Height = parseFloat(obIth.Height);
-		                    	// var strType = obIth.id;
-		                    	// var strInstanceName = m_functionGetUniqueInstanceName(strType);
 		                    	var strSrc = resourceHelper.toURL("resources", types.getType(obIth.type).data.imageId, "image", null);
 
 			                    var tiNew = new ToolInstance(obIth.id,

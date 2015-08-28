@@ -599,7 +599,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// Following is used to fetch current value of a property of a toolinstance.
 					// If not found, return ''.
 					// On error, throw and handle higher up.
-					self.getPropertyCurrentValue = function(strProperty, strInstance) {
+					self.getPropertyCurrentValue = function(strProperty, strInstance, strType) {
 
 						try {
 
@@ -615,7 +615,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 			                var objectCursor = objectPrimaryBlockChain;
 
 			                var strLookForFirst = "App_set" + strInstance;
-			                var strLookForThen = strInstance + "_set" + strProperty;
+			                var strLookForThen = strType + "_set" + strProperty;
 			                var bFoundFirst = false;
 
 			                if (objectCursor) {
