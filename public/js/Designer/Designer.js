@@ -236,6 +236,26 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						}
 					}
 
+					self.changeToolInstanceId = function(strOldId, strNewId) {
+
+						try {
+
+
+							// alert('called changeToolInstanceId with strOldId="' + strOldId + '" and strNewId="' + strNewId + '"');
+
+
+
+
+
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					///////////////////////////////
 					// Private functions.
 

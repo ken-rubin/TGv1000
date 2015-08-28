@@ -88,6 +88,32 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
+					var m_functionDoneTyping = function(strWhichInput) {
+
+						try {
+
+							var jqElem = $('#' + strWhichInput);
+							jqElem.blur();
+							var strVal = jqElem.val();
+							if (strWhichInput === 'NewName') {
+
+								if (strVal === m_toolInstance.id){
+									return;
+								}
+								var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
+								if (exceptionRet) { throw exceptionRet; }
+
+								// Update this dialog's tool instance, too.
+								m_toolInstance.id = strVal;
+								m_dialog.setTitle(strVal + " Properties");
+							}
+							
+						} catch(e) {
+
+							errorHelper.show(e);
+						}
+					}
+
 					// Wire up Property handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {
 
@@ -97,6 +123,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_dialog = dialogItself;
 
 							$("#NewName").val(m_toolInstance.id);
+
+							// Start a countdown timer for detecting NewName typing pause.
+							$("#NewName").keyup(function() {
+
+								clearTimeout(m_typingTimer);
+								if ($("#NewName").val()) {
+									m_typingTimer = setTimeout(function() {m_functionDoneTyping('NewName')}, m_doneTypingInterval); // Anonymous func needed for IE <= 9.
+								}
+							});
 
 							m_properties = [];
 
@@ -274,6 +309,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_toolInstance = null;
 				var m_dialog = null;
 				var m_properties;
+				var m_typingTimer;
+				var m_doneTypingInterval = 3500;	// A 3.5 sec pause in typing triggers an update.
 			};
 
 			// Return the constructor function as the module object.
