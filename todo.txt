@@ -23,8 +23,6 @@ Jerry
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
 - Items needed to finish PropertyGrid:
-	- change Picklist to <select> list
-	- validate input numbers (numeric) before applying in m_functionManipulateCallback (callback in m_functionHandleDClick in Designer.js)
 	- potentially (most likely) apply value changes on each keystroke and remove the buttons
 	- add tool instance renaming capability
 - Project / Quick Save may save twice--it flashes Save is complete twise and it doesn't go away the second time.
