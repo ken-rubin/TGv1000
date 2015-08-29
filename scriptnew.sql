@@ -1,4 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS `TGv1000`;
+SELECT database();
 USE TGv1000;
 
 delimiter //
