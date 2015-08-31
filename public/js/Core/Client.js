@@ -77,20 +77,34 @@ define(["Core/errorHelper",
 						}
 					};
 
-					// Start off the client.
-					self.debug = function () {
+					// Run (play) the Project
+					self.play = function () {
 
 						try {
 
-							// 
-							alert($("#BlocklyIFrame")[0].contentWindow.getMethodString());
-
+							alert('Play is not ready yet.');
 							return null;
+
 						} catch (e) {
 
 							return e;
 						}
-					};
+					}
+
+					// Start off the client.
+					// self.debug = function () {
+
+					// 	try {
+
+					// 		// 
+					// 		alert($("#BlocklyIFrame")[0].contentWindow.getMethodString());
+
+					// 		return null;
+					// 	} catch (e) {
+
+					// 		return e;
+					// 	}
+					// };
 
 					//////////////////////////////
 					// Dialog creators/openers

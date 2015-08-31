@@ -146,13 +146,13 @@ define(["Core/errorHelper"],
 								}
 							});
 
-							// Wire debug button click.
-							$("#DebugButton").click(function () {
+							// Wire Play button click.
+							$("#PlayBtn").click(function () {
 
 								try {
 
 									// Let client handle this.
-									var exceptionRet = client.debug();
+									var exceptionRet = client.play();
 									if (exceptionRet) {
 
 										throw exceptionRet;

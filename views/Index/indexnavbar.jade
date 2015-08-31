@@ -52,20 +52,11 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
               li.enabled
                 a#TechButton(href="#") Tech
 
-        //- Comic toggling
-        //- li#ComicsOn.active(style="display:none;")
-          //- a#ComicsOnButton(href="#")
-            //- span.glyphicon.glyphicon-info-sign
-            //- &nbsp;Show help
-        
-        //- Comic toggling
-        //- li#ComicsOff.active(style="display:none;")
-          //- a#ComicsOffButton(href="#")
-            //- span.glyphicon.glyphicon-remove-circle
-            //- &nbsp;Hide help
-        
         //- Adminzone will eventually be hidden to non-admin users
         li.active
           a#AdminzoneButton
             span.glyphicon.glyphicon-cog
             | &nbsp;Adminzone
+
+      button#PlayBtn.btn.btn-default.disabledifnoproj.navbar-right(type="button" data-toggle="tooltip" title="Run Project" aria-label="Run Project" style="margin-right: 40px; margin-top: 10px;")
+        span.glyphicon.glyphicon-play(aria-hidden="true")
