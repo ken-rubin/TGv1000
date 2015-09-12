@@ -199,11 +199,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    // Get the block with which to work.
 		                    var objectPrimaryBlockChain = processor.getPrimaryBlockChain(objectWorkspace);
 
-		                    var objectArray = coder.playThisInitializeWorkspace(objectPrimaryBlockChain);
 		                    // each object in objectArray looks like:
 		                    // {id:unique_toolInstanceId, type: realTypeName, X: ...}
+		                    var objectArray = coder.playThisInitializeWorkspace(objectPrimaryBlockChain);
 
+		                    // Clear out collection of tool instances.
 		                    m_arrayItems = [];
+
 		                    // Now create tool instance(s) and draw them.
 		                    for (var i = 0; i < objectArray.length; i++) {
 
@@ -213,7 +215,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    	var Y = parseFloat(obIth.Y);
 		                    	var Width = parseFloat(obIth.Width);
 		                    	var Height = parseFloat(obIth.Height);
-		                    	var strSrc = resourceHelper.toURL("resources", types.getType(obIth.type).data.imageId, "image", null);
+		                    	var strSrc = resourceHelper.toURL("resources", 
+		                    		types.getType(obIth.type).data.imageId, 
+		                    		"image", 
+		                    		null);
 
 			                    var tiNew = new ToolInstance(obIth.id,
 			                    	obIth.type,
@@ -223,7 +228,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 			                    	Width,
 			                    	Height);
 			                    m_arrayItems.push(tiNew);
-			                    							// Render canvas.
+
+			                    // Render canvas.
 								var exceptionRet = m_functionRender();
 								if (exceptionRet) { throw exceptionRet; }
 		                    }
@@ -602,21 +608,23 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								);
 								if (ex) { throw ex; }
 
-								// Check if changedProperty is one of X, Y, Width, Height and, if so,
-								// update it in item before calling m_functionRender.
-								if ($.isNumeric(newvalue)) {
+								// If the app initialize is active, then the blockly code change listener
+								// will be invoked by the above code.  So we do not need to run the follow.
+								// Otherwise, we do not to run this to cause the desited up in designer.
+								if (!types.isAppInitializeActive()) {
 
-									var fNewvalue = parseFloat(newvalue);
+									// Check if changedProperty is one of X, Y, Width, Height and, if so,
+									// update it in item before calling m_functionRender.
 									if (changedProperty === 'X')
-										item.left = fNewvalue;
+										item.left = parseFloat(newvalue);
 									else if (changedProperty === 'Y')
-										item.top = fNewvalue;
+										item.top = parseFloat(newvalue);
 									else if (changedProperty === 'Width')
-										item.width = fNewvalue;
+										item.width = parseFloat(newvalue);
 									else if (changedProperty === 'Height')
-										item.height = fNewvalue;
+										item.height = parseFloat(newvalue);
 								}
-								
+
 								ex = m_functionRender();
 								if (ex) { throw ex; }
 
@@ -923,23 +931,21 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								throw exceptionRet;
 							}
 
-							// Add type-property to app.  Also update
-							// app menu schema for the type-property. 
-							exceptionRet = code.addProperty({
+							var typeApp = types.getType("App");
+							exceptionRet = client.addPropertyToType({
+									id: 0,
+									propertyTypeId: 6,	// 'Type'
+                                    originalPropertyId: 0,
+                                    name: strInstanceName,
+                                    initialValue: '',
+                                    ordinal: 0,
+                                    isHidden: true
+								},
+								typeApp);
+							if (exceptionRet) {
 
-									data: {
-
-										name: "App"
-									}
-								}, {
-
-									name: strInstanceName,
-									isApp: true
-								});
-		                    if (exceptionRet) {
-
-		                        throw exceptionRet;
-		                    }
+								throw exceptionRet;
+							}
 
 							// Add item to app initialize.
 		                    exceptionRet = coder.add_AllocateType(strType, 

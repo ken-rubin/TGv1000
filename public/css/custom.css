@@ -114,78 +114,110 @@ a.list-group-item {
   border:none;
   font-size:0;
 }
+
+
+
+
 .TWBody
 {
-    background:rgb(0,0,128);
-    font-size: 18px;
-    font-family: arial;
-    color:white;
+  /* Must specify a definite height and overflow-y or the scrolling wont work. */ 
+  height:200px;
+  overflow-y:scroll;
+  border-radius:10px;
+  border:1px solid black;
+  background:rgb(96,96,96);
+  color: white;
+  font-size: 18px;
+  font-family: arial;
 }
 .TWParent
 {
-    /* Must specify a definite height and overflow-y or the scrolling wont work. */ 
-    height:200px;
-    overflow-y:scroll;
-    /* The rest of this file is just display and essentially unimportant. */ 
-    background:rgb(128,0,0);
-    border-radius:10px;
 }
 .TWChild
 {
-    margin:5px;
-    padding:5px;
-    background:rgb(0,128,0);
-    border-radius:10px;
-    text-align: center;
+  display: inline-block;
+
+  width: 100%;
+  height: 40px;
+
+  border-radius: 4px;
+  text-align: center;
+
+  border:1px solid rgb(64,64,64);
 }
 .TWMethCol1
 {
+  display: inline-block;
+  height:32px;
   width:10%;
-  float:left;
+  left:5%;
+}
+.TWMethCol1Image
+{
+  height:32px;
+  width:100%;
 }
 .TWMethCol2
 {
-  width:52%;
-  float:left;
-  margin-right:15px;
+  display: inline-block;
+  width:50%;
+  margin-top:4px;
 }
 .TWMethCol3
 {
-  width:10%;
-  float:left;
-  margin-right:15px;
+  display: inline-block;
+  width:15%;
+
+  border-radius: 4px;
 }
 .TWMethCol4
 {
+  display: inline-block;
+  width:15%;
+
+  border-radius: 4px;
 }
 .TWPropCol1
 {
-  width:68%;
-  float:left;
+  display: inline-block;
+  height:32px;
+  width:60%;
+  left:5%;
 }
 .TWPropCol2
 {
-  width:10%;
-  float:left;
-  margin-right:15px;
+  display: inline-block;
+  width:15%;
+
+  margin-top:4px;
+
+  border-radius: 4px;
 }
 .TWPropCol3
 {
+  display: inline-block;
+  width:15%;
+
+  border-radius: 4px;
 }
 .TWEvtCol1
 {
   width:68%;
-  float:left;
 }
 .TWEvtCol2
 {
   width:10%;
-  float:left;
-  margin-right:15px;
+  left:68%;
 }
 .TWEvtCol3
 {
+  width:22%;
+  left:78%;
 }
+
+
+
+
 .PGBody
 {
     background:rgb(0,0,128);

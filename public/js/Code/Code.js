@@ -36,6 +36,27 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					////////////////////////////////
 					// Pulbic methods.
 
+					// Clear all block and state from this and the blockly workspace.
+					self.reset = function () {
+
+						try {
+
+							// Reset state of code back to pristine.
+							self.schema = {};
+							self.blocks = {};
+							self.javaScript = {};
+							self.workspace = null;
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
 					// Method adds a type to blockly.
 //used					
 					self.addType = function (clType) {
@@ -933,7 +954,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Blocks.
 							var strGetName = clType.data.name + "_get" + property.name;
 
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.blocks[strGetName] = m_functionGenerateBlocksAppPropertyGetFunctionString(strGetName);
 							} else {
@@ -943,9 +964,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// JavaScript.
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
-								self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
+								self.javaScript[strGetName] = m_functionGenerateJavaScriptAppPropertyGetFunctionString(property.name);
 							} else {
 
 								self.javaScript[strGetName] = m_functionGenerateJavaScriptPropertyGetFunctionString(property.name);
@@ -971,7 +992,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Blocks.
 							var strSetName = clType.data.name + "_set" + property.name;
 
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.blocks[strSetName] = m_functionGenerateBlocksAppPropertySetFunctionString(strSetName);
 							} else {
@@ -981,7 +1002,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// JavaScript.
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.javaScript[strSetName] = m_functionGenerateJavaScriptAppPropertySetFunctionString(property.name);
 							} else {
@@ -1127,7 +1148,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var strGetName = clType.data.name + "_get" + property.name;
 							delete self.blocks[strOriginalName];
 
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.blocks[strGetName] = m_functionGenerateBlocksAppPropertyGetFunctionString(strGetName);
 							} else {
@@ -1139,7 +1160,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// JavaScript.
 							delete self.javaScript[strOriginalName];
 
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.javaScript[strGetName] = m_functionGenerateJavaScriptAppPropertyGetFunctionString(property.name);
 							} else {
@@ -1184,7 +1205,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var strSetName = clType.data.name + "_set" + property.name;
 							delete self.blocks[strOriginalSetName];
 
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.blocks[strSetName] = m_functionGenerateBlocksAppPropertySetFunctionString(strSetName);
 							} else {
@@ -1196,7 +1217,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// JavaScript.
 							delete self.javaScript[strOriginalSetName];
 
-							if (property.isApp) {
+							if (clType.data.isApp) {
 
 								self.javaScript[strSetName] = m_functionGenerateJavaScriptAppPropertySetFunctionString(property.name);
 							} else {

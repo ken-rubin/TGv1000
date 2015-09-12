@@ -603,10 +603,22 @@ define(["Core/errorHelper",
 						try {
 
 							var activeClType = types.getActiveClType();
-							activeClType.data.properties.push(property);
+							return self.addPropertyToType(property,
+								activeClType);
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.addPropertyToType = function (property, clType) {
+
+						try {
+
+							clType.data.properties.push(property);
 
 							// Add the property to code.
-							var exceptionRet = code.addProperty(activeClType, 
+							var exceptionRet = code.addProperty(clType, 
 								property);
 							if (exceptionRet) { throw exceptionRet; }
 
@@ -614,8 +626,9 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Now do something to scroll the props grid to the bottom.
-							$("#propertyedit_" + (activeClType.data.properties.length - 1).toString()).scrollintoview();
+							$("#propertyedit_" + (clType.data.properties.length - 1).toString()).scrollintoview();
 
+							return null;
 						} catch (e) {
 
 							return e;

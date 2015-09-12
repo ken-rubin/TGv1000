@@ -92,8 +92,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							// Select the element.
 							var jqElem = $('#' + strWhichInput);
-							jqElem.blur();
+
+							// Extract the value from the element.
 							var strVal = jqElem.val();
 							if (strWhichInput === 'NewName') {
 
@@ -170,7 +172,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// Get the current value for this property--if it exists.
 								m.currentValue = code.getPropertyCurrentValue(m.name, m_toolInstance.id, m_toolInstance.type);	// May return empty string, but not null.
 
-								if (m.propertyTypeId === 1) {
+								if (m.propertyTypeId === 1) {	// Number
 
 									if (m.currentValue === '' && m.initialValue !== '') {
 
@@ -181,7 +183,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									var strVal = "$('#t1-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_functionManipulateCallback(1, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
-								} else if (m.propertyTypeId === 2) {
+								} else if (m.propertyTypeId === 2) {	// Number range
 
 									// initialValue was mandatory (x-y)
 									strBuild += '<div class="PGPropCol2">Number in range&nbsp;'+m.initialValue+'</div>';
@@ -189,7 +191,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									var strVal = "$('#t2-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_functionManipulateCallback(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
-								} else if (m.propertyTypeId === 3) {
+								} else if (m.propertyTypeId === 3) {	// String
 
 									if (m.currentValue === '') {
 
@@ -200,14 +202,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									var strVal = "$('#t3-" + i + "').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_functionManipulateCallback(3, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
-								} else if (m.propertyTypeId === 4) {
+								} else if (m.propertyTypeId === 4) {	// Bool
 
 									strBuild += '<div class="PGPropCol2">True or false</div>';
 									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input type="radio" name="b-'+i+'" value="1" style="width:25px;"><span>true</span>&nbsp;&nbsp;&nbsp;<input type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
 									var strVal = "$('input[name=b-"+i+"]:checked').val()";
 									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_functionManipulateCallback(4, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
-								} else if (m.propertyTypeId === 5) {
+								} else if (m.propertyTypeId === 5) {	// Picklist
 
 									// m.initialValue is used to build the select list.
 									// m.currentValue, if <> '', should be used to select current; defaulting to 'Select pick...'.
@@ -225,7 +227,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									var strVal = "$('#t5-"+i+" option:selected').text()";
 									strBuild += '<div class="PGPropCol4"><button id="b5-'+i+'" type="button" onclick="m_functionManipulateCallback(5, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
-								} else if (m.propertyTypeId === 6) {
+								} else if (m.propertyTypeId === 6) {	// Typelist
 
 									// Actual Types in project (excluding App type and current type) are used to build the select list.
 									// m.currentValue, if <> '', should be used to select current; defaulting to 'Select type...'.
@@ -310,7 +312,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_properties;
 				var m_typingTimer;
-				var m_doneTypingInterval = 3500;	// A 3.5 sec pause in typing triggers an update.
+				var m_doneTypingInterval = 500;	// A 3.5 sec pause in typing triggers an update.
 			};
 
 			// Return the constructor function as the module object.

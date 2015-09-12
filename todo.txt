@@ -1,4 +1,13 @@
 Either of us
+- Get rid of bootstrap tool-tips, replace with good
+- Events!
+- Add hidden column to propertys table and don't display in scroll list in TypeWell if
+  property is hidden; change script to hide X, Y, Width, Height;
+  in designer drop, make that proprty hidden
+- Properties typewell: App type does not get x,y,w,h; also never show x, y, w, h in property table. 
+- Properties: some properties are architected properties
+- Add delete to PropertyGrid dialog
+
 
 
 Ken
@@ -8,8 +17,8 @@ Ken
 - CLick on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
      Will this be needed with Properties, Events?
 - Resizing in the two vertical toolstrips seems to now lose aspect ratio. Toolstrip for sure.
-
-
+- *** Handle newly opened project.  clear and load types into blockly and reload up blockly in comic.activate.
+			I.E. finish up loading projects.
 
 Jerry
 
@@ -26,14 +35,14 @@ Jerry
 	- potentially (most likely) apply value changes on each keystroke and remove the buttons
 	- add tool instance renaming capability
 - Project / Quick Save may save twice--it flashes Save is complete twise and it doesn't go away the second time.
-
+- Remove requirement for all images
 
 
 To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
-- Uniquified picklist values are case sensitive. OK?
+- Uniquified picklist values are case sensitive. OK? Yes.
 
 
 

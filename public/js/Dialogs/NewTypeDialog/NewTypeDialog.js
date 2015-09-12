@@ -176,9 +176,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							};
 
 							var clType = new Type();
-							clType.load(typeJO);
+							var exceptionRet = clType.load(typeJO);
+							if (exceptionRet) {
 
-							var exceptionRet = client.addTypeToProject(clType);
+								throw exceptionRet;
+							}
+
+							exceptionRet = client.addTypeToProject(clType);
 							if (exceptionRet) {
 
 								throw exceptionRet;

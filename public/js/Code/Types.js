@@ -719,11 +719,61 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								var m = m_clTypeActive.data.methods[i];
 								if (m.name === 'initialize') {
-									//strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"></td><td style="width:8%;"></td></tr>';
-									strBuild += '<div class="TWChild" style="height:42.73px;"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"></div><div class="TWMethCol4"></div></div>';
+
+									// Original: strBuild += '<div class="TWChild" style="height:42.73px;"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"></div><div class="TWMethCol4"></div></div>';
+									strBuild += '<div class="TWChild">' +
+													'<div class="TWMethCol1">' + 
+														'<img class="TWMethCol1Image" src="' + 
+															resourceHelper.toURL("images",null,null,"initialize.png") + 
+															'">'+
+														'</img>'+
+													'</div>' +
+													'<div class="TWMethCol2">'+
+														'<button class="button-as-link" id="method_' + 
+															i + 
+															'" href="#">' + 
+															m.name + 
+														'</button>'+
+													'</div>'+
+													'<div class="TWMethCol3">'+
+													'</div>'+
+													'<div class="TWMethCol4">'+
+													'</div>'+
+												'</div>';
 								} else {
-									//strBuild = '<tr><td style="width:9%;"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageId,'image') + '"></img></td><td style="width:75%;"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
-									strBuild += '<div class="TWChild"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageId,'image') + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></div><div class="TWMethCol4"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></div></div>';
+
+									// Original: strBuild += '<div class="TWChild"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageId,'image') + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></div><div class="TWMethCol4"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></div></div>';
+									strBuild += '<div class="TWChild" >' +
+													'<div class="TWMethCol1">'+
+														'<img class="TWMethCol1Image" src="' + 
+															resourceHelper.toURL("resources",m.imageId,'image') + 
+															'">'+
+														'</img>'+
+													'</div>'+
+													'<div class="TWMethCol2">'+
+														'<button class="button-as-link" id="method_' + 
+															i + 
+															'" href="#">' + 
+															m.name + 
+														'</button>'+
+													'</div>'+
+													'<div class="TWMethCol3">'+
+														'<button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + 
+															i + 
+															'">'+
+															'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
+															'</span>'+
+														'</button>'+
+													'</div>'+
+													'<div class="TWMethCol4">'+
+														'<button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + 
+															i + 
+															'">'+
+															'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
+															'</span>'+
+														'</button>'+
+													'</div>'+
+												'</div>';
 								}
 							};
 							strBuild += '</div>';
@@ -760,7 +810,27 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 								var m = m_clTypeActive.data.properties[i];
-								strBuild += '<div class="TWChild"><div class="TWPropCol1">' + m.name + '</div><div class="TWPropCol2"><button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></div><div class="TWPropCol3"><button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></div></div>';
+								strBuild += '<div class="TWChild">'+
+												'<div class="TWPropCol1">' + 
+													m.name + 
+												'</div>'+
+												'<div class="TWPropCol2">'+
+													'<button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + 
+														i + 
+														'">'+
+														'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
+														'</span>'+
+													'</button>'+
+												'</div>'+
+												'<div class="TWPropCol3">'+
+													'<button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + 
+														i + 
+														'">'+
+														'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
+														'</span>'+
+													'</button>'+
+												'</div>'+
+											'</div>';
 							};
 							strBuild += '</div>';
 

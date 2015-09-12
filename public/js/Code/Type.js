@@ -45,7 +45,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							self.data = typesItem;
 
 							return null;
-
 						} catch (e) {
 
 							return e;
