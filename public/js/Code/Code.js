@@ -360,6 +360,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
+//used
 					// Remove property from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
 					self.removeProperty = function (clType, property) {

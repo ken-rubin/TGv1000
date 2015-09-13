@@ -262,6 +262,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						}
 					}
 
+					self.deleteToolInstance = function (toolInstance) {
+
+						return m_functionUndrop(toolInstance);
+					}
+
 					///////////////////////////////
 					// Private functions.
 
@@ -926,12 +931,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 							// Render canvas.
 							var exceptionRet = m_functionRender();
-							if (exceptionRet) {
+		                    if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
-
-							var typeApp = types.getType("App");
+							var clTypeApp = types.getType("App");
 							exceptionRet = client.addPropertyToType({
 									id: 0,
 									propertyTypeId: 6,	// 'Type'
@@ -941,59 +943,88 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
                                     ordinal: 0,
                                     isHidden: true
 								},
-								typeApp);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+								clTypeApp);
+		                    if (exceptionRet) { throw exceptionRet; }
 
 							// Add item to app initialize.
 		                    exceptionRet = coder.add_AllocateType(strType, 
 		                    	strInstanceName);
-		                    if (exceptionRet) {
-
-		                        throw exceptionRet;
-		                    }
+		                    if (exceptionRet) { throw exceptionRet; }
 
 		                    // Set location.
 		                    exceptionRet = coder.add_SetPropertyValue(strType, 
 		                    	"X",
 		                    	iLeft,
 		                    	strInstanceName);
-		                    if (exceptionRet) {
-
-		                        throw exceptionRet;
-		                    }
+		                    if (exceptionRet) { throw exceptionRet; }
 		                    exceptionRet = coder.add_SetPropertyValue(strType, 
 		                    	"Y",
 		                    	iTop,
 		                    	strInstanceName);
-		                    if (exceptionRet) {
-
-		                        throw exceptionRet;
-		                    }
+		                    if (exceptionRet) { throw exceptionRet; }
 		                    exceptionRet = coder.add_SetPropertyValue(strType, 
 		                    	"Width",
 		                    	iWidth,
 		                    	strInstanceName);
-		                    if (exceptionRet) {
-
-		                        throw exceptionRet;
-		                    }
+		                    if (exceptionRet) { throw exceptionRet; }
 		                    exceptionRet = coder.add_SetPropertyValue(strType, 
 		                    	"Height",
 		                    	iHeight,
 		                    	strInstanceName);
-		                    if (exceptionRet) {
+		                    if (exceptionRet) { throw exceptionRet; }
 
-		                        throw exceptionRet;
-		                    }
 		                } catch (e) {
 
 		                    // Do nothing.
 		                    errorHelper.show(e);
 		                }
 		            };
+
+		            // Private method called by self.deleteToolInstance to remove a previously-dropped tool.
+		            // Basically, have to undo much of what was done in m_functionDrop and then re-render the Designer canvas.
+		            var m_functionUndrop = function (toolInstance) {
+
+		            	try {
+
+		            		for (var i = 0; i < m_arrayItems.length; i++) {
+
+		            			var itemIth = m_arrayItems[i];
+		            			if (itemIth.name === toolInstance.name) {
+
+		            				// Delete the TI property from the App type.
+									var clTypeApp = types.getType("App");
+									for (var j = 0; j < clTypeApp.data.properties; j++) {
+
+										var propJth = clTypeApp.data.properties[j];
+										if (propIth.name === toolInstance.name) {
+
+											var exceptionRet = m_functionRemove_Type_Property(clTypeApp,
+												propJth);
+											if (exceptionRet) { throw exceptionRet; }
+
+											clTypeApp.deleteProperty(j);
+											break;
+										}
+									}
+
+									// Remove the TI from our array.
+									m_arrayItems.splice(i, 1);
+
+									// Render canvas.
+									var exceptionRet = m_functionRender();
+				                    if (exceptionRet) { return exceptionRet; }
+
+				            		return null;
+		            			}
+		            		}
+
+		            		return new Error('We were unable to find the tool instance in the array of TIs. This is a program error.')
+
+		            	} catch (e) {
+
+		            		return e;
+		            	}
+		            }
 
 		            //////////////////////////////////////
 		            // Private fields.

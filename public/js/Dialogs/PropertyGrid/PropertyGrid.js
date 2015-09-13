@@ -70,6 +70,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
+					            		id: "DeleteBtn",
+					            		label: "Delete this Tool Instance",
+					            		cssClass: "btn-primary"
+					            	},
+					            	{
 						                label: "Close",
 						                icon: "glyphicon glyphicon-remove-circle",
 						                cssClass: "btn-warning",
@@ -116,6 +121,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
+					// Delete the double-clicked dropped Tool. No need for second confirmation, since user can just drop again.
+					var m_functionDeleteToolInstance = function () {
+
+						try {
+
+							var exceptionRet = designer.deleteToolInstance(m_toolInstance);
+							if (exceptionRet) { throw exceptionRet; }
+
+							m_dialog.close();
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
 					// Wire up Property handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {
 
@@ -123,6 +144,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+
+							$("#DeleteBtn").click(m_functionDeleteToolInstance);
 
 							$("#NewName").val(m_toolInstance.id);
 

@@ -1,12 +1,6 @@
 Either of us
 - Get rid of bootstrap tool-tips, replace with good
 - Events!
-- Add hidden column to propertys table and don't display in scroll list in TypeWell if
-  property is hidden; change script to hide X, Y, Width, Height;
-  in designer drop, make that proprty hidden
-- Properties typewell: App type does not get x,y,w,h; also never show x, y, w, h in property table. 
-- Properties: some properties are architected properties
-- Add delete to PropertyGrid dialog
 
 
 
@@ -32,17 +26,18 @@ Jerry
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
 - Items needed to finish PropertyGrid:
-	- potentially (most likely) apply value changes on each keystroke and remove the buttons
-	- add tool instance renaming capability
+	- apply value changes on each keystroke and remove the buttons
+	- finish tool instance renaming capability
+	- add delete button to delete tool instance
 - Project / Quick Save may save twice--it flashes Save is complete twise and it doesn't go away the second time.
 - Remove requirement for all images
+
 
 
 To discuss
 
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
-- Uniquified picklist values are case sensitive. OK? Yes.
 
 
 
