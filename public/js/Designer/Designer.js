@@ -998,7 +998,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 										var propJth = clTypeApp.data.properties[j];
 										if (propIth.name === toolInstance.name) {
 
-											var exceptionRet = m_functionRemove_Type_Property(clTypeApp,
+											var exceptionRet = code.removeProperty(clTypeApp,
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
 
