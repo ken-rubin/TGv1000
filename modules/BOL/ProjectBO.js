@@ -423,7 +423,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 propertyTypeId: row.propertyTypeId,
                                                 name: row.name,
                                                 initialValue: row.initialValue,
-                                                ordinal: row.ordinal
+                                                ordinal: row.ordinal,
+                                                isHidden: row.isHidden
                                             };
 
                                             if (project.id === 0) {
@@ -689,7 +690,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 propertyTypeId: row.propertyTypeId,
                                 name: row.name,
                                 initialValue: row.initialValue,
-                                ordinal: row.ordinal
+                                ordinal: row.ordinal,
+                                isHidden: row.isHidden
                             };
 
                             property.id = 0;
@@ -1344,7 +1346,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.properties.forEach(function(property) {
 
                         property.typeId = typeIth.id;
-                        strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + ");";
+                        strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + "," + property.isHidden + ");";
                         
                         m_log('Inserting property with ' + strQuery);
                         sql.queryWithCxn(connection, strQuery,

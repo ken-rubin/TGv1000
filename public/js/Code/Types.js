@@ -810,27 +810,30 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
 								var m = m_clTypeActive.data.properties[i];
-								strBuild += '<div class="TWChild">'+
-												'<div class="TWPropCol1">' + 
-													m.name + 
-												'</div>'+
-												'<div class="TWPropCol2">'+
-													'<button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + 
-														i + 
-														'">'+
-														'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
-														'</span>'+
-													'</button>'+
-												'</div>'+
-												'<div class="TWPropCol3">'+
-													'<button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + 
-														i + 
-														'">'+
-														'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
-														'</span>'+
-													'</button>'+
-												'</div>'+
-											'</div>';
+								if (!m.isHidden) {
+
+									strBuild += '<div class="TWChild">'+
+													'<div class="TWPropCol1">' + 
+														m.name + 
+													'</div>'+
+													'<div class="TWPropCol2">'+
+														'<button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + 
+															i + 
+															'">'+
+															'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
+															'</span>'+
+														'</button>'+
+													'</div>'+
+													'<div class="TWPropCol3">'+
+														'<button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + 
+															i + 
+															'">'+
+															'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
+															'</span>'+
+														'</button>'+
+													'</div>'+
+												'</div>';
+								};
 							};
 							strBuild += '</div>';
 

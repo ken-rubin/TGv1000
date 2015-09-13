@@ -118,7 +118,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
                                     originalPropertyId: 0,
                                     name: '',
                                     initialValue: '',
-                                    ordinal: 0
+                                    ordinal: 0,
+                                    isHidden: 0
 								};
 							} else {
 
@@ -356,7 +357,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								name: propertyName,
 								propertyTypeId: m_iDataType,
 								ordinal: 0,
-								initialValue: strInitialValue
+								initialValue: strInitialValue,
+								isHidden: 0
 							};
 
 							if (m_strNewOrEdit === 'New') {

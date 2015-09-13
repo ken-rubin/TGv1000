@@ -509,8 +509,12 @@ begin
 		set @dbstate := 3.0;
     end if;
 
-    if @dbstate = 333.0 THEN
+    if @dbstate = 3.0 THEN
 
+		ALTER TABLE `TGv1000`.`propertys` 
+			ADD COLUMN `isHidden` INT(1) NOT NULL DEFAULT '0' COMMENT '' AFTER `initialValue`;
+
+		UPDATE `TGv1000`.`propertys` set isHidden=1 where name in ('X','Y','Width','Height');
 
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
