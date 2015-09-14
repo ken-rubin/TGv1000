@@ -54,17 +54,57 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 return false;
             }
 
-            self.update_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
+            // Method adds an "allocate type" Blockly block to Blockly.
+            self.add_AllocateType = function (strType, strId) {
+
+                try {
+/*
+<xml xmlns="http://www.w3.org/1999/xhtml">
+    <block type="App_setThingy" id="6" inline="true" x="150" y="90">
+        <value name="VALUE">
+            <block type="new_Thingy" id="20">
+            </block>
+        </value>
+    </block>
+</xml>
+*/
+                    return m_functionAdd({
+
+                        nodeName: "block",
+                        type: "App_set" + strId,
+                        id: m_functionGetNextId(),
+                        inline: "true",
+                        x: "150",
+                        y: "100",
+                        children: [
+
+                            {
+
+                                nodeName: "value",
+                                name: "VALUE",
+                                children: [
+
+                                    {
+
+                                        nodeName: "block",
+                                        type: "new_" + strType,
+                                        id: m_functionGetNextId()
+                                    }
+                                ]
+                            }
+                        ]
+                    });
+                } catch (e) {
+
+                    return e;
+                }
+            };
+
+            // Method removes an "allocate type" Blockly block from Blockly.
+            self.remove_AllocateType = function (strType, strId) {
 
                 try {
 
-                    if (!self.doesPropertyExist(strType, strProperty, strInstance)) {
-
-                        // Need to add the property AND set its value.
-                        return self.add_SetPropertyValue(strType, strProperty, strValue, strInstance);
-                    }
-
-                    // .
                     var objectWorkspace = processor.getWorkspaceJSONObject();
                     if (!objectWorkspace) {
 
@@ -74,31 +114,16 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     // Get the block with which to work.
                     var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
 
-                    // Compose, "MyType_setX", for which to search.
-                    var strBlockType = strType + "_set" + strProperty;
 
-                    // Compose the get for the instance from the app for which to search.
-                    var strInstanceType = "App_get" + strInstance;
 
-                    // If there is a work block, add new block it it, otherwise
-                    while (blockWork) {
 
-                        // Look for a block whose type matches the composed.
-                        if (blockWork.type === strBlockType &&
-                            blockWork.children[0].children[0].type === strInstanceType) {
 
-                            // Found it.
-                            blockWork.children[1].children[0].children[0].contents = strValue;
 
-                            // Keep searching, for some reason, this property could occur more than once.
-                        }
 
-                        // Move to next statement in chain.
-                        blockWork = blockWork.next;
-                    }
 
-                    ///////////////////
-                    // Save:
+
+
+
 
                     // Convert back to XML.
                     var strXml = converter.toXML(objectWorkspace);
@@ -121,15 +146,16 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         throw { message: "Failed to find initialize method of App type." };
                     }
 
-                    // Set the workspace.
+                    // Get the workspace.
                     methodInitialize.workspace = strXml;
 
                     return null;
+
                 } catch (e) {
 
                     return e;
                 }
-            };
+            }
 
             // Method adds a "set property value" Blockly block to Blockly.
             self.add_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
@@ -207,51 +233,108 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
-            // Method adds an "allocate type" Blockly block to Blockly.
-            self.add_AllocateType = function (strType, strId) {
+            self.update_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
 
                 try {
-/*
-<xml xmlns="http://www.w3.org/1999/xhtml">
-    <block type="App_setThingy" id="6" inline="true" x="150" y="90">
-        <value name="VALUE">
-            <block type="new_Thingy" id="20">
-            </block>
-        </value>
-    </block>
-</xml>
-*/
-                    return m_functionAdd({
 
-                        nodeName: "block",
-                        type: "App_set" + strId,
-                        id: m_functionGetNextId(),
-                        inline: "true",
-                        x: "150",
-                        y: "100",
-                        children: [
+                    if (!self.doesPropertyExist(strType, strProperty, strInstance)) {
 
-                            {
+                        // Need to add the property AND set its value.
+                        return self.add_SetPropertyValue(strType, strProperty, strValue, strInstance);
+                    }
 
-                                nodeName: "value",
-                                name: "VALUE",
-                                children: [
+                    // .
+                    var objectWorkspace = processor.getWorkspaceJSONObject();
+                    if (!objectWorkspace) {
 
-                                    {
+                        throw { messgage: "Failed to get the workspace object." };
+                    }
 
-                                        nodeName: "block",
-                                        type: "new_" + strType,
-                                        id: m_functionGetNextId()
-                                    }
-                                ]
-                            }
-                        ]
-                    });
+                    // Get the block with which to work.
+                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+
+                    // Compose, "MyType_setX", for which to search.
+                    var strBlockType = strType + "_set" + strProperty;
+
+                    // Compose the get for the instance from the app for which to search.
+                    var strInstanceType = "App_get" + strInstance;
+
+                    // If there is a work block, add new block it it, otherwise
+                    while (blockWork) {
+
+                        // Look for a block whose type matches the composed.
+                        if (blockWork.type === strBlockType &&
+                            blockWork.children[0].children[0].type === strInstanceType) {
+
+                            // Found it.
+                            blockWork.children[1].children[0].children[0].contents = strValue;
+
+                            // Keep searching, for some reason, this property could occur more than once.
+                        }
+
+                        // Move to next statement in chain.
+                        blockWork = blockWork.next;
+                    }
+
+                    ///////////////////
+                    // Save:
+
+                    // Convert back to XML.
+                    var strXml = converter.toXML(objectWorkspace);
+                    if (!strXml) {
+
+                        throw new Error("Failed to convert workspace XML to JSON.");
+                    }
+
+                    // First get the app type.
+                    var typeApp = types.getType("App");
+                    if (!typeApp) {
+
+                        throw { message: "Failed to find App type." };
+                    }
+
+                    // Next get the initialize method.
+                    var methodInitialize = typeApp.getMethod("initialize");
+                    if (!methodInitialize) {
+
+                        throw { message: "Failed to find initialize method of App type." };
+                    }
+
+                    // Set the workspace.
+                    methodInitialize.workspace = strXml;
+
+                    return null;
                 } catch (e) {
 
                     return e;
                 }
             };
+
+            // Method removes a "set property value" Blockly block from Blockly.
+            self.remove_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
+
+                try {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
 
             self.playThisInitializeWorkspace = function(objectPrimaryBlockChain) {
 
