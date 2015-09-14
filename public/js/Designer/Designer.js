@@ -989,20 +989,22 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		            		for (var i = 0; i < m_arrayItems.length; i++) {
 
 		            			var itemIth = m_arrayItems[i];
-		            			if (itemIth.name === toolInstance.name) {
+		            			if (itemIth.id === toolInstance.id) {
 
 		            				// Delete the TI property from the App type.
 									var clTypeApp = types.getType("App");
-									for (var j = 0; j < clTypeApp.data.properties; j++) {
+									for (var j = 0; j < clTypeApp.data.properties.length; j++) {
 
 										var propJth = clTypeApp.data.properties[j];
-										if (propIth.name === toolInstance.name) {
+										if (propJth.name === toolInstance.id) {
 
 											var exceptionRet = code.removeProperty(clTypeApp,
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
 
-											clTypeApp.deleteProperty(j);
+											// Delete property from type here instead of using the method in Types.js.
+											// That one deletes from the currently active Type, and, who knows, App may not be active.
+											clTypeApp.data.properties.splice(j, 1);
 											break;
 										}
 									}
