@@ -105,6 +105,18 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
+                    return m_functionRemove({});
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
+
+            var m_functionRemove = function (blockToRemove) {
+
+                try {
+
                     var objectWorkspace = processor.getWorkspaceJSONObject();
                     if (!objectWorkspace) {
 
@@ -311,24 +323,11 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             };
 
             // Method removes a "set property value" Blockly block from Blockly.
-            self.remove_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
+            self.remove_SetPropertyValue = function (strType, strProperty, strInstance) {
 
                 try {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    
+                    return m_functionRemove({});
 
                 } catch (e) {
 

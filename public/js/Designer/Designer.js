@@ -986,21 +986,48 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 		            	try {
 
+		            		var strInstanceName = toolInstance.id;
+
 		            		for (var i = 0; i < m_arrayItems.length; i++) {
 
 		            			var itemIth = m_arrayItems[i];
 		            			if (itemIth.id === toolInstance.id) {
 
-		            				// Delete the TI property from the App type.
 									var clTypeApp = types.getType("App");
+									var strType = clTypeApp.data.name;
+
 									for (var j = 0; j < clTypeApp.data.properties.length; j++) {
 
 										var propJth = clTypeApp.data.properties[j];
 										if (propJth.name === toolInstance.id) {
 
+											// Remove property from left side of code pane (what's it called?).
 											var exceptionRet = code.removeProperty(clTypeApp,
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
+
+											// Remove item from app initialize.
+						                    exceptionRet = coder.remove_AllocateType(strType, 
+						                    	strInstanceName);
+						                    if (exceptionRet) { throw exceptionRet; }
+
+						                    // Remove location properties.
+						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    	"X",
+						                    	strInstanceName);
+						                    if (exceptionRet) { throw exceptionRet; }
+						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    	"Y",
+						                    	strInstanceName);
+						                    if (exceptionRet) { throw exceptionRet; }
+						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    	"Width",
+						                    	strInstanceName);
+						                    if (exceptionRet) { throw exceptionRet; }
+						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    	"Height",
+						                    	strInstanceName);
+						                    if (exceptionRet) { throw exceptionRet; }
 
 											// Delete property from type here instead of using the method in Types.js.
 											// That one deletes from the currently active Type, and, who knows, App may not be active.
