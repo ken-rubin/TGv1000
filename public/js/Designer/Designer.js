@@ -986,47 +986,54 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 		            	try {
 
-		            		var strInstanceName = toolInstance.id;
+		            		var strInstanceId = toolInstance.id;
 
 		            		for (var i = 0; i < m_arrayItems.length; i++) {
 
 		            			var itemIth = m_arrayItems[i];
-		            			if (itemIth.id === toolInstance.id) {
+		            			if (itemIth.id === strInstanceId) {
 
 									var clTypeApp = types.getType("App");
-									var strType = clTypeApp.data.name;
+									var strAppTypeName = clTypeApp.data.name;
+									var strTypeName = toolInstance.type;
 
 									for (var j = 0; j < clTypeApp.data.properties.length; j++) {
 
 										var propJth = clTypeApp.data.properties[j];
-										if (propJth.name === toolInstance.id) {
+										if (propJth.name === strInstanceId) {
 
 											// Remove property from left side of code pane (what's it called?).
 											var exceptionRet = code.removeProperty(clTypeApp,
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
 
-											// Remove item from app initialize.
-						                    exceptionRet = coder.remove_AllocateType(strType, 
-						                    	strInstanceName);
-						                    if (exceptionRet) { throw exceptionRet; }
+											// The order of removals is opposite the order of adds. It should just be cleaner that way.
 
 						                    // Remove location properties.
-						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
 						                    	"X",
-						                    	strInstanceName);
+						                    	strInstanceId,
+						                    	strAppTypeName);
 						                    if (exceptionRet) { throw exceptionRet; }
-						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
 						                    	"Y",
-						                    	strInstanceName);
+						                    	strInstanceId,
+						                    	strAppTypeName);
 						                    if (exceptionRet) { throw exceptionRet; }
-						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
 						                    	"Width",
-						                    	strInstanceName);
+						                    	strInstanceId,
+						                    	strAppTypeName);
 						                    if (exceptionRet) { throw exceptionRet; }
-						                    exceptionRet = coder.remove_SetPropertyValue(strType, 
+						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
 						                    	"Height",
-						                    	strInstanceName);
+						                    	strInstanceId,
+						                    	strAppTypeName);
+						                    if (exceptionRet) { throw exceptionRet; }
+
+											// Remove item from app initialize.
+						                    exceptionRet = coder.remove_AllocateType(strAppTypeName, 
+						                    	strInstanceId);
 						                    if (exceptionRet) { throw exceptionRet; }
 
 											// Delete property from type here instead of using the method in Types.js.

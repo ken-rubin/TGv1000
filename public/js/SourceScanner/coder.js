@@ -100,75 +100,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
-            // Method removes an "allocate type" Blockly block from Blockly.
-            self.remove_AllocateType = function (strType, strId) {
-
-                try {
-
-                    return m_functionRemove({});
-
-                } catch (e) {
-
-                    return e;
-                }
-            }
-
-            var m_functionRemove = function (blockToRemove) {
-
-                try {
-
-                    var objectWorkspace = processor.getWorkspaceJSONObject();
-                    if (!objectWorkspace) {
-
-                        throw { messgage: "Failed to get the workspace object." };
-                    }
-
-                    // Get the block with which to work.
-                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
-
-
-
-
-
-
-
-
-
-
-
-
-                    // Convert back to XML.
-                    var strXml = converter.toXML(objectWorkspace);
-                    if (!strXml) {
-
-                        throw new Error("Failed to convert workspace XML to JSON.");
-                    }
-
-                    // First get the app type.
-                    var typeApp = types.getType("App");
-                    if (!typeApp) {
-
-                        throw { message: "Failed to find App type." };
-                    }
-
-                    // Next get the initialize method.
-                    var methodInitialize = typeApp.getMethod("initialize");
-                    if (!methodInitialize) {
-
-                        throw { message: "Failed to find initialize method of App type." };
-                    }
-
-                    // Get the workspace.
-                    methodInitialize.workspace = strXml;
-
-                    return null;
-
-                } catch (e) {
-
-                    return e;
-                }
-            }
-
             // Method adds a "set property value" Blockly block to Blockly.
             self.add_SetPropertyValue = function (strType, strProperty, strValue, strInstance) {
 
@@ -323,17 +254,97 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             };
 
             // Method removes a "set property value" Blockly block from Blockly.
-            self.remove_SetPropertyValue = function (strType, strProperty, strInstance) {
+            self.remove_SetPropertyValue = function (strTypeName, strProperty, strInstanceId, strAppTypeName) {
 
                 try {
 
-                    return m_functionRemove({});
+                    // Get workspace object.
+                    var objectWorkspace = m_functionRemove_part1();
+
+                    // Get the block with which to work.
+                    blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+
+                    if (blockWork) {
+
+                        var strMatchType1 = strTypeName + "_set" + strProperty;
+                        var strMatchType2 = strAppTypeName + "_get" + strInstanceId;
+
+                        // Do the recursive looking/processing to handle this type of remove.
+                        do {
+
+                            if (next.type === strMatchType1 && next.children[0].children[0].type === strMatchType2) {
+
+                                if (next.next !== "undefined") {
+
+
+                                }
+                            }
+                        }
+
+                        blockWork = blockWork.next
+
+                    } while (blockWork)
+
+                    // Put it back in App Type's initialize method.
+                    m_functionRemove_part3(objectWorkspace);
 
                 } catch (e) {
 
                     return e;
                 }
             }
+
+            // Method removes an "allocate type" Blockly block from Blockly.
+            // Since the user could have done something hinky, it repeats until done, even after a success.
+            self.remove_AllocateType = function (strTypeName, strInstanceId) {
+
+                try {
+
+                    // Get workspace object.
+                    var objectWorkspace = m_functionRemove_part1(); // objectWorkspace has been wrapped in artificial "next" -- like {"next": objectWorkspace}
+
+                    // Get the block with which to work.
+                    blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+
+                    if (blockWork) {
+
+                        var strMatchType = strTypeName + "_set" + strInstanceId;
+
+                        // Do the recursive looking/processing to handle this type of remove.
+                        do {
+
+                            if (next.type === strMatchType) {
+
+                                if (next.next !== "undefined") {
+
+
+                                }
+                            }
+                        }
+
+                        blockWork = blockWork.next
+
+                    } while (blockWork)
+
+                    // Put it back in App Type's initialize method.
+                    m_functionRemove_part3(objectWorkspace);
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
+
+
+// var str = JSON.stringify(blockWork, null, 4);
+// var l = str.length;
+// var s = 0;
+// while (s < l) {
+//     var str1 = str.substring(s, Math.min(s+3000,l));
+//     s += 3000;
+// }
+
+
 
             self.playThisInitializeWorkspace = function(objectPrimaryBlockChain) {
 
@@ -468,6 +479,67 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
             ///////////////////////////
             // Private methods.
+
+            // Helper functions for the two removes above. 
+
+            // Part1 get the workspace JSON object.
+            // Part2 is done in the calling method.
+            // Part3 converts the result to XML and stuffs it back in the App Type's initialize method workspace.
+            var m_functionRemove_part1 = function () {
+
+                var objectWorkspace = processor.getWorkspaceJSONObject();
+                if (!objectWorkspace) {
+
+                    throw { messgage: "Failed to get the workspace object." };
+                }
+
+                // A fudge for consistency in recursion.
+                return 
+                    {
+                        "next" : objectWorkspace
+                    };
+            }
+
+            var m_functionRemove_part3 = function (objectWorkspace) {
+
+                try {
+
+                    // Convert back to XML.
+                    var strXml = "";
+
+                    if (objectWorkspace) {
+
+                        strXml = converter.toXML(objectWorkspace.next);
+                        if (!strXml) {
+
+                            throw new Error("Failed to convert workspace XML to JSON.");
+                        }
+                    }
+
+                    // First get the app type.
+                    var typeApp = types.getType("App");
+                    if (!typeApp) {
+
+                        throw { message: "Failed to find App type." };
+                    }
+
+                    // Next get the initialize method.
+                    var methodInitialize = typeApp.getMethod("initialize");
+                    if (!methodInitialize) {
+
+                        throw { message: "Failed to find initialize method of App type." };
+                    }
+
+                    // Get the workspace.
+                    methodInitialize.workspace = strXml;
+
+                    return null;
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
 
             //
             var m_functionDoProperty = function (objectCursor, strProp) {
