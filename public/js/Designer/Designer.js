@@ -247,7 +247,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						try {
 
 
-							// alert('called changeToolInstanceId with strOldId="' + strOldId + '" and strNewId="' + strNewId + '"');
+							alert('called changeToolInstanceId with strOldId="' + strOldId + '" and strNewId="' + strNewId + '"');
 
 
 

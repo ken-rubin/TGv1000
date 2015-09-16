@@ -262,7 +262,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     var objectWorkspace = m_functionRemove_part1();
 
                     // Get the block with which to work.
-                    blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
 
                     if (blockWork) {
 
@@ -274,16 +274,18 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                             if (next.type === strMatchType1 && next.children[0].children[0].type === strMatchType2) {
 
-                                if (next.next !== "undefined") {
+                                // if (next.next) {
 
 
-                                }
+                                // }
+                            } else {
+
+                                blockWork = blockWork.next;
                             }
-                        }
 
-                        blockWork = blockWork.next
+                        } while (blockWork)
 
-                    } while (blockWork)
+                    }
 
                     // Put it back in App Type's initialize method.
                     m_functionRemove_part3(objectWorkspace);
@@ -304,7 +306,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     var objectWorkspace = m_functionRemove_part1(); // objectWorkspace has been wrapped in artificial "next" -- like {"next": objectWorkspace}
 
                     // Get the block with which to work.
-                    blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
 
                     if (blockWork) {
 
@@ -315,16 +317,18 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                             if (next.type === strMatchType) {
 
-                                if (next.next !== "undefined") {
+                                // if (next.next) {
 
 
-                                }
+                                // }
+                            } else {
+
+                                blockWork = blockWork.next;
                             }
-                        }
 
-                        blockWork = blockWork.next
+                        } while (blockWork)
 
-                    } while (blockWork)
+                    }
 
                     // Put it back in App Type's initialize method.
                     m_functionRemove_part3(objectWorkspace);
@@ -496,7 +500,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 // A fudge for consistency in recursion.
                 return 
                     {
-                        "next" : objectWorkspace
+                        next : objectWorkspace
                     };
             }
 
