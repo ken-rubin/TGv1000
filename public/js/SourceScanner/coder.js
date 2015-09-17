@@ -420,34 +420,11 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                             }
                         }
 
-                        // Now put the JS object back together.
-                        if (nextArray.length) {
+                        // Put it back in App Type's initialize method.
+                        m_functionRemove_part3(nextArray);
 
-                            for (var i = 0; i < nextArray.length; i++) {
-
-                                var nextIth = nextArray[i];
-
-                                if (i > 0) {
-
-                                    blockWork.next = nextIth;
-
-                                } else {
-
-                                    // Add directly to the XML object--this is the first block.
-                                    blockWork = nextIth;
-                                }
-                            }
-                        } else {
-
-                            blockWork = null;
-                        }
+                        return null;
                     }
-
-                    // Put it back in App Type's initialize method.
-                    m_functionRemove_part3(blockWork);
-
-                    return null;
-
                 } catch (e) {
 
                     return e;
@@ -478,32 +455,11 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                             }
                         }
 
-                        // Now put the JS object back together.
-                        if (nextArray.length) {
+                        // Put it back in App Type's initialize method.
+                        m_functionRemove_part3(nextArray);
 
-                            for (var i = 0; i < nextArray.length; i++) {
-
-                                var nextIth = nextArray[i];
-
-                                if (i > 0) {
-
-                                    blockWork.next = nextIth;
-
-                                } else {
-
-                                    // Add directly to the XML object--this is the first block.
-                                    blockWork = nextIth;
-                                }
-                            }
-                        } else {
-
-                            blockWork = null;
-                        }
+                        return null;
                     }
-
-                    // Put it back in App Type's initialize method.
-                    m_functionRemove_part3(blockWork);
-
                 } catch (e) {
 
                     return e;
@@ -563,9 +519,31 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 return processor.getPrimaryBlockChain(objectWorkspace);
             }
 
-            var m_functionRemove_part3 = function (blockWork) {
+            var m_functionRemove_part3 = function (nextArray) {
 
                 try {
+
+                    // Put the JS object back together.
+                    if (nextArray.length) {
+
+                        for (var i = 0; i < nextArray.length; i++) {
+
+                            var nextIth = nextArray[i];
+
+                            if (i > 0) {
+
+                                nextArray[i - 1].next = nextArray[i];
+
+                            } else {
+
+                                // Add directly to the XML object--this is the first block.
+                                blockWork = nextArray[0];
+                            }
+                        }
+                    } else {
+
+                        blockWork = null;
+                    }
 
                     // Convert back to XML.
                     var strXml = "";
@@ -604,6 +582,9 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                     // Get the workspace.
                     methodInitialize.workspace = strXml;
+
+                    // Set into Blockly.
+                    $("#BlocklyIFrame")[0].contentWindow.setWorkspaceString(strXml);
 
                     return null;
 
