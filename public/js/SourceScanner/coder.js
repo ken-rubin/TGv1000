@@ -253,133 +253,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
-            var m_functionBreakApartBlockWork = function(blockWork) {
-
-                var retArray = [];
-
-                do {
-
-                    if (blockWork.next) {
-
-                        retArray.push({
-                            nodeName: blockWork.next.nodeName,
-                            type: blockWork.next.type,
-                            id: blockWork.next.id,
-                            inline: blockWork.next.inline,
-                            x: blockWork.next.x,
-                            y: blockWork.next.y,
-                            children: blockWork.next.children
-                        });
-
-                        blockWork = blockWork.next;
-                    }
-
-                } while (blockWork.next)
-
-                return retArray;
-            }
-
-            // Method removes all possible "set property value" Blockly blocks from Blockly for a tool instance.
-            self.remove_SetPropertyValues = function (strInstanceId, strAppTypeName) {
-
-                try {
-
-                    // Get workspace object--as massaged.
-                    var blockWork = m_functionRemove_part1();
-
-                    if (blockWork) {
-
-                        var strMatch = strAppTypeName + "_get" + strInstanceId;
-
-                        var nextArray = m_functionBreakApartBlockWork(blockWork);
-
-                        // Remove matches from nextArray
-                        for (var i = nextArray.length - 1; i >= 0; i--) {
-
-                            var nextIth = nextArray[i];
-                            if (nextIth.children[0].children[0].type &&
-                                nextIth.children[0].children[0].type === strMatch) {
-
-                                nextArray.splice(i, 1);
-                            }
-                        }
-
-                        // Now put the JS object back together.
-                        if (nextArray.length) {
-
-                            for (var i = 0; i < nextArray.length; i++) {
-
-                                var nextIth = nextArray[i];
-
-                                if (blockWork) {
-
-                                    blockWork.next = nextIth;
-
-                                } else {
-
-                                    // Add directly to the XML object--this is the first block.
-                                    blockWork.children = [];
-                                    blockWork.children.push(nextIth);
-                                }
-                            }
-                        } else {
-
-                            blockWork = {};
-                        }
-                    }
-
-                    // Put it back in App Type's initialize method.
-                    m_functionRemove_part3(blockWork);
-
-                } catch (e) {
-
-                    return e;
-                }
-            }
-
-            // Method removes an "allocate type" Blockly block from Blockly.
-            self.remove_AllocateType = function (strAppTypeName, strInstanceId) {
-
-                try {
-
-                    // Get workspace object.
-                    var objectWorkspace = m_functionRemove_part1(); // objectWorkspace has been wrapped in artificial "next" -- like {"next": objectWorkspace}
-
-                    // Get the block with which to work.
-                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
-
-                    if (blockWork) {
-
-                        var strMatch = strAppTypeName + "_set" + strInstanceId;
-
-                        // Do the recursive looking/processing to handle this type of remove.
-                        do {
-
-                            if (next.type === strMatch) {
-
-                                // if (next.next) {
-                                alert('Have matched ' + strMatch);
-
-
-                                // }
-                            } else {
-
-                                blockWork = blockWork.next;
-                            }
-
-                        } while (blockWork)
-
-                    }
-
-                    // Put it back in App Type's initialize method.
-                    m_functionRemove_part3(objectWorkspace);
-
-                } catch (e) {
-
-                    return e;
-                }
-            }
-
 
 // var str = JSON.stringify(blockWork, null, 4);
 // var l = str.length;
@@ -522,10 +395,158 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 return objectResult;
             }
 
+            // Method removes all possible "set property value" Blockly blocks from Blockly for a tool instance.
+            self.remove_SetPropertyValues = function (strInstanceId, strAppTypeName) {
+
+                try {
+
+                    // Get workspace object--as massaged.
+                    var blockWork = m_functionRemove_part1();
+
+                    if (blockWork) {
+
+                        var strMatch = strAppTypeName + "_get" + strInstanceId;
+
+                        var nextArray = m_functionBreakApartBlockWork(blockWork);
+
+                        // Remove matches from nextArray
+                        for (var i = nextArray.length - 1; i >= 0; i--) {
+
+                            var nextIth = nextArray[i];
+                            if (nextIth.children[0].children[0].type &&
+                                nextIth.children[0].children[0].type === strMatch) {
+
+                                nextArray.splice(i, 1);
+                            }
+                        }
+
+                        // Now put the JS object back together.
+                        if (nextArray.length) {
+
+                            for (var i = 0; i < nextArray.length; i++) {
+
+                                var nextIth = nextArray[i];
+
+                                if (i > 0) {
+
+                                    blockWork.next = nextIth;
+
+                                } else {
+
+                                    // Add directly to the XML object--this is the first block.
+                                    blockWork = nextIth;
+                                }
+                            }
+                        } else {
+
+                            blockWork = null;
+                        }
+                    }
+
+                    // Put it back in App Type's initialize method.
+                    m_functionRemove_part3(blockWork);
+
+                    return null;
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
+
+            // Method removes an "allocate type" Blockly block from Blockly.
+            self.remove_AllocateType = function (strAppTypeName, strInstanceId) {
+
+                try {
+
+                    // Get workspace object--as massaged.
+                    var blockWork = m_functionRemove_part1();
+
+                    if (blockWork) {
+
+                        var strMatch = strAppTypeName + "_set" + strInstanceId;
+
+                        var nextArray = m_functionBreakApartBlockWork(blockWork);
+
+                        // Remove matches from nextArray
+                        for (var i = nextArray.length - 1; i >= 0; i--) {
+
+                            var nextIth = nextArray[i];
+                            if (nextIth.type === strMatch) {
+
+                                nextArray.splice(i, 1);
+                            }
+                        }
+
+                        // Now put the JS object back together.
+                        if (nextArray.length) {
+
+                            for (var i = 0; i < nextArray.length; i++) {
+
+                                var nextIth = nextArray[i];
+
+                                if (i > 0) {
+
+                                    blockWork.next = nextIth;
+
+                                } else {
+
+                                    // Add directly to the XML object--this is the first block.
+                                    blockWork = nextIth;
+                                }
+                            }
+                        } else {
+
+                            blockWork = null;
+                        }
+                    }
+
+                    // Put it back in App Type's initialize method.
+                    m_functionRemove_part3(blockWork);
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
+
             ///////////////////////////
             // Private methods.
 
             // Helper functions for the two removes above. 
+
+            var m_functionBreakApartBlockWork = function(blockWork) {
+
+                var retArray = [];
+
+                do {
+
+                    if (blockWork) {
+
+                        retArray.push({
+                            nodeName: blockWork.nodeName,
+                            type: blockWork.type,
+                            id: blockWork.id,
+                            inline: blockWork.inline,
+                            x: blockWork.x,
+                            y: blockWork.y,
+                            children: blockWork.children
+                        });
+
+                        if (blockWork.next) {
+
+                            blockWork = blockWork.next;
+
+                        } else {
+
+                            break;
+                        }
+                    }
+
+                } while (true)
+
+                return retArray;
+            }
 
             // Part1 get the workspace JSON object.
             // Part2 is done in the calling method.
@@ -539,14 +560,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
 
                 // Strip off extraneous stuff.
-                var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
-
-                // A fudge for consistency in recursion. Supply the missing first next.
-                var fudge = 
-                    {
-                        next : blockWork
-                    };
-                return fudge;
+                return processor.getPrimaryBlockChain(objectWorkspace);
             }
 
             var m_functionRemove_part3 = function (blockWork) {
@@ -556,9 +570,18 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     // Convert back to XML.
                     var strXml = "";
 
-                    if (objectWorkspace) {
+                    if (blockWork) {
 
-                        strXml = converter.toXML(blockWork);
+                        // blockWork is just the "real" nodes. We need to wrap in what will result in <xml xmlns="...">
+                        var objectWorkspace = {
+                            nodeName: "xml",
+                            xmlns: "http://www.w3.org/1999/xhtml",
+                            children: [
+                                blockWork
+                            ]
+                        };
+
+                        strXml = converter.toXML(objectWorkspace);
                         if (!strXml) {
 
                             throw new Error("Failed to convert workspace XML to JSON.");
