@@ -190,7 +190,7 @@ define([],
                                     iCloseQuoteIndex - iOpenQuoteIndex - 1);
 
                                 // Stow in object.
-                                objectChild[strAttributeName] = strAttributeValue;
+                                objectChild[strAttributeName.trim()] = strAttributeValue;
 
                                 // Update the next ort.
                                 strNextOrt = strNextOrt.substring(iCloseQuoteIndex + 1);
