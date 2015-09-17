@@ -400,8 +400,11 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
-                    // Get workspace object--as massaged.
-                    var blockWork = m_functionRemove_part1();
+                    // Get workspace object.
+                    var objectWorkspace = m_functionRemove_part1();
+
+                    // Strip off extraneous stuff.
+                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
 
                     if (blockWork) {
 
@@ -421,7 +424,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         }
 
                         // Put it back in App Type's initialize method.
-                        m_functionRemove_part3(nextArray);
+                        m_functionRemove_part3(nextArray, objectWorkspace);
 
                         return null;
                     }
@@ -436,8 +439,11 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
-                    // Get workspace object--as massaged.
-                    var blockWork = m_functionRemove_part1();
+                    // Get workspace object.
+                    var objectWorkspace = m_functionRemove_part1();
+
+                    // Strip off extraneous stuff.
+                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
 
                     if (blockWork) {
 
@@ -456,7 +462,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         }
 
                         // Put it back in App Type's initialize method.
-                        m_functionRemove_part3(nextArray);
+                        m_functionRemove_part3(nextArray, objectWorkspace);
 
                         return null;
                     }
@@ -515,13 +521,14 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     throw { messgage: "Failed to get the workspace object." };
                 }
 
-                // Strip off extraneous stuff.
-                return processor.getPrimaryBlockChain(objectWorkspace);
+                return objectWorkspace;
             }
 
-            var m_functionRemove_part3 = function (nextArray) {
+            var m_functionRemove_part3 = function (nextArray, objectWorkspace) {
 
                 try {
+
+                    var blockWork = null;   // Will be used to reconstruct JS with remaining nexts.
 
                     // Put the JS object back together.
                     if (nextArray.length) {
@@ -540,9 +547,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                                 blockWork = nextArray[0];
                             }
                         }
-                    } else {
-
-                        blockWork = null;
                     }
 
                     // Convert back to XML.
@@ -584,7 +588,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     methodInitialize.workspace = strXml;
 
                     // Set into Blockly.
-                    $("#BlocklyIFrame")[0].contentWindow.setWorkspaceString(strXml);
+                    // $("#BlocklyIFrame")[0].contentWindow.setWorkspaceString(strXml);
+                    objectWorkspace = strXml;
 
                     return null;
 
