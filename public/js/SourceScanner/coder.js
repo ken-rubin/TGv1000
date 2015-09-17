@@ -555,7 +555,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     if (blockWork) {
 
                         // blockWork is just the "real" nodes. We need to wrap in what will result in <xml xmlns="...">
-                        var objectWorkspace = {
+                        var wrappedBlockWork = {
                             nodeName: "xml",
                             xmlns: "http://www.w3.org/1999/xhtml",
                             children: [
@@ -563,7 +563,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                             ]
                         };
 
-                        strXml = converter.toXML(objectWorkspace);
+                        strXml = converter.toXML(wrappedBlockWork);
                         if (!strXml) {
 
                             throw new Error("Failed to convert workspace XML to JSON.");
