@@ -1007,31 +1007,17 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
 
-											// The order of removals is opposite the order of adds. It should just be cleaner that way.
-
-						                    // Remove location properties.
-						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
-						                    	"X",
-						                    	strInstanceId,
-						                    	strAppTypeName);
-						                    if (exceptionRet) { throw exceptionRet; }
-						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
-						                    	"Y",
-						                    	strInstanceId,
-						                    	strAppTypeName);
-						                    if (exceptionRet) { throw exceptionRet; }
-						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
-						                    	"Width",
-						                    	strInstanceId,
-						                    	strAppTypeName);
-						                    if (exceptionRet) { throw exceptionRet; }
-						                    exceptionRet = coder.remove_SetPropertyValue(strTypeName, 
-						                    	"Height",
-						                    	strInstanceId,
+						                    // Remove ALL possible set properties.
+						                    // X, Y, Width, Height for sure, but others may have been added manually by the user, too.
+						                    // This will work by matching any next node where:
+						                    //   next.type.children[0].children[0].type === strAppTypeName + "_get" + strInstanceId
+						                    exceptionRet = coder.remove_SetPropertyValues(strInstanceId,
 						                    	strAppTypeName);
 						                    if (exceptionRet) { throw exceptionRet; }
 
 											// Remove item from app initialize.
+											// This will work by matching and "next" node where:
+											//	next.type === strAppTypeName + "_set" + strInstanceId
 						                    exceptionRet = coder.remove_AllocateType(strAppTypeName, 
 						                    	strInstanceId);
 						                    if (exceptionRet) { throw exceptionRet; }

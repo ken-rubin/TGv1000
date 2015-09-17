@@ -14,8 +14,8 @@
     "multer": "0.1.8",
     "mysql": "2.5.4",
     "nodemailer": "~0.6.2",
-    "serve-favicon": "~2.2.0",
-    "request": "^2.55.0"
+    "request": "^2.55.0",
+    "serve-favicon": "~2.2.0"
   },
   "scripts": {
     "start": "node-dev --debug app.js development"

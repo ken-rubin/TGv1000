@@ -253,42 +253,83 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
-            // Method removes a "set property value" Blockly block from Blockly.
-            self.remove_SetPropertyValue = function (strTypeName, strProperty, strInstanceId, strAppTypeName) {
+            var m_functionBreakApartBlockWork = function(blockWork) {
+
+                var retArray = [];
+
+                do {
+
+                    if (blockWork.next) {
+
+                        retArray.push({
+                            nodeName: blockWork.next.nodeName,
+                            type: blockWork.next.type,
+                            id: blockWork.next.id,
+                            inline: blockWork.next.inline,
+                            x: blockWork.next.x,
+                            y: blockWork.next.y,
+                            children: blockWork.next.children
+                        });
+
+                        blockWork = blockWork.next;
+                    }
+
+                } while (blockWork.next)
+
+                return retArray;
+            }
+
+            // Method removes all possible "set property value" Blockly blocks from Blockly for a tool instance.
+            self.remove_SetPropertyValues = function (strInstanceId, strAppTypeName) {
 
                 try {
 
-                    // Get workspace object.
-                    var objectWorkspace = m_functionRemove_part1();
-
-                    // Get the block with which to work.
-                    var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+                    // Get workspace object--as massaged.
+                    var blockWork = m_functionRemove_part1();
 
                     if (blockWork) {
 
-                        var strMatchType1 = strTypeName + "_set" + strProperty;
-                        var strMatchType2 = strAppTypeName + "_get" + strInstanceId;
+                        var strMatch = strAppTypeName + "_get" + strInstanceId;
 
-                        // Do the recursive looking/processing to handle this type of remove.
-                        do {
+                        var nextArray = m_functionBreakApartBlockWork(blockWork);
 
-                            if (next.type === strMatchType1 && next.children[0].children[0].type === strMatchType2) {
+                        // Remove matches from nextArray
+                        for (var i = nextArray.length - 1; i >= 0; i--) {
 
-                                // if (next.next) {
+                            var nextIth = nextArray[i];
+                            if (nextIth.children[0].children[0].type &&
+                                nextIth.children[0].children[0].type === strMatch) {
 
-
-                                // }
-                            } else {
-
-                                blockWork = blockWork.next;
+                                nextArray.splice(i, 1);
                             }
+                        }
 
-                        } while (blockWork)
+                        // Now put the JS object back together.
+                        if (nextArray.length) {
 
+                            for (var i = 0; i < nextArray.length; i++) {
+
+                                var nextIth = nextArray[i];
+
+                                if (blockWork) {
+
+                                    blockWork.next = nextIth;
+
+                                } else {
+
+                                    // Add directly to the XML object--this is the first block.
+                                    blockWork.children = [];
+                                    blockWork.children.push(nextIth);
+                                }
+                            }
+                        } else {
+
+                            blockWork = {};
+                        }
                     }
 
                     // Put it back in App Type's initialize method.
-                    m_functionRemove_part3(objectWorkspace);
+                    m_functionRemove_part3(blockWork);
 
                 } catch (e) {
 
@@ -297,8 +338,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             }
 
             // Method removes an "allocate type" Blockly block from Blockly.
-            // Since the user could have done something hinky, it repeats until done, even after a success.
-            self.remove_AllocateType = function (strTypeName, strInstanceId) {
+            self.remove_AllocateType = function (strAppTypeName, strInstanceId) {
 
                 try {
 
@@ -310,14 +350,15 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                     if (blockWork) {
 
-                        var strMatchType = strTypeName + "_set" + strInstanceId;
+                        var strMatch = strAppTypeName + "_set" + strInstanceId;
 
                         // Do the recursive looking/processing to handle this type of remove.
                         do {
 
-                            if (next.type === strMatchType) {
+                            if (next.type === strMatch) {
 
                                 // if (next.next) {
+                                alert('Have matched ' + strMatch);
 
 
                                 // }
@@ -497,14 +538,18 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     throw { messgage: "Failed to get the workspace object." };
                 }
 
-                // A fudge for consistency in recursion.
-                return 
+                // Strip off extraneous stuff.
+                var blockWork = processor.getPrimaryBlockChain(objectWorkspace);
+
+                // A fudge for consistency in recursion. Supply the missing first next.
+                var fudge = 
                     {
-                        next : objectWorkspace
+                        next : blockWork
                     };
+                return fudge;
             }
 
-            var m_functionRemove_part3 = function (objectWorkspace) {
+            var m_functionRemove_part3 = function (blockWork) {
 
                 try {
 
@@ -513,7 +558,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                     if (objectWorkspace) {
 
-                        strXml = converter.toXML(objectWorkspace.next);
+                        strXml = converter.toXML(blockWork);
                         if (!strXml) {
 
                             throw new Error("Failed to convert workspace XML to JSON.");

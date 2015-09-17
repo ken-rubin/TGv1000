@@ -2,10 +2,10 @@
     "next": {
         "nodeName": "block",
         "type": "App_seta",
-        "               id": "100",
-        "               inline": "true",
-        "               x": "150",
-        "               y": "100",
+        "id": "100",
+        "inline": "true",
+        "x": "150",
+        "y": "100",
         "children": [
             {
                 "nodeName": "value",
@@ -14,7 +14,7 @@
                     {
                         "nodeName": "block",
                         "type": "new_a",
-                        "               id": "101"
+                        "id": "101"
                     }
                 ]
             }
@@ -22,10 +22,10 @@
         "next": {
             "nodeName": "block",
             "type": "a_setX",
-            "              id": "102",
-            "              inline": "true",
-            "              x": "100",
-            "              y": "100",
+            "id": "102",
+            "inline": "true",
+            "x": "100",
+            "y": "100",
             "children": [
                 {
                     "nodeName": "value",
@@ -34,7 +34,7 @@
                         {
                             "nodeName": "block",
                             "type": "App_geta",
-                            "              id": "103"
+                            "id": "103"
                         }
                     ]
                 },
@@ -45,7 +45,7 @@
                         {
                             "nodeName": "block",
                             "type": "math_number",
-                            "              id": "104",
+                            "id": "104",
                             "children": [
                                 {
                                     "nodeName": "field",
@@ -60,10 +60,10 @@
             "next": {
                 "nodeName": "block",
                 "type": "a_setY",
-                "             id": "105",
-                "             inline": "true",
-                "             x": "100",
-                "             y": "100",
+                "id": "105",
+                "inline": "true",
+                "x": "100",
+                "y": "100",
                 "children": [
                     {
                         "nodeName": "value",
@@ -72,7 +72,7 @@
                             {
                                 "nodeName": "block",
                                 "type": "App_geta",
-                                "             id": "106"
+                                "id": "106"
                             }
                         ]
                     },
@@ -83,7 +83,7 @@
                             {
                                 "nodeName": "block",
                                 "type": "math_number",
-                                "             id": "107",
+                                "id": "107",
                                 "children": [
                                     {
                                         "nodeName": "field",
@@ -98,10 +98,10 @@
                 "next": {
                     "nodeName": "block",
                     "type": "a_setWidth",
-                    "            id": "108",
-                    "            inline": "true",
-                    "            x": "100",
-                    "            y": "100",
+                    "id": "108",
+                    "inline": "true",
+                    "x": "100",
+                    "y": "100",
                     "children": [
                         {
                             "nodeName": "value",
@@ -110,7 +110,7 @@
                                 {
                                     "nodeName": "block",
                                     "type": "App_geta",
-                                    "            id": "109"
+                                    "id": "109"
                                 }
                             ]
                         },
@@ -121,7 +121,7 @@
                                 {
                                     "nodeName": "block",
                                     "type": "math_number",
-                                    "            id": "110",
+                                    "id": "110",
                                     "children": [
                                         {
                                             "nodeName": "field",
@@ -136,10 +136,10 @@
                     "next": {
                         "nodeName": "block",
                         "type": "a_setHeight",
-                        "           id": "111",
-                        "           inline": "true",
-                        "           x": "100",
-                        "           y": "100",
+                        "id": "111",
+                        "inline": "true",
+                        "x": "100",
+                        "y": "100",
                         "children": [
                             {
                                 "nodeName": "value",
@@ -148,7 +148,7 @@
                                     {
                                         "nodeName": "block",
                                         "type": "App_geta",
-                                        "           id": "112"
+                                        "id": "112"
                                     }
                                 ]
                             },
@@ -159,7 +159,7 @@
                                     {
                                         "nodeName": "block",
                                         "type": "math_number",
-                                        "           id": "113",
+                                        "id": "113",
                                         "children": [
                                             {
                                                 "nodeName": "field",
@@ -174,10 +174,10 @@
                         "next": {
                             "nodeName": "block",
                             "type": "App_seta2",
-                            "          id": "114",
-                            "          inline": "true",
-                            "          x": "150",
-                            "          y": "100",
+                            "id": "114",
+                            "inline": "true",
+                            "x": "150",
+                            "y": "100",
                             "children": [
                                 {
                                     "nodeName": "value",
@@ -186,7 +186,7 @@
                                         {
                                             "nodeName": "block",
                                             "type": "new_a",
-                                            "          id": "115"
+                                            "id": "115"
                                         }
                                     ]
                                 }
@@ -194,10 +194,10 @@
                             "next": {
                                 "nodeName": "block",
                                 "type": "a_setX",
-                                "         id": "116",
-                                "         inline": "true",
-                                "         x": "100",
-                                "         y": "100",
+                                "id": "116",
+                                "inline": "true",
+                                "x": "100",
+                                "y": "100",
                                 "children": [
                                     {
                                         "nodeName": "value",
@@ -206,7 +206,7 @@
                                             {
                                                 "nodeName": "block",
                                                 "type": "App_geta2",
-                                                "         id": "117"
+                                                "id": "117"
                                             }
                                         ]
                                     },
@@ -217,7 +217,7 @@
                                             {
                                                 "nodeName": "block",
                                                 "type": "math_number",
-                                                "         id": "118",
+                                                "id": "118",
                                                 "children": [
                                                     {
                                                         "nodeName": "field",
@@ -232,10 +232,10 @@
                                 "next": {
                                     "nodeName": "block",
                                     "type": "a_setY",
-                                    "        id": "119",
-                                    "        inline": "true",
-                                    "        x": "100",
-                                    "        y": "100",
+                                    "id": "119",
+                                    "inline": "true",
+                                    "x": "100",
+                                    "y": "100",
                                     "children": [
                                         {
                                             "nodeName": "value",
@@ -244,7 +244,7 @@
                                                 {
                                                     "nodeName": "block",
                                                     "type": "App_geta2",
-                                                    "        id": "120"
+                                                    "id": "120"
                                                 }
                                             ]
                                         },
@@ -255,7 +255,7 @@
                                                 {
                                                     "nodeName": "block",
                                                     "type": "math_number",
-                                                    "        id": "121",
+                                                    "id": "121",
                                                     "children": [
                                                         {
                                                             "nodeName": "field",
@@ -270,10 +270,10 @@
                                     "next": {
                                         "nodeName": "block",
                                         "type": "a_setWidth",
-                                        "       id": "122",
-                                        "       inline": "true",
-                                        "       x": "100",
-                                        "       y": "100",
+                                        "id": "122",
+                                        "inline": "true",
+                                        "x": "100",
+                                        "y": "100",
                                         "children": [
                                             {
                                                 "nodeName": "value",
@@ -282,7 +282,7 @@
                                                     {
                                                         "nodeName": "block",
                                                         "type": "App_geta2",
-                                                        "       id": "123"
+                                                        "id": "123"
                                                     }
                                                 ]
                                             },
@@ -293,7 +293,7 @@
                                                     {
                                                         "nodeName": "block",
                                                         "type": "math_number",
-                                                        "       id": "124",
+                                                        "id": "124",
                                                         "children": [
                                                             {
                                                                 "nodeName": "field",
@@ -308,10 +308,10 @@
                                         "next": {
                                             "nodeName": "block",
                                             "type": "a_setHeight",
-                                            "      id": "125",
-                                            "      inline": "true",
-                                            "      x": "100",
-                                            "      y": "100",
+                                            "id": "125",
+                                            "inline": "true",
+                                            "x": "100",
+                                            "y": "100",
                                             "children": [
                                                 {
                                                     "nodeName": "value",
@@ -320,7 +320,7 @@
                                                         {
                                                             "nodeName": "block",
                                                             "type": "App_geta2",
-                                                            "      id": "126"
+                                                            "id": "126"
                                                         }
                                                     ]
                                                 },
@@ -331,7 +331,7 @@
                                                         {
                                                             "nodeName": "block",
                                                             "type": "math_number",
-                                                            "      id": "127",
+                                                            "id": "127",
                                                             "children": [
                                                                 {
                                                                     "nodeName": "field",
@@ -346,10 +346,10 @@
                                             "next": {
                                                 "nodeName": "block",
                                                 "type": "App_setb",
-                                                "     id": "128",
-                                                "     inline": "true",
-                                                "     x": "150",
-                                                "     y": "100",
+                                                "id": "128",
+                                                "inline": "true",
+                                                "x": "150",
+                                                "y": "100",
                                                 "children": [
                                                     {
                                                         "nodeName": "value",
@@ -358,7 +358,7 @@
                                                             {
                                                                 "nodeName": "block",
                                                                 "type": "new_b",
-                                                                "     id": "129"
+                                                                "id": "129"
                                                             }
                                                         ]
                                                     }
@@ -366,10 +366,10 @@
                                                 "next": {
                                                     "nodeName": "block",
                                                     "type": "b_setX",
-                                                    "    id": "130",
-                                                    "    inline": "true",
-                                                    "    x": "100",
-                                                    "    y": "100",
+                                                    "id": "130",
+                                                    "inline": "true",
+                                                    "x": "100",
+                                                    "y": "100",
                                                     "children": [
                                                         {
                                                             "nodeName": "value",
@@ -378,7 +378,7 @@
                                                                 {
                                                                     "nodeName": "block",
                                                                     "type": "App_getb",
-                                                                    "    id": "131"
+                                                                    "id": "131"
                                                                 }
                                                             ]
                                                         },
@@ -389,7 +389,7 @@
                                                                 {
                                                                     "nodeName": "block",
                                                                     "type": "math_number",
-                                                                    "    id": "132",
+                                                                    "id": "132",
                                                                     "children": [
                                                                         {
                                                                             "nodeName": "field",
@@ -404,10 +404,10 @@
                                                     "next": {
                                                         "nodeName": "block",
                                                         "type": "b_setY",
-                                                        "   id": "133",
-                                                        "   inline": "true",
-                                                        "   x": "100",
-                                                        "   y": "100",
+                                                        "id": "133",
+                                                        "inline": "true",
+                                                        "x": "100",
+                                                        "y": "100",
                                                         "children": [
                                                             {
                                                                 "nodeName": "value",
@@ -416,7 +416,7 @@
                                                                     {
                                                                         "nodeName": "block",
                                                                         "type": "App_getb",
-                                                                        "   id": "134"
+                                                                        "id": "134"
                                                                     }
                                                                 ]
                                                             },
@@ -427,7 +427,7 @@
                                                                     {
                                                                         "nodeName": "block",
                                                                         "type": "math_number",
-                                                                        "   id": "135",
+                                                                        "id": "135",
                                                                         "children": [
                                                                             {
                                                                                 "nodeName": "field",
@@ -442,10 +442,10 @@
                                                         "next": {
                                                             "nodeName": "block",
                                                             "type": "b_setWidth",
-                                                            "  id": "136",
-                                                            "  inline": "true",
-                                                            "  x": "100",
-                                                            "  y": "100",
+                                                            "id": "136",
+                                                            "inline": "true",
+                                                            "x": "100",
+                                                            "y": "100",
                                                             "children": [
                                                                 {
                                                                     "nodeName": "value",
@@ -454,7 +454,7 @@
                                                                         {
                                                                             "nodeName": "block",
                                                                             "type": "App_getb",
-                                                                            "  id": "137"
+                                                                            "id": "137"
                                                                         }
                                                                     ]
                                                                 },
@@ -465,7 +465,7 @@
                                                                         {
                                                                             "nodeName": "block",
                                                                             "type": "math_number",
-                                                                            "  id": "138",
+                                                                            "id": "138",
                                                                             "children": [
                                                                                 {
                                                                                     "nodeName": "field",
@@ -480,10 +480,10 @@
                                                             "next": {
                                                                 "nodeName": "block",
                                                                 "type": "b_setHeight",
-                                                                " id": "139",
-                                                                " inline": "true",
-                                                                " x": "100",
-                                                                " y": "100",
+                                                                "id": "139",
+                                                                "inline": "true",
+                                                                "x": "100",
+                                                                "y": "100",
                                                                 "children": [
                                                                     {
                                                                         "nodeName": "value",
@@ -492,7 +492,7 @@
                                                                             {
                                                                                 "nodeName": "block",
                                                                                 "type": "App_getb",
-                                                                                " id": "140"
+                                                                                "id": "140"
                                                                             }
                                                                         ]
                                                                     },
@@ -503,7 +503,7 @@
                                                                             {
                                                                                 "nodeName": "block",
                                                                                 "type": "math_number",
-                                                                                " id": "141",
+                                                                                "id": "141",
                                                                                 "children": [
                                                                                     {
                                                                                         "nodeName": "field",

@@ -11,6 +11,7 @@ define(["SourceScanner/converter"],
     function (converter) {
 
         // Define constructor function.
+
         var functionRet = function Processor() {
 
             var self = this;
@@ -42,7 +43,8 @@ define(["SourceScanner/converter"],
                 var strWorkspaceXml = methodInitialize.workspace;
 
                 // Convert xml to json.
-                return converter.toJSON(strWorkspaceXml);
+                var workspaceJSONObject = converter.toJSON(strWorkspaceXml);
+                return workspaceJSONObject;
             };
 
             // Method returns the block with which to work given the workspace JSON object.

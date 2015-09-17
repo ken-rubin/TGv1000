@@ -1,8 +1,8 @@
 Either of us
 - Get rid of bootstrap tool-tips, replace with good
 - Events!
-
-
+- Round X,Y to 0, 1 or 2 decimals (Are they pixels? If so, why not 0 decimals?)
+- Comic should slide in from the right, taking up half the screen; slide back out to strip-size when appropriate or click away; remember where they were in comic
 
 Ken
 
@@ -11,8 +11,7 @@ Ken
 - CLick on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
      Will this be needed with Properties, Events?
 - Resizing in the two vertical toolstrips seems to now lose aspect ratio. Toolstrip for sure.
-- *** Handle newly opened project.  clear and load types into blockly and reload up blockly in comic.activate.
-			I.E. finish up loading projects.
+
 
 Jerry
 
@@ -26,11 +25,19 @@ Jerry
 - Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
 - Items needed to finish PropertyGrid:
+	- kill the wait timer
 	- apply value changes on each keystroke and remove the buttons
-	- finish tool instance renaming capability
-	- add delete button to delete tool instance
+	- finish tool instance renaming capability--apply name change on blur and dialog close--even if click away (or remove click away closing)
+	- finish delete button to delete tool instance
 - Project / Quick Save may save twice--it flashes Save is complete twise and it doesn't go away the second time.
-- Remove requirement for all images
+- Remove requirement for images in project, type, method (maybe later, says John; maybe for project we generate a designer thumbnail)
+- Play button:
+	- overlay the designer to show playing
+	- change to Pause and Stop when playing
+- Implement grid of available classes on login page. Buy from there. Go right to new project(?). Needs new DB tables, admin stuff, etc.
+- When user logs in, open most recent project (or new one if just bought)
+- Give parent ability to play child's projects but not modify them. If >1 child, present a list first.
+- coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it.
 
 
 
