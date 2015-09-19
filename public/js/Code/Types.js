@@ -108,7 +108,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					};
 
-					// Add Type to strip.
+					// Add Type to array of types.
 					self.addItem = function (clType) {
 
 						try {

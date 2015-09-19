@@ -255,14 +255,15 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 							for (var i = 0; i < m_arrayItems.length; i++) {
 
-								var aIth = m_arrayItems[i];
-								if (aIth.id === strOldId) {
+								var tiIth = m_arrayItems[i];
+								if (tiIth.id === strOldId) {
 
-									aIth.id = strNewId;
+									tiIth.id = strNewId;
 									break;
 								}
 							}
 
+							var property = null;
 							var clTypeApp = types.getType("App");
 							for (var i = 0; i < clTypeApp.data.properties.length; i++) {
 
@@ -270,19 +271,22 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								if (pIth.name === strOldId) {
 
 									pIth.name = strNewId;
+									property = pIth;
 									break;
 								}
 							}
 
-							var exceptionRet = coder.update_ToolInstanceId(strOldId, strNewId, clTypeApp);
-							if (exceptionRet) {
+							if (property) {
 
-								// Undo previous two changes.
+								var exceptionRet = coder.update_ToolInstanceId(strOldId, strNewId, clTypeApp, property);
+								if (exceptionRet) {
+
+									// Undo previous two changes.
 
 
-								return exceptionRet;
+									return exceptionRet;
+								}
 							}
-
 							return null;
 
 						} catch (e) {
@@ -963,6 +967,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    if (exceptionRet) { throw exceptionRet; }
 
 							var clTypeApp = types.getType("App");
+
 							exceptionRet = client.addPropertyToType({
 									id: 0,
 									propertyTypeId: 6,	// 'Type'

@@ -52,9 +52,44 @@
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 
 
-#### Just saving this here for possible ScrollRegion paging:
+## Documentation of certain things
 
-Deferred Join
+#### General description of XML and Javascript held by Blockly or in Code.js
+
+
+#### Add a Type
+1. Types.js self.addItem calls code.addType(clType) after the Type is added to the m_arrayClTypes[].
+2. Code.js self.addType(clType) calls:
+    + m_functionAdd_Type_New. This sets: 
+        + self.blocks["new_" + type.data.name]
+        + self.javaScript["new_" + type.data.name]
+        + objectTypes[type.data.name]
+    + m_functionAdd_Type_Property for each of clType's properties--X, Y, Width and Height. This sets:
+        * self.
+    + m_functionAdd_Type_Method for each of clType's method--none for a new Type. But at some point it sets:
+        * self.
+    + events will be added (not done yet)
+    + \#BlocklyFrame is reloaded.
+3. The Type is added as a Property of the App Type. This causes....
+
+#### Rename a Type
+
+
+#### Delete a Type
+
+
+#### Drop a Tool (creating a Tool Instance)
+
+
+#### Rename a Tool Instance
+
+
+#### Delete a Tool Instance
+
+
+## Just saving this here for possible ScrollRegion paging
+
+#### Deferred Join
 
 This is an interesting trick. Suppose you have pages of customers. Each page displays ten customers. The query will use LIMIT to get ten records, and OFFSET to skip all the previous page results. When you get to the 100th page, it's doing LIMIT 10 OFFSET 990. So the server has to go and read all those records, then discard them.
 

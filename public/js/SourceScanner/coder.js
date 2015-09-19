@@ -254,7 +254,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             };
 
             // Part of renaming a dropped tool instance.
-            self.update_ToolInstanceId = function (strOldId, strNewId, clAppType) {
+            self.update_ToolInstanceId = function (strOldId, strNewId, clAppType, property) {
 
                 try {
 
@@ -285,7 +285,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     // Set the workspace.
                     methodInitialize.workspace = xmlWorkspace;
 
-                    return null;
+                    return code.renameProperty(clAppType, property, strOldId);
 
                 } catch (e) {
 
