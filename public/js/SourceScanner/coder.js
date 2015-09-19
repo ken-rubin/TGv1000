@@ -253,16 +253,45 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             };
 
+            // Part of renaming a dropped tool instance.
+            self.update_ToolInstanceId = function (strOldId, strNewId, clAppType) {
 
-// var str = JSON.stringify(blockWork, null, 4);
-// var l = str.length;
-// var s = 0;
-// while (s < l) {
-//     var str1 = str.substring(s, Math.min(s+3000,l));
-//     s += 3000;
-// }
+                try {
 
+                    var xmlWorkspace = processor.getWorkspaceXMLDoc();
+                    if (!xmlWorkspace) {
 
+                        throw { messgage: "Failed to get the workspace xml." };
+                    }
+
+                    var strAppTypeName = clAppType.data.name;
+                    var reOldSet = new RegExp(strAppTypeName + "_set" + strOldId, 'g');
+                    var strNewSet = strAppTypeName + "_set" + strNewId;
+                    var reOldGet = new RegExp(strAppTypeName + "_get" + strOldId, 'g');
+                    var strNewGet = strAppTypeName + "_get" + strNewId;
+
+                    xmlWorkspace = xmlWorkspace.replace(reOldSet, strNewSet);
+                    xmlWorkspace = xmlWorkspace.replace(reOldGet, strNewGet);
+
+                    // Update in initialize method of App type.
+
+                    // Get the initialize method.
+                    var methodInitialize = clAppType.getMethod("initialize");
+                    if (!methodInitialize) {
+
+                        throw { message: "Failed to find initialize method of App type." };
+                    }
+
+                    // Set the workspace.
+                    methodInitialize.workspace = xmlWorkspace;
+
+                    return null;
+
+                } catch (e) {
+
+                    return e;
+                }
+            }
 
             self.playThisInitializeWorkspace = function(objectPrimaryBlockChain) {
 

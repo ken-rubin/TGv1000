@@ -93,50 +93,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					var m_functionDoneTyping = function(strWhichInput) {
-
-						try {
-
-							// Select the element.
-							var jqElem = $('#' + strWhichInput);
-
-							// Extract the value from the element.
-							var strVal = jqElem.val();
-							if (strWhichInput === 'NewName') {
-
-								if (strVal === m_toolInstance.id){
-									return;
-								}
-								var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
-								if (exceptionRet) { throw exceptionRet; }
-
-								// Update this dialog's tool instance, too.
-								m_toolInstance.id = strVal;
-								m_dialog.setTitle(strVal + " Properties");
-							}
-							
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					// Delete the double-clicked dropped Tool. No need for second confirmation, since user can just drop again.
-					var m_functionDeleteToolInstance = function () {
-
-						try {
-
-							var exceptionRet = designer.deleteToolInstance(m_toolInstance);
-							if (exceptionRet) { throw exceptionRet; }
-
-							m_dialog.close();
-
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
 					// Wire up Property handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {
 
@@ -150,15 +106,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewName").val(m_toolInstance.id);
 
 							// Start a countdown timer for detecting NewName typing pause.
-							$("#NewName").keyup(function() {
+							// $("#NewName").keyup(function() {
 
-								clearTimeout(m_typingTimer);
-								if ($("#NewName").val()) {
-									m_typingTimer = setTimeout(function() {m_functionDoneTyping('NewName')}, m_doneTypingInterval); // Anonymous func needed for IE <= 9.
-								}
-							});
+							// 	clearTimeout(m_typingTimer);
+							// 	if ($("#NewName").val()) {
+							// 		m_typingTimer = setTimeout(function() {m_functionDoneTyping('NewName')}, m_doneTypingInterval); // Anonymous func needed for IE <= 9.
+							// 	}
+							// });
 
-							m_properties = [];
+							$("#NewName").blur(m_functionChangeTIName);
+
+							m_arrayProperties = [];
 
 							// Build the table to display the toolinstance's properties.
 							// Then use coder to get their current values.
@@ -168,7 +126,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 								clType.data.properties.forEach(function(prop){
 
-									m_properties.push(
+									m_arrayProperties.push(
 										{
 											name: prop.name,
 											propertyTypeId: prop.propertyTypeId,
@@ -179,7 +137,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								});
 							}
 							
-							if (m_properties.length === 0) {
+							if (m_arrayProperties.length === 0) {
 
 								throw new Error("Could not find Type in order to build complete property array.");
 							}
@@ -187,9 +145,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Build the dialog's pseudo-grid.
 							// Columns: name, property type, current value
 							var strBuild = '<div class="PGParent">';
-							for (var i = 0; i < m_properties.length; i++) {
+							for (var i = 0; i < m_arrayProperties.length; i++) {
 
-								var m = m_properties[i];
+								var m = m_arrayProperties[i];
 								strBuild += '<div class="PGChild"><div class="PGPropCol1">' + m.name + '</div>';
 
 								// Get the current value for this property--if it exists.
@@ -290,9 +248,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							jqInput.css("background-color", "aliceblue");
 
 							// Special processing for propertyTypeIds 4,5,6
-							for (var i = 0; i < m_properties.length; i++) {
+							for (var i = 0; i < m_arrayProperties.length; i++) {
 
-								var m = m_properties[i];
+								var m = m_arrayProperties[i];
 								if (m.propertyTypeId === 4) {
 
 									if (m.currentValue !== '') {
@@ -322,6 +280,68 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							errorHelper.show(e);
 						}
 					};
+
+					// If non-empty, change the name (id) of this tool instance (m_toolInstance).
+					var m_functionChangeTIName = function () {
+
+						var strVal = $("#NewName").val().trim();
+						if (strVal.length === 0)
+							return;
+						
+						if (strVal !== m_toolInstance.id) {
+
+							var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Update this dialog's tool instance, too.
+							m_toolInstance.id = strVal;
+							m_dialog.setTitle(strVal + " Properties");
+						}
+					}
+
+					// Delete the double-clicked dropped Tool. No need for second confirmation, since user can just drop again.
+					var m_functionDeleteToolInstance = function () {
+
+						try {
+
+							var exceptionRet = designer.deleteToolInstance(m_toolInstance);
+							if (exceptionRet) { throw exceptionRet; }
+
+							m_dialog.close();
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					// var m_functionDoneTyping = function(strWhichInput) {
+
+					// 	try {
+
+					// 		// Select the element.
+					// 		var jqElem = $('#' + strWhichInput);
+
+					// 		// Extract the value from the element.
+					// 		var strVal = jqElem.val();
+					// 		if (strWhichInput === 'NewName') {
+
+					// 			if (strVal === m_toolInstance.id){
+					// 				return;
+					// 			}
+					// 			var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
+					// 			if (exceptionRet) { throw exceptionRet; }
+
+					// 			// Update this dialog's tool instance, too.
+					// 			m_toolInstance.id = strVal;
+					// 			m_dialog.setTitle(strVal + " Properties");
+					// 		}
+							
+					// 	} catch(e) {
+
+					// 		errorHelper.show(e);
+					// 	}
+					// }
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -333,7 +353,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				// Reference to the dialog object instance.
 				var m_toolInstance = null;
 				var m_dialog = null;
-				var m_properties;
+				var m_arrayProperties;
 				var m_typingTimer;
 				var m_doneTypingInterval = 500;	// A 3.5 sec pause in typing triggers an update.
 			};

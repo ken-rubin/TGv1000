@@ -246,13 +246,42 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 						try {
 
+							// Change tool instance id in these locations:
+							//		Designer m_arrayItems: id
+							//		App Type's property: name
+							//		workspace
+							//		coder.update_AllocateType
+							//		coder.update_SetPropertyValue
 
-							alert('called changeToolInstanceId with strOldId="' + strOldId + '" and strNewId="' + strNewId + '"');
+							for (var i = 0; i < m_arrayItems.length; i++) {
+
+								var aIth = m_arrayItems[i];
+								if (aIth.id === strOldId) {
+
+									aIth.id = strNewId;
+									break;
+								}
+							}
+
+							var clTypeApp = types.getType("App");
+							for (var i = 0; i < clTypeApp.data.properties.length; i++) {
+
+								var pIth = clTypeApp.data.properties[i];
+								if (pIth.name === strOldId) {
+
+									pIth.name = strNewId;
+									break;
+								}
+							}
+
+							var exceptionRet = coder.update_ToolInstanceId(strOldId, strNewId, clTypeApp);
+							if (exceptionRet) {
+
+								// Undo previous two changes.
 
 
-
-
-
+								return exceptionRet;
+							}
 
 							return null;
 
