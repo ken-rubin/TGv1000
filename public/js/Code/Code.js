@@ -109,6 +109,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Method renames a type in blockly.
+					// The new name is already set in clType.data.name.
 					self.renameType = function (clType, strOriginalName) {
 
 						try {

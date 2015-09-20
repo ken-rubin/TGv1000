@@ -25,12 +25,6 @@
 - Deleting
     + Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
 - Write event loader in Code.js#self.addType.
-- Renaming
-    + renaming a type has to update XML throughout
-    + finish renaming a tool instance (PropertyGrid.js)
-        * add App_get and App_set here and remove from new Type (what if the Type needs to be accessed without having been dropped on the Designer?)
-        * update in all methods of all Types, not just App.initialize
-        * apply name change on blur and dialog close--even if click away (or remove click away closing)
 - PropertyGrid:
 	- apply property value changes on each keystroke and remove the Save buttons
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
@@ -38,12 +32,16 @@
 - Play button:
 	- place a canvas over the designer to show the project playing
 	- change Play button to Pause and Stop buttons when playing (is there a 1-button sequence for this that works? Like Play -> Pause -> Stop. I doubt it.)
+- Comic click
+    - Slide full panel over half (resizable) the main window
+    - CLick off the comic resizes back to scroll strip 
 - Implement grid of available classes (and projects?) on login page. Buy from there. Probably enroll, too. How would that work? Go right to new project(?). Needs new DB tables (take from e4Groms schema in large part), admin stuff, etc.
 - When user logs in, open most recent project (or new one if just bought).
 - Give parent ability to play child's projects but not modify them. If >1 child, present a list of children first. This implies a parent login. 
     - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
+- Passport authentication???
+    - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 - coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it throughout. Add a method to types(?) to get the isApp Type's name more easily.
-- Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 
 
 
@@ -52,12 +50,12 @@
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 
 
-## Documentation of certain things
+## Documentation of various things
 
-#### General description of XML and Javascript held by Blockly or in Code.js
+### General description of XML and Javascript held by Blockly or in Code.js
 
-
-#### Add a Type
+#### Types
+##### Add
 1. Types.js self.addItem calls code.addType(clType) after the Type is added to the m_arrayClTypes[].
 2. Code.js self.addType(clType) calls:
     + m_functionAdd_Type_New. This sets: 
@@ -71,25 +69,36 @@
     + events will be added (not done yet)
     + \#BlocklyFrame is reloaded.
 3. The Type is added as a Property of the App Type. This causes....
+##### Rename
+##### Delete
 
-#### Rename a Type
-
-
-#### Delete a Type
-
-
-#### Drop a Tool (creating a Tool Instance)
-
-
-#### Rename a Tool Instance
+#### Tool Instances
+##### Create--Drop a Tool onto the Designer
+##### Rename
+##### Delete
 
 
-#### Delete a Tool Instance
+#### Methods
+##### Rename
+##### Delete
+
+#### Properties
+##### Rename
+##### Delete
+##### Change property type
+
+#### Events
+##### Rename
+##### Delete
+
+
+
+
 
 
 ## Just saving this here for possible ScrollRegion paging
 
-#### Deferred Join
+#### Using Deferred Join for Paging
 
 This is an interesting trick. Suppose you have pages of customers. Each page displays ten customers. The query will use LIMIT to get ten records, and OFFSET to skip all the previous page results. When you get to the 100th page, it's doing LIMIT 10 OFFSET 990. So the server has to go and read all those records, then discard them.
 
