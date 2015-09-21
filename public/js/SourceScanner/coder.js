@@ -701,7 +701,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         throw { message: "Failed to find initialize method of App type." };
                     }
 
-                    // Get the workspace.
+                    // Set the workspace.
                     methodInitialize.workspace = strXml;
 
                     return null;

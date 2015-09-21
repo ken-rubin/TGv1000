@@ -72,8 +72,8 @@ To summarize, the sections below describe how our code manipulates each Method's
 
 ### Data structures and the source code
 #### Schema data
-- The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods.
-- As Types are added (including the App Type that each comic has by default), they are stored in Code.js in self.schema to be appended to the default schema list just described as if they are Categories. The App Type is created slightly differently from subsequent Types. It is created with these blocks:
+- The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods. The names of blocks that we create are added to self.schema in Code.js and marked *true* (meaning that they are available for use) and their corresponding code is added to self.blocks and self.javaScript.
+- The App Type is structured slightly differently from subsequent Types. It is created with these blocks initially:
     - new_App
     - App_getX
     - App_setX to [var]
@@ -84,7 +84,7 @@ To summarize, the sections below describe how our code manipulates each Method's
     - App_getHeight
     - App_setHeight to [var]
     - App_initialize using [method]
-- Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height are defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
+- Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height being each Type's defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
     - new_apple
     - Apple_getX from [var]
     - Apple_setX in [var1] to [var2]
@@ -94,14 +94,30 @@ To summarize, the sections below describe how our code manipulates each Method's
     - Apple_setWidth in [var1] to [var2]
     - Apple_getHeight from [var]
     - Apple_setHeight in [var1] to [var2]
-- If the Apple Type is dragged onto the designer surface, it is added as a Property of the App Type and 2 additional blocks are added to the App category:
+- If the Apple Type is dragged onto the designer surface, it is added as a Property of the App Type and 2 additional blocks are added to the App category (just as each Property of any Type results in a getter and a setter being created):
     - App_getApple
     - App_setApple to [var]
-- As stated above, adding a new method to any Type will result in adding a block to that Type similar to typename_methodname using [method].
-- Similarly, adding a Property to any Type will result in adding both a getter and a setter to that Type. The getter and setter will conform to the scheme that creates slighly different blocks for App Types and other Types.
+- As stated above, adding a new Method to any Type will result in adding a block to that Type similar to *typename_methodname using [method]*.
+- Again, adding a Property to any Type will result in adding both a getter and a setter to that Type. The getter and setter will conform to the scheme that creates slighly different blocks for App Types and other Types.
 - *As you can well imagine, renaming, deleting and adding Types, Methods and Properties all need to maintain the integrity of the abovementioned data.*
-#### Method workspaces
-- These  blocks are used to build up the Method workspace XML docs. Again, maintenance of anything requires global maintenance of the XML docs.
+#### The *initialize* Method of the App Type
+- The *initialize* Method of the App Type is special. It relects the user's actions on the Designer surface; that is, it builds what the user wants the initial state of the comic to be when it is run. Assume a comic has 3 Types: App, A and B, that A and B are minimal Types (no added Properties, Methods or Events) and that the user has dragged one each of A and B onto the Designer surface (creating Tool Instances A and B). Note: the App Type cannot be dragged onto the Designer surface. Here's a summary of what things contain:
+    - A and B have been added as Properties of the App Type.
+    - A and B are categories in Code.js self.schema and their 9 blocks exist in self.blocks and self.javaScript.
+    - A getter and a setter for each of A and B have been added as blocks of the App Type.
+    - The *initialize* Method has commands (in XML) to create A and B and to position them where the user dropped them with the size that is their default or has been adjusted by the user.
+- Now let the user drag a second instance of the A Type onto the Designer surface. Each dragged Type is an instantiation of a class (or Type). This second instance of A is given a unique name (A2 for now). Here are all the actions the program takes to memorialize this action:
+    - A getter and a setter for A2 are added to the App Type.
+    - 5 segments of XML are added to the App Type's initialize method:
+        1. App_setA2 to new A (instantiate an A and call it *A2*)
+        2. A_setX in App_getA2 to [x coordinate] (use the setX method in class A to set X in instance A2)
+        3. Similar for Y.
+        4. Similar for Width.
+        5. Similar for Height.
+#### Additional Methods of the App Type and all Methods of other Types
+- The blocks in Code.js self.blocks and self.javaScript are used to build up the Method workspace XML.
+ 
+**Remember: maintenance of anything requires global maintenance of the XML docs.**
 
 
 #### Types
