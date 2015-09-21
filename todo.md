@@ -42,6 +42,7 @@
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 - coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it throughout. Add a method to types(?) to get the isApp Type's name more easily.
+- A Type cannot be named X, Y, Width or Height or the same as any tool instance. Also, the unique namer of tool instances must check against existing type names.
 
 
 
@@ -52,34 +53,64 @@
 
 ## Documentation of various things
 
-### General description of XML and Javascript
-1. Types contain a collection of named Methods. Methods have a workspace property. This property is the representation in XML of the Method's functionality. The XML translates into actual Javascript code that executes when the method is called.
-    + The Type with property isApp === true (known as the 'App Type') always has a special method called "initialize" that describes/creates the configuration in the Designer frame.
-    + All other Methods, whether in the App Type or any other Types, have been constructed manually by the user by dragging components out of the code schema and manipulating their arrangement and variables.
-2. The code schema setup is maintained by working with self.blocks, self.javaScript and self.objectTypes in Code.js. The code schema functions as it it is a C# or C++ class defintion. The code in the methods instantiates these classes and works with those objects. So, code schema = class definition. Method workspace = class instantiation and use.
-3. Keeping the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated by the user is really our only goal when we discuss Type, Method, etc. maintenance.
+### General description of programming using our system
+A Type is our the equivalent of a class in a standard programming language (C# or C++). Like a class it consists of methods and properties. A Type's methods can use (instantiate) another Type to access or manipulate its contents.
+
+1. Projects are built in discreet steps called "comics". Think of comics as the steps a programmer goes through while a program is evolving. Each comic contains a set of Types. Usually comic[n+1] will contain all of the Types from comic[n] with more functionality fleshed out in certain Types. Also, comic[n+1] may have one or more additional Types than comic[n]. Every comic has an automatic Type called *App*. A new project contains one comic with one Type, the App type.
+    - The App type has a property *isApp* that is set to *true*. Only one Type in a comic can have isApp=true. The App Type can be renamed because of its isApp property.
+2. Types contain a collection of named Methods, each of which has a *workspace* property. This property is the representation (in XML) of the Method's functionality. The XML gets translated into actual Javascript code that executes when the method is called. A Method can also be an event handler. (Parameters are going to be added to Methods soon.) The user never interacts with the XML *per se*. He "programs" methods by one or more of these techniques:
+    - dragging and dropping a Type onto the Designer frame (creating a Tool instance)
+    - manipulating a Tool instance's properties in code or in a property maintenance grid
+    - using blockly schema actions to string operations together by dragging, dropping and arranging elements in the code pane
+3. The App Type always has a special method called *initialize* that describes/creates the configuration of the Designer frame as a comic is set to run status.
+4. All other Methods, whether in the App Type or any other Types, have been constructed manually by the user by dragging components out of the code schema and manipulating their arrangement and variables via Blockly functionality.
+5. The code schema setup is maintained by working with self.blocks, self.javaScript and self.objectTypes in Code.js in response to user actions in the site.
+
+Keeping the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated (added, removed, renamed, etc.) by the user is really our only goal when we discuss Type, Method, etc. maintenance--as we are doing in this section. Everything else is run-time detail.
+
+To summarize, the sections below describe how our code manipulates each Method's workspace XML and the schema components (to which the XML workspaces refer) as the user performs adding, deleting, renaming, etc. actions on Types, Methods and Properties.
+
+### Data structures and the source code
+#### Schema data
+- The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods.
+- As Types are added (including the App Type that each comic has by default), they are stored in Code.js in self.schema to be appended to the default schema list just described as if they are Categories. The App Type is created slightly differently from subsequent Types. It is created with these blocks:
+    - new_App
+    - App_getX
+    - App_setX to [var]
+    - App_getY
+    - App_setY to [var]
+    - App_getWidth
+    - App_setWidth to [var]
+    - App_getHeight
+    - App_setHeight to [var]
+    - App_initialize using [method]
+- Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height are defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
+    - new_apple
+    - Apple_getX from [var]
+    - Apple_setX in [var1] to [var2]
+    - Apple_getY from [var]
+    - Apple_setY in [var1] to [var2]
+    - Apple_getWidth from [var]
+    - Apple_setWidth in [var1] to [var2]
+    - Apple_getHeight from [var]
+    - Apple_setHeight in [var1] to [var2]
+- If the Apple Type is dragged onto the designer surface, it is added as a Property of the App Type and 2 additional blocks are added to the App category:
+    - App_getApple
+    - App_setApple to [var]
+- As stated above, adding a new method to any Type will result in adding a block to that Type similar to typename_methodname using [method].
+- Similarly, adding a Property to any Type will result in adding both a getter and a setter to that Type. The getter and setter will conform to the scheme that creates slighly different blocks for App Types and other Types.
+- *As you can well imagine, renaming, deleting and adding Types, Methods and Properties all need to maintain the integrity of the abovementioned data.*
+#### Method workspaces
+- These  blocks are used to build up the Method workspace XML docs. Again, maintenance of anything requires global maintenance of the XML docs.
 
 
 #### Types
 ##### Add
-1. Types.js self.addItem calls code.addType(clType) after the Type is added to the m_arrayClTypes[].
-2. Code.js self.addType(clType) calls:
-    + m_functionAdd_Type_New. This sets: 
-        + self.blocks["new_" + type.data.name]
-        + self.javaScript["new_" + type.data.name]
-        + objectTypes[type.data.name]
-    + m_functionAdd_Type_Property for each of clType's properties--X, Y, Width and Height. This sets:
-        * self.
-    + m_functionAdd_Type_Method for each of clType's method--none for a new Type. But at some point it sets:
-        * self.
-    + events will be added (not done yet)
-    + \#BlocklyFrame is reloaded.
-3. The Type is added as a Property of the App Type. This causes....
 ##### Rename
 ##### Delete
 
 #### Tool Instances
-##### Create--Drop a Tool onto the Designer
+##### Create--Drag & Drop a Tool onto the Designer
 ##### Rename
 ##### Delete
 

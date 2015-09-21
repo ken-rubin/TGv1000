@@ -37,6 +37,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// Public methods.
 
 					// Create this instance.
+// used					
 					self.load = function (typesItem) {
 
 						try {
@@ -52,6 +53,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Activate/select type instance.
+// not used					
 					self.activate = function () {
 
 						try {
@@ -66,6 +68,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Activate/select type instance.
+// not used					
 					self.setActive = function (iIndex, arrayActive) {
 
 						try {
@@ -116,6 +119,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Helper method returns the specified method.
+// used					
 					self.getMethod = function (strMethod) {
 
 						// Loop over and add the methods.
@@ -136,6 +140,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					// Loop over all methods, indicate if the specified
 					// string is found in any of their workspaces.
 					// Returns the method referenced or null.
+// used					
 					self.isReferencedInWorkspace = function (strTest) {
 
 						// Loop over the collection of methods.
@@ -161,6 +166,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 
 					// Loop over all methods, updates their workspace with the replacement.
 					// Returns the method referenced or null.
+// used					
 					self.replaceInWorkspaces = function (strOld, strNew) {
 
 						// Loop over the collection of methods.

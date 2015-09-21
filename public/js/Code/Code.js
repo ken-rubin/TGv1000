@@ -63,7 +63,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-							// Add a new for the type.
+							// Add a new for the type. This generates and adds:
+							//		self.blocks["new_" + type.data.name]
+							//		self.javaScript["new_" + type.data.name]
+							//		objectTypes[type.data.name]
 							var exceptionRet = m_functionAdd_Type_New(clType);
 							if (exceptionRet) {
 
