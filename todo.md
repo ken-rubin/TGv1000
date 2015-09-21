@@ -53,11 +53,11 @@
 ## Documentation of various things
 
 ### General description of XML and Javascript
-1. Types have named Methods. Methods have a workspace property. This property is the representation in XML of the actions that the method can take. The XML translates into actual Javascript code that executes when the method is called.
-    + The Type with isApp === true (known as the 'App Type') has a special method called "initialize" that describes/creates the configuration in the Designer frame.
-    + All other Methods, whether in the App Type or any other types have been constructed manually by the user by dragging components out of the code schema and manipulating their arrangement and variables.
+1. Types contain a collection of named Methods. Methods have a workspace property. This property is the representation in XML of the Method's functionality. The XML translates into actual Javascript code that executes when the method is called.
+    + The Type with property isApp === true (known as the 'App Type') always has a special method called "initialize" that describes/creates the configuration in the Designer frame.
+    + All other Methods, whether in the App Type or any other Types, have been constructed manually by the user by dragging components out of the code schema and manipulating their arrangement and variables.
 2. The code schema setup is maintained by working with self.blocks, self.javaScript and self.objectTypes in Code.js. The code schema functions as it it is a C# or C++ class defintion. The code in the methods instantiates these classes and works with those objects. So, code schema = class definition. Method workspace = class instantiation and use.
-3. Keeping everything the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated by the user is really our only goal.
+3. Keeping the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated by the user is really our only goal when we discuss Type, Method, etc. maintenance.
 
 
 #### Types
