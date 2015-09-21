@@ -54,7 +54,7 @@
 ## Documentation of various things
 
 ### General description of programming using our system
-A Type is our the equivalent of a class in a standard programming language (C# or C++). Like a class it consists of methods and properties. A Type's methods can use (instantiate) another Type to access or manipulate its contents.
+A Type is our equivalent of a class in a standard programming language (C# or C++). Like a class it consists of methods and properties. A Type's methods can use (instantiate) another Type to access or manipulate its contents.
 
 1. Projects are built in discreet steps called "comics". Think of comics as the steps a programmer goes through while a program is evolving. Each comic contains a set of Types. Usually comic[n+1] will contain all of the Types from comic[n] with more functionality fleshed out in certain Types. Also, comic[n+1] may have one or more additional Types than comic[n]. Every comic has an automatic Type called *App*. A new project contains one comic with one Type, the App type.
     - The App type has a property *isApp* that is set to *true*. Only one Type in a comic can have isApp=true. The App Type can be renamed because of its isApp property.
