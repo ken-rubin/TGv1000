@@ -57,23 +57,15 @@
 A Type is our equivalent of a class in a standard programming language (C# or C++). Like a class it consists of methods, properties and events. A Type's methods can use (instantiate) another Type to access or manipulate its contents.  The method also has access to a "this" reference and any specified parameters.
 
 1. Projects are built in discreet steps called "comics". Think of comics as the steps a programmer goes through while a program is evolving. Each comic contains a set of Types. Usually comic[n+1] will contain all of the Types from comic[n] with more functionality fleshed out in certain Types. Also, comic[n+1] may have one or more additional Types than comic[n]. Every comic has an automatic Type called *App*. A new project contains one comic with one Type, the App type.
-    - The App type has a property *isApp* that is set to *true*. Only one Type in a comic can have isApp=true. The App Type can be renamed because of its isApp property.
+    - The App Type has a property *isApp* that is set to *true*. Only one Type in a comic can have isApp=true. The App Type can be renamed because of its isApp property.
+    - The App Type can never be dragged onto the Designer surface.
 2. Types contain a collection of named Methods, each of which has a *workspace* property. This property is the representation (in XML) of the Method's functionality. The XML gets translated into actual Javascript code that executes when the method is called. A Method can also be an event handler. (Parameters are going to be added to Methods soon.) The user never interacts with the XML *per se*. He "programs" methods by one or more of these techniques:
     - dragging and dropping a Type onto the Designer frame (creating a Tool instance)
     - manipulating a Tool instance's properties in code or in a property maintenance grid
     - using blockly schema actions to string operations together by dragging, dropping and arranging elements in the code pane
 3. The App Type always has a special method called *initialize* that describes/creates the configuration of the Designer frame as a comic is set to run status.
 4. All other Methods, whether in the App Type or any other Types, have been constructed manually by the user by dragging components out of the code schema and manipulating their arrangement and variables via Blockly functionality.
-5. The code schema setup is maintained by working with self.blocks, self.javaScript and self.objectTypes in Code.js in response to user actions in the site.
-
-
-#####
-
-Question: I'm confused about the difference between self.objectTypes and self.schema in Code.js.  Is objectTypes supposed to be schema?
-
-#####
-
-
+5. The code schema setup is maintained by working with self.blocks, self.javaScript and self.schema in Code.js in response to user actions in the site.
 
 Keeping the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated (added, removed, renamed, etc.) by the user is really our only goal when we discuss Type, Method, etc. maintenance--as we are doing in this section. Everything else is run-time detail.
 
@@ -83,23 +75,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 #### Schema data
 - The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods. The names of blocks that we create are added to self.schema in Code.js and marked *true* (meaning that they are available for use) and their corresponding code is added to self.blocks and self.javaScript.
 - The App Type is structured slightly differently from subsequent Types. It is created with these blocks initially:
-    - new_App
-    - App_getX
-    - App_setX to [var]
-    - App_getY
-    - App_setY to [var]
-    - App_getWidth
-    - App_setWidth to [var]
-    - App_getHeight
-    - App_setHeight to [var]
-
-######
-
-Why do we set x, y, w and h for the app type?  Also we should not expose the new.
-
-#####
-
-
+    - new_App (should not be exposed as a block, but probably should exist in schema and set = false--**Ken: this is not working for me**)
     - App_initialize using [method]
 - Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height being each Type's defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
     - new_apple

@@ -229,15 +229,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         throw new Error("Failed to convert workspace XML to JSON.");
                     }
 
-                    // First get the app type.
-                    var typeApp = types.getType("App");
-                    if (!typeApp) {
-
-                        throw { message: "Failed to find App type." };
-                    }
-
                     // Next get the initialize method.
-                    var methodInitialize = typeApp.getMethod("initialize");
+                    var methodInitialize = g_clTypeApp.getMethod("initialize");
                     if (!methodInitialize) {
 
                         throw { message: "Failed to find initialize method of App type." };
@@ -599,15 +592,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         }
                     }
 
-                    // First get the app type.
-                    var typeApp = types.getType("App");
-                    if (!typeApp) {
-
-                        throw { message: "Failed to find App type." };
-                    }
-
                     // Next get the initialize method.
-                    var methodInitialize = typeApp.getMethod("initialize");
+                    var methodInitialize = g_clTypeApp.getMethod("initialize");
                     if (!methodInitialize) {
 
                         throw { message: "Failed to find initialize method of App type." };
@@ -687,15 +673,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         throw new Error("Failed to convert workspace XML to JSON.");
                     }
 
-                    // First get the app type.
-                    var typeApp = types.getType("App");
-                    if (!typeApp) {
-
-                        throw { message: "Failed to find App type." };
-                    }
-
                     // Next get the initialize method.
-                    var methodInitialize = typeApp.getMethod("initialize");
+                    var methodInitialize = g_clTypeApp.getMethod("initialize");
                     if (!methodInitialize) {
 
                         throw { message: "Failed to find initialize method of App type." };

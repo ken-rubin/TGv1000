@@ -264,10 +264,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 							}
 
 							var property = null;
-							var clTypeApp = types.getType("App");
-							for (var i = 0; i < clTypeApp.data.properties.length; i++) {
+							for (var i = 0; i < g_clTypeApp.data.properties.length; i++) {
 
-								var pIth = clTypeApp.data.properties[i];
+								var pIth = g_clTypeApp.data.properties[i];
 								if (pIth.name === strOldId) {
 
 									pIth.name = strNewId;
@@ -278,7 +277,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 							if (property) {
 
-								var exceptionRet = coder.update_ToolInstanceId(strOldId, strNewId, clTypeApp, property);
+								var exceptionRet = coder.update_ToolInstanceId(strOldId, strNewId, g_clTypeApp, property);
 								if (exceptionRet) {
 
 									// Undo previous two changes.
@@ -941,12 +940,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 		                    var strId = jHelper.attr("id");
 		                    var strSrc = jHelper.attr("src");
-		                    var strType = jHelper.attr("data-type");
+		                    var strType = jHelper.attr("data-type");	// Artificially set to App for type with isApp === true, even if the name had been changed.
 
 		                    // Don't let the user drop an app on the designer.
 		                    if (strType === "App") {
 
-		                    	throw { message: "Not allowed to instantiate the App type." };
+		                    	throw { message: "You may not drop the App type onto the Designer." };
 		                    }
 
 		                    // Get an unique instance name for the type.
@@ -966,8 +965,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 							var exceptionRet = m_functionRender();
 		                    if (exceptionRet) { throw exceptionRet; }
 
-							var clTypeApp = types.getType("App");
-
 							exceptionRet = client.addPropertyToType({
 									id: 0,
 									propertyTypeId: 6,	// 'Type'
@@ -977,7 +974,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
                                     ordinal: 0,
                                     isHidden: true
 								},
-								clTypeApp);
+								g_clTypeApp);
 		                    if (exceptionRet) { throw exceptionRet; }
 
 							// Add item to app initialize.
@@ -1027,17 +1024,16 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		            			var itemIth = m_arrayItems[i];
 		            			if (itemIth.id === strInstanceId) {
 
-									var clTypeApp = types.getType("App");
-									var strAppTypeName = clTypeApp.data.name;
+									var strAppTypeName = g_clTypeApp.data.name;
 									var strTypeName = toolInstance.type;
 
-									for (var j = 0; j < clTypeApp.data.properties.length; j++) {
+									for (var j = 0; j < g_clTypeApp.data.properties.length; j++) {
 
-										var propJth = clTypeApp.data.properties[j];
+										var propJth = g_clTypeApp.data.properties[j];
 										if (propJth.name === strInstanceId) {
 
 											// Remove property from left side of code pane (what's it called?).
-											var exceptionRet = code.removeProperty(clTypeApp,
+											var exceptionRet = code.removeProperty(g_clTypeApp,
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
 
@@ -1058,7 +1054,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 											// Delete property from type here instead of using the method in Types.js.
 											// That one deletes from the currently active Type, and, who knows, App may not be active.
-											clTypeApp.data.properties.splice(j, 1);
+											g_clTypeApp.data.properties.splice(j, 1);
 											break;
 										}
 									}

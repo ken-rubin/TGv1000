@@ -66,7 +66,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Add a new for the type. This generates and adds:
 							//		self.blocks["new_" + type.data.name]
 							//		self.javaScript["new_" + type.data.name]
-							//		objectTypes[type.data.name]
+							//		self.schema[type.data.name]
 							var exceptionRet = m_functionAdd_Type_New(clType);
 							if (exceptionRet) {
 
@@ -77,11 +77,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							for (var i = 0; i < clType.data.properties.length; i++) {
 
 								var propertyIth = clType.data.properties[i];
-								exceptionRet = m_functionAdd_Type_Property(clType,
-									propertyIth);
-								if (exceptionRet) {
 
-									throw exceptionRet;
+								// Don't add blocks for the App Type's X,Y,Width,Height properties.
+								if (!clType.data.isApp || (clType.data.isApp && $.inArray(propertyIth.name, ['X','Y', 'Width', 'Height']) === -1)) {
+
+									exceptionRet = m_functionAdd_Type_Property(clType,
+										propertyIth);
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
 								}
 							}
 
@@ -829,7 +834,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var typeNew = { };
-							typeNew["new_" + type.data.name] = true;
+							typeNew["new_" + type.data.name] = !type.data.isApp;	// avoid exposing new_App block
 							objectTypes[type.data.name] = typeNew;
 
 							return null;

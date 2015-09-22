@@ -14,6 +14,7 @@ var code = null;
 var types = null;
 var g_strUserId = '';
 var g_strUserName = '';
+var g_clTypeApp = null;
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {

@@ -70,6 +70,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									throw exceptionRet;
 								}
 
+								if (clType.data.isApp) {
+
+									g_clTypeApp = clType;	// So the App Type is always available globally.
+								}
+
 						        // Add the type.
 								exceptionRet = self.addItem(clType);
 								if (exceptionRet) {
@@ -128,24 +133,20 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					// Add Type to strip.
 					self.getType = function (strType) {
 
+						if (strType === "App") {
+
+							return g_clTypeApp;
+						}
+
 						// Loop over types.
 						for (var i = 0; i < m_arrayClTypes.length; i++) {
 
 							var typeIth = m_arrayClTypes[i];
-							if (strType === "App") {
 
-								// Look by boolean.
-								if (typeIth.data.isApp) {
+							// Look by name.
+							if (typeIth.data.name === strType) {
 
-									return typeIth;
-								}
-							} else {
-
-								// Look by name.
-								if (typeIth.data.name === strType) {
-
-									return typeIth;
-								}
+								return typeIth;
 							}
 						}
 
@@ -165,7 +166,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						return null;							
 					};
 
-					// Return true of the app's initialize is active.
+					// Return true if the app's initialize is active.
 					self.isAppInitializeActive = function () {
 
 						if (!m_clTypeActive ||
@@ -173,7 +174,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							return false;
 						}
-						if (m_clTypeActive.data.name !== "App") {
+						if (!m_clTypeActive.data.isApp) {
 
 							return false;
 						}

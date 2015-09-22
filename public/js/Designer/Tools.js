@@ -81,7 +81,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 								'toolstripitem',									// item class
 								function (jItemAdded) {	jItem = jItemAdded },		// post creation callback so we can use jItem (see below)
 								bInLoadLoop || false,								// If it wasn't passed in (new Type added), then false. If in a Types.load loop, then true.
-								"data-type='" + clType.data.name + "'"				// This becomes the type of the ToolInstance.
+								"data-type='" + (clType.data.isApp ? "App" : clType.data.name) + "'"				// This becomes the type of the ToolInstance. Done this way in case App type had been renamed.
 							);
 							if (exceptionRet) {	throw exceptionRet; }
 
