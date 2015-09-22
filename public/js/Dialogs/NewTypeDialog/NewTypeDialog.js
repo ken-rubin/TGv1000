@@ -177,16 +177,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var clType = new Type();
 							var exceptionRet = clType.load(typeJO);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							exceptionRet = client.addTypeToProject(clType);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
 
@@ -202,10 +196,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 							var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
 						} catch(e) {
 
 							errorHelper.show(e);
@@ -217,10 +209,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 							var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
 						} catch(e) {
 
 							errorHelper.show(e);
@@ -232,10 +222,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
 						} catch(e) {
 
 							errorHelper.show(e);

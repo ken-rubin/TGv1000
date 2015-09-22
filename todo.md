@@ -43,6 +43,7 @@
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 - coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it throughout. Add a method to types(?) to get the isApp Type's name more easily.
 - A Type cannot be named X, Y, Width or Height or the same as any tool instance. Also, the unique namer of tool instances must check against existing type names. I believe this is all within a single comic, but I have to check that.
+- The end of code.m_functionAdd_Type_Method looks wrong (the self.schema.Types part). **Ask Ken**
 
 
 
@@ -75,7 +76,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 #### Schema data
 - The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods. The names of blocks that we create are added to self.schema in Code.js and marked *true* (meaning that they are available for use) and their corresponding code is added to self.blocks and self.javaScript.
 - The App Type is structured slightly differently from subsequent Types. It is created with these blocks initially:
-    - new_App (should not be exposed as a block, but probably should exist in schema and set = false--**Ken: this is not working for me**)
+    - new_App (should not be exposed as a block, but probably should exist in schema and set = false--**Ken: this is not working for me; it still displays even though it is false**)
     - App_initialize using [method]
 - Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height being each Type's defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
     - new_apple
@@ -113,29 +114,137 @@ To summarize, the sections below describe how our code manipulates each Method's
 **Remember: maintenance of anything requires global maintenance of the XML docs.**
 
 
-#### Types
+#### Type
 ##### Add
+1. NewTypeDialog goes through Client then Project then Comics to Comic:
+2. comic.addType(clType)
+    1. types.addItem(clType)
+        - code.addType(clType)
+            - m_functionAdd_Type_New(clType)
+                - add self.blocks["new_" + clType.data.name] and set it
+                - add self.javaScript["new_" + clType.data.name] and set it
+                - add property "new_" + clType.data.name to self.schema.Types[clType.data.name] and set = true
+            - for each property: m_functionAdd_Type_Property(clType, property)
+                - (We will assume we are not adding the App Type.)
+                - 
+            - for each method: m_functionAdd_Type_Method(clType, method)
+            - for each event: m_functionAdd_Type_Event(clType, event)
+            - reload BlocklyIFrame
+    2. tools.addItem(clType) -- adds to toolstrip
+    3. types.select(clType) -- makes clType active and populates the TypeWell 
 ##### Rename
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Delete
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 
-#### Tool Instances
+#### Tool Instance
 ##### Create--Drag & Drop a Tool onto the Designer
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Rename
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Delete
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 
-
-#### Methods
+#### Method
+##### Add
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Rename
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Delete
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 
-#### Properties
+#### Property
+##### Add
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Rename
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Delete
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Change property type
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 
-#### Events
+#### Event
+##### Add
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Rename
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 ##### Delete
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
 
 
 
