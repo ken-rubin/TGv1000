@@ -68,10 +68,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							//		self.javaScript["new_" + type.data.name]
 							//		self.schema[type.data.name]
 							var exceptionRet = m_functionAdd_Type_New(clType);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Add properties.
 							for (var i = 0; i < clType.data.properties.length; i++) {
@@ -83,10 +80,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 									exceptionRet = m_functionAdd_Type_Property(clType,
 										propertyIth);
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
+									if (exceptionRet) { throw exceptionRet; }
 								}
 							}
 
@@ -96,15 +90,17 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								var methodIth = clType.data.methods[i];
 								exceptionRet = m_functionAdd_Type_Method(clType,
 									methodIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// Add events.
+							for (var i = 0; i < clType.data.events.length; i++) {
 
-							
+								var eventIth = clType.data.events[i];
+								exceptionRet = m_functionAdd_Type_Event(clType,
+									eventIth);
+								if (exceptionRet) { throw exceptionRet; }
+							}
 
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -125,10 +121,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Rename type.
 							var exceptionRet = m_functionRename_Type_New(clType, 
 								strOriginalName);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rename properties.
 							for (var i = 0; i < clType.data.properties.length; i++) {
@@ -138,10 +131,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 									propertyIth,
 									propertyIth.name, 
 									strOriginalName);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// Rename methods.
@@ -152,10 +142,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 									methodIth,
 									methodIth.name, 
 									strOriginalName);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// Rebuild.
@@ -177,10 +164,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							// Remove the new.
 							var exceptionRet = m_functionRemove_Type_New(clType);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Remove properties.
 							for (var i = 0; i < clType.data.properties.length; i++) {
@@ -188,10 +172,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								var propertyIth = clType.data.properties[i];
 								var exceptionRet = m_functionRemove_Type_Property(clType,
 									propertyIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// Remove methods.
@@ -200,10 +181,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								var methodIth = clType.data.methods[i];
 								var exceptionRet = m_functionRemove_Type_Method(clType,
 									methodIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// Remove events.
@@ -212,10 +190,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								var eventIth = clType.data.events[i];
 								var exceptionRet = m_functionRemove_Type_Event(clType,
 									eventIth);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// Rebuild.
@@ -294,10 +269,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Add a new for the type.
 							var exceptionRet = m_functionAdd_Type_Property(clType,
 								property);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -354,10 +326,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var exceptionRet = m_functionRename_Type_Property(clType,
 								property,
 								strOriginalName);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild blockly.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -378,10 +347,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							var exceptionRet = m_functionRemove_Type_Property(clType,
 								property);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -417,10 +383,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Add method for the type.
 							var exceptionRet = m_functionAdd_Type_Method(clType,
 								method);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -435,6 +398,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					self.renameEvent = function (clType, event, strOriginalName) {
 
 						try {
+
+
 
 
 							return null;
@@ -454,10 +419,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var exceptionRet = m_functionRename_Type_Method(clType,
 								method,
 								strOriginalName);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild blockly.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -477,10 +439,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							var exceptionRet = m_functionRemove_Type_Method(clType,
 								method);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
@@ -526,6 +485,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Allocate and create the scanner.
 							//m_scanner = new Scanner();
 							return null;//m_scanner.create();
+
 						} catch (e) {
 
 							return e;
@@ -591,10 +551,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
                             // Set the new data in the type strip.
                             var exceptionRet = types.update(self.workspace);
-                            if (exceptionRet) {
-
-                            	throw exceptionRet;
-                            }
+							if (exceptionRet) { throw exceptionRet; }
 
                             // If the current type is app, and the current method is initialize, then
                             // need to play changes into the designer in case anything changes here.
@@ -617,10 +574,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 			            	// Load up the parsed data into the designer.
 		            		var exceptionRet = designer.updateInstances(objectResult);
-		            		if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-		            			throw exceptionRet;
-		            		}
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -645,7 +600,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 			                var objectCursor = objectPrimaryBlockChain;
 
-			                var strLookForFirst = "App_set" + strInstance;
+			                var strLookForFirst = g_clTypeApp.data.name + "_set" + strInstance;
 			                var strLookForThen = strType + "_set" + strProperty;
 			                var bFoundFirst = false;
 
@@ -813,18 +768,18 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method adds a type's new_ constructor function.
-					var m_functionAdd_Type_New = function (type) {
+					var m_functionAdd_Type_New = function (clType) {
 
 						try {
 
 							////////////////////////
 							// Blocks.
 
-							self.blocks["new_" + type.data.name] = m_functionGenerateBlocksTypeNewFunctionString(type.data.name);
+							self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript["new_" + type.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(type.data.name);
+							self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
 
 							////////////////////////
 							// Schema.
@@ -834,10 +789,11 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var typeNew = { };
-							typeNew["new_" + type.data.name] = !type.data.isApp;	// avoid exposing new_App block
-							objectTypes[type.data.name] = typeNew;
+							typeNew["new_" + clType.data.name] = !clType.data.isApp;	// avoid exposing new_App block
+							objectTypes[clType.data.name] = typeNew;
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -867,6 +823,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -898,10 +855,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 									"new_" + clType.data.name);
 								var exceptionRet = types.replaceInWorkspaces("new_" + strOriginalName,
 									"new_" + clType.data.name);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							////////////////////////
@@ -922,10 +876,11 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								typeNew = {};
 							}
-							typeNew["new_" + clType.data.name] = true
+							typeNew["new_" + clType.data.name] = !clType.data.isApp;	// avoid exposing new_App block
 							objectTypes[clType.data.name] = typeNew;
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -943,6 +898,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var strLookFor = "new_" + clType.data.name;
 
 							return types.isReferencedInWorkspace(strLookFor);
+
 						} catch (e) {
 
 							return e;
@@ -1031,6 +987,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							objectType[strSetName] = true;
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1093,6 +1050,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// objectType[strSetName] = true;
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1132,6 +1090,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1187,10 +1146,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 									strGetName);
 								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
 									strGetName);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							////////////////////////
@@ -1244,10 +1200,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 									strSetName);
 								var exceptionRet = types.replaceInWorkspaces(strOriginalSetName,
 									strSetName);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							////////////////////////
@@ -1262,6 +1215,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							delete objectType[strOriginalSetName];
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1389,10 +1343,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 									strName);
 								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
 									strName);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							////////////////////////
@@ -1407,6 +1358,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							delete objectType[strOriginalName];
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1424,6 +1376,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var strName = clType.data.name + "_" + method.name;
 
 							return types.isReferencedInWorkspace(strName);
+
 						} catch (e) {
 
 							return e;
@@ -1463,6 +1416,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// }
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1478,6 +1432,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							var strName = clType.data.name + "_" + event.name;
 
 							return types.isReferencedInWorkspace(strName);
+							
 						} catch (e) {
 
 							return e;

@@ -42,7 +42,7 @@
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 - coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it throughout. Add a method to types(?) to get the isApp Type's name more easily.
-- A Type cannot be named X, Y, Width or Height or the same as any tool instance. Also, the unique namer of tool instances must check against existing type names.
+- A Type cannot be named X, Y, Width or Height or the same as any tool instance. Also, the unique namer of tool instances must check against existing type names. I believe this is all within a single comic, but I have to check that.
 
 
 
@@ -87,7 +87,7 @@ To summarize, the sections below describe how our code manipulates each Method's
     - Apple_setWidth in [var1] to [var2]
     - Apple_getHeight from [var]
     - Apple_setHeight in [var1] to [var2]
-- If the Apple Type is dragged onto the designer surface, it is added as a Property of the App Type and 2 additional blocks are added to the App category (just as each Property of any Type results in a getter and a setter being created):
+- If the Apple Type is dragged onto the designer surface, it is added as a Property of the App Type and 2 additional blocks are added to the App category (just as any new Property of a Type results in a getter and a setter being created):
     - App_getApple
     - App_setApple to [var]
 - As stated above, adding a new Method to any Type will result in adding a block to that Type similar to *typename_methodname using [method]*.

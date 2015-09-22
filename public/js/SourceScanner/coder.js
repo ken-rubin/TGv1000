@@ -34,7 +34,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 var strBlockType = strType + "_set" + strProperty;
 
                 // Compose the get for the instance from the app for which to search.
-                var strInstanceType = "App_get" + strInstance;
+                var strInstanceType = g_clTypeApp.data.name + "_get" + strInstance;
 
                 // If there is a work block, add new block it it, otherwise
                 while (blockWork) {
@@ -71,7 +71,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     return m_functionAdd({
 
                         nodeName: "block",
-                        type: "App_set" + strId,
+                        type: g_clTypeApp.data.name + "_set" + strId,
                         id: m_functionGetNextId(),
                         inline: "true",
                         x: "150",
@@ -140,7 +140,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                                     {
 
                                         nodeName: "block",
-                                        type: "App_get" + strInstance,
+                                        type: g_clTypeApp.data.name + "_get" + strInstance,
                                         id: m_functionGetNextId()
                                     }
                                 ]
@@ -200,7 +200,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     var strBlockType = strType + "_set" + strProperty;
 
                     // Compose the get for the instance from the app for which to search.
-                    var strInstanceType = "App_get" + strInstance;
+                    var strInstanceType = g_clTypeApp.data.name + "_get" + strInstance;
 
                     // If there is a work block, add new block it it, otherwise
                     while (blockWork) {
@@ -323,7 +323,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         // Use type="App_setXXX" to set id = XXX.
                         // Use type="new_YYY" to set type = YYY.
                         // Then set X, Y, Width, Height from children of type="YYY_set*"
-                        var arrayMatches = objectCursor.type.match(/App_set(.+)/);
+                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
+                        var arrayMatches = objectCursor.type.match(re);
                         if (arrayMatches && arrayMatches.length > 1) {
 
                             if (objectResult) {
@@ -386,7 +387,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                         //  Look for "new_" and "set_".
                         //  Set in designer.
-                        var arrayMatches = objectCursor.type.match(/App_set(.+)/);
+                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
+                        var arrayMatches = objectCursor.type.match(re);
                         
                         if (arrayMatches && arrayMatches.length > 1) {
 
@@ -623,7 +625,8 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     // Get the thing to set.
                     var objectToSet = objectCursor.children[0].children[0];
                     var strTypeToSet = objectToSet.type;
-                    var arrayTypes = strTypeToSet.match(/App_get(.+)/);
+                    var re = new RegExp(g_clTypeApp.data.name + "_get(.+)");
+                    var arrayTypes = strTypeToSet.match(re);
                     var strTheType = arrayTypes[1];
 
                     var objectValue = objectCursor.children[1].children[0].children[0];
