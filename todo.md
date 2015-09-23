@@ -9,6 +9,8 @@
 - Finish and integrate Coder
 - [If possible] Click on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
+- In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
+- In Code.js m_functionAdd_Type_New I now do not add to self.schema.Types for new_App. Do I still need to add to self.blocks and self.javaScript just above?
 
 
 ## Jerry
@@ -43,7 +45,6 @@
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
 - coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it throughout. Add a method to types(?) to get the isApp Type's name more easily.
 - A Type cannot be named X, Y, Width or Height or the same as any tool instance. Also, the unique namer of tool instances must check against existing type names. I believe this is all within a single comic, but I have to check that.
-- The end of code.m_functionAdd_Type_Method looks wrong (the self.schema.Types part). **Ask Ken**
 
 
 

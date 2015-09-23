@@ -782,15 +782,18 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
 
 							////////////////////////
-							// Schema.
-							if (!self.schema.Types) {
+							// Schema -- add to it except when adding the App Type.
+							if (!clType.data.isApp) {
 
-								self.schema.Types = {};
+								if (!self.schema.Types) {
+
+									self.schema.Types = {};
+								}
+								var objectTypes = self.schema.Types;
+								var typeNew = { };
+								typeNew["new_" + clType.data.name] = true;
+								objectTypes[clType.data.name] = typeNew;
 							}
-							var objectTypes = self.schema.Types;
-							var typeNew = { };
-							typeNew["new_" + clType.data.name] = !clType.data.isApp;	// avoid exposing new_App block
-							objectTypes[clType.data.name] = typeNew;
 
 							return null;
 
@@ -946,8 +949,17 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							objectType[strGetName] = true;
 
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							if (!objectType) {
+
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strGetName] = true;
+
+							} else {
+
+								objectType[strGetName] = true;
+							}
 
 							////////////////////////
 							////////////////////////
@@ -984,7 +996,17 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							objectType[strSetName] = true;
+
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							if (!objectType) {
+
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strSetName] = true;
+
+							} else {
+
+								objectType[strSetName] = true;
+							}
 
 							return null;
 
@@ -1008,11 +1030,11 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// ////////////////////////
 							// // Blocks.
 							// var strGetName = clType.data.name + "_get" + event.name;
-							// self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);
+							// self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);	// This method doesn't exist.
 
 							// ////////////////////////
 							// // JavaScript.
-							// self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);
+							// self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);	// This method doesn't exist.
 
 							// ////////////////////////
 							// // Schema.
@@ -1022,8 +1044,17 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// }
 							// var objectTypes = self.schema.Types;
 							// var objectType = objectTypes[clType.data.name];
-							// objectType[strGetName] = true;
 
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							// if (!objectType) {
+
+							// objectTypes[clType.data.name] = {};
+							// 	objectTypes[clType.data.name][strGetName] = true;
+
+							// } else {
+
+							// 	objectType[strGetName] = true;
+							// }
 
 							// ////////////////////////
 							// ////////////////////////
@@ -1032,12 +1063,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							// ////////////////////////
 							// // Blocks.
-							// var strSetName = clType.data.name + "_set" + property.name;
-							// self.blocks[strSetName] = m_functionGenerateBlocksPropertySetFunctionString(strSetName);
+							// var strSetName = clType.data.name + "_set" + event.name;
+							// self.blocks[strSetName] = m_functionGenerateBlocksEventSetFunctionString(strSetName);	// This method doesn't exist.
 
 							// ////////////////////////
 							// // JavaScript.
-							// self.javaScript[strSetName] = m_functionGenerateJavaScriptPropertySetFunctionString(property.name);
+							// self.javaScript[strSetName] = m_functionGenerateJavaScriptEventSetFunctionString(event.name);	// This method doesn't exist.
 
 							// ////////////////////////
 							// // Schema.
@@ -1047,7 +1078,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// }
 							// var objectTypes = self.schema.Types;
 							// var objectType = objectTypes[clType.data.name];
-							// objectType[strSetName] = true;
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							// if (!objectType) {
+
+							// objectTypes[clType.data.name] = {};
+							// 	objectTypes[clType.data.name][strSetName] = true;
+
+							// } else {
+
+							// 	objectType[strSetName] = true;
+							// }
 
 							return null;
 
@@ -1157,7 +1197,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							objectType[strGetName] = true;
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							if (!objectType) {
+
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strGetName] = true;
+
+							} else {
+
+								objectType[strGetName] = true;
+							}
 							delete objectType[strOriginalName];
 
 							////////////////////////
@@ -1211,7 +1260,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							objectType[strSetName] = true;
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							if (!objectType) {
+
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strSetName] = true;
+
+							} else {
+
+								objectType[strSetName] = true;
+							}
 							delete objectType[strOriginalSetName];
 
 							return null;
@@ -1269,7 +1327,17 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							objectType[strName] = true;
+
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							if (!objectType) {
+
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strName] = true;
+
+							} else {
+
+								objectType[strName] = true;
+							}
 
 							return null;
 						} catch (e) {
@@ -1302,7 +1370,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								self.schema.Types[clType.data.name]) {
 
 								var objectType = self.schema.Types[clType.data.name];
-								delete objectType[strName];
+								if (objectType && objectType[strName]) {
+
+									delete objectType[strName];
+								}
 							}
 
 							return null;
@@ -1354,7 +1425,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							objectType[strName] = true;
+							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+							if (!objectType) {
+
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strName] = true;
+
+							} else {
+
+								objectType[strName] = true;
+							}
 							delete objectType[strOriginalName];
 
 							return null;
@@ -1411,8 +1491,17 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// 	self.schema.Types[clType.data.name]) {
 
 							// 	var objectType = self.schema.Types[clType.data.name];
-							// 	delete objectType[strGet];
-							// 	delete objectType[strSet];
+							// if (objectType) {
+
+							// 	if (objectType[strGet]) {
+
+							// 		delete objectType[strGet];
+							// 	}
+							// 	if (objectType[strSet]) {
+									
+							// 		delete objectType[strSet];
+							// 	}
+							// }
 							// }
 
 							return null;
