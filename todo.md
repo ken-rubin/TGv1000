@@ -10,7 +10,6 @@
 - [If possible] Click on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
 - In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
-- In Code.js m_functionAdd_Type_New I now do not add to self.schema.Types for new_App. Do I still need to add to self.blocks and self.javaScript just above?
 
 
 ## Jerry
@@ -116,7 +115,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 
 
 #### Type
-##### Add
+##### Add - WORKS
 1. NewTypeDialog goes through Client then Project then Comics to Comic:
 2. comic.addType(clType)
     1. types.addItem(clType)
@@ -126,8 +125,7 @@ To summarize, the sections below describe how our code manipulates each Method's
                 - add self.javaScript["new_" + clType.data.name] and set it
                 - add property "new_" + clType.data.name to self.schema.Types[clType.data.name] and set = true
             - for each property: m_functionAdd_Type_Property(clType, property)
-                - (We will assume we are not adding the App Type.)
-                - 
+                - We will assume we are not adding the App Type.
             - for each method: m_functionAdd_Type_Method(clType, method)
             - for each event: m_functionAdd_Type_Event(clType, event)
             - reload BlocklyIFrame
@@ -149,7 +147,14 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 #### Tool Instance
-##### Create--Drag & Drop a Tool onto the Designer
+##### Drop a Tool onto the Designer - WORKS
+1. a
+2. b
+3. c
+4. d
+5. e
+6. f
+##### Delete (undrop) a Tool from the Designer - WORKS
 1. a
 2. b
 3. c
@@ -172,7 +177,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 #### Method
-##### Add
+##### Add - WORKS
 1. a
 2. b
 3. c
@@ -195,7 +200,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 #### Property
-##### Add
+##### Add - WORKS
 1. a
 2. b
 3. c

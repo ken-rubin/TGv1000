@@ -772,18 +772,21 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-							////////////////////////
-							// Blocks.
-
-							self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
-
-							////////////////////////
-							// JavaScript.
-							self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
-
-							////////////////////////
-							// Schema -- add to it except when adding the App Type.
 							if (!clType.data.isApp) {
+
+								// Skip doing all this for the App Type.
+
+								////////////////////////
+								// Blocks.
+
+								self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
+
+								////////////////////////
+								// JavaScript.
+								self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
+
+								////////////////////////
+								// Schema
 
 								if (!self.schema.Types) {
 
