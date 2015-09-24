@@ -115,22 +115,31 @@ To summarize, the sections below describe how our code manipulates each Method's
 
 
 #### Type
-##### Add - WORKS
-1. NewTypeDialog goes through Client then Project then Comics to Comic:
-2. comic.addType(clType)
-    1. types.addItem(clType)
-        - code.addType(clType)
-            - m_functionAdd_Type_New(clType)
-                - add self.blocks["new_" + clType.data.name] and set it
-                - add self.javaScript["new_" + clType.data.name] and set it
-                - add property "new_" + clType.data.name to self.schema.Types[clType.data.name] and set = true
-            - for each property: m_functionAdd_Type_Property(clType, property)
-                - We will assume we are not adding the App Type.
-            - for each method: m_functionAdd_Type_Method(clType, method)
-            - for each event: m_functionAdd_Type_Event(clType, event)
-            - reload BlocklyIFrame
-    2. tools.addItem(clType) -- adds to toolstrip
-    3. types.select(clType) -- makes clType active and populates the TypeWell 
+##### Add - DONE
+- types.addItem(clType)
+    * code.addType(clType)
+        * m_functionAdd_Type_New(clType) (skip this code for the App Type)
+            * add self.blocks["new_" + clType.data.name] and set it to a function string
+            * add self.javaScript["new_" + clType.data.name] and set it to a javaScript string
+            * add property "new_" + clType.data.name to self.schema.Types[clType.data.name] and set = true (a Category for the Type; create self.schema.Types if it doesn't exist)
+        * for each property in the Type (skipping X,Y,Width,Height for the App Type) call m_functionAdd_Type_Property(clType, property)
+            * set strGetName = clType.data.name + "_get" + property.name
+            * set strSetName = clType.data.name + "_set" + property.name
+            * the property's getter
+                - add self.blocks[strGetName] and set it to a function string (different for App Type and all other Types)
+                - add self.javaScript[strGetName] and set it to a javaScript string (different for App Type and all other Types)
+                - set self.schema.Types[clType.data.name][strGetName] = true
+            * the property's setter
+                - add self.blocks[strSetName] and set it to a function string (different for App Type and all other Types)
+                - add self.javaScript[strSetName] and set it to a javaScript string (different for App Type and all other Types)
+                - set self.schema.Types[clType.data.name][strSetName] = true
+        * for each method in the Type call m_functionAdd_Type_Method(clType, method)
+            * set strName = clType.data.name + "_" + method.name
+            * add self.blocks[strName] and set to function string
+            * add self.javaScript[strName] and set to javaScript string
+            * set self.schema.Types[clType.data.name][strName] = true
+        * for each event in the Type call m_functionAdd_Type_Event(clType, event)
+            * not finalized yet
 ##### Rename
 1. a
 2. b
@@ -147,14 +156,14 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 #### Tool Instance
-##### Drop a Tool onto the Designer - WORKS
+##### Drop a Tool onto the Designer - DONE
 1. a
 2. b
 3. c
 4. d
 5. e
 6. f
-##### Delete (undrop) a Tool from the Designer - WORKS
+##### Delete (undrop) a Tool from the Designer - DONE
 1. a
 2. b
 3. c
@@ -177,7 +186,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 #### Method
-##### Add - WORKS
+##### Add - DONE
 1. a
 2. b
 3. c
@@ -200,7 +209,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 #### Property
-##### Add - WORKS
+##### Add - DONE
 1. a
 2. b
 3. c
