@@ -152,9 +152,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						// Check for duplicate.
 						if (m_strObjectType === 'type') {
 
-							if (!client.isTypeNameAvailableInActiveComic(strName, m_iIndex)) {
+							var res = client.isTypeNameAvailableInActiveComic(strName, m_iIndex);
+							if (res.length) {
 
-								errorHelper.show('That name is already in use. Please try another.');
+								errorHelper.show(res);
 								return;
 							}
 

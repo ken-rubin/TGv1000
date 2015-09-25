@@ -215,6 +215,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 
 					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
+						// Check for reserved names
+						if ($.inArray(strName, ['X','Y', 'Width', 'Height']) > -1) {
+
+							return "X, Y, Width and Height are reserved words and cannot be used as a Type name.";
+						}
+
+						// Check against existing types
 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
 						// Else, we have to skip array[myIndex]
 						for (var i = 0; i < m_clComicActive.data.types.items; i++) {
@@ -224,12 +231,21 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 								var clTypeIth = m_clComicActive.data.types.items[i];
 								if (clTypeIth.data.name === strName) {
 
-									return false;
+									return "That name is already used. Please enter another.";
 								}
 							}
 						}
 
-						return true;
+						// Check against existing Tool Instances.
+						for (var i = 0; i < tools.length; i++) {
+
+							if (strName === tools[i].id) {
+
+								return "That is the name of one of your tool instances. Please enother a different name."
+							}
+						}
+
+						return "";
 					}
 
 					///////////////////////////////////

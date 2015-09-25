@@ -42,8 +42,10 @@
     - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
-- coder.js line 203 (var strInstanceType = "App_get" + strInstance;): change hardcoded "App" to isApp Type name. Same with line 143 (type: "App_get" + strInstance,) and anyplace else that needs it throughout. Add a method to types(?) to get the isApp Type's name more easily.
-- A Type cannot be named X, Y, Width or Height or the same as any tool instance. Also, the unique namer of tool instances must check against existing type names. I believe this is all within a single comic, but I have to check that.
+- A Tool Instance cannot be renamed to:
+    - another tool instance's name
+    - a Type name
+    - X,Y,Width,Height
 
 
 
