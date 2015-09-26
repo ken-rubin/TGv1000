@@ -283,6 +283,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 									// Undo previous two changes.
 
 
+
+
+									
+
+
 									return exceptionRet;
 								}
 							}

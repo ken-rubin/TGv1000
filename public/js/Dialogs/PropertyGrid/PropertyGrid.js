@@ -290,6 +290,36 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						
 						if (strVal !== m_toolInstance.id) {
 
+							// Validate:
+							// cannot be the same as another tool instance ID
+							// cannot be X,Y,Width,Height
+							// cannot be the same as a type name--unless it is this tool instance's type
+							if ($.inArray(strVal,['X','Y','Width','Height']) > -1) {
+
+								errorHelper.show("X,Y,Width and Height are reserved words. Please choose a different name.");
+								return;
+							}
+
+							for (var i = 0; i < types.length; i++) {
+
+								var typeIth = types[i];
+								if (strVal === typeIth.data.name && m_toolInstance.strType !== strVal) {
+
+									errorHelper.show("That is the name of one of your Types. Please choose a different name.");
+									return;
+								}
+							}
+
+							for (var i = 0; i < tools.length; i++) {
+
+								var toolIth = tools[i];
+								if (strVal === toolIth.id) {
+
+									errorHelper.show("That is the name of one of your Tool Instances. Please choose a different name.");
+									return;
+								}
+							}
+
 							var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
 							if (exceptionRet) { throw exceptionRet; }
 
