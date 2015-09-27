@@ -12,6 +12,7 @@ var designer = null;
 var tools = null;
 var code = null;
 var types = null;
+var validator = null;
 var g_strUserId = '';
 var g_strUserName = '';
 var g_clTypeApp = null;
@@ -22,14 +23,35 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/Client", "Code/Code", "Code/Types", "Designer/Designer", "Designer/Tools", "Navbar/Navbar", "Navbar/Comics"], 
-			function (errorHelper, Client, Code, Types, Designer, Tools, Navbar, Comics) {
+		require(["Core/errorHelper", 
+				"Core/Client", 
+				"Code/Code", 
+				"Code/Types", 
+				"Designer/Designer", 
+				"Designer/Tools", 
+				"Navbar/Navbar", 
+				"Navbar/Comics",
+				"Core/Validator"], 
+			function (errorHelper, 
+						Client, 
+						Code, 
+						Types, 
+						Designer, 
+						Tools, 
+						Navbar, 
+						Comics,
+						Validator) {
 
 			try {
 
 				// Allocate and initialize the client.
 				client = new Client();
 				var exceptionRet = client.create();
+				if (exceptionRet) { throw exceptionRet; }
+
+				// Allocate and initialize the client.
+				validator = new Validator();
+				var exceptionRet = validator.create();
 				if (exceptionRet) { throw exceptionRet; }
 
 				// Allocate and attach the designer.
