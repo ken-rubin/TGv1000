@@ -301,15 +301,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							var activeClComic = comics.getActiveComic();
-							if (activeComic) {
+							if (activeClComic) {
 
-								var typesArray = activeComic.getYourTypesArray();
+								var typesArray = activeClComic.getYourTypesArray();
 								if (typesArray) {
 
 									for (var i = 0; i < typesArray.length; i++) {
 
-										var typeIth = typesArray[i];
-										if (strVal === typeIth.data.name && m_toolInstance.strType !== strVal) {
+										var typeIth = typesArray[i];	// no data member
+										if (strVal === typeIth.name && m_toolInstance.strType !== strVal) {
 
 											errorHelper.show("That is the name of one of your Types. Please choose a different name.");
 											return;
@@ -318,9 +318,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								}
 							}
 
-							if (!isToolInstanceIdAvailable(strVal))
+							if (!designer.isToolInstanceIdAvailable(strVal)) {
 								
-								return "That is the name of one of your tool instances. Please enother a different name."
+								errorHelper.show("That is the name of one of your tool instances. Please enother a different name.");
+								return;
 							}
 
 							var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);

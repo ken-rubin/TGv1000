@@ -196,20 +196,6 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 						}
 					}
 
-					// Tool instance name is being changed in PropertyGrid dialog. Is new name available?
-					self.isToolInstanceIdAvailable(strId) {
-
-						for (var i = 0; i < m_arrayTools.length; i++) {
-
-							if (strId === m_arrayTools[i].id) {
-
-								return false;
-							}
-						}
-
-						return true;
-					}
-
 					///////////////////////////////////
 					// Private fields.
 

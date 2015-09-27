@@ -242,6 +242,20 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						}
 					}
 
+					// Tool instance name is being changed in PropertyGrid dialog. Is new name available?
+					self.isToolInstanceIdAvailable = function (strId) {
+
+						for (var i = 0; i < m_arrayItems.length; i++) {
+
+							if (strId === m_arrayItems[i].id) {
+
+								return false;
+							}
+						}
+
+						return true;
+					}
+
 					self.changeToolInstanceId = function(strOldId, strNewId) {
 
 						try {

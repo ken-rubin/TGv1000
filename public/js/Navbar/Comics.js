@@ -242,7 +242,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						}
 
 						// Check against existing Tool Instances.
-						if (!isToolInstanceIdAvailable(strName))
+						if (!designer.isToolInstanceIdAvailable(strName)) {
 
 							return "That is the name of one of your tool instances. Please enother a different name."
 						}
