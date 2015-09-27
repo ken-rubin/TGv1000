@@ -229,12 +229,12 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						// Check against existing types
 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
 						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clComicActive.data.types.items; i++) {
+						for (var i = 0; i < m_clComicActive.data.types.items.length; i++) {
 
 							if (i !== myIndex) {
 
-								var clTypeIth = m_clComicActive.data.types.items[i];
-								if (clTypeIth.data.name === strName) {
+								var typeIth = m_clComicActive.data.types.items[i];	// No data property.
+								if (typeIth.name === strName) {
 
 									return "That name is already in use. Please enter another.";
 								}

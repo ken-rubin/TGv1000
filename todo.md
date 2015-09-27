@@ -42,7 +42,6 @@
     - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
-- Test Type rename collision detection in PropertyGrid and Client.
 - In the string.replace calls that change data in workspace XML docs, add front and back delimiters to avoid incorrect matches--or do something special in the regexps.
 
 
