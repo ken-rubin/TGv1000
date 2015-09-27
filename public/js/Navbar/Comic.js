@@ -118,6 +118,11 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
+					self.getYourTypesArray = function() {
+
+						return self.data.types.items;
+					}
+
 					// Return the DOM element representing a prototypical comic item.
 					// self.generateDOM = function () {
 

@@ -42,10 +42,7 @@
     - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
-- A Tool Instance cannot be renamed to:
-    - another tool instance's name
-    - a Type name
-    - X,Y,Width,Height
+- Test Tool Instance and Type rename collision detection in PropertyGrid and Client.
 
 
 

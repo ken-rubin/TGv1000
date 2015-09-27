@@ -213,6 +213,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						}
 					}
 
+					self.getActiveComic = function() {
+
+						return m_clComicActive;
+					}
+
 					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
 						// Check for reserved names
@@ -231,18 +236,15 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 								var clTypeIth = m_clComicActive.data.types.items[i];
 								if (clTypeIth.data.name === strName) {
 
-									return "That name is already used. Please enter another.";
+									return "That name is already in use. Please enter another.";
 								}
 							}
 						}
 
 						// Check against existing Tool Instances.
-						for (var i = 0; i < tools.length; i++) {
+						if (!isToolInstanceIdAvailable(strName))
 
-							if (strName === tools[i].id) {
-
-								return "That is the name of one of your tool instances. Please enother a different name."
-							}
+							return "That is the name of one of your tool instances. Please enother a different name."
 						}
 
 						return "";
