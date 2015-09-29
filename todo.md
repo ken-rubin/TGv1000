@@ -51,9 +51,7 @@
 - If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 
 
-## Documentation of various things
-
-### General description of programming using our system
+## General description of programming using our system
 A Type is our equivalent of a class in a standard programming language (C# or C++). Like a class it consists of methods, properties and events. A Type's methods can use (instantiate) another Type to access or manipulate its contents.  The method also has access to a "this" reference and any specified parameters.
 
 1. Projects are built in discreet steps called "comics". Think of comics as the steps a programmer goes through while a program is evolving. Each comic contains a set of Types. Usually comic[n+1] will contain all of the Types from comic[n] with more functionality fleshed out in certain Types. Also, comic[n+1] may have one or more additional Types than comic[n]. Every comic has an automatic Type called *App*. A new project contains one comic with one Type, the App type.
@@ -261,13 +259,70 @@ To summarize, the sections below describe how our code manipulates each Method's
 6. f
 
 
+### Validator.js
+Name validation is being systemetized and consolidated into /Core/Validator.js. Types of validation to be checked are: name collisions, reserved word use and reserved character use. Checks in Validator.js will be run when new items are created and when existing items are renamed. Validator.js in instantiated in main.js and is available in the global namespace as *validator*.
+#### Name collisions
+- A user's Projects must have unique names. This is checked at project save time, not in Validator.js (at this time).
+- A Type name may be used only once in a comic.
+- A Type name may not be the same as a Tool Instance name in the same comic.
+- A Tool Instance may not 
+#### Reserved words
+- X, Y, Width and Height are not allowed as Type or Tool Instance names.
+#### Reserved characters
+- At this time the only reserved character is the double quote (\").
+#### Implementation status
+##### Key
+- **Complete** -- complete and in Validator.js
+- **Done** -- done, but not moved into Validator.js
+- **Started**
+
+<table>
+    <tr>
+        <td>Item</td>
+        <td>New</td>
+        <td>Rename</td>
+    </tr>
+    <tr>
+        <td>Project</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Comic</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Type</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Method</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Property</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Event</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Tool Instance</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
 
 
+## Just saving this here for possible implementation of ScrollRegion paging
 
-
-## Just saving this here for possible ScrollRegion paging
-
-#### Using Deferred Join for Paging
+### Using Deferred Join for Paging
 
 This is an interesting trick. Suppose you have pages of customers. Each page displays ten customers. The query will use LIMIT to get ten records, and OFFSET to skip all the previous page results. When you get to the 100th page, it's doing LIMIT 10 OFFSET 990. So the server has to go and read all those records, then discard them.
 
