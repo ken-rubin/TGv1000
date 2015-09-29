@@ -79,6 +79,24 @@ define(["Core/errorHelper"],
 						return null;
 					}
 
+					// Tool instance name is being changed in PropertyGrid dialog or Type name is being check in comics. Is new name available?
+					self.isToolInstanceIdAvailable = function (strId) {
+
+						var toolInstances = designer.getToolInstanceArray();
+						if (toolInstances) {
+
+							for (var i = 0; i < toolInstances.length; i++) {
+
+								if (strId === toolInstances[i].id) {
+
+									return new Error("That is the name of one of your tool instances. Please enother a different name.");
+								}
+							}
+						}
+
+						return null;
+					}
+
 					//////////////////////////////
 					// Private methods
 

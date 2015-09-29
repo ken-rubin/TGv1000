@@ -284,52 +284,41 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// If non-empty, change the name (id) of this tool instance (m_toolInstance).
 					var m_functionChangeTIName = function () {
 
-						var strVal = $("#NewName").val().trim();
-						if (strVal.length === 0)
-							return;
-						
-						if (strVal !== m_toolInstance.id) {
+						try {
 
-							// Validate:
-							// cannot be the same as another tool instance ID
-							// cannot be X,Y,Width,Height
-							// cannot be the same as a type name--unless it is this tool instance's type
-							if ($.inArray(strVal,['X','Y','Width','Height']) > -1) {
-
-								errorHelper.show("X,Y,Width and Height are reserved words. Please choose a different name.");
+							var strVal = $("#NewName").val().trim();
+							if (strVal.length === 0)
 								return;
+							
+							if (strVal !== m_toolInstance.id) {
+
+								// Validate:
+								// cannot be the same as another tool instance ID
+								// cannot be X,Y,Width,Height (reserved words)
+								// cannot be the same as a type name--unless it is this tool instance's type
+
+								var exceptionRet = validator.checkReservedWords(strVal);
+								if (exceptionRet) { throw exceptionRet; }
+
+								var exceptionRet = validator.checkReservedChars(strVal);
+								if (exceptionRet) { throw exceptionRet; }
+
+								exceptionRet = validator.checkTypeNames(strVal, m_toolInstance.strType);
+								if (exceptionRet) { throw exceptionRet; }
+
+								exceptionRet = validator.isToolInstanceIdAvailable(strVal);
+								if (exceptionRet) { throw exceptionRet; }
+
+								var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
+								if (exceptionRet) { throw exceptionRet; }
+
+								// Update this dialog's tool instance, too.
+								m_toolInstance.id = strVal;
+								m_dialog.setTitle(strVal + " Properties");
 							}
+						} catch (e) {
 
-							var activeClComic = comics.getActiveComic();
-							if (activeClComic) {
-
-								var typesArray = activeClComic.getYourTypesArray();
-								if (typesArray) {
-
-									for (var i = 0; i < typesArray.length; i++) {
-
-										var typeIth = typesArray[i];	// no data member
-										if (strVal === typeIth.name && m_toolInstance.strType !== strVal) {
-
-											errorHelper.show("That is the name of one of your Types. Please choose a different name.");
-											return;
-										}
-									}
-								}
-							}
-
-							if (!designer.isToolInstanceIdAvailable(strVal)) {
-								
-								errorHelper.show("That is the name of one of your tool instances. Please enother a different name.");
-								return;
-							}
-
-							var exceptionRet = designer.changeToolInstanceId(m_toolInstance.id, strVal);
-							if (exceptionRet) { throw exceptionRet; }
-
-							// Update this dialog's tool instance, too.
-							m_toolInstance.id = strVal;
-							m_dialog.setTitle(strVal + " Properties");
+							errorHelper.show(e);
 						}
 					}
 
