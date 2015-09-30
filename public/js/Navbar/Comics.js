@@ -218,38 +218,39 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						return m_clComicActive;
 					}
 
-					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
+//moved to Validator.js
+					// self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
-						// Check for reserved names
-						if ($.inArray(strName, ['X','Y', 'Width', 'Height']) > -1) {
+					// 	// Check for reserved names
+					// 	if ($.inArray(strName, ['X','Y', 'Width', 'Height']) > -1) {
 
-							return "X, Y, Width and Height are reserved words and cannot be used as a Type name.";
-						}
+					// 		return "X, Y, Width and Height are reserved words and cannot be used as a Type name.";
+					// 	}
 
-						// Check against existing types
-						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clComicActive.data.types.items.length; i++) {
+					// 	// Check against existing types
+					// 	// If myIndex === -1, it means we're adding, and we have to check the whole array.
+					// 	// Else, we have to skip array[myIndex]
+					// 	for (var i = 0; i < m_clComicActive.data.types.items.length; i++) {
 
-							if (i !== myIndex) {
+					// 		if (i !== myIndex) {
 
-								var typeIth = m_clComicActive.data.types.items[i];	// No data property.
-								if (typeIth.name === strName) {
+					// 			var typeIth = m_clComicActive.data.types.items[i];	// No data property.
+					// 			if (typeIth.name === strName) {
 
-									return "That name is already in use. Please enter another.";
-								}
-							}
-						}
+					// 				return "That name is already in use. Please enter another.";
+					// 			}
+					// 		}
+					// 	}
 
-						// Check against existing Tool Instances.
-						var exceptionRet = validator.isToolInstanceIdAvailable(strName);
-						if (exceptionRet) {
+					// 	// Check against existing Tool Instances.
+					// 	var exceptionRet = validator.isToolInstanceIdAvailable(strName);
+					// 	if (exceptionRet) {
 
-							return exceptionRet.message;
-						}
+					// 		return exceptionRet.message;
+					// 	}
 
-						return "";
-					}
+					// 	return "";
+					// }
 
 					///////////////////////////////////
 					// Private fields.

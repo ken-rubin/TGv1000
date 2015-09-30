@@ -145,19 +145,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						var strName = $("#RenameInput").val().trim();
 						if (strName.length === 0) {
 
-							errorHelper.show("You must enter a name.");
-							return;
+							throw new Error("You must enter a name.");
 						}
 
 						// Check for duplicate.
 						if (m_strObjectType === 'type') {
 
-							var res = client.isTypeNameAvailableInActiveComic(strName, m_iIndex);
-							if (res.length) {
-
-								errorHelper.show(res);
-								return;
-							}
+							exceptionRet = validator.isTypeNameAvailableInActiveComic(strName, m_iIndex);
+							if (exceptionRet) { throw exceptionRet; }
 
 							exceptionRet = client.renameTypeInActiveComic(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
@@ -165,11 +160,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						} else if (m_strObjectType === 'method') {
 
 
-							if (!client.isMethodNameAvailableInActiveType(strName, m_iIndex)) {
+							exceptionRet = validator.isMethodNameAvailableInActiveType(strName, m_iIndex);
+							if (exceptionRet) { throw exceptionRet; }
+							// ) {
 
-								errorHelper.show('That name is already in use. Please try another.');
-								return;
-							}
+							// 	errorHelper.show('That name is already in use. Please try another.');
+							// 	return;
+							// }
 
 							exceptionRet = client.renameMethodInActiveType(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
@@ -177,11 +174,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						} else if (m_strObjectType === 'event') {
 
 
-							if (!client.isEventNameAvailableInActiveType(strName, m_iIndex)) {
+							exceptionRet = validator.isEventNameAvailableInActiveType(strName, m_iIndex);
+							if (exceptionRet) { throw exceptionRet; }
+							// ) {
 
-								errorHelper.show('That name is already in use. Please try another.');
-								return;
-							}
+							// 	errorHelper.show('That name is already in use. Please try another.');
+							// 	return;
+							// }
 
 							exceptionRet = client.renameEventInActiveType(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
@@ -199,7 +198,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						errorHelper.show(e);
 					}
-
 				}
 
 				/////////////////////////////////

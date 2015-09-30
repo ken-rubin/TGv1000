@@ -525,65 +525,65 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
-//used
-					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
+// //moved to Validator.js
+// 					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
 
-						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
+// 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+// 						// Else, we have to skip array[myIndex]
+// 						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
-							if (i !== myIndex) {
+// 							if (i !== myIndex) {
 
-								var eventIth = m_clTypeActive.data.events[i];
-								if (eventIth.name === strName) {
+// 								var eventIth = m_clTypeActive.data.events[i];
+// 								if (eventIth.name === strName) {
 
-									return false;
-								}
-							}
-						}
+// 									return false;
+// 								}
+// 							}
+// 						}
 
-						return true;
-					}
+// 						return true;
+// 					}
 
-//used
-					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
+// //moved to Validator.js
+// 					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
 
-						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
+// 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+// 						// Else, we have to skip array[myIndex]
+// 						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
 
-							if (i !== myIndex) {
+// 							if (i !== myIndex) {
 
-								var methodIth = m_clTypeActive.data.methods[i];
-								if (methodIth.name === strName) {
+// 								var methodIth = m_clTypeActive.data.methods[i];
+// 								if (methodIth.name === strName) {
 
-									return false;
-								}
-							}
-						}
+// 									return false;
+// 								}
+// 							}
+// 						}
 
-						return true;
-					}
+// 						return true;
+// 					}
 
-//used
-					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
+// //moved to Validator.js
+// 					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
 
-						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
+// 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+// 						// Else, we have to skip array[myIndex]
+// 						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
 
-							if (i !== myIndex) {
+// 							if (i !== myIndex) {
 
-								var propertyIth = m_clTypeActive.data.properties[i];
-								if (propertyIth.name === strName) {
+// 								var propertyIth = m_clTypeActive.data.properties[i];
+// 								if (propertyIth.name === strName) {
 
-									return false;
-								}
-							}
-						}
+// 									return false;
+// 								}
+// 							}
+// 						}
 
-						return true;
-					}
+// 						return true;
+// 					}
 
 //used
 					self.changeTypeWellHeader = function (strNewTypeName) {

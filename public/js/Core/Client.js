@@ -1048,44 +1048,49 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.isComicNameAvailable = function(strName) {
+// moved to Validator.js
+					// self.isComicNameAvailable = function(strName) {
 
-						if (m_clProject) {
+					// 	if (m_clProject) {
 
-							for (var i = 0; i < m_clProject.data.comics.items.length; i++) {
+					// 		for (var i = 0; i < m_clProject.data.comics.items.length; i++) {
 
-								var comicIth = m_clProject.data.comics.items[i];
-								if (comicIth.name === strName) {
+					// 			var comicIth = m_clProject.data.comics.items[i];
+					// 			if (comicIth.name === strName) {
 
-									return false;
-								}
+					// 				return false;
+					// 			}
 
-								return true;
-							}
-						}
+					// 			return true;
+					// 		}
+					// 	}
 
-						return false;
-					}
+					// 	return false;
+					// }
 
-					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
+// moved to Validator.js
+					// self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
-						return comics.isTypeNameAvailableInActiveComic(strName, myIndex);
-					}
+					// 	return comics.isTypeNameAvailableInActiveComic(strName, myIndex);
+					// }
 
-					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
+// moved to Validator.js
+					// self.isEventNameAvailableInActiveType = function(strName, myIndex) {
 
-						return types.isEventNameAvailableInActiveType(strName, myIndex);
-					}
+					// 	return types.isEventNameAvailableInActiveType(strName, myIndex);
+					// }
 
-					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
+// moved to Validator.js
+					// self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
 
-						return types.isMethodNameAvailableInActiveType(strName, myIndex);
-					}
+					// 	return types.isMethodNameAvailableInActiveType(strName, myIndex);
+					// }
 
-					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
+// moved to Validator.js
+					// self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
 
-						return types.isPropertyNameAvailableInActiveType(strName, myIndex);
-					}
+					// 	return types.isPropertyNameAvailableInActiveType(strName, myIndex);
+					// }
 
 					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
 

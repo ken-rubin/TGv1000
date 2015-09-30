@@ -141,12 +141,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 							var typeName = $("#TypeName").val().trim();
-							var res = client.isTypeNameAvailableInActiveComic(typeName, -1);
-							if (res.length) {
 
-								errorHelper.show(res);
-								return;
+							if (typeName.length === 0) {
+
+								throw new Error("You must enter a name.");
 							}
+
+							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, -1);
+							if (exceptionRet) { throw exceptionRet; }
+							// if (res.length) {
+
+							// 	errorHelper.show(res);
+							// 	return;
+							// }
 
 							// Create minimal Type based on the dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
@@ -177,7 +184,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							};
 
 							var clType = new Type();
-							var exceptionRet = clType.load(typeJO);
+							exceptionRet = clType.load(typeJO);
 							if (exceptionRet) { throw exceptionRet; }
 
 							exceptionRet = client.addTypeToProject(clType);

@@ -142,12 +142,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var methodName = $("#MethodName").val().trim();
 
+							if (methodName.length === 0) {
 
-							if (!client.isMethodNameAvailableInActiveType(methodName, -1)) {
-
-								errorHelper.show("That name is already used. Please enter another.");
-								return;
+								throw new Error("You must enter a name.");
 							}
+
+							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, -1);
+							if (exceptionRet) { throw exceptionRet; }
+							// 	) {
+
+							// 	errorHelper.show("That name is already used. Please enter another.");
+							// 	return;
+							// }
 
 							// Create Method based on the new Method dialog's fields--or lack thereof.
 							// Call client to inject it.
@@ -169,11 +175,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								description: $("#MethodDescription").val() || ''
 							};
 
-							var exceptionRet = client.addMethodToActiveType(method);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							exceptionRet = client.addMethodToActiveType(method);
+							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
 

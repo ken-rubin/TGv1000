@@ -98,6 +98,154 @@ define(["Core/errorHelper"],
 					}
 
 					//////////////////////////////
+					// Moved from Types.js
+					//////////////////////////////
+//incomplete
+					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
+
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
+						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
+
+							if (i !== myIndex) {
+
+								var eventIth = m_clTypeActive.data.events[i];
+								if (eventIth.name === strName) {
+
+									return false;
+								}
+							}
+						}
+
+						return true;
+					}
+
+//incomplete
+					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
+
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
+						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
+
+							if (i !== myIndex) {
+
+								var methodIth = m_clTypeActive.data.methods[i];
+								if (methodIth.name === strName) {
+
+									return false;
+								}
+							}
+						}
+
+						return true;
+					}
+
+//incomplete
+					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
+
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
+						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
+
+							if (i !== myIndex) {
+
+								var propertyIth = m_clTypeActive.data.properties[i];
+								if (propertyIth.name === strName) {
+
+									return false;
+								}
+							}
+						}
+
+						return true;
+					}
+
+					//////////////////////////////
+					// Moved from Client.js
+					//////////////////////////////
+//incomplete
+					self.isComicNameAvailable = function(strName) {
+
+						if (m_clProject) {
+
+							for (var i = 0; i < m_clProject.data.comics.items.length; i++) {
+
+								var comicIth = m_clProject.data.comics.items[i];
+								if (comicIth.name === strName) {
+
+									return false;
+								}
+
+								return true;
+							}
+						}
+
+						return false;
+					}
+
+//incomplete
+					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
+
+						return comics.isTypeNameAvailableInActiveComic(strName, myIndex);
+					}
+
+//incomplete
+					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
+
+						return types.isEventNameAvailableInActiveType(strName, myIndex);
+					}
+
+//incomplete
+					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
+
+						return types.isMethodNameAvailableInActiveType(strName, myIndex);
+					}
+
+//incomplete
+					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
+
+						return types.isPropertyNameAvailableInActiveType(strName, myIndex);
+					}
+
+					//////////////////////////////
+					// Moved from Comics.js
+					//////////////////////////////
+//incomplete
+					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
+
+						// Check for reserved names
+						if ($.inArray(strName, ['X','Y', 'Width', 'Height']) > -1) {
+
+							return "X, Y, Width and Height are reserved words and cannot be used as a Type name.";
+						}
+
+						// Check against existing types
+						// If myIndex === -1, it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex]
+						for (var i = 0; i < m_clComicActive.data.types.items.length; i++) {
+
+							if (i !== myIndex) {
+
+								var typeIth = m_clComicActive.data.types.items[i];	// No data property.
+								if (typeIth.name === strName) {
+
+									return "That name is already in use. Please enter another.";
+								}
+							}
+						}
+
+						// Check against existing Tool Instances.
+						var exceptionRet = validator.isToolInstanceIdAvailable(strName);
+						if (exceptionRet) {
+
+							return exceptionRet.message;
+						}
+
+						return "";
+					}
+
+
+					//////////////////////////////
 					// Private methods
 
 					//////////////////////////////

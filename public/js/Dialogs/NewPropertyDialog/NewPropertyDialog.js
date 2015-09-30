@@ -256,17 +256,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (m_iDataType === 0) {
 
-								errorHelper.show("Please select a Data type.");
-								return;
+								throw new Error("Please select a Data type.");
 							}
 
 							var propertyName = $("#PropertyName").val().trim();
 							
-							if (!client.isPropertyNameAvailableInActiveType(propertyName, m_iIndexIfEdit)) {
+							if (propertyName.length === 0) {
 
-								errorHelper.show("That name is already used. Please enter another.");
-								return;
+								throw new Error("You must enter a name.");
 							}
+
+							var exceptionRet = validator.isPropertyNameAvailableInActiveType(propertyName, m_iIndexIfEdit);
+							if (exceptionRet) { throw exceptionRet; }
+							// ) {
+
+							// 	errorHelper.show("That name is already used. Please enter another.");
+							// 	return;
+							// }
 
 							var strInitialValue = "";
 							switch (m_iDataType) {
@@ -363,12 +369,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (m_strNewOrEdit === 'New') {
 
-								var exceptionRet = client.addPropertyToActiveType(property);
+								exceptionRet = client.addPropertyToActiveType(property);
 								if (exceptionRet) { throw exceptionRet; }
 
 							} else {
 
-								var exceptionRet = client.updatePropertyInActiveType(property, m_iIndexIfEdit, m_strOriginalNameIfEdit);
+								exceptionRet = client.updatePropertyInActiveType(property, m_iIndexIfEdit, m_strOriginalNameIfEdit);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
