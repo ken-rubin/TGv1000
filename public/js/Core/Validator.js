@@ -21,9 +21,7 @@ define(["Core/errorHelper"],
 					//////////////////////////////
 					// Public properties.
 
-					// The methods that check names will not return the usual true or false.
-					// Rather, the will return an Error instance containing the actual text to show the user or null.
-
+					// The methods that check names will return an Error instance containing the actual text to show the user--or null.
 
 					//////////////////////////////
 					// Public methods.
@@ -75,6 +73,33 @@ define(["Core/errorHelper"],
 
 					self.checkReservedChars = function(strName) {
 
+						var strRegexCharsRequiringEscaping = ".\\+*?[^]$(){}=!<>|:-";
+
+						var strRegex = "";
+						m_reservedChars.forEach(function(char) {
+
+							if (strRegex.length > 0) {
+
+								strRegex += "|";	// Or
+							}
+
+							if (strName.indexOf(char) > -1) {
+
+								// The char is reserved and requires escaping.
+								strRegex += "\\" + char;
+
+							} else {
+
+								// Char isn't reserved and can just be added.
+								strRegex += char;
+							}
+						});
+
+						var re = new RegExp(strRegex);
+						if (re.test(strName)) {
+
+							return new Error("Your name contains a character that is not allowed. Reserved characters are: " + m_reservedChars.join() + ".");
+						}
 
 						return null;
 					}
@@ -100,148 +125,138 @@ define(["Core/errorHelper"],
 					//////////////////////////////
 					// Moved from Types.js
 					//////////////////////////////
-//incomplete
+
 					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
 
-						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
+						// If myIndex === -1 (or isn't present), it means we're adding, and we have to check the whole array.
+						// Else, we have to skip array[myIndex] since we're editing.
+						myIndex = myIndex || -1;
 
-							if (i !== myIndex) {
+						var clTypeActive = types.getActiveClType();
+						if (clTypeActive) {
 
-								var eventIth = m_clTypeActive.data.events[i];
-								if (eventIth.name === strName) {
+							for (var i = 0; i < clTypeActive.data.events.length; i++) {
 
-									return false;
+								if (i !== myIndex) {
+
+									var eventIth = clTypeActive.data.events[i];
+									if (eventIth.name === strName) {
+
+										return new Error("That name is already used for an event in this type. Please enter another.");
+									}
 								}
 							}
 						}
 
-						return true;
+						return null;
 					}
 
-//incomplete
 					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
 
 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
+						// Else, we have to skip array[myIndex] since we're editing.
+						myIndex = myIndex || -1;
 
-							if (i !== myIndex) {
+						var clTypeActive = types.getActiveClType();
+						if (clTypeActive) {
 
-								var methodIth = m_clTypeActive.data.methods[i];
-								if (methodIth.name === strName) {
+							for (var i = 0; i < clTypeActive.data.methods.length; i++) {
 
-									return false;
+								if (i !== myIndex) {
+
+									var methodIth = clTypeActive.data.methods[i];
+									if (methodIth.name === strName) {
+
+										return new Error("That name is already used for a method in this type. Please enter another.");
+									}
 								}
 							}
 						}
 
-						return true;
+						return null;
 					}
 
-//incomplete
 					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
 
 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
+						// Else, we have to skip array[myIndex] since we're editing.
+						myIndex = myIndex || -1;
 
-							if (i !== myIndex) {
+						var clTypeActive = types.getActiveClType();
+						if (clTypeActive) {
 
-								var propertyIth = m_clTypeActive.data.properties[i];
-								if (propertyIth.name === strName) {
+							for (var i = 0; i < clTypeActive.data.properties.length; i++) {
 
-									return false;
+								if (i !== myIndex) {
+
+									var propertyIth = clTypeActive.data.properties[i];
+									if (propertyIth.name === strName) {
+
+										return new Error("That name is already used for a property in this type. Please enter another.");
+									}
 								}
 							}
 						}
 
-						return true;
+						return null;
 					}
 
 					//////////////////////////////
 					// Moved from Client.js
 					//////////////////////////////
-//incomplete
+
 					self.isComicNameAvailable = function(strName) {
 
-						if (m_clProject) {
+						var clProject = client.getProject();
+						if (clProject) {
 
-							for (var i = 0; i < m_clProject.data.comics.items.length; i++) {
+							for (var i = 0; i < clProject.data.comics.items.length; i++) {
 
-								var comicIth = m_clProject.data.comics.items[i];
+								var comicIth = clProject.data.comics.items[i];
 								if (comicIth.name === strName) {
 
-									return false;
+										return new Error("That name is already used for a comic in this project. Please enter another.");
 								}
-
-								return true;
 							}
 						}
 
-						return false;
-					}
-
-//incomplete
-					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
-
-						return comics.isTypeNameAvailableInActiveComic(strName, myIndex);
-					}
-
-//incomplete
-					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
-
-						return types.isEventNameAvailableInActiveType(strName, myIndex);
-					}
-
-//incomplete
-					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
-
-						return types.isMethodNameAvailableInActiveType(strName, myIndex);
-					}
-
-//incomplete
-					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
-
-						return types.isPropertyNameAvailableInActiveType(strName, myIndex);
+						return null;
 					}
 
 					//////////////////////////////
 					// Moved from Comics.js
 					//////////////////////////////
-//incomplete
+
 					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
 						// Check for reserved names
 						if ($.inArray(strName, ['X','Y', 'Width', 'Height']) > -1) {
 
-							return "X, Y, Width and Height are reserved words and cannot be used as a Type name.";
+							return new Error("X, Y, Width and Height are reserved words and cannot be used as a Type name.");
 						}
 
-						// Check against existing types
-						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-						// Else, we have to skip array[myIndex]
-						for (var i = 0; i < m_clComicActive.data.types.items.length; i++) {
+						var clComicActive = comics.getActiveComic();
 
-							if (i !== myIndex) {
+						if (clComicActive) {
 
-								var typeIth = m_clComicActive.data.types.items[i];	// No data property.
-								if (typeIth.name === strName) {
+							// Check against existing types
+							// If myIndex === -1, it means we're adding, and we have to check the whole array.
+							// Else, we have to skip array[myIndex]
+							for (var i = 0; i < clComicActive.data.types.items.length; i++) {
 
-									return "That name is already in use. Please enter another.";
+								if (i !== myIndex) {
+
+									var typeIth = clComicActive.data.types.items[i];	// No data property.
+									if (typeIth.name === strName) {
+
+										return new Error("That name is already in use. Please enter another.");
+									}
 								}
 							}
 						}
 
 						// Check against existing Tool Instances.
-						var exceptionRet = validator.isToolInstanceIdAvailable(strName);
-						if (exceptionRet) {
-
-							return exceptionRet.message;
-						}
-
-						return "";
+						return self.isToolInstanceIdAvailable(strName);
 					}
 
 
