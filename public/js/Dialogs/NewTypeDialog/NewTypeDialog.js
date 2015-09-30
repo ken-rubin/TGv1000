@@ -149,11 +149,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, -1);
 							if (exceptionRet) { throw exceptionRet; }
-							// if (res.length) {
-
-							// 	errorHelper.show(res);
-							// 	return;
-							// }
 
 							// Create minimal Type based on the dialog's fields--or lack thereof.
 							// Call client to inject it throughout.

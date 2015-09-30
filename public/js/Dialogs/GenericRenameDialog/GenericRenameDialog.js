@@ -162,11 +162,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							exceptionRet = validator.isMethodNameAvailableInActiveType(strName, m_iIndex);
 							if (exceptionRet) { throw exceptionRet; }
-							// ) {
-
-							// 	errorHelper.show('That name is already in use. Please try another.');
-							// 	return;
-							// }
 
 							exceptionRet = client.renameMethodInActiveType(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
@@ -176,11 +171,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							exceptionRet = validator.isEventNameAvailableInActiveType(strName, m_iIndex);
 							if (exceptionRet) { throw exceptionRet; }
-							// ) {
-
-							// 	errorHelper.show('That name is already in use. Please try another.');
-							// 	return;
-							// }
 
 							exceptionRet = client.renameEventInActiveType(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }

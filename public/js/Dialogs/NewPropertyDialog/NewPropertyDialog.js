@@ -268,11 +268,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var exceptionRet = validator.isPropertyNameAvailableInActiveType(propertyName, m_iIndexIfEdit);
 							if (exceptionRet) { throw exceptionRet; }
-							// ) {
-
-							// 	errorHelper.show("That name is already used. Please enter another.");
-							// 	return;
-							// }
 
 							var strInitialValue = "";
 							switch (m_iDataType) {

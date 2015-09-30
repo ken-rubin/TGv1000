@@ -1048,50 +1048,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-// moved to Validator.js
-					// self.isComicNameAvailable = function(strName) {
-
-					// 	if (m_clProject) {
-
-					// 		for (var i = 0; i < m_clProject.data.comics.items.length; i++) {
-
-					// 			var comicIth = m_clProject.data.comics.items[i];
-					// 			if (comicIth.name === strName) {
-
-					// 				return false;
-					// 			}
-
-					// 			return true;
-					// 		}
-					// 	}
-
-					// 	return false;
-					// }
-
-// moved to Validator.js
-					// self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
-
-					// 	return comics.isTypeNameAvailableInActiveComic(strName, myIndex);
-					// }
-
-// moved to Validator.js
-					// self.isEventNameAvailableInActiveType = function(strName, myIndex) {
-
-					// 	return types.isEventNameAvailableInActiveType(strName, myIndex);
-					// }
-
-// moved to Validator.js
-					// self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
-
-					// 	return types.isMethodNameAvailableInActiveType(strName, myIndex);
-					// }
-
-// moved to Validator.js
-					// self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
-
-					// 	return types.isPropertyNameAvailableInActiveType(strName, myIndex);
-					// }
-
 					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
 
 						// The following seems stupid, but it may be the best way to prevent showing this dlg after a project save.

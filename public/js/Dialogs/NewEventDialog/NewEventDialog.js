@@ -141,11 +141,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							
 							var exceptionRet = validator.isEventNameAvailableInActiveType(eventName, -1);
 							if (exceptionRet) { throw exceptionRet; }
-							// ) {
-
-							// 	errorHelper.show("That name is already used. Please enter another.");
-							// 	return;
-							// }
 
 							// // Create Event based on the dialog's fields.
 							// // Call client to inject it throughout.

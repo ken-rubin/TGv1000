@@ -149,11 +149,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, -1);
 							if (exceptionRet) { throw exceptionRet; }
-							// 	) {
-
-							// 	errorHelper.show("That name is already used. Please enter another.");
-							// 	return;
-							// }
 
 							// Create Method based on the new Method dialog's fields--or lack thereof.
 							// Call client to inject it.
