@@ -185,10 +185,14 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 
 						try {
 
-							var jItem = $("#tool-" + client.removeSpaces(strOriginalName));
+							// First fix the tool representation in m_srToolStripV.
 							// No need to destroy and re-establish tooltip. We'll do it manually. It works better.
+							var jItem = $("#tool-" + client.removeSpaces(strOriginalName));
 							jItem.attr({"data-original-title": strNewName});
 							jItem.attr("id", "tool-" + client.removeSpaces(strNewName));
+							jItem.attr("data-type", strNewName);
+
+							// Note: the name of the tool in m_arrayTools has been changed since the Type's name was changed already.
 
 						} catch(e) {
 

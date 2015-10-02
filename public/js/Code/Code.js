@@ -118,7 +118,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-							// Rename type.
+							// Rename type's new_ constructor function.
 							var exceptionRet = m_functionRename_Type_New(clType, 
 								strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
@@ -127,11 +127,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							for (var i = 0; i < clType.data.properties.length; i++) {
 
 								var propertyIth = clType.data.properties[i];
-								var exceptionRet = m_functionRename_Type_Property(clType,
-									propertyIth,
-									propertyIth.name, 
-									strOriginalName);
-								if (exceptionRet) { throw exceptionRet; }
+
+								// Don't add blocks for the App Type's X,Y,Width,Height properties.
+								if (!clType.data.isApp || (clType.data.isApp && $.inArray(propertyIth.name, ['X','Y', 'Width', 'Height']) === -1)) {
+
+									var exceptionRet = m_functionRename_Type_Property(clType,
+										propertyIth,
+										propertyIth.name, 
+										strOriginalName);
+									if (exceptionRet) { throw exceptionRet; }
+								}
 							}
 
 							// Rename methods.
@@ -856,11 +861,11 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Workspace.
 							if (self.workspace) {
 
-								var re = new RegExp("new_" + strOriginalName,"g");
+								var re = new RegExp('"' + "new_" + strOriginalName + '"',"g");
 								self.workspace = self.workspace.replace(re,
-									"new_" + clType.data.name);
-								var exceptionRet = types.replaceInWorkspaces("new_" + strOriginalName,
-									"new_" + clType.data.name);
+									'"' + "new_" + clType.data.name + '"');
+								var exceptionRet = types.replaceInWorkspaces('"' + "new_" + strOriginalName + '"',
+									'"' + "new_" + clType.data.name + '"');
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -1184,9 +1189,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Workspace.
 							if (self.workspace) {
 
-								var re = new RegExp(strOriginalName,"g");
+								var re = new RegExp('"' + strOriginalName + '"',"g");
 								self.workspace = self.workspace.replace(re,
-									strGetName);
+									'"' + strGetName + '"');
 								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
 									strGetName);
 								if (exceptionRet) { throw exceptionRet; }
@@ -1247,9 +1252,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Workspace.
 							if (self.workspace) {
 
-								var re = new RegExp(strOriginalSetName,"g");
+								var re = new RegExp('"' + strOriginalSetName + '"',"g");
 								self.workspace = self.workspace.replace(re,
-									strSetName);
+									'"' + strSetName + '"');
 								var exceptionRet = types.replaceInWorkspaces(strOriginalSetName,
 									strSetName);
 								if (exceptionRet) { throw exceptionRet; }
@@ -1412,9 +1417,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Workspace.
 							if (self.workspace) {
 
-								var re = new RegExp(strOriginalName,"g");
+								var re = new RegExp('"' + strOriginalName + '"',"g");
 								self.workspace = self.workspace.replace(re,
-									strName);
+									'"' + strName + '"');
 								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
 									strName);
 								if (exceptionRet) { throw exceptionRet; }

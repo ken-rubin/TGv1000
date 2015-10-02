@@ -258,13 +258,13 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     }
 
                     var strAppTypeName = clAppType.data.name;
-                    var reOldSet = new RegExp(strAppTypeName + "_set" + strOldId, 'g');
+                    var reOldSet = new RegExp('"' + strAppTypeName + "_set" + strOldId + '"', 'g');
                     var strNewSet = strAppTypeName + "_set" + strNewId;
-                    var reOldGet = new RegExp(strAppTypeName + "_get" + strOldId, 'g');
+                    var reOldGet = new RegExp('"' + strAppTypeName + "_get" + strOldId + '"', 'g');
                     var strNewGet = strAppTypeName + "_get" + strNewId;
 
-                    xmlWorkspace = xmlWorkspace.replace(reOldSet, strNewSet);
-                    xmlWorkspace = xmlWorkspace.replace(reOldGet, strNewGet);
+                    xmlWorkspace = xmlWorkspace.replace(reOldSet, '"' + strNewSet + '"');
+                    xmlWorkspace = xmlWorkspace.replace(reOldGet, '"' + strNewGet + '"');
 
                     // Update in initialize method of App type.
 

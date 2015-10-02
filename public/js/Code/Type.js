@@ -175,11 +175,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							var methodIth = self.data.methods[i];
 
 							// Construct the global RegExp and apply to workspace.
-							var re = new RegExp(strOld,"g");
+							var re = new RegExp('"' + strOld + '"',"g");
 							if (methodIth.workspace) {
 
 								methodIth.workspace = methodIth.workspace.replace(re,
-									strNew);
+									'"' + strNew + '"');
 							}
 						}
 
