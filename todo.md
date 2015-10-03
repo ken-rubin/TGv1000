@@ -137,125 +137,35 @@ To summarize, the sections below describe how our code manipulates each Method's
         * for each event in the Type call m_functionAdd_Type_Event(clType, event)
             * not finalized yet
 ##### Rename
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
+1. Create project; add 2nd type (type2)
+2. Drag tool type2 onto designer
+3. Rename Type type2 to type55
+4. Double-click on tool instance type2
+    - PropertyGrid starts to open but gets **ERROR**: Could not find Type in order to build property array.
+    - This will be because the strType property of the tool instance still refers to type2--which doesn't exist. Need to tell designer to loop through its array of tool instances and change all that have strType = the old type name.
+    - What about references to the old type name in initialize (and possibly other) methods? Yes, it's still type2 in initialize.
 ##### Delete
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 
 #### Tool Instance
 ##### Drop a Tool onto the Designer - DONE
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
-##### Delete (undrop) a Tool from the Designer - DONE
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
+##### Delete (undrop) a Tool from the Designer
 ##### Rename
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
-##### Delete
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 
 #### Method
 ##### Add - DONE
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Rename
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Delete
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 
 #### Property
 ##### Add - DONE
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Rename
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Delete
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Change property type
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 
 #### Event
 ##### Add
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Rename
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 ##### Delete
-1. a
-2. b
-3. c
-4. d
-5. e
-6. f
 
 
 ### Validator.js

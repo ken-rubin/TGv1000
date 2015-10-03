@@ -668,7 +668,7 @@ define(["Core/errorHelper",
 							var activeClType = types.getActiveClType();
 							activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
 
-							// Call Code.js#renameType(clType, strOriginalName).
+							// Call Code to handle categories and schema methods.
 							var exceptionRet = code.renameType(activeClType, strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
 

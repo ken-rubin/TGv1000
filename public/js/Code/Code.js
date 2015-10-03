@@ -113,14 +113,29 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Method renames a type in blockly.
-					// The new name is already set in clType.data.name.
+					// The new name is *already* set in clType.
+					//
+					// We will be performing these changes:
+					//	1. rename type's new_ constructor function (delete and add new properties)
+					//	2. tell designer to change type name in all matching tool instances
+					//	3. rename any property setters and getters in schema (again, delete and add)
+					//	4. Rename any methods that ... what does this do? Does step 5 do it?
+					//	5. In all types' methods update:
+					//		typename_get[strOriginalName], 
+					//		typename_set[strOriginalName], 
+					//		new_[strOriginalName], 
+					//		[strOriginalName]_set[all properties]
 					self.renameType = function (clType, strOriginalName) {
 
 						try {
 
-							// Rename type's new_ constructor function.
+							// 1.
 							var exceptionRet = m_functionRename_Type_New(clType, 
 								strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// 2.
+							exceptionRet = designer.updateForTypeRename(strOriginalName, clType.data.name);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Rename properties.
@@ -859,15 +874,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Workspace.
-							if (self.workspace) {
+							// if (self.workspace) {
 
-								var re = new RegExp('"' + "new_" + strOriginalName + '"',"g");
-								self.workspace = self.workspace.replace(re,
-									'"' + "new_" + clType.data.name + '"');
+							// 	var re = new RegExp('"' + "new_" + strOriginalName + '"',"g");
+							// 	self.workspace = self.workspace.replace(re,
+							// 		'"' + "new_" + clType.data.name + '"');
 								var exceptionRet = types.replaceInWorkspaces('"' + "new_" + strOriginalName + '"',
 									'"' + "new_" + clType.data.name + '"');
 								if (exceptionRet) { throw exceptionRet; }
-							}
+							// }
 
 							////////////////////////
 							// Schema.
@@ -1187,15 +1202,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Workspace.
-							if (self.workspace) {
+							// if (self.workspace) {
 
-								var re = new RegExp('"' + strOriginalName + '"',"g");
-								self.workspace = self.workspace.replace(re,
-									'"' + strGetName + '"');
+							// 	var re = new RegExp('"' + strOriginalName + '"',"g");
+							// 	self.workspace = self.workspace.replace(re,
+							// 		'"' + strGetName + '"');
 								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
 									strGetName);
 								if (exceptionRet) { throw exceptionRet; }
-							}
+							// }
 
 							////////////////////////
 							// Schema.
@@ -1250,15 +1265,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Workspace.
-							if (self.workspace) {
+							// if (self.workspace) {
 
-								var re = new RegExp('"' + strOriginalSetName + '"',"g");
-								self.workspace = self.workspace.replace(re,
-									'"' + strSetName + '"');
+							// 	var re = new RegExp('"' + strOriginalSetName + '"',"g");
+							// 	self.workspace = self.workspace.replace(re,
+							// 		'"' + strSetName + '"');
 								var exceptionRet = types.replaceInWorkspaces(strOriginalSetName,
 									strSetName);
 								if (exceptionRet) { throw exceptionRet; }
-							}
+							// }
 
 							////////////////////////
 							// Schema.
@@ -1415,15 +1430,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Workspace.
-							if (self.workspace) {
+							// if (self.workspace) {
 
-								var re = new RegExp('"' + strOriginalName + '"',"g");
-								self.workspace = self.workspace.replace(re,
-									'"' + strName + '"');
+							// 	var re = new RegExp('"' + strOriginalName + '"',"g");
+							// 	self.workspace = self.workspace.replace(re,
+							// 		'"' + strName + '"');
 								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
 									strName);
 								if (exceptionRet) { throw exceptionRet; }
-							}
+							// }
 
 							////////////////////////
 							// Schema.

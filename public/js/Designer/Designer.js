@@ -185,6 +185,29 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						}
 					};
 
+					// Type was renamed. Update in any matching tool instances.
+					self.updateForTypeRename = function(strOldName, strNewName) {
+
+						try {
+
+							for (var i = 0; i < m_arrayItems.length; i++) {
+
+								var tiIth = m_arrayItems[i];
+								if (tiIth.type === strOldName) {
+
+									tiIth.type = strNewName;
+									// This is a case where we keep looking and don't break out.
+								}
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					// Used to set initial state of designer frame on project load.
 					self.initializeWithWorkspace = function() {
 
@@ -1028,21 +1051,20 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		            	try {
 
 		            		var strInstanceId = toolInstance.id;
+							var strAppTypeName = g_clTypeApp.data.name;
+							var strTypeName = toolInstance.type;
 
 		            		for (var i = 0; i < m_arrayItems.length; i++) {
 
 		            			var itemIth = m_arrayItems[i];
 		            			if (itemIth.id === strInstanceId) {
 
-									var strAppTypeName = g_clTypeApp.data.name;
-									var strTypeName = toolInstance.type;
-
 									for (var j = 0; j < g_clTypeApp.data.properties.length; j++) {
 
 										var propJth = g_clTypeApp.data.properties[j];
 										if (propJth.name === strInstanceId) {
 
-											// Remove property from left side of code pane (what's it called?).
+											// Remove property from left side of code pane (the category).
 											var exceptionRet = code.removeProperty(g_clTypeApp,
 												propJth);
 											if (exceptionRet) { throw exceptionRet; }
