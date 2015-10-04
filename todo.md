@@ -136,14 +136,7 @@ To summarize, the sections below describe how our code manipulates each Method's
             * set self.schema.Types[clType.data.name][strName] = true
         * for each event in the Type call m_functionAdd_Type_Event(clType, event)
             * not finalized yet
-##### Rename
-1. Create project; add 2nd type (type2)
-2. Drag tool type2 onto designer
-3. Rename Type type2 to type55
-4. Double-click on tool instance type2
-    - PropertyGrid starts to open but gets **ERROR**: Could not find Type in order to build property array.
-    - This will be because the strType property of the tool instance still refers to type2--which doesn't exist. Need to tell designer to loop through its array of tool instances and change all that have strType = the old type name.
-    - What about references to the old type name in initialize (and possibly other) methods? Yes, it's still type2 in initialize.
+##### Rename - DONE
 ##### Delete
 
 #### Tool Instance

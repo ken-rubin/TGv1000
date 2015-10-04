@@ -115,6 +115,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// Method renames a type in blockly.
 					// The new name is *already* set in clType.
 					//
+					// If clType is not the App type, if the type had been dropped on the Designer, the schema for the App type has getters and setters for the 
+					// tool instance under its OLD name (the property is named from the TI ID) and references in the App type's initialize method
+					// are under the OLD name. These are CORRECT, since they are based on the TI id, not the type name.
+					//
 					// We will be performing these changes:
 					//	1. rename type's new_ constructor function (delete and add new properties)
 					//	2. tell designer to change type name in all matching tool instances
@@ -130,7 +134,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						try {
 
 							// 1.
-							var exceptionRet = m_functionRename_Type_New(clType, 
+							exceptionRet = m_functionRename_Type_New(clType, 
 								strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
 
