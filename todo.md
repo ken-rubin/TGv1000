@@ -71,9 +71,8 @@ To summarize, the sections below describe how our code manipulates each Method's
 ### Data structures and the source code
 #### Schema data
 - The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods. The names of blocks that we create are added to self.schema in Code.js and marked *true* (meaning that they are available for use) and their corresponding code is added to self.blocks and self.javaScript.
-- The App Type is structured slightly differently from subsequent Types. It is created with these blocks initially:
-    - new_App (should not be exposed as a block, but probably should exist in schema and set = false--**Ken: this is not working for me; it still displays even though it is false**)
-    - App_initialize using [method]
+- The App Type is structured slightly differently from subsequent Types. It is created with only this one block initially:
+    - App_initialize using [] **Ken: should this be created in the schema?**
 - Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height being each Type's defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
     - new_apple
     - Apple_getX from [var]
@@ -107,10 +106,10 @@ To summarize, the sections below describe how our code manipulates each Method's
 #### Additional Methods of the App Type and all Methods of other Types
 - The blocks in Code.js self.blocks and self.javaScript are used to build up the Method workspace XML.
  
-**Remember: maintenance of anything requires global maintenance of the XML docs.**
+**Remember: maintenance of anything requires global maintenance of the XML workspace docs.**
 
 
-#### Type - Add, Rename and Delete are DONE
+#### Type - all DONE
 ##### Add - DONE
 - types.addItem(clType)
     * code.addType(clType)
@@ -135,21 +134,36 @@ To summarize, the sections below describe how our code manipulates each Method's
             * add self.javaScript[strName] and set to javaScript string
             * set self.schema.Types[clType.data.name][strName] = true
         * for each event in the Type call m_functionAdd_Type_Event(clType, event)
-            * not finalized yet
+            * *not finalized yet*
 ##### Rename - DONE
 ##### Delete - DONE
-    - Delete a Type that doesn't have a TI in the designer: looks good
-    - Delete a Type that does have a TI in the designer: good--makes user delete each TI from designer first
+- Delete a Type that doesn't have a TI in the designer: looks good
+- Delete a Type that does have a TI in the designer: good--makes user delete each TI from designer first
 
-#### Tool Instance
+#### Tool Instance - all DONE
 ##### Drop a Tool onto the Designer - DONE
 ##### Delete (undrop) a Tool from the Designer - DONE
 ##### Rename - DONE
 
 #### Method
 ##### Add - DONE
+- For Method M in Type T, adding the method creates the "function call" T_M using [] in category T.
+- This function call can then be dragged into any Method in any Type.
+- **Ken: At the present time App_initialize is created. Is this needed? (same question as above)**
 ##### Rename
+- Check Type rename
+    - In schema
+    - In workspaces
+- Check Method rename
+    - In schema
+    - In workspaces
 ##### Delete
+- Check Type deletion
+    - In schema
+    - In workspaces
+- Check Method deletion
+    - In schema
+    - In workspaces
 
 #### Property
 ##### Add - DONE
@@ -165,6 +179,8 @@ To summarize, the sections below describe how our code manipulates each Method's
 
 ### Validator.js
 Name validation is being systemetized and consolidated into /Core/Validator.js. Types of validation to be checked are: name collisions, reserved word use and reserved character use. Checks in Validator.js will be run when new items are created and when existing items are renamed. Validator.js in instantiated in main.js and is available in the global namespace as *validator*.
+
+*I noticed I am not calling reserved character checking. I want to implement an intelligent dispatcher in Validator.js that is called once with enough information to do all proper internal calls.*
 #### Name collisions
 - A user's Projects must have unique names. This is checked at project save time, not in Validator.js (at this time).
 - A Type name may be used only once in a comic.
