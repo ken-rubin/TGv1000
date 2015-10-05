@@ -213,6 +213,18 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						}
 					}
 
+					self.removeType = function(clType) {
+
+						try {
+
+							return m_clComicActive.removeType(clType);;
+						
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.getActiveComic = function() {
 
 						return m_clComicActive;

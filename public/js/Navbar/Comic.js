@@ -118,6 +118,29 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
+					self.removeType = function(clType) {
+
+						try {
+
+							for (var i = 0; i < self.data.types.items.length; i++) {
+
+								var typeIth = self.data.types.items[i];
+
+								if (typeIth.name === clType.data.name) {
+
+									self.data.types.items.splice(i);
+									break;
+								}
+							}
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					self.getYourTypesArray = function() {
 
 						return self.data.types.items;

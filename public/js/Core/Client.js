@@ -769,7 +769,11 @@ define(["Core/errorHelper",
 						try {
 
 							var clType = types.getActiveClType(true);	// Param true tells method we're removing so a new active type needs assigning.
-							var exceptionRet = code.removeType(clType);
+
+							var exceptionRet = comics.removeType(clType);
+							if (exceptionRet) { return exceptionRet; }
+
+							exceptionRet = code.removeType(clType);
 							if (exceptionRet) { return exceptionRet; }
 
 							// clType has been returned so we can now remove it from tools. It has already been spliced out of project.comic.types.

@@ -110,7 +110,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 **Remember: maintenance of anything requires global maintenance of the XML docs.**
 
 
-#### Type
+#### Type - Add, Rename and Delete are DONE
 ##### Add - DONE
 - types.addItem(clType)
     * code.addType(clType)
@@ -137,12 +137,14 @@ To summarize, the sections below describe how our code manipulates each Method's
         * for each event in the Type call m_functionAdd_Type_Event(clType, event)
             * not finalized yet
 ##### Rename - DONE
-##### Delete
+##### Delete - DONE
+    - Delete a Type that doesn't have a TI in the designer: looks good
+    - Delete a Type that does have a TI in the designer: good--makes user delete each TI from designer first
 
 #### Tool Instance
 ##### Drop a Tool onto the Designer - DONE
-##### Delete (undrop) a Tool from the Designer
-##### Rename
+##### Delete (undrop) a Tool from the Designer - DONE
+##### Rename - DONE
 
 #### Method
 ##### Add - DONE
