@@ -10,6 +10,9 @@
 - [If possible] Click on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
 - In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
+- **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
+- Figure out a way to remove the category/schema display when contentWindow.setWorkspaceString("") is called in Types.js#m_functionSetUpTheWell near the bottom. It removes the blocks, but not the vertical schema strip.
+- Add 2 Types, t1 and t2. Create 1 method in each, t1m1 and t2m2. Try to add a t1m1 block to t2m1 and vice versa. You'll see that switching back and forth usually loses the block when the contentWindow.getWorkspaceString() in Code.js#self.blocklyChangeListener is ultimately called with <xml xmlns="..."></xml>. Note that blocklyChangeListener is very touchy. It is called when the cursor just moves over the code pane. You have to be very careful when going to click on a different Tool not to pass over the code pane. However, even if you are careful, this still doesn't work.
 
 
 ## Jerry
@@ -72,7 +75,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 #### Schema data
 - The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods. The names of blocks that we create are added to self.schema in Code.js and marked *true* (meaning that they are available for use) and their corresponding code is added to self.blocks and self.javaScript.
 - The App Type is structured slightly differently from subsequent Types. It is created with only this one block initially:
-    - App_initialize using [] **Ken: should this be created in the schema?**
+    - App_initialize using []
 - Each additional Type has a block *new_typename* that is used to instantiate the type and a getter and a setter for each of its properties (X, Y, Width and Height being each Type's defualt initial properties). Since a new Type has no methods to start), there is initially no block analogous to the *App_initialize* block in the preceding list. For example, the Type named *Apple* is created with these blocks:
     - new_apple
     - Apple_getX from [var]
@@ -149,7 +152,7 @@ To summarize, the sections below describe how our code manipulates each Method's
 ##### Add - DONE
 - For Method M in Type T, adding the method creates the "function call" T_M using [] in category T.
 - This function call can then be dragged into any Method in any Type.
-- **Ken: At the present time App_initialize is created. Is this needed? (same question as above)**
+- **Ken: At the present time App_initialize is created. Is this needed?**
 ##### Rename
 - Check Type rename - DONE
     - In schema - worked when renamed App; 
@@ -182,10 +185,10 @@ Name validation is being systemetized and consolidated into /Core/Validator.js. 
 
 *I noticed I am not calling reserved character checking. I want to implement an intelligent dispatcher in Validator.js that is called once with enough information to do all proper internal calls.*
 #### Name collisions
-- A user's Projects must have unique names. This is checked at project save time, not in Validator.js (at this time).
+- A user's Projects must have unique names. This is checked at project save time, not in Validator.js.
 - A Type name may be used only once in a comic.
+- In fact, all of these must be collectively distinct: Type name, Method name, Property name and Event name.
 - A Type name may not be the same as a Tool Instance name in the same comic.
-- A Tool Instance may not 
 #### Reserved words
 - X, Y, Width and Height are not allowed as Type or Tool Instance names.
 #### Reserved characters
