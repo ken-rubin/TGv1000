@@ -151,12 +151,12 @@ To summarize, the sections below describe how our code manipulates each Method's
 - This function call can then be dragged into any Method in any Type.
 - **Ken: At the present time App_initialize is created. Is this needed? (same question as above)**
 ##### Rename
-- Check Type rename
-    - In schema
-    - In workspaces
+- Check Type rename - DONE
+    - In schema - worked when renamed App; 
+    - In workspaces - worked when renamed !App Type
 - Check Method rename
-    - In schema
-    - In workspaces
+    - In schema - worked
+    - In workspaces - need to test more
 ##### Delete
 - Check Type deletion
     - In schema

@@ -150,7 +150,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								// Don't add blocks for the App Type's X,Y,Width,Height properties.
 								if (!clType.data.isApp || (clType.data.isApp && $.inArray(propertyIth.name, ['X','Y', 'Width', 'Height']) === -1)) {
 
-									var exceptionRet = m_functionRename_Type_Property(clType,
+									var exceptionRet = m_functionRename_Type_Property(
+										clType,
 										propertyIth,
 										propertyIth.name, 
 										strOriginalName);
@@ -162,10 +163,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							for (var i = 0; i < clType.data.methods.length; i++) {
 
 								var methodIth = clType.data.methods[i];
-								var exceptionRet = m_functionRename_Type_Method(clType,
-									methodIth,
-									methodIth.name, 
-									strOriginalName);
+								var exceptionRet = m_functionRename_Type_Method(
+									clType,					// has new name
+									methodIth,				// this method (name didn't change)
+									strOriginalName,		// original name of clType
+									"type rename"			// reason for call
+								);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -434,15 +437,19 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					}
 
-					// Method renmes a method of a type to blockly.
+					// Method renames a method in blockly.
+					// Parameter method has the new name. Old name is in strOriginalName.
 					self.renameMethod = function (clType, method, strOriginalName) {
 
 						try {
 
 							// Rename a method for the type.
-							var exceptionRet = m_functionRename_Type_Method(clType,
-								method,
-								strOriginalName);
+							var exceptionRet = m_functionRename_Type_Method(
+								clType,					// type containing method whose name changed
+								method,					// method with new name
+								strOriginalName,		// original name of method
+								"method rename"			// reason for call
+							);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild blockly.
@@ -865,49 +872,53 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-							////////////////////////
-							// Blocks.
+							// Skip for App type.
+							if (!clType.data.isApp) {
 
-							delete self.blocks["new_" + strOriginalName];
-							self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
+								////////////////////////
+								// Blocks.
 
-							////////////////////////
-							// JavaScript.
-							delete self.javaScript["new_" + strOriginalName];
-							self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
+								delete self.blocks["new_" + strOriginalName];
+								self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
 
-							////////////////////////
-							// Workspace.
-							// if (self.workspace) {
+								////////////////////////
+								// JavaScript.
+								delete self.javaScript["new_" + strOriginalName];
+								self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
 
-							// 	var re = new RegExp('"' + "new_" + strOriginalName + '"',"g");
-							// 	self.workspace = self.workspace.replace(re,
-							// 		'"' + "new_" + clType.data.name + '"');
-								var exceptionRet = types.replaceInWorkspaces('"' + "new_" + strOriginalName + '"',
-									'"' + "new_" + clType.data.name + '"');
-								if (exceptionRet) { throw exceptionRet; }
-							// }
+								////////////////////////
+								// Workspace.
+								// if (self.workspace) {
 
-							////////////////////////
-							// Schema.
-							if (!self.schema.Types) {
+								// 	var re = new RegExp('"' + "new_" + strOriginalName + '"',"g");
+								// 	self.workspace = self.workspace.replace(re,
+								// 		'"' + "new_" + clType.data.name + '"');
+									var exceptionRet = types.replaceInWorkspaces("new_" + strOriginalName,
+										"new_" + clType.data.name);
+									if (exceptionRet) { throw exceptionRet; }
+								// }
 
-								self.schema.Types = {};
+								////////////////////////
+								// Schema.
+								if (!self.schema.Types) {
+
+									self.schema.Types = {};
+								}
+								var objectTypes = self.schema.Types;
+
+								// Bet the type.
+								var typeNew = objectTypes[clType.data.name];
+
+								// Remove the old name.
+								delete objectTypes[strOriginalName];
+
+								if (!typeNew) {
+
+									typeNew = {};
+								}
+								typeNew["new_" + clType.data.name] = !clType.data.isApp;	// avoid exposing new_App block
+								objectTypes[clType.data.name] = typeNew;
 							}
-							var objectTypes = self.schema.Types;
-
-							// Bet the type.
-							var typeNew = objectTypes[clType.data.name];
-
-							// Remove the old name.
-							delete objectTypes[strOriginalName];
-
-							if (!typeNew) {
-
-								typeNew = {};
-							}
-							typeNew["new_" + clType.data.name] = !clType.data.isApp;	// avoid exposing new_App block
-							objectTypes[clType.data.name] = typeNew;
 
 							return null;
 
@@ -1234,7 +1245,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								objectType[strGetName] = true;
 							}
-							delete objectType[strOriginalName];
+							// delete objectTypes[strOriginalTypeName];
 
 							////////////////////////
 							////////////////////////
@@ -1297,7 +1308,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								objectType[strSetName] = true;
 							}
-							delete objectType[strOriginalSetName];
+							// delete objectTypes[strOriginalTypeName];
 
 							return null;
 
@@ -1411,26 +1422,34 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method renames a type's method accessor functions.
-					var m_functionRename_Type_Method = function (clType, method, strOriginal, strOriginalTypeName) {
+					// It is called 2 ways: for a Type rename or for a Method rename.
+					var m_functionRename_Type_Method = function (clType, method, strOriginalName, strReason) {
 
 						try {
 
-							if (!strOriginalTypeName) {
+							var strFrom;
+							var strTo;
 
-								strOriginalTypeName = clType.data.name;
+							if (strReason === "type rename") {
+
+								strFrom = strOriginalName + "_" + method.name;
+								strTo = clType.data.name + "_" + method.name;
+
+							} else {
+
+								strFrom = clType.data.name + "_" + strOriginalName;
+								strTo = clType.data.name + "_" + method.name;
 							}
 
 							////////////////////////
 							// Blocks.
-							var strOriginalName = strOriginalTypeName + "_" + strOriginal;
-							var strName = clType.data.name + "_" + method.name;
-							delete self.blocks[strOriginalName];
-							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
+							delete self.blocks[strFrom];
+							self.blocks[strTo] = m_functionGenerateBlocksMethodFunctionString(strTo);
 
 							////////////////////////
 							// JavaScript.
-							delete self.javaScript[strOriginalName];
-							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
+							delete self.javaScript[strFrom];
+							self.javaScript[strTo] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
 
 							////////////////////////
 							// Workspace.
@@ -1439,8 +1458,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// 	var re = new RegExp('"' + strOriginalName + '"',"g");
 							// 	self.workspace = self.workspace.replace(re,
 							// 		'"' + strName + '"');
-								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
-									strName);
+								var exceptionRet = types.replaceInWorkspaces(strFrom,
+									strTo);
 								if (exceptionRet) { throw exceptionRet; }
 							// }
 
@@ -1456,13 +1475,13 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							if (!objectType) {
 
 								objectTypes[clType.data.name] = {};
-								objectTypes[clType.data.name][strName] = true;
+								objectTypes[clType.data.name][strTo] = true;
 
 							} else {
 
-								objectType[strName] = true;
+								objectType[strTo] = true;
 							}
-							delete objectType[strOriginalName];
+							delete objectType[strFrom];
 
 							return null;
 

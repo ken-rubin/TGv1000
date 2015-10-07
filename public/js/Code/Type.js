@@ -175,12 +175,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 							var methodIth = self.data.methods[i];
 
 							// Construct the global RegExp and apply to workspace.
-							// The surrounding quotation marks are already around strOld and strNew.
-							var re = new RegExp(strOld,"g");
+							// In keeping with convention, concatenating surrounding quotation marks has not been done yet, but is put off till the replace.
+							var re = new RegExp('"' + strOld + '+',"g");
 							if (methodIth.workspace) {
 
 								methodIth.workspace = methodIth.workspace.replace(re,
-									strNew);
+									'"' + strNew + '"');
 							}
 						}
 
