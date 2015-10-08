@@ -113,7 +113,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Method renames a type in blockly.
-					// The new name is *already* set in clType.
+					// The new name is *already* set in clType.data.
 					//
 					// If clType is not the App type, if the type had been dropped on the Designer, the schema for the App type has getters and setters for the 
 					// tool instance under its OLD name (the property is named from the TI ID) and references in the App type's initialize method
@@ -1432,7 +1432,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							if (strReason === "type rename") {
 
-								strFrom = strOriginalName + "_" + method.name;
+								strFrom = strOriginalName + "_" + method
 								strTo = clType.data.name + "_" + method.name;
 
 							} else {
