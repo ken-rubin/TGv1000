@@ -45,7 +45,7 @@
     - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
-
+- Image search for Type is pulling up all id=0 images.
 
 
 ## To discuss
