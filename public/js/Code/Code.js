@@ -31,26 +31,37 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					self.workspace = null;
 
 					// Callback invoked (if set) when the blockly frame is loaded or re-loaded.
-					BlocklyIFrame_OnLoad = null;
+					self.BlocklyIFrame_OnLoad = null;
+
+					//
+					self.displaySchemaCategories = true;
 
 					////////////////////////////////
 					// Pulbic methods.
 
 					// Clear all block and state from this and the blockly workspace.
-					self.reset = function () {
+					// bComplete = true means reset schema data.
+					self.reset = function (bComplete) {
 
 						try {
 
 							// Reset state of code back to pristine.
-							self.schema = {};
-							self.blocks = {};
-							self.javaScript = {};
+							if (bComplete) {
+
+								self.schema = {};
+								self.blocks = {};
+								self.javaScript = {};
+							}
+
 							self.workspace = null;
+							self.BlocklyIFrame_OnLoad = null;
+							self.displaySchemaCategories = false;
 
 							// Rebuild.
 							$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -545,20 +556,22 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							};
 
 							// First time, point the frame at the blockly page.
-							if (!m_bLoaded) {
+							// if (!m_bLoaded) {
 
 								// Set the callback.
 								self.BlocklyIFrame_OnLoad = functionLoad;
 
 								// Load up blockly.
 								$("#BlocklyIFrame")[0].src = "./frameworks/blockly/blocklyframe.html";
-								m_bLoaded = true;
-							} else {
+							// 	m_bLoaded = true;
 
-								functionLoad();
-							}
+							// } else {
+
+							// 	functionLoad();
+							// }
 
 							return null;
+
 						} catch (e) {
 
 							return e;
@@ -579,6 +592,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
+							if (self.workspace.length === 0 || self.workspace.length < 50) {
+
+								debugger;
+							}
 
                             // Set the new data in the type strip.
                             var exceptionRet = types.update(self.workspace);
@@ -1582,7 +1599,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// Indicates there is something to save.
 					var m_bDirty = false;
 					// Indicates load has been called on this instance.
-					var m_bLoaded = false;
+					// var m_bLoaded = false;
 					// The code scanner, updates the designer when the app initialize code is modified.
 					var m_scanner = null;
 				} catch (e) {

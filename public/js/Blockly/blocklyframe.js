@@ -521,24 +521,33 @@ $(document).ready(function () {
         var code = parent.functionBlockFrameLoaded();
         if (code) {
 
-            // Add into the schema, workspace, blocks and javascript.
-            Schema.Types = code.schema.Types;
-            for (var strKey in code.blocks) {
+            try {
 
-                Blockly.Blocks[strKey] = { init: new Function(code.blocks[strKey]) };
+                if (code.displaySchemaCategories) {
+
+                    // Add into the schema, workspace, blocks and javascript.
+                    Schema.Types = code.schema.Types;
+                    for (var strKey in code.blocks) {
+
+                        Blockly.Blocks[strKey] = { init: new Function(code.blocks[strKey]) };
+                    }
+                    for (var strKey in code.javaScript) {
+
+                        Blockly.JavaScript[strKey] = new Function("block", code.javaScript[strKey]);
+                    }
+                    Workspace = code.workspace;
+
+                    // Create the blockly instance.
+                    exceptionRet = Create();
+                    if (exceptionRet) {
+
+                        throw exceptionRet;
+                    }
+                }
+            } finally {
+
+                code.displaySchemaCategories = true;
             }
-            for (var strKey in code.javaScript) {
-
-                Blockly.JavaScript[strKey] = new Function("block", code.javaScript[strKey]);
-            }
-            Workspace = code.workspace;
-        }
-
-        // Create the blockly instance.
-        exceptionRet = Create();
-        if (exceptionRet) {
-
-            throw exceptionRet;
         }
     } catch (e) {
 

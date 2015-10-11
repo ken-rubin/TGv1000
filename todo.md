@@ -44,7 +44,7 @@
 - Give parent ability to play child's projects but not modify them. If >1 child, present a list of children first. This implies a parent login. 
     - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 - Passport authentication???
-    - Use user sessions to make sure someone can't jump into the middle of the site without logging in.
+    - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type is pulling up all id=0 images.
 
 

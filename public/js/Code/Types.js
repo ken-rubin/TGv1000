@@ -680,7 +680,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							// And clear out the code frame.
 							try {
 
-								$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString('');
+								code.reset(false);	// Force partial reset. Do not reset schema data.
+								// var jqFrame = $("#BlocklyIFrame");
+								// jqFrame[0].contentWindow.document.innerHTML = '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"></html>';
+								// jqFrame[0].contentWindow.setWorkspaceString('');
 							
 							} catch(e) {}
 							

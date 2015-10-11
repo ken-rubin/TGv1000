@@ -45,7 +45,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							// Clear prior data out of Blockly and code.
-							exceptionRet = code.reset();
+							exceptionRet = code.reset(true);	// Force complete reset.
 							if (exceptionRet) {
 
 								throw exceptionRet;
