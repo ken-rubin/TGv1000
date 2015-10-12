@@ -15,7 +15,7 @@
     |   }
     |   return null;
     | }
-    | function functionBlockFrameLoaded() {
+    | function functionBlocklyFrameLoaded() {
     | 
     |   if (code) {
     | 
@@ -30,10 +30,14 @@
    .col-xs-12
      .row.twsection#TypeWell
       .row(style="border-bottom: 1px solid #000")
-        .col-sm-2.col-sm-offset-5
+        .col-sm-2
           span(style="font-size:20px;font-weight:bold;")
             | Current Type:&nbsp;&nbsp;&nbsp;
           span#TWtypeName(style="font-size:20px;font-weight:bold;")
+        .col-sm-2
+          span(style="font-size:20px;font-weight:bold;")
+            | Current Method:&nbsp;&nbsp;&nbsp;
+          span#TWmethodName(style="font-size:20px;font-weight:bold;")
       .row
               .col-sm-3(style="border-right: 1px solid #000;")
                   .row(style="margin-top:10px;")

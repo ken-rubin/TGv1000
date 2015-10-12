@@ -518,7 +518,7 @@ $(document).ready(function () {
         Schema = getDefaultSchema();
 
         // Get the code object, if set.
-        var code = parent.functionBlockFrameLoaded();
+        var code = parent.functionBlocklyFrameLoaded();
         if (code) {
 
             try {
@@ -544,7 +544,8 @@ $(document).ready(function () {
                         throw exceptionRet;
                     }
                 }
-            } finally {
+            } 
+            finally {
 
                 code.displaySchemaCategories = true;
             }

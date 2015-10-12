@@ -33,7 +33,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// Callback invoked (if set) when the blockly frame is loaded or re-loaded.
 					self.BlocklyIFrame_OnLoad = null;
 
-					//
+					// Control the display or non-display of the left-most column of the code pane (the schema categories).
 					self.displaySchemaCategories = true;
 
 					////////////////////////////////
@@ -548,6 +548,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								try {
 
 									// Load the specified code DOM string into the blockly frame.
+									self.displaySchemaCategories = true;
 									$("#BlocklyIFrame")[0].contentWindow.setWorkspaceString(self.workspace);
 								} catch (e) {
 
@@ -592,10 +593,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
-							if (self.workspace.length === 0 || self.workspace.length < 50) {
+							// if (self.workspace.length === 0 || self.workspace.length < 50) {
 
-								debugger;
-							}
+							// 	debugger;
+							// }
 
                             // Set the new data in the type strip.
                             var exceptionRet = types.update(self.workspace);

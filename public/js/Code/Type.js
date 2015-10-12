@@ -68,7 +68,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					};
 
 					// Activate/select type instance.
-// not used					
+// used					
 					self.setActive = function (iIndex, arrayActive) {
 
 						try {

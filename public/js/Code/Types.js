@@ -94,7 +94,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								}
 							}
 
-							// Automatically allocate the first type.
+							// Automatically activate the first type (the App type).
 							if (m_arrayClTypes.length > 0) {
 
 								// Following will activate the 0th type and set it up for maintenance in the type well.
@@ -704,6 +704,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							client.projectIsDirty();
 
 							$("#TWtypeName").text(strNewTypeName);
+							$("#TWmethodName").text(m_iActiveMethodIndex === -1 || !m_clTypeActive ? "n/a" : m_clTypeActive.data.methods[m_iActiveMethodIndex].name);
 
 							return null;
 						
