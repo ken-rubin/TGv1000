@@ -232,6 +232,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var exceptionRet = tools.functionMakeSureToolIsVisible(clType);
 							if (exceptionRet) { return exceptionRet; }
 
+							exceptionRet = m_functionSetUpTheWell();
+							if (exceptionRet) { return exceptionRet; }
+
 							return self.functionSetActiveMethodIndex(-1);
 
 						} catch (e) {
