@@ -555,8 +555,11 @@ define(["Core/errorHelper",
 							var activeClType = types.getActiveClType();
 							activeClType.data.methods.push(method);
 
+							var exceptionRet = types.functionSetActiveMethodIndex(activeClType.data.methods.length - 1);
+							if (exceptionRet) { throw exceptionRet; }
+
 							// Add the method to code.
-							var exceptionRet = code.addMethod(activeClType, 
+							exceptionRet = code.addMethod(activeClType, 
 								method);
 							if (exceptionRet) { throw exceptionRet; }
 
@@ -673,7 +676,7 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Have types.js change header of TypeWell.
-							exceptionRet = types.changeTypeWellHeader(strNewName);
+							exceptionRet = types.changeTypeWellHeader();
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Need to call someone to update the tooltip of the correct tool in toolstrip.
@@ -696,8 +699,11 @@ define(["Core/errorHelper",
 							oldMethod.name = strNewName;
 							activeClType.data.methods[index] = oldMethod;
 
+							var exceptionRet = types.functionSetActiveMethodIndex(index);
+							if (exceptionRet) { throw exceptionRet; }
+
 							// Call Code.js#renameMethod(clType, method, strOriginalName).
-							var exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
+							exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return types.regenTWMethodsTable();

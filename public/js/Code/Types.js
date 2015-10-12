@@ -232,10 +232,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var exceptionRet = tools.functionMakeSureToolIsVisible(clType);
 							if (exceptionRet) { return exceptionRet; }
 
-							exceptionRet = m_functionSetUpTheWell();
-							if (exceptionRet) { return exceptionRet; }
-
-							return null;
+							return self.functionSetActiveMethodIndex(-1);
 
 						} catch (e) {
 
@@ -432,6 +429,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							client.projectIsDirty();
 
 							m_clTypeActive.data.methods.splice(index, 1);
+							self.functionSetActiveMethodIndex(-1);
 							return m_functionRegenTWMethodsTable();
 						
 						} catch (e) {
@@ -525,72 +523,21 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
-// //moved to Validator.js
-// 					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
+					// Called when a method is activated or deactivated, such as by:
+					//  selecting a new Type, clicking on a mthod, adding a method, renaming a method, deleting a method.
+					self.functionSetActiveMethodIndex = function(index) {
 
-// 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-// 						// Else, we have to skip array[myIndex]
-// 						for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
+						m_iActiveMethodIndex = index;
 
-// 							if (i !== myIndex) {
-
-// 								var eventIth = m_clTypeActive.data.events[i];
-// 								if (eventIth.name === strName) {
-
-// 									return false;
-// 								}
-// 							}
-// 						}
-
-// 						return true;
-// 					}
-
-// //moved to Validator.js
-// 					self.isMethodNameAvailableInActiveType = function(strName, myIndex) {
-
-// 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-// 						// Else, we have to skip array[myIndex]
-// 						for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
-
-// 							if (i !== myIndex) {
-
-// 								var methodIth = m_clTypeActive.data.methods[i];
-// 								if (methodIth.name === strName) {
-
-// 									return false;
-// 								}
-// 							}
-// 						}
-
-// 						return true;
-// 					}
-
-// //moved to Validator.js
-// 					self.isPropertyNameAvailableInActiveType = function(strName, myIndex) {
-
-// 						// If myIndex === -1, it means we're adding, and we have to check the whole array.
-// 						// Else, we have to skip array[myIndex]
-// 						for (var i = 0; i < m_clTypeActive.data.properties.length; i++) {
-
-// 							if (i !== myIndex) {
-
-// 								var propertyIth = m_clTypeActive.data.properties[i];
-// 								if (propertyIth.name === strName) {
-
-// 									return false;
-// 								}
-// 							}
-// 						}
-
-// 						return true;
-// 					}
+						return m_functionSetTypewellHeader();
+					}
 
 //used
-					self.changeTypeWellHeader = function (strNewTypeName) {
+					self.changeTypeWellHeader = function () {
 
 						try {
 
-							return m_functionSetTypewellHeader(strNewTypeName);
+							return m_functionSetTypewellHeader();
 
 						} catch(e) {
 
@@ -638,7 +585,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 					var m_functionEmptyTheWell = function() {
 
-						m_functionSetTypewellHeader('');
+						m_functionSetTypewellHeader();
 						$("#TWimage").attr("src","");
 						$(".disabledifnoproj").prop("disabled", true);
 						$("#TWmethodsTbody").empty();
@@ -651,7 +598,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
-							m_functionSetTypewellHeader(m_clTypeActive.data.name);
+							m_functionSetTypewellHeader();
 							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
 							if (m_clTypeActive.data.isApp) {
@@ -697,14 +644,22 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 					// Called if Type is renamed.
 //used
-					var m_functionSetTypewellHeader = function (strNewTypeName) {
+					var m_functionSetTypewellHeader = function () {
 
 						try {
 
 							client.projectIsDirty();
 
-							$("#TWtypeName").text(strNewTypeName);
-							$("#TWmethodName").text(m_iActiveMethodIndex === -1 || !m_clTypeActive ? "n/a" : m_clTypeActive.data.methods[m_iActiveMethodIndex].name);
+							if (m_clTypeActive) {
+
+								$("#TWtypeName").text(m_clTypeActive.data.name);
+								$("#TWmethodName").text(m_iActiveMethodIndex === -1 ? "n/a" : m_clTypeActive.data.methods[m_iActiveMethodIndex].name);
+
+							} else {
+
+								$("#TWtypeName").text('');
+								$("#TWmethodName").text('');
+							}
 
 							return null;
 						
@@ -912,7 +867,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							var index = m_functionParseOutIndex(e);
 
 							// Save the active method.
-							m_iActiveMethodIndex = index;
+							self.functionSetActiveMethodIndex(index);
 
 							var exceptionRet = m_clTypeActive.setActive(index, m_clTypeActive.data.methods);
 							if (exceptionRet) { throw exceptionRet; }
