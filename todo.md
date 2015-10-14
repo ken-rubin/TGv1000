@@ -6,18 +6,17 @@
 
 ## Ken
 
+- **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
 - Finish and integrate Coder
 - [If possible] Click on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
 - In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
-- **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
-- Figure out a way to remove the category/schema display when contentWindow.setWorkspaceString("") is called in Types.js#m_functionSetUpTheWell near the bottom. It removes the blocks, but not the vertical schema strip.
-- Add 2 Types, t1 and t2. Create 1 method in each, t1m1 and t2m2. Try to add a t1m1 block to t2m1 and vice versa. You'll see that switching back and forth usually loses the block when the contentWindow.getWorkspaceString() in Code.js#self.blocklyChangeListener is ultimately called with <xml xmlns="..."></xml>. Note that blocklyChangeListener is very touchy. It is called when the cursor just moves over the code pane. You have to be very careful when going to click on a different Tool not to pass over the code pane. However, even if you are careful, this still doesn't work.
+. Note that blocklyChangeListener is very touchy. It is called when the cursor just moves over the code pane. You have to be very careful when going to click on a different Tool not to pass over the code pane. However, even if you are careful, this still doesn't work.
 
 
 ## Jerry
 
-- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
+- Add 2 Types, t1 and t2. Create 1 method in each, t1m1 and t2m2. Try to add a t1m1 block to t2m1 and vice versa. You'll see that switching back and forth usually loses the block when the contentWindow.getWorkspaceString() in Code.js#self.blocklyChangeListener is ultimately called with <xml xmlns="..."></xml>- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
     - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - I show the current project in the browser tab. I'm not sure I clear it if a project is closed, etc. So tighten this up. Shows the project name, if entered, for New Project. Check the Search for Project case.
@@ -70,6 +69,92 @@ A Type is our equivalent of a class in a standard programming language (C# or C+
 Keeping the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated (added, removed, renamed, etc.) by the user is really our only goal when we discuss Type, Method, etc. maintenance--as we are doing in this section. Everything else is run-time detail.
 
 To summarize, the sections below describe how our code manipulates each Method's workspace XML and the schema components (to which the XML workspaces refer) as the user performs adding, deleting, renaming, etc. actions on Types, Methods and Properties.
+
+### The TypeWell
+#### Header: name of active Type and possible active Method in Type
+- There will nearly always be an active Type. Only when there is no project is there no active Type. Initially, the active Type is set to the App Type in the active Comic.
+- The TypeWell header displays the name of the active Type. This changes (1) when a Tool in the left vertical toolstrip is clicked or (2) when a new Type is added (or loaded from the DB--the only possible way to add a new Type that would have methods).
+- There is not always an active Method in the Active Type. Even though the App Type always has an initialize method, it is not active unless a user clicks on it. If there is no active Method, the name in the TypeWell header displays as *n/a*.
+    - If there is no active Method, nothing is supposed to display in the Code pane--not the schema categories or the blocks representing a method.
+    - If there is an active Method, the schema categories display down the left side of the code pane and the bloacks for the Method, if any, display in the middle of the code pane.
+    - An active Method is indicated by types.m_iActiveMethodIndex > -1.
+    - **When there is an active Method, any manipulation of its code blocks in the code pane must be saved to the method's workspace property whenever it changes.**
+- The following table describes when there should be an active Method (and a couple of other aspects):
+
+<table>
+    <tr>
+        <td>Event that just occurred</td>
+        <td>There is an active Method</td>
+        <td>There is no active Method</td>
+        <td>Status</td>
+    </tr>
+    <tr>
+        <td>Code block is manipulated</td>
+        <td>X</td>
+        <td></td>
+        <td>Test that this results in immediate saving of XML to method.workspace.</td>
+    </tr>
+    <tr>
+        <td>New Project</td>
+        <td></td>
+        <td>X</td>
+        <td>Works--code pain is empty</td>
+    </tr>
+    <tr>
+        <td>New Tool selected</td>
+        <td></td>
+        <td>X</td>
+        <td>Works--clears code pane if there had been an active Method or keeps it clear if not</td>
+    </tr>
+    <tr>
+        <td>Add a Type</td>
+        <td></td>
+        <td>X</td>
+        <td>Works--clears code pane if there had been an active Method or keeps it clear if not</td>
+    </tr>
+    <tr>
+        <td>Type loaded from DB</td>
+        <td></td>
+        <td>X</td>
+        <td>(Delay testing for now)</td>
+    </tr>
+    <tr>
+        <td>Click on Method in table</td>
+        <td>X</td>
+        <td></td>
+        <td>Should display code pane with schema info and, if non-empty, the method's blocks.</td>
+    </tr>
+    <tr>
+        <td>Add new Method</td>
+        <td>X</td>
+        <td></td>
+        <td>Show code pane schema info but no blocks to start.</td>
+    </tr>
+    <tr>
+        <td>Rename active Method</td>
+        <td>X</td>
+        <td></td>
+        <td>Change TW header, but nothing else.</td>
+    </tr>
+    <tr>
+        <td>Rename inactive Method</td>
+        <td></td>
+        <td>X</td>
+        <td>Don't affect code pane: if there had been an active method, it is still active.</td>
+    </tr>
+    <tr>
+        <td>Delete a Method</td>
+        <td></td>
+        <td>X</td>
+        <td>Clear code pane if there had been an active method.</td>
+    </tr>
+    <tr>
+        <td>Open a Project</td>
+        <td></td>
+        <td>X</td>
+        <td>No active method. Clear code pane.</td>
+    </tr>
+</table>
 
 ### Data structures and the source code
 #### Schema data
