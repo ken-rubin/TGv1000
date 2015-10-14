@@ -552,6 +552,8 @@ define(["Core/errorHelper",
 
 						try {
 
+							// debugger;
+
 							var activeClType = types.getActiveClType();
 							activeClType.data.methods.push(method);
 
@@ -561,6 +563,9 @@ define(["Core/errorHelper",
 							// Add the method to code.
 							exceptionRet = code.addMethod(activeClType, 
 								method);
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = code.load(method.workspace);
 							if (exceptionRet) { throw exceptionRet; }
 
 							exceptionRet = types.regenTWMethodsTable();
