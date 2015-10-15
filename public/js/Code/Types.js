@@ -456,7 +456,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								// User deleted the only method.
 								// Clear the code pane.
-								exceptionRet = code.reset(true);	// Force complete reset.
+								exceptionRet = code.reset(false);	// Force complete reset.
 								if (exceptionRet) { throw exceptionRet; }
 
 								return null;
