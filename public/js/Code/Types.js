@@ -431,16 +431,52 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Called by client after confirmation by user.
-//used - need to write & call code.
+//used
 					self.deleteMethod = function (index) {
 
 						try {
 
 							client.projectIsDirty();
 
+							var method = m_clTypeActive.data.methods[index];
+
+							var exceptionRet = code.removeMethod(m_clTypeActive, method);
+							if (exceptionRet) { return exceptionRet; }
+
 							m_clTypeActive.data.methods.splice(index, 1);
-							self.functionSetActiveMethodIndex(-1);
-							return m_functionRegenTWMethodsTable();
+
+							// self.functionSetActiveMethodIndex(-1);
+
+							exceptionRet = m_functionRegenTWMethodsTable();
+							if (exceptionRet) { return exceptionRet; }
+
+							var newMethodIndex = -1;
+							var lastMethodIndexNow = m_clTypeActive.data.methods.length - 1;
+							if (lastMethodIndexNow === -1) {
+
+								// User deleted the only method.
+								// Clear the code pane.
+								exceptionRet = code.reset(true);	// Force complete reset.
+								if (exceptionRet) { throw exceptionRet; }
+
+								return null;
+
+							} else if (lastMethodIndexNow >= index) {
+
+								// User deleted a method in the middle.
+								// Keep methods[index] as the active one and fill the code pane.
+								newMethodIndex = index;
+
+							} else {
+
+								// User deleted the last method in the methods table.
+								// Make new last method the active one and fill the code pane.
+								newMethodIndex = lastMethodIndexNow;
+							}
+
+							$("#method_" + newMethodIndex.toString()).click();
+
+							return null;
 						
 						} catch (e) {
 

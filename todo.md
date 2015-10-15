@@ -44,7 +44,7 @@
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type is pulling up all id=0 images.
-- When loading a Type (even if by opening a project), select its first method if one exists to load the code pane. **Done, but use the actual id of method[0]--it may not always be "#method_0", especially after a deletion.**
+
 
 
 ## To discuss
@@ -84,8 +84,8 @@ To summarize, the sections below describe how our code manipulates each Method's
 <table>
     <tr>
         <td>Event that just occurred</td>
-        <td>There is an active Method</td>
-        <td>There is no active Method</td>
+        <td>Results in an active Method</td>
+        <td>Results in no active Method</td>
         <td>Status</td>
     </tr>
     <tr>
@@ -104,19 +104,19 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>New Tool selected</td>
         <td>X</td>
         <td></td>
-        <td>Works--and clicks 0th method to fill code pane if one exists; else, clears code pane.</td>
+        <td>Works--and clicks 0th method to fill code pane if one exists; else, clears code pane block area, but displays schema categories.</td>
     </tr>
     <tr>
         <td>Add a Type</td>
         <td></td>
         <td>X</td>
-        <td>Works--clears code pane if there had been an active Method or keeps it clear if not</td>
+        <td>Works--clears code pane if there had been an active Method or keeps it clear if not. The new Type, of course, has no Methods.</td>
     </tr>
     <tr>
         <td>Type loaded from DB</td>
         <td>X</td>
-        <td></td>
-        <td>(Delay testing for now. It will click on the Type's first method if one exists to load the code pane.)</td>
+        <td>X</td>
+        <td><div><strong>Delay testing for now.</strong> It will click on the Type's first method if one exists to load the code pane. If no Method exists, clears code pane.</div></td>
     </tr>
     <tr>
         <td>Click on Method in table</td>
@@ -128,7 +128,7 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Add new Method</td>
         <td>X</td>
         <td></td>
-        <td>Works--shows code pane schema info but no blocks to start.</td>
+        <td>Works--auto-clicks the new Method; shows code pane schema info but no blocks to start.</td>
     </tr>
     <tr>
         <td>Rename active Method</td>
@@ -140,16 +140,16 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Rename inactive Method</td>
         <td>X</td>
         <td></td>
-        <td>Works. Does the schema mods. Selects the renamed Method, filling the code pane.</div></td>
+        <td>Works. Does the schema mods. Clicks on the renamed Method, filling the code pane.</div></td>
     </tr>
     <tr>
         <td>Delete a Method</td>
         <td>X</td>
         <td></td>
-        <td><div><strong>To be done.</strong> Select the next method down (or up, I think, if this was the last--check scroll region logic) to display in the code pane.</div></td>
+        <td><div>Works. Selects the next method down (or up, I think, if this was the last) to display in the code pane. Clears the code pane if no more methods. <strong>Check that a method in use prevents deletion.</strong></div></td>
     </tr>
     <tr>
-        <td>Open a Project</td>
+        <td>Open an existing Project</td>
         <td>X</td>
         <td></td>
         <td><div><strong>To be done. Or maybe it will just work.</strong> Select the App type's initialize method and display in code pane.</div></td>
