@@ -548,31 +548,38 @@ define(["Core/errorHelper",
 					}
 
 //used
+					// We are going to add the method to the bottom of the methods array
+					// of the active Type; then add requisite info to code's schema info;
+					// then rebuild the TypeWell methods grid;
+					// then we'll hand-click the method in the grid.
 					self.addMethodToActiveType = function (method) {
 
 						try {
 
-							// debugger;
-
 							var activeClType = types.getActiveClType();
 							activeClType.data.methods.push(method);
 
-							var exceptionRet = types.functionSetActiveMethodIndex(activeClType.data.methods.length - 1);
-							if (exceptionRet) { throw exceptionRet; }
+							var iMethodIndex = activeClType.data.methods.length - 1;
+
+							// var exceptionRet = types.functionSetActiveMethodIndex(iMethodIndex);
+							// if (exceptionRet) { throw exceptionRet; }
 
 							// Add the method to code.
 							exceptionRet = code.addMethod(activeClType, 
 								method);
 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = code.load(method.workspace);
-							if (exceptionRet) { throw exceptionRet; }
+							// exceptionRet = code.load(method.workspace);
+							// if (exceptionRet) { throw exceptionRet; }
 
 							exceptionRet = types.regenTWMethodsTable();
 							if (exceptionRet) { throw exceptionRet; }
 
-							// Now do something to scroll the methods grid to the bottom.
-							$("#methodrename_" + (activeClType.data.methods.length - 1).toString()).scrollintoview();
+							// Scroll the methods grid to the bottom.
+							$("#methodrename_" + iMethodIndex.toString()).scrollintoview();
+
+							// Now click the new method in the grid to load the code pane.
+							$("#method_" + iMethodIndex.toString()).click();
 
 						} catch (e) {
 

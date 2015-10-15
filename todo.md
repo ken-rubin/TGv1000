@@ -45,6 +45,8 @@
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type is pulling up all id=0 images.
+- If code pane has schema showing, dragging a tool onto designer does something wrong.
+- When loading a Type (even if by opening a project), select its first method if one exists to load the code pane.
 
 
 ## To discuss
@@ -116,7 +118,7 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Type loaded from DB</td>
         <td></td>
         <td>X</td>
-        <td>(Delay testing for now)</td>
+        <td>(Delay testing for now. It will click on the Type's first method if one exists to load the code pane.)</td>
     </tr>
     <tr>
         <td>Click on Method in table</td>
@@ -134,25 +136,25 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Rename active Method</td>
         <td>X</td>
         <td></td>
-        <td>Change TW header, but nothing else.</td>
+        <td>Change TW header, but nothing else. Keep the code pane full.</td>
     </tr>
     <tr>
         <td>Rename inactive Method</td>
         <td></td>
         <td>X</td>
-        <td>Don't affect code pane: if there had been an active method, it is still active.</td>
+        <td>Select the renamed Method, filling the code pane.</td>
     </tr>
     <tr>
         <td>Delete a Method</td>
         <td></td>
         <td>X</td>
-        <td>Clear code pane if there had been an active method.</td>
+        <td>Select the next method down (or up, I think, if this was the last--check scroll region logic) to display in the code pane.</td>
     </tr>
     <tr>
         <td>Open a Project</td>
         <td></td>
         <td>X</td>
-        <td>No active method. Clear code pane.</td>
+        <td>Select the App type's initialize method and display in code pane.</td>
     </tr>
 </table>
 
