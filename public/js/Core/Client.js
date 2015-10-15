@@ -718,7 +718,12 @@ define(["Core/errorHelper",
 							exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
 
-							return types.regenTWMethodsTable();
+							exceptionRet = types.regenTWMethodsTable();
+							if (exceptionRet) { throw exceptionRet; }
+
+							$("#method_" + index.toString()).click();
+
+							return null;
 
 						} catch(e) {
 

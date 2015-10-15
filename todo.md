@@ -96,14 +96,14 @@ To summarize, the sections below describe how our code manipulates each Method's
     </tr>
     <tr>
         <td>New Project</td>
-        <td></td>
         <td>X</td>
+        <td></td>
         <td>Works--and App Type initialize method is clicked, displaying it in the code pane. (Even though at this point it has no blocks.)</td>
     </tr>
     <tr>
         <td>New Tool selected</td>
-        <td></td>
         <td>X</td>
+        <td></td>
         <td>Works--and clicks 0th method to fill code pane if one exists; else, clears code pane.</td>
     </tr>
     <tr>
@@ -114,8 +114,8 @@ To summarize, the sections below describe how our code manipulates each Method's
     </tr>
     <tr>
         <td>Type loaded from DB</td>
-        <td></td>
         <td>X</td>
+        <td></td>
         <td>(Delay testing for now. It will click on the Type's first method if one exists to load the code pane.)</td>
     </tr>
     <tr>
@@ -134,25 +134,25 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Rename active Method</td>
         <td>X</td>
         <td></td>
-        <td><div><strong>To be done.</strong> Change TW header (and anything in schema, etc.). Keep the code pane loaded.</div></td>
+        <td>Works. Changes TW header (and anything in schema, etc.). Keeps the code pane loaded.</td>
     </tr>
     <tr>
         <td>Rename inactive Method</td>
-        <td></td>
         <td>X</td>
-        <td><div><strong>To be done.</strong> Select the renamed Method, filling the code pane.</div></td>
+        <td></td>
+        <td>Works. Does the schema mods. Selects the renamed Method, filling the code pane.</div></td>
     </tr>
     <tr>
         <td>Delete a Method</td>
-        <td></td>
         <td>X</td>
+        <td></td>
         <td><div><strong>To be done.</strong> Select the next method down (or up, I think, if this was the last--check scroll region logic) to display in the code pane.</div></td>
     </tr>
     <tr>
         <td>Open a Project</td>
-        <td></td>
         <td>X</td>
-        <td><div><strong>To be done.</strong> Or maybe it will just work. Select the App type's initialize method and display in code pane.</div></td>
+        <td></td>
+        <td><div><strong>To be done. Or maybe it will just work.</strong> Select the App type's initialize method and display in code pane.</div></td>
     </tr>
 </table>
 
