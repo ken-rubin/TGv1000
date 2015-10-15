@@ -11,12 +11,11 @@
 - [If possible] Click on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
 - In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
-. Note that blocklyChangeListener is very touchy. It is called when the cursor just moves over the code pane. You have to be very careful when going to click on a different Tool not to pass over the code pane. However, even if you are careful, this still doesn't work.
 
 
 ## Jerry
 
-- Add 2 Types, t1 and t2. Create 1 method in each, t1m1 and t2m2. Try to add a t1m1 block to t2m1 and vice versa. You'll see that switching back and forth usually loses the block when the contentWindow.getWorkspaceString() in Code.js#self.blocklyChangeListener is ultimately called with <xml xmlns="..."></xml>- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
+- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
     - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - I show the current project in the browser tab. I'm not sure I clear it if a project is closed, etc. So tighten this up. Shows the project name, if entered, for New Project. Check the Search for Project case.
@@ -45,8 +44,7 @@
 - Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type is pulling up all id=0 images.
-- If code pane has schema showing, dragging a tool onto designer does something wrong.
-- When loading a Type (even if by opening a project), select its first method if one exists to load the code pane.
+- When loading a Type (even if by opening a project), select its first method if one exists to load the code pane. **Done, but use the actual id of method[0]--it may not always be "#method_0", especially after a deletion.**
 
 
 ## To discuss
@@ -94,19 +92,19 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Code block is manipulated</td>
         <td>X</td>
         <td></td>
-        <td>Test that this results in immediate saving of XML to method.workspace.</td>
+        <td>Works: this results in immediate saving of XML to method.workspace.</td>
     </tr>
     <tr>
         <td>New Project</td>
         <td></td>
         <td>X</td>
-        <td>Works--code pain is empty</td>
+        <td>Works--and App Type initialize method is clicked, displaying it in the code pane. (Even though at this point it has no blocks.)</td>
     </tr>
     <tr>
         <td>New Tool selected</td>
         <td></td>
         <td>X</td>
-        <td>Works--clears code pane if there had been an active Method or keeps it clear if not</td>
+        <td>Works--and clicks 0th method to fill code pane if one exists; else, clears code pane.</td>
     </tr>
     <tr>
         <td>Add a Type</td>
@@ -124,37 +122,37 @@ To summarize, the sections below describe how our code manipulates each Method's
         <td>Click on Method in table</td>
         <td>X</td>
         <td></td>
-        <td>Should display code pane with schema info and, if non-empty, the method's blocks.</td>
+        <td>Works. Displays code pane with schema info and, if non-empty, the method's blocks.</td>
     </tr>
     <tr>
         <td>Add new Method</td>
         <td>X</td>
         <td></td>
-        <td>Show code pane schema info but no blocks to start.</td>
+        <td>Works--shows code pane schema info but no blocks to start.</td>
     </tr>
     <tr>
         <td>Rename active Method</td>
         <td>X</td>
         <td></td>
-        <td>Change TW header, but nothing else. Keep the code pane full.</td>
+        <td><div><strong>To be done.</strong> Change TW header (and anything in schema, etc.). Keep the code pane loaded.</div></td>
     </tr>
     <tr>
         <td>Rename inactive Method</td>
         <td></td>
         <td>X</td>
-        <td>Select the renamed Method, filling the code pane.</td>
+        <td><div><strong>To be done.</strong> Select the renamed Method, filling the code pane.</div></td>
     </tr>
     <tr>
         <td>Delete a Method</td>
         <td></td>
         <td>X</td>
-        <td>Select the next method down (or up, I think, if this was the last--check scroll region logic) to display in the code pane.</td>
+        <td><div><strong>To be done.</strong> Select the next method down (or up, I think, if this was the last--check scroll region logic) to display in the code pane.</div></td>
     </tr>
     <tr>
         <td>Open a Project</td>
         <td></td>
         <td>X</td>
-        <td>Select the App type's initialize method and display in code pane.</td>
+        <td><div><strong>To be done.</strong> Or maybe it will just work. Select the App type's initialize method and display in code pane.</div></td>
     </tr>
 </table>
 

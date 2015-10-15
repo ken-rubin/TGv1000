@@ -38,7 +38,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							$("#TWsearchMethodBtn").click(m_functionClickTWsearchMethod);
 							$("#TWaddPropertyBtn").click(m_functionClickTWnewProperty);
 							$("#TWaddEventBtn").click(m_functionClickTWnewEvent);
-							$("#WorkspaceDisplayBtn").click(m_functionShowCodeWorkspace);
 
 						} catch (e) {
 
@@ -558,12 +557,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 					///////////////////////////////////
 					// Private methods.
-
-					// A helper method (help debugging, that is)
-					var m_functionShowCodeWorkspace = function() {
-
-						alert(code.workspace);
-					}
 
 					// Remove item from DOM and state.
 //used					
