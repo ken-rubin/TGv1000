@@ -236,7 +236,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							exceptionRet = m_functionSetUpTheWell();
 							if (exceptionRet) { return exceptionRet; }
 
-							return self.functionSetActiveMethodIndex(-1);
+							exceptionRet = self.functionSetActiveMethodIndex(m_clTypeActive.data.methods.length === 0 ? -1 : 0);
+							if (exceptionRet) { return exceptionRet; }
+
+							if (m_iActiveMethodIndex > -1) {
+
+								// Set the code pane by clicking on the first method.
+								$("#method_0").click();
+							}
 
 						} catch (e) {
 
@@ -629,18 +636,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							exceptionRet = m_functionRegenTWEventsTable();
 							if (exceptionRet) { return exceptionRet; }
 
-							// var jqTWimage = $("#TWimage");
-							// jqTWimage.data("tooltip", false);
-							// jqTWimage.tooltip({title: m_clTypeActive.data.name});
-							// jqTWimage.tooltip();
-
 							// And clear out the code frame.
 							try {
 
 								code.reset(false);	// Force partial reset. Do not reset schema data.
-								// var jqFrame = $("#BlocklyIFrame");
-								// jqFrame[0].contentWindow.document.innerHTML = '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"></html>';
-								// jqFrame[0].contentWindow.setWorkspaceString('');
 							
 							} catch(e) {}
 							

@@ -565,7 +565,7 @@ define(["Core/errorHelper",
 							// if (exceptionRet) { throw exceptionRet; }
 
 							// Add the method to code.
-							exceptionRet = code.addMethod(activeClType, 
+							var exceptionRet = code.addMethod(activeClType, 
 								method);
 							if (exceptionRet) { throw exceptionRet; }
 
