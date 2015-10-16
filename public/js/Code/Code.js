@@ -99,9 +99,14 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							for (var i = 0; i < clType.data.methods.length; i++) {
 
 								var methodIth = clType.data.methods[i];
-								exceptionRet = m_functionAdd_Type_Method(clType,
-									methodIth);
-								if (exceptionRet) { throw exceptionRet; }
+
+								// Don't add block for App Type's initialize method.
+								if (!clType.data.isApp || (clType.data.isApp && methodIth.name !== "initialize")) {
+
+									exceptionRet = m_functionAdd_Type_Method(clType,
+										methodIth);
+									if (exceptionRet) { throw exceptionRet; }
+								}
 							}
 
 							// Add events.

@@ -1,5 +1,4 @@
 ## Either of us
-- Get rid of bootstrap tool-tips, replace with good
 - Events!
 - Round X,Y to 0, 1 or 2 decimals (Are they pixels? If so, why not 0 decimals?)
 - Comic should slide in from the right, taking up half the screen; slide back out to strip-size when appropriate or click away; remember where they were in comic
@@ -8,13 +7,13 @@
 
 - **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
 - Finish and integrate Coder
-- [If possible] Click on the app Type's initialize method. All the Types are listed on the left-hand side of the code window. Make them like Control; i.e., [arrowhead] Types that opens on a click to reveal all the Types or no [arrowhead] and just display them all as Blockly blocks. 
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
 - In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
 
 
 ## Jerry
 
+- Get rid of bootstrap tool-tips, replace with something good, like the library *powertip* which is on my desktop.
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
     - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
@@ -26,6 +25,7 @@
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places??? What does Ken have to do here?
 - Deleting
     + Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
+    + What validation is done for deleting? If a property is being used in a method, is it deletable. I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Write event loader in Code.js#self.addType.
 - PropertyGrid:
 	- apply property value changes on each keystroke and remove the Save buttons
@@ -36,12 +36,13 @@
 	- change Play button to Pause and Stop buttons when playing (is there a 1-button sequence for this that works? Like Play -> Pause -> Stop. I doubt it.)
 - Comic click
     - Slide full panel over half (resizable) the main window
-    - CLick off the comic resizes back to scroll strip 
-- Implement grid of available classes (and projects?) on login page. Buy from there. Probably enroll, too. How would that work? Go right to new project(?). Needs new DB tables (take from e4Groms schema in large part), admin stuff, etc.
-- When user logs in, open most recent project (or new one if just bought).
-- Give parent ability to play child's projects but not modify them. If >1 child, present a list of children first. This implies a parent login. 
-    - having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
-- Passport authentication???
+    - CLick off the comic resizes back to scroll strip.
+- The enrollment / parent process. Marketing page.
+    + Implement grid of available classes (and projects?) on login page. Buy from there. Probably enroll, too. How would that work? Go right to new project(?). Needs new DB tables (take from e4Groms schema in large part), admin stuff, etc.
+    + When user logs in, open most recent project (or new one if just bought).
+    + Give parent ability to play child's projects but not modify them. If >1 child, present a list of children first. This implies a parent login. 
+        + having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
++ Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type is pulling up all id=0 images.
 
@@ -49,7 +50,10 @@
 
 ## To discuss
 
-- If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free?We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
+- All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
+- **Ken:** If I open a new project, the App Type is the Current Type and initialize is the Current Method, but, since we don't display app_initialize or the getter and setters for X, Y, Width and Height, the App category doesn't even appear in the schema category list.
+    - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
+    - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Is this OK?
 
 
 ## General description of programming using our system
@@ -71,13 +75,14 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 To summarize, the sections below describe how our code manipulates each Method's workspace XML and the schema components (to which the XML workspaces refer) as the user performs adding, deleting, renaming, etc. actions on Types, Methods and Properties.
 
 ### The TypeWell
-#### Header: name of active Type and possible active Method in Type
+
+#### The TW Header and especially identification of the active Method
 - There will nearly always be an active Type. Only when there is no project is there no active Type. Initially, the active Type is set to the App Type in the active Comic.
 - The TypeWell header displays the name of the active Type. This changes (1) when a Tool in the left vertical toolstrip is clicked or (2) when a new Type is added (or loaded from the DB--the only possible way to add a new Type that would have methods).
-- There is not always an active Method in the Active Type. Even though the App Type always has an initialize method, it is not active unless a user clicks on it. If there is no active Method, the name in the TypeWell header displays as *n/a*.
-    - If there is no active Method, nothing is supposed to display in the Code pane--not the schema categories or the blocks representing a method.
-    - If there is an active Method, the schema categories display down the left side of the code pane and the bloacks for the Method, if any, display in the middle of the code pane.
-    - An active Method is indicated by types.m_iActiveMethodIndex > -1.
+- There is not always an active Method in the Active Type. But, if there are any methods, one will always be active. Only a Type with 0 Methods has no active Method. If there is no active Method, the name in the TypeWell header displays as *n/a*.
+    - If there is no active Method, nothing should display in the Code pane--not the schema categories or the blocks representing a method.
+    - If there is an active Method, the schema categories display down the left side of the code pane and the blocks representing the Method, if any, display in the middle of the code pane.
+    - An active Method is signaled by types.m_iActiveMethodIndex > -1.
     - **When there is an active Method, any manipulation of its code blocks in the code pane must be saved to the method's workspace property whenever it changes.**
 - The following table describes when there should be an active Method (and a couple of other aspects):
 
@@ -156,8 +161,11 @@ To summarize, the sections below describe how our code manipulates each Method's
     </tr>
 </table>
 
-### Data structures and the source code
-#### Schema data
+#### TypeWell Properties
+
+#### TypeWell Events
+
+### Blockly schema structure and maintenance
 - The default Blockly schema contains function and data blocks arranged in these categories: Global, Event, Control/If, Control/Loops, Logic, Math, Lists, Text, Variables and Functions. These blocks are dragged and combined on the Code frame to create workspace methods. The names of blocks that we create are added to self.schema in Code.js and marked *true* (meaning that they are available for use) and their corresponding code is added to self.blocks and self.javaScript.
 - The App Type is structured slightly differently from subsequent Types. It is created with only this one block initially:
     - App_initialize using []
