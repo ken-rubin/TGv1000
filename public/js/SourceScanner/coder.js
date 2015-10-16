@@ -374,7 +374,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
             self.blocklyChangeListener = function (objectPrimaryBlockChain) {
 
-                debugger;
+                // debugger;
 
                 // Clear designer.
                 var objectResult = {};

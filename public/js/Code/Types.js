@@ -174,13 +174,13 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							return false;
 						}
+
 						if (!m_clTypeActive.data.isApp) {
 
 							return false;
 						}
 
-						if (m_clTypeActive.data.methods.length <= m_iActiveMethodIndex ||
-							m_clTypeActive.data.methods[m_iActiveMethodIndex].name !== "initialize") {
+						if (m_clTypeActive.data.methods[m_iActiveMethodIndex].name !== "initialize") {
 
 							return false;
 						}
@@ -200,7 +200,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								return null;
 							}
+
 							return code.load(m_clTypeActive.data.methods[m_iActiveMethodIndex].workspace);
+
 						} catch (e) {
 
 							return e;
@@ -445,8 +447,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							m_clTypeActive.data.methods.splice(index, 1);
 
-							// self.functionSetActiveMethodIndex(-1);
-
 							exceptionRet = m_functionRegenTWMethodsTable();
 							if (exceptionRet) { return exceptionRet; }
 
@@ -493,6 +493,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							client.projectIsDirty();
 
 							m_clTypeActive.data.properties.splice(index, 1);
+
+							// Something has to be done in code, I'd bet.
+
 							return m_functionRegenTWPropertiesTable();
 						
 						} catch (e) {

@@ -44,7 +44,7 @@
         + having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 + Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
-- Image search for Type is pulling up all id=0 images.
+- Image search for Type (and likely everything) is pulling up all id=0 images. I think.
 
 
 
@@ -53,7 +53,8 @@
 - All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 - **Ken:** If I open a new project, the App Type is the Current Type and initialize is the Current Method, but, since we don't display app_initialize or the getter and setters for X, Y, Width and Height, the App category doesn't even appear in the schema category list.
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
-    - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Is this OK?
+    - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
+- **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
 
 
 ## General description of programming using our system

@@ -616,7 +616,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								return;
 							}
 
-							var exceptionRet = client.showPropertyGrid(item, function(propertyTypeId, changedProperty, newvalue, helperValue){
+							var functionManipulateCallback = function(propertyTypeId, changedProperty, newvalue, helperValue) {
 
 								// Validate newvalue based on propertyTypeId.
 								// 1: 		mb numeric
@@ -678,10 +678,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								);
 								if (ex) { throw ex; }
 
-								// If the app initialize is active, then the blockly code change listener
-								// will be invoked by the above code.  So we do not need to run the follow.
-								// Otherwise, we do not to run this to cause the desited up in designer.
-								if (!types.isAppInitializeActive()) {
+								var bAppInitializeActive = types.isAppInitializeActive();
+
+								// If the App initialize method is active (displayed in the code pane), then the blockly code change listener
+								// will be invoked by the above call to coder.  In that case we do not need to run the following block of code.
+								// Otherwise, we need to run the block to cause the desired effect up in the designer pane.
+								if (!bAppInitializeActive) {
 
 									// Check if changedProperty is one of X, Y, Width, Height and, if so,
 									// update it in item before calling m_functionRender.
@@ -700,16 +702,17 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 								// Finally, since the workspace has been updated, if it's open in the code window,
 								// cause it to redraw with the new value. But only if it's showing now. This means
-								// that the user had at some point in the past selected App and clicked on the initialize
+								// that the user (or the system) had selected App and clicked on the initialize
 								// method and it's STILL showing.
-								var bAppInitializeActive = types.isAppInitializeActive();
 								if (bAppInitializeActive) {
 
 									// Force update.
 									ex = types.reloadActiveMethod();
 									if (ex) { throw ex; }
 								}
-							});
+							};
+
+							var exceptionRet = client.showPropertyGrid(item, functionManipulateCallback);
 							if (exceptionRet) { throw exceptionRet; }
 
 						} catch (err) {

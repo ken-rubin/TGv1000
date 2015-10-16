@@ -643,7 +643,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Get the App Type's initialize workspace (in JS).
 		                    if (!objectWorkspace) {
 
 		                        throw { messgage: "Failed to get the workspace object." };
@@ -654,23 +654,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 			                var objectCursor = objectPrimaryBlockChain;
 
-			                var strLookForFirst = g_clTypeApp.data.name + "_set" + strInstance;
-			                var strLookForThen = strType + "_set" + strProperty;
-			                var bFoundFirst = false;
+			                var strLookForFirst = strType + "_set" + strProperty;
+			                var strLookForThen = g_clTypeApp.data.name + "_get" + strInstance;
 
 			                if (objectCursor) {
 
 			    	            do {
 
-			    	            	if (!bFoundFirst) {
+		    	            		if (objectCursor.type === strLookForFirst) {
 
-			    	            		if (objectCursor.type === strLookForFirst) {
-
-			    	            			bFoundFirst = true;
-			    	            		}
-			    	            	} else {
-
-			    	            		if (objectCursor.type === strLookForThen) {
+			    	            		if (objectCursor.children[0].children[0].type === strLookForThen) {
 
 			    	            			return objectCursor.children[1].children[0].children[0].contents;
 			    	            		}
