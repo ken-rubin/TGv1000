@@ -45,6 +45,7 @@
 + Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
+- When viewing a Boolean property with a default value set in PropertyGrid, the default isn't displayed. If a selection is made, it does display correctly on subsequent use of PropertyGrid.
 
 
 

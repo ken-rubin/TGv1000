@@ -203,8 +203,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									}
 
 									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
-									// var strVal = "$('#t5-"+i+" option:selected').text()";
-									// strBuild += '<div class="PGPropCol4"><button id="b5-'+i+'" type="button" onclick="m_funcCB(5, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 6) {	// Typelist
 
@@ -223,8 +221,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									}
 
 									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
-									// var strVal = "$('#t6-"+i+" option:selected').text()";
-									// strBuild += '<div class="PGPropCol4"><button id="b6-'+i+'" type="button" onclick="m_funcCB(6, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else {
 
@@ -253,8 +249,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									if (m.currentValue !== '') {
 										// m.currentValue = '0' or '1'.
-										$('input[name=b-'+i+'][value='+m.currentValue+']').prop('checked', true);
+										$('input[name=b-'+i+'][value="'+m.currentValue+'"]').prop('checked', true);
 									}
+									var sel = "input[name=b-" + i + "]:checked";
+									$("input[name=b-" + i + "]").change(function(){m_funcCB(4, m.name, sel, null);});
 
 								} else if (m.propertyTypeId === 5) {
 
