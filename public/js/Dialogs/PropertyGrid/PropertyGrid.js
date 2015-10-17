@@ -162,8 +162,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									strBuild += '<div class="PGPropCol2">Number</div>';
 									var sel = "t1-" + i;
 									strBuild += '<div class="PGPropCol3"><input id="' + sel + '" type="text" onkeyup="m_funcCB(1, &apos;' + m.name + '&apos;, &apos;' + sel + '&apos;, null);" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
-									// var strVal = "$('#t1-" + i + "').val()";
-									// strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_funcCB(1, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 2) {	// Number range
 
@@ -172,8 +170,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									var sel = "t2-" + i;
 									// This is the only case where the 4th param is passed into m_funcCB: it is the acceptable number range. Only when typing results in a number in the range will it be applied.
 									strBuild += '<div class="PGPropCol3"><input id="t2-'+i+'" type="text" onkeyup="m_funcCB(2, &apos;' + m.name + '&apos;, &apos;' + sel + '&apos;, &apos;' + m.initialValue + '&apos;);" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
-									// var strVal = "$('#t2-" + i + "').val()";
-									// strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_funcCB(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 3) {	// String
 
@@ -184,8 +180,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									strBuild += '<div class="PGPropCol2">String</div>';
 									var sel = "t3-" + i;
 									strBuild += '<div class="PGPropCol3"><input id="t3-'+i+'" type="text" onkeyup="m_funcCB(3, &apos;' + m.name + '&apos;, &apos;' + sel + '&apos;, null);" placeHolder="Enter string" value="' + m.currentValue + '"></div>';
-									// var strVal = "$('#t3-" + i + "').val()";
-									// strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_funcCB(3, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 4) {	// Bool
 
@@ -269,6 +263,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										jq5.val('Select pick...');
 									else
 										jq5.val(m.currentValue);
+									var sel = "t5-" + i + " option:selected";
+									jq5.change(function(){m_funcCB(5, m.name, sel, null);});
 
 								} else if (m.propertyTypeId === 6) {
 
@@ -277,6 +273,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										jq6.val('Select type...');
 									else
 										jq6.val(m.currentValue);
+									var sel = "t6-" + i + " option:selected";
+									jq6.change(function(){m_funcCB(6, m.name, sel, null);});
 								}
 							}
 						} catch (e) {

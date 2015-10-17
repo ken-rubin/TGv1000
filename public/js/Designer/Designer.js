@@ -649,22 +649,16 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 										if (newvalue.length === 0) { return; }
 										break;
 									case 4:
-										if (newvalue !== '0' && newvalue !== '1') {
-											errorHelper.show('You must select true or false for ' + changedProperty);
-											return;
-										}
+										newvalue = $(selector).val();
+										if (newvalue !== '0' && newvalue !== '1') { return; }
 										break;
 									case 5:
-										if (newvalue === 'Select pick...') {
-											errorHelper.show('Please select an actual value for your picklist ' + changedProperty);
-											return;
-										}
+										newvalue = $("#" + selector).text();
+										if (newvalue === 'Select pick...') { return; }
 										break;
 									case 6:
-										if (newvalue === 'Select type...') {
-											errorHelper.show('Please select an actual type for ' + changedProperty);
-											return;
-										}
+										newvalue = $("#" + selector).text();
+										if (newvalue === 'Select type...') { return; }
 										break;
 								}
 
