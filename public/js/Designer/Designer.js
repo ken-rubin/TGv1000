@@ -616,8 +616,104 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								return;
 							}
 
-							var functionManipulateCallback = function(propertyTypeId, changedProperty, newvalue, helperValue) {
+							// var functionManipulateCallback = function(propertyTypeId, changedProperty, newvalue, helperValue) {
 
+							// 	// Validate newvalue based on propertyTypeId.
+							// 	// 1: 		mb numeric
+							// 	// 2: 		mb numeric and in range in helperValue
+							// 	// 3: 		mb length > 0 (maybe)
+							// 	// 4: 		true or false must be chosen
+							// 	// 5: 		cannot be 'Select pick...'
+							// 	// 6: 		cannot be 'Select type...'
+							// 	switch (propertyTypeId) {
+
+							// 		case 1:
+							// 			if (!$.isNumeric(newvalue)) {
+							// 				errorHelper.show(changedProperty + ' must be numeric.');
+							// 				return;
+							// 			}
+							// 			break;
+							// 		case 2:
+							// 			var parts = helperValue.split('-');
+							// 			var v1 = parseFloat(parts[0]);
+							// 			var v2 = parseFloat(parts[1]);
+							// 			var nv = parseFloat(newvalue);
+							// 			if (nv < v1 || nv > v2) {
+							// 				errorHelper.show('Your entry must be in this range: ' + helperValue);
+							// 				return;
+							// 			}
+							// 			break;
+							// 		case 3:
+							// 			if (newvalue.length === 0) {
+							// 				errorHelper.show('Your string for ' + changedProperty + ' may not be blank.');
+							// 				return;
+							// 			}
+							// 			break;
+							// 		case 4:
+							// 			if (newvalue !== '0' && newvalue !== '1') {
+							// 				errorHelper.show('You must select true or false for ' + changedProperty);
+							// 				return;
+							// 			}
+							// 			break;
+							// 		case 5:
+							// 			if (newvalue === 'Select pick...') {
+							// 				errorHelper.show('Please select an actual value for your picklist ' + changedProperty);
+							// 				return;
+							// 			}
+							// 			break;
+							// 		case 6:
+							// 			if (newvalue === 'Select type...') {
+							// 				errorHelper.show('Please select an actual type for ' + changedProperty);
+							// 				return;
+							// 			}
+							// 			break;
+							// 	}
+
+							// 	// Apply newvalue to changedProperty in item.type.
+							// 	var ex = coder.update_SetPropertyValue(
+							// 		item.type,
+							// 		changedProperty,
+							// 		newvalue,
+							// 		item.id
+							// 	);
+							// 	if (ex) { throw ex; }
+
+							// 	var bAppInitializeActive = types.isAppInitializeActive();
+
+							// 	// If the App initialize method is active (displayed in the code pane), then the blockly code change listener
+							// 	// will be invoked by the above call to coder.  In that case we do not need to run the following block of code.
+							// 	// Otherwise, we need to run the block to cause the desired effect up in the designer pane.
+							// 	if (!bAppInitializeActive) {
+
+							// 		// Check if changedProperty is one of X, Y, Width, Height and, if so,
+							// 		// update it in item before calling m_functionRender.
+							// 		if (changedProperty === 'X')
+							// 			item.left = parseFloat(newvalue);
+							// 		else if (changedProperty === 'Y')
+							// 			item.top = parseFloat(newvalue);
+							// 		else if (changedProperty === 'Width')
+							// 			item.width = parseFloat(newvalue);
+							// 		else if (changedProperty === 'Height')
+							// 			item.height = parseFloat(newvalue);
+							// 	}
+
+							// 	ex = m_functionRender();
+							// 	if (ex) { throw ex; }
+
+							// 	// Finally, since the workspace has been updated, if it's open in the code window,
+							// 	// cause it to redraw with the new value. But only if it's showing now. This means
+							// 	// that the user (or the system) had selected App and clicked on the initialize
+							// 	// method and it's STILL showing.
+							// 	if (bAppInitializeActive) {
+
+							// 		// Force update.
+							// 		ex = types.reloadActiveMethod();
+							// 		if (ex) { throw ex; }
+							// 	}
+							// };
+							var functionManipulateCallback = function(propertyTypeId, changedProperty, selector, helperValue) {
+
+								var newvalue = null;
 								// Validate newvalue based on propertyTypeId.
 								// 1: 		mb numeric
 								// 2: 		mb numeric and in range in helperValue
@@ -628,6 +724,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								switch (propertyTypeId) {
 
 									case 1:
+										newvalue = $("#" + selector).val();
 										if (!$.isNumeric(newvalue)) {
 											errorHelper.show(changedProperty + ' must be numeric.');
 											return;

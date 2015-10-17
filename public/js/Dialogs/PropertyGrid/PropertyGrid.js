@@ -26,7 +26,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							m_toolInstance = toolInstance;
-							m_functionManipulateCallback = functionManipulateCallback;
+							m_funcCB = functionManipulateCallback;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -160,9 +160,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										m.currentValue = parseFloat(m.initialValue);
 									}
 									strBuild += '<div class="PGPropCol2">Number</div>';
-									strBuild += '<div class="PGPropCol3"><input id="t1-'+i+'" type="text" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
-									var strVal = "$('#t1-" + i + "').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_functionManipulateCallback(1, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									var sel = "t1-" + i;
+									strBuild += '<div class="PGPropCol3"><input id="' + sel + '" type="text" onkeyup="m_funcCB(1, &apos;' + m.name + '&apos;, &apos;' + sel + '&apos;, null);" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
+									// var strVal = "$('#t1-" + i + "').val()";
+									// strBuild += '<div class="PGPropCol4"><button id="b1-'+i+'" type="button" onclick="m_funcCB(1, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 2) {	// Number range
 
@@ -170,7 +171,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									strBuild += '<div class="PGPropCol2">Number in range&nbsp;'+m.initialValue+'</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t2-'+i+'" type="text" placeHolder="Enter number" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t2-" + i + "').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_functionManipulateCallback(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b2-'+i+'" type="button" onclick="m_funcCB(2, &apos;' + m.name + '&apos;,' + strVal + ',&apos;'+m.initialValue+'&apos;);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 3) {	// String
 
@@ -181,14 +182,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									strBuild += '<div class="PGPropCol2">String</div>';
 									strBuild += '<div class="PGPropCol3"><input id="t3-'+i+'" type="text" placeHolder="Enter string" value="' + m.currentValue + '"></div>';
 									var strVal = "$('#t3-" + i + "').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_functionManipulateCallback(3, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b3-'+i+'" type="button" onclick="m_funcCB(3, &apos;' + m.name + '&apos;,&apos;' + strVal + '&apos;,null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 4) {	// Bool
 
 									strBuild += '<div class="PGPropCol2">True or false</div>';
 									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input type="radio" name="b-'+i+'" value="1" style="width:25px;"><span>true</span>&nbsp;&nbsp;&nbsp;<input type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
 									var strVal = "$('input[name=b-"+i+"]:checked').val()";
-									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_functionManipulateCallback(4, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_funcCB(4, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 5) {	// Picklist
 
@@ -206,7 +207,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
 									var strVal = "$('#t5-"+i+" option:selected').text()";
-									strBuild += '<div class="PGPropCol4"><button id="b5-'+i+'" type="button" onclick="m_functionManipulateCallback(5, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b5-'+i+'" type="button" onclick="m_funcCB(5, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 6) {	// Typelist
 
@@ -226,7 +227,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									strBuild += '</select></div>';	// close <div class="PGPropCol3" and its child <select>
 									var strVal = "$('#t6-"+i+" option:selected').text()";
-									strBuild += '<div class="PGPropCol4"><button id="b6-'+i+'" type="button" onclick="m_functionManipulateCallback(6, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
+									strBuild += '<div class="PGPropCol4"><button id="b6-'+i+'" type="button" onclick="m_funcCB(6, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else {
 
@@ -389,4 +390,4 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 			errorHelper.show(e);
 		}
 	});
-m_functionManipulateCallback = null;
+m_funcCB = null;
