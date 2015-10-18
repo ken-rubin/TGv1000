@@ -650,7 +650,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 										break;
 									case 4:
 										newvalue = $(selector).val();
-										if (newvalue !== '0' && newvalue !== '1') { return; }
+										if (newvalue !== 'false' && newvalue !== 'true') { return; }
 										break;
 									case 5:
 										newvalue = $("#" + selector).text();

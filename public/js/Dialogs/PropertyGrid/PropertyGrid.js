@@ -184,7 +184,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} else if (m.propertyTypeId === 4) {	// Bool
 
 									strBuild += '<div class="PGPropCol2">True or false</div>';
-									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input type="radio" name="b-'+i+'" value="1" style="width:25px;"><span>true</span>&nbsp;&nbsp;&nbsp;<input type="radio" name="b-'+i+'" value="0" style="width:25px;"><span>false</span></div>';
+									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input type="radio" name="b-'+i+'" value="true" style="width:25px;"><span>true</span>&nbsp;&nbsp;&nbsp;<input type="radio" name="b-'+i+'" value="false" style="width:25px;"><span>false</span></div>';
 									// var strVal = "$('input[name=b-"+i+"]:checked').val()";
 									// strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_funcCB(4, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
@@ -247,10 +247,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var m = m_arrayProperties[i];
 								if (m.propertyTypeId === 4) {
 
-debugger;
-									if (m.currentValue !== '') {
-										// m.currentValue = '0' or '1'.
-										$('input[name=b-'+i+'][value="'+m.currentValue+'"]').prop('checked', true);
+									if (m.currentValue === '') {
+										m.currentValue = m.initialValue;
+										if (m.currentValue !== '') {
+
+											$('input[name=b-'+i+'][value="'+m.currentValue+'"]').prop('checked', true);
+										}
 									}
 									var sel = "input[name=b-" + i + "]:checked";
 									$("input[name=b-" + i + "]").change(function(){m_funcCB(4, m.name, sel, null);});
@@ -258,20 +260,32 @@ debugger;
 								} else if (m.propertyTypeId === 5) {
 
 									var jq5 = $("#t5-"+i);
-									if (m.currentValue === '')
+									
+									// m.initialValue is the set of picks (without 'Select pick...').
+									if (m.currentValue === '') {
+
 										jq5.val('Select pick...');
-									else
+
+									} else {
+									
 										jq5.val(m.currentValue);
+									}
 									var sel = "t5-" + i + " option:selected";
 									jq5.change(function(){m_funcCB(5, m.name, sel, null);});
 
 								} else if (m.propertyTypeId === 6) {
 
 									var jq6 = $("#t6-"+i);
-									if (m.currentValue === '')
+
+									// There is no m.initialValue for type 6.
+									if (m.currentValue === '') {
+
 										jq6.val('Select type...');
-									else
+									
+									} else {
+
 										jq6.val(m.currentValue);
+									}
 									var sel = "t6-" + i + " option:selected";
 									jq6.change(function(){m_funcCB(6, m.name, sel, null);});
 								}
