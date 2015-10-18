@@ -764,47 +764,47 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 
 
-					// Helper method generates the function string for a event get function.
-// This is just a copy of property. It needs Ken.
-					var m_functionGenerateBlocksEventGetFunctionString = function (strName) {
+					// Helper method generates the function string for a event raise function.
+					var m_functionGenerateBlocksEventRaiseFunctionString = function (strName) {
 
 						return "this.appendDummyInput().appendField('"+strName+"');" +
 							"this.appendValueInput('SELF').appendField('from');" +
-							"this.setColour(20);" +
-							"this.setOutput(true);" +
-							"this.setInputsInline(true);" +
-							"this.setTooltip('"+strName+"');";
-					};
-
-					// Helper method generates the javascript string for a event get function.
-// This is just a copy of property. It needs Ken.
-					var m_functionGenerateJavaScriptEventGetFunctionString = function (strName) {
-
-						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
-            				'return [" " + strId + "[\'' + strName + '\'] ", Blockly.JavaScript.ORDER_MEMBER];';
-					};
-
-					// Helper method generates the function string for a event set function.
-// This is just a copy of property. It needs Ken.
-					var m_functionGenerateBlocksEventSetFunctionString = function (strName) {
-
-						return "this.appendDummyInput().appendField('"+strName+"');" +
-							"this.appendValueInput('SELF').appendField('in');" +
-							"this.appendValueInput('VALUE').appendField('to');" +
-							"this.setColour(30);" +
+							"this.appendValueInput('EVENTARGS').appendField('args');" +
+							"this.setColour(25);" +
 							"this.setPreviousStatement(true);" +
 							"this.setNextStatement(true);" +
 							"this.setInputsInline(true);" +
 							"this.setTooltip('"+strName+"');";
 					};
 
-					// Helper method generates the javascript string for a event set function.
-// This is just a copy of property. It needs Ken.
-					var m_functionGenerateJavaScriptEventSetFunctionString = function (strName) {
+					// Helper method generates the javascript string for a event raise function.
+					var m_functionGenerateJavaScriptEventRaiseFunctionString = function (strName) {
 
 						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
-					        'var strValue = Blockly.JavaScript.valueToCode(block, "VALUE",Blockly.JavaScript.ORDER_ADDITION) || "";' +
-					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
+							'var strEA = Blockly.JavaScript.valueToCode(block,"EVENTARGS",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'return " window.raiseEvent(\''+strName+'\', "+strId+", "+strEA+"); "';
+					};
+
+					// Helper method generates the function string for a event subscribe function.
+					var m_functionGenerateBlocksEventSubscribeFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('TARGET').appendField('target');" +
+							"this.appendValueInput('METHOD').appendField('method');" +
+							"this.setColour(35);" +
+							"this.setPreviousStatement(true);" +
+							"this.setNextStatement(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a event subscribe function.
+					// window.eventCollection['bounce'].push({ target: self.ship, method: 'HandleBounce' });
+					var m_functionGenerateJavaScriptEventSubscribeFunctionString = function (strName) {
+
+						return 'var strTarget = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'var strMethod = Blockly.JavaScript.valueToCode(block, "VALUE",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'return "window.eventCollection[\''+strName+'\'].push({ target: "+strTarget+", method: \'"+strMethod+"\' });"';
 					};
 
 
@@ -854,7 +854,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						return "this.appendDummyInput().appendField('"+strName+"');" +
 							"this.appendValueInput('SELF').appendField('using');" +
 							"this.setColour(40);" +
-							"this.setOutput(true);" +
+							"this.setPreviousStatement(true);" +
+							"this.setNextStatement(true);" +
 							"this.setInputsInline(true);" +
 							"this.setTooltip('"+strName+"');";
 					};
@@ -1123,7 +1124,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method adds a type's event accessor functions.
-//used - Ken has to decide what gets done here			
 					var m_functionAdd_Type_Event = function (clType, event) {
 
 						try {
@@ -1131,16 +1131,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							////////////////////////
 							////////////////////////
 							////////////////////////
-							// Get
+							// Raise
 
 							////////////////////////
 							// Blocks.
-							var strGetName = clType.data.name + "_get" + event.name;
-							self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);
+							var strRaiseName = clType.data.name + "_raise" + event.name;
+							self.blocks[strRaiseName] = m_functionGenerateBlocksEventRaiseFunctionString(strRaiseName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);
+							self.javaScript[strRaiseName] = m_functionGenerateJavaScriptEventRaiseFunctionString(event.name);
 
 							////////////////////////
 							// Schema.
@@ -1154,27 +1154,27 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// The following test is necessary, because new_App is no longer added to self.schema.Types.
 							if (!objectType) {
 
-							objectTypes[clType.data.name] = {};
-								objectTypes[clType.data.name][strGetName] = true;
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strRaiseName] = true;
 
 							} else {
 
-								objectType[strGetName] = true;
+								objectType[strRaiseName] = true;
 							}
 
 							////////////////////////
 							////////////////////////
 							////////////////////////
-							// Set
+							// Subscribe.
 
 							////////////////////////
 							// Blocks.
-							var strSetName = clType.data.name + "_set" + event.name;
-							self.blocks[strSetName] = m_functionGenerateBlocksEventSetFunctionString(strSetName);	// This method doesn't exist.
+							var strSubscribeName = clType.data.name + "_subscribe" + event.name;
+							self.blocks[strSubscribeName] = m_functionGenerateBlocksEventSubscribeFunctionString(strSubscribeName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSetName] = m_functionGenerateJavaScriptEventSetFunctionString(event.name);	// This method doesn't exist.
+							self.javaScript[strSubscribeName] = m_functionGenerateJavaScriptEventSubscribeFunctionString(event.name);
 
 							////////////////////////
 							// Schema.
@@ -1184,15 +1184,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							}
 							var objectTypes = self.schema.Types;
 							var objectType = objectTypes[clType.data.name];
-							// The following test is necessary, because new_App is no longer added to self.schema.Types.
+
 							if (!objectType) {
 
-							objectTypes[clType.data.name] = {};
-								objectTypes[clType.data.name][strSetName] = true;
+								objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strSubscribeName] = true;
 
 							} else {
 
-								objectType[strSetName] = true;
+								objectType[strSubscribeName] = true;
 							}
 
 							return null;

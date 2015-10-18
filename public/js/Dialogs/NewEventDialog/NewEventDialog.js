@@ -103,7 +103,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_dialog = dialogItself;
 							$("#EventName").focus();
 
-							$("#EventName").blur(m_functionBlurEventName);
+							$("#EventName").keyup(m_functionBlurEventName);
 
 							m_setStateCreateBtn();
 

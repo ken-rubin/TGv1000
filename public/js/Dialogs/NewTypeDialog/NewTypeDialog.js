@@ -109,7 +109,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 							$("#TypeName").focus();
 
-							$("#TypeName").blur(m_functionBlurTypeName);
+							$("#TypeName").keyup(m_functionBlurTypeName);
 
 							m_setStateCreateBtn();
 
@@ -127,9 +127,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					var m_setStateCreateBtn = function() {
 
 						var nameStatus = $("#TypeName").val().trim().length > 0;
-						var imgStatus = m_imageId > 0;
+						//var imgStatus = m_imageId > 0;
 
-						if (!nameStatus || !imgStatus) {
+						if (!nameStatus/* removing requirement for the image || !imgStatus*/) {
 							$("#CreateTypeBtn").addClass("disabled");
 						} else {
 							$("#CreateTypeBtn").removeClass("disabled");

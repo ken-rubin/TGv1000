@@ -247,6 +247,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var m = m_arrayProperties[i];
 								if (m.propertyTypeId === 4) {
 
+debugger;
 									if (m.currentValue !== '') {
 										// m.currentValue = '0' or '1'.
 										$('input[name=b-'+i+'][value="'+m.currentValue+'"]').prop('checked', true);
