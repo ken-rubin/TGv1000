@@ -26,9 +26,6 @@
 - Deleting
     + Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
     + What validation is done for deleting? If a property is being used in a method, is it deletable. I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
-- Write event loader in Code.js#self.addType.
-- PropertyGrid:
-	- apply property value changes on each keystroke and remove the Save buttons
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
 - Remove requirement for images in project, type, method (maybe later, says John; maybe for project we generate a designer thumbnail)
 - Play button:
@@ -45,7 +42,24 @@
 + Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
-- When viewing a Boolean property with a default value set in PropertyGrid, the default isn't displayed. If a selection is made, it does display correctly on subsequent use of PropertyGrid.
+- Type color schema (for schema blocks)
+    - Generate a random (unused) color for each Type (see Code.js in the 700s). 
+    - That same color goes to the type's methods, properties and events.
+- Add Method dialog
+    - Change to Add/Edit type dialog to handle changing the following new items.
+    - Split the screen
+    - Shorten the existing textareas.
+    - Add (Method) Type radio selections: o Statement    o Expression
+        - A statement can be stacked with other blocks (indented on top; triangle on bottom).
+        - An expression fits into another block as a value (triangle on left).
+    - Add Parameters typearea (works like picklist).
+    - Save all of this to the DB.
+- Base classes.
+    - All Types have a base class (Type), even the App Type.
+    - Add a Base class combo to the New Type dialog. Populate the droplist with all other Types. 
+    - When a new project is created, use either a pullover menu in Navbar or a droplist on New Project dialog.
+        - The type of Project actually sets the base class for the Project's App Type.
+        - Choices for Project type are initially: Console, Game, Web site
 
 
 
