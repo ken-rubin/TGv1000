@@ -202,17 +202,26 @@ a.list-group-item {
 }
 .TWEvtCol1
 {
-  width:68%;
+  display: inline-block;
+  height:32px;
+  width:60%;
+  left:5%;
 }
 .TWEvtCol2
 {
-  width:10%;
-  left:68%;
+  display: inline-block;
+  width:15%;
+
+  margin-top:4px;
+
+  border-radius: 4px;
 }
 .TWEvtCol3
 {
-  width:22%;
-  left:78%;
+  display: inline-block;
+  width:15%;
+
+  border-radius: 4px;
 }
 
 

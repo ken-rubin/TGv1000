@@ -761,6 +761,58 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
 					};
 
+
+
+
+					// Helper method generates the function string for a event get function.
+// This is just a copy of property. It needs Ken.
+					var m_functionGenerateBlocksEventGetFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('SELF').appendField('from');" +
+							"this.setColour(20);" +
+							"this.setOutput(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a event get function.
+// This is just a copy of property. It needs Ken.
+					var m_functionGenerateJavaScriptEventGetFunctionString = function (strName) {
+
+						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+            				'return [" " + strId + "[\'' + strName + '\'] ", Blockly.JavaScript.ORDER_MEMBER];';
+					};
+
+					// Helper method generates the function string for a event set function.
+// This is just a copy of property. It needs Ken.
+					var m_functionGenerateBlocksEventSetFunctionString = function (strName) {
+
+						return "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('SELF').appendField('in');" +
+							"this.appendValueInput('VALUE').appendField('to');" +
+							"this.setColour(30);" +
+							"this.setPreviousStatement(true);" +
+							"this.setNextStatement(true);" +
+							"this.setInputsInline(true);" +
+							"this.setTooltip('"+strName+"');";
+					};
+
+					// Helper method generates the javascript string for a event set function.
+// This is just a copy of property. It needs Ken.
+					var m_functionGenerateJavaScriptEventSetFunctionString = function (strName) {
+
+						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'var strValue = Blockly.JavaScript.valueToCode(block, "VALUE",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
+					};
+
+
+
+
+
+
+
 					// Helper method generates the function string for a app property get function.
 					var m_functionGenerateBlocksAppPropertyGetFunctionString = function (strName) {
 
@@ -1076,72 +1128,72 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-							// ////////////////////////
-							// ////////////////////////
-							// ////////////////////////
-							// // Get
+							////////////////////////
+							////////////////////////
+							////////////////////////
+							// Get
 
-							// ////////////////////////
-							// // Blocks.
-							// var strGetName = clType.data.name + "_get" + event.name;
-							// self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);	// This method doesn't exist.
+							////////////////////////
+							// Blocks.
+							var strGetName = clType.data.name + "_get" + event.name;
+							self.blocks[strGetName] = m_functionGenerateBlocksEventGetFunctionString(strGetName);
 
-							// ////////////////////////
-							// // JavaScript.
-							// self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);	// This method doesn't exist.
+							////////////////////////
+							// JavaScript.
+							self.javaScript[strGetName] = m_functionGenerateJavaScriptEventGetFunctionString(event.name);
 
-							// ////////////////////////
-							// // Schema.
-							// if (!self.schema.Types) {
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
 
-							// 	self.schema.Types = {};
-							// }
-							// var objectTypes = self.schema.Types;
-							// var objectType = objectTypes[clType.data.name];
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+							var objectType = objectTypes[clType.data.name];
 
 							// The following test is necessary, because new_App is no longer added to self.schema.Types.
-							// if (!objectType) {
+							if (!objectType) {
 
-							// objectTypes[clType.data.name] = {};
-							// 	objectTypes[clType.data.name][strGetName] = true;
+							objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strGetName] = true;
 
-							// } else {
+							} else {
 
-							// 	objectType[strGetName] = true;
-							// }
+								objectType[strGetName] = true;
+							}
 
-							// ////////////////////////
-							// ////////////////////////
-							// ////////////////////////
-							// // Set
+							////////////////////////
+							////////////////////////
+							////////////////////////
+							// Set
 
-							// ////////////////////////
-							// // Blocks.
-							// var strSetName = clType.data.name + "_set" + event.name;
-							// self.blocks[strSetName] = m_functionGenerateBlocksEventSetFunctionString(strSetName);	// This method doesn't exist.
+							////////////////////////
+							// Blocks.
+							var strSetName = clType.data.name + "_set" + event.name;
+							self.blocks[strSetName] = m_functionGenerateBlocksEventSetFunctionString(strSetName);	// This method doesn't exist.
 
-							// ////////////////////////
-							// // JavaScript.
-							// self.javaScript[strSetName] = m_functionGenerateJavaScriptEventSetFunctionString(event.name);	// This method doesn't exist.
+							////////////////////////
+							// JavaScript.
+							self.javaScript[strSetName] = m_functionGenerateJavaScriptEventSetFunctionString(event.name);	// This method doesn't exist.
 
-							// ////////////////////////
-							// // Schema.
-							// if (!self.schema.Types) {
+							////////////////////////
+							// Schema.
+							if (!self.schema.Types) {
 
-							// 	self.schema.Types = {};
-							// }
-							// var objectTypes = self.schema.Types;
-							// var objectType = objectTypes[clType.data.name];
+								self.schema.Types = {};
+							}
+							var objectTypes = self.schema.Types;
+							var objectType = objectTypes[clType.data.name];
 							// The following test is necessary, because new_App is no longer added to self.schema.Types.
-							// if (!objectType) {
+							if (!objectType) {
 
-							// objectTypes[clType.data.name] = {};
-							// 	objectTypes[clType.data.name][strSetName] = true;
+							objectTypes[clType.data.name] = {};
+								objectTypes[clType.data.name][strSetName] = true;
 
-							// } else {
+							} else {
 
-							// 	objectType[strSetName] = true;
-							// }
+								objectType[strSetName] = true;
+							}
 
 							return null;
 

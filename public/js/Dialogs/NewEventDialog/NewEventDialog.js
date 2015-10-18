@@ -115,7 +115,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_functionBlurEventName = function() {
 
-							m_setStateCreateBtn();
+						m_setStateCreateBtn();
 					}
 
 					var m_setStateCreateBtn = function() {
