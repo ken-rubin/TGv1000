@@ -63,6 +63,7 @@
     - Besides the stuff listed above, we need to change it to Add/Edit to accomodate changing things. Right now a Type can only be renamed. And the picture can't be changed, nor tags, etc.
 - In TypeWell highlight the selected Method in the grid.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
+- Style new cascading menus and remove the extraneous files from the SmartMenus frameworks folder.
 
 
 

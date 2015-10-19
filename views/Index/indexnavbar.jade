@@ -19,17 +19,33 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
       a.navbar-brand(href="/" style='color:white;') #{title}
 
     //- Main project buttons.
-    .collapse.navbar-collapse#navbarCollapse
+    .navbar-collapse.collapse
+
+      //- Left nav
       ul.nav.navbar-nav
 
         //- Projects.
-        li.active.dropdown
-          a.dropdown-toggle(href="#", data-toggle="dropdown")
-            span.glyphicon.glyphicon-list-alt
-            | &nbsp;Projects 
-            ul.dropdown-menu
+        li
+          a(href="#") Projects
+            span.caret
+          ul.dropdown-menu
               li#NewProjectLI
-                a#NewProjectButton(href="#") New Project...
+                a#NewProjectButton(href="#") 
+                  | New Project
+                  span.caret
+                  ul.dropdown-menu
+                    li
+                      a#NewProjectGame(href="#")
+                        | Game...
+                    li
+                      a#NewProjectConsole(href="#")
+                        | Console...
+                    li
+                      a#NewProjectWebSite(href="#")
+                        | Web Site...
+                    li
+                      a#NewProjectHoloLens(href="#")
+                        | HoloLens...
               li#OpenProjectLI
                 a#OpenProjectButton(href="#") Search for/Open Project...
               li#SaveProjectLI

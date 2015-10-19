@@ -36,13 +36,34 @@ define(["Core/errorHelper"],
 							});
 
 							// Wire projects buttons.
-							$("#NewProjectButton").click(function () {
+							// $("#NewProjectButton").click(function () {
+
+							// 	try {
+
+							// 		client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+
+							// 			var exceptionRet = client.showNewProjectDialog();
+							// 			if (exceptionRet) { throw exceptionRet; }
+							// 		}, 
+							// 		true);	// true means to show the Abandon dlg if applicable.
+							// 	} catch (e) {
+
+							// 		errorHelper.show(e);
+							// 	}
+							// });
+
+							$("#NewProjectGame").click(function() {functionNewProjectButton("Game");});
+							$("#NewProjectConsole").click(function() {functionNewProjectButton("Console");});
+							$("#NewProjectWebSite").click(function() {functionNewProjectButton("Web Site");});
+							$("#NewProjectHoloLens").click(function() {functionNewProjectButton("HoloLens");});
+
+							var functionNewProjectButton = function(projectType) {
 
 								try {
 
 									client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
 
-										var exceptionRet = client.showNewProjectDialog();
+										var exceptionRet = client.showNewProjectDialog(projectType);
 										if (exceptionRet) { throw exceptionRet; }
 									}, 
 									true);	// true means to show the Abandon dlg if applicable.
@@ -50,7 +71,7 @@ define(["Core/errorHelper"],
 
 									errorHelper.show(e);
 								}
-							});
+							}
 
 							$("#OpenProjectButton").click(function () {
 

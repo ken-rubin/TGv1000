@@ -21,9 +21,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(projectType) {
 
 						try {
+
+							m_projectType = projectType;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -65,7 +67,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// (1) 
 							BootstrapDialog.show({
 
-								title: "New Project",
+								title: "New " + m_projectType + " Project",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -215,6 +217,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_imageId = 0;
+				var m_projectType = null;
 			};
 
 			// Return the constructor function as the module object.
