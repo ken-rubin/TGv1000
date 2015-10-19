@@ -47,8 +47,7 @@
     - That same color goes to the type's methods, properties and events.
 - Add Method dialog
     - Change to Add/Edit type dialog to handle changing the following new items.
-    - Split the screen
-    - Shorten the existing textareas.
+    - Shorten the existing textareas to make room for more fields in two columns.
     - Add (Method) Type radio selections: o Statement    o Expression
         - A statement can be stacked with other blocks (indented on top; triangle on bottom).
         - An expression fits into another block as a value (triangle on left).
@@ -56,10 +55,14 @@
     - Save all of this to the DB.
 - Base classes.
     - All Types have a base class (Type), even the App Type.
-    - Add a Base class combo to the New Type dialog. Populate the droplist with all other Types. 
+    - Add a Base class combo to the New Type dialog. Populate the droplist with all other Types. I would think there has to be a null-ish base class for those that don't need a base class. 
     - When a new project is created, use either a pullover menu in Navbar or a droplist on New Project dialog.
         - The type of Project actually sets the base class for the Project's App Type.
         - Choices for Project type are initially: Console, Game, Web site
+- New Type dialog
+    - Besides the stuff listed above, we need to change it to Add/Edit to accomodate changing things. Right now a Type can only be renamed. And the picture can't be changed, nor tags, etc.
+- In TypeWell highlight the selected Method in the grid.
+- We might want to set a red background for the current Type in the left vertical scroll region, too.
 
 
 
