@@ -92,7 +92,30 @@ A Type is our equivalent of a class in a standard programming language (C# or C+
 
 Keeping the code schema and workspace XML in sync and complete while Types, Tools, Methods, Properties and Events are being manipulated (added, removed, renamed, etc.) by the user is really our only goal when we discuss Type, Method, etc. maintenance--as we are doing in this section. Everything else is run-time detail.
 
-To summarize, the sections below describe how our code manipulates each Method's workspace XML and the schema components (to which the XML workspaces refer) as the user performs adding, deleting, renaming, etc. actions on Types, Methods and Properties.
+### Getting (close to) real
+#### Base Types (classes) and Project types
+- We have identified 4 project types:
+    - Game
+    - Console application
+    - Web site
+    - HoloLens game
+- We will make these 4 very different types of projects happen by introducing base Types. This means that every Type can (optionally) be derived from another Type. All App Types will be derived from one of these 4 base Types.
+- The base Types will, for example, contain the physics engine, a web design framework, etc.
+- Properties of base Types will be very important. As will be their Methods and Events.
+#### Methods
+- Statements and Expressions
+    - Statements are Methods that are visually represented in the Blockly code pane with a top triangular indentation and a bottom triangular extension.
+    - This way statements can be stacked together to provide program flow.
+    - Statement-type Methods may take parameters, but they cannot return a value.
+    - Expressions are Methods that are visually represented with a left-facing triangular extension.
+    - This way the fit into other blocks that need to provided with calculated data.
+    - Expressions may take parameters and they do return a value.
+- Parameters
+    - A Method's parameters are....
+#### Events
+- Events are basically pointers to special Methods.
+- Events support a subscribe/raise model. This means that a....
+
 
 ### The TypeWell
 
