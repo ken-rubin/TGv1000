@@ -61,6 +61,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
             // req.body.userId
+            // req.body.projectType -- will only be used for projectId = 1 (New Project)
 
             var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
                 function(rows) {

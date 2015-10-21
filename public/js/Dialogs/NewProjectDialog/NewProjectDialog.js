@@ -21,11 +21,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
+					// projectType is one of:
+					//		Game, Console, Web Site, HoloLens.
+					// It is passed to the server when retrieving the prototypical New Project affect the Project type 
+					// (notably the base Type for App).
 					self.create = function(projectType) {
 
 						try {
 
-							m_projectType = projectType;
+							m_projectType = projectType;	// 
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -142,7 +146,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
 									client.setBrowserTabAndBtns();
-								}
+								},
+								m_projectType
 							);
 							if (exceptionRet) { throw exceptionRet; }
 

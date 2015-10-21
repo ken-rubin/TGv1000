@@ -58,7 +58,7 @@
     - Add a Base class combo to the New Type dialog. Populate the droplist with all other Types. I would think there has to be a null-ish base class for those that don't need a base class. 
     - When a new project is created, use either a pullover menu in Navbar or a droplist on New Project dialog.
         - The type of Project actually sets the base class for the Project's App Type.
-        - Choices for Project type are initially: Console, Game, Web site
+        - Choices for Project type are initially: Console, Game, Web site, HoloLens
 - New Type dialog
     - Besides the stuff listed above, we need to change it to Add/Edit to accomodate changing things. Right now a Type can only be renamed. And the picture can't be changed, nor tags, etc.
 - In TypeWell highlight the selected Method in the grid.
@@ -115,6 +115,19 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 #### Events
 - Events are basically pointers to special Methods.
 - Events support a subscribe/raise model. This means that a....
+#### Database changes
+- Add table *projectTypes* (game, console, web site, hololens)
+- Add *projectTypeId* col to *projects* (cannot be null)
+- Change project with id=1 to New Game Project, projectTypeId=1
+- Change demo projects 2, 3, 4 to 5, 6, 7 (along with comics that point to them)
+- Add projects with ids=2, 3, 4 with corresponding names and projectTypeIds
+- Do similar with comics
+- Create types records for the new "new" projects
+- Add *baseTypeId* to *types* (can be null--except App Type will always be non-null)
+- Add *parameters* to *methods* (can be empty)
+- Add table *methodTypes* (statement, expression)
+- Add *methodTypeId* to *methods* (cannot be null)
+- Add a types row for each project type--more on this later
 
 
 ### The TypeWell

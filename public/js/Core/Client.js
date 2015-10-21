@@ -470,14 +470,18 @@ define(["Core/errorHelper",
 					// "functionOK" links.
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
 					// Not all of these come back through client. Some places handle the processing internally.
-					self.openProjectFromDB = function (iProjectId, callback) {
+
+					// If iProjectId = 1 (New Project), then projectType will be defined as a string telling
+					// the BO what kind of Project to build. Otherwise, it will be undefined.
+					self.openProjectFromDB = function (iProjectId, callback, projectType) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
 									projectId: iProjectId,
-									userId: g_strUserId
+									userId: g_strUserId,
+									projectType: projectType || ''
 								},
 								'json');
 							posting.done(function(data){
