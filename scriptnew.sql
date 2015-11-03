@@ -42,6 +42,7 @@ begin
           `parentProjectId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `projectTypeId` int(11) NOT NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -87,6 +88,7 @@ begin
           `parentTypeId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `baseTypeId` int(11) NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_comicId (comicId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -121,6 +123,8 @@ begin
           `parentMethodId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `methodTypeId` int(11) NOT NULL,
+          `parameters` MEDIUMTEXT NOT NULL DEFAULT '',
 		  PRIMARY KEY (`id`),
           INDEX idx_typeId (typeId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -192,18 +196,30 @@ begin
 		CREATE TABLE `TGv1000`.`logitems` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-		  `logtypeId` int(11) NOT NULL,
+		  `logTypeId` int(11) NOT NULL,
 		  `jsoncontext` longtext NOT NULL,
 		  `processed` datetime DEFAULT NULL,
 		  `processedbyUserId` int(11) DEFAULT NULL,
 		  PRIMARY KEY (`id`),
-          INDEX idx_logtypeId (logtypeId)
+          INDEX idx_logTypeId (logTypeId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-		CREATE TABLE `TGv1000`.`logtypes` (
+		CREATE TABLE `TGv1000`.`logTypes` (
 		  `id` int(11) NOT NULL,
 		  `description` varchar(100) NOT NULL,
 		  `severity` tinyint(4) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`projectTypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		CREATE TABLE `TGv1000`.`methodTypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -257,7 +273,16 @@ begin
 
 		insert TGv1000.resourceTypes (id,description) values (1,'image');
 		insert TGv1000.resourceTypes (id,description) values (2,'sound');
-
+        
+		insert TGv1000.projectTypes (id,description) values (1,'game');
+		insert TGv1000.projectTypes (id,description) values (2,'console');
+		insert TGv1000.projectTypes (id,description) values (3,'website');
+		insert TGv1000.projectTypes (id,description) values (4,'hololens');
+		insert TGv1000.projectTypes (id,description) values (5,'map');
+        
+		insert TGv1000.methodTypes (id,description) values (1,'statement');
+		insert TGv1000.methodTypes (id,description) values (2,'expression');
+        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ForgotPassword','post','routeForgotPassword',1);        

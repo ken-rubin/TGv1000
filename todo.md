@@ -1,5 +1,4 @@
 ## Either of us
-- Events!
 - Round X,Y to 0, 1 or 2 decimals (Are they pixels? If so, why not 0 decimals?)
 - Comic should slide in from the right, taking up half the screen; slide back out to strip-size when appropriate or click away; remember where they were in comic
 
@@ -94,12 +93,15 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 
 ### Getting (close to) real
 #### Base Types (classes) and Project types
-- We have identified 4 project types:
+- We have decided to move toward being able to create these Project types (starting with ???):
     - Game
     - Console application
     - Web site
     - HoloLens game
-- We will make these 4 very different types of projects happen by introducing base Types. This means that every Type can (optionally) be derived from another Type. All App Types will be derived from one of these 4 base Types.
+    - Google maps API use
+- There will be one Type in initial data for each of these Project types.
+- Any Type can (but doesn't have to) be derived from a single other Type (adding a baseTypeId column). 
+- App Types will be derived from one of the base Types listed above. This is what actually creates a Project of one of these types.
 - The base Types will, for example, contain the physics engine, a web design framework, etc.
 - Properties of base Types will be very important. As will be their Methods and Events.
 #### Methods
@@ -108,26 +110,37 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
     - This way statements can be stacked together to provide program flow.
     - Statement-type Methods may take parameters, but they cannot return a value.
     - Expressions are Methods that are visually represented with a left-facing triangular extension.
-    - This way the fit into other blocks that need to provided with calculated data.
+    - This way they fit into other blocks that need to provided with calculated data.
     - Expressions may take parameters and they do return a value.
 - Parameters
-    - A Method's parameters are....
+    - A Method's parameters are entered as a (e.g., comma-separated string of parameter names).
+    - This string of names will be normalized, checked for duplicates and stored in a single column of the methods DB table.
+    - The parameters are used in the blockly blocks XML and JavaScript as in [this example](http://165.225.132.154/work/Coder/).
+- Constructor method
+    - The App Type always has an *initialize* method, but up till now none of the other Types would start with a required method. We are adding the *construct* method to every Type--even the App Type. We will decide later if the method is initialized by the system or if the user just uses it as a constructor that is executed when the Type is *newed*.
 #### Events
-- Events are basically pointers to special Methods.
-- Events support a subscribe/raise model. This means that a....
+- Events are basically named pointers to Methods.
+- Events support a subscribe/raise model.
 #### Database changes
-- Add table *projectTypes* (game, console, web site, hololens)
-- Add *projectTypeId* col to *projects* (cannot be null)
+The database script changes below will necessitate dropping your current TGv1000 schema and recreating it with the updated *scriptnew.sql*.
+##### New tables
+- *projectTypes*: game, console, website, hololens, map
+- *methodTypes*: statement, expression
+##### *projects* table
+- Add *projectTypeId* column (cannot be null)
+##### *types* table
+- Add *baseTypeId* column to *types* (can be null--except App Type will always be non-null)
+##### *methods* table
+- Add *methodTypeId* column to *methods* (cannot be null)
+- Add *parameters* column to *methods* (cannot be null; can be 0-length string)
+##### Data initialization script changes
+- Add a types row for each Project type
 - Change project with id=1 to New Game Project, projectTypeId=1
-- Change demo projects 2, 3, 4 to 5, 6, 7 (along with comics that point to them)
-- Add projects with ids=2, 3, 4 with corresponding names and projectTypeIds
+- Change demo projects 2, 3, 4, 5 to 6, 7, 8 (along with comics that point to them)
+- Add projects with ids=2, 3, 4, 5 with corresponding names and projectTypeIds
 - Do similar with comics
 - Create types records for the new "new" projects
-- Add *baseTypeId* to *types* (can be null--except App Type will always be non-null)
-- Add *parameters* to *methods* (can be empty)
-- Add table *methodTypes* (statement, expression)
-- Add *methodTypeId* to *methods* (cannot be null)
-- Add a types row for each project type--more on this later
+- Set all methodTypeId in initial methods table data to ???.
 
 
 ### The TypeWell
