@@ -303,20 +303,58 @@ begin
 
     if @dbstate = 1.0 THEN
     
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump,public)
-			VALUES (1,'New Project',1,'',0,1,0,0.00,0.00,1);
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump,public,projectTypeId)
+			VALUES 
+				(1,'New Game Project',1,'',0,1,0,0.00,0.00,1,1),
+				(2,'New Console Project',1,'',0,1,0,0.00,0.00,1,2),
+				(3,'New Website Project',1,'',0,1,0,0.00,0.00,1,3),
+				(4,'New Hololens Project',1,'',0,1,0,0.00,0.00,1,4),
+				(5,'New Map Project',1,'',0,1,0,0.00,0.00,1,5)
+                ;
             
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
-			VALUES (1,1,0,'tn3.png','TechGroms Help','http://www.techgroms.com');
+			VALUES 
+				(1,1,0,'tn3.png','TechGroms Game Project Help','http://www.techgroms.com'),
+				(2,2,0,'tn3.png','TechGroms Console Project Help','http://www.techgroms.com'),
+				(3,3,0,'tn3.png','TechGroms Website Project Help','http://www.techgroms.com'),
+				(4,4,0,'tn3.png','TechGroms Hololens Project Help','http://www.techgroms.com'),
+				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
+				;
             
 		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public)
-			VALUES (1,'App',1,1,0,0,1,'',0,0.00,0.00,1);
+			VALUES 
+				(1,'Game Base Type',1,1,0,0,1,'',0,0.00,0.00,1),
+				(2,'Console Base Type',1,1,0,0,2,'',0,0.00,0.00,1),
+				(3,'Website Base Type',1,1,0,0,3,'',0,0.00,0.00,1),
+				(4,'Hololens Base Type',1,1,0,0,4,'',0,0.00,0.00,1),
+				(5,'Map Base Type',1,1,0,0,5,'',0,0.00,0.00,1)
+                ;
             
-		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public)
+		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId)
+			VALUES 
+				(6,'App',1,1,0,0,1,'',0,0.00,0.00,1,1),
+				(7,'App',1,1,0,0,2,'',0,0.00,0.00,1,2),
+				(8,'App',1,1,0,0,3,'',0,0.00,0.00,1,3),
+				(9,'App',1,1,0,0,4,'',0,0.00,0.00,1,4),
+				(10,'App',1,1,0,0,5,'',0,0.00,0.00,1,5)
+                ;
+            
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
 			VALUES
-				(1,1,1,'initialize',0,'',0,'',0,0.00,0.00,1)
+				(1,6,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
+				(2,7,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
+				(3,8,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
+				(4,9,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
+				(5,10,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
+				(6,6,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
+				(7,7,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
+				(8,8,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
+				(9,9,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
+				(10,10,1,'construct',0,'',0,'',0,0.00,0.00,1,1,'')
 			;
-            
+           
+		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
+           because they can't be dragged onto the Designer.
 		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
 			VALUES
 				(1,1,'X','0',0),
@@ -324,6 +362,7 @@ begin
 				(3,1,'Width','0',2),
 				(4,1,'Height','0',3)
 			;
+		*/
             
 		/* need resources/tags for every project, type and method */            
         insert TGv1000.tags (id,description)
