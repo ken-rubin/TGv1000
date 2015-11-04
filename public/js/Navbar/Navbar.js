@@ -56,6 +56,7 @@ define(["Core/errorHelper"],
 							$("#NewProjectConsole").click(function() {functionNewProjectButton("Console");});
 							$("#NewProjectWebSite").click(function() {functionNewProjectButton("Web Site");});
 							$("#NewProjectHoloLens").click(function() {functionNewProjectButton("HoloLens");});
+							$("#NewProjectMapping").click(function() {functionNewProjectButton("Mapping");});
 
 							var functionNewProjectButton = function(projectType) {
 
