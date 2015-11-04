@@ -103,9 +103,13 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								// Don't add block for App Type's initialize method.
 								if (!clType.data.isApp || (clType.data.isApp && methodIth.name !== "initialize")) {
 
-									exceptionRet = m_functionAdd_Type_Method(clType,
-										methodIth);
-									if (exceptionRet) { throw exceptionRet; }
+									// Also don't add blocks for ANY Type's construct method.
+									if (methodIth.name !== "construct") {
+
+										exceptionRet = m_functionAdd_Type_Method(clType,
+											methodIth);
+										if (exceptionRet) { throw exceptionRet; }
+									}
 								}
 							}
 

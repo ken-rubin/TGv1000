@@ -124,7 +124,7 @@ begin
           `parentPrice` DECIMAL(9,2) NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `methodTypeId` int(11) NOT NULL,
-          `parameters` MEDIUMTEXT NOT NULL DEFAULT '',
+          `parameters` MEDIUMTEXT NOT NULL,
 		  PRIMARY KEY (`id`),
           INDEX idx_typeId (typeId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -321,13 +321,14 @@ begin
 				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
 				;
             
+		/* base Types have ordinal set to -1 */
 		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public)
 			VALUES 
-				(1,'Game Base Type',1,1,0,0,1,'',0,0.00,0.00,1),
-				(2,'Console Base Type',1,1,0,0,2,'',0,0.00,0.00,1),
-				(3,'Website Base Type',1,1,0,0,3,'',0,0.00,0.00,1),
-				(4,'Hololens Base Type',1,1,0,0,4,'',0,0.00,0.00,1),
-				(5,'Map Base Type',1,1,0,0,5,'',0,0.00,0.00,1)
+				(1,'Game Base Type',1,1,0,-1,1,'',0,0.00,0.00,1),
+				(2,'Console Base Type',1,1,0,-1,2,'',0,0.00,0.00,1),
+				(3,'Website Base Type',1,1,0,-1,3,'',0,0.00,0.00,1),
+				(4,'Hololens Base Type',1,1,0,-1,4,'',0,0.00,0.00,1),
+				(5,'Map Base Type',1,1,0,-1,5,'',0,0.00,0.00,1)
                 ;
             
 		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId)
@@ -346,11 +347,16 @@ begin
 				(3,8,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
 				(4,9,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
 				(5,10,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
-				(6,6,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
-				(7,7,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
-				(8,8,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
-				(9,9,1,'construct',0,'',0,'',0,0.00,0.00,1,1,''),
-				(10,10,1,'construct',0,'',0,'',0,0.00,0.00,1,1,'')
+				(6,1,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(7,2,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(8,3,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(9,4,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(10,5,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(11,6,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(12,7,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(13,8,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(14,9,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
+				(15,10,1,'construct',1,'',0,'',0,0.00,0.00,1,1,'')
 			;
            
 		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
@@ -395,7 +401,7 @@ begin
                 (1,7);
 		
         UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
-		set @dbstate := 2.0;
+		set @dbstate := 102.0;
     end if;
 
     if @dbstate = 2.0 THEN

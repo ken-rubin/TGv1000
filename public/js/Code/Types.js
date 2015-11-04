@@ -719,13 +719,14 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
 
 								var m = m_clTypeActive.data.methods[i];
-								if (m.name === 'initialize') {
+								if (m.name === 'initialize' || m.name === 'construct') {
+									// These two don't get delete, rename.
 
 									// Original: strBuild += '<div class="TWChild" style="height:42.73px;"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"></div><div class="TWMethCol4"></div></div>';
 									strBuild += '<div class="TWChild">' +
 													'<div class="TWMethCol1">' + 
 														'<img class="TWMethCol1Image" src="' + 
-															resourceHelper.toURL("images",null,null,"initialize.png") + 
+															resourceHelper.toURL("images",null,null,m.name === "initialize" ? "initialize.png" : "construct.png") + 
 															'">'+
 														'</img>'+
 													'</div>' +
@@ -784,7 +785,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							for (var i = 0; i < m_clTypeActive.data.methods.length; i++) {
 
-								if (m.name === 'initialize') {
+								if (m.name === 'initialize' || m.name === 'construct') {
 									$("#method_" + i).click(m_functionMethodClicked);
 								} else {
 									$("#method_" + i).click(m_functionMethodClicked);

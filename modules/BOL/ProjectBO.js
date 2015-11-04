@@ -61,7 +61,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
             // req.body.userId
-            // Note that projectIds 1-5 are for new projects, based on project type selected by the user.
+            // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
 
             var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
                 function(rows) {
@@ -88,6 +88,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             tags: '',
+                            projectTypeId: row.projectTypeId,
                             comics:
                             {
                                 items: []
@@ -262,6 +263,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         parentTypeId: row.parentTypeId,
                                         parentPrice: row.parentPrice,
                                         priceBump: row.priceBump,
+                                        baseTypeId: row.baseTypeId, // may be null
                                         tags: '',
                                         properties: [],
                                         methods: [],
