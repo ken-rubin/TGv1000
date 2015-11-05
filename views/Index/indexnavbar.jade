@@ -22,30 +22,14 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
     .navbar-collapse.collapse
 
       //- Left nav
-      ul#main-menu.nav.navbar-nav.sm.sm-blue
+      ul#main-menu.nav.navbar-nav
 
         //- Projects.
         li
           a(href="#") Projects
-          ul.dropdown-menu
+          ul
               li#NewProjectLI
-                a#NewProjectButton(href="#") 
-                  | New Project
-                ul.dropdown-menu
-                  li
-                    a#NewProjectGame(href="#") Game...
-                  li
-                    a#NewProjectConsole(href="#")
-                      | Console...
-                  li
-                    a#NewProjectWebSite(href="#")
-                      | Web Site...
-                  li
-                    a#NewProjectHoloLens(href="#")
-                      | HoloLens...
-                  li
-                    a#NewProjectMapping(href="#")
-                      | Mapping...
+                a#NewProjectButton(href="#") New Project...
               li#OpenProjectLI
                 a#OpenProjectButton(href="#") Search for/Open Project...
               li#SaveProjectLI
@@ -60,7 +44,7 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
         //- Themes.
         li
           a(href="#") Themes 
-          ul.dropdown-menu
+          ul
             li.enabled
               a#UnicornButton(href="#") Unicorn
             li.enabled

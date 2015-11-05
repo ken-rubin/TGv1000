@@ -131,8 +131,9 @@ The database script changes below will necessitate dropping your current TGv1000
 - Add *projectTypeId* column (cannot be null)
 ##### *types* table
 - Allow columns *comicId*, *ordinal* and *ownedByUserId* to be NULL.
+    - *comicId* = NULL is the indicator that thisis a system base type.
 - Add *baseTypeId* column (can be null--except App Type will always be non-null)
-- Add *isSystemBaseType* column (NOT NULL DEFAULT '0')
+- Add *isToolStrip* column (NOT NULL DEFAULT '0')
 ##### *methods* table
 - Add *methodTypeId* column (NOT NULL)
 - Add *parameters* column (NOT NULL; can be 0-length string if no parameters for method)

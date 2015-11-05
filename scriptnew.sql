@@ -89,7 +89,7 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `baseTypeId` int(11) NULL,
-          `isSystemBaseType` tinyint(1) NOT NULL DEFAULT '0',
+          `isToolStrip` tinyint(1) NOT NULL DEFAULT '0',
 		  PRIMARY KEY (`id`),
           INDEX idx_comicId (comicId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
