@@ -104,6 +104,7 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 - App Types will be derived from one of the base Types listed above. This is what actually creates a Project of one of these types.
 - The base Types will, for example, contain the physics engine, a web design framework, etc.
 - Properties of base Types will be very important. As will be their Methods and Events.
+- *It is undecided if system base types should appear in the ToolStrip.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
 #### Methods
 - Statements and Expressions
     - Statements are Methods that are visually represented in the Blockly code pane with a top triangular indentation and a bottom triangular extension.
@@ -129,10 +130,12 @@ The database script changes below will necessitate dropping your current TGv1000
 ##### *projects* table
 - Add *projectTypeId* column (cannot be null)
 ##### *types* table
-- Add *baseTypeId* column to *types* (can be null--except App Type will always be non-null)
+- Allow columns *comicId*, *ordinal* and *ownedByUserId* to be NULL.
+- Add *baseTypeId* column (can be null--except App Type will always be non-null)
+- Add *isSystemBaseType* column (NOT NULL DEFAULT '0')
 ##### *methods* table
-- Add *methodTypeId* column to *methods* (cannot be null)
-- Add *parameters* column to *methods* (cannot be null; can be 0-length string)
+- Add *methodTypeId* column (NOT NULL)
+- Add *parameters* column (NOT NULL; can be 0-length string if no parameters for method)
 ##### Data initialization script changes
 - Add a types row for each Project type
 - Change project with id=1 to New Game Project, projectTypeId=1
@@ -141,6 +144,7 @@ The database script changes below will necessitate dropping your current TGv1000
 - Do similar with comics
 - Create types records for the new "new" projects
 - Set all methodTypeId in initial methods table data to ???.
+- Add *construct* method to all Types.
 
 
 ### The TypeWell

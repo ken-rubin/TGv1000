@@ -969,12 +969,19 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 		                    var strId = jHelper.attr("id");
 		                    var strSrc = jHelper.attr("src");
-		                    var strType = jHelper.attr("data-type");	// Artificially set to App for type with isApp === true, even if the name had been changed.
+		                    var strType = jHelper.attr("data-type");	// Artificially set to 'App' for type with isApp === true, even if the name had been changed.
+		                    											// Or set to 'Base' for a system base type.
 
-		                    // Don't let the user drop an app on the designer.
+		                    // Don't let the user drop App type on the designer.
 		                    if (strType === "App") {
 
 		                    	throw { message: "You may not drop the App type onto the Designer." };
+		                    }
+
+		                    // Don't let the user drop a system base type on the designer.
+		                    if (strType === "Base") {
+
+		                    	throw { message: "You may not drop system base type onto the Designer." };
 		                    }
 
 		                    // Get an unique instance name for the type.

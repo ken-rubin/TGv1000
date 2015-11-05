@@ -77,9 +77,9 @@ begin
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` varchar(255) NOT NULL,
-		  `comicId` int(11) NOT NULL,
-          `ordinal` int(11) NOT NULL,
-          `ownedByUserId` int(11) NOT NULL,
+		  `comicId` int(11) NULL,
+          `ordinal` int(11) NULL,
+          `ownedByUserId` int(11) NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `isApp` tinyint(1) NOT NULL DEFAULT '0',
@@ -89,6 +89,7 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `baseTypeId` int(11) NULL,
+          `isSystemBaseType` tinyint(1) NOT NULL DEFAULT '0',
 		  PRIMARY KEY (`id`),
           INDEX idx_comicId (comicId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -282,6 +283,8 @@ begin
         
 		insert TGv1000.methodTypes (id,description) values (1,'statement');
 		insert TGv1000.methodTypes (id,description) values (2,'expression');
+		insert TGv1000.methodTypes (id,description) values (3,'initialize');
+		insert TGv1000.methodTypes (id,description) values (4,'construct');
         
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',1);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',1);        
@@ -342,21 +345,21 @@ begin
             
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
 			VALUES
-				(1,6,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
-				(2,7,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
-				(3,8,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
-				(4,9,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
-				(5,10,1,'initialize',0,'',0,'',0,0.00,0.00,1,1,''),
-				(6,1,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(7,2,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(8,3,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(9,4,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(10,5,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(11,6,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(12,7,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(13,8,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(14,9,1,'construct',1,'',0,'',0,0.00,0.00,1,1,''),
-				(15,10,1,'construct',1,'',0,'',0,0.00,0.00,1,1,'')
+				(1,6,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
+				(2,7,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
+				(3,8,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
+				(4,9,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
+				(5,10,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
+				(6,1,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(7,2,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(8,3,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(9,4,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(10,5,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(11,6,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(12,7,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(13,8,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(14,9,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
+				(15,10,1,'construct',1,'',0,'',0,0.00,0.00,1,4,'')
 			;
            
 		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
