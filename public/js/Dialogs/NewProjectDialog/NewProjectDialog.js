@@ -25,8 +25,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							m_projectType = null;	// If m_projectType === null then the dialog will display a cool project type chooser.
-													// Otherwise, it will display the real New Project Dialog.
+							m_projectType = null;	// If m_projectType === null then the dialog will display a project type chooser (newProjectDialog1).
+													// Otherwise, it will display the real New Project Dialog (newProjectDialog2).
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -34,12 +34,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								cache: false,
 								data: { 
 
-									templateFile: "Dialogs/NewProjectDialog/newProjectDialog"
+									templateFile: "Dialogs/NewProjectDialog/newProjectDialog1"
 								}, 
 								dataType: "HTML",
 								method: "POST",
 								url: "/renderJadeSnippet"
-							}).done(m_functionRenderJadeSnippetResponse).error(errorHelper.show);
+							}).done(m_functionRenderJadeSnippetResponse1).error(errorHelper.show);
 
 							return null;
 						} catch (e) {
@@ -57,9 +57,35 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Private methods.
 
 					// Have converted jade of dialog to HTML. Open its dialog.
-					var m_functionRenderJadeSnippetResponse = function (htmlData) {
+					var m_functionRenderJadeSnippetResponse1 = function (htmlData) {
 
 						try {
+
+							// Show the dialog--load the content from 
+							// the TypesDialog jade HTML-snippet.
+							//
+							// There will be buttons for creating different project configurations:
+							// (1) 
+							BootstrapDialog.show({
+
+								title: "Choose Project Type",
+								size: BootstrapDialog.SIZE_WIDE,
+					            message: $(htmlData),
+					            draggable: false,
+					            onshown: m_functionOnShownDialog1
+					        });
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					var m_functionRenderJadeSnippetResponse2 = function (htmlData) {
+
+						try {
+
+							// Close the Project type selection dialog.
+							m_dialog.close();
 
 							// Show the dialog--load the content from 
 							// the TypesDialog jade HTML-snippet.
@@ -91,7 +117,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            	}
 					            ],
 					            draggable: false,
-					            onshown: m_functionOnShownDialog
+					            onshown: m_functionOnShownDialog2
 					        });
 						} catch (e) {
 
@@ -100,7 +126,34 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					// Wire up event handlers to dialog controls.
-					var m_functionOnShownDialog = function (dialogItself) {
+					var m_functionOnShownDialog1 = function (dialogItself) {
+
+						try {
+
+							$(".tt-selector").tooltip();
+							$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
+							$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
+							$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
+							$("#HoloLensImage").attr("src", resourceHelper.toURL("images", null, null, "hololensProject.png"));
+							$("#MappingImage").attr("src", resourceHelper.toURL("images", null, null, "mappingProject.png"));
+
+							$("#GameImage").click(function(){m_functionProjectTypeSelected("Game");});
+							$("#ConsoleImage").click(function(){m_functionProjectTypeSelected("Console");});
+							$("#WebSiteImage").click(function(){m_functionProjectTypeSelected("Web Site");});
+							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
+							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
+
+							// Save the dailog object reference.
+							m_dialog = dialogItself;
+							
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					// Wire up event handlers to dialog controls.
+					var m_functionOnShownDialog2 = function (dialogItself) {
 
 						try {
 
@@ -113,12 +166,37 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 							$("#ProjectName").focus();
-
+							
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionProjectTypeSelected = function(strProjectType) {
+
+						try {
+
+							m_projectType = strProjectType;
+
+							// Get the dialog DOM.
+							$.ajax({
+
+								cache: false,
+								data: { 
+
+									templateFile: "Dialogs/NewProjectDialog/newProjectDialog2"
+								}, 
+								dataType: "HTML",
+								method: "POST",
+								url: "/renderJadeSnippet"
+							}).done(m_functionRenderJadeSnippetResponse2).error(errorHelper.show);
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
 
 					var m_functionCreateProject = function () {
 

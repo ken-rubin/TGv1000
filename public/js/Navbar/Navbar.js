@@ -35,7 +35,7 @@ define(["Core/errorHelper"],
 								$("body").css("background-image", "url('../media/images/t.png')");
 							});
 
-							Wire projects buttons.
+							// Wire projects buttons.
 							$("#NewProjectButton").click(function () {
 
 								try {
