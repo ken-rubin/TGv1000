@@ -83,7 +83,7 @@ begin
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `isApp` tinyint(1) NOT NULL DEFAULT '0',
-          `imageId` int(11) NOT NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
           `description` mediumtext NULL,
           `parentTypeId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
@@ -153,6 +153,7 @@ begin
           `ordinal` INT(11) NOT NULL,
 		  `propertyTypeId` INT(11) NOT NULL DEFAULT 1,
 	      `initialValue` MEDIUMTEXT NOT NULL,
+          `isHidden` INT(1) NOT NULL DEFAULT '0',
 		  PRIMARY KEY (`id`),
           INDEX idx_typeId (typeId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -324,23 +325,23 @@ begin
 				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
 				;
             
-		/* base Types have ordinal set to -1 */
-		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public)
+		/* These system base Types will be recognized by comicId being null */
+		insert into TGv1000.`types` (id,`name`)
 			VALUES 
-				(1,'Game Base Type',1,1,0,-1,1,'',0,0.00,0.00,1),
-				(2,'Console Base Type',1,1,0,-1,2,'',0,0.00,0.00,1),
-				(3,'Website Base Type',1,1,0,-1,3,'',0,0.00,0.00,1),
-				(4,'Hololens Base Type',1,1,0,-1,4,'',0,0.00,0.00,1),
-				(5,'Map Base Type',1,1,0,-1,5,'',0,0.00,0.00,1)
+				(1,'Game Base Type'),
+				(2,'Console Base Type'),
+				(3,'Website Base Type'),
+				(4,'Hololens Base Type'),
+				(5,'Map Base Type')
                 ;
             
-		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId)
+		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
 			VALUES 
-				(6,'App',1,1,0,0,1,'',0,0.00,0.00,1,1),
-				(7,'App',1,1,0,0,2,'',0,0.00,0.00,1,2),
-				(8,'App',1,1,0,0,3,'',0,0.00,0.00,1,3),
-				(9,'App',1,1,0,0,4,'',0,0.00,0.00,1,4),
-				(10,'App',1,1,0,0,5,'',0,0.00,0.00,1,5)
+				(6,'App',1,1,0,0,1,'',0,0.00,0.00,1,1,1),
+				(7,'App',1,1,0,0,2,'',0,0.00,0.00,1,2,1),
+				(8,'App',1,1,0,0,3,'',0,0.00,0.00,1,3,1),
+				(9,'App',1,1,0,0,4,'',0,0.00,0.00,1,4,1),
+				(10,'App',1,1,0,0,5,'',0,0.00,0.00,1,5,1)
                 ;
             
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
@@ -387,24 +388,48 @@ begin
             
 		insert TGv1000.project_tags (projectId,tagId)
 			VALUES
-				(1,1),
 				(1,2),
-				(1,3);
+				(2,2),
+				(3,2),
+				(4,2),
+				(5,2)
+				;
             
 		insert TGv1000.type_tags (typeId,tagId)
 			VALUES
-                (1,1),
-                (1,5),
-                (1,4);
+                (1,4),
+                (2,4),
+                (3,4),
+                (4,4),
+                (5,4),
+                (6,4),
+                (7,4),
+                (8,4),
+                (9,4),
+                (10,4)
+                ;
             
 		insert TGv1000.method_tags (methodId,tagId)
 			VALUES
-                (1,1),
                 (1,6),
-                (1,7);
+                (2,6),
+                (3,6),
+                (4,6),
+                (5,6),
+                (6,6),
+                (7,6),
+                (8,6),
+                (9,6),
+                (10,6),
+                (11,6),
+                (12,6),
+                (13,6),
+                (14,6),
+                (15,6)
+                ;
 		
         UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
-		set @dbstate := 102.0;
+		set @dbstate := 3.0;
     end if;
 
     if @dbstate = 2.0 THEN
@@ -581,18 +606,15 @@ begin
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
     end if;
-
+/*
     if @dbstate = 3.0 THEN
 
-		ALTER TABLE `TGv1000`.`propertys` 
-			ADD COLUMN `isHidden` INT(1) NOT NULL DEFAULT '0' COMMENT '' AFTER `initialValue`;
 
-		UPDATE `TGv1000`.`propertys` set isHidden=1 where name in ('X','Y','Width','Height');
 
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
     end if;
-
+*/
 end;
 
 //
