@@ -21,15 +21,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					// projectType is one of:
-					//		Game, Console, Web Site, HoloLens.
-					// It is passed to the server when retrieving the prototypical New Project affect the Project type 
-					// (notably the base Type for App).
-					self.create = function(projectType) {
+					self.create = function() {
 
 						try {
 
-							m_projectType = projectType;	// 
+							m_projectType = null;	// If m_projectType === null then the dialog will display a cool project type chooser.
+													// Otherwise, it will display the real New Project Dialog.
 
 							// Get the dialog DOM.
 							$.ajax({

@@ -108,12 +108,12 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Dialog creators/openers
-					self.showNewProjectDialog = function (projectType) {
+					self.showNewProjectDialog = function () {
 
 						try {
 
 							m_openDialog = new NewProjectDialog();
-							var exceptionRet = m_openDialog.create(projectType);
+							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) {
 
 								throw exceptionRet;
