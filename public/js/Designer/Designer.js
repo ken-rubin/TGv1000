@@ -981,7 +981,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    // Don't let the user drop a system base type on the designer.
 		                    if (strType === "Base") {
 
-		                    	throw { message: "You may not drop system base type onto the Designer." };
+		                    	throw { message: "You may not drop a system base type onto the Designer." };
 		                    }
 
 		                    // Get an unique instance name for the type.
