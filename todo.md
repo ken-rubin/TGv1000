@@ -102,7 +102,6 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 - Any Type can (but doesn't have to) be derived from a single other Type (adding a baseTypeId column). 
 - App Types will be derived from one of the base Types listed above. This is what actually creates a Project of one of these types.
 - The base Types will, for example, contain the physics engine, a web design framework, etc.
-- Properties of base Types will be very important. As will be their Methods and Events.
 - *It is undecided if system base types should appear in the ToolStrip.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
 #### Methods
 - Statements and Expressions
@@ -122,10 +121,20 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 - Events are basically named pointers to Methods.
 - Events support a subscribe/raise model.
 #### Database changes
-The database script changes below will necessitate dropping your current TGv1000 schema and recreating it with the updated *scriptnew.sql*.
+-  The database script changes below will necessitate dropping your current TGv1000 schema and recreating it with the updated *scriptnew.sql*.
+-  Basic implementation of base types in the database to faciliate retrieving and saving projects.
+    -  User-created Types may only derive from other user-created Types. As such, they will always be in the same Comic and can be retrieved by using a select with a match on comicId. (Ordering is an issue that can be handled outside the query.)
+    -  Only the Comic's App Type can be based upon a system Type. So, the App Type's baseTypeId column is never null and is the entry point into a chain of system base Types that provide all of the "Project type" functionality to a Comic.
+        - Recall that (at this time) there are 5 first-level system base Types.
+        - Lower down in the chain of system base Types the chains may merge. This will especially be true if the lowest Type is *object*.
+        - We will use the App Type's baseTypeId to retrieve the full list of system base Types from a new table: *systemBaseTypes*.
+            - *systemBaseTypes* will have 2 columns: id and parentId, both NOT NULL.
+            - Since the chains can merge toward the bottom, there may be multiple rows with the same parentId.
+            - For now, this table will be maintained manually in the database setup script. Initially (while the base Type of each of the 5 App Types is being set up and the 5 base Types have no functionality) there will be 5 rows in *systemBaseTypes*: [1,1], [2,2], etc.
 ##### New tables
 - *projectTypes*: game, console, website, hololens, map
 - *methodTypes*: statement, expression
+- *systemBaseTypes*: described above
 ##### *projects* table
 - Add *projectTypeId* column (cannot be null)
 ##### *types* table

@@ -1,4 +1,5 @@
-CREATE SCHEMA IF NOT EXISTS `TGv1000`;
+DROP SCHEMA IF EXISTS `TGv1000`;
+CREATE SCHEMA `TGv1000`;
 SELECT database();
 USE TGv1000;
 
@@ -99,6 +100,12 @@ begin
             FOREIGN KEY (comicId) REFERENCES comics(id)
             ON DELETE CASCADE;
 
+		CREATE TABLE `TGv1000`.`systemBaseTypes` (
+		  `id` int(11) NOT NULL,
+		  `parentId` int(11) NOT NULL,
+		  PRIMARY KEY (`id`,`parentId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
 		CREATE TABLE `TGv1000`.`type_tags` (
 		  `typeId` int(11) NOT NULL,
 		  `tagId` int(11) NOT NULL,
@@ -343,7 +350,16 @@ begin
 				(9,'App',1,1,0,0,4,'',0,0.00,0.00,1,4,1),
 				(10,'App',1,1,0,0,5,'',0,0.00,0.00,1,5,1)
                 ;
-            
+                
+		insert into TGv1000.`systemBaseTypes` (id,parentId)
+			VALUES
+				(1,1),
+                (2,2),
+                (3,3),
+                (4,4),
+                (5,5)
+				;
+                    
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
 			VALUES
 				(1,6,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),

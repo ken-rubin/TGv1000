@@ -232,7 +232,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(
                 function(comic) {
 
-                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.originalComicId + ";",
+                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.originalComicId + " order by ordinal asc;",
                         function(rows) {
 
                             // At least for now there can be comics with no types, so we disable the following test:
@@ -290,23 +290,69 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             if (--typesCount === 0) {
 
-                                                console.log('typesCount has reached 0');
-                                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
+                                                console.log('typesCount has reached 0--fetching App Type systemBaseTypes.');
+
+                                                // Use the comic's App type (comic.types.items[0]). As such it will have a baseTypeId that is a systemBaseType's id.
+                                                // Use the table systemBaseTypes to retrieve the chain of base Types for this App type and push each of them onto comic.types.items.
+
+                                                var ex2 = sql.execute("select * from " + self.dbname + "types where id in (select parentId from " + self.dbname + "systemBaseTypes where id=" + comic.types.items[0].baseTypeId + " order by parentId asc)" + ";",
                                                     function(rows) {
+                                                        rows.forEach(
+                                                            function(row) {
 
-                                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+                                                                var baseType = 
+                                                                {
+                                                                    id: row.id,
+                                                                    originalTypeId: row.id,
+                                                                    name: row.name,
+                                                                    ownedByUserId: row.ownedByUserId,
+                                                                    public: row.public,
+                                                                    quarantined: row.quarantined,
+                                                                    isApp: row.isApp === 1 ? true : false,
+                                                                    imageId: row.imageId,
+                                                                    ordinal: row.ordinal,
+                                                                    description: row.description,
+                                                                    parentTypeId: row.parentTypeId,
+                                                                    parentPrice: row.parentPrice,
+                                                                    priceBump: row.priceBump,
+                                                                    baseTypeId: row.baseTypeId, // may be null
+                                                                    tags: '',
+                                                                    properties: [],
+                                                                    methods: [],
+                                                                    events: []
+                                                                };
+                                                                strTypeIds = strTypeIds + ',' + baseType.id;
+                                                                comic.types.items.push(baseType);
 
-                                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-                                                            return;
-                                                        }
+                                                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
+                                                                    function(rows) {
 
-                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                                            return;
+                                                                        }
+
+                                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                                                    },
+                                                                    function(strError){
+                                                                        res.json({success: false, message: strError});
+                                                                        return;
+                                                                    }
+                                                                );
+                                                            }
+                                                        );
                                                     },
-                                                    function(strError){
-                                                        res.json({success: false, message: strError});
+                                                    function(strError) {
+
+                                                        res.json({
+                                                            success: false,
+                                                            message: strError
+                                                        });
                                                         return;
                                                     }
                                                 );
+
                                             }
                                         }
                                     );
@@ -387,7 +433,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 parentMethodId: row.parentMethodId,
                                                 parentPrice: row.parentPrice,
                                                 priceBump: row.priceBump,
-                                                tags: ''
+                                                tags: '',
+                                                parameters: rows.parameters
                                             };
 
                                             if (project.id === 0) {
