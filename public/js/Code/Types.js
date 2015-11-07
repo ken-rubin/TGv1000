@@ -245,7 +245,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								// Set the code pane by clicking on the first method.
 								$("#method_0").click();
 							}
-
 						} catch (e) {
 
 							return e;
