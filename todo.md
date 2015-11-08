@@ -55,7 +55,7 @@
 - Base classes.
     - All Types have a base class (Type), even the App Type.
     - Add a Base class combo to the New Type dialog. Populate the droplist with all other Types. I would think there has to be a null-ish base class for those that don't need a base class. 
-    - When a new project is created, use either a pullover menu in Navbar or a droplist on New Project dialog.
+    - When a new Project is created, show a mini dialog before the New Project Dlg for the user to select one of our Project types.
         - The type of Project actually sets the base class for the Project's App Type.
         - Choices for Project type are initially: Console, Game, Web site, HoloLens
 - New Type dialog

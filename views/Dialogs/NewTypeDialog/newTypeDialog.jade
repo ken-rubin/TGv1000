@@ -7,17 +7,23 @@
         | A TechGroms Type has a <em>name</em>, a number of <em>tags</em> and an <em>image</em> that will help you or others search for it later.
         | If you create a Type, it will be added to the currently active Comic.
   .row
-    .col-xs-12
-        .col-xs-2
-            label.control-label(for="TypeName", style="margin-top:6px;") Name
+    .col-xs-6
         .col-xs-4
+            label.control-label(for="TypeName", style="margin-top:6px;") Name
+        .col-xs-8
             input.form-control#TypeName(type="text", placeholder="Enter Type name.")
         br
         br
-        .col-xs-2
+        .col-xs-4
             label.control-label(for="TypeTags", style="margin-top:6px;") Search tags
-        .col-xs-10
+        .col-xs-8
             textarea#TypeTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this Type later.")
+    .col-xs-6
+      //- When adding a new Type or editing a non-App and non-system base Type, display a combo for the user to choose an optional base Type
+      //- from all other user-added Types in the comic.
+      //- When editing the App Type or a system base Type, show its base Type's name. Uneditable.
+      #BaseTypeCombo(style="display:none;")
+      #BaseTypeName(style="display:none;")
   .row.tt-selector
     br
     .col-xs-12
