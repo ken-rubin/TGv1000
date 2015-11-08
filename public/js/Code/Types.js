@@ -646,7 +646,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							m_functionSetTypewellHeader();
 							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
-							if (m_clTypeActive.data.isApp) {
+							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === null) {	// no deletion for App Type or system base Types.
 
 								$("#TWdeleteTypeBtn").prop("disabled", true);
 

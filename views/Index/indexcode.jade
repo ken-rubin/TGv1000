@@ -6,7 +6,7 @@
 //- Code section is a gzsection.
 #code
 
-  script
+ script
     | function functionBlockChangeListener() {
     | 
     |   if (code) {
@@ -25,10 +25,8 @@
     |   return null;
     | }
 
-  //- The type editing area.
-  .row
-   .col-xs-12
-     .row.twsection#TypeWell
+ //- The type editing area.
+ .twsection#TypeWell
       .row(style="border-bottom: 1px solid #000")
         .col-sm-1
         .col-sm-11
@@ -104,9 +102,7 @@
                    .col-xs-12
                      #TWeventsTbody.TWBody(style="margin-top:5px;")
 
-  //- Next the Blockly frame.
-  .row
-    .col-xs-12
-      iframe#BlocklyIFrame
+ //- Next the Blockly frame.
+ iframe#BlocklyIFrame
 
 
