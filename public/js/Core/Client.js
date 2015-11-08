@@ -193,7 +193,26 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewTypeDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create("New", -1);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showEditTypeDialog = function (index) {
+
+						try {
+
+							m_openDialog = new NewTypeDialog();
+							var exceptionRet = m_openDialog.create("Edit", index);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -231,7 +250,26 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewMethodDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create("New", -1);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					self.showEditMethodDialog = function (index) {
+
+						try {
+
+							m_openDialog = new NewMethodDialog();
+							var exceptionRet = m_openDialog.create("Edit", index);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -269,7 +307,7 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('New', 0);
+							var exceptionRet = m_openDialog.create('New', -1);
 							if (exceptionRet) {
 
 								throw exceptionRet;

@@ -27,13 +27,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							// Add click handlers for TypeWell.
-							$("#TWimageSearchLink").click(m_functionClickTWimageSearchLink);
-							$("#TWnewImageURLLink").click(m_functionClickTWnewImageURLLink);
-							$("#TWnewImageDiskLink").click(m_functionClickTWnewImageDiskLink);
 							$("#TWdeleteTypeBtn").click(m_functionClickTWdeleteTypeLink);
 							$("#TWnewTypeBtn").click(m_functionClickTWnewTypeLink);
 							$("#TWsearchTypeBtn").click(m_functionClickTWsearchTypeLink);
-							$("#TWRenameTypeLink").click(m_functionClickTWrenameTypeLink);
+							$("#TWEditTypeLink").click(m_functionClickTWeditTypeLink);
 							$("#TWaddMethodBtn").click(m_functionClickTWnewMethod);
 							$("#TWsearchMethodBtn").click(m_functionClickTWsearchMethod);
 							$("#TWaddPropertyBtn").click(m_functionClickTWnewProperty);
@@ -759,7 +756,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 														'</button>'+
 													'</div>'+
 													'<div class="TWMethCol3">'+
-														'<button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + 
+														'<button class="btn btn-default" type="button" aria-label="Edit this Method" data-toggle="tooltip" title="Edit this Method" id="methodrename_' + 
 															i + 
 															'">'+
 															'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
@@ -788,7 +785,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									$("#method_" + i).click(m_functionMethodClicked);
 								} else {
 									$("#method_" + i).click(m_functionMethodClicked);
-									$("#methodrename_" + i).click(m_functionMethodRenameClicked);
+									$("#methodrename_" + i).click(m_functionMethodEditClicked);
 									$("#methoddelete_" + i).click(m_functionMethodDeleteClicked);
 								}
 							}
@@ -940,21 +937,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
-					var m_functionClickTWrenameTypeLink = function () {
-
-						try {
-
-							client.projectIsDirty();
-
-							var exceptionRet = client.showGenericRenameDialog('type', m_ActiveTypeIndex);
-							if (exceptionRet) { throw exceptionRet; }
-							
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
 					var m_functionEventRenameClicked = function(e) {
 						
 						try {
@@ -972,7 +954,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
-					var m_functionMethodRenameClicked = function(e) {
+					var m_functionMethodEditClicked = function(e) {
 						
 						try {
 
@@ -980,7 +962,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							var index = m_functionParseOutIndex(e);
 
-							var exceptionRet = client.showGenericRenameDialog('method', index);
+							var exceptionRet = client.showEditMethodDialog(index);
 							if (exceptionRet) { throw exceptionRet; }
 							
 						} catch (e) {
@@ -1057,53 +1039,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						}
 					}
 
-					var m_functionClickTWimageSearchLink = function () {
-
-						try {
-
-							client.projectIsDirty();
-
-							var exceptionRet = m_clTypeActive.imageSearch();
-							if (exceptionRet) { throw exceptionRet; }
-							
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					var m_functionClickTWnewImageURLLink = function () {
-
-						try {
-
-							client.projectIsDirty();
-
-							var exceptionRet = m_clTypeActive.imageFromURL();
-							if (exceptionRet) { throw exceptionRet; }
-							
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
-					var m_functionClickTWnewImageDiskLink = function () {
-
-						try {
-
-							client.projectIsDirty();
-
-							var exceptionRet = m_clTypeActive.imageFromDisk();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					}
-
 					var m_functionClickTWdeleteTypeLink = function () {
 
 						try {
@@ -1127,7 +1062,24 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var exceptionRet = client.showNewTypeDialog();
+							var exceptionRet = client.showNewTypeDialog("New", -1);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionClickTWeditTypeLink = function () {
+
+						try {
+
+							client.projectIsDirty();
+
+							var exceptionRet = client.showEditTypeDialog("Edit", m_ActiveTypeIndex);
 							if (exceptionRet) {
 
 								throw exceptionRet;
