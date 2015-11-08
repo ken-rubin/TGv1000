@@ -70,12 +70,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Type",
+					            		label: "Save Type",
 					            		id: 'CreateTypeBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionCreateType();
+					            			m_functionSaveType();
 					            		}
 					            	},
 					            	{
@@ -145,7 +145,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						}
 					}
 
-					var m_functionCreateType = function () {
+					var m_functionSaveType = function () {
 
 						try {
 

@@ -70,12 +70,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Method",
+					            		label: "Save Method",
 					            		id: 'CreateMethodBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionCreateMethod();
+					            			m_functionSaveMethod();
 					            		}
 					            	},
 					            	{
@@ -145,7 +145,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					var m_functionCreateMethod = function () {
+					var m_functionSaveMethod = function () {
 
 						try {
 
