@@ -21,9 +21,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(strNewOrEdit, iIndexIfEdit) {
 
 						try {
+
+							m_strNewOrEdit = strNewOrEdit;
+							m_iIndexIfEdit = iIndexIfEdit;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -62,7 +65,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "New Type",
+								title: (m_strNewOrEdit === "New") ? "Add new Type" : "Edit Type",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -110,6 +113,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							$("#TypeName").focus();
 
 							$("#TypeName").keyup(m_functionBlurTypeName);
+
+							if (m_strNewOrEdit === "New") {
+
+							} else {
+								
+							}
 
 							m_setStateCreateBtn();
 
@@ -184,7 +193,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							exceptionRet = clType.load(typeJO);
 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = client.addTypeToProject(clType);
+							if (m_strNewOrEdit === "New") {
+
+								exceptionRet = client.addTypeToProject(clType);
+
+							} else {
+
+								exceptionRet = client.updateTypeInProject(clType, m_iIndexIfEdit);
+							}
 							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
@@ -252,6 +268,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
+				var m_strNewOrEdit = "";
+				var m_iIndexIfEdit = -1;
 				var m_imageId = 0;
 			};
 

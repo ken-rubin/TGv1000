@@ -21,9 +21,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(strNewOrEdit, iIndexIfEdit) {
 
 						try {
+
+							m_strNewOrEdit = strNewOrEdit;
+							m_iIndexIfEdit = iIndexIfEdit;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -62,7 +65,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "New Method",
+								title: (m_strNewOrEdit === "New") ? "Add new Method" : "Edit Method",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -110,6 +113,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#MethodName").focus();
 
 							$("#MethodName").keyup(m_functionBlurMethodName);
+
+							if (m_strNewOrEdit === "New") {
+
+							} else {
+
+							}
 
 							m_setStateCreateBtn();
 
@@ -170,7 +179,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								description: $("#MethodDescription").val() || ''
 							};
 
-							exceptionRet = client.addMethodToActiveType(method);
+							if (m_strNewOrEdit === "New") {
+
+								exceptionRet = client.addMethodToActiveType(method);
+
+							} else {
+
+								exceptionRet = client.updateMethodInActiveType(method, m_iIndexIfEdit);
+							}
 							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
@@ -244,6 +260,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
+				var m_strNewOrEdit = "";
+				var m_iIndexIfEdit = -1;
 				var m_comicName = '';
 				var m_comicTags = '';
 				var m_imageId = 0;

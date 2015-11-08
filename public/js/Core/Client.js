@@ -519,6 +519,23 @@ define(["Core/errorHelper",
 					}
 
 //used
+					self.updateTypeInProject = function(clType, iTypeIndex) {
+
+						try {
+
+
+
+
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+//used
 					self.addTypeToProjectFromDB = function (iTypeId) {
 
 						try {
@@ -584,6 +601,18 @@ define(["Core/errorHelper",
 
 							// Now click the new method in the grid to load the code pane.
 							$("#method_" + iMethodIndex.toString()).click();
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+// used
+					self.updateMethodInActiveType = function(method, iMethodIndex) {
+
+						try {
+
+							return null;
 
 						} catch (e) {
 

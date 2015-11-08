@@ -365,13 +365,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (m_strNewOrEdit === 'New') {
 
 								exceptionRet = client.addPropertyToActiveType(property);
-								if (exceptionRet) { throw exceptionRet; }
 
 							} else {
 
 								exceptionRet = client.updatePropertyInActiveType(property, m_iIndexIfEdit, m_strOriginalNameIfEdit);
-								if (exceptionRet) { throw exceptionRet; }
 							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
 
