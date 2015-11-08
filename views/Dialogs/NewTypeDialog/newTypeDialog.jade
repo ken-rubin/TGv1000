@@ -22,8 +22,18 @@
       //- When adding a new Type or editing a non-App and non-system base Type, display a combo for the user to choose an optional base Type
       //- from all other user-added Types in the comic.
       //- When editing the App Type or a system base Type, show its base Type's name. Uneditable.
-      #BaseTypeCombo(style="display:none;")
+      #BaseTypeCombo(style="display:block;")
+        .col-xs-4
+          label.control-label(for="BaseTypeSelect", style="margin-top:6px;") Base Type (opt.)
+        .col-xs-8
+          select#BaseTypeSelect.form-control
+            option#BaseTypeNone(value="None")
+              | None
       #BaseTypeName(style="display:none;")
+        .col-xs-4
+          label.control-label(for="BaseTypeName", style="margin-top:6px;") Base Type
+        .col-xs-8
+          span#BaseTypeName
   .row.tt-selector
     br
     .col-xs-12
