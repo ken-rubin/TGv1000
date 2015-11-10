@@ -114,7 +114,27 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							$("#TypeName").keyup(m_functionBlurTypeName);
 
+							$("#BaseTypeCombo").css("display", "none");
+							$("#BaseTypeName").css("display", "none");
 							if (m_strNewOrEdit === "New") {
+
+								// Add options to #BaseTypeSelect to select a base type for this new type:
+								// Choices are None and all "non-special" types in the comic.
+								var strBuild = '<option value="None">None</option>';
+								var clActiveComic = comics.getActiveComic();
+								var typesArray = clActiveComic.getYourTypesArray();
+
+								for(var i = 0; i < typesArray.length; i++) {
+
+									var typeIth = typesArray[i];
+									if (!typeIth.isApp && typeIth.ordinal) {
+
+										strBuild += '<option value="' + typeIth.name + '">' + typeIth.name + '</option>';
+									}
+								}
+
+								$("#BaseTypeSelect").html(strBuild);
+								$("#BaseTypeCombo").css("display", "block");
 
 							} else {
 								
