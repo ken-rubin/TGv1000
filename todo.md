@@ -43,24 +43,8 @@
 - Type color schema (for schema blocks)
     - Generate a random (unused) color for each Type (see Code.js in the 700s). 
     - That same color goes to the type's methods, properties and events.
-- Add Method dialog
-    - Change to Add/Edit type dialog to handle changing the following new items.
-    - Shorten the existing textareas to make room for more fields in two columns.
-    - Add (Method) Type radio selections: o Statement    o Expression
-        - A statement can be stacked with other blocks (indented on top; triangle on bottom).
-        - An expression fits into another block as a value (triangle on left).
-    - Add Parameters typearea (works like picklist).
-    - Save all of this to the DB.
-- Base classes.
-    - All Types have a base class (Type), even the App Type.
-    - Add a Base class combo to the New Type dialog. Populate the droplist with all other Types. I would think there has to be a null-ish base class for those that don't need a base class. 
-    - When a new Project is created, show a mini dialog before the New Project Dlg for the user to select one of our Project types.
-        - The type of Project actually sets the base class for the Project's App Type.
-        - Choices for Project type are initially: Console, Game, Web site, HoloLens
-- New Type dialog
-    - Besides the stuff listed above, we need to change it to Add/Edit to accomodate changing things. Right now a Type can only be renamed. And the picture can't be changed, nor tags, etc.
-- In TypeWell highlight the selected Method in the grid.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
+- Need to bring saving of projects in ProjectBO up to speed wrt changes just made to Projects, Types and Methods.
 
 
 
@@ -105,18 +89,16 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 - *It is undecided if system base types should appear in the ToolStrip.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
 #### Methods
 - Statements and Expressions
-    - Statements are Methods that are visually represented in the Blockly code pane with a top triangular indentation and a bottom triangular extension.
-    - This way statements can be stacked together to provide program flow.
+    - Statements are Methods that are visually represented in the Blockly code pane with a top triangular indentation and a bottom triangular extension. This way statements can be stacked together to provide program flow.
+    - Expressions are Methods that are visually represented with a left-facing triangular extension. This way they fit into other blocks that need to provided with calculated data.
     - Statement-type Methods may take parameters, but they cannot return a value.
-    - Expressions are Methods that are visually represented with a left-facing triangular extension.
-    - This way they fit into other blocks that need to provided with calculated data.
-    - Expressions may take parameters and they do return a value.
+    - Expressions may take parameters and they return a value.
 - Parameters
-    - A Method's parameters are entered as a (e.g., comma-separated string of parameter names).
-    - This string of names will be normalized, checked for duplicates and stored in a single column of the methods DB table.
+    - A Method's parameters are entered as a comma- or space-separated string of parameter names.
+    - This string of names will be normalized, checked for duplicates and stored concatenated, comma-separated in a single column of the methods DB table.
     - The parameters are used in the blockly blocks XML and JavaScript as in [this example](http://165.225.132.154/work/Coder/).
-- Constructor method
-    - The App Type always has an *initialize* method, but up till now none of the other Types would start with a required method. We are adding the *construct* method to every Type--even the App Type. We will decide later if the method is initialized by the system or if the user just uses it as a constructor that is executed when the Type is *newed*.
+- Construct method
+    - The App Type always has an *initialize* method, but up till now none of the other Types would start with a default method. We are adding the *construct* method to every Type--even the App Type. We will decide later if the method is initialized by the system or if the user just uses it as a constructor that is executed when the Type is *newed*.
 #### Events
 - Events are basically named pointers to Methods.
 - Events support a subscribe/raise model.

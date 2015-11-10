@@ -328,6 +328,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (strCheck.length > 0) {
 
 										var inputArray = strCheck.match(/([\w\-]+)/g);
+										// could have tried .split(/[\s.,\/:\n]+/);
 
 										// Uniquify picks: there will be at least one....
 									    var outputArray = [];

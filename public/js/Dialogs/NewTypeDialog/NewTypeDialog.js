@@ -135,8 +135,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					var m_setStateCreateBtn = function() {
 
-						var nameStatus =  > 0;
-
 						if (!($("#TypeName").val().trim().length)) {
 							$("#CreateTypeBtn").addClass("disabled");
 						} else {
