@@ -106,6 +106,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+							$("#StatementImg").attr("src", resourceHelper.toURL("images", null, null, 'statement.png'));
+							$("#ExpressionImg").attr("src", resourceHelper.toURL("images", null, null, 'expression.png'));
 							m_functionSetImageSrc(0);
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
@@ -115,6 +117,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#MethodName").keyup(m_functionBlurMethodName);
 
 							if (m_strNewOrEdit === "New") {
+
+								$('input[name=MethodType][value="0"]').prop('checked', true);
 
 							} else {
 

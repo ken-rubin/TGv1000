@@ -26,26 +26,26 @@
         .col-xs-8
             textarea#MethodTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Optionally enter words to help you search for this method later.")
     .col-xs-6
-      br
-      br
-      .col-xs-2
-        label.control-label(for="MethodType", style="margin-top:6px;") Type
-      .col-xs-4
-          input#StatementRadio(type='radio' name='MethodType' value="0" style="width:25px;margin-top:9px;")
-          span
-            | Statement
-      .col-xs-4
-          input#ExpressionRadio(type='radio' name='MethodType' value="1" style="width:25px;margin-top:9px;")
-          span
-            | Expression
-      .col-xs-2
-      br
-      br
-      br
-      .col-xs-4
-        label.control-label(for="MethodParams", style="margin-top:6px;") Parameters
-      .col-xs-8
-        textarea.form-control#MethodParams(cols=40 rows=2 placeholder="Enter optional method parameters.")
+      .row
+        br
+        .col-xs-3
+          label.control-label(for="MethodType", style="margin-top:20px;") Method type
+        .col-xs-9
+            input#StatementRadio(type='radio' name='MethodType' value="0" style="width:25px;")
+            span
+              | Statement
+            img#StatementImg
+            br
+            input#ExpressionRadio(type='radio' name='MethodType' value="1" style="width:25px;")
+            span
+              | Expression
+            img#ExpressionImg
+      .row
+        br
+        .col-xs-3
+          label.control-label(for="MethodParams", style="margin-top:6px;") Parameters
+        .col-xs-9
+          textarea.form-control#MethodParams(cols=40 rows=2 placeholder="Enter optional method parameters.")
   .row.tt-selector
     br
     .col-xs-12

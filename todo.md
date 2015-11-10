@@ -26,7 +26,6 @@
     + Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
     + What validation is done for deleting? If a property is being used in a method, is it deletable. I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
-- Remove requirement for images in project, type, method (maybe later, says John; maybe for project we generate a designer thumbnail)
 - Play button:
 	- place a canvas over the designer to show the project playing
 	- change Play button to Pause and Stop buttons when playing (is there a 1-button sequence for this that works? Like Play -> Pause -> Stop. I doubt it.)
@@ -72,6 +71,7 @@
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
 - **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
+- Remove requirement for images in project, type, method (maybe later, says John; maybe for project we generate a designer thumbnail)
 
 
 ## General description of programming using our system
