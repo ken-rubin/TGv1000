@@ -139,10 +139,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setStateCreateBtn = function() {
 
-						var nameStatus = $("#MethodName").val().trim().length > 0;
-						//var imgStatus = m_imageId > 0;
-
-						if (!nameStatus/* removing requirement for the image || !imgStatus*/) {
+						if (!($("#MethodName").val().trim().length)) {
 							$("#CreateMethodBtn").addClass("disabled");
 						} else {
 							$("#CreateMethodBtn").removeClass("disabled");
@@ -252,7 +249,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						m_imageId = imageId;
 						$("#MethodImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
-						m_setStateCreateBtn();
 					}
 				} catch (e) {
 

@@ -135,10 +135,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					var m_setStateCreateBtn = function() {
 
-						var nameStatus = $("#TypeName").val().trim().length > 0;
-						//var imgStatus = m_imageId > 0;
+						var nameStatus =  > 0;
 
-						if (!nameStatus/* removing requirement for the image || !imgStatus*/) {
+						if (!($("#TypeName").val().trim().length)) {
 							$("#CreateTypeBtn").addClass("disabled");
 						} else {
 							$("#CreateTypeBtn").removeClass("disabled");
@@ -256,7 +255,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						m_imageId = imageId;
 						$("#TypeImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
-						m_setStateCreateBtn();
 					}
 				} catch (e) {
 
