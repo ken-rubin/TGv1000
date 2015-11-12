@@ -138,6 +138,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							} else {
 
+								// Initialize fields that user can edit.
+								$("#TypeName").val(m_typeForEdit.name);
+								$("#TypeTags").val(m_typeForEdit.tags);
+								var strUrl = resourceHelper.toURL('resources', m_typeForEdit.imageId, 'image', '');
+								$("#TypeImage").attr("src", strUrl);
+
 								// User may be editing (1) a user Type (not a system base Type or the App Type)
 								// or (2) the App Type.
 								// In case (1) prepare a base Type select list of all user Type names plus "None"
@@ -200,6 +206,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 								$("#BaseTypeCombo").css("display", "block");
 
+								return null;
+
 							} catch(e) {
 
 								return e;
@@ -214,6 +222,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							jqs.mousedown(function(){if(this.options.length>8){this.size=8;}});
 							jqs.change(function(){this.size=0;});
 							jqs.blur(function(){this.size=0;});
+
+							return null;
 
 						} catch (e) {
 
@@ -246,11 +256,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								throw new Error("You must enter a name.");
 							}
 
+							var typeTags = $("#TypeTags").val() || "";
+
 							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, -1);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// First, handle the possible setting of a base type.
-							var setBaseTypeId = null;
+							var setBaseTypeId;
 							if (m_strNewOrEdit === "New" ||
 								(m_strNewOrEdit === "Edit" && !m_typeForEdit.isApp)) {
 
@@ -266,50 +278,80 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 											break;
 										}
 									}
+								} else {
+
+									setBaseTypeId = null;
 								}
+							} else {
+
+								setBaseTypeId = m_typeForEdit.baseTypeId;
 							}
 
-							// Create minimal Type based on the dialog's fields--or lack thereof.
-							// Call client to inject it throughout.
-							var typeJO = 
-							{
-								id: 0,
-								originalTypeId: 0,
-								name: typeName,
-								ownedByUserId: g_strUserId,
-								public: 0,
-								quarantined: 0,
-								isApp: false,
-								imageId: m_imageId,
-								ordinal: client.getNumberOfTypesInActiveComic(),
-								description: '',
-								parentTypeId: 0,
-								parentPrice: 0.00,
-								priceBump: 0.00,
-								tags: $("#TypeTags").val() || "",
-								properties: [
-									{id: 0, originalPropertyId: 0, name: "X", propertyTypeId: 1, initialValue: "0", ordinal: 0, isHidden: 1},
-									{id: 0, originalPropertyId: 0, name: "Y", propertyTypeId: 1, initialValue: "0", ordinal: 1, isHidden: 1},
-									{id: 0, originalPropertyId: 0, name: "Width", propertyTypeId: 1, initialValue: "0", ordinal: 2, isHidden: 1},
-									{id: 0, originalPropertyId: 0, name: "Height", propertyTypeId: 1, initialValue: "0", ordinal: 3, isHidden: 1}
-								],
-								methods: [
-									{id: 0, name: 'construct', ordinal: 0, ownedByUserId: g_strUserId, public: 0, workspace: '', imageId: 0, methodTypeId: 4, parameters: ''}
-								],
-								events: [],
-								baseTypeId: setBaseTypeId,
-								isToolStrip: 1
-							};
-
 							var clType = new Type();
-							exceptionRet = clType.load(typeJO);
-							if (exceptionRet) { throw exceptionRet; }
 
 							if (m_strNewOrEdit === "New") {
+
+								// Create minimal Type based on the dialog's fields--or lack thereof.
+								// Call client to inject it throughout.
+
+								// Pick an unused (in this comic) negative id. This will be used
+								// in case this Type is used as a base type before the project is saved
+								// and to indicate that in the save project code, the id has to be replaced
+								// with the database-assigned id and any baseTypeIds that contained the negative
+								// number need to be changed.
+								var typeId = -1;
+								for (var i = 0; i < m_typesArray.length; i++) {
+
+									var typeIth = m_typesArray[i];
+									if (typeIth.id < typeId) {
+
+										typeId = typeIth.id - 1;
+									}
+								}
+								var typeJO = 
+								{
+									id: typeId,
+									originalTypeId: 0,
+									name: typeName,
+									ownedByUserId: g_strUserId,
+									public: 0,
+									quarantined: 0,
+									isApp: false,
+									imageId: m_imageId,
+									ordinal: client.getNumberOfTypesInActiveComic(),
+									description: '',
+									parentTypeId: 0,
+									parentPrice: 0.00,
+									priceBump: 0.00,
+									tags: typeTags,
+									properties: [
+										{id: 0, originalPropertyId: 0, name: "X", propertyTypeId: 1, initialValue: "0", ordinal: 0, isHidden: 1},
+										{id: 0, originalPropertyId: 0, name: "Y", propertyTypeId: 1, initialValue: "0", ordinal: 1, isHidden: 1},
+										{id: 0, originalPropertyId: 0, name: "Width", propertyTypeId: 1, initialValue: "0", ordinal: 2, isHidden: 1},
+										{id: 0, originalPropertyId: 0, name: "Height", propertyTypeId: 1, initialValue: "0", ordinal: 3, isHidden: 1}
+									],
+									methods: [
+										{id: 0, name: 'construct', ordinal: 0, ownedByUserId: g_strUserId, public: 0, workspace: '', imageId: 0, methodTypeId: 4, parameters: ''}
+									],
+									events: [],
+									baseTypeId: setBaseTypeId,
+									isToolStrip: 1
+								};
+
+								exceptionRet = clType.load(typeJO);
+								if (exceptionRet) { throw exceptionRet; }
 
 								exceptionRet = client.addTypeToProject(clType);
 
 							} else {
+
+								m_typeForEdit.name = typeName;
+								m_typeForEdit.tags = typeTags;
+								m_typeForEdit.imageId = m_imageId;
+								m_typeForEdit.baseTypeId = setBaseTypeId;
+
+								exceptionRet = clType.load(m_typeForEdit);
+								if (exceptionRet) { throw exceptionRet; }
 
 								exceptionRet = client.updateTypeInProject(clType, m_iIndexIfEdit);
 							}
