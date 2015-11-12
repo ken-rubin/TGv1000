@@ -134,6 +134,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								}
 
 								$("#BaseTypeSelect").html(strBuild);
+								m_setSelectHandlers();
 								$("#BaseTypeCombo").css("display", "block");
 
 							} else {
@@ -147,6 +148,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							errorHelper.show(e);
 						}
 					};
+
+					var m_setSelectHandlers = function () {
+
+						var jqs = $("#BaseTypeSelect");
+						jqs.mousedown(function(){if(this.options.length>8){this.size=8;}});
+						jqs.change(function(){this.size=0;});
+						jqs.blur(function(){this.size=0;});
+					}
 
 					var m_functionBlurTypeName = function() {
 

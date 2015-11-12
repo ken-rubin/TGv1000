@@ -269,3 +269,13 @@ a.list-group-item {
   margin-left: 5px;
 }
 
+#SelectContainer
+{
+  position:relative;
+  height:14px;
+}
+
+#SelectContainer select
+{
+  position:absolute;
+}
