@@ -258,7 +258,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var typeTags = $("#TypeTags").val() || "";
 
-							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, -1);
+							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, m_strNewOrEdit === "New" ? -1 : m_iIndexIfEdit);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// First, handle the possible setting of a base type.
