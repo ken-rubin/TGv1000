@@ -646,7 +646,8 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							m_functionSetTypewellHeader();
 							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
-							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === null) {	// no deletion for App Type or system base Types.
+							// App type and system base types cannot be deleted.
+							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === null) {
 
 								$("#TWdeleteTypeBtn").prop("disabled", true);
 
@@ -654,6 +655,19 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								$("#TWdeleteTypeBtn").prop("disabled", false);
 							}
+
+							// System base types cannot be editing, but all other types can be.
+							if (m_clTypeActive.data.ordinal === null) {
+
+								$("#TWEditTypeLink").prop("disabled", true);
+
+							} else {
+
+								$("#TWEditTypeLink").prop("disabled", false);
+							}
+
+							// There will be other TW buttons that are disabled or enabled based on type of the active Type.
+							// TBD.
 
 							var exceptionRet = m_functionRegenTWMethodsTable();
 							if (exceptionRet) { return exceptionRet; }

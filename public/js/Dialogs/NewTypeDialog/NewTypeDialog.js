@@ -116,10 +116,42 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							$("#BaseTypeCombo").css("display", "none");
 							$("#BaseTypeName").css("display", "none");
+							var exceptionRet = null;
 							if (m_strNewOrEdit === "New") {
 
+								// User us definitely creating a new user Type.
+								// A user Type is not a sysem base Type (ordinal === null) or the App Type.
+								// It may or may not be based on an existing user Type.
+								// We will build and display a select list of available base Types. starting with None.
+
 								// Add options to #BaseTypeSelect to select a base type for this new type:
-								// Choices are None and all "non-special" types in the comic.
+								// Choices are None and all user types in the comic.
+								exceptionRet = m_prepareBaseTypeSelectList();
+								if (exceptionRet) { throw exceptionRet; }
+
+							} else {
+
+								// User may be editing (1) a user Type (not a system base Type or the App Type)
+								// or (2) the App Type.
+								// In case (1) prepare a base Type select list of all user Types plus None
+								// and select either None of this Type's base Type.
+								// In case (2) user cannot change the base Type since this is the project type.
+								// But user will be shown the system base Type's name. User can edit all other fields.
+
+							}
+
+							m_setStateCreateBtn();
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					var m_prepareBaseTypeSelectList = function() {
+
+						try {
+
 								var strBuild = '<option value="None">None</option>';
 								var clActiveComic = comics.getActiveComic();
 								var typesArray = clActiveComic.getYourTypesArray();
@@ -134,27 +166,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								}
 
 								$("#BaseTypeSelect").html(strBuild);
-								m_setSelectHandlers();
+								var exceptionRet = m_setSelectHandlers();
+								if (exceptionRet) { throw exceptionRet; }
+								
 								$("#BaseTypeCombo").css("display", "block");
 
-							} else {
-								
+							} catch(e) {
+
+								return e;
 							}
-
-							m_setStateCreateBtn();
-
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					};
+					}
 
 					var m_setSelectHandlers = function () {
 
-						var jqs = $("#BaseTypeSelect");
-						jqs.mousedown(function(){if(this.options.length>8){this.size=8;}});
-						jqs.change(function(){this.size=0;});
-						jqs.blur(function(){this.size=0;});
+						try {
+
+							var jqs = $("#BaseTypeSelect");
+							jqs.mousedown(function(){if(this.options.length>8){this.size=8;}});
+							jqs.change(function(){this.size=0;});
+							jqs.blur(function(){this.size=0;});
+
+						} catch (e) {
+
+							return e;
+						}
 					}
 
 					var m_functionBlurTypeName = function() {
