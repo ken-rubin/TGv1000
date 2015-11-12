@@ -27,6 +27,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							m_strNewOrEdit = strNewOrEdit;
 							m_iIndexIfEdit = iIndexIfEdit;
+							m_clActiveComic = comics.getActiveComic();
+							m_typesArray = m_clActiveComic.getYourTypesArray();
+							if (m_strNewOrEdit === "Edit") {
+
+								// Put the type being edited aside for reference later.
+								m_typeForEdit = m_typesArray[m_iIndexIfEdit];
+							}
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -119,13 +126,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							var exceptionRet = null;
 							if (m_strNewOrEdit === "New") {
 
-								// User us definitely creating a new user Type.
-								// A user Type is not a sysem base Type (ordinal === null) or the App Type.
+								// User is creating a new user Type.
+								// A user Type is not a sysem base Type (ordinal === null) nor the App Type.
 								// It may or may not be based on an existing user Type.
-								// We will build and display a select list of available base Types. starting with None.
+								// We will build and display a select list of available base Types, starting with None.
 
-								// Add options to #BaseTypeSelect to select a base type for this new type:
-								// Choices are None and all user types in the comic.
+								// Set up #BaseTypeSelect for user to select a base type for this new type.
+								// Choices are "None" and the names of all user types in the comic.
 								exceptionRet = m_prepareBaseTypeSelectList();
 								if (exceptionRet) { throw exceptionRet; }
 
@@ -133,11 +140,35 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 								// User may be editing (1) a user Type (not a system base Type or the App Type)
 								// or (2) the App Type.
-								// In case (1) prepare a base Type select list of all user Types plus None
-								// and select either None of this Type's base Type.
+								// In case (1) prepare a base Type select list of all user Type names plus "None"
+								// and select either "None" of this Type's base Type name.
 								// In case (2) user cannot change the base Type since this is the project type.
 								// But user will be shown the system base Type's name. User can edit all other fields.
 
+								if (m_typeForEdit.isApp) {
+
+								} else {
+
+									exceptionRet = m_prepareBaseTypeSelectList();
+									if (exceptionRet) { throw exceptionRet; }
+
+									// Select the current base type.
+									var strSelectName = "None";
+									if (m_typeForEdit.baseTypeId) {
+
+										for (var i = 0; i < m_typesArray.length; i++) {
+
+											var typeIth = m_typesArray[i];
+											if (typeIth.id === m_typeForEdit.baseTypeId) {
+
+												strSelectName = typeIth.name;
+												break;
+											}
+										}
+									}
+
+									$("#BaseTypeSelect").val(strSelectName);
+								}
 							}
 
 							m_setStateCreateBtn();
@@ -153,12 +184,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 								var strBuild = '<option value="None">None</option>';
-								var clActiveComic = comics.getActiveComic();
-								var typesArray = clActiveComic.getYourTypesArray();
 
-								for(var i = 0; i < typesArray.length; i++) {
+								for(var i = 0; i < m_typesArray.length; i++) {
 
-									var typeIth = typesArray[i];
+									var typeIth = m_typesArray[i];
 									if (!typeIth.isApp && typeIth.ordinal) {
 
 										strBuild += '<option value="' + typeIth.name + '">' + typeIth.name + '</option>';
@@ -168,7 +197,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								$("#BaseTypeSelect").html(strBuild);
 								var exceptionRet = m_setSelectHandlers();
 								if (exceptionRet) { throw exceptionRet; }
-								
+
 								$("#BaseTypeCombo").css("display", "block");
 
 							} catch(e) {
@@ -194,7 +223,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					var m_functionBlurTypeName = function() {
 
-							m_setStateCreateBtn();
+						m_setStateCreateBtn();
 					}
 
 					var m_setStateCreateBtn = function() {
@@ -219,6 +248,26 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, -1);
 							if (exceptionRet) { throw exceptionRet; }
+
+							// First, handle the possible setting of a base type.
+							var setBaseTypeId = null;
+							if (m_strNewOrEdit === "New" ||
+								(m_strNewOrEdit === "Edit" && !m_typeForEdit.isApp)) {
+
+								var selectVal = $("#BaseTypeSelect").val();
+								if (selectVal !== "None") {
+
+									for (var i = 0; i < m_typesArray.length; i++) {
+
+										var typeIth = m_typesArray[i];
+										if (typeIth.name === selectVal) {
+
+											setBaseTypeId = typeIth.id;
+											break;
+										}
+									}
+								}
+							}
 
 							// Create minimal Type based on the dialog's fields--or lack thereof.
 							// Call client to inject it throughout.
@@ -247,7 +296,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								methods: [
 									{id: 0, name: 'construct', ordinal: 0, ownedByUserId: g_strUserId, public: 0, workspace: '', imageId: 0, methodTypeId: 4, parameters: ''}
 								],
-								events: []
+								events: [],
+								baseTypeId: setBaseTypeId,
+								isToolStrip: 1
 							};
 
 							var clType = new Type();
@@ -331,6 +382,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 				var m_strNewOrEdit = "";
 				var m_iIndexIfEdit = -1;
 				var m_imageId = 0;
+				var m_typeForEdit;
+				var m_clActiveComic;
+				var m_typesArray;
 			};
 
 			// Return the constructor function as the module object.

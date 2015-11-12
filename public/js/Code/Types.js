@@ -1076,7 +1076,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var exceptionRet = client.showNewTypeDialog("New", -1);
+							var exceptionRet = client.showNewTypeDialog();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -1093,7 +1093,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var exceptionRet = client.showEditTypeDialog("Edit", m_ActiveTypeIndex);
+							var exceptionRet = client.showEditTypeDialog(m_ActiveTypeIndex);
 							if (exceptionRet) {
 
 								throw exceptionRet;
