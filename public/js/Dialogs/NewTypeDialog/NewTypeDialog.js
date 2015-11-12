@@ -151,7 +151,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								// In case (2) user cannot change the base Type since this is the project type.
 								// But user will be shown the system base Type's name. User can edit all other fields.
 
+								var strSelectName = "None";
+								if (m_typeForEdit.baseTypeId) {
+
+									for (var i = 0; i < m_typesArray.length; i++) {
+
+										var typeIth = m_typesArray[i];
+										if (typeIth.id === m_typeForEdit.baseTypeId) {
+
+											strSelectName = typeIth.name;
+											break;
+										}
+									}
+								}
+
 								if (m_typeForEdit.isApp) {
+
+									$("#BaseTypeNameSpan").text(strSelectName);
+									$("#BaseTypeName").css("display", "block");
 
 								} else {
 
@@ -159,20 +176,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									if (exceptionRet) { throw exceptionRet; }
 
 									// Select the current base type.
-									var strSelectName = "None";
-									if (m_typeForEdit.baseTypeId) {
-
-										for (var i = 0; i < m_typesArray.length; i++) {
-
-											var typeIth = m_typesArray[i];
-											if (typeIth.id === m_typeForEdit.baseTypeId) {
-
-												strSelectName = typeIth.name;
-												break;
-											}
-										}
-									}
-
 									$("#BaseTypeSelect").val(strSelectName);
 								}
 							}
