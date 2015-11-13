@@ -325,7 +325,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								case 5:
 									var strCheck = $("#PicklistInitial").val().trim();
 
-									if (strCheck.length > 0) {
+									if (strCheck.length) {
 
 										var inputArray = strCheck.match(/([\w\-]+)/g);
 										// could have tried .split(/[\s.,\/:\n]+/);

@@ -650,6 +650,12 @@ define(["Core/errorHelper",
 
 						try {
 
+
+
+
+
+							
+
 							return null;
 
 						} catch (e) {
