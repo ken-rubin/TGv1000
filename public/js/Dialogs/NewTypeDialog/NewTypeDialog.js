@@ -359,6 +359,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								if (exceptionRet) { throw exceptionRet; }
 
 								exceptionRet = client.updateTypeInProject(clType, m_iIndexIfEdit);
+								if (exceptionRet) { throw exceptionRet; }
+
+								exceptionRet = types.updateActiveTypeImage();
 							}
 							if (exceptionRet) { throw exceptionRet; }
 
