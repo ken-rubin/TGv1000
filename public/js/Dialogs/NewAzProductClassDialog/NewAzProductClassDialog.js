@@ -102,9 +102,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector .btn-default").tooltip();
-
-							// Save the dailog object reference.
+							$(".tt-selector .btn-default").powerTip({
+								smartPlacement: true
+							});
+							
+							// Save the dialog object reference.
 							m_dialog = dialogItself;
 							m_functionSetImageSrc(0);
 							$("#ImageSearchLink").click(m_functionSearchClick);

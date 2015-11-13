@@ -130,7 +130,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector").tooltip();
+							$(".tt-selector").powerTip({
+								smartPlacement: true
+							});
 							$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
 							$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
 							$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
@@ -157,7 +159,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector .btn-default").tooltip();
+							$(".tt-selector .btn-default").powerTip({
+								smartPlacement: true
+							});
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;

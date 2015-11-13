@@ -47,6 +47,8 @@
 - Need to bring saving of projects in ProjectBO up to speed wrt changes just made to Projects, Types and Methods.
 - Need dialogs to submit on Enter (i.e., button is triggered).
 - In types.js determine what other TypeWell buttons need to be disabled or enabled if a system base type is the active type. May be based on user class.
+- Changing image in new edit mode of NewTypeDialog doesn't change image in TW or toolstrip.
+- Make sure method editing image change changes image in TW grid.
 
 
 

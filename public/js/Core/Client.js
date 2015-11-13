@@ -1000,8 +1000,10 @@ define(["Core/errorHelper",
 									$(".disabledifnoproj").prop("disabled", true);
 
 									// Remove tooltip functionality from TypeWell icons.
-									$(".disabledifnoproj").tooltip("destroy");
-
+									$(".disabledifnoproj").powerTip({
+										smartPlacement: true,
+										manual: true
+									});
 									// Empty the toolstrip, designer, comicstrip and typewell.
 									tools.empty();
 
@@ -1096,7 +1098,10 @@ define(["Core/errorHelper",
 				    		self.projectIsDirty();
 
 							// Fire bootstrap tooltip opt-in.
-							$(".disabledifnoproj").tooltip();
+							$(".disabledifnoproj").powerTip({
+								smartPlacement: true,
+								manual: false
+							});
 
 							if ($.isFunction(callback)) {
 

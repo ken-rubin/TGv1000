@@ -102,7 +102,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector .btn-default").tooltip();
+							$(".tt-selector .btn-default").powerTip({
+								smartPlacement: true
+							});
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
