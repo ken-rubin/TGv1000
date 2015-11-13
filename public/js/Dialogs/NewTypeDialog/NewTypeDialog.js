@@ -347,6 +347,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								if (exceptionRet) { throw exceptionRet; }
 
 								exceptionRet = client.addTypeToProject(clType);
+								if (exceptionRet) { throw exceptionRet; }
 
 							} else {
 
@@ -361,9 +362,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								exceptionRet = client.updateTypeInProject(clType, m_iIndexIfEdit);
 								if (exceptionRet) { throw exceptionRet; }
 
-								exceptionRet = types.updateActiveTypeImage();
+								clType.updateYourImage(m_imageId);
 							}
-							if (exceptionRet) { throw exceptionRet; }
 
 							m_dialog.close();
 
