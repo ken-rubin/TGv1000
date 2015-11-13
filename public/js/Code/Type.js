@@ -246,6 +246,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/C
 					var m_arrayActive = null;
 					// Original name about to be renamed.
 					var m_strOriginalName = "";
+					
 				} catch (e) {
 
 					errorHelper.show(e);
