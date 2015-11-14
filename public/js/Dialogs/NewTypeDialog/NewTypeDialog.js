@@ -359,7 +359,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								exceptionRet = clType.load(m_typeForEdit);
 								if (exceptionRet) { throw exceptionRet; }
 
-								exceptionRet = client.updateTypeInProject(clType, m_iIndexIfEdit);
+								exceptionRet = client.updateTypeInProject(clType, m_clActiveComic, m_typeForEdit, m_iIndexIfEdit);
 								if (exceptionRet) { throw exceptionRet; }
 
 								clType.updateYourImage(m_imageId);

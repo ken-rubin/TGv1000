@@ -202,6 +202,25 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// 	}
 					// };
 
+					// Removes XML and JavaScript blocks for orignal type. Adds new blocks for updated type.
+					self.replaceType = function(updatedType, origType) {
+
+						try {
+
+
+
+
+
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Remove type from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
 //used					

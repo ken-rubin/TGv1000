@@ -557,14 +557,16 @@ define(["Core/errorHelper",
 					}
 
 //used
-					self.updateTypeInProject = function(clType, iTypeIndex) {
+					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
 
 						try {
 
+							self.projectIsDirty();
+							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
 
-
-
-
+							exceptionRet = code.replaceType(updatedClType.data, origType);
+							if (exceptionRet) { throw exceptionRet; }
+							
 							return null;
 
 						} catch (e) {
