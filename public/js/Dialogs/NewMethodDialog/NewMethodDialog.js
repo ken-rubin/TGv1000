@@ -231,7 +231,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							} else {
 
-								exceptionRet = client.updateMethodInActiveType(method, m_iIndexIfEdit);
+								exceptionRet = client.updateMethodInActiveType(method, m_methodForEdit, m_iIndexIfEdit, m_clActiveType);
 							}
 							if (exceptionRet) { throw exceptionRet; }
 
@@ -311,6 +311,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_comicTags = '';
 				var m_imageId = 0;
 				var m_clActiveType = null;
+				var m_methodForEdit = null;
 			};
 
 			// Return the constructor function as the module object.

@@ -646,15 +646,21 @@ define(["Core/errorHelper",
 						}
 					}
 // used
-					self.updateMethodInActiveType = function(method, iMethodIndex) {
+					self.updateMethodInActiveType = function(updatedMethod, origMethod, iMethodIndex, activeClType) {
 
 						try {
 
+							self.projectIsDirty();
+							activeClType.data.methods[iMethodIndex] = updatedMethod;
 
+							var exceptionRet = types.regenTWMethodsTable();
+							if (exceptionRet) { throw exceptionRet; }
 
-
-
+							exceptionRet = code.replaceMethod(updatedMethod, origMethod);
+							if (exceptionRet) { throw exceptionRet; }
 							
+							// Now click the updated method in the grid to load the code pane.
+							$("#method_" + iMethodIndex.toString()).click();
 
 							return null;
 

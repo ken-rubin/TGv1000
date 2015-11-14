@@ -482,6 +482,25 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// 	}
 					// };
 
+					// Removes XML and JavaScript blocks for orignal method. Adds new blocks for updated method.
+					self.replaceMethod = function(updatedMethod, origMethod) {
+
+						try {
+
+
+
+
+
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Remove method from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
 					self.removeMethod = function (clType, method) {
