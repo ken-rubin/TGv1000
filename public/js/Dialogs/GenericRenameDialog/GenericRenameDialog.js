@@ -10,6 +10,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 		try {
 
+			// Since Type and Method rename have been replaced by full use of the New...Dialogs for editing,
+			// this dialog is called only for Event renaming.
+			// Type and Method renaming capabilities have been removed, although it hasn't been made fully non-generic.
+
 			// Define the GenericRenameDialog constructor function.
 			var functionGenericRenameDialog = function() {
 
@@ -104,22 +108,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var strType = m_strObjectType.charAt(0).toUpperCase() + m_strObjectType.substring(1);
 
-							if (m_strObjectType === 'type') {
+							// if (m_strObjectType === 'type') {
 
-								m_strOriginalName = types.getActiveClType().data.name;
+							// 	m_strOriginalName = types.getActiveClType().data.name;
 
-							} else if (m_strObjectType === 'method') {
+							// } else if (m_strObjectType === 'method') {
 
-								m_strOriginalName = types.getActiveClType().data.methods[m_iIndex].name;
+							// 	m_strOriginalName = types.getActiveClType().data.methods[m_iIndex].name;
 
-							} else if (m_strObjectType === 'event') {
+							// } else if (m_strObjectType === 'event') {
 
 								m_strOriginalName = types.getActiveClType().data.events[m_iIndex].name;
 
-							} else {
+							// } else {
 
-								throw new Error('Invalid objectType passed to Rename Dialog.');
-							}
+							// 	throw new Error('Invalid objectType passed to Rename Dialog.');
+							// }
 
 							$("#RenameLabel").text("Enter a new name for the " + strType + ":");
 							$("#RenameInput").val(m_strOriginalName);
@@ -149,24 +153,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						}
 
 						// Check for duplicate.
-						if (m_strObjectType === 'type') {
+						// if (m_strObjectType === 'type') {
 
-							exceptionRet = validator.isTypeNameAvailableInActiveComic(strName, m_iIndex);
-							if (exceptionRet) { throw exceptionRet; }
+						// 	exceptionRet = validator.isTypeNameAvailableInActiveComic(strName, m_iIndex);
+						// 	if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = client.renameTypeInActiveComic(strName, m_iIndex, m_strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+						// 	exceptionRet = client.renameTypeInActiveComic(strName, m_iIndex, m_strOriginalName);
+						// 	if (exceptionRet) { throw exceptionRet; }
 
-						} else if (m_strObjectType === 'method') {
+						// } else if (m_strObjectType === 'method') {
 
 
-							exceptionRet = validator.isMethodNameAvailableInActiveType(strName, m_iIndex);
-							if (exceptionRet) { throw exceptionRet; }
+						// 	exceptionRet = validator.isMethodNameAvailableInActiveType(strName, m_iIndex);
+						// 	if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = client.renameMethodInActiveType(strName, m_iIndex, m_strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+						// 	exceptionRet = client.renameMethodInActiveType(strName, m_iIndex, m_strOriginalName);
+						// 	if (exceptionRet) { throw exceptionRet; }
 
-						} else if (m_strObjectType === 'event') {
+						// } else if (m_strObjectType === 'event') {
 
 
 							exceptionRet = validator.isEventNameAvailableInActiveType(strName, m_iIndex);
@@ -175,10 +179,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							exceptionRet = client.renameEventInActiveType(strName, m_iIndex, m_strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
 
-						} else {
+						// } else {
 
-							throw new Error("Invalid objectType passed to Rename Dialog.")
-						}
+						// 	throw new Error("Invalid objectType passed to Rename Dialog.")
+						// }
 
 						m_dialog.close();
 

@@ -752,61 +752,61 @@ define(["Core/errorHelper",
 						}
 					}
 
-//used
-					self.renameTypeInActiveComic = function (strNewName, index, strOriginalName) {
+//not used
+					// self.renameTypeInActiveComic = function (strNewName, index, strOriginalName) {
 
-						try {
+					// 	try {
 
-							var activeClType = types.getActiveClType();
-							activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
+					// 		var activeClType = types.getActiveClType();
+					// 		activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
 
-							// Call Code to handle categories and schema methods.
-							var exceptionRet = code.renameType(activeClType, strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Call Code to handle categories and schema methods.
+					// 		var exceptionRet = code.renameType(activeClType, strOriginalName);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Have types.js change header of TypeWell.
-							exceptionRet = types.changeTypeWellHeader();
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Have types.js change header of TypeWell.
+					// 		exceptionRet = types.changeTypeWellHeader();
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Need to call someone to update the tooltip of the correct tool in toolstrip.
-							// Everything else should be handled.
-							return tools.changeTooltipAndId(strOriginalName, strNewName);
+					// 		// Need to call someone to update the tooltip of the correct tool in toolstrip.
+					// 		// Everything else should be handled.
+					// 		return tools.changeTooltipAndId(strOriginalName, strNewName);
 
-						} catch(e) {
+					// 	} catch(e) {
 
-							return e;
-						}
-					}
+					// 		return e;
+					// 	}
+					// }
 
-//used
-					self.renameMethodInActiveType = function (strNewName, index, strOriginalName) {
+//not used
+					// self.renameMethodInActiveType = function (strNewName, index, strOriginalName) {
 
-						try {
+					// 	try {
 
-							var activeClType = types.getActiveClType();
-							var oldMethod = activeClType.data.methods[index];
-							oldMethod.name = strNewName;
-							activeClType.data.methods[index] = oldMethod;
+					// 		var activeClType = types.getActiveClType();
+					// 		var oldMethod = activeClType.data.methods[index];
+					// 		oldMethod.name = strNewName;
+					// 		activeClType.data.methods[index] = oldMethod;
 
-							var exceptionRet = types.functionSetActiveMethodIndex(index);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		var exceptionRet = types.functionSetActiveMethodIndex(index);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Call Code.js#renameMethod(clType, method, strOriginalName).
-							exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Call Code.js#renameMethod(clType, method, strOriginalName).
+					// 		exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = types.regenTWMethodsTable();
-							if (exceptionRet) { throw exceptionRet; }
+					// 		exceptionRet = types.regenTWMethodsTable();
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							$("#method_" + index.toString()).click();
+					// 		$("#method_" + index.toString()).click();
 
-							return null;
+					// 		return null;
 
-						} catch(e) {
+					// 	} catch(e) {
 
-							return e;
-						}
-					}
+					// 		return e;
+					// 	}
+					// }
 
 //used
 					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {

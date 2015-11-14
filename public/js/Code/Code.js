@@ -149,58 +149,58 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					//		typename_set[strOriginalName], 
 					//		new_[strOriginalName], 
 					//		[strOriginalName]_set[all properties]
-					self.renameType = function (clType, strOriginalName) {
+					// self.renameType = function (clType, strOriginalName) {
 
-						try {
+					// 	try {
 
-							// 1.
-							exceptionRet = m_functionRename_Type_New(clType, 
-								strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// 1.
+					// 		exceptionRet = m_functionRename_Type_New(clType, 
+					// 			strOriginalName);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// 2.
-							exceptionRet = designer.updateForTypeRename(strOriginalName, clType.data.name);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// 2.
+					// 		exceptionRet = designer.updateForTypeRename(strOriginalName, clType.data.name);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Rename properties.
-							for (var i = 0; i < clType.data.properties.length; i++) {
+					// 		// Rename properties.
+					// 		for (var i = 0; i < clType.data.properties.length; i++) {
 
-								var propertyIth = clType.data.properties[i];
+					// 			var propertyIth = clType.data.properties[i];
 
-								// Don't add blocks for the App Type's X,Y,Width,Height properties.
-								if (!clType.data.isApp || (clType.data.isApp && $.inArray(propertyIth.name, ['X','Y', 'Width', 'Height']) === -1)) {
+					// 			// Don't add blocks for the App Type's X,Y,Width,Height properties.
+					// 			if (!clType.data.isApp || (clType.data.isApp && $.inArray(propertyIth.name, ['X','Y', 'Width', 'Height']) === -1)) {
 
-									var exceptionRet = m_functionRename_Type_Property(
-										clType,
-										propertyIth,
-										propertyIth.name, 
-										strOriginalName);
-									if (exceptionRet) { throw exceptionRet; }
-								}
-							}
+					// 				var exceptionRet = m_functionRename_Type_Property(
+					// 					clType,
+					// 					propertyIth,
+					// 					propertyIth.name, 
+					// 					strOriginalName);
+					// 				if (exceptionRet) { throw exceptionRet; }
+					// 			}
+					// 		}
 
-							// Rename methods.
-							for (var i = 0; i < clType.data.methods.length; i++) {
+					// 		// Rename methods.
+					// 		for (var i = 0; i < clType.data.methods.length; i++) {
 
-								var methodIth = clType.data.methods[i];
-								var exceptionRet = m_functionRename_Type_Method(
-									clType,					// has new name
-									methodIth,				// this method (name didn't change)
-									strOriginalName,		// original name of clType
-									"type rename"			// reason for call
-								);
-								if (exceptionRet) { throw exceptionRet; }
-							}
+					// 			var methodIth = clType.data.methods[i];
+					// 			var exceptionRet = m_functionRename_Type_Method(
+					// 				clType,					// has new name
+					// 				methodIth,				// this method (name didn't change)
+					// 				strOriginalName,		// original name of clType
+					// 				"type rename"			// reason for call
+					// 			);
+					// 			if (exceptionRet) { throw exceptionRet; }
+					// 		}
 
-							// Rebuild.
-							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+					// 		// Rebuild.
+					// 		$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					// Remove type from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
@@ -459,28 +459,28 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 					// Method renames a method in blockly.
 					// Parameter method has the new name. Old name is in strOriginalName.
-					self.renameMethod = function (clType, method, strOriginalName) {
+					// self.renameMethod = function (clType, method, strOriginalName) {
 
-						try {
+					// 	try {
 
-							// Rename a method for the type.
-							var exceptionRet = m_functionRename_Type_Method(
-								clType,					// type containing method whose name changed
-								method,					// method with new name
-								strOriginalName,		// original name of method
-								"method rename"			// reason for call
-							);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Rename a method for the type.
+					// 		var exceptionRet = m_functionRename_Type_Method(
+					// 			clType,					// type containing method whose name changed
+					// 			method,					// method with new name
+					// 			strOriginalName,		// original name of method
+					// 			"method rename"			// reason for call
+					// 		);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Rebuild blockly.
-							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+					// 		// Rebuild blockly.
+					// 		$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
-							return null;
-						} catch (e) {
+					// 		return null;
+					// 	} catch (e) {
 
-							return e;
-						}
-					};
+					// 		return e;
+					// 	}
+					// };
 
 					// Remove method from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
