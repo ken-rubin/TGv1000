@@ -488,9 +488,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							m_clTypeActive.data.properties.splice(index, 1);
+							var property = m_clTypeActive.data.properties[index];
+							var exceptionRet = code.removeProperty(m_clTypeActive, property);
+							if (exceptionRet) { return exceptionRet; }
 
-							// Something has to be done in code, I'd bet.
+							m_clTypeActive.data.properties.splice(index, 1);
 
 							return m_functionRegenTWPropertiesTable();
 						
@@ -508,9 +510,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							m_clTypeActive.data.events.splice(index, 1);
+							var event = m_clTypeActive.data.events[index];
+							var exceptionRet = code.removeEvent(m_clTypeActive, event);
+							if (exceptionRet) { return exceptionRet; }
 
-							// Something has to be done in code, I'd bet.
+							m_clTypeActive.data.events.splice(index, 1);
 
 							return m_functionRegenTWEventsTable();
 						

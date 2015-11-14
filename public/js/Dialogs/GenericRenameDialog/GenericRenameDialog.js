@@ -152,37 +152,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							throw new Error("You must enter a name.");
 						}
 
-						// Check for duplicate.
-						// if (m_strObjectType === 'type') {
+						exceptionRet = validator.isEventNameAvailableInActiveType(strName, m_iIndex);
+						if (exceptionRet) { throw exceptionRet; }
 
-						// 	exceptionRet = validator.isTypeNameAvailableInActiveComic(strName, m_iIndex);
-						// 	if (exceptionRet) { throw exceptionRet; }
-
-						// 	exceptionRet = client.renameTypeInActiveComic(strName, m_iIndex, m_strOriginalName);
-						// 	if (exceptionRet) { throw exceptionRet; }
-
-						// } else if (m_strObjectType === 'method') {
-
-
-						// 	exceptionRet = validator.isMethodNameAvailableInActiveType(strName, m_iIndex);
-						// 	if (exceptionRet) { throw exceptionRet; }
-
-						// 	exceptionRet = client.renameMethodInActiveType(strName, m_iIndex, m_strOriginalName);
-						// 	if (exceptionRet) { throw exceptionRet; }
-
-						// } else if (m_strObjectType === 'event') {
-
-
-							exceptionRet = validator.isEventNameAvailableInActiveType(strName, m_iIndex);
-							if (exceptionRet) { throw exceptionRet; }
-
-							exceptionRet = client.renameEventInActiveType(strName, m_iIndex, m_strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
-
-						// } else {
-
-						// 	throw new Error("Invalid objectType passed to Rename Dialog.")
-						// }
+						exceptionRet = client.renameEventInActiveType(strName, m_iIndex, m_strOriginalName);
+						if (exceptionRet) { throw exceptionRet; }
 
 						m_dialog.close();
 

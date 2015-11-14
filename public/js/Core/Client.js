@@ -744,7 +744,7 @@ define(["Core/errorHelper",
 							activeClType.data.properties[index] = property;
 
 							// Add the property to code.
-							var exceptionRet = code.updateProperty(activeClType, 
+							var exceptionRet = code.replaceProperty(activeClType, 
 								property,
 								strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }

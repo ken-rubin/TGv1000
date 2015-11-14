@@ -347,10 +347,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-//used -  not finished
-					self.updateProperty = function (clType, property, strOriginalName) {
+//used
+					self.replaceProperty = function (clType, property, strOriginalName) {
 
 						try {
+
+
+
+
+
 
 
 
@@ -361,27 +366,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							return e;
 						}
 					}					
-
-					// Method adds an event to a type to blockly.
-//used					
-					self.addEvent = function (clType, event) {
-
-						try {
-
-							// Add a new for the type.
-							var exceptionRet = m_functionAdd_Type_Event(clType,
-								event);
-							if (exceptionRet) { throw exceptionRet; }
-
-							// Rebuild.
-							$("#BlocklyIFrame")[0].contentWindow.location.reload();
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
 
 					// Method renames a property of a type to blockly.
 					self.renameProperty = function (clType, property, strOriginalName) {
@@ -425,9 +409,70 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
+					// Method adds an event to a type to blockly.
+//used					
+					self.addEvent = function (clType, event) {
+
+						try {
+
+							// Add a new for the type.
+							var exceptionRet = m_functionAdd_Type_Event(clType,
+								event);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+						} catch (e) {
+
+							return e;
+						}
+					};
+
+					self.renameEvent = function (clType, event, strOriginalName) {
+
+						try {
+
+
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
+					// Remove event from schema, blocks and javaScript.  
+					// It is already not in any workspace per validation.
+					self.removeEvent = function (clType, event) {
+
+						try {
+
+
+
+
+
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Generic name reference checker
-//used - needs to be written					
+//used			
 					self.isReferencedInWorkspace = function(strTest) {
+
+
+
+
+
+
 
 						return null;
 					}
@@ -460,21 +505,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							return e;
 						}
 					};
-
-					self.renameEvent = function (clType, event, strOriginalName) {
-
-						try {
-
-
-
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}
 
 					// Method renames a method in blockly.
 					// Parameter method has the new name. Old name is in strOriginalName.
