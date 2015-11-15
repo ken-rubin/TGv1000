@@ -1644,21 +1644,34 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
+							////////////////////////
+							////////////////////////
+							////////////////////////
+							// Raise
 
+							var strRaiseName = clType.data.name + "_raise" + eventName;
+							var strSubscribeName = clType.data.name + "_subscribe" + eventName;
 
+							////////////////////////
+							// Blocks.
+							delete self.blocks[strRaiseName];
+							delete self.blocks[strSubscribeName];
 
+							////////////////////////
+							// JavaScript.
+							delete self.javaScript[strRaiseName];
+							delete self.javaScript[strSubscribeName];
 
+							////////////////////////
+							// Schema.
+							if (self.schema &&
+								self.schema.Types &&
+								self.schema.Types[clType.data.name]) {
 
-
-
-
-
-
-
-
-
-
-
+								var objectType = self.schema.Types[clType.data.name];
+								delete objectType[strRaiseName];
+								delete objectType[strSubscribeName];
+							}
 
 							return null;
 
