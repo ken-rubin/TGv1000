@@ -658,7 +658,7 @@ define(["Core/errorHelper",
 							var exceptionRet = types.regenTWMethodsTable();
 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = code.replaceMethod(updatedMethod, origMethod);
+							exceptionRet = code.replaceMethod(updatedMethod, origMethod, activeClType);
 							if (exceptionRet) { throw exceptionRet; }
 							
 							// Now click the updated method in the grid to load the code pane.
