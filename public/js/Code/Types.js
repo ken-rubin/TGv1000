@@ -503,7 +503,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Called by client after confirmation by user.
-//used - need to write & call code.
+//used
 					self.deleteEvent = function (index) {
 
 						try {

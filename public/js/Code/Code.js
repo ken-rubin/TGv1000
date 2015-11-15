@@ -118,7 +118,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								var eventIth = clType.data.events[i];
 								exceptionRet = m_functionAdd_Type_Event(clType,
-									eventIth);
+									eventIth.name);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -236,7 +236,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								var eventIth = clType.data.events[i];
 								var exceptionRet = m_functionRemove_Type_Event(clType,
-									eventIth);
+									eventIth.name);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -412,7 +412,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							// Add a new for the type.
 							var exceptionRet = m_functionAdd_Type_Event(clType,
-								event);
+								event.name);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
@@ -429,8 +429,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
+							var exceptionRet = m_functionRemove_Type_Event(clType,
+								strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
 
+							exceptionRet = self.addEvent(clType, event);
+							if (exceptionRet) { throw exceptionRet; }
 
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
 							return null;
 
@@ -446,10 +453,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
+							var exceptionRet = m_functionRemove_Type_Event(clType,
+								event.name);
+							if (exceptionRet) { throw exceptionRet; }
 
-
-
-
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
 
 							return null;
 
@@ -1176,7 +1185,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method adds a type's event accessor functions.
-					var m_functionAdd_Type_Event = function (clType, event) {
+					var m_functionAdd_Type_Event = function (clType, eventName) {
 
 						try {
 
@@ -1187,12 +1196,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Blocks.
-							var strRaiseName = clType.data.name + "_raise" + event.name;
+							var strRaiseName = clType.data.name + "_raise" + eventName;
 							self.blocks[strRaiseName] = m_functionGenerateBlocksEventRaiseFunctionString(strRaiseName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strRaiseName] = m_functionGenerateJavaScriptEventRaiseFunctionString(event.name);
+							self.javaScript[strRaiseName] = m_functionGenerateJavaScriptEventRaiseFunctionString(eventName);
 
 							////////////////////////
 							// Schema.
@@ -1221,12 +1230,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Blocks.
-							var strSubscribeName = clType.data.name + "_subscribe" + event.name;
+							var strSubscribeName = clType.data.name + "_subscribe" + eventName;
 							self.blocks[strSubscribeName] = m_functionGenerateBlocksEventSubscribeFunctionString(strSubscribeName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSubscribeName] = m_functionGenerateJavaScriptEventSubscribeFunctionString(event.name);
+							self.javaScript[strSubscribeName] = m_functionGenerateJavaScriptEventSubscribeFunctionString(eventName);
 
 							////////////////////////
 							// Schema.
@@ -1629,46 +1638,27 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-					// Helper method removes a type's new_ constructor function.
+					// Helper method removes event.
 //used					
-					var m_functionRemove_Type_Event = function (clType, event) {
+					var m_functionRemove_Type_Event = function (clType, eventName) {
 
 						try {
 
-							// var strGet = clType.data.name + "_get" + property.name;
-							// var strSet = clType.data.name + "_set" + property.name;
 
-							// ////////////////////////
-							// // Blocks.
 
-							// delete self.blocks[strGet];
-							// delete self.blocks[strSet];
 
-							// ////////////////////////
-							// // JavaScript.
 
-							// delete self.javaScript[strGet];
-							// delete self.javaScript[strSet];
 
-							// ////////////////////////
-							// // Schema.
-							// if (self.schema &&
-							// 	self.schema.Types &&
-							// 	self.schema.Types[clType.data.name]) {
 
-							// 	var objectType = self.schema.Types[clType.data.name];
-							// if (objectType) {
 
-							// 	if (objectType[strGet]) {
 
-							// 		delete objectType[strGet];
-							// 	}
-							// 	if (objectType[strSet]) {
-									
-							// 		delete objectType[strSet];
-							// 	}
-							// }
-							// }
+
+
+
+
+
+
+
 
 							return null;
 
