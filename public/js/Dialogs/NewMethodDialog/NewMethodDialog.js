@@ -199,7 +199,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								            uniqueArray.push(pArray[i]);
 								        }
 								    }
-						            parameters = uniqueArray.join(' ');
+						            parameters = uniqueArray.join(', ');
 								}
 							}
 
