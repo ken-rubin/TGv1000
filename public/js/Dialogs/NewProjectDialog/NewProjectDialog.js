@@ -165,7 +165,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							m_functionSetImageSrc(0);
+
+							// Set project image.
+							var imgSrc;
+							switch (m_projectType) {
+								case "Game":
+									imgSrc = "media/images/gameProject.png";
+									break;
+								case "Console":
+									imgSrc = "media/images/consoleProject.png";
+									break;
+								case "Web Site":
+									imgSrc = "media/images/websiteProject.png";
+									break;
+								case "HoloLens":
+									imgSrc = "media/images/hololensProject.png";
+									break;
+								case "Mapping":
+									imgSrc = "media/images/mappingProject.png";
+									break;
+								default:
+									imgSrc = resourceHelper.toURL("resources", 0, "image");
+							}
+							$("#ProjectImage").attr("src", imgSrc);
+
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);

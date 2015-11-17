@@ -376,7 +376,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', '');
+							var strUrl = m_clTypeActive.data.altImagePath.length ? m_clTypeActive.data.altImagePath : resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', '');
 							
 							// Update the image in the TypeWell
 							$("#TWimage").attr("src", strUrl);
@@ -648,7 +648,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							m_functionSetTypewellHeader();
-							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
+							$("#TWimage").attr("src", m_clTypeActive.data.altImagePath.length ? m_clTypeActive.data.altImagePath : resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
 							// App type and system base types cannot be deleted.
 							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === null) {

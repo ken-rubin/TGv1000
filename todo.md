@@ -48,6 +48,7 @@
 
 
 
+
 ## To discuss
 
 - All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.

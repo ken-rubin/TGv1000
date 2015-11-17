@@ -73,11 +73,7 @@ define(["Core/errorHelper", "Designer/Tool", "Core/ScrollRegionV", "Core/resourc
 								"tool-" + client.removeSpaces(clType.data.name),	// id
 								clType.data.name,									// name for tooltip
 								"",													// no description--at this time
-								resourceHelper.toURL(								// image url
-									'resources', 
-									clType.data.imageId, 
-									'image'
-								),
+								clType.data.altImagePath.length ? clType.data.altImagePath : resourceHelper.toURL('resources', clType.data.imageId, 'image'),
 								'toolstripitem',									// item class
 								function (jItemAdded) {	jItem = jItemAdded },		// post creation callback so we can use jItem (see below)
 								bInLoadLoop || false,								// If it wasn't passed in (new Type added), then false. If in a Types.load loop, then true.

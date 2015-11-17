@@ -5,8 +5,8 @@
 //
 
 // Define Type module.
-define(["Core/errorHelper", "Core/resourceHelper", "Core/contextMenu", "Navbar/Comic", "Navbar/Comics"],
-	function (errorHelper, resourceHelper, contextMenu, comic, comics) {
+define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics"],
+	function (errorHelper, comic, comics) {
 
 		try {
 
