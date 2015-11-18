@@ -30,11 +30,6 @@
 - Comic click
     - Slide full panel over half (resizable) the main window
     - CLick off the comic resizes back to scroll strip.
-- The enrollment / parent process. Marketing page.
-    + Implement grid of available classes (and projects?) on login page. Buy from there. Probably enroll, too. How would that work? Go right to new project(?). Needs new DB tables (take from e4Groms schema in large part), admin stuff, etc.
-    + When user logs in, open most recent project (or new one if just bought).
-    + Give parent ability to play child's projects but not modify them. If >1 child, present a list of children first. This implies a parent login. 
-        + having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
 + Passport authentication???
     - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
