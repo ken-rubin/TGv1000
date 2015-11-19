@@ -30,8 +30,6 @@
 - Comic click
     - Slide full panel over half (resizable) the main window
     - CLick off the comic resizes back to scroll strip.
-+ Passport authentication???
-    - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
 - Type color schema (for schema blocks)
     - Generate a random (unused) color for each Type (see Code.js in the 700s). 

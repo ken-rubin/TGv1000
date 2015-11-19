@@ -40,7 +40,8 @@ app.use(morgan("dev"));
 /////////////////////////////////////
 console.log("Initialize stormpath");
 app.use(stormpath.init(app, {
-  website: true
+    // Other optional configuaration properties.
+    website: true
 }));
 
 /////////////////////////////////////
@@ -100,7 +101,7 @@ app.post("/renderJadeSnippet", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (login.jade).");
+console.log("Map main route login.jade.");
 app.get("/", function (req, res) {
 
     try {
@@ -118,7 +119,7 @@ app.get("/", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (index.jade).");
+console.log("Map main route index.jade.");
 app.get("/index", stormpath.loginRequired, function (req, res) {
 
     try {
@@ -136,8 +137,8 @@ app.get("/index", stormpath.loginRequired, function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (adminzone.jade).");
-app.get("/adminzone", function (req, res) {
+console.log("Map main route adminzone.jade.");
+app.get("/adminzone", stormpath.groupsRequired(['admin']), function (req, res) {
 
     try {
 
