@@ -9,7 +9,6 @@ var bodyParser = require("body-parser");
 var morgan = require("morgan");
 var lessMiddleware = require("less-middleware");
 var favicon = require('serve-favicon');
-var stormpath = require('express-stormpath');
 
 /////////////////////////////////////
 console.log("Allocate application (express).");
@@ -36,13 +35,6 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 /////////////////////////////////////
 console.log("Configure logger (morgan).");
 app.use(morgan("dev"));
-
-/////////////////////////////////////
-console.log("Initialize stormpath");
-app.use(stormpath.init(app, {
-    // Other optional configuaration properties.
-    website: true
-}));
 
 /////////////////////////////////////
 if (app.get("development")) {
@@ -120,7 +112,7 @@ app.get("/", function (req, res) {
 
 /////////////////////////////////////
 console.log("Map main route index.jade.");
-app.get("/index", stormpath.loginRequired, function (req, res) {
+app.get("/index", function (req, res) {
 
     try {
 
@@ -138,7 +130,7 @@ app.get("/index", stormpath.loginRequired, function (req, res) {
 
 /////////////////////////////////////
 console.log("Map main route adminzone.jade.");
-app.get("/adminzone", stormpath.groupsRequired(['admin']), function (req, res) {
+app.get("/adminzone", function (req, res) {
 
     try {
 
@@ -180,10 +172,6 @@ app.use(multer(
         }
     }
 ));
-
-////////////////////////////////////
-app.set("portnum",8001);
-console.log('Server will be listening on port ' + app.get("portnum") + ".");
 
 /////////////////////////////////////
 console.log("Setting up routes from database.");
@@ -259,10 +247,8 @@ sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order b
             });
         });
 */
-        console.log('Waiting for stormpath SDK to be ready...');
-        app.on('stormpath.ready', function () {
-            app.listen(app.get("portnum"));
-        });
+        app.set("portnum",8001);
+        app.listen(app.get("portnum"));
         console.log("Listening on port " + app.get("portnum") + ".");
     },
     function(strError) {
