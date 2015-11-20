@@ -40,7 +40,7 @@ app.use(morgan("dev"));
 if (app.get("development")) {
 
 	console.log("Configure css middleware (less).");
-	app.use(lessMiddleware(__dirname + "/public"));
+	app.use(lessMiddleware(__dirname + "/public/css"));
 }
 
 /////////////////////////////////////
