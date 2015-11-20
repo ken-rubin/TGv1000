@@ -21,10 +21,10 @@ $(document).ready(function () {
 					// Allocate and initialize the client.
 					clientLogin = new ClientLogin();
 					var exceptionRet = clientLogin.create(/*iUserId -- eventually from server specified cookie*/);
-					if (exceptionRet) {
+					if (exceptionRet) { throw exceptionRet; }
 
-						throw exceptionRet;
-					}
+					exceptionRet = m_functionLoadThreeLists();
+					if (exceptionRet) { throw exceptionRet; }
 
 	                // Wire up the enroll button
 	                $("#enrollBtn").click(function () {
@@ -125,6 +125,47 @@ $(document).ready(function () {
 		alert(e.message);
 	}
 });
+
+var m_functionLoadThreeLists = function() {
+
+	try {
+
+		var posting = $.post("/BOL/ProjectBO/RetrieveProjectsForLists", 
+			{},
+			'json');
+		posting.done(function(data){
+
+			if (data.success) {
+
+				$("#FreeList").empty();
+				$("#ProductList").empty();
+				$("#ClassList").empty();
+
+				data.frees.items.forEach(function(free){
+					
+				});
+
+				data.products.items.forEach(function(product){
+					
+				});
+
+				data.classes.items.forEach(function(klass){
+					
+				});
+
+				return null;
+
+			} else {
+
+				// !data.success
+				return new Error(data.message);
+			}
+		});
+	} catch (e) {
+
+		return e;
+	}
+}
 
 var m_functionEnrollButtonClick = function(errorHelper) {
 	
