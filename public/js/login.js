@@ -142,15 +142,15 @@ var m_functionLoadThreeLists = function() {
 				$("#ClassList").empty();
 
 				data.frees.items.forEach(function(free){
-					
+					var i = 0;
 				});
 
 				data.products.items.forEach(function(product){
-					
+					var j=0;
 				});
 
 				data.classes.items.forEach(function(klass){
-					
+					var k= 0;
 				});
 
 				return null;
