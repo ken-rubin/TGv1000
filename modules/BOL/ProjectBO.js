@@ -1675,7 +1675,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             level: 3,
                             difficulty: 4,
                             description: "In this series of classes, students will learn....",
-                            imgsrc: "/media/images/oop.png",
+                            imgsrc: "/media/images/OOP.png",
                             price: 149.99,
                             location: "Weston Community Center~123 Main Street~Room 255~Westport, CT 06823",
                             instructor: "Peter Leventhal",
