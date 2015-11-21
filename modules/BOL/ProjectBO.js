@@ -1630,7 +1630,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         {
                             name: "Game",
                             imgsrc: "/media/images/gameProject.png",
-                            description: "This is the...."
+                            description: "This is the type of project that you will use most often. It teaches you to create a graphical game, one player for now with multi-player coming soon."
                         },
                         {
                             name: "Console",
@@ -1659,11 +1659,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                     items: [
                         {
                             name: "Robot Mayhem",
-                            level: 4,
-                            difficulty: 4,
+                            level: "4",
+                            difficulty: "4",
                             description: "Following all of the steps in this product will....",
                             imgsrc: "/media/images/robotmayhem.png",
-                            price: 29.99
+                            price: "29.99"
                         }
                     ]
                 },
@@ -1681,16 +1681,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                             instructor: "Peter Leventhal",
                             schedule: {
                                 items: [
-                                    {when: "Sunday~March 16, 2016~7-8pm"},
-                                    {when: "Sunday~March 23, 2016~7-8pm"},
-                                    {when: "Sunday~March 30, 2016~7-8pm"},
-                                    {when: "Sunday~March 37, 2016~7-8pm"},
-                                    {when: "Sunday~March 44, 2016~7-8pm"},
-                                    {when: "Sunday~March 51, 2016~7-8pm"},
-                                    {when: "Sunday~March 58, 2016~7-8pm"},
+                                    {when: "Sunday, March 16, 2016, 7-8pm"},
+                                    {when: "Sunday, March 23, 2016, 7-8pm"},
+                                    {when: "Sunday, March 30, 2016, 7-8pm"},
+                                    {when: "Sunday, March 37, 2016, 7-8pm"},
+                                    {when: "Sunday, March 44, 2016, 7-8pm"},
+                                    {when: "Sunday, March 51, 2016, 7-8pm"},
+                                    {when: "Sunday, March 58, 2016, 7-8pm"},
                                 ]
                             },
-                            notes: "Please bring a laptop or tablet (iPad or ChromeBook), but if not, some will be available. Please call beforehand if you will need one.",
+                            notes: "Please send your child with a laptop or tablet (iPad or ChromeBook), but if you can't, some will be available. Please call beforehand if you will need one.",
                             phone: "(203) 544-1966"
                         },
                         {

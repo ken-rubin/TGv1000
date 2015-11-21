@@ -295,8 +295,9 @@ var m_functionFillTheLists = function() {
 		$("#FreeList").append('<div id="Free_' + i + '">' + m_freeHTML + '</div>');
 
 		// Fill the data in Free_i.
-
-
+		$("#Free_" + i + " #Name").text(freeIth.name);
+		$("#Free_" + i + " #Img").attr("src", freeIth.imgsrc);
+		$("#Free_" + i + " #Description").text(freeIth.description);
 	}
 
 	$("#ProductList").empty();
@@ -306,8 +307,12 @@ var m_functionFillTheLists = function() {
 		$("#ProductList").append('<div id="Product_' + i + '">' + m_productHTML + '</div>');
 
 		// Fill the data in Product_i.
-
-
+		$("#Product_" + i + " #Name").text(productIth.name);
+		$("#Product_" + i + " #Img").attr("src", productIth.imgsrc);
+		$("#Product_" + i + " #Description").text(productIth.description);
+		$("#Product_" + i + " #Level").text("Level: " + productIth.level);
+		$("#Product_" + i + " #Difficulty").text("Rating: " + productIth.difficulty);
+		$("#Product_" + i + " #Price").text("Price: $" + productIth.price);
 	}
 
 	$("#ClassList").empty();
@@ -317,10 +322,31 @@ var m_functionFillTheLists = function() {
 		$("#ClassList").append('<div id="Class_' + i + '">' + m_classHTML + '</div>');
 
 		// Fill the data in Class_i.
+		$("#Class_" + i + " #Name").text(classIth.name);
+		$("#Class_" + i + " #Img").attr("src", classIth.imgsrc);
+		$("#Class_" + i + " #Description").text(classIth.description);
+		$("#Class_" + i + " #Level").text("Level: " + classIth.level);
+		$("#Class_" + i + " #Difficulty").text("Rating: " + classIth.difficulty);
+		$("#Class_" + i + " #Price").text("Price: $" + classIth.price);
+		$("#Class_" + i + " #Instructor").text("Instructor: " + classIth.instructor);
+		$("#Class_" + i + " #Phone").text("Questions: " + classIth.phone);
+		var locations = classIth.location.split('~');
+		while(locations.length < 5) {
+			locations.push('');
+		}
+		for (var j = 0; j < 5; j++) {
 
+			$("#Class_" + i + " #Where" + (j+1)).text(locations[j]);
+		}
+		while(classIth.schedule.items.length < 8) {
+			classIth.schedule.items.push({when:''});
+		}
+		for (var j = 1; j < 8; j++) {
 
+			$("#Class_" + i + " #When" + (j+1)).text(classIth.schedule.items[j].when);
+		}
+		$("#Class_" + i + " #Note").text(classIth.notes);
 	}
-
 }
 
 // Define some app-globals.
