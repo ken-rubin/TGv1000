@@ -682,14 +682,16 @@ define(["Core/errorHelper",
 					}
 
 //used
-					self.updateTypeInProject = function(clType, iTypeIndex) {
+					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
 
 						try {
 
+							self.projectIsDirty();
+							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
 
-
-
-
+							exceptionRet = code.replaceType(updatedClType.data, origType);
+							if (exceptionRet) { throw exceptionRet; }
+							
 							return null;
 
 						} catch (e) {
@@ -771,9 +773,21 @@ define(["Core/errorHelper",
 						}
 					}
 // used
-					self.updateMethodInActiveType = function(method, iMethodIndex) {
+					self.updateMethodInActiveType = function(updatedMethod, origMethod, iMethodIndex, activeClType) {
 
 						try {
+
+							self.projectIsDirty();
+							activeClType.data.methods[iMethodIndex] = updatedMethod;
+
+							var exceptionRet = types.regenTWMethodsTable();
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = code.replaceMethod(updatedMethod, origMethod, activeClType);
+							if (exceptionRet) { throw exceptionRet; }
+							
+							// Now click the updated method in the grid to load the code pane.
+							$("#method_" + iMethodIndex.toString()).click();
 
 							return null;
 
@@ -855,7 +869,7 @@ define(["Core/errorHelper",
 							activeClType.data.properties[index] = property;
 
 							// Add the property to code.
-							var exceptionRet = code.updateProperty(activeClType, 
+							var exceptionRet = code.replaceProperty(activeClType, 
 								property,
 								strOriginalName);
 							if (exceptionRet) { throw exceptionRet; }
@@ -871,61 +885,61 @@ define(["Core/errorHelper",
 						}
 					}
 
-//used
-					self.renameTypeInActiveComic = function (strNewName, index, strOriginalName) {
+//not used
+					// self.renameTypeInActiveComic = function (strNewName, index, strOriginalName) {
 
-						try {
+					// 	try {
 
-							var activeClType = types.getActiveClType();
-							activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
+					// 		var activeClType = types.getActiveClType();
+					// 		activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
 
-							// Call Code to handle categories and schema methods.
-							var exceptionRet = code.renameType(activeClType, strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Call Code to handle categories and schema methods.
+					// 		var exceptionRet = code.renameType(activeClType, strOriginalName);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Have types.js change header of TypeWell.
-							exceptionRet = types.changeTypeWellHeader();
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Have types.js change header of TypeWell.
+					// 		exceptionRet = types.changeTypeWellHeader();
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Need to call someone to update the tooltip of the correct tool in toolstrip.
-							// Everything else should be handled.
-							return tools.changeTooltipAndId(strOriginalName, strNewName);
+					// 		// Need to call someone to update the tooltip of the correct tool in toolstrip.
+					// 		// Everything else should be handled.
+					// 		return tools.changeTooltipAndId(strOriginalName, strNewName);
 
-						} catch(e) {
+					// 	} catch(e) {
 
-							return e;
-						}
-					}
+					// 		return e;
+					// 	}
+					// }
 
-//used
-					self.renameMethodInActiveType = function (strNewName, index, strOriginalName) {
+//not used
+					// self.renameMethodInActiveType = function (strNewName, index, strOriginalName) {
 
-						try {
+					// 	try {
 
-							var activeClType = types.getActiveClType();
-							var oldMethod = activeClType.data.methods[index];
-							oldMethod.name = strNewName;
-							activeClType.data.methods[index] = oldMethod;
+					// 		var activeClType = types.getActiveClType();
+					// 		var oldMethod = activeClType.data.methods[index];
+					// 		oldMethod.name = strNewName;
+					// 		activeClType.data.methods[index] = oldMethod;
 
-							var exceptionRet = types.functionSetActiveMethodIndex(index);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		var exceptionRet = types.functionSetActiveMethodIndex(index);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							// Call Code.js#renameMethod(clType, method, strOriginalName).
-							exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+					// 		// Call Code.js#renameMethod(clType, method, strOriginalName).
+					// 		exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = types.regenTWMethodsTable();
-							if (exceptionRet) { throw exceptionRet; }
+					// 		exceptionRet = types.regenTWMethodsTable();
+					// 		if (exceptionRet) { throw exceptionRet; }
 
-							$("#method_" + index.toString()).click();
+					// 		$("#method_" + index.toString()).click();
 
-							return null;
+					// 		return null;
 
-						} catch(e) {
+					// 	} catch(e) {
 
-							return e;
-						}
-					}
+					// 		return e;
+					// 	}
+					// }
 
 //used
 					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {
@@ -1125,8 +1139,10 @@ define(["Core/errorHelper",
 									$(".disabledifnoproj").prop("disabled", true);
 
 									// Remove tooltip functionality from TypeWell icons.
-									$(".disabledifnoproj").tooltip("destroy");
-
+									$(".disabledifnoproj").powerTip({
+										smartPlacement: true,
+										manual: true
+									});
 									// Empty the toolstrip, designer, comicstrip and typewell.
 									tools.empty();
 
@@ -1221,7 +1237,10 @@ define(["Core/errorHelper",
 				    		self.projectIsDirty();
 
 							// Fire bootstrap tooltip opt-in.
-							$(".disabledifnoproj").tooltip();
+							$(".disabledifnoproj").powerTip({
+								smartPlacement: true,
+								manual: false
+							});
 
 							if ($.isFunction(callback)) {
 

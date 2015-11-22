@@ -97,7 +97,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
-                    var jItem = $("<img data-ibase='" + iBase + "' data-toggle='tooltip' data-container='body' data-placement='bottom' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
+                    var jItem = $("<img data-ibase='" + iBase + "' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>");
 
@@ -229,7 +229,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         m_jSlider.width(dSliderNewWidth);
                     }
                     // ...and opt-in on the tooltip.
-                    jItem.tooltip();
+                    jItem.powerTip({
+                        smartPlacement: true
+                    });
 
                     // Make sure strip scrolls to show new image.
                     if (!m_bInLoadLoop) {
@@ -667,8 +669,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             var m_jLeft = null;
             // The "move the items to the right" button.
             var m_jRight = null;
-            // The tooltip.
-            var m_jTooltip = null;
             // Collection of items.
             var m_arrayItems = [];
             // Width of item.
@@ -695,12 +695,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Amount, below which, the increment is 
             // considered 0 and the scroll may stop.
             var m_dDampeningIncrementEpsilon = 0.1;
-            // Number of pixels to offset tooltip from cursor left-right.
-            var m_dTooltipWidthOffset = 20;
-            // Number of pixels to offset tooltip from cursor top-bottom.
-            var m_dTooltipHeightOffset = 2;
-            // Cookie keeps track of tooltip callback staged on mouse move.
-            var m_cookieTooltip = null;
             // Used to prevent scrolling to right when loading an entire set images.
             var m_bInLoadLoop = false;
         };

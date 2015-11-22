@@ -142,11 +142,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
-					self.setImageId = function (imageId) {
-
-						self.data.imageId = imageId;
-					}
-
 					self.getStatus = function () {
 
 

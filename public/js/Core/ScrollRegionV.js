@@ -104,7 +104,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         strDataDashAttributeString + 
                         " data-ibase='" + 
                         iBase + 
-                        "' data-toggle='tooltip' data-container='body' title='" + 
+                        "' title='" + 
                         strName + 
                         "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
@@ -289,7 +289,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         m_jSlider.height(dSliderNewHeight);
                     }
                     // ..and opt-in for the tooltip
-                    jItem.tooltip();
+                    jItem.powerTip({
+                        smartPlacement: true
+                    });
 
                     // Make sure toolstrip scrolls to show new image.
                     if (!m_bInLoadLoop) {
@@ -753,13 +755,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             // Amount, below which, the increment is 
             // considered 0 and the scroll may stop.
             var m_dDampeningIncrementEpsilon = 0.1;
-            // Number of pixels to offset tooltip from cursor left-right.
-            var m_dTooltipWidthOffset = 20;
-            // Number of pixels to offset tooltip from cursor top-bottom.
-            var m_dTooltipHeightOffset = 2;
-            // Cookie keeps track of tooltip callback staged on mouse move.
-            var m_cookieTooltip = null;
-            // Used to prevent scrolling to bottom when loading an entire set of Types for a comic (ultimately a project).
             var m_bInLoadLoop = false;
         };
 

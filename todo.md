@@ -12,7 +12,6 @@
 
 ## Jerry
 
-- Get rid of bootstrap tool-tips, replace with something good, like the library *powertip* which is on my desktop.
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
     - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
@@ -23,7 +22,6 @@
     - close window or browser (possible?)
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places??? What does Ken have to do here?
 - Deleting
-    + Need to finish delete Property, Method and Event. They don't call code to clean up Blockly. This is in Types.js.
     + What validation is done for deleting? If a property is being used in a method, is it deletable. I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
 - Play button:
@@ -32,19 +30,15 @@
 - Comic click
     - Slide full panel over half (resizable) the main window
     - CLick off the comic resizes back to scroll strip.
-- The enrollment / parent process. Marketing page.
-    + Implement grid of available classes (and projects?) on login page. Buy from there. Probably enroll, too. How would that work? Go right to new project(?). Needs new DB tables (take from e4Groms schema in large part), admin stuff, etc.
-    + When user logs in, open most recent project (or new one if just bought).
-    + Give parent ability to play child's projects but not modify them. If >1 child, present a list of children first. This implies a parent login. 
-        + having a parent password wouldn't be a bad idea, but I wouldn't auto-assign it.
-+ Passport authentication???
-    - Use user sessions to make sure someone can't jump into the middle of the site without logging in. Look into npm install connect-ensure-login to assist with this.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
 - Type color schema (for schema blocks)
     - Generate a random (unused) color for each Type (see Code.js in the 700s). 
     - That same color goes to the type's methods, properties and events.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
 - Need to bring saving of projects in ProjectBO up to speed wrt changes just made to Projects, Types and Methods.
+- Need dialogs to submit on Enter (i.e., button is triggered).
+- In types.js determine what other TypeWell buttons need to be disabled or enabled if a system base type is the active type. May be based on user class.
+
 
 
 
@@ -86,7 +80,7 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 - Any Type can (but doesn't have to) be derived from a single other Type (adding a baseTypeId column). 
 - App Types will be derived from one of the base Types listed above. This is what actually creates a Project of one of these types.
 - The base Types will, for example, contain the physics engine, a web design framework, etc.
-- *It is undecided if system base types should appear in the ToolStrip.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
+- *It is undecided if system base types should appear in the ToolStrip for everyone.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
 #### Methods
 - Statements and Expressions
     - Statements are Methods that are visually represented in the Blockly code pane with a top triangular indentation and a bottom triangular extension. This way statements can be stacked together to provide program flow.
@@ -95,7 +89,7 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
     - Expressions may take parameters and they return a value.
 - Parameters
     - A Method's parameters are entered as a comma- or space-separated string of parameter names.
-    - This string of names will be normalized, checked for duplicates and stored concatenated, comma-separated in a single column of the methods DB table.
+    - This string of names will be normalized, checked for duplicates and stored concatenated, space-separated in a single column of the methods DB table.
     - The parameters are used in the blockly blocks XML and JavaScript as in [this example](http://165.225.132.154/work/Coder/).
 - Construct method
     - The App Type always has an *initialize* method, but up till now none of the other Types would start with a default method. We are adding the *construct* method to every Type--even the App Type. We will decide later if the method is initialized by the system or if the user just uses it as a constructor that is executed when the Type is *newed*.
@@ -113,29 +107,6 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
             - *systemBaseTypes* will have 2 columns: id and parentId, both NOT NULL.
             - Since the chains can merge toward the bottom, there may be multiple rows with the same parentId.
             - For now, this table will be maintained manually in the database setup script. Initially (while the base Type of each of the 5 App Types is being set up and the 5 base Types have no functionality) there will be 5 rows in *systemBaseTypes*: [1,1], [2,2], etc.
-##### New tables
-- *projectTypes*: game, console, website, hololens, map
-- *methodTypes*: statement, expression
-- *systemBaseTypes*: described above
-##### *projects* table
-- Add *projectTypeId* column (cannot be null)
-##### *types* table
-- Allow columns *comicId*, *ordinal* and *ownedByUserId* to be NULL.
-    - *comicId* = NULL is the indicator that thisis a system base type.
-- Add *baseTypeId* column (can be null--except App Type will always be non-null)
-- Add *isToolStrip* column (NOT NULL DEFAULT '0')
-##### *methods* table
-- Add *methodTypeId* column (NOT NULL)
-- Add *parameters* column (NOT NULL; can be 0-length string if no parameters for method)
-##### Data initialization script changes
-- Add a types row for each Project type
-- Change project with id=1 to New Game Project, projectTypeId=1
-- Change demo projects 2, 3, 4, 5 to 6, 7, 8 (along with comics that point to them)
-- Add projects with ids=2, 3, 4, 5 with corresponding names and projectTypeIds
-- Do similar with comics
-- Create types records for the new "new" projects
-- Set all methodTypeId in initial methods table data to ???.
-- Add *construct* method to all Types.
 
 
 ### The TypeWell

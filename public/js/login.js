@@ -4,9 +4,6 @@
 // Return null--no module object.
 //
 
-// Define some app-globals.
-var clientLogin = null;
-
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
 	
@@ -19,12 +16,12 @@ $(document).ready(function () {
 				try {
 
 					// Allocate and initialize the client.
-					clientLogin = new ClientLogin();
-					var exceptionRet = clientLogin.create(/*iUserId -- eventually from server specified cookie*/);
-					if (exceptionRet) {
+					m_clientLogin = new ClientLogin();
+					var exceptionRet = m_clientLogin.create(/*iUserId -- eventually from server specified cookie*/);
+					if (exceptionRet) { throw exceptionRet; }
 
-						throw exceptionRet;
-					}
+					exceptionRet = m_functionLoadThreeLists(errorHelper);
+					if (exceptionRet) { throw exceptionRet; }
 
 	                // Wire up the enroll button
 	                $("#enrollBtn").click(function () {
@@ -34,7 +31,7 @@ $(document).ready(function () {
 	                });
 
 	                // Get the signed in user id from a cookie.
-	                var strUserName = clientLogin.getTGCookie("userName");
+	                var strUserName = m_clientLogin.getTGCookie("userName");
 	                if (strUserName && strUserName.length > 0) {
 
 	                    $("#inputName").val(strUserName);
@@ -131,7 +128,7 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	try {
 
 		// Ask client to show the enroll dialog.
-		var exceptionRet = clientLogin.showEnrollDialog(m_functionOnGotNewEnrollee);
+		var exceptionRet = m_clientLogin.showEnrollDialog(m_functionOnGotNewEnrollee);
 		if (exceptionRet) {
 
 			throw exceptionRet;
@@ -196,3 +193,167 @@ var m_functionSignInButtonClick = function(errorHelper) {
     }
 }
 
+var m_functionLoadThreeLists = function(errorHelper) {
+
+	try {
+
+		var posting = $.post("/BOL/ProjectBO/RetrieveProjectsForLists", 
+			{},
+			'json');
+		posting.done(function(data){
+
+			if (data.success) {
+
+				m_frees = data.frees.items;
+				m_products = data.products.items;
+				m_classes = data.classes.items;
+
+				$.ajax({
+
+					cache: false,
+					data: { 
+
+						templateFile: "Login/Listboxes/freeBox"
+					}, 
+					dataType: "HTML",
+					method: "POST",
+					url: "/renderJadeSnippet"
+				}).done(m_functionRenderJadeSnippetResponseFree).error(errorHelper.show);
+
+				$.ajax({
+
+					cache: false,
+					data: { 
+
+						templateFile: "Login/Listboxes/productBox"
+					}, 
+					dataType: "HTML",
+					method: "POST",
+					url: "/renderJadeSnippet"
+				}).done(m_functionRenderJadeSnippetResponseProduct).error(errorHelper.show);
+
+				$.ajax({
+
+					cache: false,
+					data: { 
+
+						templateFile: "Login/Listboxes/classBox"
+					}, 
+					dataType: "HTML",
+					method: "POST",
+					url: "/renderJadeSnippet"
+				}).done(m_functionRenderJadeSnippetResponseClass).error(errorHelper.show);
+
+				return null;
+
+			} else {
+
+				// !data.success
+				return new Error(data.message);
+			}
+		});
+	} catch (e) {
+
+		return e;
+	}
+}
+
+var m_functionRenderJadeSnippetResponseFree = function(htmlData) {
+
+	m_freeHTML = htmlData;
+	if (m_productHTML && m_classHTML) {
+
+		m_functionFillTheLists();
+	}
+}
+
+var m_functionRenderJadeSnippetResponseProduct = function(htmlData) {
+
+	m_productHTML = htmlData;
+	if (m_freeHTML && m_classHTML) {
+
+		m_functionFillTheLists();
+	}
+}
+
+var m_functionRenderJadeSnippetResponseClass = function(htmlData) {
+
+	m_classHTML = htmlData;
+	if (m_productHTML && m_freeHTML) {
+
+		m_functionFillTheLists();
+	}
+}
+
+var m_functionFillTheLists = function() {
+
+
+	$("#FreeList").empty();
+	for(var i = 0; i < m_frees.length; i++) {
+
+		var freeIth = m_frees[i];
+		$("#FreeList").append('<div id="Free_' + i + '">' + m_freeHTML + '</div>');
+
+		// Fill the data in Free_i.
+		$("#Free_" + i + " #Name").text(freeIth.name);
+		$("#Free_" + i + " #Img").attr("src", freeIth.imgsrc);
+		$("#Free_" + i + " #Description").text(freeIth.description);
+	}
+
+	$("#ProductList").empty();
+	for(var i = 0; i < m_products.length; i++) {
+
+		var productIth = m_products[i];
+		$("#ProductList").append('<div id="Product_' + i + '">' + m_productHTML + '</div>');
+
+		// Fill the data in Product_i.
+		$("#Product_" + i + " #Name").text(productIth.name);
+		$("#Product_" + i + " #Img").attr("src", productIth.imgsrc);
+		$("#Product_" + i + " #Description").text(productIth.description);
+		$("#Product_" + i + " #Level").text("Level: " + productIth.level);
+		$("#Product_" + i + " #Difficulty").text("Rating: " + productIth.difficulty);
+		$("#Product_" + i + " #Price").text("Price: $" + productIth.price);
+	}
+
+	$("#ClassList").empty();
+	for(var i = 0; i < m_classes.length; i++) {
+
+		var classIth = m_classes[i];
+		$("#ClassList").append('<div id="Class_' + i + '">' + m_classHTML + '</div>');
+
+		// Fill the data in Class_i.
+		$("#Class_" + i + " #Name").text(classIth.name);
+		$("#Class_" + i + " #Img").attr("src", classIth.imgsrc);
+		$("#Class_" + i + " #Description").text(classIth.description);
+		$("#Class_" + i + " #Level").text("Level: " + classIth.level);
+		$("#Class_" + i + " #Difficulty").text("Rating: " + classIth.difficulty);
+		$("#Class_" + i + " #Price").text("Price: $" + classIth.price);
+		$("#Class_" + i + " #Instructor").text("Instructor: " + classIth.instructor);
+		$("#Class_" + i + " #Phone").text("Questions: " + classIth.phone);
+		var locations = classIth.location.split('~');
+		while(locations.length < 5) {
+			locations.push('');
+		}
+		for (var j = 0; j < 5; j++) {
+
+			$("#Class_" + i + " #Where" + (j+1)).text(locations[j]);
+		}
+		while(classIth.schedule.items.length < 8) {
+			classIth.schedule.items.push({when:''});
+		}
+		for (var j = 1; j < 8; j++) {
+
+			$("#Class_" + i + " #When" + (j+1)).text(classIth.schedule.items[j].when);
+		}
+		$("#Class_" + i + " #Note").text(classIth.notes);
+	}
+}
+
+// Define some app-globals.
+var m_clientLogin = null;
+var m_frees = [];
+var m_products = [];
+var m_classes = [];
+var m_freeHTML = null;
+var m_productHTML = null;
+var m_classHTML = null;

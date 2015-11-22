@@ -93,7 +93,7 @@ app.post("/renderJadeSnippet", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (login.jade).");
+console.log("Map main route login.jade.");
 app.get("/", function (req, res) {
 
     try {
@@ -111,7 +111,7 @@ app.get("/", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (index.jade).");
+console.log("Map main route index.jade.");
 app.get("/index", function (req, res) {
 
     try {
@@ -129,7 +129,7 @@ app.get("/index", function (req, res) {
 });
 
 /////////////////////////////////////
-console.log("Map main route (adminzone.jade).");
+console.log("Map main route adminzone.jade.");
 app.get("/adminzone", function (req, res) {
 
     try {
@@ -172,10 +172,6 @@ app.use(multer(
         }
     }
 ));
-
-////////////////////////////////////
-app.set("portnum",8001);
-console.log('Server will be listening on port ' + app.get("portnum") + ".");
 
 /////////////////////////////////////
 console.log("Setting up routes from database.");
@@ -251,6 +247,7 @@ sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order b
             });
         });
 */
+        app.set("portnum",8001);
         app.listen(app.get("portnum"));
         console.log("Listening on port " + app.get("portnum") + ".");
     },

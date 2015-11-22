@@ -14,10 +14,19 @@ html
     include ./loginstylesheets.jade
 
   body
-    .container-fluid
+    .container-fluid(style="background-color:white;")
 
-      //- Include the code element DOM.
-      include ./logincode.jade
+      //- Include the navbar element DOM.
+      include ./loginnav.jade
+
+      //- Include the marketing stuff
+      include ./loginmktg.jade
+
+      //- Include the project/product lists
+      include ./loginlists.jade
+
+      //- Include the footer.
+      include ./loginfoot.jade
 
     //- Inlcude the list of scripts.
     include ./loginscripts.jade

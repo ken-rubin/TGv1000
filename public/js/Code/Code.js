@@ -118,77 +118,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								var eventIth = clType.data.events[i];
 								exceptionRet = m_functionAdd_Type_Event(clType,
-									eventIth);
-								if (exceptionRet) { throw exceptionRet; }
-							}
-
-							// Rebuild.
-							$("#BlocklyIFrame")[0].contentWindow.location.reload();
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Method renames a type in blockly.
-					// The new name is *already* set in clType.data.
-					//
-					// If clType is not the App type, if the type had been dropped on the Designer, the schema for the App type has getters and setters for the 
-					// tool instance under its OLD name (the property is named from the TI ID) and references in the App type's initialize method
-					// are under the OLD name. These are CORRECT, since they are based on the TI id, not the type name.
-					//
-					// We will be performing these changes:
-					//	1. rename type's new_ constructor function (delete and add new properties)
-					//	2. tell designer to change type name in all matching tool instances
-					//	3. rename any property setters and getters in schema (again, delete and add)
-					//	4. Rename any methods that ... what does this do? Does step 5 do it?
-					//	5. In all types' methods update:
-					//		typename_get[strOriginalName], 
-					//		typename_set[strOriginalName], 
-					//		new_[strOriginalName], 
-					//		[strOriginalName]_set[all properties]
-					self.renameType = function (clType, strOriginalName) {
-
-						try {
-
-							// 1.
-							exceptionRet = m_functionRename_Type_New(clType, 
-								strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
-
-							// 2.
-							exceptionRet = designer.updateForTypeRename(strOriginalName, clType.data.name);
-							if (exceptionRet) { throw exceptionRet; }
-
-							// Rename properties.
-							for (var i = 0; i < clType.data.properties.length; i++) {
-
-								var propertyIth = clType.data.properties[i];
-
-								// Don't add blocks for the App Type's X,Y,Width,Height properties.
-								if (!clType.data.isApp || (clType.data.isApp && $.inArray(propertyIth.name, ['X','Y', 'Width', 'Height']) === -1)) {
-
-									var exceptionRet = m_functionRename_Type_Property(
-										clType,
-										propertyIth,
-										propertyIth.name, 
-										strOriginalName);
-									if (exceptionRet) { throw exceptionRet; }
-								}
-							}
-
-							// Rename methods.
-							for (var i = 0; i < clType.data.methods.length; i++) {
-
-								var methodIth = clType.data.methods[i];
-								var exceptionRet = m_functionRename_Type_Method(
-									clType,					// has new name
-									methodIth,				// this method (name didn't change)
-									strOriginalName,		// original name of clType
-									"type rename"			// reason for call
-								);
+									eventIth.name);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -218,7 +148,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								var propertyIth = clType.data.properties[i];
 								var exceptionRet = m_functionRemove_Type_Property(clType,
-									propertyIth);
+									propertyIth.name);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -236,7 +166,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								var eventIth = clType.data.events[i];
 								var exceptionRet = m_functionRemove_Type_Event(clType,
-									eventIth);
+									eventIth.name);
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
@@ -249,6 +179,23 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							return e;
 						}
 					};
+
+					// Removes XML and JavaScript blocks for orignal type. Adds new blocks for updated type.
+					// Cheats. Deletes old type and adds updated type.
+					self.replaceType = function(updatedType, origType) {
+
+						try {
+
+							var exceptionRet = self.removeType(origType);
+							if (exceptionRet) { return exceptionRet; }
+
+							return self.addType(updatedType);
+
+						} catch(e) {
+
+							return e;
+						}
+					}
 
 					// Return referencing method for the specified Type.
 //used
@@ -328,30 +275,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-//used -  not finished
-					self.updateProperty = function (clType, property, strOriginalName) {
+//used
+					// Remove property from schema, blocks and javaScript.  
+					// It is already not in any workspace per validation.
+					self.removeProperty = function (clType, propertyName) {
 
 						try {
 
-
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}					
-
-					// Method adds an event to a type to blockly.
-//used					
-					self.addEvent = function (clType, event) {
-
-						try {
-
-							// Add a new for the type.
-							var exceptionRet = m_functionAdd_Type_Event(clType,
-								event);
+							var exceptionRet = m_functionRemove_Type_Property(clType,
+								propertyName);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
@@ -363,6 +295,23 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							return e;
 						}
 					};
+
+//used
+					// Cheats. Removes and adds.
+					self.replaceProperty = function (clType, property, strOriginalName) {
+
+						try {
+
+							var exceptionRet = self.removeProperty(clType, strOriginalName);
+							if (exceptionRet) { return exceptionRet; }
+
+							return self.addProperty(clType, property);
+
+						} catch(e) {
+
+							return e;
+						}
+					}					
 
 					// Method renames a property of a type to blockly.
 					self.renameProperty = function (clType, property, strOriginalName) {
@@ -385,15 +334,15 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-//used
-					// Remove property from schema, blocks and javaScript.  
-					// It is already not in any workspace per validation.
-					self.removeProperty = function (clType, property) {
+					// Method adds an event to a type to blockly.
+//used					
+					self.addEvent = function (clType, event) {
 
 						try {
 
-							var exceptionRet = m_functionRemove_Type_Property(clType,
-								property);
+							// Add a new for the type.
+							var exceptionRet = m_functionAdd_Type_Event(clType,
+								event.name);
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild.
@@ -406,11 +355,47 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-					// Generic name reference checker
-//used - needs to be written					
-					self.isReferencedInWorkspace = function(strTest) {
+					self.renameEvent = function (clType, event, strOriginalName) {
 
-						return null;
+						try {
+
+							var exceptionRet = m_functionRemove_Type_Event(clType,
+								strOriginalName);
+							if (exceptionRet) { throw exceptionRet; }
+
+							exceptionRet = self.addEvent(clType, event);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
+					// Remove event from schema, blocks and javaScript.  
+					// It is already not in any workspace per validation.
+					self.removeEvent = function (clType, event) {
+
+						try {
+
+							var exceptionRet = m_functionRemove_Type_Event(clType,
+								event.name);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Rebuild.
+							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
 					}
 
 					// Return referencing method for the specified property.
@@ -442,46 +427,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-					self.renameEvent = function (clType, event, strOriginalName) {
-
-						try {
-
-
-
-
-							return null;
-
-						} catch(e) {
-
-							return e;
-						}
-					}
-
-					// Method renames a method in blockly.
-					// Parameter method has the new name. Old name is in strOriginalName.
-					self.renameMethod = function (clType, method, strOriginalName) {
-
-						try {
-
-							// Rename a method for the type.
-							var exceptionRet = m_functionRename_Type_Method(
-								clType,					// type containing method whose name changed
-								method,					// method with new name
-								strOriginalName,		// original name of method
-								"method rename"			// reason for call
-							);
-							if (exceptionRet) { throw exceptionRet; }
-
-							// Rebuild blockly.
-							$("#BlocklyIFrame")[0].contentWindow.location.reload();
-
-							return null;
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Remove method from schema, blocks and javaScript.  
 					// It is already not in any workspace per validation.
 					self.removeMethod = function (clType, method) {
@@ -501,6 +446,23 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							return e;
 						}
 					};
+
+					// Removes XML and JavaScript blocks for orignal method. Adds new blocks for updated method.
+					// Cheats. Does a remove and then an add.
+					self.replaceMethod = function(updatedMethod, origMethod, clType) {
+
+						try {
+
+							var exceptionRet = self.removeMethod(clType, origMethod);
+							if (exceptionRet) { return exceptionRet; }
+
+							return self.addMethod(clType, updatedMethod);
+
+						} catch(e) {
+
+							return e;
+						}
+					}
 
 					// Return referencing method for the specified property.
 //used
@@ -711,6 +673,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method generates the function string for a "new" type function.
+					// TODO: handle base Types.
 					var m_functionGenerateBlocksTypeNewFunctionString = function (strName) {
 
 						return "this.appendDummyInput().appendField('new_"+strName+"');" +
@@ -721,6 +684,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method generates the javascript string for a property get function.
+					// TODO: handle base Types.
 					var m_functionGenerateJavaScriptTypeNewFunctionString = function (strName) {
 
 						return 'return [" new ' + strName + '() ", Blockly.JavaScript.ORDER_MEMBER];';
@@ -765,9 +729,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					        'return " " + strId + "[\'' + strName + '\'] = " + strValue + "; "';
 					};
 
-
-
-
 					// Helper method generates the function string for a event raise function.
 					var m_functionGenerateBlocksEventRaiseFunctionString = function (strName) {
 
@@ -811,12 +772,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					        'return "window.eventCollection[\''+strName+'\'].push({ target: "+strTarget+", method: \'"+strMethod+"\' });"';
 					};
 
-
-
-
-
-
-
 					// Helper method generates the function string for a app property get function.
 					var m_functionGenerateBlocksAppPropertyGetFunctionString = function (strName) {
 
@@ -853,7 +808,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method generates the function string for a method function.
-					var m_functionGenerateBlocksMethodFunctionString = function (strName) {
+					// strName is the name of the method prepended with its type name + "_".
+					// method is passed in to have access to properties methodTypeId (effectively, statement or expression)
+					// and parameters.
+
+					// TODO: do this
+					var m_functionGenerateBlocksMethodFunctionString = function (strName, method) {
 
 						return "this.appendDummyInput().appendField('"+strName+"');" +
 							"this.appendValueInput('SELF').appendField('using');" +
@@ -865,10 +825,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method generates the javascript string for a method function.
-					var m_functionGenerateJavaScriptMethodFunctionString = function (strName) {
+					
+					// TODO: do this
+					var m_functionGenerateJavaScriptMethodFunctionString = function (method) {
 
 						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
-            				'return [" " + strId + "[\'' + strName + '\']() ", Blockly.JavaScript.ORDER_MEMBER];';
+            				'return [" " + strId + "[\'' + method.name + '\'](' + method.parameters + ') ", Blockly.JavaScript.ORDER_MEMBER];';
+
+            			// WAS:
+						// return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
+      					//       				'return [" " + strId + "[\'' + method.name + '\']() ", Blockly.JavaScript.ORDER_MEMBER];';
 					};
 
 					// Helper method adds a type's new_ constructor function.
@@ -930,67 +896,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 								self.schema.Types) {
 
 								delete self.schema.Types[clType.data.name];
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					};
-
-					// Helper method renames a type's new_ constructor function.
-					var m_functionRename_Type_New = function (clType, strOriginalName) {
-
-						try {
-
-							// Skip for App type.
-							if (!clType.data.isApp) {
-
-								////////////////////////
-								// Blocks.
-
-								delete self.blocks["new_" + strOriginalName];
-								self.blocks["new_" + clType.data.name] = m_functionGenerateBlocksTypeNewFunctionString(clType.data.name);
-
-								////////////////////////
-								// JavaScript.
-								delete self.javaScript["new_" + strOriginalName];
-								self.javaScript["new_" + clType.data.name] = m_functionGenerateJavaScriptTypeNewFunctionString(clType.data.name);
-
-								////////////////////////
-								// Workspace.
-								// if (self.workspace) {
-
-								// 	var re = new RegExp('"' + "new_" + strOriginalName + '"',"g");
-								// 	self.workspace = self.workspace.replace(re,
-								// 		'"' + "new_" + clType.data.name + '"');
-									var exceptionRet = types.replaceInWorkspaces("new_" + strOriginalName,
-										"new_" + clType.data.name);
-									if (exceptionRet) { throw exceptionRet; }
-								// }
-
-								////////////////////////
-								// Schema.
-								if (!self.schema.Types) {
-
-									self.schema.Types = {};
-								}
-								var objectTypes = self.schema.Types;
-
-								// Bet the type.
-								var typeNew = objectTypes[clType.data.name];
-
-								// Remove the old name.
-								delete objectTypes[strOriginalName];
-
-								if (!typeNew) {
-
-									typeNew = {};
-								}
-								typeNew["new_" + clType.data.name] = !clType.data.isApp;	// avoid exposing new_App block
-								objectTypes[clType.data.name] = typeNew;
 							}
 
 							return null;
@@ -1128,7 +1033,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method adds a type's event accessor functions.
-					var m_functionAdd_Type_Event = function (clType, event) {
+					var m_functionAdd_Type_Event = function (clType, eventName) {
 
 						try {
 
@@ -1139,12 +1044,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Blocks.
-							var strRaiseName = clType.data.name + "_raise" + event.name;
+							var strRaiseName = clType.data.name + "_raise" + eventName;
 							self.blocks[strRaiseName] = m_functionGenerateBlocksEventRaiseFunctionString(strRaiseName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strRaiseName] = m_functionGenerateJavaScriptEventRaiseFunctionString(event.name);
+							self.javaScript[strRaiseName] = m_functionGenerateJavaScriptEventRaiseFunctionString(eventName);
 
 							////////////////////////
 							// Schema.
@@ -1173,12 +1078,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Blocks.
-							var strSubscribeName = clType.data.name + "_subscribe" + event.name;
+							var strSubscribeName = clType.data.name + "_subscribe" + eventName;
 							self.blocks[strSubscribeName] = m_functionGenerateBlocksEventSubscribeFunctionString(strSubscribeName);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strSubscribeName] = m_functionGenerateJavaScriptEventSubscribeFunctionString(event.name);
+							self.javaScript[strSubscribeName] = m_functionGenerateJavaScriptEventSubscribeFunctionString(eventName);
 
 							////////////////////////
 							// Schema.
@@ -1209,12 +1114,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 					// Helper method removes a type's new_ constructor function.
 //used					
-					var m_functionRemove_Type_Property = function (clType, property) {
+					var m_functionRemove_Type_Property = function (clType, propertyName) {
 
 						try {
 
-							var strGet = clType.data.name + "_get" + property.name;
-							var strSet = clType.data.name + "_set" + property.name;
+							var strGet = clType.data.name + "_get" + propertyName;
+							var strSet = clType.data.name + "_set" + propertyName;
 
 							////////////////////////
 							// Blocks.
@@ -1423,11 +1328,11 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							////////////////////////
 							// Blocks.
 							var strName = clType.data.name + "_" + method.name;
-							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName);
+							self.blocks[strName] = m_functionGenerateBlocksMethodFunctionString(strName, method);
 
 							////////////////////////
 							// JavaScript.
-							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
+							self.javaScript[strName] = m_functionGenerateJavaScriptMethodFunctionString(method);
 
 							////////////////////////
 							// Schema.
@@ -1493,76 +1398,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-					// Helper method renames a type's method accessor functions.
-					// It is called 2 ways: for a Type rename or for a Method rename.
-					var m_functionRename_Type_Method = function (clType, method, strOriginalName, strReason) {
-
-						try {
-
-							var strFrom;
-							var strTo;
-
-							if (strReason === "type rename") {
-
-								strFrom = strOriginalName + "_" + method
-								strTo = clType.data.name + "_" + method.name;
-
-							} else {
-
-								strFrom = clType.data.name + "_" + strOriginalName;
-								strTo = clType.data.name + "_" + method.name;
-							}
-
-							////////////////////////
-							// Blocks.
-							delete self.blocks[strFrom];
-							self.blocks[strTo] = m_functionGenerateBlocksMethodFunctionString(strTo);
-
-							////////////////////////
-							// JavaScript.
-							delete self.javaScript[strFrom];
-							self.javaScript[strTo] = m_functionGenerateJavaScriptMethodFunctionString(method.name);
-
-							////////////////////////
-							// Workspace.
-							// if (self.workspace) {
-
-							// 	var re = new RegExp('"' + strOriginalName + '"',"g");
-							// 	self.workspace = self.workspace.replace(re,
-							// 		'"' + strName + '"');
-								var exceptionRet = types.replaceInWorkspaces(strFrom,
-									strTo);
-								if (exceptionRet) { throw exceptionRet; }
-							// }
-
-							////////////////////////
-							// Schema.
-							if (!self.schema.Types) {
-
-								self.schema.Types = {};
-							}
-							var objectTypes = self.schema.Types;
-							var objectType = objectTypes[clType.data.name];
-							// The following test is necessary, because new_App is no longer added to self.schema.Types.
-							if (!objectType) {
-
-								objectTypes[clType.data.name] = {};
-								objectTypes[clType.data.name][strTo] = true;
-
-							} else {
-
-								objectType[strTo] = true;
-							}
-							delete objectType[strFrom];
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					// Helper method determines if the type's new is referenced 
 					// anywhere.  Returns the referencing method if found.
 //used					
@@ -1581,46 +1416,40 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 						}
 					};
 
-					// Helper method removes a type's new_ constructor function.
+					// Helper method removes event.
 //used					
-					var m_functionRemove_Type_Event = function (clType, event) {
+					var m_functionRemove_Type_Event = function (clType, eventName) {
 
 						try {
 
-							// var strGet = clType.data.name + "_get" + property.name;
-							// var strSet = clType.data.name + "_set" + property.name;
+							////////////////////////
+							////////////////////////
+							////////////////////////
+							// Raise
 
-							// ////////////////////////
-							// // Blocks.
+							var strRaiseName = clType.data.name + "_raise" + eventName;
+							var strSubscribeName = clType.data.name + "_subscribe" + eventName;
 
-							// delete self.blocks[strGet];
-							// delete self.blocks[strSet];
+							////////////////////////
+							// Blocks.
+							delete self.blocks[strRaiseName];
+							delete self.blocks[strSubscribeName];
 
-							// ////////////////////////
-							// // JavaScript.
+							////////////////////////
+							// JavaScript.
+							delete self.javaScript[strRaiseName];
+							delete self.javaScript[strSubscribeName];
 
-							// delete self.javaScript[strGet];
-							// delete self.javaScript[strSet];
+							////////////////////////
+							// Schema.
+							if (self.schema &&
+								self.schema.Types &&
+								self.schema.Types[clType.data.name]) {
 
-							// ////////////////////////
-							// // Schema.
-							// if (self.schema &&
-							// 	self.schema.Types &&
-							// 	self.schema.Types[clType.data.name]) {
-
-							// 	var objectType = self.schema.Types[clType.data.name];
-							// if (objectType) {
-
-							// 	if (objectType[strGet]) {
-
-							// 		delete objectType[strGet];
-							// 	}
-							// 	if (objectType[strSet]) {
-									
-							// 		delete objectType[strSet];
-							// 	}
-							// }
-							// }
+								var objectType = self.schema.Types[clType.data.name];
+								delete objectType[strRaiseName];
+								delete objectType[strSubscribeName];
+							}
 
 							return null;
 

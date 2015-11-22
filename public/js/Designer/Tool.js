@@ -58,7 +58,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
 							// Update the resourceId and src attributes on the DOM.
 							jToolDOM.attr("src",
-							 	resourceHelper.toURL('resources', self.type.imageId, 'image'));
+							 	self.type.altImagePath.length ? self.type.altImagePath : resourceHelper.toURL('resources', self.type.imageId, 'image'));
 
 						} catch (e) {
 

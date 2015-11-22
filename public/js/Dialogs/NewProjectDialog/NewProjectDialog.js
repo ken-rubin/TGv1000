@@ -130,7 +130,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector").tooltip();
+							$(".tt-selector").powerTip({
+								smartPlacement: true
+							});
 							$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
 							$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
 							$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
@@ -157,11 +159,36 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector .btn-default").tooltip();
+							$(".tt-selector .btn-default").powerTip({
+								smartPlacement: true
+							});
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							m_functionSetImageSrc(0);
+
+							// Set project image.
+							var imgSrc;
+							switch (m_projectType) {
+								case "Game":
+									imgSrc = "media/images/gameProject.png";
+									break;
+								case "Console":
+									imgSrc = "media/images/consoleProject.png";
+									break;
+								case "Web Site":
+									imgSrc = "media/images/websiteProject.png";
+									break;
+								case "HoloLens":
+									imgSrc = "media/images/hololensProject.png";
+									break;
+								case "Mapping":
+									imgSrc = "media/images/mappingProject.png";
+									break;
+								default:
+									imgSrc = resourceHelper.toURL("resources", 0, "image");
+							}
+							$("#ProjectImage").attr("src", imgSrc);
+
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);

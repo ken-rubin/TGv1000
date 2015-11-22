@@ -38,7 +38,8 @@ begin
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `description` VARCHAR(255) NULL,
-          `imageId` int(11) NOT NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
           `isProduct` TINYINT(1) NOT NULL,
           `parentProjectId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
@@ -85,6 +86,7 @@ begin
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
           `isApp` tinyint(1) NOT NULL DEFAULT '0',
           `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
           `description` mediumtext NULL,
           `parentTypeId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
@@ -305,6 +307,7 @@ begin
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchMethods','post','routeSearchMethods',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveProject','post','routeSaveProject',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveProject',1);
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProjectsForLists','post','routeRetrieveProjectsForLists',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveType','post','routeRetrieveType',1);
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,inuse) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveMethod','post','routeRetrieveMethod',1);
 
@@ -314,13 +317,13 @@ begin
 
     if @dbstate = 1.0 THEN
     
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,imageId,isProduct,parentProjectId,parentPrice,priceBump,public,projectTypeId)
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,isProduct,parentProjectId,parentPrice,priceBump,public,projectTypeId)
 			VALUES 
-				(1,'New Game Project',1,'',0,1,0,0.00,0.00,1,1),
-				(2,'New Console Project',1,'',0,1,0,0.00,0.00,1,2),
-				(3,'New Website Project',1,'',0,1,0,0.00,0.00,1,3),
-				(4,'New Hololens Project',1,'',0,1,0,0.00,0.00,1,4),
-				(5,'New Map Project',1,'',0,1,0,0.00,0.00,1,5)
+				(1,'New Game Project',1,'','media/images/gameProject.png',1,0,0.00,0.00,1,1),
+				(2,'New Console Project',1,'','media/images/consoleProject.png',1,0,0.00,0.00,1,2),
+				(3,'New Website Project',1,'','media/images/websiteProject.png',1,0,0.00,0.00,1,3),
+				(4,'New Hololens Project',1,'','media/images/hololensProject.png',1,0,0.00,0.00,1,4),
+				(5,'New Map Project',1,'','media/images/mappingProject.png',1,0,0.00,0.00,1,5)
                 ;
             
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
@@ -333,13 +336,13 @@ begin
 				;
             
 		/* These system base Types will be recognized by comicId being null */
-		insert into TGv1000.`types` (id,`name`)
+		insert into TGv1000.`types` (id,`name`,altImagePath)
 			VALUES 
-				(1,'Game Base Type'),
-				(2,'Console Base Type'),
-				(3,'Website Base Type'),
-				(4,'Hololens Base Type'),
-				(5,'Map Base Type')
+				(1,'Game Base Type','media/images/gameProject.png'),
+				(2,'Console Base Type','media/images/consoleProject.png'),
+				(3,'Website Base Type','media/images/websiteProject.png'),
+				(4,'Hololens Base Type','media/images/hololensProject.png'),
+				(5,'Map Base Type','media/images/mappingProject.png')
                 ;
             
 		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)

@@ -376,7 +376,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var strUrl = resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', '');
+							var strUrl = m_clTypeActive.data.altImagePath.length ? m_clTypeActive.data.altImagePath : resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', '');
 							
 							// Update the image in the TypeWell
 							$("#TWimage").attr("src", strUrl);
@@ -488,9 +488,11 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							m_clTypeActive.data.properties.splice(index, 1);
+							var property = m_clTypeActive.data.properties[index];
+							var exceptionRet = code.removeProperty(m_clTypeActive, property);
+							if (exceptionRet) { return exceptionRet; }
 
-							// Something has to be done in code, I'd bet.
+							m_clTypeActive.data.properties.splice(index, 1);
 
 							return m_functionRegenTWPropertiesTable();
 						
@@ -501,16 +503,18 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 					}
 
 					// Called by client after confirmation by user.
-//used - need to write & call code.
+//used
 					self.deleteEvent = function (index) {
 
 						try {
 
 							client.projectIsDirty();
 
-							m_clTypeActive.data.events.splice(index, 1);
+							var event = m_clTypeActive.data.events[index];
+							var exceptionRet = code.removeEvent(m_clTypeActive, event);
+							if (exceptionRet) { return exceptionRet; }
 
-							// Something has to be done in code, I'd bet.
+							m_clTypeActive.data.events.splice(index, 1);
 
 							return m_functionRegenTWEventsTable();
 						
@@ -644,9 +648,10 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 						try {
 
 							m_functionSetTypewellHeader();
-							$("#TWimage").attr("src", resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
+							$("#TWimage").attr("src", m_clTypeActive.data.altImagePath.length ? m_clTypeActive.data.altImagePath : resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
-							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === null) {	// no deletion for App Type or system base Types.
+							// App type and system base types cannot be deleted.
+							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === null) {
 
 								$("#TWdeleteTypeBtn").prop("disabled", true);
 
@@ -654,6 +659,19 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 								$("#TWdeleteTypeBtn").prop("disabled", false);
 							}
+
+							// System base types cannot be editing, but all other types can be.
+							if (m_clTypeActive.data.ordinal === null) {
+
+								$("#TWEditTypeLink").prop("disabled", true);
+
+							} else {
+
+								$("#TWEditTypeLink").prop("disabled", false);
+							}
+
+							// There will be other TW buttons that are disabled or enabled based on type of the active Type.
+							// TBD.
 
 							var exceptionRet = m_functionRegenTWMethodsTable();
 							if (exceptionRet) { return exceptionRet; }
@@ -718,7 +736,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								if (m.name === 'initialize' || m.name === 'construct') {
 									// These two don't get delete, rename.
 
-									// Original: strBuild += '<div class="TWChild" style="height:42.73px;"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("images",null,null,"initialize.png") + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"></div><div class="TWMethCol4"></div></div>';
 									strBuild += '<div class="TWChild">' +
 													'<div class="TWMethCol1">' + 
 														'<img class="TWMethCol1Image" src="' + 
@@ -740,7 +757,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 												'</div>';
 								} else {
 
-									// Original: strBuild += '<div class="TWChild"><div class="TWMethCol1"><img style="height:20px;width:27px;" src="' + resourceHelper.toURL("resources",m.imageId,'image') + '"></img></div><div class="TWMethCol2"><button class="button-as-link" id="method_' + i + '" href="#">' + m.name + '</button></div><div class="TWMethCol3"><button class="btn btn-default" type="button" aria-label="Rename this Method" data-toggle="tooltip" title="Rename this Method" id="methodrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></div><div class="TWMethCol4"><button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></div></div>';
 									strBuild += '<div class="TWChild" >' +
 													'<div class="TWMethCol1">'+
 														'<img class="TWMethCol1Image" src="' + 
@@ -756,7 +772,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 														'</button>'+
 													'</div>'+
 													'<div class="TWMethCol3">'+
-														'<button class="btn btn-default" type="button" aria-label="Edit this Method" data-toggle="tooltip" title="Edit this Method" id="methodrename_' + 
+														'<button class="btn btn-default" type="button" title="Edit this Method" id="methodrename_' + 
 															i + 
 															'">'+
 															'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
@@ -764,7 +780,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 														'</button>'+
 													'</div>'+
 													'<div class="TWMethCol4">'+
-														'<button class="btn btn-default" type="button" aria-label="Delete this Method" data-toggle="tooltip" title="Delete this Method" id="methoddelete_' + 
+														'<button class="btn btn-default" type="button" title="Delete this Method" id="methoddelete_' + 
 															i + 
 															'">'+
 															'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
@@ -789,7 +805,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 									$("#methoddelete_" + i).click(m_functionMethodDeleteClicked);
 								}
 							}
-							$("#TWmethodsTbody .btn-default").tooltip();
+							$("#TWmethodsTbody .btn-default").powerTip({
+								smartPlacement: true
+							});
 
 							return null;
 
@@ -815,7 +833,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 														m.name + 
 													'</div>'+
 													'<div class="TWPropCol2">'+
-														'<button class="btn btn-default" type="button" aria-label="Edit this Property" data-toggle="tooltip" title="Edit this Property" id="propertyedit_' + 
+														'<button class="btn btn-default" type="button" title="Edit this Property" id="propertyedit_' + 
 															i + 
 															'">'+
 															'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
@@ -823,7 +841,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 														'</button>'+
 													'</div>'+
 													'<div class="TWPropCol3">'+
-														'<button class="btn btn-default" type="button" aria-label="Delete this Property" data-toggle="tooltip" title="Delete this Property" id="propertydelete_' + 
+														'<button class="btn btn-default" type="button" title="Delete this Property" id="propertydelete_' + 
 															i + 
 															'">'+
 															'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
@@ -842,7 +860,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								$("#propertyedit_" + i).click(m_functionPropertyEditClicked);
 								$("#propertydelete_" + i).click(m_functionPropertyDeleteClicked);
 							}
-							$("#TWpropertiesTbody .btn-default").tooltip();
+							$("#TWpropertiesTbody .btn-default").powerTip({
+								smartPlacement: true
+							});
 
 							return null;
 
@@ -861,13 +881,12 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							for (var i = 0; i < m_clTypeActive.data.events.length; i++) {
 
 								var m = m_clTypeActive.data.events[i];
-								//strBuild = '<tr><td style="width:84%;">' + m.name + '</td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + i + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button></td><td style="width:8%;"><button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></td></tr>';
 								strBuild += '<div class="TWChild">'+
 									'<div class="TWEvtCol1">' + 
 										m.name + 
 									'</div>'+
 									'<div class="TWEvtCol2">'+
-										'<button class="btn btn-default" type="button" aria-label="Rename this Event" data-toggle="tooltip" title="Rename this Event" id="eventrename_' + 
+										'<button class="btn btn-default" type="button" title="Rename this Event" id="eventrename_' + 
 											i + 
 											'">'+
 											'<span class="glyphicon glyphicon-pencil" aria-hidden="true">'+
@@ -875,7 +894,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 										'</button>'+
 									'</div>'+
 									'<div class="TWEvtCol3">'+
-										'<button class="btn btn-default" type="button" aria-label="Delete this Event" data-toggle="tooltip" title="Delete this Event" id="eventdelete_' + i + '">'+
+										'<button class="btn btn-default" type="button" title="Delete this Event" id="eventdelete_' + i + '">'+
 											'<span class="glyphicon glyphicon-trash" aria-hidden="true">'+
 											'</span>'+
 										'</button>'+
@@ -891,8 +910,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								$("#eventrename_" + i).click(m_functionEventRenameClicked);
 								$("#eventdelete_" + i).click(m_functionEventDeleteClicked);
 							}
-							$("#TWeventsTbody .btn-default").tooltip();
-
+							$("#TWeventsTbody .btn-default").powerTip({
+								smartPlacement: true
+							});
 							return null;
 
 						} catch (e) { 
@@ -1062,7 +1082,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var exceptionRet = client.showNewTypeDialog("New", -1);
+							var exceptionRet = client.showNewTypeDialog();
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -1079,7 +1099,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							client.projectIsDirty();
 
-							var exceptionRet = client.showEditTypeDialog("Edit", m_ActiveTypeIndex);
+							var exceptionRet = client.showEditTypeDialog(m_ActiveTypeIndex);
 							if (exceptionRet) {
 
 								throw exceptionRet;
@@ -1202,100 +1222,6 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							errorHelper.show(e);
 						}
 					}
-
-					// Invoked when the types dialog exist newly.
-					// var m_functionNewType = function () {
-
-					// 	try {
-
-				 //    		// Allocate project.
-				 //    		var clType = new Type();
-				 //    		var exceptionRet = clType.load({ 
-
-	    // 						properties: [],
-	    // 						methods: [],
-	    // 						events: [],
-	    // 						dependencies: [],
-	    // 						name: "new type",
-	    // 						id: m_arrayClTypes.length + 1,
-	    // 						resourceId: 0
-				 //    		});
-				 //    		if (exceptionRet) {
-
-				 //    			return exceptionRet;
-				 //    		}
-
-				 //    		// Add the type.
-					// 		exceptionRet = self.addItem(clType);
-					// 		if (exceptionRet) {
-
-					// 			throw exceptionRet;
-					// 		}
-
-					//         // Also add to the designer/tool strip.
-					// 		exceptionRet = tools.addItem(clType);
-					// 		if (exceptionRet) {
-
-					// 			throw exceptionRet;
-					// 		}
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
-					// Invoked when the types dialog exist clonely.
-					// var m_functionCloneType = function (strId) {
-
-					// 	try {
-
-				 //    		BootstrapDialog.alert(":Clone " + strId + " type....");
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
-
-					// Create a new type.
-					// var m_functionAddNewType = function (e) {
-
-					// 	try {
-
-					// 		// Show the types dialog.
-					// 		var exceptionRet = client.showTypesDialog(m_functionNewType,
-					// 			m_functionCloneType);
-					// 		if (exceptionRet) {
-
-					// 			throw exceptionRet;
-					// 		}
-					// 	} catch (e) {
-
-					// 		errorHelper.show(e);
-					// 	}
-					// };
-
-					// Create the add button.
-					// var m_functionCreateAddButton = function () {
-
-					// 	try {
-
-					// 		var jAdd = $("<img class='typestripitem' id='AddType' src='" +
-					// 			resourceHelper.toURL('images', null, null, 'plus.png') +
-					// 			"'></img>");
-
-					// 		// Add to the DOM.
-					// 		m_jStrip.append(jAdd);
-
-					// 		jAdd.click(m_functionAddNewType);
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
 
 					///////////////////////////////////
 					// Private fields.

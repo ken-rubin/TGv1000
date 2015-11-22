@@ -96,12 +96,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector .btn-default").tooltip();
+							$(".tt-selector .btn-default").powerTip({
+								smartPlacement: true
+							});
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							m_project = client.getProject();
-							m_functionSetImageSrc(m_project.data.imageId);
+
+							// Set project image.
+							if (m_project.data.altImagePath.length) {
+
+								$("#ProjectImage").attr("src", m_project.data.altImagePath);
+							
+							} else {
+
+								m_functionSetImageSrc(m_project.data.imageId);
+							}
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
@@ -244,7 +255,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						m_project.setImageId(imageId);
+						m_project.imageId = imageId;
+						m_project.altImagePath = '';
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}

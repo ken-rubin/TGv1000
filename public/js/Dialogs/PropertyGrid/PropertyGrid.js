@@ -185,8 +185,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									strBuild += '<div class="PGPropCol2">True or false</div>';
 									strBuild += '<div class="PGPropCol3 style="display:inline-block;"><input type="radio" name="b-'+i+'" value="true" style="width:25px;"><span>true</span>&nbsp;&nbsp;&nbsp;<input type="radio" name="b-'+i+'" value="false" style="width:25px;"><span>false</span></div>';
-									// var strVal = "$('input[name=b-"+i+"]:checked').val()";
-									// strBuild += '<div class="PGPropCol4"><button id="b4-'+i+'" type="button" onclick="m_funcCB(4, &apos;' + m.name + '&apos;,' + strVal + ',null);" data-toggle="tooltip" aria-label="Save" title="Save" class="btn btn-default" ><span class="glyphicon glyphicon-save" aria-hidden="true"></span></button></div>';
 
 								} else if (m.propertyTypeId === 5) {	// Picklist
 
