@@ -163,6 +163,23 @@ define(["Core/errorHelper"],
 								}
 							});
 
+							// Wire Play button click.
+							$("#StopBtn").click(function () {
+
+								try {
+
+									// Let client handle this.
+									var exceptionRet = client.stop();
+									if (exceptionRet) {
+
+										throw exceptionRet;
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							});
+
 							client.setBrowserTabAndBtns();
 
 							return null;
@@ -191,7 +208,7 @@ define(["Core/errorHelper"],
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 
-							// See definition of status in Project.js method self.getStatus(). Of course.
+							// See definition of status in Project.js method self.getStatus().
 							var status = project.getStatus();
 
 							// Any project can be saved as--even if not all fields are filled in yet,

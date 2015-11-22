@@ -3,6 +3,7 @@
 //
 // Return null--no module object.
 //
+// This is the entry point.  GZ globals are defined, allocated and initialized here.
 
 // Define some app-globals.
 var client = null;
@@ -86,6 +87,7 @@ $(document).ready(function () {
 
 				// Disable all the TypeWell icons, since there is current no project loaded.
 				$(".disabledifnoproj").prop("disabled", true);
+				$(".hiddenifnotrunning").css("display", "none");
 
 				// Cause the code and designer panels to size themselves. Initially, there will be no comic or panels strips because of bDisplayComics setting.
 				$(window).resize();
