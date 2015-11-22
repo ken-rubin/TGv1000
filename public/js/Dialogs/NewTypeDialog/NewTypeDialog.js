@@ -323,6 +323,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									quarantined: 0,
 									isApp: false,
 									imageId: m_imageId,
+									altImagePath: '',
 									ordinal: client.getNumberOfTypesInActiveComic(),
 									description: '',
 									parentTypeId: 0,

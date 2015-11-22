@@ -815,13 +815,25 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// TODO: do this
 					var m_functionGenerateBlocksMethodFunctionString = function (strName, method) {
 
-						return "this.appendDummyInput().appendField('"+strName+"');" +
-							"this.appendValueInput('SELF').appendField('using');" +
-							"this.setColour(40);" +
-							"this.setPreviousStatement(true);" +
-							"this.setNextStatement(true);" +
+						var arrayParameters = method.parameters.split(/[\s,]+/);
+
+						var strResult = "this.appendDummyInput().appendField('"+strName+"');" +
+							"this.appendValueInput('SELF').appendField('using');";
+
+						for (var i = 0; i < arrayParameters.length; i++) {
+
+							var strIthParameter = arrayParameters[i];
+							strResult += "this.appendValueInput('"+strIthParameter+"').appendField('"+strIthParameter+"');";
+						}
+
+						strResult += ("this.setColour(40);" +
+							(method.methodTypeId === 1 ? 
+								"this.setPreviousStatement(true);this.setNextStatement(true);" :
+								"this.setOutput(true);") +
 							"this.setInputsInline(true);" +
-							"this.setTooltip('"+strName+"');";
+							"this.setTooltip('"+strName+"');");
+
+						return strResult;
 					};
 
 					// Helper method generates the javascript string for a method function.
@@ -831,10 +843,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
             				'return [" " + strId + "[\'' + method.name + '\'](' + method.parameters + ') ", Blockly.JavaScript.ORDER_MEMBER];';
-
-            			// WAS:
-						// return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
-      					//       				'return [" " + strId + "[\'' + method.name + '\']() ", Blockly.JavaScript.ORDER_MEMBER];';
 					};
 
 					// Helper method adds a type's new_ constructor function.
