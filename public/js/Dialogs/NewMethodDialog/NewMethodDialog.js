@@ -183,6 +183,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var methodTypeId = $("input:checked").val() === "0" ? 1 : 2;
 
 							var parameters = "";
+				            var uniqueArray = [];	// Will be used below so declaration has been pulled up here.
 							var parametersRaw = $("#MethodParams").val().trim();
 							if (parametersRaw.length) {
 
@@ -191,7 +192,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								if (pArray.length) {
 
 						        	// Remove possible dups from pArray.
-						            var uniqueArray = [];
 								    for (var i = 0; i < pArray.length; i++)
 								    {
 								        if (($.inArray(pArray[i], uniqueArray)) == -1)
@@ -225,6 +225,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								parameters: parameters
 							};
 
+							uniqueArray.unshift('self');
 							if (m_strNewOrEdit === "New") {
 
 								// Generate a workspace that declares 'self' and all parameters entered by the user.
@@ -237,7 +238,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// 		<field name="VAR">cat</field>
 								// 	</block>
 								// </xml>
-								method.workspace = m_functionGenNewWorkspace(method.parameters);
+								method.workspace = m_functionGenNewWorkspace(uniqueArray);
 								exceptionRet = client.addMethodToActiveType(method);
 
 							} else {
@@ -261,7 +262,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									// 		</value>																	>
 									// 	</block>																		>
 									// </xml>'
-									method.workspace = m_functionGenReplacementWorkspace(method.parameters);
+									method.workspace = m_functionGenReplacementWorkspace(uniqueArray);
 								}
 								exceptionRet = client.updateMethodInActiveType(method, m_methodForEdit, m_iIndexIfEdit, m_clActiveType);
 							}
@@ -275,13 +276,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					var m_functionGenNewWorkspace = function(parameters) {
+					var m_functionGenNewWorkspace = function(parametersArray) {
 
 						try {
 							
 							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+							var id = 8;
+							var y = 10;
 
+							parametersArray.forEach(function(param){
 
+								strBuild += '<block type="variables_get" id="' + id + '" x="10" y="' + y + '"><field name="VAR">' + param + '</field></block>';
+								id++;
+								y += 30;
+							});
 
 							strBuild += '</xml>';
 							return strBuild;
@@ -293,7 +301,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					var m_functionGenReplacementWorkspace = function(parameters) {
+					var m_functionGenReplacementWorkspace = function(parametersArray) {
 
 						try {
 							
