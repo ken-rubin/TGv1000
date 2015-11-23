@@ -281,7 +281,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						try {
 							
 							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
-							var id = 8;
+							var id = 1;
 							var y = 10;
 
 							parametersArray.forEach(function(param){
@@ -305,12 +305,44 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 							
-							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+							// Isolate the final <block>. It will be a parameter (self or the final one) or blockly code, if any.
+							// We'll determine by counting the number of parameters the original method had. If the final block
+							// is code, there'll be one more than there should be based solely on the parameters (plus 'self').
+							var origParamsArray = m_methodForEdit.parameters.split(',');
+							var origParamCountInclSelf = origParamsArray.length + 1;
 
+							xmlWS = $.parseXML(m_methodForEdit.workspace);
+							var cn = xmlWS.childNodes[0].childNodes;
+							var numBlocks = cn.length;
 
+							if (numBlocks > origParamCountInclSelf) {
 
-							strBuild += '</xml>';
-							return strBuild;
+								// There is code to preserve.
+								var lastBlock = cn[numBlocks - 1].outerHTML;
+
+								// Gen the XML for the current set of parameters.
+								var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+								var id = 1;
+								var y = 10;
+
+								parametersArray.forEach(function(param){
+
+									strBuild += '<block type="variables_get" id="' + id + '" x="10" y="' + y + '"><field name="VAR">' + param + '</field></block>';
+									id++;
+									y += 30;
+								});
+
+								// Add the preserved block and close it up.
+								strBuild += lastBlock + '</xml>';
+								return strBuild;
+							
+							} else {
+
+								// There is no code to preserve. Can use the other method.
+								return 	m_functionGenNewWorkspace(parametersArray);
+							}							
+
+							return '';
 
 						} catch (e) {
 
