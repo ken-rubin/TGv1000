@@ -227,10 +227,42 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (m_strNewOrEdit === "New") {
 
+								// Generate a workspace that declares 'self' and all parameters entered by the user.
+								// For example, if user entered 'cat', set method.workspace (note: additional parameters don't get nested deeper):
+								// <xml xmlns="http://www.w3.org/1999/xhtml">
+								// 	<block type="variables_get" id="8" x="10" y="10">
+								// 		<field name="VAR">self</field>
+								// 	</block>
+								// 	<block type="variables_get" id="9" x="10" y="40">
+								// 		<field name="VAR">cat</field>
+								// 	</block>
+								// </xml>
+								method.workspace = m_functionGenNewWorkspace(method.parameters);
 								exceptionRet = client.addMethodToActiveType(method);
 
 							} else {
 
+								if (method.parameters !== m_methodForEdit.parameters) {
+									
+									// Similar to above, but we need potentially to save any "coding" the user did and just swap out the vars (including 'self') of the original method with potentially-changed new ones.
+									// For example, the above with a bit a coding:
+									// <xml xmlns="http://www.w3.org/1999/xhtml">
+									// 	<block type="variables_get" id="8" x="10" y="10">
+									// 		<field name="VAR">self</field>
+									// 	</block>
+									// 	<block type="variables_get" id="9" x="10" y="40">
+									// 		<field name="VAR">cat</field>
+									// 	</block>
+									// 	<block type="App_setThingyInstance" id="25" inline="true" x="370" y="210">		>
+									// 		<value name="VALUE">														>
+									// 			<block type="variables_get" id="32">									>
+									// 				<field name="VAR">item</field>										> the code to be preserved
+									// 			</block>																>
+									// 		</value>																	>
+									// 	</block>																		>
+									// </xml>'
+									method.workspace = m_functionGenReplacementWorkspace(method.parameters);
+								}
 								exceptionRet = client.updateMethodInActiveType(method, m_methodForEdit, m_iIndexIfEdit, m_clActiveType);
 							}
 							if (exceptionRet) { throw exceptionRet; }
@@ -240,6 +272,42 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						} catch (e) {
 
 							errorHelper.show(e);
+						}
+					}
+
+					var m_functionGenNewWorkspace = function(parameters) {
+
+						try {
+							
+							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+
+
+
+							strBuild += '</xml>';
+							return strBuild;
+
+						} catch (e) {
+
+							errorHelper.show(e);
+							return '';
+						}
+					}
+
+					var m_functionGenReplacementWorkspace = function(parameters) {
+
+						try {
+							
+							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+
+
+
+							strBuild += '</xml>';
+							return strBuild;
+
+						} catch (e) {
+
+							errorHelper.show(e);
+							return '';
 						}
 					}
 
