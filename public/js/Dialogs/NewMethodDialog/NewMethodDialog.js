@@ -305,44 +305,102 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 							
-							// Isolate the final <block>. It will be a parameter (self or the final one) or blockly code, if any.
-							// We'll determine by counting the number of parameters the original method had. If the final block
-							// is code, there'll be one more than there should be based solely on the parameters (plus 'self').
+							// There is an XML doc in m_methodForEdit.workspace.
+							// It contains something like
+							// 	<block type="variables_get" id="9" x="10" y="40">
+							// 		<field name="VAR">cat</field>
+							// 	</block>
+							// for every parameter that was in the original version of the method (plus
+							// a block for self) plus blocks for anything else done manually by the user in the code pane.
+
+							// Since the user edited this method's parameters (at least the old and new strings are different),
+							// parameters have probably been added or removed. (It's also possible the user did
+							// something like removing a comma or rearranging the parameters, but that won't make a difference.)
+
+							// For this first implementation of parameter editing all we're going to do is
+							// to add a block for any new parameters. We're not going to delete the blocks for deleted
+							// parameters, since it's possible they are used in code blocks. This may change in time.
+
+							// All we have to do is to compare parametersArray (the edited ones plus 'self') to
+							// m_methodForEdit.parameters (again, plus 'self') and add a block just before the closing "</xml>".
+							// The difficulty comes in assigning an id and setting x and y.
+
 							var origParamsArray = m_methodForEdit.parameters.split(',');
-							var origParamCountInclSelf = origParamsArray.length + 1;
+							origParamsArray.unshift('self');	// So comparisons will work.
 
-							xmlWS = $.parseXML(m_methodForEdit.workspace);
-							var cn = xmlWS.childNodes[0].childNodes;
-							var numBlocks = cn.length;
+							var paramsToAdd = [];
 
-							if (numBlocks > origParamCountInclSelf) {
+							for (var i = 0; i < parametersArray.length; i++) {
 
-								// There is code to preserve.
-								var lastBlock = cn[numBlocks - 1].outerHTML;
+								var foundit = false;
+								for (var j = 0; j < origParamsArray.length; j++) {
 
-								// Gen the XML for the current set of parameters.
-								var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
-								var id = 1;
-								var y = 10;
+									if (parametersArray[i] === origParamsArray[j]) {
 
-								parametersArray.forEach(function(param){
+										foundit = true;
+										break;
+									}
+								}
 
-									strBuild += '<block type="variables_get" id="' + id + '" x="10" y="' + y + '"><field name="VAR">' + param + '</field></block>';
-									id++;
-									y += 30;
-								});
+								if (!foundit) {
 
-								// Add the preserved block and close it up.
-								strBuild += lastBlock + '</xml>';
+									paramsToAdd.push(parametersArray[i]);
+								}
+							}
+
+							// So, if there's anything in paramsToAdd, we add.
+							if (paramsToAdd.length) {
+
+								var i = m_methodForEdit.workspace.indexOf("</xml>");
+								var strBuild = m_methodForEdit.workspace.substring(0, i);
+
+								for (var i = 0; i < paramsToAdd.length; i++) {
+
+									strBuild += '<block type="variables_get" id="~id~" x="10" y="~y~"><field name="VAR">' + paramsToAdd[i] + '</field></block>';
+								}
+
+								strBuild += '</xml>';
+
+								// Now we have to fix up the "~id~" and "~y~" values.
+
+
+
+
+
 								return strBuild;
+
+							}
+
+							return m_methodForEdit.workspace;
+
+
+							// var origParamCountInclSelf = origParamsArray.length + 1;
+
+							// xmlWS = $.parseXML(m_methodForEdit.workspace);
+							// var cn = xmlWS.childNodes[0].childNodes;
+							// var numBlocks = cn.length;
+
+
+							// 	// There is code to preserve.
+							// 	var lastBlock = cn[numBlocks - 1].outerHTML;
+
+							// 	// Gen the XML for the current set of parameters.
+							// 	var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+							// 	var id = 1;
+							// 	var y = 10;
+
+							// 	parametersArray.forEach(function(param){
+
+							// 		strBuild += '<block type="variables_get" id="' + id + '" x="10" y="' + y + '"><field name="VAR">' + param + '</field></block>';
+							// 		id++;
+							// 		y += 30;
+							// 	});
+
+							// 	// Add the preserved block and close it up.
+							// 	strBuild += lastBlock + '</xml>';
+							// 	return strBuild;
 							
-							} else {
 
-								// There is no code to preserve. Can use the other method.
-								return 	m_functionGenNewWorkspace(parametersArray);
-							}							
-
-							return '';
 
 						} catch (e) {
 
