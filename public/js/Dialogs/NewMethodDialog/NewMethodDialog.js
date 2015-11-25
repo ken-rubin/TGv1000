@@ -229,41 +229,56 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (m_strNewOrEdit === "New") {
 
 								// Generate a workspace that declares 'self' and all parameters entered by the user.
-								// For example, if user entered 'cat', set method.workspace (note: additional parameters don't get nested deeper):
-								// <xml xmlns="http://www.w3.org/1999/xhtml">
-								// 	<block type="variables_get" id="8" x="10" y="10">
-								// 		<field name="VAR">self</field>
-								// 	</block>
-								// 	<block type="variables_get" id="9" x="10" y="40">
-								// 		<field name="VAR">cat</field>
-								// 	</block>
-								// </xml>
-								method.workspace = m_functionGenNewWorkspace(uniqueArray);
+								// For example, if user entered 'x, y, z', set method.workspace (note: additional parameters don't get nested deeper):
+								/*
+									<xml xmlns="http://www.w3.org/1999/xhtml">
+									  <block type="procedures_defreturn" x="88" y="163">	<== defreturn for expression-type method; defnoreturn for statement-type method
+									    <mutation>
+									      <arg name="self"></arg>							<== 1 for each parameter plus 'self'
+									      <arg name="x"></arg>
+									      <arg name="y"></arg>
+									      <arg name="z"></arg>
+									    </mutation>
+									    <field name="NAME">methodName</field>				<== plug in method.name
+									  </block>
+									</xml>								
+								*/
+								method.workspace = m_functionGenNewWorkspace(uniqueArray, method);
 								exceptionRet = client.addMethodToActiveType(method);
 
-							} else {
+							} else {	
 
-								if (method.parameters !== m_methodForEdit.parameters) {
-									
-									// Similar to above, but we need potentially to save any "coding" the user did and just swap out the vars (including 'self') of the original method with potentially-changed new ones.
-									// For example, the above with a bit a coding:
-									// <xml xmlns="http://www.w3.org/1999/xhtml">
-									// 	<block type="variables_get" id="8" x="10" y="10">
-									// 		<field name="VAR">self</field>
-									// 	</block>
-									// 	<block type="variables_get" id="9" x="10" y="40">
-									// 		<field name="VAR">cat</field>
-									// 	</block>
-									// 	<block type="App_setThingyInstance" id="25" inline="true" x="370" y="210">		>
-									// 		<value name="VALUE">														>
-									// 			<block type="variables_get" id="32">									>
-									// 				<field name="VAR">item</field>										> the code to be preserved
-									// 			</block>																>
-									// 		</value>																	>
-									// 	</block>																		>
-									// </xml>'
-									method.workspace = m_functionGenReplacementWorkspace(uniqueArray);
-								}
+								// Edit--user might have changed method name, type or parameters or nothing.
+								// Similar to above, but we need potentially to save any "coding" the user did and just swap out the vars (including 'self') of the original method with potentially-changed new ones.
+								// For example, the above with a bit a coding (note the coding is in the single <statement>...</statement> block; everything around it is the same as above before the user added functionality;):
+								/*
+									<xml xmlns="http://www.w3.org/1999/xhtml">
+									  <block type="procedures_defnoreturn" x="263" y="138">
+									    <mutation>
+									      <arg name="x"></arg>
+									    </mutation>
+									    <field name="NAME">XCCC</field>
+									    <statement name="STACK">
+									      <block type="text_print">
+									        <value name="TEXT">
+									          <shadow type="text">
+									            <field name="TEXT">abc</field>
+									          </shadow>
+									          <block type="text_join">
+									            <mutation items="1"></mutation>
+									            <value name="ADD0">
+									              <block type="variables_get">
+									                <field name="VAR">x</field>
+									              </block>
+									            </value>
+									          </block>
+									        </value>
+									      </block>
+									    </statement>
+									  </block>
+									</xml>
+								*/
+								method.workspace = m_functionGenReplacementWorkspace(uniqueArray, method);
 								exceptionRet = client.updateMethodInActiveType(method, m_methodForEdit, m_iIndexIfEdit, m_clActiveType);
 							}
 							if (exceptionRet) { throw exceptionRet; }
@@ -276,22 +291,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					var m_functionGenNewWorkspace = function(parametersArray) {
+					var m_functionGenNewWorkspace = function(parametersArray, method) {
 
 						try {
 							
-							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
-							var id = 1;
-							var y = 10;
+							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_def' + (method.methodTypeId === 1 ? 'no' : '') + 'return"><mutation>';
 
 							parametersArray.forEach(function(param){
 
-								strBuild += '<block type="variables_get" id="' + id + '" x="10" y="' + y + '"><field name="VAR">' + param + '</field></block>';
-								id++;
-								y += 30;
+								strBuild += '<arg name="' + param + '"></arg>';
 							});
 
-							strBuild += '</xml>';
+							strBuild += '</mutation><field name="NAME">' + method.name + '</field></block></xml>';
 							return strBuild;
 
 						} catch (e) {
@@ -301,106 +312,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					var m_functionGenReplacementWorkspace = function(parametersArray) {
+					var m_functionGenReplacementWorkspace = function(parametersArray, method) {
 
 						try {
 							
-							// There is an XML doc in m_methodForEdit.workspace.
-							// It contains something like
-							// 	<block type="variables_get" id="9" x="10" y="40">
-							// 		<field name="VAR">cat</field>
-							// 	</block>
-							// for every parameter that was in the original version of the method (plus
-							// a block for self) plus blocks for anything else done manually by the user in the code pane.
+							var origWorkspace = m_methodForEdit.workspace;
+							var newWorkspace = m_functionGenNewWorkspace(parametersArray, method);
 
-							// Since the user edited this method's parameters (at least the old and new strings are different),
-							// parameters have probably been added or removed. (It's also possible the user did
-							// something like removing a comma or rearranging the parameters, but that won't make a difference.)
+							// Now we just have to pluck the middle out of origWorkspace and plunk it into the middle of newWorkspace.
+							// Note: the user could have all sorts of junk in origWorkspace. We'll ignore it and just take <statement>...</statement>.
+							var startSortOf = origWorkspace.indexOf('</field><statement');
+							var endSortOf = origWorkspace.indexOf('</block></xml>');
 
-							// For this first implementation of parameter editing all we're going to do is
-							// to add a block for any new parameters. We're not going to delete the blocks for deleted
-							// parameters, since it's possible they are used in code blocks. This may change in time.
+							// Ignore if wrong.
+							if (startSortOf > -1 && endSortOf > -1) {
 
-							// All we have to do is to compare parametersArray (the edited ones plus 'self') to
-							// m_methodForEdit.parameters (again, plus 'self') and add a block just before the closing "</xml>".
-							// The difficulty comes in assigning an id and setting x and y.
+								var guts = origWorkspace.substring(startSortOf + 8, endSortOf);
 
-							var origParamsArray = m_methodForEdit.parameters.split(',');
-							origParamsArray.unshift('self');	// So comparisons will work.
-
-							var paramsToAdd = [];
-
-							for (var i = 0; i < parametersArray.length; i++) {
-
-								var foundit = false;
-								for (var j = 0; j < origParamsArray.length; j++) {
-
-									if (parametersArray[i] === origParamsArray[j]) {
-
-										foundit = true;
-										break;
-									}
-								}
-
-								if (!foundit) {
-
-									paramsToAdd.push(parametersArray[i]);
-								}
+								var otherEndSortOf = newWorkspace.indexOf('</field>');
+								var newWorkspace = newWorkspace.substring(0, otherEndSortOf + 8) + guts + '</block></xml>';
 							}
 
-							// So, if there's anything in paramsToAdd, we add.
-							if (paramsToAdd.length) {
-
-								var i = m_methodForEdit.workspace.indexOf("</xml>");
-								var strBuild = m_methodForEdit.workspace.substring(0, i);
-
-								for (var i = 0; i < paramsToAdd.length; i++) {
-
-									strBuild += '<block type="variables_get" id="~id~" x="10" y="~y~"><field name="VAR">' + paramsToAdd[i] + '</field></block>';
-								}
-
-								strBuild += '</xml>';
-
-								// Now we have to fix up the "~id~" and "~y~" values.
-
-
-
-
-
-								return strBuild;
-
-							}
-
-							return m_methodForEdit.workspace;
-
-
-							// var origParamCountInclSelf = origParamsArray.length + 1;
-
-							// xmlWS = $.parseXML(m_methodForEdit.workspace);
-							// var cn = xmlWS.childNodes[0].childNodes;
-							// var numBlocks = cn.length;
-
-
-							// 	// There is code to preserve.
-							// 	var lastBlock = cn[numBlocks - 1].outerHTML;
-
-							// 	// Gen the XML for the current set of parameters.
-							// 	var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml">';
-							// 	var id = 1;
-							// 	var y = 10;
-
-							// 	parametersArray.forEach(function(param){
-
-							// 		strBuild += '<block type="variables_get" id="' + id + '" x="10" y="' + y + '"><field name="VAR">' + param + '</field></block>';
-							// 		id++;
-							// 		y += 30;
-							// 	});
-
-							// 	// Add the preserved block and close it up.
-							// 	strBuild += lastBlock + '</xml>';
-							// 	return strBuild;
-							
-
+							return newWorkspace;
 
 						} catch (e) {
 

@@ -251,6 +251,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
+                    // TODO: does the following assume that the code pane contains the block(s) for App.initialize? Because I don't think it has to.
                     var xmlWorkspace = processor.getWorkspaceXMLDoc();
                     if (!xmlWorkspace) {
 
@@ -267,7 +268,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     xmlWorkspace = xmlWorkspace.replace(reOldGet, '"' + strNewGet + '"');
 
                     // Update in initialize method of App type.
-
                     // Get the initialize method.
                     var methodInitialize = clAppType.getMethod("initialize");
                     if (!methodInitialize) {

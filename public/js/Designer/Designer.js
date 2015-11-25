@@ -308,7 +308,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								var exceptionRet = coder.update_ToolInstanceId(strOldId, strNewId, g_clTypeApp, property);
 								if (exceptionRet) {
 
-									// Undo previous two changes.
+									// TODO: Undo previous two changes.
 
 
 
