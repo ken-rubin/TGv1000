@@ -36,8 +36,9 @@
     - That same color goes to the type's methods, properties and events.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
 - Need to bring saving of projects in ProjectBO up to speed wrt changes just made to Projects, Types and Methods.
-- Need dialogs to submit on Enter (i.e., button is triggered).
+- Need dialogs to submit on Enter key (i.e., button is triggered).
 - In types.js determine what other TypeWell buttons need to be disabled or enabled if a system base type is the active type. May be based on user class.
+- Finish type.js#m_functionUpdateActiveMethodWorkspace.
 
 
 

@@ -5,8 +5,8 @@
 //
 
 // Define Type module.
-define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics"],
-	function (errorHelper, comic, comics) {
+define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/converter"],
+	function (errorHelper, comic, comics, converter) {
 
 		try {
 
@@ -181,12 +181,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics"],
 							}
 
 							// Get the item.
-							var itemActive = m_arrayActive[m_iActiveIndex];
+							// var itemActive = m_arrayActive[m_iActiveIndex];
 
 							// Replace the workspace of the active method.
-							itemActive.workspace = strWorkspace;
+							// itemActive.workspace = strWorkspace;
 
-							return null;
+							return m_functionUpdateActiveMethodWorkspace(strWorkspace);
+
 						} catch (e) {
 
 							return e;
@@ -200,6 +201,45 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics"],
 
 					///////////////////////////////////////
 					// Private methods
+
+//used
+					// TODO finish this
+					var m_functionUpdateActiveMethodWorkspace = function(strWorkspace) {
+
+						try {
+
+							// Get the item.
+							var itemActive = m_arrayActive[m_iActiveIndex];
+
+							// Replace the workspace of the active method.
+							itemActive.workspace = strWorkspace;
+
+							// It's not just the workspace that has changed.
+							// This method's name, parameters, even method type could have changed.
+							// We will examine the workspace and adjust what needs adjusting.
+							// The big problem is that the user might have changed the function name to
+							// one that already exists. We'll handle this by changing the name slightly and
+							// informing the user if necessary.
+
+			                // Convert xml to json for ease of perusal.
+			                var workspaceJSONObject = converter.toJSON(strWorkspace);
+
+			                // We have to remove any chaff--stuff that's not formally part of the method that the user might have left in.
+			                // For example, a second block.
+
+
+
+
+
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 
 //used
 					var m_functionOnGotResourceId = function (iResourceId) {
