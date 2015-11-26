@@ -1178,11 +1178,14 @@ module.exports = function ProjectBO(app, sql, logger) {
             var guts = " SET name='" + project.name + "'"
                 + ",ownedByUserId=" + req.body.userId
                 + ",public=" + project.public
+                + ",isProduct=" + project.isProduct
+                + ",projectTypeId=" + project.projectTypeId
                 + ",quarantined=" + project.quarantined
                 + ",parentPrice=" + project.parentPrice
                 + ",parentProjectId=" + project.parentProjectId
                 + ",priceBump=" + project.priceBump
                 + ",imageId=" + project.imageId
+                + ",altImagePath='" + project.altImagePath + "'"
                 + ",isProduct=" + project.isProduct
                 + ",description='" + project.description + "' ";
 
@@ -1276,6 +1279,22 @@ module.exports = function ProjectBO(app, sql, logger) {
         // Time to do types and then move on to type contents: methods, properties and events.
         // Types will require resource, tags and resources_tags. (As will methods.)
 
+        // Here's the situation with base types:
+        // (1) The comic's App type has baseTypeId = id of one of the system base types. This remains unchanged.
+        // (2) System base types are recognized by having ordinal === null.
+        // (3) Any new types will have id < 0 and this id will be unique. This is so that, if they are then
+        //     used as a base type, the derived type will have an id for baseTypeId. So, after new types are written
+        //     to the DB and given a real id (saving off their negative id), we need to loop through the other types
+        //     and change any that where baseTypeId = the saved negative id.
+        //
+        // All this means several things:
+        // (1) We should write out the App type so it gets ordinal 0.
+        // (2) We should loop through all types in the comic and write the ones with id < 0. When we get a real id,
+        //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
+        // (3) We should then loop through all the types again, skipping the App type and skipping any types with
+        //     ordinal === null, and write the rest to the db.
+        // (4) We also have to modify the Tags and type-sub-array routines to skip system base types.
+
         try {
 
             var typesCountdown = 0;
@@ -1300,7 +1319,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     typeIth.comicId = comicIth.id;
 
-                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + "," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
                     m_log('Inserting type with ' + strQuery);
                     sql.queryWithCxn(connection, strQuery,
                         function(err, rows) {
