@@ -39,6 +39,7 @@
 - Need dialogs to submit on Enter key (i.e., button is triggered).
 - In types.js determine what other TypeWell buttons need to be disabled or enabled if a system base type is the active type. May be based on user class.
 - Finish type.js#m_functionUpdateActiveMethodWorkspace.
+- PropertyGrid.js rename type instance not working.
 
 
 
@@ -50,7 +51,7 @@
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
 - **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- Remove requirement for images in project, type, method (maybe later, says John; maybe for project we generate a designer thumbnail)
+
 
 
 ## General description of programming using our system
