@@ -221,7 +221,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							// one that already exists. We'll handle this by changing the name slightly and
 							// informing the user if necessary.
 
-			                // Convert xml to json for ease of perusal.
+			                // Convert xml to json for ease of perusal (and perhaps cleanup).
 			                var workspaceJSONObject = converter.toJSON(strWorkspace);
 
 			                // We have to remove any chaff--stuff that's not formally part of the method that the user might have left in.

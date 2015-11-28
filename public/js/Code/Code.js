@@ -811,8 +811,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// strName is the name of the method prepended with its type name + "_".
 					// method is passed in to have access to properties methodTypeId (effectively, statement or expression)
 					// and parameters.
-
-					// TODO: do this
 					var m_functionGenerateBlocksMethodFunctionString = function (strName, method) {
 
 						var arrayParameters = method.parameters.split(/[\s,]+/);
@@ -837,8 +835,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method generates the javascript string for a method function.
-					
-					// TODO: do this
 					var m_functionGenerateJavaScriptMethodFunctionString = function (method) {
 
 						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +
