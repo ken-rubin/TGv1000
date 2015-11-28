@@ -221,12 +221,76 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							// one that already exists. We'll handle this by changing the name slightly and
 							// informing the user if necessary.
 
-			                // Convert xml to json for ease of perusal (and perhaps cleanup).
-			                var workspaceJSONObject = converter.toJSON(strWorkspace);
+							// And everything has to be done quickly, because we're getting called on every keystroke, drag (pixel?), etc.
 
 			                // We have to remove any chaff--stuff that's not formally part of the method that the user might have left in.
 			                // For example, a second block.
 
+							/*	This is the structure have to work with (both variations):
+
+										<xml xmlns="http://www.w3.org/1999/xhtml">
+										  <block type="procedures_defreturn">
+										    <mutation>
+										    	<arg> elements with parameters
+										    </mutation>
+										    <field name="NAME">method name</field>
+										    <statement name="STACK">
+										    	<block> with guts </block>
+										    </statement>
+											
+										procedures_defreturn adds the following return block here:
+											<value name="RETURN">
+												<block> with return items </block>
+											</value>								
+
+										  </block>
+										</xml>
+			                */
+
+			                var proceduresBlock = $(strWorkspace).xpath("/xml/block");
+			                if (proceduresBlock.length) {
+
+				                var blockType = $(proceduresBlock).xpath("@type");
+				                // blockType[0].nodeValue is either "procedures_defreturn" or "procedures_defnoreturn"
+
+				                var mutationArgs = $(proceduresBlock).xpath("mutation/arg");
+				                var currArgs = [];
+				                for (var i = 0; i < mutationArgs.length; i++) {
+
+				                	var argIth = mutationArgs[i];
+				                	var argIthName = $(argIth).xpath("@name");
+				                	currArgs.push(argIthName[0].nodeValue);
+				                }
+
+				                // In the following compares, if there is a change, set a bool to indicate a grid refresh
+				                // and set the corresponding field in itemActive.
+				                var anythingChanged = false;
+				                // Compare currArgs with itemActive.parameters.
+
+
+
+
+
+
+				                var methodName = $(strWorkspace).xpath("/xml/block/field")[0].innerText;
+				                
+				                // Compare methodName with itemActive.name.
+				                // TODO add dup checking and automatic name adjustment.
+				                if (methodName !== itemActive.name) {
+
+				                	anythingChanged = true;
+				                	itemActive.name = methodName;
+				                }
+
+
+
+
+
+				                if (anythingChanged) {
+
+				                	types.regenTWMethodsTable();
+				                }
+				            }
 
 
 

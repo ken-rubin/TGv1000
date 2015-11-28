@@ -313,6 +313,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					}
 
 					// TODO Re-work this crap either with real XML tools or by converting to JSON, doing the manipulation in JSON, and converting back to XML.
+					// The reason is that, depending on the content of the code pane, for example, '</block></xml>' doesn't always exist.
 					var m_functionGenReplacementWorkspace = function(parametersArray, method) {
 
 						try {
