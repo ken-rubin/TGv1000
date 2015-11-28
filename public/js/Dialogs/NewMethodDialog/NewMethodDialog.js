@@ -228,56 +228,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							uniqueArray.unshift('self');
 							if (m_strNewOrEdit === "New") {
 
-								// Generate a workspace that declares 'self' and all parameters entered by the user.
-								// For example, if user entered 'x, y, z', set method.workspace (note: additional parameters don't get nested deeper):
-								/*
-									<xml xmlns="http://www.w3.org/1999/xhtml">
-									  <block type="procedures_defreturn" x="88" y="163">	<== defreturn for expression-type method; defnoreturn for statement-type method
-									    <mutation>
-									      <arg name="self"></arg>							<== 1 for each parameter plus 'self'
-									      <arg name="x"></arg>
-									      <arg name="y"></arg>
-									      <arg name="z"></arg>
-									    </mutation>
-									    <field name="NAME">methodName</field>				<== plug in method.name
-									  </block>
-									</xml>								
-								*/
+								// Generate a workspace that declares 'self' plus all parameters entered by the user.
 								method.workspace = m_functionGenNewWorkspace(uniqueArray, method);
 								exceptionRet = client.addMethodToActiveType(method);
 
 							} else {	
 
-								// Edit--user might have changed method name, type or parameters or nothing.
-								// Similar to above, but we need potentially to save any "coding" the user did and just swap out the vars (including 'self') of the original method with potentially-changed new ones.
-								// For example, the above with a bit a coding (note the coding is in the single <statement>...</statement> block; everything around it is the same as above before the user added functionality;):
-								/*
-									<xml xmlns="http://www.w3.org/1999/xhtml">
-									  <block type="procedures_defnoreturn" x="263" y="138">
-									    <mutation>
-									      <arg name="x"></arg>
-									    </mutation>
-									    <field name="NAME">XCCC</field>
-									    <statement name="STACK">
-									      <block type="text_print">
-									        <value name="TEXT">
-									          <shadow type="text">
-									            <field name="TEXT">abc</field>
-									          </shadow>
-									          <block type="text_join">
-									            <mutation items="1"></mutation>
-									            <value name="ADD0">
-									              <block type="variables_get">
-									                <field name="VAR">x</field>
-									              </block>
-									            </value>
-									          </block>
-									        </value>
-									      </block>
-									    </statement>
-									  </block>
-									</xml>
-								*/
+								// Merge changes into workspace that might have code put in by the user using Blockly blocks in the code pane.
 								method.workspace = m_functionGenReplacementWorkspace(uniqueArray, method);
 								exceptionRet = client.updateMethodInActiveType(method, m_methodForEdit, m_iIndexIfEdit, m_clActiveType);
 							}
@@ -291,6 +248,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
+					// If user entered 'x, y, z', set method.workspace (note: additional parameters don't get nested deeper):
+					/*
+						<xml xmlns="http://www.w3.org/1999/xhtml">
+						  <block type="procedures_defreturn" x="88" y="163">	<== defreturn for expression-type method; defnoreturn for statement-type method
+						    <mutation>
+						      <arg name="self"></arg>							<== 1 for each parameter plus 'self'
+						      <arg name="x"></arg>
+						      <arg name="y"></arg>
+						      <arg name="z"></arg>
+						    </mutation>
+						    <field name="NAME">methodName</field>				<== plug in method.name
+						  </block>
+						</xml>								
+					*/
 					var m_functionGenNewWorkspace = function(parametersArray, method) {
 
 						try {
@@ -312,30 +283,75 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					// TODO Re-work this crap either with real XML tools or by converting to JSON, doing the manipulation in JSON, and converting back to XML.
-					// The reason is that, depending on the content of the code pane, for example, '</block></xml>' doesn't always exist.
+					// User might have changed method name, type or parameters or nothing.
+					// Similar to above, but we need potentially to save any "coding" the user did and just swap out the vars (including 'self') of the original method with potentially-changed new ones.
+					// For example, the above with a bit a coding (note the coding is in the single <statement>...</statement> block; everything around it is the same as above before the user added functionality;):
+					/*
+						<xml xmlns="http://www.w3.org/1999/xhtml">
+						  <block type="procedures_defnoreturn" x="263" y="138">
+						    <mutation>
+						      <arg name="self"></arg>
+						      <arg name="x"></arg>
+						    </mutation>
+						    <field name="NAME">XCCC</field>
+						    				<----- If user has coded in Blockly frame, there could be a <statement>...</statement> node here. A sibling to <field>.
+						    <statement name="STACK">
+						      <block type="text_print">
+						        <value name="TEXT">
+						          <shadow type="text">
+						            <field name="TEXT">abc</field>
+						          </shadow>
+						          <block type="text_join">
+						            <mutation items="1"></mutation>
+						            <value name="ADD0">
+						              <block type="variables_get">
+						                <field name="VAR">x</field>
+						              </block>
+						            </value>
+						          </block>
+						        </value>
+						      </block>
+						    </statement>
+						      				<----- if type="procedures_defreturn" there might be a <value>...</value> node here. A sibling to <statement>. Or not.
+						  </block>
+						</xml>
+					*/
 					var m_functionGenReplacementWorkspace = function(parametersArray, method) {
 
 						try {
 							
 							var origWorkspace = m_methodForEdit.workspace;
-							var newWorkspace = m_functionGenNewWorkspace(parametersArray, method);
+
+							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_def' + (method.methodTypeId === 1 ? 'no' : '') + 'return"><mutation>';
+
+							parametersArray.forEach(function(param){
+
+								strBuild += '<arg name="' + param + '"></arg>';
+							});
+
+							strBuild += '</mutation><field name="NAME">' + method.name + '</field>';
 
 							// Now we just have to pluck the middle out of origWorkspace and plunk it into the middle of newWorkspace.
-							// Note: the user could have all sorts of junk in origWorkspace. We'll ignore it and just take <statement>...</statement>.
-							var startSortOf = origWorkspace.indexOf('</field><statement');
-							var endSortOf = origWorkspace.indexOf('</block></xml>');
+							// Note: the user could have all sorts of junk in origWorkspace. We'll ignore it and just take <statement>...</statement> and <value>...</value> if present.
+							var origBlock = $(origWorkspace).xpath("/xml/block[1]");	// xpath is 1-based
+							if (origBlock.length) {
 
-							// Ignore if wrong.
-							if (startSortOf > -1 && endSortOf > -1) {
+								// var newBlock = $(newWorkspace).xpath("/xml/block[1]");	// xpath is 1-based
+								var statementBlock = $(origBlock).xpath("statement[1]");
+								var valueBlock = $(origBlock).xpath("value[1]");
 
-								var guts = origWorkspace.substring(startSortOf + 8, endSortOf);
+								if (statementBlock.length) {
 
-								var otherEndSortOf = newWorkspace.indexOf('</field>');
-								var newWorkspace = newWorkspace.substring(0, otherEndSortOf + 8) + guts + '</block></xml>';
+									strBuild += statementBlock[0].outerHTML;
+								}
+
+								if (valueBlock.length) {
+
+									strBuild += valueBlock[0].outerHTML;
+								}
 							}
 
-							return newWorkspace;
+							return strBuild + '</block></xml>';
 
 						} catch (e) {
 

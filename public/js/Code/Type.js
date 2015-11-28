@@ -249,20 +249,23 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 										</xml>
 			                */
 
-			                var proceduresBlock = $(strWorkspace).xpath("/xml/block");
+			                var proceduresBlock = $(strWorkspace).xpath("/xml/block[1]");	// xpath is 1-based
 			                if (proceduresBlock.length) {
 
 				                var blockType = $(proceduresBlock).xpath("@type");
 				                // blockType[0].nodeValue is either "procedures_defreturn" or "procedures_defnoreturn"
 				                // If the user had changd this in the Blockly code pane, we've already handled that by assignment to itemActive.workspace.
 
-				                var mutationArgs = $(proceduresBlock).xpath("mutation/arg");
+				                var mutationArgs = $(proceduresBlock).xpath("mutation/arg");	// all of them
 				                var currArgs = [];
 				                for (var i = 0; i < mutationArgs.length; i++) {
 
 				                	var argIth = mutationArgs[i];
-				                	var argIthName = $(argIth).xpath("@name");
-				                	currArgs.push(argIthName[0].nodeValue);
+				                	var argIthName = $(argIth).xpath("@name")[0].nodeValue;	// 0-based since we're now in JS array land
+				                	if (argIthName !== "self") {
+
+				                		currArgs.push(argIthName);
+				                	}
 				                }
 
 				                // No need to compare since they're not showing anywhere.
@@ -272,7 +275,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				                // For now this can be only the method name.
 				                var gridRefreshNeeded = false;
 
-				                var methodName = $(strWorkspace).xpath("/xml/block/field")[0].innerText;
+				                var methodName = $(strWorkspace).xpath("/xml/block/field")[0].innerText;	// again, JS 0-based arrays
 				                
 				                // Compare methodName with itemActive.name.
 				                if (methodName !== itemActive.name) {
@@ -303,7 +306,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							return e;
 						}
 					}
-
 
 //used
 					var m_functionOnGotResourceId = function (iResourceId) {
