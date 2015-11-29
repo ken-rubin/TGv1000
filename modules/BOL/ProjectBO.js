@@ -1308,51 +1308,160 @@ module.exports = function ProjectBO(app, sql, logger) {
             var methodsCountdown = 0,
                 propertiesCountdown = 0,
                 eventsCountdown = 0;
+
             project.comics.items.forEach(function(comicIth) {
 
                 var ordinal = 0;
-                comicIth.types.items.forEach(function(typeIth) {
 
-                    methodsCountdown += typeIth.methods.length;
-                    propertiesCountdown += typeIth.properties.length;
-                    eventsCountdown += typeIth.events.length;
+                for (var passNum = 1; passNum <=3; passNum++) { 
 
-                    typeIth.comicId = comicIth.id;
+                    for (var i = 0; i < comicIth.types.items.length; i++) {
 
-                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                    m_log('Inserting type with ' + strQuery);
-                    sql.queryWithCxn(connection, strQuery,
-                        function(err, rows) {
+                        var typeIth = comicIth.types.items[i];
 
-                            if (err) { throw err; }
+                        switch (passNum) {
 
-                            if (rows.length === 0) {
+                            case 1:
+                                // passNum = 1: just the type with isApp === true
+                                if (typeIth.isApp) {
 
-                                callback(new Error("Error writing type to database."));
-                                return;
-                            }
+                                    methodsCountdown += typeIth.methods.length;
+                                    propertiesCountdown += typeIth.properties.length;
+                                    eventsCountdown += typeIth.events.length;
 
-                            typeIth.id = rows[0].insertId;
-                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+                                    typeIth.comicId = comicIth.id;
 
-                                if (err) {
+                                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                                    m_log('Inserting type with ' + strQuery);
+                                    sql.queryWithCxn(connection, strQuery,
+                                        function(err, rows) {
 
-                                    callback(err);
-                                    return;
+                                            if (err) { throw err; }
 
-                                } else {
+                                            if (rows.length === 0) {
 
-                                    if (--typesCountdown === 0) {
+                                                callback(new Error("Error writing type to database."));
+                                                return;
+                                            }
 
-                                        m_log('Going to m_doTypeArraysForSaveAs');
-                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                    }
+                                            typeIth.id = rows[0].insertId;
+                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
+                                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+
+                                                if (err) {
+
+                                                    callback(err);
+                                                    return;
+
+                                                } else {
+
+                                                    if (--typesCountdown === 0) {
+
+                                                        m_log('Going to m_doTypeArraysForSaveAs');
+                                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    );
                                 }
-                            });
+                                break;
+
+                            case 2:
+                                // passNum = 2: any types with id < 0, building a correspondance array
+                                if (typeIth.id < 0) {
+
+                                    methodsCountdown += typeIth.methods.length;
+                                    propertiesCountdown += typeIth.properties.length;
+                                    eventsCountdown += typeIth.events.length;
+
+                                    typeIth.comicId = comicIth.id;
+
+                                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                                    m_log('Inserting type with ' + strQuery);
+                                    sql.queryWithCxn(connection, strQuery,
+                                        function(err, rows) {
+
+                                            if (err) { throw err; }
+
+                                            if (rows.length === 0) {
+
+                                                callback(new Error("Error writing type to database."));
+                                                return;
+                                            }
+
+                                            typeIth.id = rows[0].insertId;
+                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
+                                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+
+                                                if (err) {
+
+                                                    callback(err);
+                                                    return;
+
+                                                } else {
+
+                                                    if (--typesCountdown === 0) {
+
+                                                        m_log('Going to m_doTypeArraysForSaveAs');
+                                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    );
+                                }
+                                break;
+
+                            case 3:
+                                // passNum = 3: the rest of the types where ordinal !== null, id > 0, !isAPP. If baseTypeId !== null and < 0, look it up in the correspondance array and set it before writing to the DB.
+                                if (typeIth.ordinal !== null && !isApp && id > 0) {
+
+                                    methodsCountdown += typeIth.methods.length;
+                                    propertiesCountdown += typeIth.properties.length;
+                                    eventsCountdown += typeIth.events.length;
+
+                                    typeIth.comicId = comicIth.id;
+
+                                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                                    m_log('Inserting type with ' + strQuery);
+                                    sql.queryWithCxn(connection, strQuery,
+                                        function(err, rows) {
+
+                                            if (err) { throw err; }
+
+                                            if (rows.length === 0) {
+
+                                                callback(new Error("Error writing type to database."));
+                                                return;
+                                            }
+
+                                            typeIth.id = rows[0].insertId;
+                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
+                                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+
+                                                if (err) {
+
+                                                    callback(err);
+                                                    return;
+
+                                                } else {
+
+                                                    if (--typesCountdown === 0) {
+
+                                                        m_log('Going to m_doTypeArraysForSaveAs');
+                                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    );
+                                }
+                                break;
                         }
-                    );
-                });
+
+                    }
+                }
             });
         } catch (e) {
 
