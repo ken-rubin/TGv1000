@@ -1312,154 +1312,180 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(function(comicIth) {
 
                 var ordinal = 0;
+                var negTypeIdXlate = [];
 
+                // We're going to make 3 whole loops through the comic's types, processing (or ignoring) the ones specific to that loop.
                 for (var passNum = 1; passNum <=3; passNum++) { 
 
                     for (var i = 0; i < comicIth.types.items.length; i++) {
 
                         var typeIth = comicIth.types.items[i];
 
-                        switch (passNum) {
+                        if (passNum === 1) {
 
-                            case 1:
-                                // passNum = 1: just the type with isApp === true
-                                if (typeIth.isApp) {
+                            // passNum = 1: just the type with isApp === true
+                            if (typeIth.isApp) {
 
-                                    methodsCountdown += typeIth.methods.length;
-                                    propertiesCountdown += typeIth.properties.length;
-                                    eventsCountdown += typeIth.events.length;
+                                methodsCountdown += typeIth.methods.length;
+                                propertiesCountdown += typeIth.properties.length;
+                                eventsCountdown += typeIth.events.length;
 
-                                    typeIth.comicId = comicIth.id;
+                                typeIth.comicId = comicIth.id;
 
-                                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                                    m_log('Inserting type with ' + strQuery);
-                                    sql.queryWithCxn(connection, strQuery,
-                                        function(err, rows) {
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                m_log('Inserting type with ' + strQuery);
+                                sql.queryWithCxn(connection, strQuery,
+                                    function(err, rows) {
 
-                                            if (err) { throw err; }
+                                        if (err) { throw err; }
 
-                                            if (rows.length === 0) {
+                                        if (rows.length === 0) {
 
-                                                callback(new Error("Error writing type to database."));
-                                                return;
-                                            }
-
-                                            typeIth.id = rows[0].insertId;
-                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
-
-                                                if (err) {
-
-                                                    callback(err);
-                                                    return;
-
-                                                } else {
-
-                                                    if (--typesCountdown === 0) {
-
-                                                        m_log('Going to m_doTypeArraysForSaveAs');
-                                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                                    }
-                                                }
-                                            });
+                                            callback(new Error("Error writing type to database."));
+                                            return;
                                         }
-                                    );
-                                }
-                                break;
 
-                            case 2:
-                                // passNum = 2: any types with id < 0, building a correspondance array
-                                if (typeIth.id < 0) {
+                                        typeIth.id = rows[0].insertId;
+                                        m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
+                                        m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
 
-                                    methodsCountdown += typeIth.methods.length;
-                                    propertiesCountdown += typeIth.properties.length;
-                                    eventsCountdown += typeIth.events.length;
+                                            if (err) {
 
-                                    typeIth.comicId = comicIth.id;
-
-                                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                                    m_log('Inserting type with ' + strQuery);
-                                    sql.queryWithCxn(connection, strQuery,
-                                        function(err, rows) {
-
-                                            if (err) { throw err; }
-
-                                            if (rows.length === 0) {
-
-                                                callback(new Error("Error writing type to database."));
+                                                callback(err);
                                                 return;
-                                            }
 
-                                            typeIth.id = rows[0].insertId;
-                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+                                            } else {
 
-                                                if (err) {
+                                                if (--typesCountdown === 0) {
 
-                                                    callback(err);
-                                                    return;
-
-                                                } else {
-
-                                                    if (--typesCountdown === 0) {
-
-                                                        m_log('Going to m_doTypeArraysForSaveAs');
-                                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                                    }
+                                                    m_log('Going to m_doTypeArraysForSaveAs');
+                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
                                                 }
-                                            });
+                                            }
+                                        });
+                                    }
+                                );
+                                break; // break out of types loop--we've found and processed the App type
+                            }
+                        } else if (passNum === 2) {
+
+                            // passNum = 2: any types with id < 0, building a correspondance array
+                            if (typeIth.id < 0) {
+
+                                methodsCountdown += typeIth.methods.length;
+                                propertiesCountdown += typeIth.properties.length;
+                                eventsCountdown += typeIth.events.length;
+
+                                typeIth.comicId = comicIth.id;
+
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                                m_log('Inserting type with ' + strQuery);
+                                sql.queryWithCxn(connection, strQuery,
+                                    function(err, rows) {
+
+                                        if (err) { throw err; }
+
+                                        if (rows.length === 0) {
+
+                                            callback(new Error("Error writing type to database."));
+                                            return;
                                         }
-                                    );
-                                }
-                                break;
 
-                            case 3:
-                                // passNum = 3: the rest of the types where ordinal !== null, id > 0, !isAPP. If baseTypeId !== null and < 0, look it up in the correspondance array and set it before writing to the DB.
-                                if (typeIth.ordinal !== null && !isApp && id > 0) {
+                                        // Add to correspondance array.
+                                        negTypeIdXlate.push({negId:typeIth.id, dbId:rows[0].insertId});
 
-                                    methodsCountdown += typeIth.methods.length;
-                                    propertiesCountdown += typeIth.properties.length;
-                                    eventsCountdown += typeIth.events.length;
+                                        typeIth.id = rows[0].insertId;
+                                        m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
+                                        m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
 
-                                    typeIth.comicId = comicIth.id;
+                                            if (err) {
 
-                                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                                    m_log('Inserting type with ' + strQuery);
-                                    sql.queryWithCxn(connection, strQuery,
-                                        function(err, rows) {
-
-                                            if (err) { throw err; }
-
-                                            if (rows.length === 0) {
-
-                                                callback(new Error("Error writing type to database."));
+                                                callback(err);
                                                 return;
-                                            }
 
-                                            typeIth.id = rows[0].insertId;
-                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                            m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+                                            } else {
 
-                                                if (err) {
+                                                if (--typesCountdown === 0) {
 
-                                                    callback(err);
-                                                    return;
-
-                                                } else {
-
-                                                    if (--typesCountdown === 0) {
-
-                                                        m_log('Going to m_doTypeArraysForSaveAs');
-                                                        m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                                    }
+                                                    m_log('Going to m_doTypeArraysForSaveAs');
+                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
                                                 }
-                                            });
+                                            }
+                                        });
+                                    }
+                                );
+                            }
+                        } else {
+
+                            // passNum = 3: the rest of the types where ordinal !== null, id > 0, !isAPP. If baseTypeId !== null and < 0, look it up in the correspondance array and set it before writing to the DB.
+                            if (typeIth.ordinal !== null && !isApp && id > 0) {
+
+                                methodsCountdown += typeIth.methods.length;
+                                propertiesCountdown += typeIth.properties.length;
+                                eventsCountdown += typeIth.events.length;
+
+                                typeIth.comicId = comicIth.id;
+
+                                // If this type has a non-null, negative baseTypeId, find correct Id in negTypeIdXlate and update it.
+                                if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
+
+                                    var foundBase = false;
+                                    for (var j = 0; j < negTypeIdXlate.length; j++) {
+
+                                        if (negTypeIdXlate.negId === typeIth.baseTypeId) {
+
+                                            foundBase = true;
+                                            typeIth.baseTypeId = negTypeIdXlate.dbId;
+                                            break;
                                         }
-                                    );
+                                    }
+                                    if (!foundBase) {
+
+                                        // It might have been deleted. Just null out baseTypeId.
+                                        typeIth.baseTypeId = null;
+                                    }
                                 }
-                                break;
+
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "'," + (typeIth.isApp?1:0) + "," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + (ordinal++) + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                m_log('Inserting type with ' + strQuery);
+                                sql.queryWithCxn(connection, strQuery,
+                                    function(err, rows) {
+
+                                        if (err) { throw err; }
+
+                                        if (rows.length === 0) {
+
+                                            callback(new Error("Error writing type to database."));
+                                            return;
+                                        }
+
+                                        typeIth.id = rows[0].insertId;
+                                        m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
+                                        m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
+
+                                            if (err) {
+
+                                                callback(err);
+                                                return;
+
+                                            } else {
+
+                                                if (--typesCountdown === 0) {
+
+                                                    m_log('Going to m_doTypeArraysForSaveAs');
+                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
+                                                }
+                                            }
+                                        });
+                                    }
+                                );
+                            } else if (--typesCountdown === 0) {
+
+                                // Making up for not counting down or doing anything with system base types.
+                                m_log('Going to m_doTypeArraysForSaveAs');
+                                m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
+                            }
                         }
-
                     }
                 }
             });
@@ -1480,115 +1506,119 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 comicIth.types.items.forEach(function(typeIth) {
 
-                    ordinal = 0;
-                    typeIth.methods.forEach(function(method) {
+                    if (typeIth.ordinal) {
+                        // In other words, don't do this for system base types.
 
-                        method.typeId = typeIth.id;
+                        ordinal = 0;
+                        typeIth.methods.forEach(function(method) {
 
-                        var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined) values (" + method.typeId + ",'" + method.name + "'," + (ordinal++) + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + ");";
-                        m_log('Inserting method with ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery,
-                            function(err, rows) {
+                            method.typeId = typeIth.id;
 
-                                if (err) {
-
-                                    callback(err);
-                                    return;
-                                }
-
-                                if (rows.length === 0) {
-
-                                    callback(new Error("Error inserting method into database"));
-                                    return;
-                                }
-
-                                method.id = rows[0].insertId;
-                                m_log('Going to do method tags');
-                                m_setUpAndDoTagsWithCxn(connection, method.id, 'method', req.body.userName, method.tags, method.name, function(err) {
+                            var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined) values (" + method.typeId + ",'" + method.name + "'," + (ordinal++) + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + ");";
+                            m_log('Inserting method with ' + strQuery);
+                            sql.queryWithCxn(connection, strQuery,
+                                function(err, rows) {
 
                                     if (err) {
 
                                         callback(err);
                                         return;
                                     }
-                                });
+
+                                    if (rows.length === 0) {
+
+                                        callback(new Error("Error inserting method into database"));
+                                        return;
+                                    }
+
+                                    method.id = rows[0].insertId;
+                                    m_log('Going to do method tags');
+                                    m_setUpAndDoTagsWithCxn(connection, method.id, 'method', req.body.userName, method.tags, method.name, function(err) {
+
+                                        if (err) {
+
+                                            callback(err);
+                                            return;
+                                        }
+                                    });
+                                }
+                            );
+
+                            methodsCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+
+                                callback(null);
+                                return;
                             }
-                        );
+                        });
 
-                        methodsCountdown--;
-                        if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+                        ordinal = 0;
+                        typeIth.properties.forEach(function(property) {
 
-                            callback(null);
-                            return;
-                        }
-                    });
+                            property.typeId = typeIth.id;
+                            strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + "," + property.isHidden + ");";
+                            
+                            m_log('Inserting property with ' + strQuery);
+                            sql.queryWithCxn(connection, strQuery,
+                                function(err, rows) {
 
-                    ordinal = 0;
-                    typeIth.properties.forEach(function(property) {
+                                    if (err) {
 
-                        property.typeId = typeIth.id;
-                        strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + "," + property.isHidden + ");";
-                        
-                        m_log('Inserting property with ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery,
-                            function(err, rows) {
+                                        callback(err);
+                                        return;
+                                    }
 
-                                if (err) {
+                                    if (rows.length === 0) {
 
-                                    callback(err);
-                                    return;
+                                        callback(new Error("Error inserting property into database"));
+                                        return;
+                                    }
+
+                                    property.id = rows[0].insertId;
                                 }
+                            );
 
-                                if (rows.length === 0) {
+                            propertiesCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
 
-                                    callback(new Error("Error inserting property into database"));
-                                    return;
-                                }
-
-                                property.id = rows[0].insertId;
+                                callback(null);
+                                return;
                             }
-                        );
+                        });
 
-                        propertiesCountdown--;
-                        if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+                        ordinal = 0;
+                        typeIth.events.forEach(function(event) {
 
-                            callback(null);
-                            return;
-                        }
-                    });
+                            event.typeId = typeIth.id;
+                            strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");";
+                            m_log('Inserting event with ' + strQuery);
+                            sql.queryWithCxn(connection, strQuery,
+                                function(err, rows) {
 
-                    ordinal = 0;
-                    typeIth.events.forEach(function(event) {
+                                    if (err) {
 
-                        event.typeId = typeIth.id;
-                        strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");";
-                        m_log('Inserting event with ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery,
-                            function(err, rows) {
+                                        callback(err);
+                                        return;
+                                    }
 
-                                if (err) {
+                                    if (rows.length === 0) {
 
-                                    callback(err);
-                                    return;
+                                        callback(new Error("Error inserting method into database"));
+                                        return;
+                                    }
+
+                                    event.id = rows[0].insertId;
                                 }
+                            );
 
-                                if (rows.length === 0) {
+                            eventsCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
 
-                                    callback(new Error("Error inserting method into database"));
-                                    return;
-                                }
-
-                                event.id = rows[0].insertId;
+                                callback(null);
+                                return;
                             }
-                        );
-
-                        eventsCountdown--;
-                        if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
-
-                            callback(null);
-                            return;
-                        }
-                    });
+                        });
+                    }
                 });
             });
         } catch (e) {

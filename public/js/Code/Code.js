@@ -576,11 +576,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             // If the current type is app, and the current method is initialize, then
                             // need to play changes into the designer in case anything changes here.
 
-                            var bAppInitializeActive = types.isAppInitializeActive();
-                            if (!bAppInitializeActive) {
-
-                            	return;
-                            }
+                            if (!types.isAppInitializeActive()) { return; }
 
 		                    // .
 		                    var objectWorkspace = processor.getWorkspaceJSONObject();
