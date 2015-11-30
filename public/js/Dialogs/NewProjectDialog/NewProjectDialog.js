@@ -248,6 +248,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
+
+									// Add baseTypeName field to all Types that have a base Type.
+									clProject.data.comics.items.forEach(function(comic){
+
+										comic.types.items.forEach(function(type){
+
+											if (type.baseTypeId) {
+
+												for (var i = 0; i < comic.types.items.length; i++) {
+
+													var typeIth = comic.types.items[i];
+													if (type.baseTypeId === typeIth.id) {
+
+														type.baseTypeName = typeIth.name;
+														break;
+													}
+												}
+											} else {
+
+												type.baseTypeName = '';
+											}
+										});
+									});
+
 									client.setBrowserTabAndBtns();
 								}
 							);

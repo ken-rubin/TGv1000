@@ -268,6 +268,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							// First, handle the possible setting of a base type.
 							var setBaseTypeId;
+							var setBaseTypeName;
+
 							if (m_strNewOrEdit === "New" ||
 								(m_strNewOrEdit === "Edit" && !m_typeForEdit.isApp)) {
 
@@ -280,16 +282,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 										if (typeIth.name === selectVal) {
 
 											setBaseTypeId = typeIth.id;
+											setBaseTypeName = selectVal;
 											break;
 										}
 									}
 								} else {
 
 									setBaseTypeId = null;
+									setBaseTypeName = '';
 								}
 							} else {
 
 								setBaseTypeId = m_typeForEdit.baseTypeId;
+								setBaseTypeName = m_typeForEdit.baseTypeName;
 							}
 
 							var clType = new Type();
@@ -337,10 +342,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 										{id: 0, originalPropertyId: 0, name: "Height", propertyTypeId: 1, initialValue: "0", ordinal: 3, isHidden: 1}
 									],
 									methods: [
-										{id: 0, name: 'construct', ordinal: 0, ownedByUserId: g_strUserId, public: 0, workspace: '', imageId: 0, methodTypeId: 4, parameters: ''}
+										{
+											id: 0, 
+											name: 'construct', 
+											ordinal: 0, 
+											ownedByUserId: g_strUserId, 
+											public: 0, 
+											workspace: '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>', 
+											imageId: 0, 
+											methodTypeId: 4, 
+											parameters: ''}
 									],
 									events: [],
 									baseTypeId: setBaseTypeId,
+									baseTypeName: setBaseTypeName,
 									isToolStrip: 1
 								};
 
@@ -356,6 +371,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								m_typeForEdit.tags = typeTags;
 								m_typeForEdit.imageId = m_imageId;
 								m_typeForEdit.baseTypeId = setBaseTypeId;
+								m_typeForEdit.baseTypeName = setBaseTypeName;
 
 								exceptionRet = clType.load(m_typeForEdit);
 								if (exceptionRet) { throw exceptionRet; }

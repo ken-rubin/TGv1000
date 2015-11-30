@@ -92,16 +92,10 @@ define(["SourceScanner/converter"],
             }
 
             // Extract the primary block chain from the JSON object.
+            // This is the stack of statements inside the function wrapper. Or null if none.
             self.getPrimaryBlockChain = function (objectJSON) {
 
-                // Do something to scan the object for the primary block chain:
-
-                // Are there no chains at all?  (Return an empty, non-null statement-chain.)
-
-                // Is there just one chain?
-
-                // No?, then get the list of chains that only contain 
-                // commands for adding objects and setting property values.
+                // TODO: Might have to search for the function wrapper. For now we're assuming it's all there is (if present).
 
                 if (!objectJSON.children ||
                     !objectJSON.children.length) {
@@ -109,8 +103,13 @@ define(["SourceScanner/converter"],
                     return null;
                 }
 
-                // Take the first one.
-                return objectJSON.children[0];
+                if (objectJSON.children[0].children.length < 3) {
+
+                    return null;
+                }
+
+                // Return the statements inside the stack.
+                return objectJSON.children[0].children[2].children[0];
             };
         };
 

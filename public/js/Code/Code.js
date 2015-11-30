@@ -564,10 +564,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
-							// if (self.workspace.length === 0 || self.workspace.length < 50) {
-
-							// 	debugger;
-							// }
 
                             // Set the new data in the type strip.
                             var exceptionRet = types.update(self.workspace);
@@ -576,14 +572,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             // If the current type is app, and the current method is initialize, then
                             // need to play changes into the designer in case anything changes here.
 
-                            var bAppInitializeActive = types.isAppInitializeActive();
-                            if (!bAppInitializeActive) {
+                            if (!types.isAppInitializeActive()) { return; }
 
-                            	return;
-                            }
-
-		                    // .
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    // The App type is selected. The initialize method is clicked on (loaded into code pane).
+		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Pulls workspace XML out of the App::initialize and converts to JSON.
 		                    if (!objectWorkspace) {
 
 		                        throw { messgage: "Failed to get the workspace object." };
@@ -811,8 +803,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// strName is the name of the method prepended with its type name + "_".
 					// method is passed in to have access to properties methodTypeId (effectively, statement or expression)
 					// and parameters.
-
-					// TODO: do this
 					var m_functionGenerateBlocksMethodFunctionString = function (strName, method) {
 
 						var arrayParameters = method.parameters.split(/[\s,]+/);
@@ -837,8 +827,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					};
 
 					// Helper method generates the javascript string for a method function.
-					
-					// TODO: do this
 					var m_functionGenerateJavaScriptMethodFunctionString = function (method) {
 
 						return 'var strId = Blockly.JavaScript.valueToCode(block,"SELF",Blockly.JavaScript.ORDER_ADDITION) || "";' +

@@ -36,8 +36,10 @@
     - That same color goes to the type's methods, properties and events.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
 - Need to bring saving of projects in ProjectBO up to speed wrt changes just made to Projects, Types and Methods.
-- Need dialogs to submit on Enter (i.e., button is triggered).
-- In types.js determine what other TypeWell buttons need to be disabled or enabled if a system base type is the active type. May be based on user class.
+- Need dialogs to submit on Enter key (i.e., button is triggered).
+- In types.js: are there additional TypeWell buttons that need to be disabled or enabled if a system base type is the active type. May be based on user group.
+- PropertyGrid.js rename type instance not working.
+- Switch indexscripts.jade to include jquery.xpath.min.js after debugging with jquery.xpath.js.
 
 
 
@@ -49,7 +51,7 @@
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
 - **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- Remove requirement for images in project, type, method (maybe later, says John; maybe for project we generate a designer thumbnail)
+
 
 
 ## General description of programming using our system
@@ -93,6 +95,187 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
     - The parameters are used in the blockly blocks XML and JavaScript as in [this example](http://165.225.132.154/work/Coder/).
 - Construct method
     - The App Type always has an *initialize* method, but up till now none of the other Types would start with a default method. We are adding the *construct* method to every Type--even the App Type. We will decide later if the method is initialized by the system or if the user just uses it as a constructor that is executed when the Type is *newed*.
+- In case of manipulation of the method in the code pane by manipulating blockly blocks:
+    - It's not just the workspace that has changed.
+    - This method's name, parameters, even method type could have changed.
+    - We will examine the workspace and adjust what needs adjusting.
+    - The big problem is that the user might have changed the function name to
+    - one that already exists. We'll handle this by changing the name slightly and
+    - informing the user if necessary.
+    - And everything has to be done quickly, because we're getting called on every keystroke, drag (pixel?), etc.
+    - We have to remove any chaff--stuff that's not formally part of the method that the user might have left in.
+    - For example, a second block.
+    - Examples of strWorkspace:
+
+    (1) procedures_defnoreturn with nothing extraneous:
+
+        <xml xmlns="http://www.w3.org/1999/xhtml">
+            <block type="procedures_defnoreturn">
+                <mutation>
+                    <arg name="self"/>
+                    <arg name="Param1"/>
+                </mutation>
+                <field name="NAME">Print</field>
+                <statement name="STACK"> (guts of the method)                
+                    <block type="text_print">
+                        <value name="TEXT">
+                            <block type="variables_get">
+                                <field name="VAR">Param1</field>
+                            </block>
+                        </value>
+                    </block>
+                </statement>
+            </block>
+        </xml>
+
+    (2) procedures_defreturn with nothing extraneous:
+
+            <xml xmlns="http://www.w3.org/1999/xhtml">
+                <block type="procedures_defreturn">
+                    <mutation>
+                        <arg name="self"/>
+                        <arg name="P1"/>
+                        <arg name="P2"/>
+                        <arg name="P3"/>
+                    </mutation>
+                    <field name="NAME">M2</field>
+                    <value name="RETURN">
+                        <block type="math_arithmetic">
+                            <field name="OP">ADD</field>
+                            <value name="A">
+                                <block type="variables_get">
+                                    <field name="VAR">P1</field>
+                                </block>
+                            </value>
+                            <value name="B">
+                                <block type="math_arithmetic">
+                                    <field name="OP">DIVIDE</field>
+                                    <value name="A">
+                                        <block type="variables_get">
+                                            <field name="VAR">P2</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get">
+                                            <field name="VAR">P3</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                    </value>
+                </block>
+            </xml>
+
+    (3) procedures_defreturn with an extraneous block at the end:
+
+            <xml xmlns="http://www.w3.org/1999/xhtml">
+                <block type="procedures_defreturn">
+                    <mutation>
+                        <arg name="self"/>
+                        <arg name="P1"/>
+                        <arg name="P2"/>
+                        <arg name="P3"/>
+                    </mutation>
+                    <field name="NAME">M2</field>
+                    <value name="RETURN">
+                        <block type="math_arithmetic">
+                            <field name="OP">ADD</field>
+                            <value name="A">
+                                <block type="variables_get">
+                                    <field name="VAR">P1</field>
+                                </block>
+                            </value>
+                            <value name="B">
+                                <block type="math_arithmetic">
+                                    <field name="OP">DIVIDE</field>
+                                    <value name="A">
+                                        <block type="variables_get">
+                                            <field name="VAR">P2</field>
+                                        </block>
+                                    </value>
+                                    <value name="B">
+                                        <block type="variables_get">
+                                            <field name="VAR">P3</field>
+                                        </block>
+                                    </value>
+                                </block>
+                            </value>
+                        </block>
+                    </value>
+                </block>
+                <block type="logic_ternary"/>    <---- ignore extra block.
+            </xml>
+
+    (4) procedures_defreturn with an internal statement (and the return):
+
+            <xml xmlns="http://www.w3.org/1999/xhtml">
+              <block type="procedures_defreturn">
+                <mutation>
+                  <arg name="self"></arg>
+                  <arg name="P1"></arg>
+                  <arg name="P2"></arg>
+                  <arg name="P3"></arg>
+                </mutation>
+                <field name="NAME">M2</field>
+                <statement name="STACK">    <----- the guts of the method
+                  <block type="text_print">
+                    <value name="TEXT">
+                      <shadow type="text">
+                        <field name="TEXT">abc</field>
+                      </shadow>
+                    </value>
+                  </block>
+                </statement>
+                <value name="RETURN">       <----- the return
+                  <block type="math_arithmetic">
+                    <field name="OP">ADD</field>
+                    <value name="A">
+                      <block type="variables_get">
+                        <field name="VAR">P1</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_arithmetic">
+                        <field name="OP">DIVIDE</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR">P2</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="variables_get">
+                            <field name="VAR">P3</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </xml>  
+
+
+    So, this is the main structure:
+
+            <xml xmlns="http://www.w3.org/1999/xhtml">
+              <block type="procedures_defreturn">
+                <mutation>
+                    <arg> elements with parameters
+                </mutation>
+                <field name="NAME">method name</field>
+                <statement name="STACK">
+                    <block> with guts </block>
+                </statement>
+                
+            procedures_defreturn adds the following return block here:
+                <value name="RETURN">
+                    <block> with return items </block>
+                </value>                                
+
+              </block>
+            </xml>
+
 #### Events
 - Events are basically named pointers to Methods.
 - Events support a subscribe/raise model.
