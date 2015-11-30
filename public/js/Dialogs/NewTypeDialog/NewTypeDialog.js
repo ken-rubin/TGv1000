@@ -268,6 +268,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							// First, handle the possible setting of a base type.
 							var setBaseTypeId;
+							var setBaseTypeName;
+
 							if (m_strNewOrEdit === "New" ||
 								(m_strNewOrEdit === "Edit" && !m_typeForEdit.isApp)) {
 
@@ -280,16 +282,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 										if (typeIth.name === selectVal) {
 
 											setBaseTypeId = typeIth.id;
+											setBaseTypeName = selectVal;
 											break;
 										}
 									}
 								} else {
 
 									setBaseTypeId = null;
+									setBaseTypeName = '';
 								}
 							} else {
 
 								setBaseTypeId = m_typeForEdit.baseTypeId;
+								setBaseTypeName = m_typeForEdit.baseTypeName;
 							}
 
 							var clType = new Type();
@@ -350,6 +355,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									],
 									events: [],
 									baseTypeId: setBaseTypeId,
+									baseTypeName: setBaseTypeName,
 									isToolStrip: 1
 								};
 
@@ -365,6 +371,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								m_typeForEdit.tags = typeTags;
 								m_typeForEdit.imageId = m_imageId;
 								m_typeForEdit.baseTypeId = setBaseTypeId;
+								m_typeForEdit.baseTypeName = setBaseTypeName;
 
 								exceptionRet = clType.load(m_typeForEdit);
 								if (exceptionRet) { throw exceptionRet; }
