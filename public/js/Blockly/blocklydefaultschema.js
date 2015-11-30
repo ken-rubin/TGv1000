@@ -10,9 +10,7 @@
 // Function returns a schema from an array of names.
 function getSchemaFromArrayOfNames(nameArray) {
 
-    var Global = {};
-    var sObject = {};
-    var Ship = {};
+    var System = {};
     var Event = {};
     var Controls = {};
     var ControlsIf = {};
@@ -39,13 +37,7 @@ function getSchemaFromArrayOfNames(nameArray) {
             switch(parts[0]) {
 
                 case "system":
-                    Global[parts[1]] = true;
-                    break;
-                case "trackableItem":
-                    sObject[parts[1]] = true;
-                    break;
-                case "ship":
-                    Ship[parts[1]] = true;
+                    System[parts[1]] = true;
                     break;
                 case "event":
                     Event[parts[1]] = true;
@@ -95,12 +87,8 @@ function getSchemaFromArrayOfNames(nameArray) {
     }
 
     var sc = {};
-    if (!$.isEmptyObject(Global))
-        sc['Global'] = Global;
-    if (!$.isEmptyObject(sObject))
-        sc['Object'] = sObject;
-    if (!$.isEmptyObject(Ship))
-        sc['Ship'] = Ship;
+    if (!$.isEmptyObject(System))
+        Controls['System'] = System;
     if (!$.isEmptyObject(Event))
         sc['Event'] = Event;
     if (!$.isEmptyObject(ControlsIf))
@@ -131,127 +119,19 @@ BlocklyMenuRenderer = function (include) {
 
     var strRet = '<xml id="toolbox" style="display: none">';
 
-    if (include.Global) {
+    if (include.System) {
 
-        strRet += '<category name="Global">';
+        strRet += '<category name="System">';
 
-        if (include.Global.GetGlobal) 
-            strRet += '<block type="system_getGlobal"></block>';
-        if (include.Global.SetGlobal) 
-            strRet += '<block type="system_setGlobal"></block>';
-        if (include.Global.InvokeMethod) 
-            strRet += '<block type="system_invokeMethod"></block>';
-        if (include.Global.PlaySound) 
-            strRet += '<block type="system_playSound"></block>';
-        if (include.Global.SetTimeout) 
-            strRet += '<block type="window_setTimeout"></block>';
-        if (include.Global.SetBackgroundUrl) 
-            strRet += '<block type="system_setBackgroundUrl"></block>';
-        if (include.Global.SetBackgroundDrift) 
-            strRet += '<block type="system_setBackgroundDrift"></block>';
+        if (include.System.DesignerCanvasContext) {
 
-        strRet += '</category>';
-    }
+            strRet += '<block type="system_DesignerCanvasContext"></block>';
+        }
+        if (include.System.ClearRect) {
 
-    if (include.Object) {
-
-        strRet += '<category name="Object">';
-
-        if (include.Object.Add) 
-            strRet += '<block type="trackableItem_add"></block>';
-        if (include.Object.Remove) 
-            strRet += '<block type="trackableItem_remove"></block>';
-        if (include.Object.Exists) 
-            strRet += '<block type="trackableItem_exists"></block>';
-
-        if (include.Object.SetonUpdate) 
-            strRet += '<block type="trackableItem_setonUpdate"></block>';
-
-        if (include.Object.SetonCollide) 
-            strRet += '<block type="trackableItem_setonCollide"></block>';
-
-        if (include.Object.SetonOutOfBounds) 
-            strRet += '<block type="trackableItem_setonOutOfBounds"></block>';
-
-        if (include.Object.GetLeft) 
-            strRet += '<block type="trackableItem_getLeft"></block>';
-        if (include.Object.SetLeft) 
-            strRet += '<block type="trackableItem_setLeft"></block>';
-        if (include.Object.GetTop) 
-            strRet += '<block type="trackableItem_getTop"></block>';
-        if (include.Object.SetTop) 
-            strRet += '<block type="trackableItem_setTop"></block>';
-
-        if (include.Object.GetWidth) 
-            strRet += '<block type="trackableItem_getWidth"></block>';
-        if (include.Object.SetWidth) 
-            strRet += '<block type="trackableItem_setWidth"></block>';
-        if (include.Object.GetHeight) 
-            strRet += '<block type="trackableItem_getHeight"></block>';
-        if (include.Object.SetHeight) 
-            strRet += '<block type="trackableItem_setHeight"></block>';
-
-        if (include.Object.GetImage) 
-            strRet += '<block type="trackableItem_getImage"></block>';
-        if (include.Object.SetImage) 
-            strRet += '<block type="trackableItem_setImage"></block>';
-        if (include.Object.GetMass) 
-            strRet += '<block type="trackableItem_getMass"></block>';
-        if (include.Object.SetMass) 
-            strRet += '<block type="trackableItem_setMass"></block>';
-        if (include.Object.GetPresentation) 
-            strRet += '<block type="trackableItem_getPresentation"></block>';
-        if (include.Object.SetPresentation) 
-            strRet += '<block type="trackableItem_setPresentation"></block>';
-        if (include.Object.GetRadius) 
-            strRet += '<block type="trackableItem_getRadius"></block>';
-        if (include.Object.SetRadius) 
-            strRet += '<block type="trackableItem_setRadius"></block>';
-        if (include.Object.GetTheta) 
-            strRet += '<block type="trackableItem_getTheta"></block>';
-        if (include.Object.SetTheta) 
-            strRet += '<block type="trackableItem_setTheta"></block>';
-
-        if (include.Object.SetOOB) 
-            strRet += '<block type="trackableItem_setOOB"></block>';
-
-        if (include.Object.GetVelocityX) 
-            strRet += '<block type="trackableItem_getVelocityX"></block>';
-        if (include.Object.GetVelocityY) 
-            strRet += '<block type="trackableItem_getVelocityY"></block>';
-        if (include.Object.SetVelocity) 
-            strRet += '<block type="trackableItem_setVelocity"></block>';
-
-        if (include.Object.GetAttributeValue) 
-            strRet += '<block type="trackableItem_getAttributeValue"></block>';
-
-        if (include.Object.SetScore) 
-            strRet += '<block type="trackableItem_setScore"></block>';
-
-        strRet += '</category>';
-    }
-
-    if (include.Ship) {
-
-        strRet += '<category name="Ship">';
-
-        if (include.Ship.BeginCounterRotate) 
-            strRet += '<block type="ship_beginCounterRotate"></block>';
-        if (include.Ship.EndCounterRotate) 
-            strRet += '<block type="ship_endCounterRotate"></block>';
-        if (include.Ship.BeginRotate) 
-            strRet += '<block type="ship_beginRotate"></block>';
-        if (include.Ship.EndRotate) 
-            strRet += '<block type="ship_endRotate"></block>';
-
-        if (include.Ship.BeginThrust) 
-            strRet += '<block type="ship_beginThrust"></block>';
-        if (include.Ship.EndThrust) 
-            strRet += '<block type="ship_endThrust"></block>';
-
-        if (include.Ship.Fire) 
-            strRet += '<block type="ship_fire"></block>';
-
+            strRet += '<block type="system_ClearRect"></block>';
+        }
+        
         strRet += '</category>';
     }
 
@@ -417,6 +297,7 @@ BlocklyMenuRenderer = function (include) {
         strRet += '<category name="Functions" custom="PROCEDURE"></category>';
     }
 
+    // Include all system and user defined types in their own nodes.
     if (include.Types) {
 
         // Loop over each type.
@@ -444,59 +325,10 @@ BlocklyMenuRenderer = function (include) {
 // Generate schema from JSON structure.
 var defaultSchema = {
 
-    Global: {
+    System: {
 
-        GetGlobal: true,
-        SetGlobal: true,
-        InvokeMethod: true,
-        PlaySound: true,
-        SetTimeout: true,
-        SetBackgroundUrl: true,
-        SetBackgroundDrift: true
-    }/*,
-    Object: {
-
-        Add: true,
-        Remove: true,
-        Exists: true,
-        SetonUpdate: true,
-        SetonCollide: true,
-        SetonOutOfBounds: true,
-        GetLeft: true,
-        SetLeft: true,
-        GetTop: true,
-        SetTop: true,
-        GetWidth: true,
-        SetWidth: true,
-        GetHeight: true,
-        SetHeight: true,
-        GetImage: true,
-        SetImage: true,
-        GetMass: true,
-        SetMass: true,
-        GetPresentation: true,
-        SetPresentation: true,
-        GetRadius: true,
-        SetRadius: true,
-        GetTheta: true,
-        SetTheta: true,
-        SetOOB: true,
-        GetVelocityX: true,
-        GetVelocityY: true,
-        SetVelocity: true,
-        GetAttributeValue: true,
-        SetScore: true
+        DesignerCanvasContext: true,
     },
-    Ship: {
-
-        BeginCounterRotate: true,
-        EndCounterRotate: true,
-        BeginRotate: true,
-        EndRotate: true,
-        BeginThrust: true,
-        EndThrust: true,
-        Fire: true
-    }*/,
     Event: {
 
         WhoAmI: true,

@@ -23,6 +23,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 					// Selector.
 					self.selector = "#designer";
 					self.selectorCanvas = "#surfacecanvas";
+					self.canvasContext = null;
 
 					////////////////////////////////
 					// Pulbic methods.
@@ -351,7 +352,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 								m_dHeight);
 
 							// Get context.
-							m_context = canvas.getContext("2d");
+							self.canvasContext = canvas.getContext("2d");
 
 							// Render canvas.
 							var exceptionRet = m_functionRender();
@@ -858,42 +859,42 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						try {
 
 							// Save the entire state of the canvas.
-							m_context.save();
+							self.canvasContext.save();
 
 							// Set the transform--note this is the reason for the save.
-							m_context.transform(1, 0, 0, 1, m_dWidth / 2, m_dHeight / 2);
+							self.canvasContext.transform(1, 0, 0, 1, m_dWidth / 2, m_dHeight / 2);
 
 							// Draw out the background and grid lines.
-							m_context.fillStyle = "rgb(0,0,0)";
-							m_context.fillRect(-m_dWidth / 2, -m_dHeight / 2, m_dWidth, m_dHeight);
+							self.canvasContext.fillStyle = "rgb(0,0,0)";
+							self.canvasContext.fillRect(-m_dWidth / 2, -m_dHeight / 2, m_dWidth, m_dHeight);
 
-							m_context.fillStyle = "#333";
+							self.canvasContext.fillStyle = "#333";
 							var iX = 0;
 							var iY = 0;
 							while (iX < m_dWidth / 2) {
 
-								m_context.fillRect(iX, -m_dHeight / 2, 1, m_dHeight);
-								m_context.fillRect(-iX, -m_dHeight / 2, 1, m_dHeight);
+								self.canvasContext.fillRect(iX, -m_dHeight / 2, 1, m_dHeight);
+								self.canvasContext.fillRect(-iX, -m_dHeight / 2, 1, m_dHeight);
 
 								iX += 50;
 							}
 							while (iY < m_dHeight / 2) {
 
-								m_context.fillRect(-m_dWidth / 2, iY, m_dWidth, 1);
-								m_context.fillRect(-m_dWidth / 2, -iY, m_dWidth, 1);
+								self.canvasContext.fillRect(-m_dWidth / 2, iY, m_dWidth, 1);
+								self.canvasContext.fillRect(-m_dWidth / 2, -iY, m_dWidth, 1);
 
 								iY += 50;
 							}
-/*							m_context.strokeStyle = "#ccc";
-							m_context.strokeRect(-m_dWidth / 2, 0, m_dWidth, 1);
-							m_context.strokeRect(0, -m_dHeight / 2, 1, m_dHeight);
-							m_context.strokeRect(-m_dWidth / 2, -m_dHeight / 2, m_dWidth, m_dHeight);
+/*							self.canvasContext.strokeStyle = "#ccc";
+							self.canvasContext.strokeRect(-m_dWidth / 2, 0, m_dWidth, 1);
+							self.canvasContext.strokeRect(0, -m_dHeight / 2, 1, m_dHeight);
+							self.canvasContext.strokeRect(-m_dWidth / 2, -m_dHeight / 2, m_dWidth, m_dHeight);
 */
 							// Draw all items.
 							for (var i = 0; i < m_arrayItems.length; i++) {
 
 								var itemIth = m_arrayItems[i];
-								var exceptionRet = itemIth.render(m_context);
+								var exceptionRet = itemIth.render(self.canvasContext);
 								if (exceptionRet) {
 
 									throw exceptionRet;
@@ -907,7 +908,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 						} finally {
 
 							// Reset state/transform.
-							m_context.restore();
+							self.canvasContext.restore();
 						}
 					};
 
@@ -1120,8 +1121,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		            var m_jWrapper = null;
 		            // Reference to the background canvas.
 		            var m_jCanvas = null;
-		            // The rendering context.
-		            var m_context = null;
 		            // Collection of tool instances.
 		            var m_arrayItems = [];
 		            // Dimension of canvas.

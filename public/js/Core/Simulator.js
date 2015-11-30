@@ -314,7 +314,7 @@ define(["Core/EnvironmentBuilder"],
                         if (instanceIth.render) {
 
                             // Call update if it exists.
-                            var exceptionRet = instanceIth.render(m_context);
+                            var exceptionRet = instanceIth.render();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -332,10 +332,6 @@ define(["Core/EnvironmentBuilder"],
             ///////////////////////////
             // Private fields.
 
-            // .
-            var m_jCanvas = null;
-            // .
-            var m_context = null;
             // .
             var m_renderCookie = null;
             // .

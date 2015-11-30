@@ -196,148 +196,50 @@ function DefineDefaultBlocks() {
             return [strCode, Blockly.JavaScript.ORDER_MEMBER];
         };
 
-        //////////////////////////////////////////////////////
-        // Trackable Item:
-
-        // Add object.
-        Blockly.Blocks["trackableItem_add"] = {
-
-            init: function() {
-
-                this.appendDummyInput()
-                    .appendField("add");
-                this.appendValueInput("ID")
-                  .appendField("id");
-                this.appendValueInput("URL")
-                  .appendField("url");
-                this.appendValueInput("LEFT")
-                  .appendField("left");
-                this.appendValueInput("TOP")
-                  .appendField("top");
-                this.appendValueInput("WIDTH")
-                  .appendField("width");
-                this.appendValueInput("HEIGHT")
-                  .appendField("height");
-                this.appendValueInput("INIT")
-                  .appendField("init");
-                this.setColour(30);
-                this.setPreviousStatement(true);
-                this.setNextStatement(true);
-                this.setInputsInline(true);
-               this.setTooltip("Allocate a new object.");
-            }
-        };
-        Blockly.JavaScript["trackableItem_add"] = function(block) {
-            
-            // Search the text for a substring.
-            var strId = Blockly.JavaScript.valueToCode(block, 'ID', Blockly.JavaScript.ORDER_ADDITION) || "";
-            var strUrl = Blockly.JavaScript.valueToCode(block, 'URL', Blockly.JavaScript.ORDER_ADDITION) || "";
-            var strLeft = Blockly.JavaScript.valueToCode(block, 'LEFT', Blockly.JavaScript.ORDER_ADDITION) || 0;
-            var strTop = Blockly.JavaScript.valueToCode(block, 'TOP', Blockly.JavaScript.ORDER_ADDITION) || 0;
-            var strWidth = Blockly.JavaScript.valueToCode(block, 'WIDTH', Blockly.JavaScript.ORDER_ADDITION) || 100;
-            var strHeight = Blockly.JavaScript.valueToCode(block, 'HEIGHT', Blockly.JavaScript.ORDER_ADDITION) || 100;
-            var strInit = Blockly.JavaScript.valueToCode(block, 'INIT', Blockly.JavaScript.ORDER_ADDITION) || "";
-
-            var strCode = 
-                "self.allocateItem('TrackableItemBase', " + 
-                    strId + 
-                    ", " +
-                    strUrl + 
-                    ", self.options.width / 2 + (" + 
-                    strLeft + 
-                    "), self.options.height / 2 - (" +
-                    strTop +
-                    "), " + 
-                    strWidth + 
-                    ", " +
-                    strHeight +
-                    ", " +
-                    strInit +
-                    "); ";
-            return strCode;
-        };
-
-        // Remove object.
-        Blockly.Blocks["trackableItem_remove"] = {
-
-            init: function() {
-
-                this.appendDummyInput()
-                    .appendField("remove");
-                this.appendValueInput("ID")
-                  .appendField("id");
-                this.setColour(30);
-                this.setPreviousStatement(true);
-                this.setNextStatement(true);
-                this.setInputsInline(true);
-               this.setTooltip("Remove existing object.");
-            }
-        };
-        Blockly.JavaScript["trackableItem_remove"] = function(block) {
-            
-            // Search the text for a substring.
-            var strId = Blockly.JavaScript.valueToCode(block, 'ID', Blockly.JavaScript.ORDER_ADDITION) || "";
-
-            var strCode = "self.slateItemForRemoval(self.getItem(" + strId + ")); ";
-            return strCode;
-        };
-
-        // Set image.
-        Blockly.Blocks["trackableItem_setImage"] = {
-
-            init: function() {
-
-                this.appendDummyInput()
-                    .appendField("setImage");
-                this.appendValueInput("TARGET")
-                  .appendField("target");
-                this.appendValueInput("URL")
-                  .appendField("url");
-                this.setColour(30);
-                this.setPreviousStatement(true);
-                this.setNextStatement(true);
-                this.setInputsInline(true);
-               this.setTooltip("Set image url.");
-            }
-        };
-        Blockly.JavaScript["trackableItem_setImage"] = function(block) {
-            
-            // Search the text for a substring.
-            var strTargetId = Blockly.JavaScript.valueToCode(block, 'TARGET', Blockly.JavaScript.ORDER_ADDITION) || "";
-            var strUrl = Blockly.JavaScript.valueToCode(block, 'URL', Blockly.JavaScript.ORDER_ADDITION) || "";
-
-            var strCode = 
-                "self.getItem(" + strTargetId + ").setUrl(" + strUrl + "); ";
-            return strCode;
-        };
-
-        // Exists.
-        Blockly.Blocks["trackableItem_exists"] = {
-
-            init: function() {
-
-                this.appendDummyInput()
-                    .appendField("exists");
-                this.appendValueInput("TARGET")
-                  .appendField("target");
-                this.setColour(30);
-                this.setOutput(true);
-                this.setInputsInline(true);
-               this.setTooltip("Determine if the specified target exists.");
-            }
-        };
-        Blockly.JavaScript["trackableItem_exists"] = function(block) {
-            
-            // Search the text for a substring.
-            var strTargetId = Blockly.JavaScript.valueToCode(block, 'TARGET', Blockly.JavaScript.ORDER_ADDITION) || "";
-
-            var strCode = 
-                " self.getItem(" + strTargetId + ") !== null ";
-            return [strCode, Blockly.JavaScript.ORDER_MEMBER];
-        };
-
         ///////////////////////////////////////////////////////////
         // System:
+
+        // ClearRect.
+        Blockly.Blocks["system_ClearRect"] = {
+
+            init: function() {
+
+                this.appendDummyInput()
+                  .appendField("clearRect");
+                this.appendValueInput("Using")
+                  .appendField("Using");
+                this.setColour(160);
+                this.setInputsInline(true);
+                this.setPreviousStatement(true);
+                this.setNextStatement(true);
+                this.setTooltip("Clear the specified rect.");
+            }
+        };
+        Blockly.JavaScript["system_ClearRect"] = function(block) {
+            
+            var strUsing = Blockly.JavaScript.valueToCode(block, 'Using', Blockly.JavaScript.ORDER_ADDITION) || '';
+
+            var strCode = " " + strUsing + ".clearRect(0,0,"+strUsing+".canvas.clientWidth,"+strUsing+".canvas.clientHeight); ";
+            return strCode;
+        };
+        // WhoAmI.
+        Blockly.Blocks["system_DesignerCanvasContext"] = {
+
+            init: function() {
+
+                this.appendDummyInput()
+                    .appendField("Designer Canvas Context");
+                this.setColour(10);
+                this.setOutput(true);
+                this.setInputsInline(true);
+               this.setTooltip("Return designer canvas context.");
+            }
+        };
+        Blockly.JavaScript["system_DesignerCanvasContext"] = function(block) {
+            
+            var strCode = " (Designer.canvasContext) ";
+            return [strCode, Blockly.JavaScript.ORDER_MEMBER];
+        };
 
         // Invoke Method.
         Blockly.Blocks["system_invokeMethod"] = {

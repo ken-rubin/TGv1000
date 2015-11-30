@@ -114,6 +114,12 @@ define([],
                         " /* Register with system. */ window.instances.push(self); " + 
                         " /* Reference to the application object. */ self.app = app; ";
 
+                    // If there is a base class, then add the inherits command.
+                    if (objectType.baseTypeName) {
+
+                        strConstructorFunction += " /* Inherit from base class. */ self.inherits(" + objectType.baseTypeName + "); ";
+                    }
+
                     // Add properties.
                     for (var i = 0; i < objectType.properties.length; i++) {
 
@@ -138,10 +144,17 @@ define([],
                     }
 
                     // Add methods.
+                    bool bFoundConstruct = false;
                     for (var i = 0; i < objectType.methods.length; i++) {
 
                         // Get the ith method.
                         var objectMethod = objectType.methods[i];
+
+                        // Look for construct method, invoke when created.
+                        if (objectMethod.name == "construct") {
+
+                            bFoundConstruct = true;
+                        }
 
                         strConstructorFunction += " self." + objectMethod.name + " = function (";
                         
@@ -161,7 +174,19 @@ define([],
                         strConstructorFunction += ") { " + objectMethod.code + " }; ";
                     }
 
-                    strConstructorFunction += " };";
+                    // If there is a base class, do the function injection.
+                    if (bFoundConstruct) {
+        
+                        strConstructorFunction += " /* Invoke construct. */ self.construct(); ";
+                    }
+
+                    strConstructorFunction += " }; ";
+
+                    // If there is a base class, do the function injection.
+                    if (objectType.baseTypeName) {
+        
+                        strConstructorFunction += " /* Do function injection. */ window." + objectType.name + ".inheritsFrom(" + objectType.baseTypeName + "); ";
+                    }
 
                     eval(strConstructorFunction);
 
