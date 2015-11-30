@@ -266,7 +266,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 							
-							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_def' + (method.methodTypeId === 1 ? 'no' : '') + 'return"><mutation>';
+							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_def' + (method.methodTypeId === 2 ? '' : 'no') + 'return"><mutation>';
 
 							parametersArray.forEach(function(param){
 
@@ -322,7 +322,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							
 							var origWorkspace = m_methodForEdit.workspace;
 
-							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_def' + (method.methodTypeId === 1 ? 'no' : '') + 'return"><mutation>';
+							var strBuild = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_def' + (method.methodTypeId === 2 ? '' : 'no') + 'return"><mutation>';
 
 							parametersArray.forEach(function(param){
 

@@ -151,7 +151,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							inDBAlready: (self.data.id > 0),
 							userOwnsProject: (self.data.ownedByUserId === test),
 							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
-											&& self.data.imageId > 0
+											&& (self.data.imageId > 0 || self.data.altImagePath.length > 0)
 										),
 							projectNameIsFilled: (self.data.name.trim().length > 0)
 						};

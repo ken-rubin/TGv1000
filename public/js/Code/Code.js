@@ -564,10 +564,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
-							// if (self.workspace.length === 0 || self.workspace.length < 50) {
-
-							// 	debugger;
-							// }
 
                             // Set the new data in the type strip.
                             var exceptionRet = types.update(self.workspace);
