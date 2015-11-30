@@ -664,12 +664,54 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                         // Add the new block to the work block.
                         blockWork.next = blockNew;
+
                     } else {
 
-                        // Add directly to the XML object--this is the first block.
-                        objectWorkspace.children = [];
-                        objectWorkspace.children.push(blockNew);
+                        // There was no blockWork. This can be due to these reasons:
+                        // (1) There is no function c-block. It must have been deleted by the user.
+                        // (2) There is a function c-block, but it's empty because nothing's been dropped on the designer or the user messed with it.
+                        // In either case, we're just going to build the initialize method from scratch with blockNew.
+                        objectWorkspace = 
+                        {
+                            nodeName: "xml",
+                            xmlns: "http://www.w3.org/1999/xhtml",
+                            children:
+                            [
+                                {
+                                    nodeName: "block",
+                                    type: "procedures_defnoreturn",
+                                    children:
+                                    [
+                                        {
+                                            nodeName: "mutation",
+                                            children:
+                                            [
+                                                {
+                                                    name: "self",
+                                                    nodeName: "arg"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            contents: "initialize",
+                                            name: "NAME",
+                                            nodeName: "field"
+                                        },
+                                        {
+                                            nodeName: "statement",
+                                            name: "STACK",
+                                            children:
+                                            [
+                                                blockNew
+                                            ]
+                                        }
+                                    ],
+                                }
+                            ]
+                        };
                     }
+
+                    // Replace objectWorkspace in workspaceJSONObject.
 
                     // Convert back to XML.
                     var strXml = converter.toXML(objectWorkspace);

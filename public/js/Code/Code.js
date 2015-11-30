@@ -574,8 +574,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
                             if (!types.isAppInitializeActive()) { return; }
 
-		                    // .
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    // The App type is selected. The initialize method is clicked on (loaded into code pane).
+		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Pulls workspace XML out of the App::initialize and converts to JSON.
 		                    if (!objectWorkspace) {
 
 		                        throw { messgage: "Failed to get the workspace object." };
