@@ -180,12 +180,6 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 								return null;
 							}
 
-							// Get the item.
-							// var itemActive = m_arrayActive[m_iActiveIndex];
-
-							// Replace the workspace of the active method.
-							// itemActive.workspace = strWorkspace;
-
 							return m_functionUpdateActiveMethodWorkspace(strWorkspace);
 
 						} catch (e) {

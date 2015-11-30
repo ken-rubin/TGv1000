@@ -365,21 +365,21 @@ begin
                     
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
 			VALUES
-				(1,6,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
-				(2,7,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
-				(3,8,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
-				(4,9,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
-				(5,10,1,'initialize',0,'',0,'',0,0.00,0.00,1,3,''),
-				(6,1,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(7,2,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(8,3,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(9,4,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(10,5,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(11,6,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(12,7,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(13,8,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(14,9,1,'construct',1,'',0,'',0,0.00,0.00,1,4,''),
-				(15,10,1,'construct',1,'',0,'',0,0.00,0.00,1,4,'')
+				(1,6,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(2,7,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(3,8,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(4,9,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(5,10,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(6,1,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(7,2,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(8,3,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(9,4,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(10,5,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(11,6,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(12,7,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(13,8,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(14,9,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(15,10,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,'')
 			;
            
 		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
