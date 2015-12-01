@@ -575,10 +575,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             if (!types.isAppInitializeActive()) { return; }
 
 		                    // The App type is selected. The initialize method is clicked on (loaded into code pane).
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Pulls workspace XML out of the App::initialize and converts to JSON.
+		                    var objectWorkspace = processor.getAppInitializeJSONObject();	// Pulls workspace XML out of the App::initialize and converts to JSON.
 		                    if (!objectWorkspace) {
 
-		                        throw { messgage: "Failed to get the workspace object." };
+		                        throw { message: "Failed to get the workspace object." };
 		                    }
 
 		                    // Get the block with which to work and pass
@@ -601,10 +601,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Get the App Type's initialize workspace (in JS).
+		                    var objectWorkspace = processor.getAppInitializeJSONObject();	// Get the App Type's initialize workspace (in JS).
 		                    if (!objectWorkspace) {
 
-		                        throw { messgage: "Failed to get the workspace object." };
+		                        throw { message: "Failed to get the workspace object." };
 		                    }
 
 		                    // Get the block with which to work.

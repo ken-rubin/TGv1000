@@ -211,17 +211,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							// It's not just the workspace that has changed.
 							// This method's name, parameters, even method type could have changed.
 							// As could the user's implementation of the method or its return value.
-							// We will examine the workspace and adjust what needs adjusting.
+							// We will examine the workspace and adjust what needs adjusting in itemActive.
 							
-							// One problem is that the user might have changed the method name to
-							// one that already exists. We'll handle this by changing the name slightly and
-							// informing the user if necessary. For this it would be best to set a timer and let the user finish typing, if possible.
-
-							// However, everything has to be done quickly, because we're getting called on every keystroke, drag (pixel?), etc.
-
-			                // We also might remove any chaff--stuff that's not formally part of the method that the user might have left in the code pane.
-			                // For example, a second block. Or maybe we won't.
-
 							/*	This is the structure have to work with (both variations):
 
 										<xml xmlns="http://www.w3.org/1999/xhtml">
@@ -243,54 +234,72 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 										</xml>
 			                */
 
-			                var proceduresBlock = $(strWorkspace).xpath("/xml/block[1]");	// xpath is 1-based
-			                if (proceduresBlock.length) {
+				            var workspaceJSON = converter.toJSON(strWorkspace);
+				            if (!workspaceJSON.children) { return null; }
 
-				                var blockType = $(proceduresBlock).xpath("@type");
-				                // blockType[0].nodeValue is either "procedures_defreturn" or "procedures_defnoreturn"
-				                // If the user had changd this in the Blockly code pane, we've already handled that by assignment to itemActive.workspace.
+				            // Look among the children for the first one with a c-block (type="procedures_def...") signature.
+				            for (var i = 0; i < workspaceJSON.children.length; i++) {
 
-				                var mutationArgs = $(proceduresBlock).xpath("mutation/arg");	// all of them
-				                var currArgs = [];
-				                for (var i = 0; i < mutationArgs.length; i++) {
+				            	var childIth = workspaceJSON.children[i];
 
-				                	var argIth = mutationArgs[i];
-				                	var argIthName = $(argIth).xpath("@name")[0].nodeValue;	// 0-based since we're now in JS array land
-				                	if (argIthName !== "self") {
+			                    // Check if childIth matches what we need.
+			                    if (childIth.hasOwnProperty("nodeName") && 
+			                        childIth.hasOwnProperty("type") &&
+			                        childIth.hasOwnProperty("children")) {
 
-				                		currArgs.push(argIthName);
-				                	}
-				                }
+			                        if (childIth.nodeName === "block" &&
+			                            childIth.type.substr(0, 11) === "procedures_" &&
+			                            childIth.children.length > 1) {     // mutation, field, statement and (if procedures_defreturn) return.
 
-				                // No need to compare since they're not showing anywhere.
-				                itemActive.parameters = currArgs.join(', ');
+			                            if (childIth.children[1].hasOwnProperty("contents")) {
 
-				                // If anything changes that does display in TypeWell, set the following to true.
-				                // For now this can be only the method name.
-				                var gridRefreshNeeded = false;
+			                            	// We have a c-block. We'll work with it.
 
-				                var methodName = $(strWorkspace).xpath("/xml/block/field")[0].innerText;	// again, JS 0-based arrays
-				                
-				                // Compare methodName with itemActive.name.
-				                if (methodName !== itemActive.name) {
+			                            	// First the methodTypeId.
+			                            	var type = childIth.type;
+			                            	itemActive.methodTypeId = type === "procedures_defreturn" ? 2 : 1;
 
-					                // Dup checking and automatic name adjustment.
-           							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, m_iActiveIndex);
+			                            	// Then the parameters (args).
+			                            	if (childIth.children[0].hasOwnProperty("nodeName") &&
+			                            		childIth.children[0].hasOwnProperty("children")) {
 
-           							if (exceptionRet) {
+			                            		if (childIth.children[0].nodeName === "mutation" &&
+			                            			childIth.children[0].children.length) {
 
-           								// This isn't really an exception. It just means that the name isn't available.
-           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
-           							}
+				                            		var currArgs = [];
+				                            		for (var j = 0; j < childIth.children[0].children.length; j++) {
 
-				                	gridRefreshNeeded = true;
-				                	itemActive.name = methodName;
-				                }
+				                            			var nameJth = childIth.children[0].children[j].name;
+				                            			if (nameJth !== "self") {
 
-				                if (gridRefreshNeeded) {
+				                            				currArgs.push(nameJth);
+				                            			}
+				                            		}
 
-				                	types.regenTWMethodsTable();
-				                }
+				                            		itemActive.parameters = currArgs.join(', ');
+			                            		}
+			                            	}
+
+
+			                            	// Finally, the method name. This is the only one that can cause a grid refresh.
+			                            	var methodName = childIth.children[1].contents;
+							                if (methodName !== itemActive.name) {
+
+								                // Dup checking and automatic name adjustment.
+			           							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, m_iActiveIndex);
+
+			           							if (exceptionRet) {
+
+			           								// This isn't really an exception. It just means that the name isn't available.
+			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
+			           							}
+
+							                	itemActive.name = methodName;
+							                	types.regenTWMethodsTable();
+							                }
+							            }
+							        }
+							    }
 				            }
 
 							return null;

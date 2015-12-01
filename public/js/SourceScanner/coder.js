@@ -21,10 +21,10 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             // Does property exist in app.initialize workspace for toolinstance with id = strInstance?
             self.doesPropertyExist = function (strType, strProperty, strInstance) {
 
-                var objectWorkspace = processor.getWorkspaceJSONObject();
+                var objectWorkspace = processor.getAppInitializeJSONObject();
                 if (!objectWorkspace) {
 
-                    throw { messgage: "Failed to get the workspace object." };
+                    throw { message: "Failed to get the workspace object." };
                 }
 
                 // Get the block with which to work.
@@ -187,10 +187,10 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     }
 
                     // .
-                    var objectWorkspace = processor.getWorkspaceJSONObject();
+                    var objectWorkspace = processor.getAppInitializeJSONObject();
                     if (!objectWorkspace) {
 
-                        throw { messgage: "Failed to get the workspace object." };
+                        throw { message: "Failed to get the workspace object." };
                     }
 
                     // Get the block with which to work.
@@ -251,11 +251,10 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
-                    // TODO: does the following assume that the code pane contains the block(s) for App.initialize? Because I don't think it has to.
-                    var xmlWorkspace = processor.getWorkspaceXMLDoc();
+                    var xmlWorkspace = processor.getAppInitializeXMLDoc();
                     if (!xmlWorkspace) {
 
-                        throw { messgage: "Failed to get the workspace xml." };
+                        throw { message: "Failed to get the workspace xml." };
                     }
 
                     var strAppTypeName = clAppType.data.name;
@@ -541,15 +540,16 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             // Part3 converts the result to XML and stuffs it back in the App Type's initialize method workspace.
             var m_functionRemove_part1 = function () {
 
-                var objectWorkspace = processor.getWorkspaceJSONObject();
+                var objectWorkspace = processor.getAppInitializeJSONObject();
                 if (!objectWorkspace) {
 
-                    throw { messgage: "Failed to get the workspace object." };
+                    throw { message: "Failed to get the workspace object." };
                 }
 
                 return objectWorkspace;
             }
 
+            // TODO Needs updating now that we have C-block format.
             var m_functionRemove_part3 = function (nextArray, objectWorkspace) {
 
                 try {
@@ -650,13 +650,13 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 try {
 
                     // .
-                    var objectWorkspace = processor.getWorkspaceJSONObject();
+                    var objectWorkspace = processor.getAppInitializeJSONObject();
                     if (!objectWorkspace) {
 
-                        throw { messgage: "Failed to get the workspace object." };
+                        throw { message: "Failed to get the workspace object." };
                     }
 
-                    // Get the block with which to work.
+                    // Get the block with which to work--the last block in the primaryBlockChain inside App initialize's c-block.
                     var blockWork = processor.getWorkBlock(objectWorkspace);
 
                     // If there is a work block, add new block it it, otherwise
