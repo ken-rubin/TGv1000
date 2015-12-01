@@ -205,8 +205,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							// Get the item.
 							var itemActive = m_arrayActive[m_iActiveIndex];
 
-							// Replace the workspace of the active method.
-							itemActive.workspace = strWorkspace;
+							// Use this below to display an error box if they try to change one of these reserved names.
+							var methodNameCannotBeChanged = (itemActive.name === "initialize") || (itemActive.name === "construct");
 
 							// It's not just the workspace that has changed.
 							// This method's name, parameters, even method type could have changed.
@@ -253,13 +253,44 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 			                            if (childIth.children[1].hasOwnProperty("contents")) {
 
+			                            	/////////////////////////////////////////
 			                            	// We have a c-block. We'll work with it.
+			                            	/////////////////////////////////////////
 
-			                            	// First the methodTypeId.
+			                            	// First, the method name. This is the only one that can cause a grid refresh.
+			                            	// And it kicks them out of this method if they've changed initialize or construct.
+			                            	var methodName = childIth.children[1].contents;
+
+							                if (methodName !== itemActive.name) {
+
+							                	if (methodNameCannotBeChanged) {
+
+							                		errorHelper.show("The " + itemActive.name + " method cannot be renamed.", 3000);
+
+													var exceptionRet = code.load(itemActive.workspace);
+													if (exceptionRet) { throw exceptionRet; }
+
+													return null;
+							                	}
+
+								                // Dup checking and automatic name adjustment.
+			           							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, m_iActiveIndex);
+
+			           							if (exceptionRet) {
+
+			           								// This isn't really an exception. It just means that the name isn't available.
+			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
+			           							}
+
+							                	itemActive.name = methodName;
+							                	types.regenTWMethodsTable();
+							                }
+
+			                            	// Now the methodTypeId.
 			                            	var type = childIth.type;
 			                            	itemActive.methodTypeId = type === "procedures_defreturn" ? 2 : 1;
 
-			                            	// Then the parameters (args).
+			                            	// Now the parameters (args).
 			                            	if (childIth.children[0].hasOwnProperty("nodeName") &&
 			                            		childIth.children[0].hasOwnProperty("children")) {
 
@@ -279,28 +310,18 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				                            		itemActive.parameters = currArgs.join(', ');
 			                            		}
 			                            	}
+							            } else {
 
-
-			                            	// Finally, the method name. This is the only one that can cause a grid refresh.
-			                            	var methodName = childIth.children[1].contents;
-							                if (methodName !== itemActive.name) {
-
-								                // Dup checking and automatic name adjustment.
-			           							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, m_iActiveIndex);
-
-			           							if (exceptionRet) {
-
-			           								// This isn't really an exception. It just means that the name isn't available.
-			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
-			           							}
-
-							                	itemActive.name = methodName;
-							                	types.regenTWMethodsTable();
-							                }
+							            	// The fact that we're here means the user has just blanked out the method name.
+							            	// We can't save when that happens. We'll ignore it. Perhaps the user was about to type.
+							            	return null;
 							            }
 							        }
 							    }
 				            }
+
+							// Replace the workspace of the active method.
+							itemActive.workspace = strWorkspace;
 
 							return null;
 

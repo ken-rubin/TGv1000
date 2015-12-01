@@ -581,13 +581,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     if (blockWork) {
 
                         // blockWork is just the "real" nodes. We need to wrap in what will result in <xml xmlns="...">
-                        var wrappedBlockWork = {
-                            nodeName: "xml",
-                            xmlns: "http://www.w3.org/1999/xhtml",
-                            children: [
-                                blockWork
-                            ]
-                        };
+                        var wrappedBlockWork = m_functionBuildNewJSONWorkspace(blockWork);
 
                         strXml = converter.toXML(wrappedBlockWork);
                         if (!strXml) {
@@ -671,44 +665,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         // (1) There is no function c-block. It must have been deleted by the user.
                         // (2) There is a function c-block, but it's empty because nothing's been dropped on the designer or the user messed with it.
                         // In either case, we're just going to build the initialize method from scratch with blockNew.
-                        objectWorkspace = 
-                        {
-                            nodeName: "xml",
-                            xmlns: "http://www.w3.org/1999/xhtml",
-                            children:
-                            [
-                                {
-                                    nodeName: "block",
-                                    type: "procedures_defnoreturn",
-                                    children:
-                                    [
-                                        {
-                                            nodeName: "mutation",
-                                            children:
-                                            [
-                                                {
-                                                    name: "self",
-                                                    nodeName: "arg"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            contents: "initialize",
-                                            name: "NAME",
-                                            nodeName: "field"
-                                        },
-                                        {
-                                            nodeName: "statement",
-                                            name: "STACK",
-                                            children:
-                                            [
-                                                blockNew
-                                            ]
-                                        }
-                                    ],
-                                }
-                            ]
-                        };
+                        objectWorkspace = m_functionBuildNewJSONWorkspace(blocknew);
                     }
 
                     // Replace objectWorkspace in workspaceJSONObject.
@@ -731,11 +688,53 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     methodInitialize.workspace = strXml;
 
                     return null;
+
                 } catch (e) {
 
                     return e;
                 }
             };
+
+            var m_functionBuildNewJSONWorkspace = function (blockNew) {
+
+                return {
+                        nodeName: "xml",
+                        xmlns: "http://www.w3.org/1999/xhtml",
+                        children:
+                        [
+                            {
+                                nodeName: "block",
+                                type: "procedures_defnoreturn",
+                                children:
+                                [
+                                    {
+                                        nodeName: "mutation",
+                                        children:
+                                        [
+                                            {
+                                                name: "self",
+                                                nodeName: "arg"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        contents: "initialize",
+                                        name: "NAME",
+                                        nodeName: "field"
+                                    },
+                                    {
+                                        nodeName: "statement",
+                                        name: "STACK",
+                                        children:
+                                        [
+                                            blockNew
+                                        ]
+                                    }
+                                ],
+                            }
+                        ]
+                    };
+            }
 
             ////////////////////////
             // Private fields.
