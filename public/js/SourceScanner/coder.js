@@ -665,7 +665,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         // (1) There is no function c-block. It must have been deleted by the user.
                         // (2) There is a function c-block, but it's empty because nothing's been dropped on the designer or the user messed with it.
                         // In either case, we're just going to build the initialize method from scratch with blockNew.
-                        objectWorkspace = m_functionBuildNewJSONWorkspace(blocknew);
+                        objectWorkspace = m_functionBuildNewJSONWorkspace(blockNew);
                     }
 
                     // Replace objectWorkspace in workspaceJSONObject.
