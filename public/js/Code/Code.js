@@ -565,7 +565,8 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
 
-                            // Set the new data in the type strip.
+                            // Set the new data in the TypeWell. types calls type.js#update for the active type.
+                            // In type.js m_functionUpdateActiveMethodWorkspace does all the parsing and updating.
                             var exceptionRet = types.update(self.workspace);
 							if (exceptionRet) { throw exceptionRet; }
 

@@ -61,12 +61,12 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							var exceptionRet = comics.unload();	// the global object
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							self.data = null;
+
+							exceptionRet = code.reset(true);
+							if (exceptionRet) { throw exceptionRet; }
 
 							return designer.unload();
 

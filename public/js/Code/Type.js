@@ -203,15 +203,15 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 						try {
 
 							// Get the item.
-							var itemActive = m_arrayActive[m_iActiveIndex];
+							var activeMethod = m_arrayActive[m_iActiveIndex];
 
-							// Use this below to display an error box if they try to change one of these reserved names.
-							var methodNameCannotBeChanged = (itemActive.name === "initialize") || (itemActive.name === "construct");
+							// Set bool to be used below to display an error box if they try to change the name of either the initialize or construct methods.
+							var methodNameCannotBeChanged = (activeMethod.name === "initialize") || (activeMethod.name === "construct");
 
 							// It's not just the workspace that has changed.
 							// This method's name, parameters, even method type could have changed.
 							// As could the user's implementation of the method or its return value.
-							// We will examine the workspace and adjust what needs adjusting in itemActive.
+							// We will examine the workspace and adjust what needs adjusting in activeMethod.
 							
 							/*	This is the structure have to work with (both variations):
 
@@ -261,13 +261,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			                            	// And it kicks them out of this method if they've changed initialize or construct.
 			                            	var methodName = childIth.children[1].contents;
 
-							                if (methodName !== itemActive.name) {
+							                if (methodName !== activeMethod.name) {
 
 							                	if (methodNameCannotBeChanged) {
 
-							                		errorHelper.show("The " + itemActive.name + " method cannot be renamed.", 3000);
+							                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 
-													var exceptionRet = code.load(itemActive.workspace);
+													var exceptionRet = code.load(activeMethod.workspace);
 													if (exceptionRet) { throw exceptionRet; }
 
 													return null;
@@ -282,13 +282,13 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
 			           							}
 
-							                	itemActive.name = methodName;
+							                	activeMethod.name = methodName;
 							                	types.regenTWMethodsTable();
 							                }
 
 			                            	// Now the methodTypeId.
 			                            	var type = childIth.type;
-			                            	itemActive.methodTypeId = type === "procedures_defreturn" ? 2 : 1;
+			                            	activeMethod.methodTypeId = (type === "procedures_defreturn" ? 2 : 1);
 
 			                            	// Now the parameters (args).
 			                            	if (childIth.children[0].hasOwnProperty("nodeName") &&
@@ -307,13 +307,25 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				                            			}
 				                            		}
 
-				                            		itemActive.parameters = currArgs.join(', ');
+				                            		activeMethod.parameters = currArgs.join(', ');
 			                            		}
 			                            	}
 							            } else {
 
 							            	// The fact that we're here means the user has just blanked out the method name.
-							            	// We can't save when that happens. We'll ignore it. Perhaps the user was about to type.
+							            	// We'll tell the user how to handle this.
+							            	if (methodNameCannotBeChanged) {
+
+						                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
+
+							            	} else {
+
+					                			errorHelper.show("The procedure for completely changing a method name is to double-click on it and begin typing. Then either type Enter or click away.", 7500);
+							            	}
+
+											var exceptionRet = code.load(activeMethod.workspace);
+											if (exceptionRet) { throw exceptionRet; }
+
 							            	return null;
 							            }
 							        }
@@ -321,7 +333,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				            }
 
 							// Replace the workspace of the active method.
-							itemActive.workspace = strWorkspace;
+							activeMethod.workspace = strWorkspace;
 
 							return null;
 
