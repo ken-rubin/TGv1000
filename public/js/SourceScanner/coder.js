@@ -347,7 +347,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                             for (var i = 0; i < props.length; i++) {
 
                                 var propIth = props[i];
-                                strValue = m_functionDoProperty(objectCursor, propIth); // strValue comes back like "Type2~-373.987" -- we can now ignore the first part.
+                                strValue = self.functionDoProperty(objectCursor, propIth); // strValue comes back like "Type2~-373.987" -- we can now ignore the first part.
 
                                 if (strValue) {
 
@@ -371,51 +371,24 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 return objectArray;
             }
 
-            self.blocklyChangeListener = function (objectPrimaryBlockChain) {
+            //
+            self.functionDoProperty = function (objectCursor, strProp) {
 
-                // Clear designer.
-                var objectResult = {};
-                var strValue = null;
-                var parts = [];
+                var re = new RegExp("_set" + strProp);
+                if (objectCursor.type.match(re)) {
 
-                // Scan.
-                var objectCursor = objectPrimaryBlockChain;
-                if (objectCursor) {
+                    // Get the thing to set.
+                    var objectToSet = objectCursor.children[0].children[0];
+                    var strTypeToSet = objectToSet.type;
+                    var re = new RegExp(g_clTypeApp.data.name + "_get(.+)");
+                    var arrayTypes = strTypeToSet.match(re);
+                    var strTheType = arrayTypes[1];
 
-                    do {
-
-                        //  Look for "new_" and "set_".
-                        //  Set in designer.
-                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
-                        var arrayMatches = objectCursor.type.match(re);
-                        
-                        if (arrayMatches && arrayMatches.length > 1) {
-
-                            objectResult[arrayMatches[1]] = {};
-
-                        } else {
-
-                            var props = ["X", "Y", "Width", "Height"];
-                            for (var i = 0; i < props.length; i++) {
-
-                                var propIth = props[i];
-                                strValue = m_functionDoProperty(objectCursor, propIth);
-
-                                if (strValue) {
-
-                                    parts = strValue.split('~');
-                                    objectResult[parts[0]][propIth] = parts[1];
-                                    break;
-                                }                                
-                            }
-                        }
-
-                        objectCursor = objectCursor.next
-
-                    } while (objectCursor)
+                    var objectValue = objectCursor.children[1].children[0].children[0];
+                    return strTheType + '~' + objectValue.contents;            
                 }
 
-                return objectResult;
+                return null;
             }
 
             // Method removes all possible "set property value" Blockly blocks from Blockly for a tool instance.
@@ -608,26 +581,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                     return e;
                 }
-            }
-
-            //
-            var m_functionDoProperty = function (objectCursor, strProp) {
-
-                var re = new RegExp("_set" + strProp);
-                if (objectCursor.type.match(re)) {
-
-                    // Get the thing to set.
-                    var objectToSet = objectCursor.children[0].children[0];
-                    var strTypeToSet = objectToSet.type;
-                    var re = new RegExp(g_clTypeApp.data.name + "_get(.+)");
-                    var arrayTypes = strTypeToSet.match(re);
-                    var strTheType = arrayTypes[1];
-
-                    var objectValue = objectCursor.children[1].children[0].children[0];
-                    return strTheType + '~' + objectValue.contents;            
-                }
-
-                return null;
             }
 
             // Return the next id as a string.

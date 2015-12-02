@@ -5,8 +5,8 @@
 //
 
 // Define Type module.
-define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/converter"],
-	function (errorHelper, comic, comics, converter) {
+define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/converter", "SourceScanner/processor", "SourceScanner/coder"],
+	function (errorHelper, comic, comics, converter, processor, coder) {
 
 		try {
 
@@ -332,7 +332,58 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							    }
 				            }
 
-							// Replace the workspace of the active method.
+                            // If the current type is app, and the current method is initialize, then
+                            // need to play changes into the Designer pane in case a position or size change was made to a TI.
+
+                            if (!types.isAppInitializeActive()) { return; }
+
+		                    // Prepare objectResult to hold parameters for all ToolInstances. Then pass to designer to effect changes, if any.
+			                var objectResult = {};
+			                var strValue = null;
+			                var parts = [];
+
+			                // Scan.
+			                var objectCursor = processor.getPrimaryBlockChain(workspaceJSON);
+			                if (objectCursor) {
+
+			                    do {
+
+			                        //  Look for "new_" and "set_".
+			                        //  Set in designer.
+			                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
+			                        var arrayMatches = objectCursor.type.match(re);
+			                        
+			                        if (arrayMatches && arrayMatches.length > 1) {
+
+			                            objectResult[arrayMatches[1]] = {};
+
+			                        } else {
+
+			                            var props = ["X", "Y", "Width", "Height"];
+			                            for (var i = 0; i < props.length; i++) {
+
+			                                var propIth = props[i];
+			                                strValue = coder.functionDoProperty(objectCursor, propIth);
+
+			                                if (strValue) {
+
+			                                    parts = strValue.split('~');
+			                                    objectResult[parts[0]][propIth] = parts[1];
+			                                    break;
+			                                }                                
+			                            }
+			                        }
+
+			                        objectCursor = objectCursor.next;
+
+			                    } while (objectCursor)
+			                }
+
+			            	// Load up the parsed data into the designer.
+		            		var exceptionRet = designer.updateInstances(objectResult);
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Finally, replace the workspace of the active method.
 							activeMethod.workspace = strWorkspace;
 
 							return null;

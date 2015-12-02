@@ -570,32 +570,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             var exceptionRet = types.update(self.workspace);
 							if (exceptionRet) { throw exceptionRet; }
 
-
-
-
-							// TODO: Move the rest of this into Type.js#m_functionUpdateActiveMethodWorkspace:
-
-
-
-                            // If the current type is app, and the current method is initialize, then
-                            // need to play changes into the designer in case anything changes here.
-
-                            if (!types.isAppInitializeActive()) { return; }
-
-		                    // The App type is selected. The initialize method is clicked on (loaded into code pane).
-		                    var objectWorkspace = processor.getAppInitializeJSONObject();	// Pulls workspace XML out of the App::initialize and converts to JSON.
-		                    if (!objectWorkspace) {
-
-		                        throw { message: "Failed to get the workspace object." };
-		                    }
-
-		                    // Get the block with which to work and pass
-		                    var objectResult = coder.blocklyChangeListener(processor.getPrimaryBlockChain(objectWorkspace));
-
-			            	// Load up the parsed data into the designer.
-		            		var exceptionRet = designer.updateInstances(objectResult);
-							if (exceptionRet) { throw exceptionRet; }
-
 						} catch (e) {
 
 							errorHelper.show(e);
