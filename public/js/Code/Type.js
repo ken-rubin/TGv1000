@@ -206,17 +206,17 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							var activeMethod = m_arrayActive[m_iActiveIndex];
 
 							// Set bool to be used below to display an error box if they try to change the name of either the initialize or construct methods.
-							var methodIsInitializeOrConstruct = (activeMethod.name === "initialize") || (activeMethod.name === "construct");
+							var methodIsAppInitializeOrConstruct = (types.isAppInitializeActive()) || (activeMethod.name === "construct");
 
-							// It's not just the workspace that has changed.
 							// This method's name, parameters, even method type could have changed.
 							// As could the user's implementation of the method or its return value.
+							// Or, if App initialize is active, size or position of TIs could have been changed.
 							// We will examine the workspace and adjust what needs adjusting in activeMethod.
 							
 							/*	This is the structure have to work with (both variations):
 
 										<xml xmlns="http://www.w3.org/1999/xhtml">
-										  <block type="procedures_defreturn">
+										  <block type="procedures_defreturn">		or procedures_defnoreturn
 										    <mutation>
 										    	<arg> elements with parameters
 										    </mutation>
@@ -263,7 +263,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							                if (methodName !== activeMethod.name) {
 
-							                	if (methodIsInitializeOrConstruct) {
+							                	if (methodIsAppInitializeOrConstruct) {
 
 							                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 
@@ -314,7 +314,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							            	// The fact that we're here means the user has just blanked out the method name.
 							            	// We'll tell the user how to handle this.
-							            	if (methodIsInitializeOrConstruct) {
+							            	if (methodIsAppInitializeOrConstruct) {
 
 						                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 
@@ -332,7 +332,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							    }
 				            }
 
-                            // If the current type is app, and the current method is initialize, then
+                            // If the current type is App, and the current method is "initialize", then
                             // need to play changes into the Designer pane in case a position or size change was made to a TI.
 
                             if (!types.isAppInitializeActive()) { return; }

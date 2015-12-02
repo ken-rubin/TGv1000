@@ -177,12 +177,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							return false;
 						}
 
-						if (m_clTypeActive.data.methods[m_iActiveMethodIndex].name !== "initialize") {
-
-							return false;
-						}
-
-						return true;
+						return (m_clTypeActive.data.methods[m_iActiveMethodIndex].name === "initialize");
 					};
 
 					// Cause the code to reload the current type.
