@@ -206,7 +206,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							var activeMethod = m_arrayActive[m_iActiveIndex];
 
 							// Set bool to be used below to display an error box if they try to change the name of either the initialize or construct methods.
-							var methodNameCannotBeChanged = (activeMethod.name === "initialize") || (activeMethod.name === "construct");
+							var methodIsInitializeOrConstruct = (activeMethod.name === "initialize") || (activeMethod.name === "construct");
 
 							// It's not just the workspace that has changed.
 							// This method's name, parameters, even method type could have changed.
@@ -263,7 +263,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							                if (methodName !== activeMethod.name) {
 
-							                	if (methodNameCannotBeChanged) {
+							                	if (methodIsInitializeOrConstruct) {
 
 							                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 
@@ -314,7 +314,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							            	// The fact that we're here means the user has just blanked out the method name.
 							            	// We'll tell the user how to handle this.
-							            	if (methodNameCannotBeChanged) {
+							            	if (methodIsInitializeOrConstruct) {
 
 						                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 

@@ -128,6 +128,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 							// Just call to helper method.
 							return m_functionRender();
+							
 						} catch (e) {
 
 							return e;

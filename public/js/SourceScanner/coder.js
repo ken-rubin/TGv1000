@@ -373,8 +373,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
             self.blocklyChangeListener = function (objectPrimaryBlockChain) {
 
-                // debugger;
-
                 // Clear designer.
                 var objectResult = {};
                 var strValue = null;

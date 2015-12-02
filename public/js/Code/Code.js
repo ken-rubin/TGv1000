@@ -570,6 +570,13 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             var exceptionRet = types.update(self.workspace);
 							if (exceptionRet) { throw exceptionRet; }
 
+
+
+
+							// TODO: Move the rest of this into Type.js#m_functionUpdateActiveMethodWorkspace:
+
+
+
                             // If the current type is app, and the current method is initialize, then
                             // need to play changes into the designer in case anything changes here.
 
