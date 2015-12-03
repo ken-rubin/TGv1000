@@ -251,7 +251,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			                            childIth.type.substr(0, 11) === "procedures_" &&
 			                            childIth.children.length > 1) {     // mutation, field, statement and (if procedures_defreturn) return.
 
-			                            if (childIth.children[1].hasOwnProperty("contents")) {
+			                            if (childIth.children[1].hasOwnProperty("contents")) {	// This means the function has a name; i.e., it hasn't been blanked out.
 
 			                            	/////////////////////////////////////////
 			                            	// We have a c-block. We'll work with it.
@@ -286,9 +286,29 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							                	types.regenTWMethodsTable();
 							                }
 
-			                            	// Now the methodTypeId.
+			                            	// Now the methodTypeId. It's possible that the user dragged out a function block of the other type,
+			                            	// set it all up and then dragged it above the original function block (or dragged the original to trash).
+			                            	//
+			                            	// methodTypeIds are:
+			                            	// 1 - statement (no return value)
+			                            	// 2 - expression (return value)
+			                            	// 3 - initialize (no return value)
+			                            	// 4 - construct (no return value)
 			                            	var type = childIth.type;
-			                            	activeMethod.methodTypeId = (type === "procedures_defreturn" ? 2 : 1);
+			                            	var thisMethodTypeId = (type === "procedures_defreturn" ? 2 : 1) + (methodIsAppInitializeOrConstruct ? 2 : 0);
+
+			                            	// Cannot change method type id of initialize or construct.
+			                            	if (methodIsAppInitializeOrConstruct && thisMethodTypeId !== activeMethod.methodTypeId) {
+
+						                		errorHelper.show(activeMethod.name + "'s method type cannot be changed.", 3000);
+
+												var exceptionRet = code.load(activeMethod.workspace);
+												if (exceptionRet) { throw exceptionRet; }
+
+												return null;
+			                            	}
+
+			                            	activeMethod.methodTypeId = thisMethodTypeId;
 
 			                            	// Now the parameters (args).
 			                            	if (childIth.children[0].hasOwnProperty("nodeName") &&
@@ -305,6 +325,16 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 				                            				currArgs.push(nameJth);
 				                            			}
+				                            		}
+
+				                            		if (activeMethod.name === "initialize" &&& currArgs.length > 0) {
+
+								                		errorHelper.show("The initialize method cannot have parameters (beyond 'self').", 5000);
+
+														var exceptionRet = code.load(activeMethod.workspace);
+														if (exceptionRet) { throw exceptionRet; }
+
+														return null;
 				                            		}
 
 				                            		activeMethod.parameters = currArgs.join(', ');
