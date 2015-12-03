@@ -236,9 +236,19 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			                */
 
 				            var workspaceJSON = converter.toJSON(strWorkspace);
-				            if (!workspaceJSON.children) { return null; }
+				            if (!workspaceJSON.children) {
 
-				            // Look among the children for the first one with a c-block (type="procedures_def...") signature.
+				            	// They must have dragged the function block to trash.
+		                		errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
+
+								var exceptionRet = code.load(activeMethod.workspace);
+								if (exceptionRet) { throw exceptionRet; }
+
+								return null;
+				            }
+
+				            // Look among the children for the **first one** with a c-block (type="procedures_def...") signature.
+				            var bHandledACBlock = false;
 				            for (var i = 0; i < workspaceJSON.children.length; i++) {
 
 				            	var childIth = workspaceJSON.children[i];
@@ -299,10 +309,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			                            	// 3 - initialize (no return value)
 			                            	// 4 - construct (no return value)
 			                            	var type = childIth.type;
-			                            	var thisMethodTypeId = (type === "procedures_defreturn" ? 2 : 1) + (methodIsAppInitializeOrConstruct ? 2 : 0);
 
-			                            	// Cannot change method type id of initialize or construct.
-			                            	if (methodIsAppInitializeOrConstruct && thisMethodTypeId !== activeMethod.methodTypeId) {
+			                            	// Cannot change method type of initialize or construct from defnoreturn.
+			                            	if (methodIsAppInitializeOrConstruct && type === "procedures_defreturn") {
 
 						                		errorHelper.show(activeMethod.name + "'s method type cannot be changed.", 3000);
 
@@ -312,7 +321,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 												return null;
 			                            	}
 
-			                            	activeMethod.methodTypeId = thisMethodTypeId;
+			                            	if (!methodIsAppInitializeOrConstruct) {
+
+				                            	var thisMethodTypeId = (type === "procedures_defreturn" ? 2 : 1);
+				                            	activeMethod.methodTypeId = thisMethodTypeId;
+			                            	}
 
 			                            	// Now the parameters (args).
 			                            	if (childIth.children[0].hasOwnProperty("nodeName") &&
@@ -362,8 +375,22 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							            	return null;
 							            }
+
+							            bHandledACBlock = true;
+							            break;	// Out of loop looking for c-blocks. We have handled the first (highest) one.
 							        }
 							    }
+				            }
+
+				            if (!bHandledACBlock) {
+
+				            	// They must have dragged the function block to trash.
+		                		errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
+
+								var exceptionRet = code.load(activeMethod.workspace);
+								if (exceptionRet) { throw exceptionRet; }
+
+								return null;
 				            }
 
                             // If the current type is App, and the current method is "initialize", then
