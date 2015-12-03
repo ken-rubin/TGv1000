@@ -122,10 +122,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						    		var projectId = m_searchResultRawArray[j].id;
 						    		self.callFunctionOK(projectId);
 						    	});
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
+							// Click the search button on the way in to fetch user's own projects.
+							m_functionSearchBtnClicked();
+
 						} catch (e) {
 
 							errorHelper.show(e.message);

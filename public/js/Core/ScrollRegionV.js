@@ -117,6 +117,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     jItem.click(m_functionImageClick);
 
                     // .
+                    JL().info("about to set image src to " + strResourceUrl);
                     jItem.attr("src",
                         strResourceUrl);
 
@@ -266,6 +267,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
                 try {
 
+                    JL().info("got into m_functionOnNewImageLoaded");
                     // Get reference to the item that raised the load.
                     var jItem = $(this);
 

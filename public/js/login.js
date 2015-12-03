@@ -172,6 +172,8 @@ var m_functionSignInButtonClick = function(errorHelper) {
 
 	            if (data.success) {
 
+					JL().info("<<< successful login occurred >>>");
+
 					// These cookies don't expire, but they mau be overridden if a different user logs in.
 					var strDate = "; expires=Tue, 19 Jan 2038 03:14:07 GMT";
 
@@ -183,6 +185,8 @@ var m_functionSignInButtonClick = function(errorHelper) {
 	            } else {
 
 	                // !data.success
+					JL().info("<<< unsuccessful login attempt >>>");
+
 	                errorHelper.show(data.message);
 	            }
 	        });
