@@ -204,6 +204,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							// Get the item.
 							var activeMethod = m_arrayActive[m_iActiveIndex];
+							var copyOfActiveMethod = activeMethod;
 
 							// Set bool to be used below to display an error box if they try to change the name of either the initialize or construct methods.
 							var methodIsAppInitializeOrConstruct = (types.isAppInitializeActive()) || (activeMethod.name === "construct");
@@ -284,6 +285,9 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							                	activeMethod.name = methodName;
 							                	types.regenTWMethodsTable();
+
+							                	// Call code to update schema since method name changed.
+							                	code.replaceMethod(activeMethod, copyOfActiveMethod, types.getActiveClType(false));
 							                }
 
 			                            	// Now the methodTypeId. It's possible that the user dragged out a function block of the other type,
@@ -327,7 +331,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				                            			}
 				                            		}
 
-				                            		if (activeMethod.name === "initialize" &&& currArgs.length > 0) {
+				                            		if (activeMethod.name === "initialize" && currArgs.length > 0) {
 
 								                		errorHelper.show("The initialize method cannot have parameters (beyond 'self').", 5000);
 
