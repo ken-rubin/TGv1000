@@ -239,12 +239,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				            if (!workspaceJSON.children) {
 
 				            	// They must have dragged the function block to trash.
-		                		errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
-
-								var exceptionRet = code.load(activeMethod.workspace);
-								if (exceptionRet) { throw exceptionRet; }
-
-								return null;
+				            	return m_functionRestoreWorkspaceFromMethod(activeMethod, workspaceJSON);
 				            }
 
 				            // Look among the children for the **first one** with a c-block (type="procedures_def...") signature.
@@ -385,12 +380,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 				            if (!bHandledACBlock) {
 
 				            	// They must have dragged the function block to trash.
-		                		errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
-
-								var exceptionRet = code.load(activeMethod.workspace);
-								if (exceptionRet) { throw exceptionRet; }
-
-								return null;
+				            	return m_functionRestoreWorkspaceFromMethod(activeMethod, workspaceJSON);
 				            }
 
                             // If the current type is App, and the current method is "initialize", then
@@ -449,6 +439,40 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							return null;
 
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					var m_functionRestoreWorkspaceFromMethod = function(activeMethod, workspaceJSON) {
+
+						try {
+
+							// There are either no procedures_def... block amongst workspaceJSON.children or we didn't find one while
+							// looping that met sufficient criteria.
+							// If there are any children (there don't have to be), they are chaff--extraneous work blocks.
+							// We're going to re-load activeMethod.workspace into code, but we'd like to retain any chaff.
+							// So we'll do this cleverly and carefully.
+
+							var methodWorkspaceJSON = converter.toJSON(activeMethod.workspace);
+
+							if (!workspaceJSON.children) {
+
+								workspaceJSON.children = methodWorkspaceJSON.children;
+							
+							} else {
+
+								workspaceJSON.children.unshift(methodWorkspaceJSON.children[0]);
+							}
+
+	                		errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
+
+							var exceptionRet = code.load(converter.toXML(workspaceJSON));
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+						
 						} catch (e) {
 
 							return e;

@@ -335,7 +335,7 @@ begin
 				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
 				;
             
-		/* These system base Types will be recognized by comicId being null */
+		/* These system base Types will be skipped in initial loads by comicId being null; after being returned, they will be recognized by having ordinal = 10000. */
 		insert into TGv1000.`types` (id,`name`,altImagePath)
 			VALUES 
 				(1,'Game Base Type','media/images/gameProject.png'),
