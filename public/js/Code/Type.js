@@ -271,7 +271,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							                	if (methodIsAppInitializeOrConstruct) {
 
-							                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
+							                		//errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 
 													var exceptionRet = code.load(activeMethod.workspace);
 													if (exceptionRet) { throw exceptionRet; }
@@ -289,10 +289,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			           							}
 
 							                	activeMethod.name = methodName;
+							                	types.changeTypeWellHeader();
 							                	types.regenTWMethodsTable();
 
 							                	// Call code to update schema since method name changed.
-							                	code.replaceMethod(activeMethod, copyOfActiveMethod, types.getActiveClType(false));
+							                	//code.replaceMethod(activeMethod, copyOfActiveMethod, types.getActiveClType(false));
 							                }
 
 			                            	// Now the methodTypeId. It's possible that the user dragged out a function block of the other type,
@@ -308,7 +309,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			                            	// Cannot change method type of initialize or construct from defnoreturn.
 			                            	if (methodIsAppInitializeOrConstruct && type === "procedures_defreturn") {
 
-						                		errorHelper.show(activeMethod.name + "'s method type cannot be changed.", 3000);
+						                		//errorHelper.show(activeMethod.name + "'s method type cannot be changed.", 3000);
 
 												var exceptionRet = code.load(activeMethod.workspace);
 												if (exceptionRet) { throw exceptionRet; }
@@ -341,7 +342,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 				                            		if (activeMethod.name === "initialize" && currArgs.length > 0) {
 
-								                		errorHelper.show("The initialize method cannot have parameters (beyond 'self').", 5000);
+								                		//errorHelper.show("The initialize method cannot have parameters (beyond 'self').", 5000);
 
 														var exceptionRet = code.load(activeMethod.workspace);
 														if (exceptionRet) { throw exceptionRet; }
@@ -358,11 +359,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							            	// We'll tell the user how to handle this.
 							            	if (methodIsAppInitializeOrConstruct) {
 
-						                		errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
+						                		//errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
 
 							            	} else {
 
-					                			errorHelper.show("The procedure for completely changing a method name is to double-click on it and begin typing. Then either type Enter or click away.", 7500);
+					                			//errorHelper.show("The procedure for completely changing a method name is to double-click on it and begin typing. Then either type Enter or click away.", 7500);
 							            	}
 
 											var exceptionRet = code.load(activeMethod.workspace);
@@ -385,54 +386,54 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
                             // If the current type is App, and the current method is "initialize", then
                             // need to play changes into the Designer pane in case a position or size change was made to a TI.
+                            if (types.isAppInitializeActive()) { 
 
-                            if (!types.isAppInitializeActive()) { return; }
+			                    // Prepare objectResult to hold parameters for all ToolInstances. Then pass to designer to effect changes, if any.
+				                var objectResult = {};
+				                var strValue = null;
+				                var parts = [];
 
-		                    // Prepare objectResult to hold parameters for all ToolInstances. Then pass to designer to effect changes, if any.
-			                var objectResult = {};
-			                var strValue = null;
-			                var parts = [];
+				                // Scan.
+				                var objectCursor = processor.getPrimaryBlockChain(workspaceJSON);
+				                if (objectCursor) {
 
-			                // Scan.
-			                var objectCursor = processor.getPrimaryBlockChain(workspaceJSON);
-			                if (objectCursor) {
+				                    do {
 
-			                    do {
+				                        //  Look for "new_" and "set_".
+				                        //  Set in designer.
+				                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
+				                        var arrayMatches = objectCursor.type.match(re);
+				                        
+				                        if (arrayMatches && arrayMatches.length > 1) {
 
-			                        //  Look for "new_" and "set_".
-			                        //  Set in designer.
-			                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
-			                        var arrayMatches = objectCursor.type.match(re);
-			                        
-			                        if (arrayMatches && arrayMatches.length > 1) {
+				                            objectResult[arrayMatches[1]] = {};
 
-			                            objectResult[arrayMatches[1]] = {};
+				                        } else {
 
-			                        } else {
+				                            var props = ["X", "Y", "Width", "Height"];
+				                            for (var i = 0; i < props.length; i++) {
 
-			                            var props = ["X", "Y", "Width", "Height"];
-			                            for (var i = 0; i < props.length; i++) {
+				                                var propIth = props[i];
+				                                strValue = coder.functionDoProperty(objectCursor, propIth);
 
-			                                var propIth = props[i];
-			                                strValue = coder.functionDoProperty(objectCursor, propIth);
+				                                if (strValue) {
 
-			                                if (strValue) {
+				                                    parts = strValue.split('~');
+				                                    objectResult[parts[0]][propIth] = parts[1];
+				                                    break;
+				                                }                                
+				                            }
+				                        }
 
-			                                    parts = strValue.split('~');
-			                                    objectResult[parts[0]][propIth] = parts[1];
-			                                    break;
-			                                }                                
-			                            }
-			                        }
+				                        objectCursor = objectCursor.next;
 
-			                        objectCursor = objectCursor.next;
+				                    } while (objectCursor)
+				                }
 
-			                    } while (objectCursor)
-			                }
-
-			            	// Load up the parsed data into the designer.
-		            		var exceptionRet = designer.updateInstances(objectResult);
-							if (exceptionRet) { throw exceptionRet; }
+				            	// Load up the parsed data into the designer.
+			            		var exceptionRet = designer.updateInstances(objectResult);
+								if (exceptionRet) { throw exceptionRet; }
+							}
 
 							// Finally, replace the workspace of the active method.
 							activeMethod.workspace = strWorkspace;
@@ -466,7 +467,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 								workspaceJSON.children.unshift(methodWorkspaceJSON.children[0]);
 							}
 
-	                		errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
+	                		//errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
 
 							var exceptionRet = code.load(converter.toXML(workspaceJSON));
 							if (exceptionRet) { throw exceptionRet; }
