@@ -962,7 +962,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                  SaveProject
+    //              SaveProject & SaveProjectAs entry point
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -999,36 +999,46 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             sql.getCxnFromPool(function(err, connection) {
 
-                if (err) {
+                try {
+                    if (err) {
 
-                    m_functionFinalCallback(new Error('Could not get a database connection: ' + err.message), res, null, null);
+                        throw new Error('Could not get a database connection: ' + err.message);
 
-                } else {
+                    } else {
 
-                    m_log('Have a connection');
+                        m_log('Have a connection');
 
-                    connection.beginTransaction(function(err) {
+                        connection.beginTransaction(function(err) {
 
-                        if (err) {
+                            try {
+                                if (err) {
 
-                            m_functionFinalCallback(new Error('Could not "begin" database connection: ' + err.message), res, null, null);
-                        
-                        } else {
+                                    throw new Error('Could not "begin" database connection: ' + err.message);
+                                
+                                } else {
 
-                            m_log('Connection has a transaction');
+                                    m_log('Connection has a transaction');
 
-                            if (typeOfSave === 'save') {
+                                    if (typeOfSave === 'save') {
 
-                                m_log('Going into m_functionSaveProject');
-                                m_functionSaveProject(connection, req, res, project);
-                            
-                            } else {    // 'saveAs'
+                                        m_log('Going into m_functionSaveProject');
+                                        m_functionSaveProject(connection, req, res, project);
+                                    
+                                    } else {    // 'saveAs'
 
-                                m_log('Going into m_functionSaveProjectAs');
-                                m_functionSaveProjectAs(connection, req, res, project);
+                                        m_log('Going into m_functionSaveProjectAs');
+                                        m_functionSaveProjectAs(connection, req, res, project);
+                                    }
+                                }
+                            } catch (e1) {
+
+                                m_functionFinalCallback(e1, res, null, null);
                             }
-                        }
-                    });
+                        });
+                    }
+                } catch (e2) {
+
+                    m_functionFinalCallback(e2, res, null, null);
                 }
             });
         } catch(e) {
@@ -1096,21 +1106,20 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(err, rows) {
 
                     try {
-
                         if (err) { 
 
                             m_log('err back from delete project');
+                            
                             // Rollback has happened already.
                             throw err; 
                         }
 
                         // Now we can just INSERT the project as passed from the client side.
-                        var exceptionRet = m_functionProjectSaveAsPart2(connection, req, res, project);
-                        if (exceptionRet) { throw exceptionRet; }
+                        m_functionProjectSaveAsPart2(connection, req, res, project);
 
-                    } catch (e) {
+                    } catch (e1) {
 
-                        m_functionFinalCallback(e, res, null, null);
+                        m_functionFinalCallback(e1, res, null, null);
                     }
                 }
             );
@@ -1140,33 +1149,36 @@ module.exports = function ProjectBO(app, sql, logger) {
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
-                    if (err) { throw err; }
+                    try {                
+                        if (err) { throw err; }
 
-                    if (rows.length === 0) {
+                        if (rows.length === 0) {
 
-                        throw new Error('Failed database action checking for duplicate project name.');
-
-                    } else {
-
-                        if (rows[0].cnt > 0) {
-
-                            throw new Error('You already have a project with that name.');
+                            throw new Error('Failed database action checking for duplicate project name.');
 
                         } else {
-                            
-                            m_log('Name for SaveAs is good');
 
-                            project.public = 0;     // A saved-as project needs review by admins.
-                            var exceptionRet = m_functionProjectSaveAsPart2(connection,req,res,project);
-                            if (exceptionRet) { throw exceptionRet; }
+                            if (rows[0].cnt > 0) {
+
+                                throw new Error('You already have a project with that name.');
+
+                            } else {
+                                
+                                m_log('Name for SaveAs is good');
+
+                                project.public = 0;                 // A saved-as project needs review by an admin or instructor.
+                                m_functionProjectSaveAsPart2(connection, req, res, project);
+                            }
                         }
+                    } catch (e1) {
+
+                        m_functionFinalCallback(e1, res, null, null);
                     }
                 }
             );
         } catch (e) {
 
-            m_log('In catch in m_functionSaveProjectAs');
-            return e;
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
@@ -1191,39 +1203,40 @@ module.exports = function ProjectBO(app, sql, logger) {
                 + ",altImagePath='" + project.altImagePath + "'"
                 + ",description='" + project.description + "' ";
 
-            verb = "INSERT ";
-
             var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
 
             m_log('Inserting project record with ' + strQuery);
+
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
-                    if (err) { throw err; }
+                    try {
+                        if (err) { throw err; }
 
-                    if (rows.length === 0) {
+                        if (rows.length === 0) {
 
-                        throw new Error('Error saving project to database.');
+                            throw new Error('Error saving project to database.');
+                        }
+
+                        project.id = rows[0].insertId;
+
+                        // Handle tags and project_tags.
+                        m_log('Going to m_setUpAndDoTagsWithCxn for project');
+                        m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, project.tags, project.name);
+
+                        m_log('Going to m_saveComicsWithCxn');
+                        m_saveComicsWithCxn(connection, req, res, project);
+
+                    } catch (e1) {
+
+                        m_functionFinalCallback(e1, res, null, null);
                     }
-
-                    project.id = rows[0].insertId;
-
-                    // Handle tags and project_tags.
-                    m_log('Going to m_setUpAndDoTagsWithCxn for project');
-                    var exceptionRet = m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, project.tags, project.name);
-                    if (exceptionRet) { throw exceptionRet; }
-
-                    m_log('Going to m_saveComicsWithCxn');
-                    exceptionRet = m_saveComicsWithCxn(connection, req, res, project);
-                    if (exceptionRet) { throw exceptionRet; }
                 }
             );
 
-            return null;
-
         } catch(e) {
 
-            return e;
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
@@ -1248,30 +1261,36 @@ module.exports = function ProjectBO(app, sql, logger) {
                 sql.queryWithCxn(connection, strQuery,
                     function(err, rows) {
 
-                        if (err) { throw err; }
+                        try {
+                            if (err) { throw err; }
 
-                        if (rows.length === 0) {
+                            if (rows.length === 0) {
 
-                            throw new Error("Error writing comic to database.");
-                        }
+                                throw new Error("Error writing comic to database.");
+                            }
 
-                        comicIth.id = rows[0].insertId;
+                            comicIth.id = rows[0].insertId;
 
-                        if (--comicsCountdown === 0) {
+                            if (--comicsCountdown === 0) {
 
-                            m_log('Going to m_saveTypes');
-                            m_saveTypes(connection, project, req, callback);
+                                m_log('Going to m_saveTypes');
+
+                                m_saveTypes(connection, req, res, project);
+                            }
+                        } catch (e1) {
+
+                            m_functionFinalCallback(e1, res, null, null);
                         }
                     }
                 );
             });
         } catch (e) {
 
-            callback(e);
+            m_functionFinalCallback(e, res, null, null);
         }
     } 
 
-    var m_saveTypes = function (connection, project, req, callback) {
+    var m_saveTypes = function (connection, req, res, project) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.

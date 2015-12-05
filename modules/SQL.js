@@ -40,12 +40,11 @@ module.exports = function SQL(app) {
     self.getCxnFromPool = function (callback) {
 
         try {
-
             m_pool.getConnection(function(err, connection) {
 
-                callback(err, connection);
+                // if err then connection is null and vice-versa.
+                callback(err, connection);  
             });
-
         } catch (e) {
 
             callback(new Error("Error getting database connection"), null);
@@ -55,11 +54,9 @@ module.exports = function SQL(app) {
     self.queryWithCxn = function (connection, strQuery, callback) {
 
         try {
-
             connection.query(strQuery, function(err, rows) {
 
                 try {
-
                     if (err) { throw err; }
 
                     // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
@@ -92,14 +89,12 @@ module.exports = function SQL(app) {
     self.commitCxn = function (connection, callback) {
 
         try {
-
             connection.commit(function (err) {
 
                 if (err) { throw err; }
 
                 callback(null);
             });
-
         } catch (e) {
 
             connection.rollback(function() { callback(e, null);});
