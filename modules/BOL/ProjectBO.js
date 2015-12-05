@@ -979,11 +979,10 @@ module.exports = function ProjectBO(app, sql, logger) {
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
 
-            // Muis important: the project's name must be unique to the user's projects, but can be the same as another user's project name.
+            // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
             var project = req.body.projectJson;
-
             var typeOfSave = req.body.saveType;
             if (typeOfSave === 'save') {
 
@@ -1002,61 +1001,54 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 if (err) {
 
-                    res.json({
-                        success: false,
-                        message: 'Could not get a database connection: ' + err.message
-                    });
+                    m_functionFinalCallback(new Error('Could not get a database connection: ' + err.message), res, null, null);
+
                 } else {
 
                     m_log('Have a connection');
+
                     connection.beginTransaction(function(err) {
 
                         if (err) {
 
-                            res.json({
-                                success: false,
-                                message: 'Could not "begin" database connection: ' + err.message
-                            });
-                            return;
-                        }
-
-                        m_log('Connection has a transaction');
-                        if (typeOfSave === 'save') {
-
-                            m_log('Going into m_functionSaveProject');
-                            m_functionSaveProject(connection, req, res, project, m_functionFinalCallback);
+                            m_functionFinalCallback(new Error('Could not "begin" database connection: ' + err.message), res, null, null);
                         
-                        } else {    // 'saveAs'
+                        } else {
 
-                            m_log('Going into m_functionSaveProjectAs');
-                            m_functionSaveProjectAs(connection, req, res, project, m_functionFinalCallback);
+                            m_log('Connection has a transaction');
+
+                            if (typeOfSave === 'save') {
+
+                                m_log('Going into m_functionSaveProject');
+                                m_functionSaveProject(connection, req, res, project);
+                            
+                            } else {    // 'saveAs'
+
+                                m_log('Going into m_functionSaveProjectAs');
+                                m_functionSaveProjectAs(connection, req, res, project);
+                            }
                         }
                     });
                 }
             });
         } catch(e) {
 
-            m_log('Save exception');
-            res.json({
-                success: false,
-                message: 'Save failed. Error received: ' + e.message
-            });
+            m_log('Top level exception saving project');
+            m_functionFinalCallback(new Error("Database failure"), res, null, null);
         }
     }
 
     var m_functionFinalCallback = function (err, res, connection, project) {
 
-        m_log('Reached m_functionFinalCallback');
+        m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
+
         if (err) {
 
-            m_log('err is non-null: ' + err.message);
             res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
        } else {
-
-            m_log('Success. Committing transaction.');
 
             sql.commitCxn(connection,
                 function(err){
@@ -1090,31 +1082,41 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProject = function (connection, req, res, project, callback) {
+    var m_functionSaveProject = function (connection, req, res, project) {
 
         try {
 
             // The following will delete the former project completely from the database using cascading delete.
             var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
-            m_log('Save project step 1; deleting with ' + strQuery);
-            sql.queryWithCxn(connection, strQuery, 
+
+            m_log('Save project step 1; deleting old version with ' + strQuery);
+            
+            sql.queryWithCxn(connection, 
+                strQuery, 
                 function(err, rows) {
 
-                    if (err) { 
+                    try {
 
-                        m_log('err back from delete project');
-                        // Rollback has happened already.
-                        throw err; 
+                        if (err) { 
+
+                            m_log('err back from delete project');
+                            // Rollback has happened already.
+                            throw err; 
+                        }
+
+                        // Now we can just INSERT the project as passed from the client side.
+                        var exceptionRet = m_functionProjectSaveAsPart2(connection, req, res, project);
+                        if (exceptionRet) { throw exceptionRet; }
+
+                    } catch (e) {
+
+                        m_functionFinalCallback(e, res, null, null);
                     }
-
-                    m_log('No error in delete; moving into SaveAs');
-                    // Now we can just INSERT the project as passed from the client side.
-                    return callback(m_functionProjectSaveAsPart2(connection, req, res, project), res, connection, project);
                 }
             );
         } catch (e) {
 
-            callback(e, res, null, null);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
@@ -1125,7 +1127,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
+    var m_functionSaveProjectAs = function (connection, req, res, project) {
         
         // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
 
@@ -1133,6 +1135,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // Look for and reject an attempt to add a 2nd project for same user with same name.
             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+            
             m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
@@ -1141,38 +1144,29 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     if (rows.length === 0) {
 
-                        // throw new Error('Failed database action checking for duplicate project name.');
-                        callback( new Error('Failed database action checking for duplicate project name.'), res, null, null);
-                        return;
+                        throw new Error('Failed database action checking for duplicate project name.');
 
                     } else {
 
                         if (rows[0].cnt > 0) {
 
-                            // throw new Error('You already have a project with that name.');
-                            callback( new Error('You already have a project with that name.'), res, null, null);
-                            return;
+                            throw new Error('You already have a project with that name.');
 
                         } else {
                             
                             m_log('Name for SaveAs is good');
+
                             project.public = 0;     // A saved-as project needs review by admins.
                             var exceptionRet = m_functionProjectSaveAsPart2(connection,req,res,project);
-                            if (exceptionRet) { 
-                                // throw exceptionRet; 
-                                callback( exceptionRet, res, null, null); 
-                                return;
-                            }
+                            if (exceptionRet) { throw exceptionRet; }
                         }
-
-                        callback(null, res, connection, project);
                     }
                 }
             );
         } catch (e) {
 
             m_log('In catch in m_functionSaveProjectAs');
-            callback(e, res, null, null);
+            return e;
         }
     }
 
@@ -1216,27 +1210,24 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     // Handle tags and project_tags.
                     m_log('Going to m_setUpAndDoTagsWithCxn for project');
-                    m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, project.tags, project.name, function(err) {
+                    var exceptionRet = m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, project.tags, project.name);
+                    if (exceptionRet) { throw exceptionRet; }
 
-                        if (err) { throw err; }
-                    });
+                    m_log('Going to m_saveComicsWithCxn');
+                    exceptionRet = m_saveComicsWithCxn(connection, req, res, project);
+                    if (exceptionRet) { throw exceptionRet; }
+                }
+            );
 
-                    m_log('Going to m_doComicsForSaveAs');
-                    m_doComicsForSaveAs(connection, project, req, function(err) {
+            return null;
 
-                        if (err) { throw err; }
-                    }
-                );
-
-                return null;
-            });
         } catch(e) {
 
             return e;
         }
     }
 
-    var m_doComicsForSaveAs = function (connection, project, req, callback) {
+    var m_saveComicsWithCxn = function (connection, req, res, project) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
         // Also, a row has been added to resource and tags have been handled, too.
@@ -1253,7 +1244,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 comicIth.projectId = project.id;
 
                 var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
-                m_log('In m_doComicsForSaveAs with ' + strQuery);
+                m_log('In m_saveComicsWithCxn with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
                     function(err, rows) {
 
@@ -1261,16 +1252,15 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         if (rows.length === 0) {
 
-                            callback(new Error("Error writing comic to database."));
-                            return;
+                            throw new Error("Error writing comic to database.");
                         }
 
                         comicIth.id = rows[0].insertId;
 
                         if (--comicsCountdown === 0) {
 
-                            m_log('Going to m_doTypesForSaveAs');
-                            m_doTypesForSaveAs(connection, project, req, callback);
+                            m_log('Going to m_saveTypes');
+                            m_saveTypes(connection, project, req, callback);
                         }
                     }
                 );
@@ -1281,7 +1271,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_doTypesForSaveAs = function (connection, project, req, callback) {
+    var m_saveTypes = function (connection, project, req, callback) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.

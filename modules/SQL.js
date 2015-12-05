@@ -58,23 +58,29 @@ module.exports = function SQL(app) {
 
             connection.query(strQuery, function(err, rows) {
 
-                if (err) { throw err; }
+                try {
 
-                // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
-                //          INSERT returns rows.insertId (primary key of inserted row)
-                //          UPDATE returns rows.changedRows (# of changed rows)
-                //          DELETE returns rows.affectedRows (# of deleted rows)
-                // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
-                if (rows.constructor === Array) {
+                    if (err) { throw err; }
 
-                    callback(null, rows);
-                
-                } else {
+                    // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
+                    //          INSERT returns rows.insertId (primary key of inserted row)
+                    //          UPDATE returns rows.changedRows (# of changed rows)
+                    //          DELETE returns rows.affectedRows (# of deleted rows)
+                    // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
+                    if (rows.constructor === Array) {
 
-                    // rows is a non-array js object. Turn it into an array.
-                    var newRows = [];
-                    newRows.push(rows);
-                    callback(null, newRows);
+                        callback(null, rows);
+                    
+                    } else {
+
+                        // rows is a non-array js object. Turn it into an array.
+                        var newRows = [];
+                        newRows.push(rows);
+                        callback(null, newRows);
+                    }
+                } catch (e) {
+
+                    connection.rollback(function() { callback(e, null);});
                 }
             });
         } catch (e) {

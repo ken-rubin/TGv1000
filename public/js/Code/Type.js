@@ -168,6 +168,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 						return null;
 					};
 
+					var blocklyChangeListenerTimeoutId = null;
+
 					// Update the blockly data in the active member.
 					self.update = function (strWorkspace) {
 
@@ -180,7 +182,16 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 								return null;
 							}
 
-							return m_functionUpdateActiveMethodWorkspace(strWorkspace);
+							if (blocklyChangeListenerTimeoutId) {
+
+								window.clearTimeout(blocklyChangeListenerTimeoutId);
+							}
+							
+							blocklyChangeListenerTimeoutId = window.setTimeout(
+								function(){ m_functionUpdateActiveMethodWorkspace(strWorkspace); }, 
+								1500);
+
+							return null;
 
 						} catch (e) {
 
@@ -285,7 +296,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 			           							if (exceptionRet) {
 
 			           								// This isn't really an exception. It just means that the name isn't available.
-			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
+			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.");
 			           							}
 
 							                	activeMethod.name = methodName;
@@ -293,7 +304,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							                	types.regenTWMethodsTable();
 
 							                	// Call code to update schema since method name changed.
-							                	//code.replaceMethod(activeMethod, copyOfActiveMethod, types.getActiveClType(false));
+							                	JL().info("About to call code.replaceMethod with new method name=" + activeMethod.name + " and original method name=" + copyOfActiveMethod.name);
+							                	code.replaceMethod(activeMethod, copyOfActiveMethod, types.getActiveClType(false));
 							                }
 
 			                            	// Now the methodTypeId. It's possible that the user dragged out a function block of the other type,
