@@ -1300,7 +1300,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         // (2) We should loop through all types in the comic and write the ones with id < 0. When we get a real id,
         //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
         // (3) We should then loop through all the types again, skipping the App type and skipping any types with
-        //     ordinal === null, and write the rest to the db.
+        //     ordinal === 10000, and write the rest to the db.
         // (4) We also have to modify the Tags and type-sub-array routines to skip system base types.
 
         try {
@@ -1315,7 +1315,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         typesCountdown1++; 
                     } else if (type.id < 0) {
                         typesCountdown2++;
-                    } else if (type.ordinal !== null && !type.isApp && type.id >= 0) {
+                    } else if (type.ordinal !== 10000 && !type.isApp && type.id >= 0) {
                         typesCountdown3++;
                     }
                 });
@@ -1442,7 +1442,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         } else {
 
-                            // passNum = 3: the rest of the types where ordinal !== 10000, id >= 0, !isAPP. If baseTypeId !== null and < 0, look it up in the correspondance array and set it before writing to the DB.
+                            // passNum = 3: the rest of the types where ordinal !== 10000, id >= 0, !isAPP. If baseTypeId !== 10000 and < 0, look it up in the correspondance array and set it before writing to the DB.
                             if (typeIth.ordinal !== 10000 && !typeIth.isApp && typeIth.id >= 0) {
 
                                 methodsCountdown += typeIth.methods.length;
