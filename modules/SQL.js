@@ -54,6 +54,7 @@ module.exports = function SQL(app) {
     self.queryWithCxn = function (connection, strQuery, callback, passbackWithCallback) {
 
         try {
+            
             connection.query(strQuery, function(err, rows) {
 
                 try {

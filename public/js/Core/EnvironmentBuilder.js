@@ -144,7 +144,7 @@ define([],
                     }
 
                     // Add methods.
-                    bool bFoundConstruct = false;
+                    var bFoundConstruct = false;
                     for (var i = 0; i < objectType.methods.length; i++) {
 
                         // Get the ith method.

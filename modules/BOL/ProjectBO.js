@@ -1537,7 +1537,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 event.typeId = typeIth.id;
                 event.ordinal = ordinal++;
-                strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + event.ordinal + ");";
+                strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "'," + event.ordinal + ");";
                 // m_log('Inserting event with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
                     function(err, rows, ev) {

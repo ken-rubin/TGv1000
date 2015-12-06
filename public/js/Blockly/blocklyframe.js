@@ -196,6 +196,72 @@ function DefineDefaultBlocks() {
             return [strCode, Blockly.JavaScript.ORDER_MEMBER];
         };
 
+        ///////////////////////////////////////////////////////////////
+        // Draw:
+
+        // SetFillStyle.
+        Blockly.Blocks["draw_SetFillStyle"] = {
+
+            init: function() {
+
+                this.appendDummyInput()
+                    .appendField("Set Fill Style");
+                this.appendValueInput("Using")
+                  .appendField("Using");
+                this.appendValueInput("Value")
+                  .appendField("Value");
+                this.setColour(10);
+                this.setPreviousStatement(true);
+                this.setNextStatement(true);
+                this.setInputsInline(true);
+               this.setTooltip("Set the specified context's FillStyle.");
+            }
+        };
+        Blockly.JavaScript["draw_SetFillStyle"] = function(block) {
+            
+            var strUsing = Blockly.JavaScript.valueToCode(block, 'Using', Blockly.JavaScript.ORDER_ADDITION) || '';
+            var strValue = Blockly.JavaScript.valueToCode(block, 'Value', Blockly.JavaScript.ORDER_ADDITION) || '';
+
+            var strCode = " " + strUsing + " .fillStyle = " + strValue + " ";
+            return strCode;
+        };
+
+        // FillRect.
+        Blockly.Blocks["draw_FillRect"] = {
+
+            init: function() {
+
+                this.appendDummyInput()
+                  .appendField("Fill Rect");
+                this.appendValueInput("Using")
+                  .appendField("Using");
+                this.appendValueInput("X")
+                  .appendField("X");
+                this.appendValueInput("Y")
+                  .appendField("Y");
+                this.appendValueInput("Width")
+                  .appendField("Width");
+                this.appendValueInput("Height")
+                  .appendField("Height");
+                this.setColour(160);
+                this.setInputsInline(true);
+                this.setPreviousStatement(true);
+                this.setNextStatement(true);
+                this.setTooltip("Fill the specified rectangle.");
+            }
+        };
+        Blockly.JavaScript["draw_FillRect"] = function(block) {
+            
+            var strUsing = Blockly.JavaScript.valueToCode(block, 'Using', Blockly.JavaScript.ORDER_ADDITION) || '';
+            var strX = Blockly.JavaScript.valueToCode(block, 'X', Blockly.JavaScript.ORDER_ADDITION) || '';
+            var strY = Blockly.JavaScript.valueToCode(block, 'Y', Blockly.JavaScript.ORDER_ADDITION) || '';
+            var strWidth = Blockly.JavaScript.valueToCode(block, 'Width', Blockly.JavaScript.ORDER_ADDITION) || '';
+            var strHeight = Blockly.JavaScript.valueToCode(block, 'Height', Blockly.JavaScript.ORDER_ADDITION) || '';
+
+            var strCode = " " + strUsing + ".fillRect(" + strX + "," + strY + "," + strWidth + "," + strHeight + "); ";
+            return strCode;
+        };
+
         ///////////////////////////////////////////////////////////
         // System:
 
@@ -222,7 +288,8 @@ function DefineDefaultBlocks() {
             var strCode = " " + strUsing + ".clearRect(0,0,"+strUsing+".canvas.clientWidth,"+strUsing+".canvas.clientHeight); ";
             return strCode;
         };
-        // WhoAmI.
+
+        // DesignerCanvasContext.
         Blockly.Blocks["system_DesignerCanvasContext"] = {
 
             init: function() {

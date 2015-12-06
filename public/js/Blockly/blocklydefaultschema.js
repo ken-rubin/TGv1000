@@ -11,6 +11,7 @@
 function getSchemaFromArrayOfNames(nameArray) {
 
     var System = {};
+    var Draw = {};
     var Event = {};
     var Controls = {};
     var ControlsIf = {};
@@ -38,6 +39,9 @@ function getSchemaFromArrayOfNames(nameArray) {
 
                 case "system":
                     System[parts[1]] = true;
+                    break;
+                case "draw":
+                    Draw[parts[1]] = true;
                     break;
                 case "event":
                     Event[parts[1]] = true;
@@ -88,7 +92,9 @@ function getSchemaFromArrayOfNames(nameArray) {
 
     var sc = {};
     if (!$.isEmptyObject(System))
-        Controls['System'] = System;
+        sc['System'] = System;
+    if (!$.isEmptyObject(Draw))
+        sc['Draw'] = Draw;
     if (!$.isEmptyObject(Event))
         sc['Event'] = Event;
     if (!$.isEmptyObject(ControlsIf))
@@ -130,6 +136,22 @@ BlocklyMenuRenderer = function (include) {
         if (include.System.ClearRect) {
 
             strRet += '<block type="system_ClearRect"></block>';
+        }
+        
+        strRet += '</category>';
+    }
+
+    if (include.Draw) {
+
+        strRet += '<category name="Draw">';
+
+        if (include.Draw.SetFillStyle) {
+
+            strRet += '<block type="draw_SetFillStyle"></block>';
+        }
+        if (include.Draw.FillRect) {
+
+            strRet += '<block type="draw_FillRect"></block>';
         }
         
         strRet += '</category>';
@@ -328,6 +350,12 @@ var defaultSchema = {
     System: {
 
         DesignerCanvasContext: true,
+        ClearRect: true
+    },
+    Draw: {
+
+        SetFillStyle: true,
+        FillRect: true
     },
     Event: {
 

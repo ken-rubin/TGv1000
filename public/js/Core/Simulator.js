@@ -40,10 +40,10 @@ define(["Core/EnvironmentBuilder"],
                     m_objectProject = objectProject;
 
                     // Get reference to canvas.
-                    m_jCanvas = $(strCanvasSelector);
+//                    m_jCanvas = $(strCanvasSelector);
 
                     // Get a reference to the context object.
-                    m_context = m_jCanvas[0].getContext("2d");
+//                    m_context = m_jCanvas[0].getContext("2d");
 
                     return null;
                 } catch (e) {
@@ -134,7 +134,7 @@ define(["Core/EnvironmentBuilder"],
                     // Allocate the app.
                     window.app = new window.App();
                     window.app.initialize();
-                    window.app.context = m_context;
+//                    window.app.context = m_context;
 
                     // Begin the rendering.
                     if (m_renderCookie) {
@@ -198,7 +198,8 @@ define(["Core/EnvironmentBuilder"],
                     }
 
                     // Clear the surface before rendering everything.
-                    m_context.clearRect(0,0,800,600);
+                    window.app.PreRender();
+//                    m_context.clearRect(0,0,800,600);
 
                     exceptionRet = m_functionRender();
                     if (exceptionRet) {
