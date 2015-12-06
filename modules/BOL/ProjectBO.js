@@ -1222,11 +1222,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         // Handle tags and project_tags.
                         m_log('Going to m_setUpAndDoTagsWithCxn for project');
-                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name);
+                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name,
+                            function() {
 
-                        m_log('Going to m_saveComicsWithCxn');
-                        m_saveComicsWithCxn(connection, req, res, project);
-
+                                m_log('Going to m_saveComicsWithCxn');
+                                m_saveComicsWithCxn(connection, req, res, project);
+                            }
+                        );
                     } catch (e1) {
 
                         m_functionFinalCallback(e1, res, null, null);
@@ -1251,10 +1253,15 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
+            var totalNumTypesExclSystemBaseTypes = 0;
 
             project.comics.items.forEach(
                 function(comicIth) {
 
+                    for (var i = 0; i < comicIth.types.items.length; i++) {
+
+                        if (comicIth.types.items.ordinal !== 10000) { totalNumTypesExclSystemBaseTypes++; }
+                    }
                     comicIth.projectId = project.id;
 
                     var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
@@ -1272,9 +1279,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 if (--comicsCountdown === 0) {
 
-                                    m_log('Going to m_saveTypesWithCxn');
+                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesExclSystemBaseTypes);
 
-                                    m_saveTypesWithCxn(connection, req, res, project);
+                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesExclSystemBaseTypes);
                                 }
                             } catch (e1) {
 
@@ -1291,7 +1298,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_saveTypesWithCxn = function (connection, req, res, project) {
+    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesExclSystemBaseTypes) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.
@@ -1349,11 +1356,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             var msg = 'Just wrote type[passNum 1]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
                                             m_log(msg);
                                             m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                function() {
 
-                                            m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                            m_doTypeArraysForSaveAs(connection, project, type, req, res);
-
+                                                    m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, --totalNumTypesExclSystemBaseTypes);
+                                                }
+                                            );
                                         } catch (e1) {
 
                                             m_functionFinalCallback(e1, res, null, null);
@@ -1387,11 +1396,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             var msg = 'Just wrote type[passNum 2]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
                                             m_log(msg);
                                             m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                function() {
 
-                                            m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                            m_doTypeArraysForSaveAs(connection, project, type, req, res);
-
+                                                    m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, --totalNumTypesExclSystemBaseTypes);
+                                                }
+                                            );
                                         } catch (e2) {
 
                                             m_functionFinalCallback(e2, res, null, null);
@@ -1442,11 +1453,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             var msg = 'Just wrote type[passNum 3]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
                                             m_log(msg);
                                             m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                function() {
 
-                                            m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                            m_doTypeArraysForSaveAs(connection, project, type, req, res);
-
+                                                    m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, --totalNumTypesExclSystemBaseTypes);
+                                                }
+                                            );
                                         } catch (e3) {
 
                                             m_functionFinalCallback(e3, res, null, null);
@@ -1465,7 +1478,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res) {
+    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, iWhenZeroCanReturn) {
 
         try {
 
@@ -1495,13 +1508,16 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             meth.id = rows[0].insertId;
                             m_log('Going to do method tags');
-                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name);
+                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name,
+                                function() {
 
-                            methodsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+                                    methodsCountdown--;
+                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && iWhenZeroCanReturn) {
 
-                                m_functionFinalCallback(null, res, connection, project);
-                            }
+                                        m_functionFinalCallback(null, res, connection, project);
+                                    }
+                                }
+                            );
                         } catch (em) {
 
                             m_functionFinalCallback(em, res, null, null);
@@ -1529,7 +1545,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             prop.id = rows[0].insertId;
                             propertiesCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && iWhenZeroCanReturn) {
 
                                 m_functionFinalCallback(null, res, connection, project);
                             }
@@ -1560,7 +1576,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             ev.id = rows[0].insertId;
                             eventsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && iWhenZeroCanReturn) {
 
                                 m_functionFinalCallback(null, res, connection, project);
                             }
@@ -1585,7 +1601,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName) {
+    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, callback) {
 
         try {
             
@@ -1628,7 +1644,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType);
+            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, callback);
 
         } catch(e) {
 
@@ -1636,7 +1652,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType){
+    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, callback){
 
         try {
             var tagIds = [];
@@ -1662,7 +1678,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 tagIds.push(rows[0].id);
                                 if (--iCtr === 0){
 
-                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds);
+                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
                                 }
                             } else {
 
@@ -1678,7 +1694,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             tagIds.push(rows[0].insertId);
                                             if (--iCtr === 0){
 
-                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds);
+                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
                                             }
                                         } catch (e2) {
 
@@ -1700,7 +1716,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds) {
+    var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
 
         try {
             var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
@@ -1719,6 +1735,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(err, rows){
 
                     if (err) { m_functionFinalCallback(err, res, null, null); }
+                    callback();
                 }
             );
         } catch (e) {
