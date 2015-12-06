@@ -1315,24 +1315,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            var typesCountdown1 = 0,
-                typesCountdown2 = 0,
-                typesCountdown3 = 0;
-            project.comics.items.forEach(function(comicIth) {
-
-                comicIth.types.items.forEach(function(type){
-                    if (type.isApp) { 
-                        typesCountdown1++; 
-                    } else if (type.id < 0) {
-                        typesCountdown2++;
-                    } else if (type.ordinal !== 10000 && !type.isApp && type.id >= 0) {
-                        typesCountdown3++;
-                    }
-                });
-            });
-
-            m_log("The 3 typesCountdowns: " + typesCountdown1 + "-" + typesCountdown2 + "-" + typesCountdown3);
-
             for (var j = 0; j < project.comics.items.length; j++) {
 
                 var comicIth = project.comics.items[j];
@@ -1369,11 +1351,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
 
-                                            typesCountdown1--;
-                                            if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
-                                                m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                                m_doTypeArraysForSaveAs(connection, project, type, req, res);
-                                            }
+                                            m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
+                                            m_doTypeArraysForSaveAs(connection, project, type, req, res);
+
                                         } catch (e1) {
 
                                             m_functionFinalCallback(e1, res, null, null);
@@ -1409,11 +1389,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
 
-                                            typesCountdown2--;
-                                            if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
-                                                m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                                m_doTypeArraysForSaveAs(connection, project, type, req, res);
-                                            }
+                                            m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
+                                            m_doTypeArraysForSaveAs(connection, project, type, req, res);
+
                                         } catch (e2) {
 
                                             m_functionFinalCallback(e2, res, null, null);
@@ -1466,11 +1444,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
 
-                                            typesCountdown3--;
-                                            if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
-                                                m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                m_doTypeArraysForSaveAs(connection, project, type, req, res);
-                                            }
+                                            m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
+                                            m_doTypeArraysForSaveAs(connection, project, type, req, res);
+
                                         } catch (e3) {
 
                                             m_functionFinalCallback(e3, res, null, null);
@@ -1615,15 +1591,6 @@ module.exports = function ProjectBO(app, sql, logger) {
             
             m_log("In m_setUpAndDoTagsWithCxn with for type " + strItemType + " and itemId=" + itemId);
 
-
-
-
-            return;
-
-
-
-
-
             // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
             var tagArray = [];
             tagArray.push(strItemType);
@@ -1671,88 +1638,93 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType){
 
-        var tagIds = [];
-        var iCtr = tagArray.length;
-        // For each string in tagArry:
-        //      if it already exists in table tags, push its id onto tagIds.
-        //      else, add it and push the new array.
-        // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
+        try {
+            var tagIds = [];
+            var iCtr = tagArray.length;
 
-        m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
-        tagArray.forEach(function(tag) {
+            // For each string in tagArry:
+            //      if it already exists in table tags, push its id onto tagIds.
+            //      else, add it and push the new array.
+            // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
 
-            var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+            m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
+            tagArray.forEach(function(tag) {
+
+                var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+                sql.queryWithCxn(connection, strSql,
+                    function(err, rows){
+
+                        try{
+                            if (err) { m_functionFinalCallback(err, res, null, null); }
+
+                            if (rows.length > 0) {
+
+                                tagIds.push(rows[0].id);
+                                if (--iCtr === 0){
+
+                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds);
+                                }
+                            } else {
+
+                                strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
+                                sql.queryWithCxn(connection, strSql,
+                                    function(err, rows){
+
+                                        try {
+                                            if (err) { m_functionFinalCallback(err, res, null, null); }
+
+                                            if (rows.length === 0) { m_functionFinalCallback(new error('Could not insert tag into database.'), res, null, null); }
+
+                                            tagIds.push(rows[0].insertId);
+                                            if (--iCtr === 0){
+
+                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds);
+                                            }
+                                        } catch (e2) {
+
+                                            m_functionFinalCallback(e2, res, null, null);
+                                        }
+                                    }
+                                );
+                            }
+                        } catch (e1) {
+
+                            m_functionFinalCallback(e1, res, null, null);
+                        }
+                    }
+                );
+            });
+        } catch (e) {
+
+            m_functionFinalCallback(e, res, null, null);
+        }
+    }
+
+    var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds) {
+
+        try {
+            var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
+            for (var j = 0; j < tagIds.length; j++) {
+
+                strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
+                if (j !== tagIds.length - 1){
+
+                    strSql = strSql + ",";
+                }
+            }
+
+            strSql = strSql + ";";
+            m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
             sql.queryWithCxn(connection, strSql,
                 function(err, rows){
 
-                    if (err) {
-
-                        callback(err);
-                        return;
-                    }
-
-                    if (rows.length > 0) {
-
-                        tagIds.push(rows[0].id);
-                        if (--iCtr === 0){
-
-                            callback(m_createTagJunctionsWithCxn(connection, itemId, strItemType, tagIds));
-                            return;
-                        }
-                    } else {
-
-                        strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-                        sql.queryWithCxn(connection, strSql,
-                            function(err, rows){
-
-                                if (err) {
-
-                                    callback(err);
-                                    return;
-                                }
-
-                                if (rows.length === 0) {
-
-                                    callback({message:'Could not insert tag into database.'});
-                                    return;
-                                
-                                } else {
-
-                                    tagIds.push(rows[0].insertId);
-                                    if (--iCtr === 0){
-
-                                        callback(m_createTagJunctionsWithCxn(connection, itemId, strItemType, tagIds));
-                                        return;
-                                    }
-                                }
-                            }
-                        );
-                    }
+                    if (err) { m_functionFinalCallback(err, res, null, null); }
                 }
             );
-        });
-    }
+        } catch (e) {
 
-    var m_createTagJunctionsWithCxn = function(connection, itemId, strItemType, tagIds) {
-
-        var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
-        for (var j = 0; j < tagIds.length; j++) {
-
-            strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
-            if (j !== tagIds.length - 1){
-
-                strSql = strSql + ",";
-            }
+            m_functionFinalCallback(e, res, null, null);
         }
-
-        strSql = strSql + ";";
-        m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
-        sql.queryWithCxn(connection, strSql,
-            function(err, rows){
-
-                return err;
-            }
-        );
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
