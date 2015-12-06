@@ -51,7 +51,7 @@ module.exports = function SQL(app) {
         }
     }
 
-    self.queryWithCxn = function (connection, strQuery, callback) {
+    self.queryWithCxn = function (connection, strQuery, callback, passbackWithCallback) {
 
         try {
             connection.query(strQuery, function(err, rows) {
@@ -66,14 +66,14 @@ module.exports = function SQL(app) {
                     // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
                     if (rows.constructor === Array) {
 
-                        callback(null, rows);
+                        callback(null, rows, passbackWithCallback);
                     
                     } else {
 
                         // rows is a non-array js object. Turn it into an array.
                         var newRows = [];
                         newRows.push(rows);
-                        callback(null, newRows);
+                        callback(null, newRows, passbackWithCallback);
                     }
                 } catch (e) {
 

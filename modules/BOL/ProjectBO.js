@@ -1259,15 +1259,16 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
                     m_log('In m_saveComicsWithCxn with ' + strQuery);
-                    sql.queryWithCxn(connection, strQuery,
-                        function(err, rows) {
+                    sql.queryWithCxn(connection, 
+                        strQuery,
+                        function(err, rows, comic) {
 
                             try {
                                 if (err) { throw err; }
 
                                 if (rows.length === 0) { throw new Error("Error writing comic to database."); }
 
-                                comicIth.id = rows[0].insertId;
+                                comic.id = rows[0].insertId;
 
                                 if (--comicsCountdown === 0) {
 
@@ -1279,7 +1280,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 m_functionFinalCallback(e1, res, null, null);
                             }
-                        }
+                        },
+                        comicIth
                     );
                 }
             );
@@ -1354,29 +1356,30 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                                 m_log('Inserting type with ' + strQuery);
                                 sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
                                         try {
                                             if (err) { throw err; }
 
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            typeIth.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 1]: (' + typeIth.id + ',' + typeIth.name + ',' + typeIth.ordinal + ')';
+                                            type.id = rows[0].insertId;
+                                            var msg = 'Just wrote type[passNum 1]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
                                             m_log(msg);
-                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name);
+                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
 
                                             typesCountdown1--;
                                             if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
                                                 m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                                m_doTypeArraysForSaveAs(connection, project, typeIth, req, res);
+                                                m_doTypeArraysForSaveAs(connection, project, type, req, res);
                                             }
                                         } catch (e1) {
 
                                             m_functionFinalCallback(e1, res, null, null);
                                         }
-                                    }
+                                    },
+                                    typeIth
                                 );
                             }
                         } else if (passNum === 2) {
@@ -1390,7 +1393,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
                                 m_log('Inserting type with ' + strQuery);
                                 sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
                                         try {
                                             if (err) { throw err; }
@@ -1398,24 +1401,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
                                             // Add to correspondance array.
-                                            negTypeIdXlate.push({negId:typeIth.id, dbId:rows[0].insertId});
+                                            negTypeIdXlate.push({negId:type.id, dbId:rows[0].insertId});
 
-                                            typeIth.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 2]: (' + typeIth.id + ',' + typeIth.name + ',' + typeIth.ordinal + ')';
+                                            type.id = rows[0].insertId;
+                                            var msg = 'Just wrote type[passNum 2]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
                                             m_log(msg);
-                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name);
+                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
 
                                             typesCountdown2--;
                                             if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
                                                 m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                                m_doTypeArraysForSaveAs(connection, project, typeIth, req, res);
+                                                m_doTypeArraysForSaveAs(connection, project, type, req, res);
                                             }
                                         } catch (e2) {
 
                                             m_functionFinalCallback(e2, res, null, null);
                                         }
-                                    }
+                                    },
+                                    typeIth
                                 );
                             }
                         } else {
@@ -1449,29 +1453,30 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                                 m_log('Inserting type with ' + strQuery);
                                 sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
                                         try {
                                             if (err) { throw err; }
 
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            typeIth.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 3]: (' + typeIth.id + ',' + typeIth.name + ',' + typeIth.ordinal + ')';
+                                            type.id = rows[0].insertId;
+                                            var msg = 'Just wrote type[passNum 3]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
                                             m_log(msg);
-                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name);
+                                            m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name);
 
                                             typesCountdown3--;
                                             if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
                                                 m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                m_doTypeArraysForSaveAs(connection, project, typeIth, req, res);
+                                                m_doTypeArraysForSaveAs(connection, project, type, req, res);
                                             }
                                         } catch (e3) {
 
                                             m_functionFinalCallback(e3, res, null, null);
                                         }
-                                    }
+                                    },
+                                    typeIth
                                 );
                             }
                         }
@@ -1505,16 +1510,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                 var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined,methodTypeId,parameters) values (" + method.typeId + ",'" + method.name + "'," + method.ordinal + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + "," + method.methodTypeId + ",'" + method.parameters + "');";
                 m_log('Inserting method with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows) {
+                    function(err, rows, meth) {
 
                         try {
                             if (err) { throw err; }
 
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
-                            method.id = rows[0].insertId;
+                            meth.id = rows[0].insertId;
                             m_log('Going to do method tags');
-                            m_setUpAndDoTagsWithCxn(connection, res, method.id, 'method', req.body.userName, method.tags, method.name);
+                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name);
 
                             methodsCountdown--;
                             if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
@@ -1525,7 +1530,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             m_functionFinalCallback(em, res, null, null);
                         }
-                    }
+                    },
+                    method
                 );
             });
 
@@ -1538,14 +1544,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                 
                 m_log('Inserting property with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows) {
+                    function(err, rows, prop) {
 
                         try {
                             if (err) { throw err; }
 
                             if (rows.length === 0) { throw new Error("Error inserting property into database"); }
 
-                            property.id = rows[0].insertId;
+                            prop.id = rows[0].insertId;
                             propertiesCountdown--;
                             if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
 
@@ -1555,7 +1561,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             m_functionFinalCallback(ep, res, null, null);
                         }
-                    }
+                    },
+                    property
                 );
 
             });
@@ -1568,14 +1575,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                 strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + event.ordinal + ");";
                 m_log('Inserting event with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows) {
+                    function(err, rows, ev) {
 
                         try {
                             if (err) { throw err; }
 
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
-                            event.id = rows[0].insertId;
+                            ev.id = rows[0].insertId;
                             eventsCountdown--;
                             if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
 
@@ -1585,7 +1592,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             m_functionFinalCallback(ee, res, null, null);
                         }
-                    }
+                    },
+                    event
                 );
 
             });
