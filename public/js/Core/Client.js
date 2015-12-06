@@ -885,62 +885,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-//not used
-					// self.renameTypeInActiveComic = function (strNewName, index, strOriginalName) {
-
-					// 	try {
-
-					// 		var activeClType = types.getActiveClType();
-					// 		activeClType.data.name = strNewName;		// Since it's a reference, it's updated everywhere important.
-
-					// 		// Call Code to handle categories and schema methods.
-					// 		var exceptionRet = code.renameType(activeClType, strOriginalName);
-					// 		if (exceptionRet) { throw exceptionRet; }
-
-					// 		// Have types.js change header of TypeWell.
-					// 		exceptionRet = types.changeTypeWellHeader();
-					// 		if (exceptionRet) { throw exceptionRet; }
-
-					// 		// Need to call someone to update the tooltip of the correct tool in toolstrip.
-					// 		// Everything else should be handled.
-					// 		return tools.changeTooltipAndId(strOriginalName, strNewName);
-
-					// 	} catch(e) {
-
-					// 		return e;
-					// 	}
-					// }
-
-//not used
-					// self.renameMethodInActiveType = function (strNewName, index, strOriginalName) {
-
-					// 	try {
-
-					// 		var activeClType = types.getActiveClType();
-					// 		var oldMethod = activeClType.data.methods[index];
-					// 		oldMethod.name = strNewName;
-					// 		activeClType.data.methods[index] = oldMethod;
-
-					// 		var exceptionRet = types.functionSetActiveMethodIndex(index);
-					// 		if (exceptionRet) { throw exceptionRet; }
-
-					// 		// Call Code.js#renameMethod(clType, method, strOriginalName).
-					// 		exceptionRet = code.renameMethod(activeClType, oldMethod, strOriginalName);
-					// 		if (exceptionRet) { throw exceptionRet; }
-
-					// 		exceptionRet = types.regenTWMethodsTable();
-					// 		if (exceptionRet) { throw exceptionRet; }
-
-					// 		$("#method_" + index.toString()).click();
-
-					// 		return null;
-
-					// 	} catch(e) {
-
-					// 		return e;
-					// 	}
-					// }
-
 //used
 					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {
 

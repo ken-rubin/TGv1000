@@ -5,8 +5,8 @@
 //
 
 // Define Type module.
-define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/converter"],
-	function (errorHelper, comic, comics, converter) {
+define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/converter", "SourceScanner/processor", "SourceScanner/coder"],
+	function (errorHelper, comic, comics, converter, processor, coder) {
 
 		try {
 
@@ -168,6 +168,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 						return null;
 					};
 
+					var blocklyChangeListenerTimeoutId = null;
+
 					// Update the blockly data in the active member.
 					self.update = function (strWorkspace) {
 
@@ -180,7 +182,16 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 								return null;
 							}
 
-							return m_functionUpdateActiveMethodWorkspace(strWorkspace);
+							if (blocklyChangeListenerTimeoutId) {
+
+								window.clearTimeout(blocklyChangeListenerTimeoutId);
+							}
+							
+							blocklyChangeListenerTimeoutId = window.setTimeout(
+								function(){ m_functionUpdateActiveMethodWorkspace(strWorkspace); }, 
+								1500);
+
+							return null;
 
 						} catch (e) {
 
@@ -203,29 +214,21 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 						try {
 
 							// Get the item.
-							var itemActive = m_arrayActive[m_iActiveIndex];
+							var activeMethod = m_arrayActive[m_iActiveIndex];
+							var copyOfActiveMethod = JSON.parse(JSON.stringify(activeMethod));	// Done this way to disassociate them.
 
-							// Replace the workspace of the active method.
-							itemActive.workspace = strWorkspace;
+							// Set bool to be used below to display an error box if they try to change the name of either the initialize or construct methods.
+							var methodIsAppInitializeOrConstruct = (types.isAppInitializeActive()) || (activeMethod.name === "construct");
 
-							// It's not just the workspace that has changed.
 							// This method's name, parameters, even method type could have changed.
 							// As could the user's implementation of the method or its return value.
-							// We will examine the workspace and adjust what needs adjusting.
+							// Or, if App initialize is active, size or position of TIs could have been changed.
+							// We will examine the workspace and adjust what needs adjusting in activeMethod.
 							
-							// One problem is that the user might have changed the method name to
-							// one that already exists. We'll handle this by changing the name slightly and
-							// informing the user if necessary. For this it would be best to set a timer and let the user finish typing, if possible.
-
-							// However, everything has to be done quickly, because we're getting called on every keystroke, drag (pixel?), etc.
-
-			                // We also might remove any chaff--stuff that's not formally part of the method that the user might have left in the code pane.
-			                // For example, a second block. Or maybe we won't.
-
 							/*	This is the structure have to work with (both variations):
 
 										<xml xmlns="http://www.w3.org/1999/xhtml">
-										  <block type="procedures_defreturn">
+										  <block type="procedures_defreturn">		or procedures_defnoreturn
 										    <mutation>
 										    	<arg> elements with parameters
 										    </mutation>
@@ -243,58 +246,246 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 										</xml>
 			                */
 
-			                var proceduresBlock = $(strWorkspace).xpath("/xml/block[1]");	// xpath is 1-based
-			                if (proceduresBlock.length) {
+				            var workspaceJSON = converter.toJSON(strWorkspace);
+				            if (!workspaceJSON.children) {
 
-				                var blockType = $(proceduresBlock).xpath("@type");
-				                // blockType[0].nodeValue is either "procedures_defreturn" or "procedures_defnoreturn"
-				                // If the user had changd this in the Blockly code pane, we've already handled that by assignment to itemActive.workspace.
-
-				                var mutationArgs = $(proceduresBlock).xpath("mutation/arg");	// all of them
-				                var currArgs = [];
-				                for (var i = 0; i < mutationArgs.length; i++) {
-
-				                	var argIth = mutationArgs[i];
-				                	var argIthName = $(argIth).xpath("@name")[0].nodeValue;	// 0-based since we're now in JS array land
-				                	if (argIthName !== "self") {
-
-				                		currArgs.push(argIthName);
-				                	}
-				                }
-
-				                // No need to compare since they're not showing anywhere.
-				                itemActive.parameters = currArgs.join(', ');
-
-				                // If anything changes that does display in TypeWell, set the following to true.
-				                // For now this can be only the method name.
-				                var gridRefreshNeeded = false;
-
-				                var methodName = $(strWorkspace).xpath("/xml/block/field")[0].innerText;	// again, JS 0-based arrays
-				                
-				                // Compare methodName with itemActive.name.
-				                if (methodName !== itemActive.name) {
-
-					                // Dup checking and automatic name adjustment.
-           							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, m_iActiveIndex);
-
-           							if (exceptionRet) {
-
-           								// This isn't really an exception. It just means that the name isn't available.
-           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.")
-           							}
-
-				                	gridRefreshNeeded = true;
-				                	itemActive.name = methodName;
-				                }
-
-				                if (gridRefreshNeeded) {
-
-				                	types.regenTWMethodsTable();
-				                }
+				            	// They must have dragged the function block to trash.
+				            	return m_functionRestoreWorkspaceFromMethod(activeMethod, workspaceJSON);
 				            }
+
+				            // Look among the children for the **first one** with a c-block (type="procedures_def...") signature.
+				            var bHandledACBlock = false;
+				            for (var i = 0; i < workspaceJSON.children.length; i++) {
+
+				            	var childIth = workspaceJSON.children[i];
+
+			                    // Check if childIth matches what we need.
+			                    if (childIth.hasOwnProperty("nodeName") && 
+			                        childIth.hasOwnProperty("type") &&
+			                        childIth.hasOwnProperty("children")) {
+
+			                        if (childIth.nodeName === "block" &&
+			                            childIth.type.substr(0, 11) === "procedures_" &&
+			                            childIth.children.length > 1) {     // mutation, field, statement and (if procedures_defreturn) return.
+
+			                            if (childIth.children[1].hasOwnProperty("contents")) {	// This means the function has a name; i.e., it hasn't been blanked out.
+
+			                            	/////////////////////////////////////////
+			                            	// We have a c-block. We'll work with it.
+			                            	/////////////////////////////////////////
+
+			                            	// First, the method name. This is the only one that can cause a grid refresh.
+			                            	// And it kicks them out of this method if they've changed initialize or construct.
+			                            	var methodName = childIth.children[1].contents;
+
+							                if (methodName !== activeMethod.name) {
+
+							                	if (methodIsAppInitializeOrConstruct) {
+
+							                		//errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
+
+													var exceptionRet = code.load(activeMethod.workspace);
+													if (exceptionRet) { throw exceptionRet; }
+
+													return null;
+							                	}
+
+								                // Dup checking and automatic name adjustment.
+			           							var exceptionRet = validator.isMethodNameAvailableInActiveType(methodName, m_iActiveIndex);
+
+			           							if (exceptionRet) {
+
+			           								// This isn't really an exception. It just means that the name isn't available.
+			           								return new Error("The name '" + methodName + "' isn't available. Please change the name to be unique.");
+			           							}
+
+							                	activeMethod.name = methodName;
+							                	types.changeTypeWellHeader();
+							                	types.regenTWMethodsTable();
+
+							                	// Call code to update schema since method name changed.
+							                	JL().info("About to call code.replaceMethod with new method name=" + activeMethod.name + " and original method name=" + copyOfActiveMethod.name);
+							                	code.replaceMethod(activeMethod, copyOfActiveMethod, types.getActiveClType(false));
+							                }
+
+			                            	// Now the methodTypeId. It's possible that the user dragged out a function block of the other type,
+			                            	// set it all up and then dragged it above the original function block (or dragged the original to trash).
+			                            	//
+			                            	// methodTypeIds are:
+			                            	// 1 - statement (no return value)
+			                            	// 2 - expression (return value)
+			                            	// 3 - initialize (no return value)
+			                            	// 4 - construct (no return value)
+			                            	var type = childIth.type;
+
+			                            	// Cannot change method type of initialize or construct from defnoreturn.
+			                            	if (methodIsAppInitializeOrConstruct && type === "procedures_defreturn") {
+
+						                		//errorHelper.show(activeMethod.name + "'s method type cannot be changed.", 3000);
+
+												var exceptionRet = code.load(activeMethod.workspace);
+												if (exceptionRet) { throw exceptionRet; }
+
+												return null;
+			                            	}
+
+			                            	if (!methodIsAppInitializeOrConstruct) {
+
+				                            	var thisMethodTypeId = (type === "procedures_defreturn" ? 2 : 1);
+				                            	activeMethod.methodTypeId = thisMethodTypeId;
+			                            	}
+
+			                            	// Now the parameters (args).
+			                            	if (childIth.children[0].hasOwnProperty("nodeName") &&
+			                            		childIth.children[0].hasOwnProperty("children")) {
+
+			                            		if (childIth.children[0].nodeName === "mutation" &&
+			                            			childIth.children[0].children.length) {
+
+				                            		var currArgs = [];
+				                            		for (var j = 0; j < childIth.children[0].children.length; j++) {
+
+				                            			var nameJth = childIth.children[0].children[j].name;
+				                            			if (nameJth !== "self") {
+
+				                            				currArgs.push(nameJth);
+				                            			}
+				                            		}
+
+				                            		if (activeMethod.name === "initialize" && currArgs.length > 0) {
+
+								                		//errorHelper.show("The initialize method cannot have parameters (beyond 'self').", 5000);
+
+														var exceptionRet = code.load(activeMethod.workspace);
+														if (exceptionRet) { throw exceptionRet; }
+
+														return null;
+				                            		}
+
+				                            		activeMethod.parameters = currArgs.join(', ');
+			                            		}
+			                            	}
+							            } else {
+
+							            	// The fact that we're here means the user has just blanked out the method name.
+							            	// We'll tell the user how to handle this.
+							            	if (methodIsAppInitializeOrConstruct) {
+
+						                		//errorHelper.show("The " + activeMethod.name + " method cannot be renamed.", 3000);
+
+							            	} else {
+
+					                			//errorHelper.show("The procedure for completely changing a method name is to double-click on it and begin typing. Then either type Enter or click away.", 7500);
+							            	}
+
+											var exceptionRet = code.load(activeMethod.workspace);
+											if (exceptionRet) { throw exceptionRet; }
+
+							            	return null;
+							            }
+
+							            bHandledACBlock = true;
+							            break;	// Out of loop looking for c-blocks. We have handled the first (highest) one.
+							        }
+							    }
+				            }
+
+				            if (!bHandledACBlock) {
+
+				            	// They must have dragged the function block to trash.
+				            	return m_functionRestoreWorkspaceFromMethod(activeMethod, workspaceJSON);
+				            }
+
+                            // If the current type is App, and the current method is "initialize", then
+                            // need to play changes into the Designer pane in case a position or size change was made to a TI.
+                            if (types.isAppInitializeActive()) { 
+
+			                    // Prepare objectResult to hold parameters for all ToolInstances. Then pass to designer to effect changes, if any.
+				                var objectResult = {};
+				                var strValue = null;
+				                var parts = [];
+
+				                // Scan.
+				                var objectCursor = processor.getPrimaryBlockChain(workspaceJSON);
+				                if (objectCursor) {
+
+				                    do {
+
+				                        //  Look for "new_" and "set_".
+				                        //  Set in designer.
+				                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
+				                        var arrayMatches = objectCursor.type.match(re);
+				                        
+				                        if (arrayMatches && arrayMatches.length > 1) {
+
+				                            objectResult[arrayMatches[1]] = {};
+
+				                        } else {
+
+				                            var props = ["X", "Y", "Width", "Height"];
+				                            for (var i = 0; i < props.length; i++) {
+
+				                                var propIth = props[i];
+				                                strValue = coder.functionDoProperty(objectCursor, propIth);
+
+				                                if (strValue) {
+
+				                                    parts = strValue.split('~');
+				                                    objectResult[parts[0]][propIth] = parts[1];
+				                                    break;
+				                                }                                
+				                            }
+				                        }
+
+				                        objectCursor = objectCursor.next;
+
+				                    } while (objectCursor)
+				                }
+
+				            	// Load up the parsed data into the designer.
+			            		var exceptionRet = designer.updateInstances(objectResult);
+								if (exceptionRet) { throw exceptionRet; }
+							}
+
+							// Finally, replace the workspace of the active method.
+							activeMethod.workspace = strWorkspace;
 
 							return null;
 
+						} catch (e) {
+
+							return e;
+						}
+					}
+
+					var m_functionRestoreWorkspaceFromMethod = function(activeMethod, workspaceJSON) {
+
+						try {
+
+							// There are either no procedures_def... block amongst workspaceJSON.children or we didn't find one while
+							// looping that met sufficient criteria.
+							// If there are any children (there don't have to be), they are chaff--extraneous work blocks.
+							// We're going to re-load activeMethod.workspace into code, but we'd like to retain any chaff.
+							// So we'll do this cleverly and carefully.
+
+							var methodWorkspaceJSON = converter.toJSON(activeMethod.workspace);
+
+							if (!workspaceJSON.children) {
+
+								workspaceJSON.children = methodWorkspaceJSON.children;
+							
+							} else {
+
+								workspaceJSON.children.unshift(methodWorkspaceJSON.children[0]);
+							}
+
+	                		//errorHelper.show("You are not allowed to trash (delete) the function block.", 5000);
+
+							var exceptionRet = code.load(converter.toXML(workspaceJSON));
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+						
 						} catch (e) {
 
 							return e;

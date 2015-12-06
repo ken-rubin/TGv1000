@@ -9,6 +9,8 @@ var bodyParser = require("body-parser");
 var morgan = require("morgan");
 var lessMiddleware = require("less-middleware");
 var favicon = require('serve-favicon');
+var JL = require("jsnlog").JL;
+var jsnlog_nodejs = require('jsnlog-nodejs').jsnlog_nodejs;
 
 /////////////////////////////////////
 console.log("Allocate application (express).");
@@ -50,6 +52,20 @@ app.use(express.static(__dirname + "/public"));
 /////////////////////////////////////
 app.set("dbname","TGv1000.");
 console.log("dbname is " +  app.get("dbname"));
+
+/////////////////////////////////////
+console.log("Configuring jsnlog to listen for client-side messages and logging to console.");
+// jsnlog.js on the client by default sends log messages to /jsnlog.logger, using POST.
+app.post('*.logger', function (req, res) { 
+    
+    jsnlog_nodejs(JL, req.body);
+
+    // Send empty response. This is ok, because client side jsnlog does not use response from server.
+    res.send(''); 
+});
+
+// Test server-generated jsnlog message.
+JL().info('<<< log message from server to show logging is live >>>');
 
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");

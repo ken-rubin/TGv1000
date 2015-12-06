@@ -565,27 +565,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
 
-                            // Set the new data in the type strip.
+                            // Set the new data in the TypeWell. types calls type.js#update for the active type.
+                            // In type.js m_functionUpdateActiveMethodWorkspace does all the parsing and updating.
                             var exceptionRet = types.update(self.workspace);
-							if (exceptionRet) { throw exceptionRet; }
-
-                            // If the current type is app, and the current method is initialize, then
-                            // need to play changes into the designer in case anything changes here.
-
-                            if (!types.isAppInitializeActive()) { return; }
-
-		                    // The App type is selected. The initialize method is clicked on (loaded into code pane).
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Pulls workspace XML out of the App::initialize and converts to JSON.
-		                    if (!objectWorkspace) {
-
-		                        throw { messgage: "Failed to get the workspace object." };
-		                    }
-
-		                    // Get the block with which to work and pass
-		                    var objectResult = coder.blocklyChangeListener(processor.getPrimaryBlockChain(objectWorkspace));
-
-			            	// Load up the parsed data into the designer.
-		            		var exceptionRet = designer.updateInstances(objectResult);
 							if (exceptionRet) { throw exceptionRet; }
 
 						} catch (e) {
@@ -601,10 +583,10 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();	// Get the App Type's initialize workspace (in JS).
+		                    var objectWorkspace = processor.getAppInitializeJSONObject();	// Get the App Type's initialize workspace (in JS).
 		                    if (!objectWorkspace) {
 
-		                        throw { messgage: "Failed to get the workspace object." };
+		                        throw { message: "Failed to get the workspace object." };
 		                    }
 
 		                    // Get the block with which to work.

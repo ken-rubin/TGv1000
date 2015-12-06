@@ -9,6 +9,8 @@
     "gm": "^1.17.0",
     "imagemagick": "*",
     "jade": "*",
+    "jsnlog": "^2.14.0",
+    "jsnlog-nodejs": "^2.14.0",
     "less-middleware": "^2.0.1",
     "morgan": "^1.5.1",
     "multer": "0.1.8",

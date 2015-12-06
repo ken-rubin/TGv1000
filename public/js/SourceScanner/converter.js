@@ -57,9 +57,10 @@ define([],
 
                     // Convert.
                     return m_functionOutput(objectJSON);
+
                 } catch (e) {
 
-                    return e;
+                    return '';  // Big problem if this hits.
                 }
             };
 

@@ -129,6 +129,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 							// Just call to helper method.
 							return m_functionRender();
+							
 						} catch (e) {
 
 							return e;
@@ -214,10 +215,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 
 						try {
 
-		                    var objectWorkspace = processor.getWorkspaceJSONObject();
+		                    var objectWorkspace = processor.getAppInitializeJSONObject();
 		                    if (!objectWorkspace) {
 
-		                        throw { messgage: "Failed to get the workspace object." };
+		                        throw { message: "Failed to get the workspace object." };
 		                    }
 
 		                    // Get the block with which to work.

@@ -199,7 +199,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								for(var i = 0; i < m_typesArray.length; i++) {
 
 									var typeIth = m_typesArray[i];
-									if (!typeIth.isApp && typeIth.ordinal) {
+									if (!typeIth.isApp && typeIth.ordinal !== 10000) {
 
 										strBuild += '<option value="' + typeIth.name + '">' + typeIth.name + '</option>';
 									}
@@ -348,10 +348,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 											ordinal: 0, 
 											ownedByUserId: g_strUserId, 
 											public: 0, 
+											quarantined: 0,
 											workspace: '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>', 
 											imageId: 0, 
+											description: '',
+											parentMethodId: null,
+											parentPrice: null,
+											priceBump: 0.00,
 											methodTypeId: 4, 
-											parameters: ''}
+											parameters: ''
+										}
 									],
 									events: [],
 									baseTypeId: setBaseTypeId,

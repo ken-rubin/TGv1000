@@ -233,7 +233,9 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(
                 function(comic) {
 
-                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.originalComicId + " order by ordinal asc;",
+                    // We originally has order by ordinal asc, but, probably due to async or something, this didn't always work, so,
+                    // since we want them ordered that way, we'll sort them manually below when we have them all (before fetching system base types).
+                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.originalComicId + ";",
                         function(rows) {
 
                             // At least for now there can be comics with no types, so we disable the following test:
@@ -292,7 +294,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             if (--typesCount === 0) {
 
-                                                console.log('typesCount has reached 0--fetching App Type systemBaseTypes.');
+                                                console.log('typesCount has reached 0--fetching systemBaseTypes.');
+
+                                                // The sort referred to above.
+                                                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+
+                                                console.log('comic.types.items[0].baseTypeId=' + comic.types.items[0].baseTypeId);
+                                                console.log('comic.types.items[0].name=' + comic.types.items[0].name);
 
                                                 // Use the comic's App type (comic.types.items[0]). As such it will have a baseTypeId that is a systemBaseType's id.
                                                 // Use the table systemBaseTypes to retrieve the chain of base Types for this App type and push each of them onto comic.types.items.
@@ -313,7 +321,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                     isApp: row.isApp === 1 ? true : false,
                                                                     imageId: row.imageId,
                                                                     altImagePath: row.altImagePath,
-                                                                    ordinal: null,                  // system base types must always have ordinal === null
+                                                                    ordinal: 10000,                  // system base types must always have ordinal === 10000 for sorting and recognition purposes
                                                                     description: row.description,
                                                                     parentTypeId: row.parentTypeId,
                                                                     parentPrice: row.parentPrice,
@@ -452,7 +460,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function(tags) {
 
                                                     method.tags = tags;
-                                                    m_log('Method fetched: ' + JSON.stringify(method));
+                                                    // m_log('Method fetched: ' + JSON.stringify(method));
                                                     type.methods.push(method);
 
                                                     mcnt--;
@@ -954,7 +962,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                  SaveProject
+    //              SaveProject & SaveProjectAs entry point
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -962,7 +970,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            // m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
@@ -971,11 +979,10 @@ module.exports = function ProjectBO(app, sql, logger) {
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
 
-            // Muis important: the project's name must be unique to the user's projects, but can be the same as another user's project name.
+            // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
             var project = req.body.projectJson;
-
             var typeOfSave = req.body.saveType;
             if (typeOfSave === 'save') {
 
@@ -992,88 +999,53 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             sql.getCxnFromPool(function(err, connection) {
 
-                if (err) {
+                try {
+                    if (err) {
 
-                    res.json({
-                        success: false,
-                        message: 'Could not get a database connection: ' + err.message
-                    });
-                } else {
+                        throw new Error('Could not get a database connection: ' + err.message);
 
-                    m_log('Have a connection');
-                    connection.beginTransaction(function(err) {
+                    } else {
 
-                        if (err) {
+                        // m_log('Have a connection');
 
-                            res.json({
-                                success: false,
-                                message: 'Could not "begin" database connection: ' + err.message
-                            });
-                            return;
-                        }
+                        connection.beginTransaction(function(err) {
 
-                        m_log('Connection has a transaction');
-                        if (typeOfSave === 'save') {
+                            try {
+                                if (err) {
 
-                            m_log('Going into m_functionSaveProject');
-                            m_functionSaveProject(connection, req, res, project, m_functionFinalCallback);
-                        
-                        } else {    // 'saveAs'
+                                    throw new Error('Could not "begin" database connection: ' + err.message);
+                                
+                                } else {
 
-                            m_log('Going into m_functionSaveProjectAs');
-                            m_functionSaveProjectAs(connection, req, res, project, m_functionFinalCallback);
-                        }
-                    });
+                                    // m_log('Connection has a transaction');
+
+                                    if (typeOfSave === 'save') {
+
+                                        // m_log('Going into m_functionSaveProject');
+                                        m_functionSaveProject(connection, req, res, project);
+                                    
+                                    } else {    // 'saveAs'
+
+                                        // m_log('Going into m_functionSaveProjectAs');
+                                        m_functionSaveProjectAs(connection, req, res, project);
+                                    }
+                                }
+                            } catch (e1) {
+
+                                m_functionFinalCallback(e1, res, null, null);
+                            }
+                        });
+                    }
+                } catch (e2) {
+
+                    m_functionFinalCallback(e2, res, null, null);
                 }
             });
         } catch(e) {
 
-            m_log('Save exception');
-            res.json({
-                success: false,
-                message: 'Save failed. Error received: ' + e.message
-            });
+            // m_log('Top level exception saving project');
+            m_functionFinalCallback(new Error("Database failure"), res, null, null);
         }
-    }
-
-    var m_functionFinalCallback = function (err, res, connection, project) {
-
-        m_log('Reached m_functionFinalCallback');
-        if (err) {
-
-            m_log('err is non-null: ' + err.message);
-            res.json({
-                success: false,
-                message: 'Save Project failed with error: ' + err.message
-            });
-       } else {
-
-            m_log('Success. Committing transaction.');
-
-            sql.commitCxn(connection,
-                function(err){
-
-                    if (err) {
-                        res.json({
-                            success: false,
-                            message: 'Committing transaction failed with ' + err.message
-                        });
-                    } else {
-
-                        res.json({
-                            success: true,
-                            project: project
-                        });
-                    }
-                }
-            );
-        }
-    }
-
-    var m_log = function(msg) {
-
-        console.log(' ');
-        console.log(msg);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1082,31 +1054,40 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProject = function (connection, req, res, project, callback) {
+    var m_functionSaveProject = function (connection, req, res, project) {
 
         try {
 
             // The following will delete the former project completely from the database using cascading delete.
             var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
-            m_log('Save project step 1; deleting with ' + strQuery);
-            sql.queryWithCxn(connection, strQuery, 
+
+            // m_log('Save project step 1; deleting old version with ' + strQuery);
+            
+            sql.queryWithCxn(connection, 
+                strQuery, 
                 function(err, rows) {
 
-                    if (err) { 
+                    try {
+                        if (err) { 
 
-                        m_log('err back from delete project');
-                        // Rollback has happened already.
-                        throw err; 
+                            // m_log('err back from delete project');
+                            
+                            // Rollback has happened already.
+                            throw err; 
+                        }
+
+                        // Now we can just INSERT the project as passed from the client side.
+                        m_functionProjectSaveAsPart2(connection, req, res, project);
+
+                    } catch (e1) {
+
+                        m_functionFinalCallback(e1, res, null, null);
                     }
-
-                    m_log('No error in delete; moving into SaveAs');
-                    // Now we can just INSERT the project as passed from the client side.
-                    return callback(m_functionProjectSaveAsPart2(connection, req, res, project), res, connection, project);
                 }
             );
         } catch (e) {
 
-            callback(e, res, null, null);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
@@ -1117,7 +1098,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
+    var m_functionSaveProjectAs = function (connection, req, res, project) {
         
         // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
 
@@ -1125,57 +1106,52 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // Look for and reject an attempt to add a 2nd project for same user with same name.
             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
-            m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
+            
+            // m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
-                    if (err) { throw err; }
+                    try {                
+                        if (err) { throw err; }
 
-                    if (rows.length === 0) {
+                        if (rows.length === 0) {
 
-                        // throw new Error('Failed database action checking for duplicate project name.');
-                        callback( new Error('Failed database action checking for duplicate project name.'), res, null, null);
-                        return;
-
-                    } else {
-
-                        if (rows[0].cnt > 0) {
-
-                            // throw new Error('You already have a project with that name.');
-                            callback( new Error('You already have a project with that name.'), res, null, null);
-                            return;
+                            throw new Error('Failed database action checking for duplicate project name.');
 
                         } else {
-                            
-                            m_log('Name for SaveAs is good');
-                            project.public = 0;     // A saved-as project needs review by admins.
-                            var exceptionRet = m_functionProjectSaveAsPart2(connection,req,res,project);
-                            if (exceptionRet) { 
-                                // throw exceptionRet; 
-                                callback( exceptionRet, res, null, null); 
-                                return;
+
+                            if (rows[0].cnt > 0) {
+
+                                throw new Error('You already have a project with that name.');
+
+                            } else {
+                                
+                                // m_log('Name for SaveAs is good');
+
+                                project.public = 0;                 // A saved-as project needs review by an admin or instructor.
+                                m_functionProjectSaveAsPart2(connection, req, res, project);
                             }
                         }
+                    } catch (e1) {
 
-                        callback(null, res, connection, project);
+                        m_functionFinalCallback(e1, res, null, null);
                     }
                 }
             );
         } catch (e) {
 
-            m_log('In catch in m_functionSaveProjectAs');
-            callback(e, res, null, null);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
-    var m_functionProjectSaveAsPart2 = function (connection,req,res,project) {
+    var m_functionProjectSaveAsPart2 = function (connection, req, res, project) {
 
         // If we came in doing a Save, we've deleted the old project and jumped in here to re-INSERT the project as sent from client-side.
         // If we came in doing a SaveAs, we stopped off at m_functionSaveProjectAs to check for name uniqueness.
 
         try {
 
-            m_log('Continuing in m_functionProjectSaveAsPart2');
+            // m_log('Continuing in m_functionProjectSaveAsPart2');
             var guts = " SET name='" + project.name + "'"
                 + ",ownedByUserId=" + req.body.userId
                 + ",public=" + project.public
@@ -1189,46 +1165,46 @@ module.exports = function ProjectBO(app, sql, logger) {
                 + ",altImagePath='" + project.altImagePath + "'"
                 + ",description='" + project.description + "' ";
 
-            verb = "INSERT ";
-
             var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
 
-            m_log('Inserting project record with ' + strQuery);
+            // m_log('Inserting project record with ' + strQuery);
+
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
 
-                    if (err) { throw err; }
-
-                    if (rows.length === 0) {
-
-                        throw new Error('Error saving project to database.');
-                    }
-
-                    project.id = rows[0].insertId;
-
-                    // Handle tags and project_tags.
-                    m_log('Going to m_setUpAndDoTagsWithCxn for project');
-                    m_setUpAndDoTagsWithCxn(connection, project.id, 'project', req.body.userName, project.tags, project.name, function(err) {
-
+                    try {
                         if (err) { throw err; }
-                    });
 
-                    m_log('Going to m_doComicsForSaveAs');
-                    m_doComicsForSaveAs(connection, project, req, function(err) {
+                        if (rows.length === 0) {
 
-                        if (err) { throw err; }
+                            throw new Error('Error saving project to database.');
+                        }
+
+                        project.id = rows[0].insertId;
+
+                        // Handle tags and project_tags.
+                        // m_log('Going to m_setUpAndDoTagsWithCxn for project');
+                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name,
+                            function() {
+
+                                // m_log('Going to m_saveComicsWithCxn');
+                                m_saveComicsWithCxn(connection, req, res, project);
+                            }
+                        );
+                    } catch (e1) {
+
+                        m_functionFinalCallback(e1, res, null, null);
                     }
-                );
+                }
+            );
 
-                return null;
-            });
         } catch(e) {
 
-            return e;
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
-    var m_doComicsForSaveAs = function (connection, project, req, callback) {
+    var m_saveComicsWithCxn = function (connection, req, res, project) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
         // Also, a row has been added to resource and tags have been handled, too.
@@ -1239,41 +1215,55 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
+            var totalNumTypesExclSystemBaseTypes = 0;
 
-            project.comics.items.forEach(function(comicIth) {
+            project.comics.items.forEach(
+                function(comicIth) {
 
-                comicIth.projectId = project.id;
+                    for (var i = 0; i < comicIth.types.items.length; i++) {
 
-                var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
-                m_log('In m_doComicsForSaveAs with ' + strQuery);
-                sql.queryWithCxn(connection, strQuery,
-                    function(err, rows) {
-
-                        if (err) { throw err; }
-
-                        if (rows.length === 0) {
-
-                            callback(new Error("Error writing comic to database."));
-                            return;
-                        }
-
-                        comicIth.id = rows[0].insertId;
-
-                        if (--comicsCountdown === 0) {
-
-                            m_log('Going to m_doTypesForSaveAs');
-                            m_doTypesForSaveAs(connection, project, req, callback);
-                        }
+                        if (comicIth.types.items[i].ordinal !== 10000) { totalNumTypesExclSystemBaseTypes++; }
                     }
-                );
-            });
+
+                    m_log("Just counted types. Got " + totalNumTypesExclSystemBaseTypes + ".");
+
+                    comicIth.projectId = project.id;
+
+                    var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
+                    // m_log('In m_saveComicsWithCxn with ' + strQuery);
+                    sql.queryWithCxn(connection, 
+                        strQuery,
+                        function(err, rows, comic) {
+
+                            try {
+                                if (err) { throw err; }
+
+                                if (rows.length === 0) { throw new Error("Error writing comic to database."); }
+
+                                comic.id = rows[0].insertId;
+
+                                if (--comicsCountdown === 0) {
+
+                                    // m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesExclSystemBaseTypes);
+
+                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesExclSystemBaseTypes);
+                                }
+                            } catch (e1) {
+
+                                m_functionFinalCallback(e1, res, null, null);
+                            }
+                        },
+                        comicIth
+                    );
+                }
+            );
         } catch (e) {
 
-            callback(e);
+            m_functionFinalCallback(e, res, null, null);
         }
     } 
 
-    var m_doTypesForSaveAs = function (connection, project, req, callback) {
+    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesExclSystemBaseTypes) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.
@@ -1281,7 +1271,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         // Here's the situation with base types:
         // (1) The comic's App type has baseTypeId = id of one of the system base types. This remains unchanged.
-        // (2) System base types are recognized by having ordinal === null.
+        // (2) System base types are recognized by having ordinal === 10000.
         // (3) Any new types will have id < 0 and this id will be unique. This is so that, if they are then
         //     used as a base type, the derived type will have an id for baseTypeId. So, after new types are written
         //     to the DB and given a real id (saving off their negative id), we need to loop through the other types
@@ -1292,90 +1282,62 @@ module.exports = function ProjectBO(app, sql, logger) {
         // (2) We should loop through all types in the comic and write the ones with id < 0. When we get a real id,
         //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
         // (3) We should then loop through all the types again, skipping the App type and skipping any types with
-        //     ordinal === null, and write the rest to the db.
+        //     ordinal === 10000, and write the rest to the db.
         // (4) We also have to modify the Tags and type-sub-array routines to skip system base types.
 
         try {
 
-            var typesCountdown1 = 0,
-                typesCountdown2 = 0,
-                typesCountdown3 = 0;
-            project.comics.items.forEach(function(comicIth) {
+            var typeCount = {cnt: totalNumTypesExclSystemBaseTypes};
 
-                comicIth.types.items.forEach(function(type){
-                    if (type.isApp) { 
-                        typesCountdown1++; 
-                    } else if (type.id < 0) {
-                        typesCountdown2++;
-                    } else if (type.ordinal !== null && !type.isApp && type.id >= 0) {
-                        typesCountdown3++;
-                    }
-                });
-            });
+            m_log("Arrived into m_saveTypesWithCxn. typeCount=" + JSON.stringify(typeCount));
 
-            m_log("The 3 typesCountdowns: " + typesCountdown1 + "-" + typesCountdown2 + "-" + typesCountdown3);
+            for (var j = 0; j < project.comics.items.length; j++) {
 
-            // To pass into m_doTypeArraysForSaveAs to save some time by taking advantage of this loop.
-            // These will hold total counts across all comics/types.
-            var methodsCountdown = 0,
-                propertiesCountdown = 0,
-                eventsCountdown = 0;
-
-            project.comics.items.forEach(function(comicIth) {
-
+                var comicIth = project.comics.items[j];
                 var ordinal = 0;
                 var negTypeIdXlate = [];
 
                 // We're going to make 3 whole loops through the comic's types, processing (or ignoring) the ones specific to that loop.
                 for (var passNum = 1; passNum <=3; passNum++) { 
 
-                    comicIth.types.items.forEach(function(typeIth){
+                    for (var i = 0; i < comicIth.types.items.length; i++) {
 
+                        var typeIth = comicIth.types.items[i];
                         if (passNum === 1) {
 
                             // passNum = 1: just the type with isApp === true
                             if (typeIth.isApp) {
 
-                                methodsCountdown += typeIth.methods.length;
-                                propertiesCountdown += typeIth.properties.length;
-                                eventsCountdown += typeIth.events.length;
-
                                 typeIth.comicId = comicIth.id;
+                                typeIth.ordinal = ordinal++;
 
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                                m_log('Inserting type with ' + strQuery);
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                // m_log('Inserting type with ' + strQuery);
                                 sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
-                                        if (err) { throw err; }
+                                        try {
+                                            if (err) { throw err; }
 
-                                        if (rows.length === 0) {
+                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            callback(new Error("Error writing type to database."));
-                                            return;
-                                        }
+                                            type.id = rows[0].insertId;
+                                            var msg = 'Just wrote type[passNum 1]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
+                                            // m_log(msg);
+                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                function() {
 
-                                        typeIth.id = rows[0].insertId;
-                                        typeIth.ordinal = ordinal++;
-                                        m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                        m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
-
-                                            if (err) {
-
-                                                callback(err);
-                                                return;
-
-                                            } else {
-
-                                                typesCountdown1--;
-                                                if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
-                                                    m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                                    return;
+                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
                                                 }
-                                            }
-                                        });
-                                    }
+                                            );
+                                        } catch (e1) {
+
+                                            m_functionFinalCallback(e1, res, null, null);
+                                        }
+                                    },
+                                    typeIth
                                 );
                             }
                         } else if (passNum === 2) {
@@ -1383,61 +1345,48 @@ module.exports = function ProjectBO(app, sql, logger) {
                             // passNum = 2: any types with id < 0, building a correspondance array
                             if (typeIth.id < 0) {
 
-                                methodsCountdown += typeIth.methods.length;
-                                propertiesCountdown += typeIth.properties.length;
-                                eventsCountdown += typeIth.events.length;
-
                                 typeIth.comicId = comicIth.id;
+                                typeIth.ordinal = ordinal++;
 
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                                m_log('Inserting type with ' + strQuery);
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
+                                // m_log('Inserting type with ' + strQuery);
                                 sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
-                                        if (err) { throw err; }
+                                        try {
+                                            if (err) { throw err; }
 
-                                        if (rows.length === 0) {
+                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            callback(new Error("Error writing type to database."));
-                                            return;
-                                        }
+                                            // Add to correspondance array.
+                                            negTypeIdXlate.push({negId:type.id, dbId:rows[0].insertId});
 
-                                        // Add to correspondance array.
-                                        negTypeIdXlate.push({negId:typeIth.id, dbId:rows[0].insertId});
+                                            type.id = rows[0].insertId;
+                                            var msg = 'Just wrote type[passNum 2]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
+                                            // m_log(msg);
+                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                function() {
 
-                                        typeIth.id = rows[0].insertId;
-                                        typeIth.ordinal = ordinal++;
-                                        m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                        m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
-
-                                            if (err) {
-
-                                                callback(err);
-                                                return;
-
-                                            } else {
-
-                                                typesCountdown2--;
-                                                if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
-                                                    m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                                    return;
+                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
                                                 }
-                                            }
-                                        });
-                                    }
+                                            );
+                                        } catch (e2) {
+
+                                            m_functionFinalCallback(e2, res, null, null);
+                                        }
+                                    },
+                                    typeIth
                                 );
                             }
                         } else {
 
-                            // passNum = 3: the rest of the types where ordinal !== null, id >= 0, !isAPP. If baseTypeId !== null and < 0, look it up in the correspondance array and set it before writing to the DB.
-                            if (typeIth.ordinal !== null && !typeIth.isApp && typeIth.id >= 0) {
-
-                                methodsCountdown += typeIth.methods.length;
-                                propertiesCountdown += typeIth.properties.length;
-                                eventsCountdown += typeIth.events.length;
+                            // passNum = 3: the rest of the types where ordinal !== 10000, id >= 0, !isAPP. If baseTypeId !== 10000 and < 0, look it up in the correspondance array and set it before writing to the DB.
+                            if (typeIth.ordinal !== 10000 && !typeIth.isApp && typeIth.id >= 0) {
 
                                 typeIth.comicId = comicIth.id;
+                                typeIth.ordinal = ordinal++;
 
                                 // If this type has a non-null, negative baseTypeId, find correct Id in negTypeIdXlate and update it.
                                 if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
@@ -1459,185 +1408,163 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     }
                                 }
 
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                                m_log('Inserting type with ' + strQuery);
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                // m_log('Inserting type with ' + strQuery);
                                 sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
-                                        if (err) { throw err; }
+                                        try {
+                                            if (err) { throw err; }
 
-                                        if (rows.length === 0) {
+                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            callback(new Error("Error writing type to database."));
-                                            return;
-                                        }
+                                            type.id = rows[0].insertId;
+                                            var msg = 'Just wrote type[passNum 3]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
+                                            // m_log(msg);
+                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
+                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                function() {
 
-                                        typeIth.id = rows[0].insertId;
-                                        typeIth.ordinal = ordinal++;
-                                        m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + typeIth.id);
-                                        m_setUpAndDoTagsWithCxn(connection, typeIth.id, 'type', req.body.userName, typeIth.tags, typeIth.name, function(err) {
-
-                                            if (err) {
-
-                                                callback(err);
-                                                return;
-
-                                            } else {
-
-                                                typesCountdown3--;
-                                                if (typesCountdown1 + typesCountdown2 + typesCountdown3 === 0) {
-                                                    m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                    m_doTypeArraysForSaveAs(connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback);
-                                                    return;
+                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
                                                 }
-                                            }
-                                        });
-                                    }
+                                            );
+                                        } catch (e3) {
+
+                                            m_functionFinalCallback(e3, res, null, null);
+                                        }
+                                    },
+                                    typeIth
                                 );
                             }
                         }
-                    });
+                    }
                 }
-            });
+            }
         } catch (e) {
 
-            callback(e);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
-    var m_doTypeArraysForSaveAs = function (connection, project, req, methodsCountdown, propertiesCountdown, eventsCountdown, callback) {
+    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, typeCount) {
 
         try {
 
-            var exceptionRet = null;
             var ordinal;
+            typeCount.cnt--;
 
-            project.comics.items.forEach(function(comicIth) {
+            m_log("Arrived in m_doTypeArraysForSaveAs. After decrementing typeCount=" + JSON.stringify(typeCount));
 
-                comicIth.types.items.forEach(function(typeIth) {
+            // m_log("About to do arrays for type with id=" + typeIth.id + " and name=" + typeIth.name);
 
-                    m_log("About to do arrays for type with id=" + typeIth.id + " and name=" + typeIth.name);
+            var methodsCountdown = typeIth.methods.length;
+            var propertiesCountdown = typeIth.properties.length;
+            var eventsCountdown = typeIth.events.length;
+            ordinal = 0;
+            typeIth.methods.forEach(function(method) {
 
-                    if (typeIth.ordinal !== null) {
-                        // In other words, don't do this for system base types.
+                // m_log("About to write method for type with id and name=" + typeIth.id + "," + typeIth.name );
+                method.typeId = typeIth.id;
+                method.ordinal = ordinal++;
+                // m_log("Just set method.typeId=" + method.typeId + " and method.ordinal=" + method.ordinal);
 
-                        ordinal = 0;
-                        typeIth.methods.forEach(function(method) {
+                var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined,methodTypeId,parameters) values (" + method.typeId + ",'" + method.name + "'," + method.ordinal + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + "," + method.methodTypeId + ",'" + method.parameters + "');";
+                // m_log('Inserting method with ' + strQuery);
+                sql.queryWithCxn(connection, strQuery,
+                    function(err, rows, meth) {
 
-                            m_log("About to write method for type with id and name=" + typeIth.id + "," + typeIth.name );
-                            method.typeId = typeIth.id;
-                            m_log("***Just set method.typeId=" + method.typeId);
+                        try {
+                            if (err) { throw err; }
 
-                            var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined,methodTypeId,parameters) values (" + method.typeId + ",'" + method.name + "'," + (ordinal++) + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + "," + method.methodTypeId + ",'" + method.parameters + "');";
-                            m_log('Inserting method with ' + strQuery);
-                            sql.queryWithCxn(connection, strQuery,
-                                function(err, rows) {
+                            if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
-                                    if (err) {
+                            meth.id = rows[0].insertId;
+                            // m_log('Going to do method tags');
+                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name,
+                                function() {
 
-                                        callback(err);
-                                        return;
+                                    methodsCountdown--;
+                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
+
+                                        m_functionFinalCallback(null, res, connection, project);
                                     }
-
-                                    if (rows.length === 0) {
-
-                                        callback(new Error("Error inserting method into database"));
-                                        return;
-                                    }
-
-                                    method.id = rows[0].insertId;
-                                    m_log('Going to do method tags');
-                                    m_setUpAndDoTagsWithCxn(connection, method.id, 'method', req.body.userName, method.tags, method.name, function(err) {
-
-                                        if (err) {
-
-                                            callback(err);
-                                            return;
-                                        }
-                                    });
                                 }
                             );
+                        } catch (em) {
 
-                            methodsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
-
-                                callback(null);
-                                return;
-                            }
-                        });
-
-                        ordinal = 0;
-                        typeIth.properties.forEach(function(property) {
-
-                            property.typeId = typeIth.id;
-                            strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + (ordinal++) + "," + property.isHidden + ");";
-                            
-                            m_log('Inserting property with ' + strQuery);
-                            sql.queryWithCxn(connection, strQuery,
-                                function(err, rows) {
-
-                                    if (err) {
-
-                                        callback(err);
-                                        return;
-                                    }
-
-                                    if (rows.length === 0) {
-
-                                        callback(new Error("Error inserting property into database"));
-                                        return;
-                                    }
-
-                                    property.id = rows[0].insertId;
-                                }
-                            );
-
-                            propertiesCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
-
-                                callback(null);
-                                return;
-                            }
-                        });
-
-                        ordinal = 0;
-                        typeIth.events.forEach(function(event) {
-
-                            event.typeId = typeIth.id;
-                            strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + (ordinal++) + ");";
-                            m_log('Inserting event with ' + strQuery);
-                            sql.queryWithCxn(connection, strQuery,
-                                function(err, rows) {
-
-                                    if (err) {
-
-                                        callback(err);
-                                        return;
-                                    }
-
-                                    if (rows.length === 0) {
-
-                                        callback(new Error("Error inserting method into database"));
-                                        return;
-                                    }
-
-                                    event.id = rows[0].insertId;
-                                }
-                            );
-
-                            eventsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) {
-
-                                callback(null);
-                                return;
-                            }
-                        });
-                    } else {
-
-                        m_log("Ooops. It was a base type so we're skipping it");
-                    }
-                });
+                            m_functionFinalCallback(em, res, null, null);
+                        }
+                    },
+                    method
+                );
             });
+
+            ordinal = 0;
+            typeIth.properties.forEach(function(property) {
+
+                property.typeId = typeIth.id;
+                property.ordinal = ordinal++;
+                strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + property.ordinal + "," + property.isHidden + ");";
+                
+                // m_log('Inserting property with ' + strQuery);
+                sql.queryWithCxn(connection, strQuery,
+                    function(err, rows, prop) {
+
+                        try {
+                            if (err) { throw err; }
+
+                            if (rows.length === 0) { throw new Error("Error inserting property into database"); }
+
+                            prop.id = rows[0].insertId;
+                            propertiesCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
+
+                                m_functionFinalCallback(null, res, connection, project);
+                            }
+                        } catch (ep) {
+
+                            m_functionFinalCallback(ep, res, null, null);
+                        }
+                    },
+                    property
+                );
+
+            });
+
+            ordinal = 0;
+            typeIth.events.forEach(function(event) {
+
+                event.typeId = typeIth.id;
+                event.ordinal = ordinal++;
+                strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "," + event.ordinal + ");";
+                // m_log('Inserting event with ' + strQuery);
+                sql.queryWithCxn(connection, strQuery,
+                    function(err, rows, ev) {
+
+                        try {
+                            if (err) { throw err; }
+
+                            if (rows.length === 0) { throw new Error("Error inserting method into database"); }
+
+                            ev.id = rows[0].insertId;
+                            eventsCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
+
+                                m_functionFinalCallback(null, res, connection, project);
+                            }
+                        } catch (ee) {
+
+                            m_functionFinalCallback(ee, res, null, null);
+                        }
+                    },
+                    event
+                );
+
+            });
+
+            // m_log("At bottom of m_doTypeArraysForSaveAs for type " + typeIth.name + ". Have methodsCountdown, propertiesCountdown, eventsCountdown, typeCount=" + methodsCountdown + "," + propertiesCountdown + "," + eventsCountdown + "," + JSON.stringify(typeCount));
+
         } catch (e) {
 
             callback(e);
@@ -1650,11 +1577,11 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_setUpAndDoTagsWithCxn = function(connection, itemId, strItemType, userName, strTags, strName, callback) {
+    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, callback) {
 
         try {
             
-            m_log("In m_setUpAndDoTagsWithCxn with for type " + strItemType + " and itemId=" + itemId);
+            // m_log("In m_setUpAndDoTagsWithCxn with for type " + strItemType + " and itemId=" + itemId);
 
             // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
             var tagArray = [];
@@ -1693,98 +1620,142 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            m_doTagsWithCxn(connection, uniqueArray, itemId, strItemType, callback);
+            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, callback);
 
         } catch(e) {
 
-            callback(e);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
-    var m_doTagsWithCxn = function(connection, tagArray, itemId, strItemType, callback){
+    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, callback){
 
-        var tagIds = [];
-        var iCtr = tagArray.length;
-        // For each string in tagArry:
-        //      if it already exists in table tags, push its id onto tagIds.
-        //      else, add it and push the new array.
-        // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
+        try {
+            var tagIds = [];
+            var iCtr = tagArray.length;
 
-        m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
-        tagArray.forEach(function(tag) {
+            // For each string in tagArry:
+            //      if it already exists in table tags, push its id onto tagIds.
+            //      else, add it and push the new array.
+            // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
 
-            var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+            // m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
+            tagArray.forEach(function(tag) {
+
+                var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+                sql.queryWithCxn(connection, strSql,
+                    function(err, rows){
+
+                        try{
+                            if (err) { m_functionFinalCallback(err, res, null, null); }
+
+                            if (rows.length > 0) {
+
+                                tagIds.push(rows[0].id);
+                                if (--iCtr === 0){
+
+                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
+                                }
+                            } else {
+
+                                strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
+                                sql.queryWithCxn(connection, strSql,
+                                    function(err, rows){
+
+                                        try {
+                                            if (err) { m_functionFinalCallback(err, res, null, null); }
+
+                                            if (rows.length === 0) { m_functionFinalCallback(new error('Could not insert tag into database.'), res, null, null); }
+
+                                            tagIds.push(rows[0].insertId);
+                                            if (--iCtr === 0){
+
+                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
+                                            }
+                                        } catch (e2) {
+
+                                            m_functionFinalCallback(e2, res, null, null);
+                                        }
+                                    }
+                                );
+                            }
+                        } catch (e1) {
+
+                            m_functionFinalCallback(e1, res, null, null);
+                        }
+                    }
+                );
+            });
+        } catch (e) {
+
+            m_functionFinalCallback(e, res, null, null);
+        }
+    }
+
+    var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
+
+        try {
+            var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
+            for (var j = 0; j < tagIds.length; j++) {
+
+                strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
+                if (j !== tagIds.length - 1){
+
+                    strSql = strSql + ",";
+                }
+            }
+
+            strSql = strSql + ";";
+            // m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
             sql.queryWithCxn(connection, strSql,
                 function(err, rows){
 
+                    if (err) { m_functionFinalCallback(err, res, null, null); }
+                    callback();
+                }
+            );
+        } catch (e) {
+
+            m_functionFinalCallback(e, res, null, null);
+        }
+    }
+
+    var m_functionFinalCallback = function (err, res, connection, project) {
+
+        // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
+
+        if (err) {
+
+            res.json({
+                success: false,
+                message: 'Save Project failed with error: ' + err.message
+            });
+       } else {
+
+            sql.commitCxn(connection,
+                function(err){
+
                     if (err) {
-
-                        callback(err);
-                        return;
-                    }
-
-                    if (rows.length > 0) {
-
-                        tagIds.push(rows[0].id);
-                        if (--iCtr === 0){
-
-                            callback(m_createTagJunctionsWithCxn(connection, itemId, strItemType, tagIds));
-                            return;
-                        }
+                        res.json({
+                            success: false,
+                            message: 'Committing transaction failed with ' + err.message
+                        });
                     } else {
 
-                        strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-                        sql.queryWithCxn(connection, strSql,
-                            function(err, rows){
-
-                                if (err) {
-
-                                    callback(err);
-                                    return;
-                                }
-
-                                if (rows.length === 0) {
-
-                                    callback({message:'Could not insert tag into database.'});
-                                    return;
-                                
-                                } else {
-
-                                    tagIds.push(rows[0].insertId);
-                                    if (--iCtr === 0){
-
-                                        callback(m_createTagJunctionsWithCxn(connection, itemId, strItemType, tagIds));
-                                        return;
-                                    }
-                                }
-                            }
-                        );
+                        res.json({
+                            success: true,
+                            project: project
+                        });
                     }
                 }
             );
-        });
+        }
     }
 
-    var m_createTagJunctionsWithCxn = function(connection, itemId, strItemType, tagIds) {
+    var m_log = function(msg) {
 
-        var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
-        for (var j = 0; j < tagIds.length; j++) {
-
-            strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
-            if (j !== tagIds.length - 1){
-
-                strSql = strSql + ",";
-            }
-        }
-
-        strSql = strSql + ";";
-        m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
-        sql.queryWithCxn(connection, strSql,
-            function(err, rows){
-
-                return err;
-            }
-        );
+        console.log(' ');
+        console.log(msg);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

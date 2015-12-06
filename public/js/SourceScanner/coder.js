@@ -21,10 +21,10 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             // Does property exist in app.initialize workspace for toolinstance with id = strInstance?
             self.doesPropertyExist = function (strType, strProperty, strInstance) {
 
-                var objectWorkspace = processor.getWorkspaceJSONObject();
+                var objectWorkspace = processor.getAppInitializeJSONObject();
                 if (!objectWorkspace) {
 
-                    throw { messgage: "Failed to get the workspace object." };
+                    throw { message: "Failed to get the workspace object." };
                 }
 
                 // Get the block with which to work.
@@ -187,10 +187,10 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     }
 
                     // .
-                    var objectWorkspace = processor.getWorkspaceJSONObject();
+                    var objectWorkspace = processor.getAppInitializeJSONObject();
                     if (!objectWorkspace) {
 
-                        throw { messgage: "Failed to get the workspace object." };
+                        throw { message: "Failed to get the workspace object." };
                     }
 
                     // Get the block with which to work.
@@ -251,11 +251,10 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
-                    // TODO: does the following assume that the code pane contains the block(s) for App.initialize? Because I don't think it has to.
-                    var xmlWorkspace = processor.getWorkspaceXMLDoc();
+                    var xmlWorkspace = processor.getAppInitializeXMLDoc();
                     if (!xmlWorkspace) {
 
-                        throw { messgage: "Failed to get the workspace xml." };
+                        throw { message: "Failed to get the workspace xml." };
                     }
 
                     var strAppTypeName = clAppType.data.name;
@@ -348,7 +347,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                             for (var i = 0; i < props.length; i++) {
 
                                 var propIth = props[i];
-                                strValue = m_functionDoProperty(objectCursor, propIth); // strValue comes back like "Type2~-373.987" -- we can now ignore the first part.
+                                strValue = self.functionDoProperty(objectCursor, propIth); // strValue comes back like "Type2~-373.987" -- we can now ignore the first part.
 
                                 if (strValue) {
 
@@ -372,53 +371,24 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 return objectArray;
             }
 
-            self.blocklyChangeListener = function (objectPrimaryBlockChain) {
+            //
+            self.functionDoProperty = function (objectCursor, strProp) {
 
-                // debugger;
+                var re = new RegExp("_set" + strProp);
+                if (objectCursor.type.match(re)) {
 
-                // Clear designer.
-                var objectResult = {};
-                var strValue = null;
-                var parts = [];
+                    // Get the thing to set.
+                    var objectToSet = objectCursor.children[0].children[0];
+                    var strTypeToSet = objectToSet.type;
+                    var re = new RegExp(g_clTypeApp.data.name + "_get(.+)");
+                    var arrayTypes = strTypeToSet.match(re);
+                    var strTheType = arrayTypes[1];
 
-                // Scan.
-                var objectCursor = objectPrimaryBlockChain;
-                if (objectCursor) {
-
-                    do {
-
-                        //  Look for "new_" and "set_".
-                        //  Set in designer.
-                        var re = new RegExp(g_clTypeApp.data.name + "_set(.+)");
-                        var arrayMatches = objectCursor.type.match(re);
-                        
-                        if (arrayMatches && arrayMatches.length > 1) {
-
-                            objectResult[arrayMatches[1]] = {};
-
-                        } else {
-
-                            var props = ["X", "Y", "Width", "Height"];
-                            for (var i = 0; i < props.length; i++) {
-
-                                var propIth = props[i];
-                                strValue = m_functionDoProperty(objectCursor, propIth);
-
-                                if (strValue) {
-
-                                    parts = strValue.split('~');
-                                    objectResult[parts[0]][propIth] = parts[1];
-                                    break;
-                                }                                
-                            }
-                        }
-
-                        objectCursor = objectCursor.next
-
-                    } while (objectCursor)
+                    var objectValue = objectCursor.children[1].children[0].children[0];
+                    return strTheType + '~' + objectValue.contents;            
                 }
 
-                return objectResult;
+                return null;
             }
 
             // Method removes all possible "set property value" Blockly blocks from Blockly for a tool instance.
@@ -541,15 +511,16 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
             // Part3 converts the result to XML and stuffs it back in the App Type's initialize method workspace.
             var m_functionRemove_part1 = function () {
 
-                var objectWorkspace = processor.getWorkspaceJSONObject();
+                var objectWorkspace = processor.getAppInitializeJSONObject();
                 if (!objectWorkspace) {
 
-                    throw { messgage: "Failed to get the workspace object." };
+                    throw { message: "Failed to get the workspace object." };
                 }
 
                 return objectWorkspace;
             }
 
+            // TODO Needs updating now that we have C-block format.
             var m_functionRemove_part3 = function (nextArray, objectWorkspace) {
 
                 try {
@@ -581,13 +552,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     if (blockWork) {
 
                         // blockWork is just the "real" nodes. We need to wrap in what will result in <xml xmlns="...">
-                        var wrappedBlockWork = {
-                            nodeName: "xml",
-                            xmlns: "http://www.w3.org/1999/xhtml",
-                            children: [
-                                blockWork
-                            ]
-                        };
+                        var wrappedBlockWork = m_functionBuildNewJSONWorkspace(blockWork);
 
                         strXml = converter.toXML(wrappedBlockWork);
                         if (!strXml) {
@@ -618,26 +583,6 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 }
             }
 
-            //
-            var m_functionDoProperty = function (objectCursor, strProp) {
-
-                var re = new RegExp("_set" + strProp);
-                if (objectCursor.type.match(re)) {
-
-                    // Get the thing to set.
-                    var objectToSet = objectCursor.children[0].children[0];
-                    var strTypeToSet = objectToSet.type;
-                    var re = new RegExp(g_clTypeApp.data.name + "_get(.+)");
-                    var arrayTypes = strTypeToSet.match(re);
-                    var strTheType = arrayTypes[1];
-
-                    var objectValue = objectCursor.children[1].children[0].children[0];
-                    return strTheType + '~' + objectValue.contents;            
-                }
-
-                return null;
-            }
-
             // Return the next id as a string.
             var m_functionGetNextId = function () {
 
@@ -650,13 +595,13 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                 try {
 
                     // .
-                    var objectWorkspace = processor.getWorkspaceJSONObject();
+                    var objectWorkspace = processor.getAppInitializeJSONObject();
                     if (!objectWorkspace) {
 
-                        throw { messgage: "Failed to get the workspace object." };
+                        throw { message: "Failed to get the workspace object." };
                     }
 
-                    // Get the block with which to work.
+                    // Get the block with which to work--the last block in the primaryBlockChain inside App initialize's c-block.
                     var blockWork = processor.getWorkBlock(objectWorkspace);
 
                     // If there is a work block, add new block it it, otherwise
@@ -671,44 +616,7 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                         // (1) There is no function c-block. It must have been deleted by the user.
                         // (2) There is a function c-block, but it's empty because nothing's been dropped on the designer or the user messed with it.
                         // In either case, we're just going to build the initialize method from scratch with blockNew.
-                        objectWorkspace = 
-                        {
-                            nodeName: "xml",
-                            xmlns: "http://www.w3.org/1999/xhtml",
-                            children:
-                            [
-                                {
-                                    nodeName: "block",
-                                    type: "procedures_defnoreturn",
-                                    children:
-                                    [
-                                        {
-                                            nodeName: "mutation",
-                                            children:
-                                            [
-                                                {
-                                                    name: "self",
-                                                    nodeName: "arg"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            contents: "initialize",
-                                            name: "NAME",
-                                            nodeName: "field"
-                                        },
-                                        {
-                                            nodeName: "statement",
-                                            name: "STACK",
-                                            children:
-                                            [
-                                                blockNew
-                                            ]
-                                        }
-                                    ],
-                                }
-                            ]
-                        };
+                        objectWorkspace = m_functionBuildNewJSONWorkspace(blockNew);
                     }
 
                     // Replace objectWorkspace in workspaceJSONObject.
@@ -731,11 +639,53 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
                     methodInitialize.workspace = strXml;
 
                     return null;
+
                 } catch (e) {
 
                     return e;
                 }
             };
+
+            var m_functionBuildNewJSONWorkspace = function (blockNew) {
+
+                return {
+                        nodeName: "xml",
+                        xmlns: "http://www.w3.org/1999/xhtml",
+                        children:
+                        [
+                            {
+                                nodeName: "block",
+                                type: "procedures_defnoreturn",
+                                children:
+                                [
+                                    {
+                                        nodeName: "mutation",
+                                        children:
+                                        [
+                                            {
+                                                name: "self",
+                                                nodeName: "arg"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        contents: "initialize",
+                                        name: "NAME",
+                                        nodeName: "field"
+                                    },
+                                    {
+                                        nodeName: "statement",
+                                        name: "STACK",
+                                        children:
+                                        [
+                                            blockNew
+                                        ]
+                                    }
+                                ],
+                            }
+                        ]
+                    };
+            }
 
             ////////////////////////
             // Private fields.

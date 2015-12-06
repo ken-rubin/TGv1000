@@ -40,41 +40,44 @@ module.exports = function SQL(app) {
     self.getCxnFromPool = function (callback) {
 
         try {
-
             m_pool.getConnection(function(err, connection) {
 
-                callback(err, connection);
+                // if err then connection is null and vice-versa.
+                callback(err, connection);  
             });
-
         } catch (e) {
 
             callback(new Error("Error getting database connection"), null);
         }
     }
 
-    self.queryWithCxn = function (connection, strQuery, callback) {
+    self.queryWithCxn = function (connection, strQuery, callback, passbackWithCallback) {
 
         try {
-
             connection.query(strQuery, function(err, rows) {
 
-                if (err) { throw err; }
+                try {
+                    if (err) { throw err; }
 
-                // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
-                //          INSERT returns rows.insertId (primary key of inserted row)
-                //          UPDATE returns rows.changedRows (# of changed rows)
-                //          DELETE returns rows.affectedRows (# of deleted rows)
-                // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
-                if (rows.constructor === Array) {
+                    // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
+                    //          INSERT returns rows.insertId (primary key of inserted row)
+                    //          UPDATE returns rows.changedRows (# of changed rows)
+                    //          DELETE returns rows.affectedRows (# of deleted rows)
+                    // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
+                    if (rows.constructor === Array) {
 
-                    callback(null, rows);
-                
-                } else {
+                        callback(null, rows, passbackWithCallback);
+                    
+                    } else {
 
-                    // rows is a non-array js object. Turn it into an array.
-                    var newRows = [];
-                    newRows.push(rows);
-                    callback(null, newRows);
+                        // rows is a non-array js object. Turn it into an array.
+                        var newRows = [];
+                        newRows.push(rows);
+                        callback(null, newRows, passbackWithCallback);
+                    }
+                } catch (e) {
+
+                    connection.rollback(function() { callback(e, null);});
                 }
             });
         } catch (e) {
@@ -86,14 +89,12 @@ module.exports = function SQL(app) {
     self.commitCxn = function (connection, callback) {
 
         try {
-
             connection.commit(function (err) {
 
                 if (err) { throw err; }
 
                 callback(null);
             });
-
         } catch (e) {
 
             connection.rollback(function() { callback(e, null);});
