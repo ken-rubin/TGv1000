@@ -1242,6 +1242,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
+    var totalNumTypesExclSystemBaseTypes;
     var m_saveComicsWithCxn = function (connection, req, res, project) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
@@ -1253,7 +1254,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
-            var totalNumTypesExclSystemBaseTypes = 0;
+            totalNumTypesExclSystemBaseTypes = 0;
 
             project.comics.items.forEach(
                 function(comicIth) {
@@ -1281,7 +1282,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesExclSystemBaseTypes);
 
-                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesExclSystemBaseTypes);
+                                    m_saveTypesWithCxn(connection, req, res, project);
                                 }
                             } catch (e1) {
 
@@ -1298,7 +1299,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesExclSystemBaseTypes) {
+    var m_saveTypesWithCxn = function (connection, req, res, project) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.
@@ -1360,7 +1361,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function() {
 
                                                     m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, --totalNumTypesExclSystemBaseTypes);
+                                                    totalNumTypesExclSystemBaseTypes--;
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res);
                                                 }
                                             );
                                         } catch (e1) {
@@ -1400,7 +1402,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function() {
 
                                                     m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, --totalNumTypesExclSystemBaseTypes);
+                                                    totalNumTypesExclSystemBaseTypes--;
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res);
                                                 }
                                             );
                                         } catch (e2) {
@@ -1457,7 +1460,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function() {
 
                                                     m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, --totalNumTypesExclSystemBaseTypes);
+                                                    totalNumTypesExclSystemBaseTypes--;
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res);
                                                 }
                                             );
                                         } catch (e3) {
@@ -1478,7 +1482,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, iWhenZeroCanReturn) {
+    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res) {
 
         try {
 
@@ -1512,7 +1516,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 function() {
 
                                     methodsCountdown--;
-                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && iWhenZeroCanReturn) {
+                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && totalNumTypesExclSystemBaseTypes == 0) {
 
                                         m_functionFinalCallback(null, res, connection, project);
                                     }
@@ -1545,7 +1549,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             prop.id = rows[0].insertId;
                             propertiesCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && iWhenZeroCanReturn) {
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && totalNumTypesExclSystemBaseTypes == 0) {
 
                                 m_functionFinalCallback(null, res, connection, project);
                             }
@@ -1576,7 +1580,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             ev.id = rows[0].insertId;
                             eventsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && iWhenZeroCanReturn) {
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && totalNumTypesExclSystemBaseTypes == 0) {
 
                                 m_functionFinalCallback(null, res, connection, project);
                             }

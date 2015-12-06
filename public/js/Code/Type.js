@@ -215,7 +215,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							// Get the item.
 							var activeMethod = m_arrayActive[m_iActiveIndex];
-							var copyOfActiveMethod = activeMethod;
+							var copyOfActiveMethod = JSON.parse(JSON.stringify(activeMethod));	// Done this way to disassociate them.
 
 							// Set bool to be used below to display an error box if they try to change the name of either the initialize or construct methods.
 							var methodIsAppInitializeOrConstruct = (types.isAppInitializeActive()) || (activeMethod.name === "construct");
