@@ -1222,14 +1222,14 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
-            var totalNumTypesExclSystemBaseTypes = 0;
+            var totalNumTypesInclSBTs = 0;
 
             project.comics.items.forEach(
                 function(comicIth) {
 
-                    totalNumTypesExclSystemBaseTypes += comicIth.types.items.length;
+                    totalNumTypesInclSBTs += comicIth.types.items.length;
 
-                    m_log("Just counted types. Got " + totalNumTypesExclSystemBaseTypes + ".");
+                    m_log("Just counted types. Got " + totalNumTypesInclSBTs + ".");
 
                     comicIth.projectId = project.id;
 
@@ -1248,9 +1248,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 if (--comicsCountdown === 0) {
 
-                                    // m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesExclSystemBaseTypes);
+                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesInclSBTs);
 
-                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesExclSystemBaseTypes);
+                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesInclSBTs, function() {
+
+                                        m_functionFinalCallback(null, res, connection, project);
+                                    });
                                 }
                             } catch (e1) {
 
@@ -1267,31 +1270,32 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesExclSystemBaseTypes) {
+    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesInclSBTs, callback) {
 
         // All comics have now been inserted and their ids are set in project.
         // Time to do types and then move on to type contents: methods, properties and events.
         // Types will require resource, tags and resources_tags. (As will methods.)
 
-        // Here's the situation with base types:
-        // (1) The comic's App type has baseTypeId = id of one of the system base types. This remains unchanged.
+        // Here's the situation with System Base Types (SBTs):
+        // (1) The comic's App type has baseTypeId = id of one of the system base types.
         // (2) System base types are recognized by having ordinal === 10000.
-        // (3) Any new types will have id < 0 and this id will be unique. This is so that, if they are then
-        //     used as a base type, the derived type will have an id for baseTypeId. So, after new types are written
-        //     to the DB and given a real id (saving off their negative id), we need to loop through the other types
-        //     and change any that where baseTypeId = the saved negative id.
+        // (3) Any new types (including SBTs) will have id < 0 and this id will be unique. This is so that, if they are then
+        //     used as a base type, the derived type will have an id (albeit negative) for baseTypeId. So, after new types are written
+        //     to the DB and given a positive id (saving their negative and new actual ids to an array), we need to loop through the other types
+        //     and change any where baseTypeId = the saved negative id.
         //
-        // All this means several things:
-        // (1) We should write out the App type so it gets ordinal 0.
-        // (2) We should loop through all types in the comic and write the ones with id < 0. When we get a real id,
+        // All this means we have several passes to make through the types in each comic in the project.
+        // As we loop, we increment the ordinal for each comic's types, starting at 0. Note: we DO NOT assign an ordinal to
+        // as SBT. It is already 10000.
+        // (Pass 1) We should write out the App type so it gets ordinal 0.
+        // (Pass 2) We should loop through all types in the comic and write the ones with id < 0. When we get back a real id,
         //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
-        // (3) We should then loop through all the types again, skipping the App type and skipping any types with
+        // (Pass 3) We should then loop through all the types again, skipping the App type and skipping any types with
         //     ordinal === 10000, and write the rest to the db.
-        // (4) We also have to modify the Tags and type-sub-array routines to skip system base types.
 
         try {
 
-            var typeCount = totalNumTypesExclSystemBaseTypes;
+            var typeCount = totalNumTypesInclSBTs;
 
             m_log("Arrived into m_saveTypesWithCxn. typeCount=" + JSON.stringify(typeCount));
 
@@ -1302,14 +1306,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                 var negTypeIdXlate = [];
 
                 // We're going to make 3 whole loops through the comic's types, processing (or ignoring) the ones specific to that loop.
-                for (var passNum = 1; passNum <=4; passNum++) { 
+                for (var passNum = 1; passNum <=3; passNum++) { 
 
                     for (var i = 0; i < comicIth.types.items.length; i++) {
 
                         var typeIth = comicIth.types.items[i];
                         if (passNum === 1) {
 
-                            // passNum = 1: just the type with isApp === true
+                            // Process just the type with isApp === true.
                             if (typeIth.isApp) {
 
                                 typeIth.comicId = comicIth.id;
@@ -1322,20 +1326,15 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         try {
                                             if (err) { throw err; }
-
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
                                             type.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 1]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
-                                            // m_log(msg);
-                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
                                                 function() {
 
-                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
                                                     m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
 
-                                                        if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
+                                                        if (--typeCount === 0) { callback(); }
                                                     });
                                                 }
                                             );
@@ -1349,11 +1348,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         } else if (passNum === 2) {
 
-                            // passNum = 2: any types with id < 0, building a correspondance array
+                            // Process any types with id < 0, building a correspondance array. This includes any SBTs.
                             if (typeIth.id < 0) {
 
                                 typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;
+                                // Don't assign an ordinal to an SBT.
+                                if (typeIth.ordinal !== 10000) {
+                                    typeIth.ordinal = ordinal++;
+                                }
 
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
                                 // m_log('Inserting type with ' + strQuery);
@@ -1362,23 +1364,17 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         try {
                                             if (err) { throw err; }
-
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
                                             // Add to correspondance array.
                                             negTypeIdXlate.push({negId:type.id, dbId:rows[0].insertId});
-
                                             type.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 2]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
-                                            // m_log(msg);
-                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
                                                 function() {
 
-                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
                                                     m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
 
-                                                        if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
+                                                        if (--typeCount === 0) { callback(); }
                                                     });
                                                 }
                                             );
@@ -1392,12 +1388,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         } else if (passNum === 3) {
 
-                            // passNum = 3: the rest of the types where ordinal !== 10000, id >= 0, !isAPP. If baseTypeId !== 10000 and < 0, look it up in the correspondance array and set it before writing to the DB.
-                            if (typeIth.ordinal !== 10000 && !typeIth.isApp && typeIth.id >= 0) {
+                            // Process the rest of the types where !isAPP. 
+                            // If baseTypeId < 0, look it up in negTypeIdXlate and set its now correct id before writing to the DB.
+                            // If its id is in negTypeIdXlate in property dbId, it means it was written out during passNum 2, and doesn't have to be written again,
+                            // but we do have to do its tags and methods, properties and events.
+                            // If we're going to write an SBT, update it instead of inserting it.
+                            if (!typeIth.isApp) {
 
                                 typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;
-
                                 // If this type has a non-null, negative baseTypeId, find correct Id in negTypeIdXlate and update it.
                                 if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
 
@@ -1418,50 +1416,78 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     }
                                 }
 
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                                // m_log('Inserting type with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows, type) {
+                                // If this type's id is in negTypeIdXlate in property dbId, it's already been inserted in passNum 2.
+                                var saveToDB = true;
+                                for (var i = 0; i < negTypeIdXlate.length; i++) {
 
-                                        try {
-                                            if (err) { throw err; }
+                                    if (negTypeIdXlate[i].dbId === typeIth.id) {
+                                        saveToDB = false;
+                                        break;
+                                    }
+                                }
 
-                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
+                                if (!saveToDB) {
+                                    if (--typeCount === 0) { callback(); }
+                                } else {
 
-                                            type.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 3]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
-                                            // m_log(msg);
-                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                function() {
+                                    // Don't assign an ordinal to an SBT.
+                                    if (typeIth.ordinal !== 10000) {
+                                        typeIth.ordinal = ordinal++;
+                                    }
 
-                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
+                                    var guts = " SET name='" + typeIth.name + "'"
+                                        + ",isApp=" + typeIth.isApp
+                                        + ",imageId=" + typeIth.imageId
+                                        + ",altImagePath='" + typeIth.altImagePath + "' "
+                                        + ",ordinal=" + typeIth.ordinal
+                                        + ",comicId=" + typeIth.comicId
+                                        + ",description='" + typeIth.description + "' "
+                                        + ",parentTypeId=" + typeIth.parentTypeId
+                                        + ",parentPrice=" + typeIth.parentPrice
+                                        + ",priceBump=" + typeIth.priceBump
+                                        + ",ownedByUserId=" + typeIth.ownedByUserId
+                                        + ",public=" + typeIth.public
+                                        + ",quarantined=" + typeIth.quarantined
+                                        + ",baseTypeId=" + typeIth.baseTypeId
+                                        ;
 
-                                                        if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
-                                                    });
+                                    var verb = "insert ";
+                                    var whereClause = "";
+                                    if (typeIth.ordinal === 10000) {
+                                        verb = "update ";
+                                        whereClause = " where id=" + typeIth.id;
+                                    }
+                                    var strQuery = verb + self.dbname + "projects" + guts + whereClause + ";";
+
+                                    m_log('Inserting or updating type with ' + strQuery);
+
+                                    sql.queryWithCxn(connection, strQuery,
+                                        function(err, rows, type) {
+
+                                            try {
+                                                if (err) { throw err; }
+                                                if (rows.length === 0) { throw new Error("Error writing type to database."); }
+
+                                                if (type.ordinal < 10000) {
+                                                    type.id = rows[0].insertId;
                                                 }
-                                            );
-                                        } catch (e3) {
+                                                m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                                    function() {
 
-                                            m_functionFinalCallback(e3, res, null, null);
-                                        }
-                                    },
-                                    typeIth
-                                );
-                            }
-                        } else {
+                                                        m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
 
-                            // passNum = 4: write out system base types. Some may already exist. Some might be new.
-                            if (typeIth.ordinal === 10000) {
+                                                            if (--typeCount === 0) { callback(); }
+                                                        });
+                                                    }
+                                                );
+                                            } catch (e3) {
 
-                                m_log("Would be doing the work for SBT " + typeIth.name + " now. But not yet.");
-
-                                // m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                m_doTypeArraysForSaveAs(connection, project, typeIth, req, res, function() {       // <==== Note the typeIth here, not type. Will change when we're adding new system base types.
-
-                                    if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
-                                });
+                                                m_functionFinalCallback(e3, res, null, null);
+                                            }
+                                        },
+                                        typeIth
+                                    );
+                                }
                             }
                         }
                     }
@@ -1476,13 +1502,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, callback) {
 
         try {
-
-            // Get out (for now) for system base type.
-            if (typeIth.ordinal === 10000) { 
-
-                callback();
-                return;
-            }
 
             var ordinal;
 
