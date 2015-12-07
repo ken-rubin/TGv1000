@@ -682,6 +682,7 @@ define(["Core/errorHelper",
 					}
 
 //used
+					// Note: updateClType has .data; origType doesn't.
 					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
 
 						try {
@@ -689,7 +690,9 @@ define(["Core/errorHelper",
 							self.projectIsDirty();
 							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
 
-							exceptionRet = code.replaceType(updatedClType.data, origType);
+							var origClType = new Type();
+							origClType.load(origType);
+							exceptionRet = code.replaceType(updatedClType, origClType);
 							if (exceptionRet) { throw exceptionRet; }
 							
 							return null;

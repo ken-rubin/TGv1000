@@ -497,7 +497,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 						try {
 
-							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
+							if (typeof iResourceId !== 'undefined' && iResourceId !== null /* resourceId can now be 0 && iResourceId > 0*/) {
 
 								// Save off the new resource in state.
 								self.data.imageId = iResourceId;

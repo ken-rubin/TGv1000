@@ -982,6 +982,13 @@ module.exports = function ProjectBO(app, sql, logger) {
             // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
+            // System Base Types (SBTs):
+                // Since there is only one copy in the DB for SBTs, they are treated differently from other new or edited Types.
+                // Whether in a Save or a SaveAs, if an SBT already exists (id>=0), it is not deleted and then added again. It is updated.
+                // Its methods, event and properties are deleted.
+                // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
+                // Methods, events and properties are inserted.
+
             var project = req.body.projectJson;
             var typeOfSave = req.body.saveType;
             if (typeOfSave === 'save') {
@@ -1471,7 +1478,11 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             // Get out (for now) for system base type.
-            if (typeIth.ordinal === 10000) { callback(); }
+            if (typeIth.ordinal === 10000) { 
+
+                callback();
+                return;
+            }
 
             var ordinal;
 

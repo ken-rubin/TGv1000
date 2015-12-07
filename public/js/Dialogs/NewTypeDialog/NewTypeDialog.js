@@ -28,11 +28,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							m_strNewOrEdit = strNewOrEdit;
 							m_iIndexIfEdit = iIndexIfEdit;
 							m_clActiveComic = comics.getActiveComic();
-							m_typesArray = m_clActiveComic.getYourTypesArray();
+							m_typesArray = m_clActiveComic.getYourTypesArray();	// An array of types, not clTypes.
 							if (m_strNewOrEdit === "Edit") {
 
 								// Put the type being edited aside for reference later.
-								m_typeForEdit = m_typesArray[m_iIndexIfEdit];
+								m_typeForEdit = m_typesArray[m_iIndexIfEdit];	// Again, a type, not a clType
+								m_imageId = m_typeForEdit.imageId;
 							}
 
 							// Get the dialog DOM.
@@ -123,14 +124,29 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							$("#TypeName").keyup(m_functionBlurTypeName);
 
+							// How to deal with System Base Types (SBTs):
+							// After usergroups exist, replace 'true' in the next if statement with a test for valid usergroup.
+							// An SBT is recognized by having ordinal === 10000.
+							// If we come in here and check #cb1 to create one, we will give it the normal negative id in addition to ordinal = 10000.
+							// **An SBT requires a non-zero imageId.**
+							
+							if (true) {
+
+								$("#SBTCheckBox").css("display", "block");
+								if (m_strNewOrEdit === "Edit" && m_typeForEdit.ordinal === 10000) {
+
+									$("#SBTCheckBox").prop("checked", true);
+								}
+							}
+
 							$("#BaseTypeCombo").css("display", "none");
 							$("#BaseTypeName").css("display", "none");
 							var exceptionRet = null;
 							if (m_strNewOrEdit === "New") {
 
 								// User is creating a new user Type.
-								// A user Type is not a sysem base Type (ordinal === null) nor the App Type.
-								// It may or may not be based on an existing user Type.
+								// A user Type is not a sysem base Type (ordinal === 10000) nor the App Type.
+								// It may or may not be based on (derived from) another Type.
 								// We will build and display a select list of available base Types, starting with None.
 
 								// Set up #BaseTypeSelect for user to select a base type for this new type.
@@ -152,7 +168,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								// and select either "None" of this Type's base Type name.
 								// In case (2) user cannot change the base Type since this is the project type.
 								// But user will be shown the system base Type's name. User can edit all other fields.
-
 								var strSelectName = "None";
 								if (m_typeForEdit.baseTypeId) {
 
@@ -194,29 +209,29 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						try {
 
-								var strBuild = '<option value="None">None</option>';
+							var strBuild = '<option value="None">None</option>';
 
-								for(var i = 0; i < m_typesArray.length; i++) {
+							for(var i = 0; i < m_typesArray.length; i++) {
 
-									var typeIth = m_typesArray[i];
-									if (!typeIth.isApp && typeIth.id !== m_typesArray[0].baseTypeId) {
+								var typeIth = m_typesArray[i];
+								if (!typeIth.isApp && typeIth.id !== m_typesArray[0].baseTypeId && (m_strNewOrEdit === "New" || (m_strNewOrEdit === "Edit" && i !== m_iIndexIfEdit))) {
 
-										strBuild += '<option value="' + typeIth.name + '">' + typeIth.name + '</option>';
-									}
+									strBuild += '<option value="' + typeIth.name + '">' + typeIth.name + '</option>';
 								}
-
-								$("#BaseTypeSelect").html(strBuild);
-								var exceptionRet = m_setSelectHandlers();
-								if (exceptionRet) { throw exceptionRet; }
-
-								$("#BaseTypeCombo").css("display", "block");
-
-								return null;
-
-							} catch(e) {
-
-								return e;
 							}
+
+							$("#BaseTypeSelect").html(strBuild);
+							var exceptionRet = m_setSelectHandlers();
+							if (exceptionRet) { throw exceptionRet; }
+
+							$("#BaseTypeCombo").css("display", "block");
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
 					}
 
 					var m_setSelectHandlers = function () {
@@ -255,7 +270,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						try {
 
 							var typeName = $("#TypeName").val().trim();
-
 							if (typeName.length === 0) {
 
 								throw new Error("You must enter a name.");
@@ -298,6 +312,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							}
 
 							var clType = new Type();
+							var bIsSBT = $("#cb1").prop("checked");
 
 							if (m_strNewOrEdit === "New") {
 
@@ -329,7 +344,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									isApp: false,
 									imageId: m_imageId,
 									altImagePath: '',
-									ordinal: client.getNumberOfTypesInActiveComic(),
+									ordinal: !bIsSBT ? client.getNumberOfTypesInActiveComic() : 10000,
 									description: '',
 									parentTypeId: 0,
 									parentPrice: 0.00,
@@ -382,7 +397,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								exceptionRet = clType.load(m_typeForEdit);
 								if (exceptionRet) { throw exceptionRet; }
 
-								exceptionRet = client.updateTypeInProject(clType, m_clActiveComic, m_typeForEdit, m_iIndexIfEdit);
+								exceptionRet = client.updateTypeInProject(clType, m_clActiveComic, m_typeForEdit, m_iIndexIfEdit);	// Note: clType has data; m_typeForEdit doesn't.
 								if (exceptionRet) { throw exceptionRet; }
 
 								clType.updateYourImage(m_imageId);
