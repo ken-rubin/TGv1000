@@ -199,7 +199,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								for(var i = 0; i < m_typesArray.length; i++) {
 
 									var typeIth = m_typesArray[i];
-									if (!typeIth.isApp && typeIth.ordinal !== 10000) {
+									if (!typeIth.isApp && typeIth.id !== m_typesArray[0].baseTypeId) {
 
 										strBuild += '<option value="' + typeIth.name + '">' + typeIth.name + '</option>';
 									}

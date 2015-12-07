@@ -102,12 +102,6 @@ begin
             FOREIGN KEY (comicId) REFERENCES comics(id)
             ON DELETE CASCADE;
 
-		CREATE TABLE `TGv1000`.`systemBaseTypes` (
-		  `id` int(11) NOT NULL,
-		  `parentId` int(11) NOT NULL,
-		  PRIMARY KEY (`id`,`parentId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        
 		CREATE TABLE `TGv1000`.`type_tags` (
 		  `typeId` int(11) NOT NULL,
 		  `tagId` int(11) NOT NULL,
@@ -335,7 +329,7 @@ begin
 				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
 				;
             
-		/* These system base Types will be skipped in initial loads by comicId being null; after being returned, they will be recognized by having ordinal = 10000. */
+		/* These system base Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
 		insert into TGv1000.`types` (id,`name`,altImagePath)
 			VALUES 
 				(1,'Game Base Type','media/images/gameProject.png'),
@@ -354,15 +348,6 @@ begin
 				(10,'App',1,1,0,0,5,'',0,0.00,0.00,1,5,1)
                 ;
                 
-		insert into TGv1000.`systemBaseTypes` (id,parentId)
-			VALUES
-				(1,1),
-                (2,2),
-                (3,3),
-                (4,4),
-                (5,5)
-				;
-                    
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
 			VALUES
 				(1,6,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),

@@ -58,7 +58,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
             // req.body.userId
             // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
@@ -135,7 +135,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetProjDoComics');
+            m_log('In m_functionRetProjDoComics');
 
             var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.originalProjectId + ";",
                 function(rows)
@@ -149,7 +149,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } 
 
                     var comicsCounter = rows.length;
-                    console.log('Got ' + comicsCounter + ' comics.');
+                    m_log('Got ' + comicsCounter + ' comics.');
                     var strComicIds = '';
 
                     rows.forEach(
@@ -184,7 +184,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             if (--comicsCounter === 0) {
 
-                                console.log('strComicIds = "' + strComicIds + '"');
+                                m_log('strComicIds = "' + strComicIds + '"');
                                 var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where comicId in (" + strComicIds + ");",
                                     function(rows){
 
@@ -226,7 +226,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
+            m_log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
 
             var strTypeIds = '';    // Will be used for a count(*) query.
 
@@ -294,19 +294,16 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             if (--typesCount === 0) {
 
-                                                console.log('typesCount has reached 0--fetching systemBaseTypes.');
-
                                                 // The sort referred to above.
                                                 comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                console.log('comic.types.items[0].baseTypeId=' + comic.types.items[0].baseTypeId);
-                                                console.log('comic.types.items[0].name=' + comic.types.items[0].name);
+                                                m_log('typesCount has reached 0--fetching systemBaseTypes.');
 
-                                                // Use the comic's App type (comic.types.items[0]). As such it will have a baseTypeId that is a systemBaseType's id.
-                                                // Use the table systemBaseTypes to retrieve the chain of base Types for this App type and push each of them onto comic.types.items.
-
-                                                var ex2 = sql.execute("select * from " + self.dbname + "types where id in (select parentId from " + self.dbname + "systemBaseTypes where id=" + comic.types.items[0].baseTypeId + " order by parentId asc)" + ";",
+                                                var ex2 = sql.execute("select * from " + self.dbname + "types where comicId is null order by id asc;",
                                                     function(rows) {
+
+                                                        typesCount = rows.length;
+
                                                         rows.forEach(
                                                             function(row) {
 
@@ -335,22 +332,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                 strTypeIds = strTypeIds + ',' + baseType.id;
                                                                 comic.types.items.push(baseType);
 
-                                                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
-                                                                    function(rows) {
+                                                                if (--typesCount === 0) {
 
-                                                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+                                                                    var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
+                                                                        function(rows) {
 
-                                                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                                            if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                                                                res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                                                return;
+                                                                            }
+
+                                                                            m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                                                        },
+                                                                        function(strError){
+                                                                            res.json({success: false, message: strError});
                                                                             return;
                                                                         }
-
-                                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
-                                                                    },
-                                                                    function(strError){
-                                                                        res.json({success: false, message: strError});
-                                                                        return;
-                                                                    }
-                                                                );
+                                                                    );
+                                                                }
                                                             }
                                                         );
                                                     },
@@ -398,26 +398,26 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            m_log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
             project.comics.items.forEach(
                 function(comic) {
-                    // console.log('in comic ' + JSON.stringify(comic));
+                    // m_log('in comic ' + JSON.stringify(comic));
                     comic.types.items.forEach(
                         function(type) {
-                            // console.log('in type ' + JSON.stringify(type));
+                            // m_log('in type ' + JSON.stringify(type));
                             var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
                                 function(rows){
 
-                                    // console.log(' ');
-                                    // console.log('************** Start of triple select ******************');
-                                    // console.log(' ');
-                                    // console.log(JSON.stringify(rows));
-                                    // console.log(' ');
-                                    // console.log('************** Start of triple select ******************');
-                                    // console.log(' ');
+                                    // m_log(' ');
+                                    // m_log('************** Start of triple select ******************');
+                                    // m_log(' ');
+                                    // m_log(JSON.stringify(rows));
+                                    // m_log(' ');
+                                    // m_log('************** Start of triple select ******************');
+                                    // m_log(' ');
 
                                     if (rows.length !== 3) {
-                                        console.log('The triple select did not return rows.length === 3');
+                                        m_log('The triple select did not return rows.length === 3');
                                         res.json({
                                             success: false,
                                             message: 'Unable to retrieve selected project.'
@@ -428,7 +428,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // methods
                                     rows[0].forEach(
                                         function(row) {
-                                            // console.log('method row: ' + JSON.stringify(row));
+                                            // m_log('method row: ' + JSON.stringify(row));
                                             var method = 
                                             { 
                                                 id: row.id,
@@ -477,7 +477,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // properties
                                     rows[1].forEach(
                                         function(row) {
-                                            // console.log('property row: ' + JSON.stringify(row));
+                                            // m_log('property row: ' + JSON.stringify(row));
                                             var property = 
                                             {
                                                 id: row.id,
@@ -508,7 +508,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // events
                                     rows[2].forEach(
                                         function(row) {
-                                            // console.log('event row: ' + JSON.stringify(row));
+                                            // m_log('event row: ' + JSON.stringify(row));
                                             var event = 
                                             {
                                                 id: row.id,
@@ -550,7 +550,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSetSuccessProjectReturn = function(res, project) {
 
-        console.log('They have all reached 0. Returning project after sorting array by ordinal.');
+        m_log('They have all reached 0. Returning project after sorting array by ordinal.');
         project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
         project.comics.items.forEach(
             function(comic) {
@@ -579,7 +579,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     self.routeRetrieveType = function (req, res) {
 
-        console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
+        m_log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
         // req.body.typeId
 
         try {
@@ -677,20 +677,20 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            m_log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
             var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
                 function(rows){
 
-                    // console.log(' ');
-                    // console.log('************** Start of triple select ******************');
-                    // console.log(' ');
-                    // console.log(JSON.stringify(rows));
-                    // console.log(' ');
-                    // console.log('************** Start of triple select ******************');
-                    // console.log(' ');
+                    // m_log(' ');
+                    // m_log('************** Start of triple select ******************');
+                    // m_log(' ');
+                    // m_log(JSON.stringify(rows));
+                    // m_log(' ');
+                    // m_log('************** Start of triple select ******************');
+                    // m_log(' ');
 
                     if (rows.length !== 3) {
-                        console.log('The triple select did not return rows.length === 3');
+                        m_log('The triple select did not return rows.length === 3');
                         res.json({
                             success: false,
                             message: 'Unable to retrieve selected type.'
@@ -701,7 +701,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // methods
                     rows[0].forEach(
                         function(row) {
-                            // console.log('method row: ' + JSON.stringify(row));
+                            // m_log('method row: ' + JSON.stringify(row));
                             var method = 
                             { 
                                 id: row.id,
@@ -744,7 +744,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // properties
                     rows[1].forEach(
                         function(row) {
-                            // console.log('property row: ' + JSON.stringify(row));
+                            // m_log('property row: ' + JSON.stringify(row));
                             var property = 
                             {
                                 id: row.id,
@@ -772,7 +772,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // events
                     rows[2].forEach(
                         function(row) {
-                            // console.log('event row: ' + JSON.stringify(row));
+                            // m_log('event row: ' + JSON.stringify(row));
                             var event = 
                             {
                                 id: row.id,
@@ -807,7 +807,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSetSuccessTypeReturn = function(res, type) {
 
-        console.log('They have all reached 0. Returning type after sorting arrays by ordinal.');
+        m_log('They have all reached 0. Returning type after sorting arrays by ordinal.');
         type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
         type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
         type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
@@ -826,7 +826,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     self.routeRetrieveMethod = function (req, res) {
 
-        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
+        m_log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
         // req.body.methodId
 
         try {
