@@ -1220,10 +1220,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.comics.items.forEach(
                 function(comicIth) {
 
-                    for (var i = 0; i < comicIth.types.items.length; i++) {
-
-                        if (comicIth.types.items[i].ordinal !== 10000) { totalNumTypesExclSystemBaseTypes++; }
-                    }
+                    totalNumTypesExclSystemBaseTypes += comicIth.types.items.length;
 
                     m_log("Just counted types. Got " + totalNumTypesExclSystemBaseTypes + ".");
 
@@ -1287,7 +1284,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            var typeCount = {cnt: totalNumTypesExclSystemBaseTypes};
+            var typeCount = totalNumTypesExclSystemBaseTypes;
 
             m_log("Arrived into m_saveTypesWithCxn. typeCount=" + JSON.stringify(typeCount));
 
@@ -1298,7 +1295,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 var negTypeIdXlate = [];
 
                 // We're going to make 3 whole loops through the comic's types, processing (or ignoring) the ones specific to that loop.
-                for (var passNum = 1; passNum <=3; passNum++) { 
+                for (var passNum = 1; passNum <=4; passNum++) { 
 
                     for (var i = 0; i < comicIth.types.items.length; i++) {
 
@@ -1329,7 +1326,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function() {
 
                                                     // m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
+
+                                                        if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
+                                                    });
                                                 }
                                             );
                                         } catch (e1) {
@@ -1369,7 +1369,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function() {
 
                                                     // m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
+
+                                                        if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
+                                                    });
                                                 }
                                             );
                                         } catch (e2) {
@@ -1380,7 +1383,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     typeIth
                                 );
                             }
-                        } else {
+                        } else if (passNum === 3) {
 
                             // passNum = 3: the rest of the types where ordinal !== 10000, id >= 0, !isAPP. If baseTypeId !== 10000 and < 0, look it up in the correspondance array and set it before writing to the DB.
                             if (typeIth.ordinal !== 10000 && !typeIth.isApp && typeIth.id >= 0) {
@@ -1426,7 +1429,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function() {
 
                                                     // m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
+                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
+
+                                                        if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
+                                                    });
                                                 }
                                             );
                                         } catch (e3) {
@@ -1436,6 +1442,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     },
                                     typeIth
                                 );
+                            }
+                        } else {
+
+                            // passNum = 4: write out system base types. Some may already exist. Some might be new.
+                            if (typeIth.ordinal === 10000) {
+
+                                m_log("Would be doing the work for SBT " + typeIth.name + " now. But not yet.");
+
+                                // m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
+                                m_doTypeArraysForSaveAs(connection, project, typeIth, req, res, function() {       // <==== Note the typeIth here, not type. Will change when we're adding new system base types.
+
+                                    if (--typeCount === 0) { m_functionFinalCallback(null, res, connection, project); }
+                                });
                             }
                         }
                     }
@@ -1447,14 +1466,16 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, typeCount) {
+    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, callback) {
 
         try {
 
-            var ordinal;
-            typeCount.cnt--;
+            // Get out (for now) for system base type.
+            if (typeIth.ordinal === 10000) { callback(); }
 
-            m_log("Arrived in m_doTypeArraysForSaveAs. After decrementing typeCount=" + JSON.stringify(typeCount));
+            var ordinal;
+
+            m_log("Arrived in m_doTypeArraysForSaveAs.");
 
             // m_log("About to do arrays for type with id=" + typeIth.id + " and name=" + typeIth.name);
 
@@ -1476,7 +1497,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         try {
                             if (err) { throw err; }
-
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
                             meth.id = rows[0].insertId;
@@ -1485,10 +1505,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 function() {
 
                                     methodsCountdown--;
-                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
-
-                                        m_functionFinalCallback(null, res, connection, project);
-                                    }
+                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
                                 }
                             );
                         } catch (em) {
@@ -1513,15 +1530,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         try {
                             if (err) { throw err; }
-
                             if (rows.length === 0) { throw new Error("Error inserting property into database"); }
 
                             prop.id = rows[0].insertId;
                             propertiesCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
-
-                                m_functionFinalCallback(null, res, connection, project);
-                            }
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
+                        
                         } catch (ep) {
 
                             m_functionFinalCallback(ep, res, null, null);
@@ -1544,15 +1558,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         try {
                             if (err) { throw err; }
-
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
                             ev.id = rows[0].insertId;
                             eventsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
-
-                                m_functionFinalCallback(null, res, connection, project);
-                            }
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
+                        
                         } catch (ee) {
 
                             m_functionFinalCallback(ee, res, null, null);
@@ -1562,20 +1573,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                 );
 
             });
-
-            // m_log("At bottom of m_doTypeArraysForSaveAs for type " + typeIth.name + ". Have methodsCountdown, propertiesCountdown, eventsCountdown, typeCount=" + methodsCountdown + "," + propertiesCountdown + "," + eventsCountdown + "," + JSON.stringify(typeCount));
-
         } catch (e) {
 
-            callback(e);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                  Utility method(s) for save routes
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, callback) {
 
