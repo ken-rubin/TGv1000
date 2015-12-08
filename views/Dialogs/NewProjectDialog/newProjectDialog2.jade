@@ -14,12 +14,19 @@
               label.control-label(for="ProjectName", style="margin-top:6px;") Name
           .col-xs-4
               input.form-control#ProjectName(type="text", placeholder="Enter project name.")
+          .col-xs-1
+          .col-xs-5
+            #SBTCheckBox(style="display:none;margin-top:-6px;")
+              label.checkbox
+                input#cb1(type='checkbox')
+                | Allow creation, editing and saving of System Base Types for this project.
           br
           br
           .col-xs-2
               label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
           .col-xs-10
               textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
+          br
           br
           br
           br

@@ -90,6 +90,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
+                            canEditSBTs: row.canEditSBTs === 1 ? true : false,
                             comics:
                             {
                                 items: []
@@ -1170,7 +1171,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                 + ",priceBump=" + project.priceBump
                 + ",imageId=" + project.imageId
                 + ",altImagePath='" + project.altImagePath + "'"
-                + ",description='" + project.description + "' ";
+                + ",description='" + project.description + "' "
+                + ",canEditSBTs=" + project.canEditSBTs ? 1 : 0
+                ;
 
             var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
 

@@ -143,6 +143,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					            		id: 'EnrollButton',
 					            		label: "Enroll",
 					            		cssClass: 'btn-primary',
+					            		hotkey: 13,
 					            		action: function () {
 
 					            			m_functionEnrollButtonClick();

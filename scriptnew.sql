@@ -45,6 +45,7 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `projectTypeId` int(11) NOT NULL,
+          `canEditSBTs` TINYINT(1) NOT NULL DEFAULT 0,
 		  PRIMARY KEY (`id`),
           INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

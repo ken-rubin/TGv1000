@@ -101,6 +101,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            	{
 					            		label: "Create Project",
 					            		cssClass: "btn-primary",
+					            		hotkey: 13,
 					            		action: function(){
 
 					            			m_functionCreateProject();
@@ -165,6 +166,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+
+							if (true) {
+								$("#SBTCheckBox").css("display", "block");
+							}
 
 							// Set project image.
 							var imgSrc;
@@ -248,6 +253,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
+									clProject.data.canEditSBTs = $("#cb1").prop("checked");
 
 									// Add baseTypeName field to all Types that have a base Type.
 									clProject.data.comics.items.forEach(function(comic){

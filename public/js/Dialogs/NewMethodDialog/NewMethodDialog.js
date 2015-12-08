@@ -79,6 +79,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            		label: "Save Method",
 					            		id: 'CreateMethodBtn',
 					            		cssClass: "btn-primary",
+					            		hotkey: 13,
 					            		action: function(){
 
 					            			m_functionSaveMethod();

@@ -81,6 +81,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					            		label: "Save Type",
 					            		id: 'CreateTypeBtn',
 					            		cssClass: "btn-primary",
+					            		hotkey: 13,
 					            		action: function(){
 
 					            			m_functionSaveType();
@@ -130,12 +131,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// If we come in here and check #cb1 to create one, we will give it the normal negative id in addition to ordinal = 10000.
 							// **An SBT requires a non-zero imageId.**
 							
-							if (true) {
+							if (true && client.getProject().data.canEditSBTs) {
 
 								$("#SBTCheckBox").css("display", "block");
 								if (m_strNewOrEdit === "Edit" && m_typeForEdit.ordinal === 10000) {
 
-									$("#SBTCheckBox").prop("checked", true);
+									$("#cb1").prop("checked", true);
 								}
 							}
 
