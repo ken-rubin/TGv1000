@@ -1142,7 +1142,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         }
                     } catch (e1) {
 
-                        m_functionFinalCallback(e1, res, null, null);
+                        throw e1;
                     }
                 }
             );
@@ -1197,13 +1197,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name,
                             function() {
 
-                                // m_log('Going to m_saveComicsWithCxn');
-                                m_saveComicsWithCxn(connection, req, res, project);
+                                try{
+                                    // m_log('Going to m_saveComicsWithCxn');
+                                    m_saveComicsWithCxn(connection, req, res, project);
+                                } catch (e) {
+                                    throw e;
+                                }
                             }
                         );
                     } catch (e1) {
 
-                        m_functionFinalCallback(e1, res, null, null);
+                        throw e1;
                     }
                 }
             );
@@ -1255,12 +1259,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     m_saveTypesWithCxn(connection, req, res, project, totalNumTypesInclSBTs, function() {
 
+                                        // This is the ONE place that does a call to m_functionFinalCallback with success in its intent.
                                         m_functionFinalCallback(null, res, connection, project);
                                     });
                                 }
                             } catch (e1) {
 
-                                m_functionFinalCallback(e1, res, null, null);
+                                throw e1;
                             }
                         },
                         comicIth
@@ -1320,7 +1325,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             if (typeIth.isApp) {
 
                                 typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;
+                                typeIth.ordinal = ordinal++;    // Assigns ordinal 0 to isApp type; then increments for next passes (except for SBTs).
 
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                                 // m_log('Inserting type with ' + strQuery);
@@ -1343,7 +1348,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             );
                                         } catch (e1) {
 
-                                            m_functionFinalCallback(e1, res, null, null);
+                                            throw e1;
                                         }
                                     },
                                     typeIth
@@ -1354,9 +1359,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                             // Process any types with id < 0, building a correspondance array. This includes any SBTs.
                             if (typeIth.id < 0) {
 
-                                typeIth.comicId = comicIth.id;
-                                // Don't assign an ordinal to an SBT.
+                                // Don't assign an ordinal to an SBT. It's always 10000.
+                                // Don't set an SBT's comicId either.
                                 if (typeIth.ordinal !== 10000) {
+                                    typeIth.comicId = comicIth.id;
                                     typeIth.ordinal = ordinal++;
                                 }
 
@@ -1369,7 +1375,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             if (err) { throw err; }
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            // Add to correspondance array.
+                                            // Add to negTypeIdXlate for use in passNum 3.
                                             negTypeIdXlate.push({negId:type.id, dbId:rows[0].insertId});
                                             type.id = rows[0].insertId;
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
@@ -1383,7 +1389,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             );
                                         } catch (e2) {
 
-                                            m_functionFinalCallback(e2, res, null, null);
+                                            throw e2;
                                         }
                                     },
                                     typeIth
@@ -1427,6 +1433,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         saveToDB = false;
                                         break;
                                     }
+                                }
+
+                                // If editing of SBTs is not on for this project and this is an SBT, block saving.
+                                if (!project.canEditSBTs && typeIth.ordinal === 10000) {
+                                    saveToDB = false;
                                 }
 
                                 if (!saveToDB) {
@@ -1485,7 +1496,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 );
                                             } catch (e3) {
 
-                                                m_functionFinalCallback(e3, res, null, null);
+                                                throw e3;
                                             }
                                         },
                                         typeIth
@@ -1543,7 +1554,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             );
                         } catch (em) {
 
-                            m_functionFinalCallback(em, res, null, null);
+                            throw em;
                         }
                     },
                     method
@@ -1571,7 +1582,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         
                         } catch (ep) {
 
-                            m_functionFinalCallback(ep, res, null, null);
+                            throw ep;
                         }
                     },
                     property
@@ -1599,7 +1610,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         
                         } catch (ee) {
 
-                            m_functionFinalCallback(ee, res, null, null);
+                            throw ee;
                         }
                     },
                     event
@@ -1709,14 +1720,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             }
                                         } catch (e2) {
 
-                                            m_functionFinalCallback(e2, res, null, null);
+                                            throw e2;
                                         }
                                     }
                                 );
                             }
                         } catch (e1) {
 
-                            m_functionFinalCallback(e1, res, null, null);
+                            throw e1;
                         }
                     }
                 );
@@ -1746,6 +1757,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(err, rows){
 
                     if (err) { m_functionFinalCallback(err, res, null, null); }
+                    // No problem; nothing to do but return.
                     callback();
                 }
             );
@@ -1776,7 +1788,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             message: 'Committing transaction failed with ' + err.message
                         });
                     } else {
-
                         res.json({
                             success: true,
                             project: project
@@ -1788,7 +1799,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     }
 
     var m_log = function(msg) {
-
         console.log(' ');
         console.log(msg);
     }
