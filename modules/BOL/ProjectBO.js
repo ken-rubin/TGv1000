@@ -1195,9 +1195,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                         // Handle tags and project_tags.
                         // m_log('Going to m_setUpAndDoTagsWithCxn for project');
                         m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name,
-                            function() {
+                            function(err) {
 
                                 try{
+                                    if (err) { throw err; }
                                     // m_log('Going to m_saveComicsWithCxn');
                                     m_saveComicsWithCxn(connection, req, res, project);
                                 } catch (e) {
@@ -1257,7 +1258,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalTypesAcrossAllComicsInclSBTs);
 
-                                    m_saveTypesWithCxn(connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, function() {
+                                    m_saveTypesWithCxn(connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, function(err) {
+
+                                        if (err) { throw err; }
 
                                         // This is the ONE place that does a call to m_functionFinalCallback with success in its intent.
                                         m_functionFinalCallback(null, res, connection, project);
@@ -1314,18 +1317,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                 connection: connection,
                 req: req,
                 res: res,
-                project: project,
-                callback: callback
+                project: project
             };
 
             m_log("Arrived into m_saveTypesWithCxn.");
 
             for (var j = 0; j < project.comics.items.length; j++) {
 
-                var passObj.comicIth = project.comics.items[j];
-                var passObj.ordinal = 0;
+                passObj.comicIth = project.comics.items[j];
+                passObj.ordinal = 0;
 
-                m_log("Going off to do App type pass");
+                m_log("Going off to do App type.");
                 m_saveAppType(passObj, function(err) {
                     try {
                         if (err) { throw err; }
@@ -1359,210 +1361,179 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_saveAppType(passObj, callback) {
+    var m_saveAppType = function(passObj, callback) {
 
         try {
 
-        } catch (e) {
-            callback(e);
-        }
+            passObj.comicIth.types.items.forEach(function(typeIth){
+
+                if (typeIth.isApp) {
+
+                    typeIth.comicId = passObj.comicIth.id;
+                    typeIth.ordinal = 0;
+                    passObj.ordinal++;
+                    passObj.typesCount--;
+                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                    
+                    m_log('Inserting App type with ' + strQuery);
+                    sql.queryWithCxn(passObj.connection, strQuery,
+                        function(err, rows, type) {
+
+                            try {
+                                if (err) { throw err; }
+                                if (rows.length === 0) { throw new Error("Error writing type to database."); }
+
+                                // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
+                                // But we do have to set the newly assign id.
+                                type.id = rows[0].insertId;
+                                m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
+                                    function(err) {
+
+                                        if (err) { throw err; }
+
+                                        m_doTypeArraysForSaveAs(passObj.connection, passObj.project, type, passObj.req, passObj.res, function() {
+
+                                            callback(null); 
+                                        });
+                                    }
+                                );
+                            } catch (e1) { throw e1; }
+                        },
+                        typeIth
+                    );
+                }
+            });
+        } catch (e) { callback(e); }
     }
 
-                for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
+    var m_saveRemainingTypes = function(passObj, callback) {
 
-                    var typeIth = comicIth.types.items[i];
+        try {
 
-                    // Process just the type with isApp === true.
-                    if (typeIth.isApp) {
+            passObj.comicIth.types.items.forEach(function(typeIth){
 
+                if (!typeIth.isApp) {
+
+                    var processTypeIth = true;
+
+                    // If !project.canEditSBTs, there won't be any SBTs with id < 0, but there will be SBTs
+                    // with id > 0 which need to be skipped but counted down.
+
+                    // Don't assign an ordinal to an SBT. It's always 10000.
+                    // Don't set an SBT's comicId either.
+                    if (typeIth.ordinal === 10000) {
+                        if (!passObj.project.canEditSBTs) {
+                            if (--passObj.typeCount === 0) { 
+                                callback(null); 
+                            } else {
+                                processTypeIth = false;
+                            }
+                        }
+                    } else {
                         typeIth.comicId = comicIth.id;
-                        typeIth.ordinal = ordinal++;    // Assigns ordinal 0 to isApp type; then increments for next passes (except for SBTs).
+                        typeIth.ordinal = ordinal++;
+                    }
 
-                        var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                        
-                        // m_log('Inserting App type with ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery,
+                    if (processTypeIth) {
+
+                        // Prepare for insert for new Types, including SBTs; update for existing SBTs.
+                        var guts = " SET name='" + typeIth.name + "'"
+                            + ",isApp=" + typeIth.isApp
+                            + ",imageId=" + typeIth.imageId
+                            + ",altImagePath='" + typeIth.altImagePath + "' "
+                            + ",ordinal=" + typeIth.ordinal
+                            + ",comicId=" + typeIth.comicId
+                            + ",description='" + typeIth.description + "' "
+                            + ",parentTypeId=" + typeIth.parentTypeId
+                            + ",parentPrice=" + typeIth.parentPrice
+                            + ",priceBump=" + typeIth.priceBump
+                            + ",ownedByUserId=" + typeIth.ownedByUserId
+                            + ",public=" + typeIth.public
+                            + ",quarantined=" + typeIth.quarantined
+                            + ",baseTypeId=" + typeIth.baseTypeId
+                            ;
+
+                        var verb = "insert ";
+                        var whereClause = "";
+                        if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
+                            verb = "update ";
+                            whereClause = " where id=" + typeIth.id;
+                        }
+                        var strQuery = verb + self.dbname + "projects" + guts + whereClause + ";";
+
+                        m_log('Inserting or updating type with ' + strQuery);
+
+                        sql.queryWithCxn(passObj.connection, strQuery,
                             function(err, rows, type) {
 
                                 try {
                                     if (err) { throw err; }
                                     if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                    // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
-                                    type.id = rows[0].insertId;
-                                    m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                        function() {
+                                    if (verb === "insert ") {
+                                        typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
+                                        type.id = rows[0].insertId;
+                                    }
+                                    m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
+                                        function(err) {
 
-                                            m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
+                                            if (err) { throw err; }
 
-                                                if (--typeCount === 0) { 
-                                                    callback(); 
-                                                } else {
+                                            m_doTypeArraysForSaveAs(passObj.connection, passObj.project, type, passObj.req, passObj.res, function() {
 
-                                                }
+                                                if (--passObj.typeCount === 0) { callback(null); }
                                             });
                                         }
                                     );
-                                } catch (e1) {
+                                } catch (e3) {
 
-                                    throw e1;
+                                    throw e3;
                                 }
                             },
                             typeIth
                         );
                     }
                 }
-            }
-                        } else if (passNum === 2) {
+            });
+        } catch (e) {
+            callback(e);
+        }
+    }
 
-                            // Process any types with id < 0, building a correspondance array. This includes any SBTs.
-                            if (typeIth.id < 0) {
+    var m_fixUpBaseTypeIds = function(passObj, callback) {
 
-                                // Don't assign an ordinal to an SBT. It's always 10000.
-                                // Don't set an SBT's comicId either.
-                                if (typeIth.ordinal !== 10000) {
-                                    typeIth.comicId = comicIth.id;
-                                    typeIth.ordinal = ordinal++;
-                                }
+        try {
 
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                                // m_log('Inserting type with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows, type) {
 
-                                        try {
-                                            if (err) { throw err; }
-                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            // Add to typeIdTranslationArray for use in passNum 3.
-                                            typeIdTranslationArray.push({negId:type.id, dbId:rows[0].insertId});
-                                            type.id = rows[0].insertId;
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                function() {
+        } catch (e) { callback(e); }
+    }
 
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
 
-                                                        if (--typeCount === 0) { callback(); }
-                                                    });
-                                                }
-                                            );
-                                        } catch (e2) {
 
-                                            throw e2;
-                                        }
-                                    },
-                                    typeIth
-                                );
-                            }
-                        } else if (passNum === 3) {
+                            // if (!typeIth.isApp) {
 
-                            // Process the rest of the types where !isAPP. 
-                            // If baseTypeId < 0, look it up in typeIdTranslationArray and set its now correct id before writing to the DB.
-                            // If its id is in typeIdTranslationArray in property dbId, it means it was written out during passNum 2, and doesn't have to be written again,
-                            // but we do have to do its tags and methods, properties and events.
-                            // If we're going to write an SBT, update it instead of inserting it.
-                            if (!typeIth.isApp) {
+                            //     typeIth.comicId = comicIth.id;
+                            //     // If this type has a non-null, negative baseTypeId, find correct Id in typeIdTranslationArray and update it.
+                            //     if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
 
-                                typeIth.comicId = comicIth.id;
-                                // If this type has a non-null, negative baseTypeId, find correct Id in typeIdTranslationArray and update it.
-                                if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
+                            //         var foundBase = false;
+                            //         for (var j = 0; j < typeIdTranslationArray.length; j++) {
 
-                                    var foundBase = false;
-                                    for (var j = 0; j < typeIdTranslationArray.length; j++) {
+                            //             if (typeIdTranslationArray.negId === typeIth.baseTypeId) {
 
-                                        if (typeIdTranslationArray.negId === typeIth.baseTypeId) {
+                            //                 foundBase = true;
+                            //                 typeIth.baseTypeId = typeIdTranslationArray.dbId;
+                            //                 break;
+                            //             }
+                            //         }
+                            //         if (!foundBase) {
 
-                                            foundBase = true;
-                                            typeIth.baseTypeId = typeIdTranslationArray.dbId;
-                                            break;
-                                        }
-                                    }
-                                    if (!foundBase) {
+                            //             // It might have been deleted. Just null out baseTypeId.
+                            //             typeIth.baseTypeId = null;
+                            //         }
+                            //     }
 
-                                        // It might have been deleted. Just null out baseTypeId.
-                                        typeIth.baseTypeId = null;
-                                    }
-                                }
-
-                                // If this type's id is in typeIdTranslationArray in property dbId, it's already been inserted in passNum 2.
-                                var saveToDB = true;
-                                for (var i = 0; i < typeIdTranslationArray.length; i++) {
-
-                                    if (typeIdTranslationArray[i].dbId === typeIth.id) {
-                                        saveToDB = false;
-                                        break;
-                                    }
-                                }
-
-                                // If editing of SBTs is not on for this project and this is an SBT, block saving.
-                                if (!project.canEditSBTs && typeIth.ordinal === 10000) {
-                                    saveToDB = false;
-                                }
-
-                                if (!saveToDB) {
-                                    if (--typeCount === 0) { callback(); }
-                                } else {
-
-                                    // Don't assign an ordinal to an SBT.
-                                    if (typeIth.ordinal !== 10000) {
-                                        typeIth.ordinal = ordinal++;
-                                    }
-
-                                    var guts = " SET name='" + typeIth.name + "'"
-                                        + ",isApp=" + typeIth.isApp
-                                        + ",imageId=" + typeIth.imageId
-                                        + ",altImagePath='" + typeIth.altImagePath + "' "
-                                        + ",ordinal=" + typeIth.ordinal
-                                        + ",comicId=" + typeIth.comicId
-                                        + ",description='" + typeIth.description + "' "
-                                        + ",parentTypeId=" + typeIth.parentTypeId
-                                        + ",parentPrice=" + typeIth.parentPrice
-                                        + ",priceBump=" + typeIth.priceBump
-                                        + ",ownedByUserId=" + typeIth.ownedByUserId
-                                        + ",public=" + typeIth.public
-                                        + ",quarantined=" + typeIth.quarantined
-                                        + ",baseTypeId=" + typeIth.baseTypeId
-                                        ;
-
-                                    var verb = "insert ";
-                                    var whereClause = "";
-                                    if (typeIth.ordinal === 10000) {
-                                        verb = "update ";
-                                        whereClause = " where id=" + typeIth.id;
-                                    }
-                                    var strQuery = verb + self.dbname + "projects" + guts + whereClause + ";";
-
-                                    m_log('Inserting or updating type with ' + strQuery);
-
-                                    sql.queryWithCxn(connection, strQuery,
-                                        function(err, rows, type) {
-
-                                            try {
-                                                if (err) { throw err; }
-                                                if (rows.length === 0) { throw new Error("Error writing type to database."); }
-
-                                                if (type.ordinal < 10000) {
-                                                    type.id = rows[0].insertId;
-                                                }
-                                                m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                    function() {
-
-                                                        m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
-
-                                                            if (--typeCount === 0) { callback(); }
-                                                        });
-                                                    }
-                                                );
-                                            } catch (e3) {
-
-                                                throw e3;
-                                            }
-                                        },
-                                        typeIth
-                                    );
-                                }
-                            }
-                        }
 
     var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, callback) {
 
@@ -1717,11 +1688,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, callback);
+            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, function(err) {
+                callback(err);  // null or not
+            });
 
         } catch(e) {
 
-            m_functionFinalCallback(e, res, null, null);
+            callback(e);
         }
     }
 
@@ -1744,14 +1717,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                     function(err, rows){
 
                         try{
-                            if (err) { m_functionFinalCallback(err, res, null, null); }
+                            if (err) { throw err; }
 
                             if (rows.length > 0) {
 
                                 tagIds.push(rows[0].id);
                                 if (--iCtr === 0){
 
-                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
+                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err) {
+                                        if (err) { throw err; }
+                                        callback(null);
+                                    });
                                 }
                             } else {
 
@@ -1760,33 +1736,27 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     function(err, rows){
 
                                         try {
-                                            if (err) { m_functionFinalCallback(err, res, null, null); }
+                                            if (err) { throw err; }
 
-                                            if (rows.length === 0) { m_functionFinalCallback(new error('Could not insert tag into database.'), res, null, null); }
+                                            if (rows.length === 0) { throw new error('Could not insert tag into database.'); }
 
                                             tagIds.push(rows[0].insertId);
                                             if (--iCtr === 0){
 
-                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
+                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err){
+                                                    if (err) { throw err; }
+                                                    callback(null);
+                                                });
                                             }
-                                        } catch (e2) {
-
-                                            throw e2;
-                                        }
+                                        } catch (e2) { throw e2; }
                                     }
                                 );
                             }
-                        } catch (e1) {
-
-                            throw e1;
-                        }
+                        } catch (e1) { throw e1; }
                     }
                 );
             });
-        } catch (e) {
-
-            m_functionFinalCallback(e, res, null, null);
-        }
+        } catch (e) { callback(e); }
     }
 
     var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
@@ -1807,20 +1777,15 @@ module.exports = function ProjectBO(app, sql, logger) {
             sql.queryWithCxn(connection, strSql,
                 function(err, rows){
 
-                    if (err) { m_functionFinalCallback(err, res, null, null); }
-                    // No problem; nothing to do but return.
-                    callback();
+                    callback(err);  // null or not
                 }
             );
-        } catch (e) {
-
-            m_functionFinalCallback(e, res, null, null);
-        }
+        } catch (e) { callback(e); }
     }
 
     var m_functionFinalCallback = function (err, res, connection, project) {
 
-        // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
+        m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
 
