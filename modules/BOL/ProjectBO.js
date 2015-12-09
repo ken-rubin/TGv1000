@@ -1471,7 +1471,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
                                     if (verb === "insert ") {
-                                        typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
+                                        passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
                                         type.id = rows[0].insertId;
                                     }
                                     m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
@@ -1504,36 +1504,39 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
+            var numUpdatesToDo = 0;
+            passObj.comicIth.types.items.forEach(function(typeIth){
 
+                if (typeIth.baseTypeId !== null) {
 
+                    numUpdatesToDo++;
+                }
+            });
+
+            passObj.comicIth.types.items.forEach(function(typeIth){
+
+                if (typeIth.baseTypeId !== null) {
+
+                    passObj.typeIdTranslationArray.forEach(function(xlateIth) {
+
+                        if (xlateIth.origId === typeIth.baseTypeId) {
+
+                            var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+                            sql.queryWithCxn(passObj.connection, strQuery,
+                                function(err, rows, type) {
+
+                                    try {
+                                        if (err) { throw err; }
+                                        if (--numUpdatesToDo === 0) { callback(null); }
+                                    } catch (ex) { throw ex; }
+                                }
+                            );
+                        }
+                    });
+                }
+            });
         } catch (e) { callback(e); }
     }
-
-
-
-                            // if (!typeIth.isApp) {
-
-                            //     typeIth.comicId = comicIth.id;
-                            //     // If this type has a non-null, negative baseTypeId, find correct Id in typeIdTranslationArray and update it.
-                            //     if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
-
-                            //         var foundBase = false;
-                            //         for (var j = 0; j < typeIdTranslationArray.length; j++) {
-
-                            //             if (typeIdTranslationArray.negId === typeIth.baseTypeId) {
-
-                            //                 foundBase = true;
-                            //                 typeIth.baseTypeId = typeIdTranslationArray.dbId;
-                            //                 break;
-                            //             }
-                            //         }
-                            //         if (!foundBase) {
-
-                            //             // It might have been deleted. Just null out baseTypeId.
-                            //             typeIth.baseTypeId = null;
-                            //         }
-                            //     }
-
 
     var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, callback) {
 
