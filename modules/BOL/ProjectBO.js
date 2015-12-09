@@ -971,7 +971,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
@@ -1159,7 +1159,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // m_log('Continuing in m_functionProjectSaveAsPart2');
+            m_log('Continuing in m_functionProjectSaveAsPart2');
             var guts = " SET name='" + project.name + "'"
                 + ",ownedByUserId=" + req.body.userId
                 + ",public=" + project.public
@@ -1171,13 +1171,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                 + ",priceBump=" + project.priceBump
                 + ",imageId=" + project.imageId
                 + ",altImagePath='" + project.altImagePath + "'"
-                + ",description='" + project.description + "' "
-                + ",canEditSBTs=" + project.canEditSBTs ? 1 : 0
-                ;
+                + ",description='" + project.description + "'"
+                + ",canEditSBTs=" + (project.canEditSBTs ? 1 : 0);
+
+            m_log("Guts: " + guts);
 
             var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
 
-            // m_log('Inserting project record with ' + strQuery);
+            m_log('Inserting project record with ' + strQuery);
 
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
@@ -1341,7 +1342,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 m_fixUpBaseTypeIds(passObj, function(err) {
                                     if (err) { throw err; }
 
-                                    if (passObj.totalTypesAcrossAllComicsInclSBTs === 0) {
+                                    if (passObj.typesCount === 0) {
 
                                         // Total success. We can call back to the outer comics loop.
                                         callback();
@@ -1373,7 +1374,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.ordinal = 0;
                     passObj.ordinal++;
                     passObj.typesCount--;
-                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                     
                     m_log('Inserting App type with ' + strQuery);
                     sql.queryWithCxn(passObj.connection, strQuery,
@@ -1410,6 +1411,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
+            m_log("In m_saveRemainingTypes with typesCount=" + passObj.typesCount);
             passObj.comicIth.types.items.forEach(function(typeIth){
 
                 if (!typeIth.isApp) {
@@ -1423,11 +1425,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Don't set an SBT's comicId either.
                     if (typeIth.ordinal === 10000) {
                         if (!passObj.project.canEditSBTs) {
-                            if (--passObj.typeCount === 0) { 
-                                callback(null); 
-                            } else {
-                                processTypeIth = false;
-                            }
+                            processTypeIth = false;
                         }
                     } else {
                         typeIth.comicId = comicIth.id;
@@ -1438,11 +1436,11 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         // Prepare for insert for new Types, including SBTs; update for existing SBTs.
                         var guts = " SET name='" + typeIth.name + "'"
-                            + ",isApp=" + typeIth.isApp
+                            + ",isApp=" + (typeIth.isApp ? 1 : 0)
                             + ",imageId=" + typeIth.imageId
                             + ",altImagePath='" + typeIth.altImagePath + "' "
                             + ",ordinal=" + typeIth.ordinal
-                            + ",comicId=" + typeIth.comicId
+                            + ",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
                             + ",description='" + typeIth.description + "' "
                             + ",parentTypeId=" + typeIth.parentTypeId
                             + ",parentPrice=" + typeIth.parentPrice
@@ -1481,7 +1479,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             m_doTypeArraysForSaveAs(passObj.connection, passObj.project, type, passObj.req, passObj.res, function() {
 
-                                                if (--passObj.typeCount === 0) { callback(null); }
+                                                if (--passObj.typesCount === 0) { callback(null); }
                                             });
                                         }
                                     );
@@ -1492,6 +1490,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             typeIth
                         );
+                    } else {
+                        // Even though we didn't write it out, we'll have it for lookups.
+                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+                        
+                        if (--passObj.typesCount === 0) { callback(null); }
                     }
                 }
             });
@@ -1513,6 +1516,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             });
 
+            m_log(numUpdatesToDo + " update(s) to do. Here's typeIdTranslationArray: " + JSON.stringify(passObj.typeIdTranslationArray));
+
             passObj.comicIth.types.items.forEach(function(typeIth){
 
                 if (typeIth.baseTypeId !== null) {
@@ -1521,16 +1526,22 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         if (xlateIth.origId === typeIth.baseTypeId) {
 
-                            var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
-                            sql.queryWithCxn(passObj.connection, strQuery,
-                                function(err, rows, type) {
+                            if (xlateIth.newId === xlateIth.origId){
+                                // No need to update the type. Just count down.
+                                if (--numUpdatesToDo === 0) { callback(null); }
+                            } else {
 
-                                    try {
-                                        if (err) { throw err; }
-                                        if (--numUpdatesToDo === 0) { callback(null); }
-                                    } catch (ex) { throw ex; }
-                                }
-                            );
+                                var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+                                sql.queryWithCxn(passObj.connection, strQuery,
+                                    function(err, rows, type) {
+
+                                        try {
+                                            if (err) { throw err; }
+                                            if (--numUpdatesToDo === 0) { callback(null); }
+                                        } catch (ex) { throw ex; }
+                                    }
+                                );
+                            }
                         }
                     });
                 }
