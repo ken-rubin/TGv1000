@@ -1428,8 +1428,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             processTypeIth = false;
                         }
                     } else {
-                        typeIth.comicId = comicIth.id;
-                        typeIth.ordinal = ordinal++;
+                        typeIth.comicId = passObj.comicIth.id;
+                        typeIth.ordinal = passObj.ordinal++;
                     }
 
                     if (processTypeIth) {
@@ -1457,7 +1457,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             verb = "update ";
                             whereClause = " where id=" + typeIth.id;
                         }
-                        var strQuery = verb + self.dbname + "projects" + guts + whereClause + ";";
+                        var strQuery = verb + self.dbname + "types" + guts + whereClause + ";";
 
                         m_log('Inserting or updating type with ' + strQuery);
 
