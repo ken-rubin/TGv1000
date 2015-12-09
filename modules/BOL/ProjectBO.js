@@ -1229,14 +1229,14 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
-            var totalNumTypesInclSBTs = 0;
+            var totalTypesAcrossAllComicsInclSBTs = 0;
 
             project.comics.items.forEach(
                 function(comicIth) {
 
-                    totalNumTypesInclSBTs += comicIth.types.items.length;
+                    totalTypesAcrossAllComicsInclSBTs += comicIth.types.items.length;
 
-                    m_log("Just counted types. Got " + totalNumTypesInclSBTs + ".");
+                    m_log("Just counted types. Got " + totalTypesAcrossAllComicsInclSBTs + ".");
 
                     comicIth.projectId = project.id;
 
@@ -1255,9 +1255,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 if (--comicsCountdown === 0) {
 
-                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesInclSBTs);
+                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalTypesAcrossAllComicsInclSBTs);
 
-                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesInclSBTs, function() {
+                                    m_saveTypesWithCxn(connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, function() {
 
                                         // This is the ONE place that does a call to m_functionFinalCallback with success in its intent.
                                         m_functionFinalCallback(null, res, connection, project);
@@ -1278,24 +1278,27 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesInclSBTs, callback) {
+    var m_saveTypesWithCxn = function (connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, callback) {
 
-        // All comics have now been inserted and their ids are set in project.
+        // All comics have now been inserted and their ids are set in project.comics.items.
         // Time to do types and then move on to type contents: methods, properties and events.
         // Types will require resource, tags and resources_tags. (As will methods.)
 
         // Here's the situation with System Base Types (SBTs):
         // (1) The comic's App type has baseTypeId = id of one of the system base types.
-        // (2) System base types are recognized by having ordinal === 10000.
+        // (2) All SBTs are recognized by having ordinal === 10000 and comicId === null. There is really nothing special about
+        //     the five special project type SBTs except that they are chosen before the project is created, are the base type of
+        //     the project's App type and are not changeable when editing the App type.
         // (3) Any new types (including SBTs) will have id < 0 and this id will be unique. This is so that, if they are then
         //     used as a base type, the derived type will have an id (albeit negative) for baseTypeId. So, after new types are written
-        //     to the DB and given a positive id (saving their negative and new actual ids to an array), we need to loop through the other types
-        //     and change any where baseTypeId = the saved negative id.
+        //     to the DB and given a positive id (saving their negative and new actual ids to an array of 2-tuples), we need to loop through the other types
+        //     and change any where baseTypeId = the saved negative id. Addition, since we ultimately will be writing ALL types to the DB and all but
+        //     pre-existing SBTs will receive a new Id, we need to save them to the array, too, to adjust possible other types that derive from them.
         //
         // All this means we have several passes to make through the types in each comic in the project.
-        // As we loop, we increment the ordinal for each comic's types, starting at 0. Note: we DO NOT assign an ordinal to
+        // As we loop, we increment the ordinal for each of the project's comic's types, starting at 0 for each comic. Note: we DO NOT assign an ordinal to
         // as SBT. It is already 10000.
-        // (Pass 1) We should write out the App type so it gets ordinal 0.
+        // (Pass 1) We should write out the App type so it gets ordinal 0 and break out of that loop.
         // (Pass 2) We should loop through all types in the comic and write the ones with id < 0. When we get back a real id,
         //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
         // (Pass 3) We should then loop through all the types again, skipping the App type and skipping any types with
@@ -1303,57 +1306,113 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            var typeCount = totalNumTypesInclSBTs;
+            var passObj = {
+                typesCount: totalTypesAcrossAllComicsInclSBTs,
+                ordinal: 0,
+                typeIdTranslationArray: [],
+                comicIth: null,
+                connection: connection,
+                req: req,
+                res: res,
+                project: project,
+                callback: callback
+            };
 
-            m_log("Arrived into m_saveTypesWithCxn. typeCount=" + JSON.stringify(typeCount));
+            m_log("Arrived into m_saveTypesWithCxn.");
 
             for (var j = 0; j < project.comics.items.length; j++) {
 
-                var comicIth = project.comics.items[j];
-                var ordinal = 0;
-                var negTypeIdXlate = [];
+                var passObj.comicIth = project.comics.items[j];
+                var passObj.ordinal = 0;
 
-                // We're going to make 3 whole loops through the comic's types, processing (or ignoring) the ones specific to that loop.
-                for (var passNum = 1; passNum <=3; passNum++) { 
+                m_log("Going off to do App type pass");
+                m_saveAppType(passObj, function(err) {
+                    try {
+                        if (err) { throw err; }
 
-                    for (var i = 0; i < comicIth.types.items.length; i++) {
+                        m_log("Going off to do remaining types pass");
+                        m_saveRemainingTypes(passObj, function(err) {
+                            try {
+                                if (err) { throw err; }
 
-                        var typeIth = comicIth.types.items[i];
-                        if (passNum === 1) {
+                                m_log("Going off to do fixUp pass");
+                                m_fixUpBaseTypeIds(passObj, function(err) {
+                                    if (err) { throw err; }
 
-                            // Process just the type with isApp === true.
-                            if (typeIth.isApp) {
+                                    if (passObj.totalTypesAcrossAllComicsInclSBTs === 0) {
 
-                                typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;    // Assigns ordinal 0 to isApp type; then increments for next passes (except for SBTs).
-
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                                // m_log('Inserting type with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows, type) {
-
-                                        try {
-                                            if (err) { throw err; }
-                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
-
-                                            type.id = rows[0].insertId;
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                function() {
-
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
-
-                                                        if (--typeCount === 0) { callback(); }
-                                                    });
-                                                }
-                                            );
-                                        } catch (e1) {
-
-                                            throw e1;
-                                        }
-                                    },
-                                    typeIth
-                                );
+                                        // Total success. We can call back to the outer comics loop.
+                                        callback();
+                                    }
+                                });
+                            } catch (eRest) {
+                                throw eRest;
                             }
+                        });
+                    } catch (eApp) {
+                        throw eApp;
+                    }
+                });
+            }
+        } catch (e) {
+            m_functionFinalCallback(e, res, null, null);
+        }
+    }
+
+    var m_saveAppType(passObj, callback) {
+
+        try {
+
+        } catch (e) {
+            callback(e);
+        }
+    }
+
+                for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
+
+                    var typeIth = comicIth.types.items[i];
+
+                    // Process just the type with isApp === true.
+                    if (typeIth.isApp) {
+
+                        typeIth.comicId = comicIth.id;
+                        typeIth.ordinal = ordinal++;    // Assigns ordinal 0 to isApp type; then increments for next passes (except for SBTs).
+
+                        var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                        
+                        // m_log('Inserting App type with ' + strQuery);
+                        sql.queryWithCxn(connection, strQuery,
+                            function(err, rows, type) {
+
+                                try {
+                                    if (err) { throw err; }
+                                    if (rows.length === 0) { throw new Error("Error writing type to database."); }
+
+                                    // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
+                                    type.id = rows[0].insertId;
+                                    m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
+                                        function() {
+
+                                            m_doTypeArraysForSaveAs(connection, project, type, req, res, function() {
+
+                                                if (--typeCount === 0) { 
+                                                    callback(); 
+                                                } else {
+
+                                                }
+                                            });
+                                        }
+                                    );
+                                } catch (e1) {
+
+                                    throw e1;
+                                }
+                            },
+                            typeIth
+                        );
+                    }
+                }
+            }
                         } else if (passNum === 2) {
 
                             // Process any types with id < 0, building a correspondance array. This includes any SBTs.
@@ -1375,8 +1434,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             if (err) { throw err; }
                                             if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                            // Add to negTypeIdXlate for use in passNum 3.
-                                            negTypeIdXlate.push({negId:type.id, dbId:rows[0].insertId});
+                                            // Add to typeIdTranslationArray for use in passNum 3.
+                                            typeIdTranslationArray.push({negId:type.id, dbId:rows[0].insertId});
                                             type.id = rows[0].insertId;
                                             m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
                                                 function() {
@@ -1398,23 +1457,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                         } else if (passNum === 3) {
 
                             // Process the rest of the types where !isAPP. 
-                            // If baseTypeId < 0, look it up in negTypeIdXlate and set its now correct id before writing to the DB.
-                            // If its id is in negTypeIdXlate in property dbId, it means it was written out during passNum 2, and doesn't have to be written again,
+                            // If baseTypeId < 0, look it up in typeIdTranslationArray and set its now correct id before writing to the DB.
+                            // If its id is in typeIdTranslationArray in property dbId, it means it was written out during passNum 2, and doesn't have to be written again,
                             // but we do have to do its tags and methods, properties and events.
                             // If we're going to write an SBT, update it instead of inserting it.
                             if (!typeIth.isApp) {
 
                                 typeIth.comicId = comicIth.id;
-                                // If this type has a non-null, negative baseTypeId, find correct Id in negTypeIdXlate and update it.
+                                // If this type has a non-null, negative baseTypeId, find correct Id in typeIdTranslationArray and update it.
                                 if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
 
                                     var foundBase = false;
-                                    for (var j = 0; j < negTypeIdXlate.length; j++) {
+                                    for (var j = 0; j < typeIdTranslationArray.length; j++) {
 
-                                        if (negTypeIdXlate.negId === typeIth.baseTypeId) {
+                                        if (typeIdTranslationArray.negId === typeIth.baseTypeId) {
 
                                             foundBase = true;
-                                            typeIth.baseTypeId = negTypeIdXlate.dbId;
+                                            typeIth.baseTypeId = typeIdTranslationArray.dbId;
                                             break;
                                         }
                                     }
@@ -1425,11 +1484,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     }
                                 }
 
-                                // If this type's id is in negTypeIdXlate in property dbId, it's already been inserted in passNum 2.
+                                // If this type's id is in typeIdTranslationArray in property dbId, it's already been inserted in passNum 2.
                                 var saveToDB = true;
-                                for (var i = 0; i < negTypeIdXlate.length; i++) {
+                                for (var i = 0; i < typeIdTranslationArray.length; i++) {
 
-                                    if (negTypeIdXlate[i].dbId === typeIth.id) {
+                                    if (typeIdTranslationArray[i].dbId === typeIth.id) {
                                         saveToDB = false;
                                         break;
                                     }
@@ -1504,14 +1563,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
                             }
                         }
-                    }
-                }
-            }
-        } catch (e) {
-
-            m_functionFinalCallback(e, res, null, null);
-        }
-    }
 
     var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, callback) {
 
