@@ -7,7 +7,6 @@
 - **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
 - Finish and integrate Coder
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
-- In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
 
 
 ## Jerry
@@ -44,6 +43,7 @@
 - A New SBT should probably require an image.
 - Add  new fields to ProjectBO.routeRetrieveType and its 3 arrays. And to routeRetrieveMethod.
 - Add usergroups
+- If !project.canEditSBTs, when active type is an SBT, disable about everything.
 
 
 
