@@ -1451,13 +1451,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                             + ",baseTypeId=" + typeIth.baseTypeId
                             ;
 
-                        var verb = "insert ";
-                        var whereClause = "";
+                        var strQuery;
+                        var weInserted;
                         if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
-                            verb = "update ";
-                            whereClause = " where id=" + typeIth.id;
+
+                            // First the update statement.
+                            strQuery = "update " + self.dbname + "types" + guts + " where id=" + typeIth.id + ";";
+                            // Then delete methods, properties and events which will be re-inserted.
+                            strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
+                            strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
+                            strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
+                            // Then type_tags.
+                            strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
+                            weInserted = false;
+
+                        } else {
+
+                            strQuery = "insert " + self.dbname + "types" + guts + ";";
+                            weInserted = true;
                         }
-                        var strQuery = verb + self.dbname + "types" + guts + whereClause + ";";
 
                         m_log('Inserting or updating type with ' + strQuery);
 
@@ -1468,7 +1480,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     if (err) { throw err; }
                                     if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                    if (verb === "insert ") {
+                                    if (weInserted) {
                                         passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
                                         type.id = rows[0].insertId;
                                     }
@@ -1544,6 +1556,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         }
                     });
+                    // If we fall through the xlate loop and haven't reached numUpdates === 0,
+                    // it means the current typeIth doesn't need its baseTypeId updated.
+                    // We can decrement and check for callback.
+                    // TODO: what if a base type had been deleted? Don't we have to check for that and null out base type Id?
+                    // Or will that be done client side?
+                    if (--numUpdatesToDo === 0) { callback(null); }
                 }
             });
         } catch (e) { callback(e); }
@@ -1787,7 +1805,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             }
 
             strSql = strSql + ";";
-            // m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
+            m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
             sql.queryWithCxn(connection, strSql,
                 function(err, rows){
 
