@@ -329,7 +329,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								for (var i = 0; i < m_typesArray.length; i++) {
 
 									var typeIth = m_typesArray[i];
-									if (typeIth.id < typeId) {
+									if (typeIth.id <= typeId) {
 
 										typeId = typeIth.id - 1;
 									}

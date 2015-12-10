@@ -1058,6 +1058,24 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 						try {
 
+							// If this type is a base type for any other type in this comic,
+							// user cannot delete.
+							var activeClComic = comics.getActiveComic();
+							var typeArray = activeClComic.getYourTypesArray();
+							var activeTypeId = m_clTypeActive.data.id;
+							var arrDerivedTypes = [];
+							for (var i = 0; i < typeArray.length; i++) {
+
+								var typeIth = typeArray[i];
+								if (typeIth.baseTypeId === activeTypeId) {
+									arrDerivedTypes.push(typeIth.name);
+								}
+							}
+							if (arrDerivedTypes.length){
+								errorHelper.show("The type " + m_clTypeActive.data.name + " is a base type for these other types: " + arrDerivedTypes.join(', ') + " and may not be deleted.");
+								return;
+							}
+
 							client.projectIsDirty();
 
 							var exceptionRet = client.showDeleteConfirmDialog('type', -1);
