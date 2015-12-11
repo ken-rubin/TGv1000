@@ -124,9 +124,7 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
-								client.unloadProject(null, true);	// No callback; show the Abandon dlg if there's a project and it's dirty.
-
-								self.enableDisableProjectsMenuItems();
+								client.unloadProject(function(){ self.enableDisableProjectsMenuItems(); }, true);
 							});
 
 							// Wire Adminzone button click.

@@ -68,6 +68,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							exceptionRet = code.reset(true);
 							if (exceptionRet) { throw exceptionRet; }
 
+							client.projectIsClean();
+
 							return designer.unload();
 
 						} catch(e) {
