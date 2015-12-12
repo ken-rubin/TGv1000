@@ -1476,6 +1476,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
                             weInserted = false;
 
+                            // Add this update statement to project.script.
+                            passObj.project.script.push(strQuery);
+
                         } else {
 
                             strQuery = "insert " + self.dbname + "types" + guts + ";";
@@ -1494,6 +1497,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     if (weInserted) {
                                         passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
                                         type.id = rows[0].insertId;
+
+                                        // If this is a System Type, alter the SQL statement with the id and push onto passObj.project.script.
+                                        if (type.ordinal === 10000) {
+                                            passObj.project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + type.id + ";");                                        }
                                     }
                                     m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
                                         function(err) {
