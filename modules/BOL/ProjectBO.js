@@ -1205,13 +1205,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                         project.id = rows[0].insertId;
 
                         // Handle tags and project_tags.
-                        // m_log('Going to m_setUpAndDoTagsWithCxn for project');
-                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name,
+                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
+                            null,   // this says not to push to project.script
                             function(err) {
 
                                 try{
                                     if (err) { throw err; }
-                                    // m_log('Going to m_saveComicsWithCxn');
+
                                     m_saveComicsWithCxn(connection, req, res, project);
                                 } catch (e) {
                                     throw e;
@@ -1398,7 +1398,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
                                 // But we do have to set the newly assign id.
                                 type.id = rows[0].insertId;
-                                m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
+                                m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
+                                    null,   // this says not to push to project.script
                                     function(err) {
 
                                         if (err) { throw err; }
@@ -1506,7 +1507,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         // Add the update statement to project.script.
                                         passObj.project.script.push(strQuery);
                                     }
-                                    m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
+                                    m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
+                                        (type.ordinal === 10000 ? passObj.project.script : null),
                                         function(err) {
 
                                             if (err) { throw err; }
@@ -1626,7 +1628,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + meth.id + ";");
                             }
 
-                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name,
+                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name, 
+                                (typeIth.ordinal === 10000 ? project.script : null),
                                 function() {
 
                                     methodsCountdown--;
@@ -1716,16 +1719,17 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, callback) {
+    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, projectScript, callback) {
 
         try {
             
-            // m_log("In m_setUpAndDoTagsWithCxn with for type " + strItemType + " and itemId=" + itemId);
-
-            // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
+            // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
             var tagArray = [];
             tagArray.push(strItemType);
-            tagArray.push(userName);
+            if (projectScript === null){
+                // Not right to use user name for a System Type tag.
+                tagArray.push(userName);
+            }
             if (strName.length > 0) {
 
                 tagArray.push(strName.trim().replace(/\s/g, '_').toLowerCase());
@@ -1759,7 +1763,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, function(err) {
+            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, projectScript, function(err) {
                 callback(err);  // null or not
             });
 
@@ -1769,7 +1773,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, callback){
+    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, projectScript, callback){
 
         try {
             var tagIds = [];
