@@ -50,11 +50,6 @@
 
 ## To discuss
 
-- This is a discussion of the loading and maintenance of what were formerly called System Base Types, but are now called System Types.
-    - Background
-        - Only special users (like maybe just Ken) can add or modify STs. This capability is turned on in the New Project dialog by checking a box that only this select group of users even sees. The state of a project having this turned on is saved to and loaded from the database.
-        - There is only one copy of the System Types. Every one of them is accessible in every project.
-        - If a special user adds or edits a System Type, the changes are saved to the database. However, since work on System Types may be done either on the production server or on a local dev server, there needs to be a fairly painless way to propogate them to every other dev or production server.
 - All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 - **Ken:** If I open a new project, the App Type is the Current Type and initialize is the Current Method, but, since we don't display app_initialize or the getter and setters for X, Y, Width and Height, the App category doesn't even appear in the schema category list.
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.

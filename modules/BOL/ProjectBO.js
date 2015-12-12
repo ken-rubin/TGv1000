@@ -1476,8 +1476,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
                             weInserted = false;
 
-                            // Add this update statement to project.script.
-                            passObj.project.script.push(strQuery);
 
                         } else {
 
@@ -1500,7 +1498,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         // If this is a System Type, alter the SQL statement with the id and push onto passObj.project.script.
                                         if (type.ordinal === 10000) {
-                                            passObj.project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + type.id + ";");                                        }
+                                            passObj.project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + type.id + ";");
+                                        }
+                                    } else {
+
+                                        // !weInserted means we updated a System Type.
+                                        // Add the update statement to project.script.
+                                        passObj.project.script.push(strQuery);
                                     }
                                     m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name,
                                         function(err) {
@@ -1616,7 +1620,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
                             meth.id = rows[0].insertId;
-                            // m_log('Going to do method tags');
+
+                            // If this is a System Type method, alter the SQL statement with the id and push onto passObj.project.script.
+                            if (typeIth.ordinal === 10000) {
+                                project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + meth.id + ";");
+                            }
+
                             m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name,
                                 function() {
 
@@ -1649,6 +1658,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                             if (rows.length === 0) { throw new Error("Error inserting property into database"); }
 
                             prop.id = rows[0].insertId;
+
+                            // If this is a System Type property, alter the SQL statement with the id and push onto passObj.project.script.
+                            if (typeIth.ordinal === 10000) {
+                                project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + prop.id + ";");
+                            }
+
                             propertiesCountdown--;
                             if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
                         
@@ -1677,6 +1692,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
                             ev.id = rows[0].insertId;
+
+                            // If this is a System Type event, alter the SQL statement with the id and push onto passObj.project.script.
+                            if (typeIth.ordinal === 10000) {
+                                project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + ev.id + ";");
+                            }
+
                             eventsCountdown--;
                             if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
                         
