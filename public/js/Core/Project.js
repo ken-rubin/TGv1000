@@ -84,9 +84,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							// errorHelper.show("We're not doing this yet", 4000);
-							// return;
-
 							var data = {
 									userId: g_strUserId,
 									userName: g_strUserName,
@@ -94,6 +91,35 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									projectJson: self.data
 							};
 
+							// If !data.projectJson.canEditSBTs, then success and error mean that the project was or wasn't saved to the database.
+							// If not saved, it was rolled back.
+							//
+							// If data.projectJson.canEditSBTs, the save code will collect and try to write a complete SQL script to the project root
+							// directory that can be run to propogate any changes or additions to System Types. This script is written to ST.sql.
+							// We attempt to write the SQL script only if the saving of the project to the database succeeded and wasn't rolled back.
+							// This means that we could encounter two cases: the project was saved to the database and the script file was created successfully;
+							// or the project was saved to the database and the script file wasn't created.
+							// Object data is returned for both these cases with success=true.
+							/* Note:
+                                if (err) {
+                                    // Writing the file didn't work, but saving the project has already been committed to the DB.
+                                    // We'll inform the user, but do so in a way that the project is saved.
+                                    res.json({
+                                        success: true,
+                                        project: project,
+                                        scriptSuccess: false,
+                                        message: "Your project was saved the the database, but creating the System Type SQL script (ST.sql) failed."
+                                    });
+                                } else {
+
+                                    res.json({
+                                        success: true,
+                                        project: project,
+                                        scriptSuccess: true,
+                                        message: "Your project was saved to the database and the System Type SQL script (ST.sql) was created."
+                                    });
+                                }
+							*/
 							$.ajax({
 
 								type: 'POST',
@@ -105,7 +131,15 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 									if (objectData.success) {
 
-										errorHelper.show('Project was saved', 1000);
+										if (!objectData.project.canEditSBTs) {
+											errorHelper.show('Project was saved', 1000);
+										} else {
+											if (objectData.scriptSuccess) {
+												errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
+											} else {
+												errorHelper.show("Your project was saved to the database and the System Type script COULD NOT be created.");
+											}
+										}
 
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:

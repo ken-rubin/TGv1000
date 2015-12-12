@@ -1160,6 +1160,17 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             m_log('Continuing in m_functionProjectSaveAsPart2');
+
+            if (project.canEditSBTs) {
+                // User turned on project.canEditSBTs. We assume some were edited or added.
+                // Set up array of strings that will hold the System Types sql script.
+
+                project.script = [];
+
+                // By delete ST types, we will cascade and also delete their methods, properties, events and tag-related rows.
+                project.script.push("delete from " + self.dbname + "types where ordinal=10000;");
+            }
+
             var guts = " SET name='" + project.name + "'"
                 + ",ownedByUserId=" + req.body.userId
                 + ",public=" + project.public
@@ -1836,13 +1847,61 @@ module.exports = function ProjectBO(app, sql, logger) {
                             message: 'Committing transaction failed with ' + err.message
                         });
                     } else {
-                        res.json({
-                            success: true,
-                            project: project
-                        });
+
+                        if (project.hasOwnProperty("script")) {
+                            // There's a sql script that needs to be written to project root.
+                            // In the callback from that file creation, we'll return to the client.
+                            m_log("About to write sql script containing " + project.script.length + " lines.");
+                            m_functionWriteSqlScript(project, function(err) {
+
+                                delete project.script;
+                                if (err) {
+                                    // Writing the file didn't work, but saving the project has already been committed to the DB.
+                                    // We'll inform the user, but do so in a way that the project is saved.
+                                    res.json({
+                                        success: true,
+                                        project: project,
+                                        scriptSuccess: false
+                                    });
+                                } else {
+
+                                    res.json({
+                                        success: true,
+                                        project: project,
+                                        scriptSuccess: true
+                                    });
+                                }
+                            });
+
+                        } else {
+
+                            res.json({
+                                success: true,
+                                project: project
+                            });
+                        }
                     }
                 }
             );
+        }
+    }
+
+    var m_functionWriteSqlScript = function(project, callback) {
+
+        try {
+
+            var fs = require('fs');
+            var os = require('os');
+
+            fs.writeFile('ST.sql', project.script.join(os.EOL), function (err) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null);
+                }
+            });
+        } catch(e) {
+            callback(e);
         }
     }
 

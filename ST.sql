@@ -1,0 +1,1 @@
+delete from TGv1000.types where ordinal=10000;
