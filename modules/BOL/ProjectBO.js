@@ -1487,7 +1487,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_log('Inserting or updating type with ' + strQuery);
 
                         sql.queryWithCxn(passObj.connection, strQuery,
-                            function(err, rows, type) {
+                            function(err, rows, type, queryBack) {
 
                                 try {
                                     if (err) { throw err; }
@@ -1499,13 +1499,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         // If this is a System Type, alter the SQL statement with the id and push onto passObj.project.script.
                                         if (type.ordinal === 10000) {
-                                            passObj.project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + type.id + ";");
+                                            passObj.project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + type.id + ";");
                                         }
                                     } else {
 
                                         // !weInserted means we updated a System Type.
                                         // Add the update statement to project.script.
-                                        passObj.project.script.push(strQuery);
+                                        passObj.project.script.push(queryBack);
                                     }
                                     m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
                                         (type.ordinal === 10000 ? passObj.project.script : null),
@@ -1569,7 +1569,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
                                 sql.queryWithCxn(passObj.connection, strQuery,
-                                    function(err, rows, type) {
+                                    function(err, rows) {
 
                                         try {
                                             if (err) { throw err; }
@@ -1612,10 +1612,26 @@ module.exports = function ProjectBO(app, sql, logger) {
                 method.ordinal = ordinal++;
                 // m_log("Just set method.typeId=" + method.typeId + " and method.ordinal=" + method.ordinal);
 
-                var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined,methodTypeId,parameters) values (" + method.typeId + ",'" + method.name + "'," + method.ordinal + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + "," + method.methodTypeId + ",'" + method.parameters + "');";
+                var guts = " SET typeId=" + method.typeId
+                            + ",name='" + method.name + "'"
+                            + ",ordinal=" + method.ordinal
+                            + ",workspace='" + method.workspace + "' "
+                            + ",imageId=" + method.imageId
+                            + ",description='" + method.description + "'"
+                            + ",parentMethodId=" + method.parentMethodId
+                            + ",parentPrice=" + method.parentPrice
+                            + ",priceBump=" + method.priceBump
+                            + ",ownedByUserId=" + method.ownedByUserId
+                            + ",public=" + method.public
+                            + ",quarantined=" + method.quarantined
+                            + ",methodTypeId=" + method.methodTypeId
+                            + ",parameters='" + method.parameters + "'"
+                            ;
+
+                var strQuery = "insert " + self.dbname + "methods" + guts + ";";
                 // m_log('Inserting method with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows, meth) {
+                    function(err, rows, meth, queryBack) {
 
                         try {
                             if (err) { throw err; }
@@ -1625,7 +1641,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             // If this is a System Type method, alter the SQL statement with the id and push onto passObj.project.script.
                             if (typeIth.ordinal === 10000) {
-                                project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + meth.id + ";");
+                                project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + meth.id + ";");
                             }
 
                             m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name, 
@@ -1654,7 +1670,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 
                 // m_log('Inserting property with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows, prop) {
+                    function(err, rows, prop, queryBack) {
 
                         try {
                             if (err) { throw err; }
@@ -1664,7 +1680,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             // If this is a System Type property, alter the SQL statement with the id and push onto passObj.project.script.
                             if (typeIth.ordinal === 10000) {
-                                project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + prop.id + ";");
+                                project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + prop.id + ";");
                             }
 
                             propertiesCountdown--;
@@ -1688,7 +1704,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "'," + event.ordinal + ");";
                 // m_log('Inserting event with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows, ev) {
+                    function(err, rows, ev, queryBack) {
 
                         try {
                             if (err) { throw err; }
@@ -1698,7 +1714,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             // If this is a System Type event, alter the SQL statement with the id and push onto passObj.project.script.
                             if (typeIth.ordinal === 10000) {
-                                project.script.push(strQuery.substr(0, strQuery.length - 1) + ",id=" + ev.id + ";");
+                                project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + ev.id + ";");
                             }
 
                             eventsCountdown--;
@@ -1723,6 +1739,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
             
+            m_log("in m_setUpAndDoTagsWithCxn");
             // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
             var tagArray = [];
             tagArray.push(strItemType);
@@ -1763,124 +1780,39 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            // OLD WAY
-            // m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, projectScript, function(err) {
-            //     callback(err);  // null or not
-            // });
+            m_log("uniqueArray=" +  JSON.stringify(uniqueArray));
 
-            // NEW WAY
             var tagsCount = uniqueArray.length;
-            for (var i = 1; i < uniqueArray.length; i++) {
+            for (var i = 0; i < uniqueArray.length; i++) {
 
                 var tagIth = uniqueArray[i];
-                var strSql = "call " + self.dbname + "doTag('" + tagIth + "'," + itemId + ",'" + strItemType + "')";
+                var strSql = "call " + self.dbname + "doTag('" + tagIth + "'," + itemId + ",'" + strItemType + "');";
+                m_log("Sending this sql: " + strSql);
                 sql.queryWithCxn(connection, strSql, 
-                    function(err, rows) {
+                    function(err, rows, tag, queryBack) {
 
                         try{
+                            m_log("Back from call doTag()");
                             if (err) { throw err; }
 
                             if (projectScript !== null) {
                                 // projectScript is passed in if it is meant for us to push the procedure call. So we will.
-                                projectScript.push(strSql);
+                                projectScript.push(queryBack);
                             }
                             if (--tagsCount === 0) { callback(null); }
 
                         } catch(et) {
                             throw et;
                         }
-                    });
+                    },
+                    tagIth
+                );
             }
         } catch(e) {
 
             callback(e);
         }
     }
-
-    // var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, projectScript, callback){
-
-    //     try {
-    //         var tagIds = [];
-    //         var iCtr = tagArray.length;
-
-    //         // For each string in tagArry:
-    //         //      if it already exists in table tags, push its id onto tagIds.
-    //         //      else, add it and push the new array.
-    //         // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
-
-    //         // m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
-    //         tagArray.forEach(function(tag) {
-
-    //             var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
-    //             sql.queryWithCxn(connection, strSql,
-    //                 function(err, rows){
-
-    //                     try{
-    //                         if (err) { throw err; }
-
-    //                         if (rows.length > 0) {
-
-    //                             tagIds.push(rows[0].id);
-    //                             if (--iCtr === 0){
-
-    //                                 m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err) {
-    //                                     if (err) { throw err; }
-    //                                     callback(null);
-    //                                 });
-    //                             }
-    //                         } else {
-
-    //                             strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-    //                             sql.queryWithCxn(connection, strSql,
-    //                                 function(err, rows){
-
-    //                                     try {
-    //                                         if (err) { throw err; }
-
-    //                                         if (rows.length === 0) { throw new error('Could not insert tag into database.'); }
-
-    //                                         tagIds.push(rows[0].insertId);
-    //                                         if (--iCtr === 0){
-
-    //                                             m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err){
-    //                                                 if (err) { throw err; }
-    //                                                 callback(null);
-    //                                             });
-    //                                         }
-    //                                     } catch (e2) { throw e2; }
-    //                                 }
-    //                             );
-    //                         }
-    //                     } catch (e1) { throw e1; }
-    //                 }
-    //             );
-    //         });
-    //     } catch (e) { callback(e); }
-    // }
-
-    // var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
-
-    //     try {
-    //         var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
-    //         for (var j = 0; j < tagIds.length; j++) {
-
-    //             strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
-    //             if (j !== tagIds.length - 1){
-
-    //                 strSql = strSql + ",";
-    //             }
-    //         }
-
-    //         strSql = strSql + ";";
-    //         m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
-    //         sql.queryWithCxn(connection, strSql,
-    //             function(err, rows){
-
-    //                 callback(err);  // null or not
-    //             }
-    //         );
-    //     } catch (e) { callback(e); }
-    // }
 
     var m_functionFinalCallback = function (err, res, connection, project) {
 
