@@ -1450,10 +1450,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                         var guts = " SET name='" + typeIth.name + "'"
                             + ",isApp=" + (typeIth.isApp ? 1 : 0)
                             + ",imageId=" + typeIth.imageId
-                            + ",altImagePath='" + typeIth.altImagePath + "' "
+                            + ",altImagePath='" + typeIth.altImagePath + "'"
                             + ",ordinal=" + typeIth.ordinal
                             + ",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
-                            + ",description='" + typeIth.description + "' "
+                            + ",description='" + typeIth.description + "'"
                             + ",parentTypeId=" + typeIth.parentTypeId
                             + ",parentPrice=" + typeIth.parentPrice
                             + ",priceBump=" + typeIth.priceBump
@@ -1477,7 +1477,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
                             weInserted = false;
 
-
                         } else {
 
                             strQuery = "insert " + self.dbname + "types" + guts + ";";
@@ -1496,17 +1495,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     if (weInserted) {
                                         passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
                                         type.id = rows[0].insertId;
+                                    }
 
-                                        // If this is a System Type, alter the SQL statement with the id and push onto passObj.project.script.
-                                        if (type.ordinal === 10000) {
-                                            passObj.project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + type.id + ";");
-                                        }
-                                    } else {
-
-                                        // !weInserted means we updated a System Type.
-                                        // Add the update statement to project.script.
+                                    // If this is a System Type, push the SQL statement onto passObj.project.script.
+                                    if (type.ordinal === 10000) {
                                         passObj.project.script.push(queryBack);
                                     }
+
                                     m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
                                         (type.ordinal === 10000 ? passObj.project.script : null),
                                         function(err) {
@@ -1615,7 +1610,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 var guts = " SET typeId=" + method.typeId
                             + ",name='" + method.name + "'"
                             + ",ordinal=" + method.ordinal
-                            + ",workspace='" + method.workspace + "' "
+                            + ",workspace='" + method.workspace + "'"
                             + ",imageId=" + method.imageId
                             + ",description='" + method.description + "'"
                             + ",parentMethodId=" + method.parentMethodId
@@ -1639,9 +1634,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             meth.id = rows[0].insertId;
 
-                            // If this is a System Type method, alter the SQL statement with the id and push onto passObj.project.script.
+                            // If this is a System Type method, push onto passObj.project.script.
                             if (typeIth.ordinal === 10000) {
-                                project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + meth.id + ";");
+                                project.script.push(queryBack);
                             }
 
                             m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name, 
@@ -1678,9 +1673,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             prop.id = rows[0].insertId;
 
-                            // If this is a System Type property, alter the SQL statement with the id and push onto passObj.project.script.
+                            // If this is a System Type property, push onto passObj.project.script.
                             if (typeIth.ordinal === 10000) {
-                                project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + prop.id + ";");
+                                project.script.push(queryBack);
                             }
 
                             propertiesCountdown--;
@@ -1712,9 +1707,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             ev.id = rows[0].insertId;
 
-                            // If this is a System Type event, alter the SQL statement with the id and push onto passObj.project.script.
+                            // If this is a System Type event, push onto passObj.project.script.
                             if (typeIth.ordinal === 10000) {
-                                project.script.push(queryBack.substr(0, queryBack.length - 1) + ",id=" + ev.id + ";");
+                                project.script.push(queryBack);
                             }
 
                             eventsCountdown--;
