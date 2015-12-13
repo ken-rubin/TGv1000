@@ -385,6 +385,20 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 							            }
 
 							            bHandledACBlock = true;
+
+							            // Check the value of i, our loop var.
+							            // If not === 0, then we want to move childIth to index 0 of workspaceJSON.children and
+							            // rebuild strWorkspace from workspaceJSON.
+							            if (i > 0) {
+
+							            	workspaceJSON.children.unshift(childIth);
+							            	workspaceJSON.children.splice(i + 1, 1);
+							            	strWorkspace = converter.toXML(workspaceJSON);
+
+											var exceptionRet = code.load(activeMethod.workspace);
+											if (exceptionRet) { throw exceptionRet; }
+							            }
+
 							            break;	// Out of loop looking for c-blocks. We have handled the first (highest) one.
 							        }
 							    }
@@ -497,7 +511,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 						try {
 
-							if (typeof iResourceId !== 'undefined' && iResourceId !== null && iResourceId > 0) {
+							if (typeof iResourceId !== 'undefined' && iResourceId !== null /* resourceId can now be 0 && iResourceId > 0*/) {
 
 								// Save off the new resource in state.
 								self.data.imageId = iResourceId;

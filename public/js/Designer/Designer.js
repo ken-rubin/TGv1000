@@ -980,12 +980,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Designer/ToolInstance", "Sou
 		                    	throw { message: "You may not drop the App type onto the Designer." };
 		                    }
 
-		                    // Don't let the user drop a system base type on the designer.
-		                    if (strType === "Base") {
-
-		                    	throw { message: "You may not drop a system base type onto the Designer." };
-		                    }
-
 		                    // Get an unique instance name for the type.
 		                    var strInstanceName = m_functionGetUniqueInstanceName(strType);
 

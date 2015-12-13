@@ -185,14 +185,14 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 					// Removes XML and JavaScript blocks for orignal type. Adds new blocks for updated type.
 					// Cheats. Deletes old type and adds updated type.
-					self.replaceType = function(updatedType, origType) {
+					self.replaceType = function(updatedClType, origClType) {
 
 						try {
 
-							var exceptionRet = self.removeType(origType);
+							var exceptionRet = self.removeType(origClType);
 							if (exceptionRet) { return exceptionRet; }
 
-							return self.addType(updatedType);
+							return self.addType(updatedClType);
 
 						} catch(e) {
 

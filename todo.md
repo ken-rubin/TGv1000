@@ -7,7 +7,6 @@
 - **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
 - Finish and integrate Coder
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
-- In Code.js m_functionAdd_Type_Event (which is commented out) the 4 called methods do not exist.
 
 
 ## Jerry
@@ -22,7 +21,7 @@
     - close window or browser (possible?)
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places??? What does Ken have to do here?
 - Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable. I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
+    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
 - Play button:
 	- place a canvas over the designer to show the project playing
@@ -35,11 +34,16 @@
     - Generate a random (unused) color for each Type (see Code.js in the 700s). 
     - That same color goes to the type's methods, properties and events.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
-- Need to bring saving of projects in ProjectBO up to speed wrt changes just made to Projects, Types and Methods.
-- Need dialogs to submit on Enter key (i.e., button is triggered).
-- In types.js: are there additional TypeWell buttons that need to be disabled or enabled if a system base type is the active type. May be based on user group.
-- PropertyGrid.js rename type instance not working.
-- Switch indexscripts.jade to include jquery.xpath.min.js after debugging with jquery.xpath.js.
+- Need rest of the dialogs to submit on Enter key.
+- Rename TI in PropertyGrid. Is it still broken?
+- All Projects menu items are available after closing a Project. Also, closing a project has to clear the browser tab. This is a complex chain of calls that has to be analyzed.
+- Reverse enabled/disabled menu colors.
+- See if I can auto-update the system base type SQL script when a project with system base types maintenance is saved.
+- In TypeWell: Delete current type should be disabled for: App Type; any SBT; any Type in the current Comic that is a base type for another type in that comic.
+- A New SBT should probably require an image.
+- Add  new fields to ProjectBO.routeRetrieveType and its 3 arrays. And to routeRetrieveMethod.
+- Add usergroups
+- If !project.canEditSBTs, when active type is an SBT, disable just about everything.
 
 
 

@@ -682,6 +682,7 @@ define(["Core/errorHelper",
 					}
 
 //used
+					// Note: updateClType has .data; origType doesn't.
 					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
 
 						try {
@@ -689,7 +690,9 @@ define(["Core/errorHelper",
 							self.projectIsDirty();
 							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
 
-							exceptionRet = code.replaceType(updatedClType.data, origType);
+							var origClType = new Type();
+							origClType.load(origType);
+							exceptionRet = code.replaceType(updatedClType, origClType);
 							if (exceptionRet) { throw exceptionRet; }
 							
 							return null;
@@ -1072,10 +1075,7 @@ define(["Core/errorHelper",
 
 									// This callback will be called if the user wants to abandon the open project.
 									var exceptionRet = m_clProject.unload();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
+									if (exceptionRet) { throw exceptionRet; }
 
 									m_clProject = null;
 
@@ -1237,7 +1237,7 @@ define(["Core/errorHelper",
 					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
 
 						// The following seems stupid, but it may be the best way to prevent showing this dlg after a project save.
-						if (!(bShowAbandonDlg && m_bProjectIsDirty)) {
+						if (!bShowAbandonDlg || !m_bProjectIsDirty) {
 
 							abandonCallback();
 							return;

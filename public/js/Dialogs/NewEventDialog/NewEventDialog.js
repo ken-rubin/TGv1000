@@ -70,6 +70,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            		label: "Create Event",
 					            		id: 'CreateEventBtn',
 					            		cssClass: "btn-primary",
+					            		hotkey: 13,
 					            		action: function(){
 
 					            			m_functionCreateEvent();

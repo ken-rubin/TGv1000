@@ -58,7 +58,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
             // req.body.projectId
             // req.body.userId
             // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
@@ -90,6 +90,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
+                            canEditSBTs: row.canEditSBTs === 1 ? true : false,
                             comics:
                             {
                                 items: []
@@ -135,7 +136,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetProjDoComics');
+            m_log('In m_functionRetProjDoComics');
 
             var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.originalProjectId + ";",
                 function(rows)
@@ -149,7 +150,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } 
 
                     var comicsCounter = rows.length;
-                    console.log('Got ' + comicsCounter + ' comics.');
+                    m_log('Got ' + comicsCounter + ' comics.');
                     var strComicIds = '';
 
                     rows.forEach(
@@ -184,7 +185,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             if (--comicsCounter === 0) {
 
-                                console.log('strComicIds = "' + strComicIds + '"');
+                                m_log('strComicIds = "' + strComicIds + '"');
                                 var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where comicId in (" + strComicIds + ");",
                                     function(rows){
 
@@ -226,7 +227,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
+            m_log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
 
             var strTypeIds = '';    // Will be used for a count(*) query.
 
@@ -294,19 +295,16 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             if (--typesCount === 0) {
 
-                                                console.log('typesCount has reached 0--fetching systemBaseTypes.');
-
                                                 // The sort referred to above.
                                                 comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                console.log('comic.types.items[0].baseTypeId=' + comic.types.items[0].baseTypeId);
-                                                console.log('comic.types.items[0].name=' + comic.types.items[0].name);
+                                                m_log('typesCount has reached 0--fetching systemBaseTypes.');
 
-                                                // Use the comic's App type (comic.types.items[0]). As such it will have a baseTypeId that is a systemBaseType's id.
-                                                // Use the table systemBaseTypes to retrieve the chain of base Types for this App type and push each of them onto comic.types.items.
-
-                                                var ex2 = sql.execute("select * from " + self.dbname + "types where id in (select parentId from " + self.dbname + "systemBaseTypes where id=" + comic.types.items[0].baseTypeId + " order by parentId asc)" + ";",
+                                                var ex2 = sql.execute("select * from " + self.dbname + "types where comicId is null order by id asc;",
                                                     function(rows) {
+
+                                                        typesCount = rows.length;
+
                                                         rows.forEach(
                                                             function(row) {
 
@@ -335,22 +333,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                 strTypeIds = strTypeIds + ',' + baseType.id;
                                                                 comic.types.items.push(baseType);
 
-                                                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
-                                                                    function(rows) {
+                                                                if (--typesCount === 0) {
 
-                                                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+                                                                    var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
+                                                                        function(rows) {
 
-                                                                            res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                                            if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+
+                                                                                res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
+                                                                                return;
+                                                                            }
+
+                                                                            m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
+                                                                        },
+                                                                        function(strError){
+                                                                            res.json({success: false, message: strError});
                                                                             return;
                                                                         }
-
-                                                                        m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
-                                                                    },
-                                                                    function(strError){
-                                                                        res.json({success: false, message: strError});
-                                                                        return;
-                                                                    }
-                                                                );
+                                                                    );
+                                                                }
                                                             }
                                                         );
                                                     },
@@ -398,26 +399,26 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            m_log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
             project.comics.items.forEach(
                 function(comic) {
-                    // console.log('in comic ' + JSON.stringify(comic));
+                    // m_log('in comic ' + JSON.stringify(comic));
                     comic.types.items.forEach(
                         function(type) {
-                            // console.log('in type ' + JSON.stringify(type));
+                            // m_log('in type ' + JSON.stringify(type));
                             var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
                                 function(rows){
 
-                                    // console.log(' ');
-                                    // console.log('************** Start of triple select ******************');
-                                    // console.log(' ');
-                                    // console.log(JSON.stringify(rows));
-                                    // console.log(' ');
-                                    // console.log('************** Start of triple select ******************');
-                                    // console.log(' ');
+                                    // m_log(' ');
+                                    // m_log('************** Start of triple select ******************');
+                                    // m_log(' ');
+                                    // m_log(JSON.stringify(rows));
+                                    // m_log(' ');
+                                    // m_log('************** Start of triple select ******************');
+                                    // m_log(' ');
 
                                     if (rows.length !== 3) {
-                                        console.log('The triple select did not return rows.length === 3');
+                                        m_log('The triple select did not return rows.length === 3');
                                         res.json({
                                             success: false,
                                             message: 'Unable to retrieve selected project.'
@@ -428,7 +429,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // methods
                                     rows[0].forEach(
                                         function(row) {
-                                            // console.log('method row: ' + JSON.stringify(row));
+                                            // m_log('method row: ' + JSON.stringify(row));
                                             var method = 
                                             { 
                                                 id: row.id,
@@ -477,7 +478,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // properties
                                     rows[1].forEach(
                                         function(row) {
-                                            // console.log('property row: ' + JSON.stringify(row));
+                                            // m_log('property row: ' + JSON.stringify(row));
                                             var property = 
                                             {
                                                 id: row.id,
@@ -508,7 +509,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // events
                                     rows[2].forEach(
                                         function(row) {
-                                            // console.log('event row: ' + JSON.stringify(row));
+                                            // m_log('event row: ' + JSON.stringify(row));
                                             var event = 
                                             {
                                                 id: row.id,
@@ -550,7 +551,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSetSuccessProjectReturn = function(res, project) {
 
-        console.log('They have all reached 0. Returning project after sorting array by ordinal.');
+        m_log('They have all reached 0. Returning project after sorting array by ordinal.');
         project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
         project.comics.items.forEach(
             function(comic) {
@@ -579,7 +580,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     self.routeRetrieveType = function (req, res) {
 
-        console.log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
+        m_log("Entered ProjectBO/routeRetrieveType with req.body=" + JSON.stringify(req.body));
         // req.body.typeId
 
         try {
@@ -677,20 +678,20 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            console.log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
+            m_log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
             var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
                 function(rows){
 
-                    // console.log(' ');
-                    // console.log('************** Start of triple select ******************');
-                    // console.log(' ');
-                    // console.log(JSON.stringify(rows));
-                    // console.log(' ');
-                    // console.log('************** Start of triple select ******************');
-                    // console.log(' ');
+                    // m_log(' ');
+                    // m_log('************** Start of triple select ******************');
+                    // m_log(' ');
+                    // m_log(JSON.stringify(rows));
+                    // m_log(' ');
+                    // m_log('************** Start of triple select ******************');
+                    // m_log(' ');
 
                     if (rows.length !== 3) {
-                        console.log('The triple select did not return rows.length === 3');
+                        m_log('The triple select did not return rows.length === 3');
                         res.json({
                             success: false,
                             message: 'Unable to retrieve selected type.'
@@ -701,7 +702,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // methods
                     rows[0].forEach(
                         function(row) {
-                            // console.log('method row: ' + JSON.stringify(row));
+                            // m_log('method row: ' + JSON.stringify(row));
                             var method = 
                             { 
                                 id: row.id,
@@ -744,7 +745,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // properties
                     rows[1].forEach(
                         function(row) {
-                            // console.log('property row: ' + JSON.stringify(row));
+                            // m_log('property row: ' + JSON.stringify(row));
                             var property = 
                             {
                                 id: row.id,
@@ -772,7 +773,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // events
                     rows[2].forEach(
                         function(row) {
-                            // console.log('event row: ' + JSON.stringify(row));
+                            // m_log('event row: ' + JSON.stringify(row));
                             var event = 
                             {
                                 id: row.id,
@@ -807,7 +808,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSetSuccessTypeReturn = function(res, type) {
 
-        console.log('They have all reached 0. Returning type after sorting arrays by ordinal.');
+        m_log('They have all reached 0. Returning type after sorting arrays by ordinal.');
         type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
         type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
         type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
@@ -826,7 +827,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     self.routeRetrieveMethod = function (req, res) {
 
-        console.log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
+        m_log("Entered ProjectBO/routeRetrieveMethod with req.body=" + JSON.stringify(req.body));
         // req.body.methodId
 
         try {
@@ -970,7 +971,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
@@ -981,6 +982,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
+
+            // System Base Types (SBTs):
+                // Since there is only one copy in the DB for SBTs, they are treated differently from other new or edited Types.
+                // Whether in a Save or a SaveAs, if an SBT already exists (id>=0), it is not deleted and then added again. It is updated.
+                // Its methods, event and properties are deleted.
+                // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
+                // Methods, events and properties are inserted.
 
             var project = req.body.projectJson;
             var typeOfSave = req.body.saveType;
@@ -1134,7 +1142,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         }
                     } catch (e1) {
 
-                        m_functionFinalCallback(e1, res, null, null);
+                        throw e1;
                     }
                 }
             );
@@ -1151,7 +1159,18 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // m_log('Continuing in m_functionProjectSaveAsPart2');
+            m_log('Continuing in m_functionProjectSaveAsPart2');
+
+            if (project.canEditSBTs) {
+                // User turned on project.canEditSBTs. We assume some were edited or added.
+                // Set up array of strings that will hold the System Types sql script.
+
+                project.script = [];
+
+                // By delete ST types, we will cascade and also delete their methods, properties, events and tag-related rows.
+                project.script.push("delete from " + self.dbname + "types where ordinal=10000;");
+            }
+
             var guts = " SET name='" + project.name + "'"
                 + ",ownedByUserId=" + req.body.userId
                 + ",public=" + project.public
@@ -1163,11 +1182,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                 + ",priceBump=" + project.priceBump
                 + ",imageId=" + project.imageId
                 + ",altImagePath='" + project.altImagePath + "'"
-                + ",description='" + project.description + "' ";
+                + ",description='" + project.description + "'"
+                + ",canEditSBTs=" + (project.canEditSBTs ? 1 : 0);
+
+            m_log("Guts: " + guts);
 
             var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
 
-            // m_log('Inserting project record with ' + strQuery);
+            m_log('Inserting project record with ' + strQuery);
 
             sql.queryWithCxn(connection, strQuery, 
                 function(err, rows) {
@@ -1183,17 +1205,22 @@ module.exports = function ProjectBO(app, sql, logger) {
                         project.id = rows[0].insertId;
 
                         // Handle tags and project_tags.
-                        // m_log('Going to m_setUpAndDoTagsWithCxn for project');
-                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name,
-                            function() {
+                        m_setUpAndDoTagsWithCxn(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
+                            null,   // this says not to push to project.script
+                            function(err) {
 
-                                // m_log('Going to m_saveComicsWithCxn');
-                                m_saveComicsWithCxn(connection, req, res, project);
+                                try{
+                                    if (err) { throw err; }
+
+                                    m_saveComicsWithCxn(connection, req, res, project);
+                                } catch (e) {
+                                    throw e;
+                                }
                             }
                         );
                     } catch (e1) {
 
-                        m_functionFinalCallback(e1, res, null, null);
+                        throw e1;
                     }
                 }
             );
@@ -1215,17 +1242,14 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
-            var totalNumTypesExclSystemBaseTypes = 0;
+            var totalTypesAcrossAllComicsInclSBTs = 0;
 
             project.comics.items.forEach(
                 function(comicIth) {
 
-                    for (var i = 0; i < comicIth.types.items.length; i++) {
+                    totalTypesAcrossAllComicsInclSBTs += comicIth.types.items.length;
 
-                        if (comicIth.types.items[i].ordinal !== 10000) { totalNumTypesExclSystemBaseTypes++; }
-                    }
-
-                    m_log("Just counted types. Got " + totalNumTypesExclSystemBaseTypes + ".");
+                    m_log("Just counted types. Got " + totalTypesAcrossAllComicsInclSBTs + ".");
 
                     comicIth.projectId = project.id;
 
@@ -1244,13 +1268,19 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 if (--comicsCountdown === 0) {
 
-                                    // m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalNumTypesExclSystemBaseTypes);
+                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalTypesAcrossAllComicsInclSBTs);
 
-                                    m_saveTypesWithCxn(connection, req, res, project, totalNumTypesExclSystemBaseTypes);
+                                    m_saveTypesWithCxn(connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, function(err) {
+
+                                        if (err) { throw err; }
+
+                                        // This is the ONE place that does a call to m_functionFinalCallback with success in its intent.
+                                        m_functionFinalCallback(null, res, connection, project);
+                                    });
                                 }
                             } catch (e1) {
 
-                                m_functionFinalCallback(e1, res, null, null);
+                                throw e1;
                             }
                         },
                         comicIth
@@ -1263,198 +1293,306 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_saveTypesWithCxn = function (connection, req, res, project, totalNumTypesExclSystemBaseTypes) {
+    var m_saveTypesWithCxn = function (connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, callback) {
 
-        // All comics have now been inserted and their ids are set in project.
+        // All comics have now been inserted and their ids are set in project.comics.items.
         // Time to do types and then move on to type contents: methods, properties and events.
         // Types will require resource, tags and resources_tags. (As will methods.)
 
-        // Here's the situation with base types:
-        // (1) The comic's App type has baseTypeId = id of one of the system base types. This remains unchanged.
-        // (2) System base types are recognized by having ordinal === 10000.
-        // (3) Any new types will have id < 0 and this id will be unique. This is so that, if they are then
-        //     used as a base type, the derived type will have an id for baseTypeId. So, after new types are written
-        //     to the DB and given a real id (saving off their negative id), we need to loop through the other types
-        //     and change any that where baseTypeId = the saved negative id.
+        // Here's the situation with System Base Types (SBTs):
+        // (1) The comic's App type has baseTypeId = id of one of the system base types.
+        // (2) All SBTs are recognized by having ordinal === 10000 and comicId === null. There is really nothing special about
+        //     the five special project type SBTs except that they are chosen before the project is created, are the base type of
+        //     the project's App type and are not changeable when editing the App type.
+        // (3) Any new types (including SBTs) will have id < 0 and this id will be unique. This is so that, if they are then
+        //     used as a base type, the derived type will have an id (albeit negative) for baseTypeId. So, after new types are written
+        //     to the DB and given a positive id (saving their negative and new actual ids to an array of 2-tuples), we need to loop through the other types
+        //     and change any where baseTypeId = the saved negative id. Addition, since we ultimately will be writing ALL types to the DB and all but
+        //     pre-existing SBTs will receive a new Id, we need to save them to the array, too, to adjust possible other types that derive from them.
         //
-        // All this means several things:
-        // (1) We should write out the App type so it gets ordinal 0.
-        // (2) We should loop through all types in the comic and write the ones with id < 0. When we get a real id,
+        // All this means we have several passes to make through the types in each comic in the project.
+        // As we loop, we increment the ordinal for each of the project's comic's types, starting at 0 for each comic. Note: we DO NOT assign an ordinal to
+        // as SBT. It is already 10000.
+        // (Pass 1) We should write out the App type so it gets ordinal 0 and break out of that loop.
+        // (Pass 2) We should loop through all types in the comic and write the ones with id < 0. When we get back a real id,
         //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
-        // (3) We should then loop through all the types again, skipping the App type and skipping any types with
+        // (Pass 3) We should then loop through all the types again, skipping the App type and skipping any types with
         //     ordinal === 10000, and write the rest to the db.
-        // (4) We also have to modify the Tags and type-sub-array routines to skip system base types.
 
         try {
 
-            var typeCount = {cnt: totalNumTypesExclSystemBaseTypes};
+            var passObj = {
+                typesCount: totalTypesAcrossAllComicsInclSBTs,
+                ordinal: 0,
+                typeIdTranslationArray: [],
+                comicIth: null,
+                connection: connection,
+                req: req,
+                res: res,
+                project: project
+            };
 
-            m_log("Arrived into m_saveTypesWithCxn. typeCount=" + JSON.stringify(typeCount));
+            m_log("Arrived into m_saveTypesWithCxn.");
 
             for (var j = 0; j < project.comics.items.length; j++) {
 
-                var comicIth = project.comics.items[j];
-                var ordinal = 0;
-                var negTypeIdXlate = [];
+                passObj.comicIth = project.comics.items[j];
+                passObj.ordinal = 0;
 
-                // We're going to make 3 whole loops through the comic's types, processing (or ignoring) the ones specific to that loop.
-                for (var passNum = 1; passNum <=3; passNum++) { 
+                m_log("Going off to do App type.");
+                m_saveAppType(passObj, function(err) {
+                    try {
+                        if (err) { throw err; }
 
-                    for (var i = 0; i < comicIth.types.items.length; i++) {
+                        m_log("Going off to do remaining types pass");
+                        m_saveRemainingTypes(passObj, function(err) {
+                            try {
+                                if (err) { throw err; }
 
-                        var typeIth = comicIth.types.items[i];
-                        if (passNum === 1) {
+                                m_log("Going off to do fixUp pass");
+                                m_fixUpBaseTypeIds(passObj, function(err) {
+                                    if (err) { throw err; }
 
-                            // passNum = 1: just the type with isApp === true
-                            if (typeIth.isApp) {
+                                    if (passObj.typesCount === 0) {
 
-                                typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;
-
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                                // m_log('Inserting type with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows, type) {
-
-                                        try {
-                                            if (err) { throw err; }
-
-                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
-
-                                            type.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 1]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
-                                            // m_log(msg);
-                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                function() {
-
-                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=1');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
-                                                }
-                                            );
-                                        } catch (e1) {
-
-                                            m_functionFinalCallback(e1, res, null, null);
-                                        }
-                                    },
-                                    typeIth
-                                );
-                            }
-                        } else if (passNum === 2) {
-
-                            // passNum = 2: any types with id < 0, building a correspondance array
-                            if (typeIth.id < 0) {
-
-                                typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;
-
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined + ");";
-                                // m_log('Inserting type with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows, type) {
-
-                                        try {
-                                            if (err) { throw err; }
-
-                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
-
-                                            // Add to correspondance array.
-                                            negTypeIdXlate.push({negId:type.id, dbId:rows[0].insertId});
-
-                                            type.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 2]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
-                                            // m_log(msg);
-                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                function() {
-
-                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=2');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
-                                                }
-                                            );
-                                        } catch (e2) {
-
-                                            m_functionFinalCallback(e2, res, null, null);
-                                        }
-                                    },
-                                    typeIth
-                                );
-                            }
-                        } else {
-
-                            // passNum = 3: the rest of the types where ordinal !== 10000, id >= 0, !isAPP. If baseTypeId !== 10000 and < 0, look it up in the correspondance array and set it before writing to the DB.
-                            if (typeIth.ordinal !== 10000 && !typeIth.isApp && typeIth.id >= 0) {
-
-                                typeIth.comicId = comicIth.id;
-                                typeIth.ordinal = ordinal++;
-
-                                // If this type has a non-null, negative baseTypeId, find correct Id in negTypeIdXlate and update it.
-                                if (typeIth.baseTypeId && typeIth.baseTypeId < 0) {
-
-                                    var foundBase = false;
-                                    for (var j = 0; j < negTypeIdXlate.length; j++) {
-
-                                        if (negTypeIdXlate.negId === typeIth.baseTypeId) {
-
-                                            foundBase = true;
-                                            typeIth.baseTypeId = negTypeIdXlate.dbId;
-                                            break;
-                                        }
+                                        // Total success. We can call back to the outer comics loop.
+                                        callback();
                                     }
-                                    if (!foundBase) {
-
-                                        // It might have been deleted. Just null out baseTypeId.
-                                        typeIth.baseTypeId = null;
-                                    }
-                                }
-
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',0," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                                // m_log('Inserting type with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows, type) {
-
-                                        try {
-                                            if (err) { throw err; }
-
-                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
-
-                                            type.id = rows[0].insertId;
-                                            var msg = 'Just wrote type[passNum 3]: (' + type.id + ',' + type.name + ',' + type.ordinal + ')';
-                                            // m_log(msg);
-                                            // m_log('Going to m_setUpAndDoTagsWithCxn for type with (new) id ' + type.id);
-                                            m_setUpAndDoTagsWithCxn(connection, res, type.id, 'type', req.body.userName, type.tags, type.name,
-                                                function() {
-
-                                                    // m_log('Going to m_doTypeArraysForSaveAs from passNum=3');
-                                                    m_doTypeArraysForSaveAs(connection, project, type, req, res, typeCount);
-                                                }
-                                            );
-                                        } catch (e3) {
-
-                                            m_functionFinalCallback(e3, res, null, null);
-                                        }
-                                    },
-                                    typeIth
-                                );
+                                });
+                            } catch (eRest) {
+                                throw eRest;
                             }
-                        }
+                        });
+                    } catch (eApp) {
+                        throw eApp;
                     }
-                }
+                });
             }
         } catch (e) {
-
             m_functionFinalCallback(e, res, null, null);
         }
     }
 
-    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, typeCount) {
+    var m_saveAppType = function(passObj, callback) {
+
+        try {
+
+            passObj.comicIth.types.items.forEach(function(typeIth){
+
+                if (typeIth.isApp) {
+
+                    typeIth.comicId = passObj.comicIth.id;
+                    typeIth.ordinal = 0;
+                    passObj.ordinal++;
+                    passObj.typesCount--;
+                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                    
+                    m_log('Inserting App type with ' + strQuery);
+                    sql.queryWithCxn(passObj.connection, strQuery,
+                        function(err, rows, type) {
+
+                            try {
+                                if (err) { throw err; }
+                                if (rows.length === 0) { throw new Error("Error writing type to database."); }
+
+                                // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
+                                // But we do have to set the newly assign id.
+                                type.id = rows[0].insertId;
+                                m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
+                                    null,   // this says not to push to project.script
+                                    function(err) {
+
+                                        if (err) { throw err; }
+
+                                        m_doTypeArraysForSaveAs(passObj.connection, passObj.project, type, passObj.req, passObj.res, function() {
+
+                                            callback(null); 
+                                        });
+                                    }
+                                );
+                            } catch (e1) { throw e1; }
+                        },
+                        typeIth
+                    );
+                }
+            });
+        } catch (e) { callback(e); }
+    }
+
+    var m_saveRemainingTypes = function(passObj, callback) {
+
+        try {
+
+            m_log("In m_saveRemainingTypes with typesCount=" + passObj.typesCount);
+            passObj.comicIth.types.items.forEach(function(typeIth){
+
+                if (!typeIth.isApp) {
+
+                    var processTypeIth = true;
+
+                    // If !project.canEditSBTs, there won't be any SBTs with id < 0, but there will be SBTs
+                    // with id > 0 which need to be skipped but counted down.
+
+                    // Don't assign an ordinal to an SBT. It's always 10000.
+                    // Don't set an SBT's comicId either.
+                    if (typeIth.ordinal === 10000) {
+                        if (!passObj.project.canEditSBTs) {
+                            processTypeIth = false;
+                        }
+                    } else {
+                        typeIth.comicId = passObj.comicIth.id;
+                        typeIth.ordinal = passObj.ordinal++;
+                    }
+
+                    if (processTypeIth) {
+
+                        // Prepare for insert for new Types, including SBTs; update for existing SBTs.
+                        var guts = " SET name='" + typeIth.name + "'"
+                            + ",isApp=" + (typeIth.isApp ? 1 : 0)
+                            + ",imageId=" + typeIth.imageId
+                            + ",altImagePath='" + typeIth.altImagePath + "'"
+                            + ",ordinal=" + typeIth.ordinal
+                            + ",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
+                            + ",description='" + typeIth.description + "'"
+                            + ",parentTypeId=" + typeIth.parentTypeId
+                            + ",parentPrice=" + typeIth.parentPrice
+                            + ",priceBump=" + typeIth.priceBump
+                            + ",ownedByUserId=" + typeIth.ownedByUserId
+                            + ",public=" + typeIth.public
+                            + ",quarantined=" + typeIth.quarantined
+                            + ",baseTypeId=" + typeIth.baseTypeId
+                            ;
+
+                        var strQuery;
+                        var weInserted;
+                        if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
+
+                            // First the update statement.
+                            strQuery = "update " + self.dbname + "types" + guts + " where id=" + typeIth.id + ";";
+                            // Then delete methods, properties and events which will be re-inserted.
+                            strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
+                            strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
+                            strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
+                            // Then type_tags.
+                            strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
+                            weInserted = false;
+
+                        } else {
+
+                            strQuery = "insert " + self.dbname + "types" + guts + ";";
+                            weInserted = true;
+                        }
+
+                        m_log('Inserting or updating type with ' + strQuery);
+
+                        sql.queryWithCxn(passObj.connection, strQuery,
+                            function(err, rows, type, queryBack) {
+
+                                try {
+                                    if (err) { throw err; }
+                                    if (rows.length === 0) { throw new Error("Error writing type to database."); }
+
+                                    if (weInserted) {
+                                        passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
+                                        type.id = rows[0].insertId;
+                                    }
+
+                                    // If this is a System Type, push the SQL statement onto passObj.project.script.
+                                    if (type.ordinal === 10000) {
+                                        passObj.project.script.push(queryBack);
+                                    }
+
+                                    m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
+                                        (type.ordinal === 10000 ? passObj.project.script : null),
+                                        function(err) {
+
+                                            if (err) { throw err; }
+
+                                            m_doTypeArraysForSaveAs(passObj.connection, passObj.project, type, passObj.req, passObj.res, function() {
+
+                                                if (--passObj.typesCount === 0) { callback(null); }
+                                            });
+                                        }
+                                    );
+                                } catch (e3) {
+
+                                    throw e3;
+                                }
+                            },
+                            typeIth
+                        );
+                    } else {
+                        // Even though we didn't write it out, we'll have it for lookups.
+                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+                        
+                        if (--passObj.typesCount === 0) { callback(null); }
+                    }
+                }
+            });
+        } catch (e) {
+            callback(e);
+        }
+    }
+
+    var m_fixUpBaseTypeIds = function(passObj, callback) {
+
+        try {
+
+            var numUpdatesToDo = 0;
+            passObj.comicIth.types.items.forEach(function(typeIth){
+
+                if (typeIth.baseTypeId !== null) {
+
+                    numUpdatesToDo++;
+                }
+            });
+
+            m_log(numUpdatesToDo + " update(s) to do. Here's typeIdTranslationArray: " + JSON.stringify(passObj.typeIdTranslationArray));
+
+            passObj.comicIth.types.items.forEach(function(typeIth){
+
+                if (typeIth.baseTypeId !== null) {
+
+                    passObj.typeIdTranslationArray.forEach(function(xlateIth) {
+
+                        if (xlateIth.origId === typeIth.baseTypeId) {
+
+                            if (xlateIth.newId === xlateIth.origId){
+                                // No need to update the type. Just count down.
+                                if (--numUpdatesToDo === 0) { callback(null); }
+                            } else {
+
+                                var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+                                sql.queryWithCxn(passObj.connection, strQuery,
+                                    function(err, rows) {
+
+                                        try {
+                                            if (err) { throw err; }
+                                            if (--numUpdatesToDo === 0) { callback(null); }
+                                        } catch (ex) { throw ex; }
+                                    }
+                                );
+                            }
+                        }
+                    });
+                    // If we fall through the xlate loop and haven't reached numUpdates === 0,
+                    // it means the current typeIth doesn't need its baseTypeId updated.
+                    // We can decrement and check for callback.
+                    // TODO: what if a base type had been deleted? Don't we have to check for that and null out base type Id?
+                    // Or will that be done client side?
+                    if (--numUpdatesToDo === 0) { callback(null); }
+                }
+            });
+        } catch (e) { callback(e); }
+    }
+
+    var m_doTypeArraysForSaveAs = function (connection, project, typeIth, req, res, callback) {
 
         try {
 
             var ordinal;
-            typeCount.cnt--;
 
-            m_log("Arrived in m_doTypeArraysForSaveAs. After decrementing typeCount=" + JSON.stringify(typeCount));
+            m_log("Arrived in m_doTypeArraysForSaveAs.");
 
             // m_log("About to do arrays for type with id=" + typeIth.id + " and name=" + typeIth.name);
 
@@ -1469,31 +1607,49 @@ module.exports = function ProjectBO(app, sql, logger) {
                 method.ordinal = ordinal++;
                 // m_log("Just set method.typeId=" + method.typeId + " and method.ordinal=" + method.ordinal);
 
-                var strQuery = "insert " + self.dbname + "methods (typeId,name,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,ownedByUserId,public,quarantined,methodTypeId,parameters) values (" + method.typeId + ",'" + method.name + "'," + method.ordinal + ",'" + method.workspace + "'," + method.imageId + ",'" + method.description + "'," + method.parentMethodId + "," + method.parentPrice + "," + method.priceBump + "," + req.body.userId + "," + method.public + "," + method.quarantined + "," + method.methodTypeId + ",'" + method.parameters + "');";
+                var guts = " SET typeId=" + method.typeId
+                            + ",name='" + method.name + "'"
+                            + ",ordinal=" + method.ordinal
+                            + ",workspace='" + method.workspace + "'"
+                            + ",imageId=" + method.imageId
+                            + ",description='" + method.description + "'"
+                            + ",parentMethodId=" + method.parentMethodId
+                            + ",parentPrice=" + method.parentPrice
+                            + ",priceBump=" + method.priceBump
+                            + ",ownedByUserId=" + method.ownedByUserId
+                            + ",public=" + method.public
+                            + ",quarantined=" + method.quarantined
+                            + ",methodTypeId=" + method.methodTypeId
+                            + ",parameters='" + method.parameters + "'"
+                            ;
+
+                var strQuery = "insert " + self.dbname + "methods" + guts + ";";
                 // m_log('Inserting method with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows, meth) {
+                    function(err, rows, meth, queryBack) {
 
                         try {
                             if (err) { throw err; }
-
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
                             meth.id = rows[0].insertId;
-                            // m_log('Going to do method tags');
-                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name,
+
+                            // If this is a System Type method, push onto passObj.project.script.
+                            if (typeIth.ordinal === 10000) {
+                                project.script.push(queryBack);
+                            }
+
+                            m_setUpAndDoTagsWithCxn(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name, 
+                                (typeIth.ordinal === 10000 ? project.script : null),
                                 function() {
 
                                     methodsCountdown--;
-                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
-
-                                        m_functionFinalCallback(null, res, connection, project);
-                                    }
+                                    if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
                                 }
                             );
                         } catch (em) {
 
-                            m_functionFinalCallback(em, res, null, null);
+                            throw em;
                         }
                     },
                     method
@@ -1509,22 +1665,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                 
                 // m_log('Inserting property with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows, prop) {
+                    function(err, rows, prop, queryBack) {
 
                         try {
                             if (err) { throw err; }
-
                             if (rows.length === 0) { throw new Error("Error inserting property into database"); }
 
                             prop.id = rows[0].insertId;
-                            propertiesCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
 
-                                m_functionFinalCallback(null, res, connection, project);
+                            // If this is a System Type property, push onto passObj.project.script.
+                            if (typeIth.ordinal === 10000) {
+                                project.script.push(queryBack);
                             }
+
+                            propertiesCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
+                        
                         } catch (ep) {
 
-                            m_functionFinalCallback(ep, res, null, null);
+                            throw ep;
                         }
                     },
                     property
@@ -1540,53 +1699,49 @@ module.exports = function ProjectBO(app, sql, logger) {
                 strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "'," + event.ordinal + ");";
                 // m_log('Inserting event with ' + strQuery);
                 sql.queryWithCxn(connection, strQuery,
-                    function(err, rows, ev) {
+                    function(err, rows, ev, queryBack) {
 
                         try {
                             if (err) { throw err; }
-
                             if (rows.length === 0) { throw new Error("Error inserting method into database"); }
 
                             ev.id = rows[0].insertId;
-                            eventsCountdown--;
-                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0 && typeCount.cnt == 0) {
 
-                                m_functionFinalCallback(null, res, connection, project);
+                            // If this is a System Type event, push onto passObj.project.script.
+                            if (typeIth.ordinal === 10000) {
+                                project.script.push(queryBack);
                             }
+
+                            eventsCountdown--;
+                            if (methodsCountdown === 0 && propertiesCountdown === 0 && eventsCountdown == 0) { callback(); }
+                        
                         } catch (ee) {
 
-                            m_functionFinalCallback(ee, res, null, null);
+                            throw ee;
                         }
                     },
                     event
                 );
 
             });
-
-            // m_log("At bottom of m_doTypeArraysForSaveAs for type " + typeIth.name + ". Have methodsCountdown, propertiesCountdown, eventsCountdown, typeCount=" + methodsCountdown + "," + propertiesCountdown + "," + eventsCountdown + "," + JSON.stringify(typeCount));
-
         } catch (e) {
 
-            callback(e);
+            m_functionFinalCallback(e, res, null, null);
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                  Utility method(s) for save routes
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, callback) {
+    var m_setUpAndDoTagsWithCxn = function(connection, res, itemId, strItemType, userName, strTags, strName, projectScript, callback) {
 
         try {
             
-            // m_log("In m_setUpAndDoTagsWithCxn with for type " + strItemType + " and itemId=" + itemId);
-
-            // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
+            m_log("in m_setUpAndDoTagsWithCxn");
+            // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
             var tagArray = [];
             tagArray.push(strItemType);
-            tagArray.push(userName);
+            if (projectScript === null){
+                // Not right to use user name for a System Type tag.
+                tagArray.push(userName);
+            }
             if (strName.length > 0) {
 
                 tagArray.push(strName.trim().replace(/\s/g, '_').toLowerCase());
@@ -1620,109 +1775,43 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, callback);
+            m_log("uniqueArray=" +  JSON.stringify(uniqueArray));
 
-        } catch(e) {
+            var tagsCount = uniqueArray.length;
+            for (var i = 0; i < uniqueArray.length; i++) {
 
-            m_functionFinalCallback(e, res, null, null);
-        }
-    }
-
-    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, callback){
-
-        try {
-            var tagIds = [];
-            var iCtr = tagArray.length;
-
-            // For each string in tagArry:
-            //      if it already exists in table tags, push its id onto tagIds.
-            //      else, add it and push the new array.
-            // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
-
-            // m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
-            tagArray.forEach(function(tag) {
-
-                var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
-                sql.queryWithCxn(connection, strSql,
-                    function(err, rows){
+                var tagIth = uniqueArray[i];
+                var strSql = "call " + self.dbname + "doTag('" + tagIth + "'," + itemId + ",'" + strItemType + "');";
+                m_log("Sending this sql: " + strSql);
+                sql.queryWithCxn(connection, strSql, 
+                    function(err, rows, tag, queryBack) {
 
                         try{
-                            if (err) { m_functionFinalCallback(err, res, null, null); }
+                            m_log("Back from call doTag()");
+                            if (err) { throw err; }
 
-                            if (rows.length > 0) {
-
-                                tagIds.push(rows[0].id);
-                                if (--iCtr === 0){
-
-                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
-                                }
-                            } else {
-
-                                strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-                                sql.queryWithCxn(connection, strSql,
-                                    function(err, rows){
-
-                                        try {
-                                            if (err) { m_functionFinalCallback(err, res, null, null); }
-
-                                            if (rows.length === 0) { m_functionFinalCallback(new error('Could not insert tag into database.'), res, null, null); }
-
-                                            tagIds.push(rows[0].insertId);
-                                            if (--iCtr === 0){
-
-                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, callback);
-                                            }
-                                        } catch (e2) {
-
-                                            m_functionFinalCallback(e2, res, null, null);
-                                        }
-                                    }
-                                );
+                            if (projectScript !== null) {
+                                // projectScript is passed in if it is meant for us to push the procedure call. So we will.
+                                projectScript.push(queryBack);
                             }
-                        } catch (e1) {
+                            if (--tagsCount === 0) { callback(null); }
 
-                            m_functionFinalCallback(e1, res, null, null);
+                        } catch(et) {
+                            throw et;
                         }
-                    }
+                    },
+                    tagIth
                 );
-            });
-        } catch (e) {
-
-            m_functionFinalCallback(e, res, null, null);
-        }
-    }
-
-    var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
-
-        try {
-            var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
-            for (var j = 0; j < tagIds.length; j++) {
-
-                strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
-                if (j !== tagIds.length - 1){
-
-                    strSql = strSql + ",";
-                }
             }
+        } catch(e) {
 
-            strSql = strSql + ";";
-            // m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
-            sql.queryWithCxn(connection, strSql,
-                function(err, rows){
-
-                    if (err) { m_functionFinalCallback(err, res, null, null); }
-                    callback();
-                }
-            );
-        } catch (e) {
-
-            m_functionFinalCallback(e, res, null, null);
+            callback(e);
         }
     }
 
     var m_functionFinalCallback = function (err, res, connection, project) {
 
-        // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
+        m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
 
@@ -1742,18 +1831,64 @@ module.exports = function ProjectBO(app, sql, logger) {
                         });
                     } else {
 
-                        res.json({
-                            success: true,
-                            project: project
-                        });
+                        if (project.hasOwnProperty("script")) {
+                            // There's a sql script that needs to be written to project root.
+                            // In the callback from that file creation, we'll return to the client.
+                            m_log("About to write sql script containing " + project.script.length + " lines.");
+                            m_functionWriteSqlScript(project, function(err) {
+
+                                delete project.script;
+                                if (err) {
+                                    // Writing the file didn't work, but saving the project has already been committed to the DB.
+                                    // We'll inform the user, but do so in a way that the project is saved.
+                                    res.json({
+                                        success: true,
+                                        project: project,
+                                        scriptSuccess: false
+                                    });
+                                } else {
+
+                                    res.json({
+                                        success: true,
+                                        project: project,
+                                        scriptSuccess: true
+                                    });
+                                }
+                            });
+
+                        } else {
+
+                            res.json({
+                                success: true,
+                                project: project
+                            });
+                        }
                     }
                 }
             );
         }
     }
 
-    var m_log = function(msg) {
+    var m_functionWriteSqlScript = function(project, callback) {
 
+        try {
+
+            var fs = require('fs');
+            var os = require('os');
+
+            fs.writeFile('ST.sql', project.script.join(os.EOL), function (err) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null);
+                }
+            });
+        } catch(e) {
+            callback(e);
+        }
+    }
+
+    var m_log = function(msg) {
         console.log(' ');
         console.log(msg);
     }

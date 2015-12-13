@@ -67,14 +67,14 @@ module.exports = function SQL(app) {
                     // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
                     if (rows.constructor === Array) {
 
-                        callback(null, rows, passbackWithCallback);
+                        callback(null, rows, passbackWithCallback, strQuery);
                     
                     } else {
 
                         // rows is a non-array js object. Turn it into an array.
                         var newRows = [];
                         newRows.push(rows);
-                        callback(null, newRows, passbackWithCallback);
+                        callback(null, newRows, passbackWithCallback, strQuery);
                     }
                 } catch (e) {
 
