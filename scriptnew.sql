@@ -5,6 +5,37 @@ USE TGv1000;
 
 delimiter //
 
+create procedure doTag(tag varchar(255), itemId int, strItemType varchar(20))
+
+begin
+
+	set @id := (select id from tags where description=tag);
+    
+    if @id IS NULL THEN
+    
+		insert tags (description) values (tag);
+        set @id := (select LAST_INSERT_ID());
+    
+    end if;
+    
+    if strItemType = 'project' THEN
+    
+		insert project_tags values (itemId, @id);
+    
+    elseif strItemType = 'type' THEN
+    
+		insert type_tags values (itemId, @id);
+    
+    else
+    
+		insert method_tags values (itemId, @id);
+    
+    end if;
+
+end;
+
+//
+
 create procedure maintainDB()
 
 begin

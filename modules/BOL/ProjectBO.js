@@ -1763,100 +1763,124 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, projectScript, function(err) {
-                callback(err);  // null or not
-            });
+            // OLD WAY
+            // m_doTagsWithCxn(connection, res, uniqueArray, itemId, strItemType, projectScript, function(err) {
+            //     callback(err);  // null or not
+            // });
 
+            // NEW WAY
+            var tagsCount = uniqueArray.length;
+            for (var i = 1; i < uniqueArray.length; i++) {
+
+                var tagIth = uniqueArray[i];
+                var strSql = "call " + self.dbname + "doTag('" + tagIth + "'," + itemId + ",'" + strItemType + "')";
+                sql.queryWithCxn(connection, strSql, 
+                    function(err, rows) {
+
+                        try{
+                            if (err) { throw err; }
+
+                            if (projectScript !== null) {
+                                // projectScript is passed in if it is meant for us to push the procedure call. So we will.
+                                projectScript.push(strSql);
+                            }
+                            if (--tagsCount === 0) { callback(null); }
+
+                        } catch(et) {
+                            throw et;
+                        }
+                    });
+            }
         } catch(e) {
 
             callback(e);
         }
     }
 
-    var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, projectScript, callback){
+    // var m_doTagsWithCxn = function(connection, res, tagArray, itemId, strItemType, projectScript, callback){
 
-        try {
-            var tagIds = [];
-            var iCtr = tagArray.length;
+    //     try {
+    //         var tagIds = [];
+    //         var iCtr = tagArray.length;
 
-            // For each string in tagArry:
-            //      if it already exists in table tags, push its id onto tagIds.
-            //      else, add it and push the new array.
-            // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
+    //         // For each string in tagArry:
+    //         //      if it already exists in table tags, push its id onto tagIds.
+    //         //      else, add it and push the new array.
+    //         // Then write as many records to strItemType_tags using itemId and tagIds[i] as called for.
 
-            // m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
-            tagArray.forEach(function(tag) {
+    //         // m_log('**In m_doTagsWithCxn with tagArray = ' + tagArray);
+    //         tagArray.forEach(function(tag) {
 
-                var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
-                sql.queryWithCxn(connection, strSql,
-                    function(err, rows){
+    //             var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+    //             sql.queryWithCxn(connection, strSql,
+    //                 function(err, rows){
 
-                        try{
-                            if (err) { throw err; }
+    //                     try{
+    //                         if (err) { throw err; }
 
-                            if (rows.length > 0) {
+    //                         if (rows.length > 0) {
 
-                                tagIds.push(rows[0].id);
-                                if (--iCtr === 0){
+    //                             tagIds.push(rows[0].id);
+    //                             if (--iCtr === 0){
 
-                                    m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err) {
-                                        if (err) { throw err; }
-                                        callback(null);
-                                    });
-                                }
-                            } else {
+    //                                 m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err) {
+    //                                     if (err) { throw err; }
+    //                                     callback(null);
+    //                                 });
+    //                             }
+    //                         } else {
 
-                                strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
-                                sql.queryWithCxn(connection, strSql,
-                                    function(err, rows){
+    //                             strSql = "insert into " + self.dbname + "tags (description) values ('" + tag + "');";
+    //                             sql.queryWithCxn(connection, strSql,
+    //                                 function(err, rows){
 
-                                        try {
-                                            if (err) { throw err; }
+    //                                     try {
+    //                                         if (err) { throw err; }
 
-                                            if (rows.length === 0) { throw new error('Could not insert tag into database.'); }
+    //                                         if (rows.length === 0) { throw new error('Could not insert tag into database.'); }
 
-                                            tagIds.push(rows[0].insertId);
-                                            if (--iCtr === 0){
+    //                                         tagIds.push(rows[0].insertId);
+    //                                         if (--iCtr === 0){
 
-                                                m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err){
-                                                    if (err) { throw err; }
-                                                    callback(null);
-                                                });
-                                            }
-                                        } catch (e2) { throw e2; }
-                                    }
-                                );
-                            }
-                        } catch (e1) { throw e1; }
-                    }
-                );
-            });
-        } catch (e) { callback(e); }
-    }
+    //                                             m_createTagJunctionsWithCxn(connection, res, itemId, strItemType, tagIds, function(err){
+    //                                                 if (err) { throw err; }
+    //                                                 callback(null);
+    //                                             });
+    //                                         }
+    //                                     } catch (e2) { throw e2; }
+    //                                 }
+    //                             );
+    //                         }
+    //                     } catch (e1) { throw e1; }
+    //                 }
+    //             );
+    //         });
+    //     } catch (e) { callback(e); }
+    // }
 
-    var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
+    // var m_createTagJunctionsWithCxn = function(connection, res, itemId, strItemType, tagIds, callback) {
 
-        try {
-            var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
-            for (var j = 0; j < tagIds.length; j++) {
+    //     try {
+    //         var strSql = "insert into " + self.dbname + strItemType + "_tags (" + strItemType + "Id,tagId) values";
+    //         for (var j = 0; j < tagIds.length; j++) {
 
-                strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
-                if (j !== tagIds.length - 1){
+    //             strSql = strSql + "(" + itemId + "," + tagIds[j].toString() + ")";
+    //             if (j !== tagIds.length - 1){
 
-                    strSql = strSql + ",";
-                }
-            }
+    //                 strSql = strSql + ",";
+    //             }
+    //         }
 
-            strSql = strSql + ";";
-            m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
-            sql.queryWithCxn(connection, strSql,
-                function(err, rows){
+    //         strSql = strSql + ";";
+    //         m_log('About to write to ' + strItemType + '_tags with query: ' + strSql);
+    //         sql.queryWithCxn(connection, strSql,
+    //             function(err, rows){
 
-                    callback(err);  // null or not
-                }
-            );
-        } catch (e) { callback(e); }
-    }
+    //                 callback(err);  // null or not
+    //             }
+    //         );
+    //     } catch (e) { callback(e); }
+    // }
 
     var m_functionFinalCallback = function (err, res, connection, project) {
 
