@@ -84,7 +84,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							// For now, just hard-code the environment to build.
+							/* For now, just hard-code the environment to build.
 				            var objectProject = {
 
 				                comics: [{
@@ -169,11 +169,11 @@ define(["Core/errorHelper",
 				                        }]
 				                    }]
 				                }]
-				            };
+				            };*/
 
 				            // Allocate simulator.
 				            m_simulator = new Simulator();
-				            var exceptionRet = m_simulator.create(objectProject);
+				            var exceptionRet = m_simulator.create(m_clProject.data);
 				            if (exceptionRet) {
 
 				                throw exceptionRet;

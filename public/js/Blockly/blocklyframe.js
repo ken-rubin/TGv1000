@@ -31,10 +31,10 @@ function run() {
 function getMethodString() {
 
     // Generate JavaScript code and run it.
-    window.LoopTrap = 1000;
-    Blockly.JavaScript.INFINITE_LOOP_TRAP = 'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
+//    window.LoopTrap = 1000;
+//    Blockly.JavaScript.INFINITE_LOOP_TRAP = 'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
     var strCode = Blockly.JavaScript.workspaceToCode();
-    Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+//    Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
 
     return strCode;
 };
@@ -99,11 +99,14 @@ function Create() {
 
           try {
 
-            // Call, if the listener.
-            var exceptionRet = parent.functionBlockChangeListener();
-            if (exceptionRet) {
+            // Call, if the listener is set.
+            if ($.isFunction(parent.functionBlockChangeListener)) {
 
-                throw exceptionRet;
+                var exceptionRet = parent.functionBlockChangeListener();
+                if (exceptionRet) {
+
+                    throw exceptionRet;
+                }
             }
           } catch (e) {
 
@@ -138,11 +141,17 @@ function setWorkspaceString(strData) {
     }
 };
 
+/* Get callback invoked when blockly structure changes.
+function getChangeListener() {
+
+    return functionChangeListener;
+};
+
 // Set callback invoked when blockly structure changes.
 function setChangeListener(functionCallback) {
 
     functionChangeListener = functionCallback;
-};
+};*/
 
 // Hook up Blockly.
 function DefineDefaultBlocks() {
