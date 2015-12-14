@@ -11,10 +11,25 @@
 
 ## Jerry
 
+- **Monday**
+    + Fix the system base type SQL script (ST.sql) to work on new and existing DBs.
+    + Look into IIFE as a type of closure.
+- **Tuesday**
+    + Rename TI in PropertyGrid. Is it still broken? If so, fix it.
+    + All Projects menu items are available after closing a Project. Also, closing a project has to clear the browser tab. This is a complex chain of calls that has to be analyzed.
+    + Reverse enabled/disabled menu colors.
+    + Still getting delete confirmation dialog if I close a project immediately after saving it.
+- **Wednesday**
+    + Image search for Type (and likely everything) is pulling up all id=0 images. I think.
+    + Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
+    + Add usergroups.
+- **Thursday**
+    + Do we want to have to search for System Types that aren't base types for any other type? Probably.
+- **Friday**
+    - Type color schema (for schema blocks)--Generate a random (unused) color for each Type (see Code.js in the 700s)--That same color goes to the type's methods, properties and events.
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
     - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
-- I show the current project in the browser tab. I'm not sure I clear it if a project is closed, etc. So tighten this up. Shows the project name, if entered, for New Project. Check the Search for Project case.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; 
@@ -22,27 +37,13 @@
 - Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places??? What does Ken have to do here?
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
-- Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
-- Play button:
-	- place a canvas over the designer to show the project playing
-	- change Play button to Pause and Stop buttons when playing (is there a 1-button sequence for this that works? Like Play -> Pause -> Stop. I doubt it.)
 - Comic click
     - Slide full panel over half (resizable) the main window
     - CLick off the comic resizes back to scroll strip.
-- Image search for Type (and likely everything) is pulling up all id=0 images. I think.
-- Type color schema (for schema blocks)
-    - Generate a random (unused) color for each Type (see Code.js in the 700s). 
-    - That same color goes to the type's methods, properties and events.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
 - Need rest of the dialogs to submit on Enter key.
-- Rename TI in PropertyGrid. Is it still broken?
-- All Projects menu items are available after closing a Project. Also, closing a project has to clear the browser tab. This is a complex chain of calls that has to be analyzed.
-- Reverse enabled/disabled menu colors.
-- See if I can auto-update the system base type SQL script when a project with system base types maintenance is saved.
-- In TypeWell: Delete current type should be disabled for: App Type; any SBT; any Type in the current Comic that is a base type for another type in that comic.
+- In TypeWell: Delete current type should be disabled for: App Type; any SBT; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSBTs.
 - A New SBT should probably require an image.
-- Add  new fields to ProjectBO.routeRetrieveType and its 3 arrays. And to routeRetrieveMethod.
-- Add usergroups
 - If !project.canEditSBTs, when active type is an SBT, disable just about everything.
 
 

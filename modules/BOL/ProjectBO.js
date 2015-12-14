@@ -236,7 +236,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     // We originally has order by ordinal asc, but, probably due to async or something, this didn't always work, so,
                     // since we want them ordered that way, we'll sort them manually below when we have them all (before fetching system base types).
-                    var ex = sql.execute("select * from " + self.dbname + "types where comicId = " + comic.originalComicId + ";",
+                    var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId = " + comic.originalComicId + ";",
                         function(rows) {
 
                             // At least for now there can be comics with no types, so we disable the following test:
@@ -269,6 +269,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         parentPrice: row.parentPrice,
                                         priceBump: row.priceBump,
                                         baseTypeId: row.baseTypeId, // may be null
+                                        baseTypeName: row.baseTypeName, // this, too
                                         tags: '',
                                         properties: [],
                                         methods: [],
@@ -300,7 +301,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 m_log('typesCount has reached 0--fetching systemBaseTypes.');
 
-                                                var ex2 = sql.execute("select * from " + self.dbname + "types where comicId is null order by id asc;",
+                                                var ex2 = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId is null order by id asc;",
                                                     function(rows) {
 
                                                         typesCount = rows.length;
@@ -325,6 +326,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                     parentPrice: row.parentPrice,
                                                                     priceBump: row.priceBump,
                                                                     baseTypeId: row.baseTypeId, // may be null
+                                                                    baseTypeName: row.baseTypeName, // ditto
                                                                     tags: '',
                                                                     properties: [],
                                                                     methods: [],
@@ -585,7 +587,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId + ";",
+            var exceptionRet = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.id=" + req.body.typeId + ";",
                 function(rows){
 
                     if (rows.length !== 1) {
@@ -607,12 +609,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                             quarantined: row.quarantined,
                             isApp: row.isApp === 1 ? true : false,
                             imageId: row.imageId,
+                            altImagePath: row.altImagePath,
                             ordinal: row.ordinal,
                             description: row.description,
                             parentTypeId: row.parentTypeId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             tags: '',
+                            baseTypeId: row.baseTypeId,
+                            baseTypeName: row.baseTypeName,
                             properties: [],
                             methods: [],
                             events: []
@@ -718,7 +723,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 parentMethodId: row.parentMethodId,
                                 parentPrice: row.parentPrice,
                                 priceBump: row.priceBump,
-                                tags: ''
+                                tags: '',
+                                methodTypeId: row.methodTypeId,
+                                parameters: row.parameters
                             };
 
                             method.id = 0;
@@ -859,7 +866,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             parentMethodId: row.parentMethodId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
-                            tags: ''
+                            tags: '',
+                            methodTypeId: row.methodTypeId,
+                            parameters: row.parameters
                         };
 
                         // We don't know whose method this is (req.body.userId's or someone else's). So we're going to make like it's someone else's.
