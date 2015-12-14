@@ -7,8 +7,9 @@
 "use strict";
 
 // Define module.
-define([],
-    function () {
+define(["SourceScanner/converter",
+    "SourceScanner/processor"],
+    function (converter, processor) {
 
         // If window.instances not defined, define it as an array.
         // This is necessary so the instances can register themselves.
@@ -23,6 +24,12 @@ define([],
             var self = this;
 
             ///////////////////////////
+            // Public properties.
+
+            // The active comic.
+            self.comic = null;
+
+            ///////////////////////////
             // Public methods.
 
             // Process the specified project's index-specified comic.
@@ -31,37 +38,53 @@ define([],
                 try {
 
                     // Get the iComicIndex'th comic;
-                    var objectComic = objectProject.comics[iComicIndex];
+                    var objectComic = objectProject.comics.items[iComicIndex];
+                    self.comic = objectComic;
 
                     // Pre-process type events.
-                    for (var i = 0; i < objectComic.types.length; i++) {
+                    for (var i = 0; i < objectComic.types.items.length; i++) {
 
                         // Get the ith type.
-                        var objectType = objectComic.types[i];
+                        var objectType = objectComic.types.items[i];
 
                         // Process each event.
-                        for (var i = 0; i < objectType.events.length; i++) {
+                        for (var j = 0; j < objectType.events.length; j++) {
 
                             // Get the ith event.
-                            var objectEvent = objectType.events[i];
+                            var objectEvent = objectType.events[j];
 
                             // Allocate the collection for this event.
                             window.eventCollection[objectEvent.name] = [];
                         }
                     }
 
+                    // Save off blockly workspace string
+                    var blockly = $("#BlocklyIFrame")[0].contentWindow;
+                    var strWorkspace = blockly.getWorkspaceString();
+
+                    // Stop code form listening to blockly code changes.
+                    code.deaf = true;
+
                     // Process each type.
-                    for (var i = 0; i < objectComic.types.length; i++) {
+                    try {
 
-                        // Get the ith type.
-                        var objectType = objectComic.types[i];
+                        for (var i = 0; i < objectComic.types.items.length; i++) {
 
-                        // Add each type individually.
-                        var exceptionRet = m_functionProcessType(objectType);
-                        if (exceptionRet) {
+                            // Get the ith type.
+                            var objectType = objectComic.types.items[i];
 
-                            throw exceptionRet;
+                            // Add each type individually.
+                            var exceptionRet = m_functionProcessType(objectType);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
                         }
+                    } finally {
+
+                        // Restore blockly.
+                        blockly.setWorkspaceString(strWorkspace);
+                        code.dead = false;
                     }
 
                     return null;
@@ -72,20 +95,24 @@ define([],
             };
 
             // Remove the specified project's index-specified comic's types.
-            self.deactivate = function (objectProject, iComicIndex) {
+            self.deactivate = function () {
 
                 try {
 
                     // Get the iComicIndex'th comic;
-                    var objectComic = objectProject.comics[iComicIndex];
+                    var objectComic = self.comic;
+                    if (!objectComic) {
+
+                        return null;
+                    }
 
                     // Process each type.
-                    for (var i = 0; i < objectComic.types.length; i++) {
+                    for (var i = 0; i < objectComic.types.items.length; i++) {
 
                         // Get the ith type.
-                        var objectType = objectComic.types[i];
+                        var objectType = objectComic.types.items[i];
 
-                        var strRemoveType = "delete window." + objectType.name + ";";
+                        var strRemoveType = "delete window['" + objectType.name + "'];";
                         eval(strRemoveType);
                     }
 
@@ -102,29 +129,94 @@ define([],
             ///////////////////////////
             // Private methods.
 
+            var m_functionAccumulate = function (objectType, objectAccumulator) {
+
+                try {
+
+                    if (!objectType ||
+                        !objectAccumulator) {
+
+                        return null;
+                    }
+
+                    if (objectType.baseTypeName) {
+
+                        // Find the base type in the comic.
+                        var objectBaseType = null;
+
+                        // Test each type.
+                        for (var i = 0; i < self.comic.types.items.length; i++) {
+
+                            // Get the ith type.
+                            var objectTypeInner = self.comic.types.items[i];
+
+                            if (objectTypeInner.name === objectType.baseTypeName) {
+
+                                objectBaseType = objectTypeInner;
+                                break;
+                            }
+                        }
+
+                        // Base structure if not found.
+                        if (objectBaseType == null) {
+
+                            throw { message: "Base type not found: " + objectType.baseTypeName };
+                        }
+
+                        // Call down recursively, inject the base type--return on error.
+                        var exceptionRet = m_functionAccumulate(objectBaseType,
+                            objectAccumulator);
+                        if (exceptionRet) {
+
+                            return exceptionRet;
+                        }
+                    }
+
+                    // Process each property into the object.
+                    for (var i = 0; i < objectType.properties.length; i++) {
+
+                        objectAccumulator.properties[objectType.properties[i].name] = objectType.properties[i];
+                    }
+                    // Process each method into the object.
+                    for (var i = 0; i < objectType.methods.length; i++) {
+
+                        objectAccumulator.methods[objectType.methods[i].name] = objectType.methods[i];
+                    }
+
+                    return null;
+                } catch (e) {
+
+                    return e;
+                }
+            };
+
             // Process the specified project.
             var m_functionProcessType = function (objectType) {
 
                 try {
 
                     // Build the constructor function for the type.
-                    var strConstructorFunction = " window." + objectType.name + 
-                        " = function (app) { " + 
+                    var strConstructorFunction = " window['" + objectType.name +
+                        "'] = function (app) { " + 
                         " /* Closure. */ var self = this; " + 
                         " /* Register with system. */ window.instances.push(self); " + 
                         " /* Reference to the application object. */ self.app = app; ";
 
-                    // If there is a base class, then add the inherits command.
-                    if (objectType.baseTypeName) {
+                    // Recursively build up the collection of properties to add.
+                    var objectAccumulator = { properties: {}, methods: {} };
+                    var exceptionRet = m_functionAccumulate(objectType,
+                        objectAccumulator);
+                    if (exceptionRet) {
 
-                        strConstructorFunction += " /* Inherit from base class. */ self.inherits(" + objectType.baseTypeName + "); ";
+                        throw exceptionRet;
                     }
 
                     // Add properties.
-                    for (var i = 0; i < objectType.properties.length; i++) {
+                    var arrayProperties = Object.keys(objectAccumulator.properties);
+                    for (var i = 0; i < arrayProperties.length; i++) {
 
                         // Get the ith property.
-                        var objectProperty = objectType.properties[i];
+                        var objectProperty = objectAccumulator.properties[arrayProperties[i]];
 
                         strConstructorFunction += " self." + objectProperty.name;
                         if (objectProperty.initialValue) {
@@ -145,10 +237,11 @@ define([],
 
                     // Add methods.
                     var bFoundConstruct = false;
-                    for (var i = 0; i < objectType.methods.length; i++) {
+                    var arrayMethods = Object.keys(objectAccumulator.methods);
+                    for (var i = 0; i < arrayMethods.length; i++) {
 
                         // Get the ith method.
-                        var objectMethod = objectType.methods[i];
+                        var objectMethod = objectAccumulator.methods[arrayMethods[i]];
 
                         // Look for construct method, invoke when created.
                         if (objectMethod.name == "construct") {
@@ -170,8 +263,32 @@ define([],
                                 strConstructorFunction += objectMethod.parameters[j];
                             }
                         }
+
+                        // Get the primary block chain.
+                        var strWorkspace = objectMethod.workspace;
+                        var jsonWorkspace = converter.toJSON(strWorkspace);
+                        var jsonPrimaryBlockChain = processor.getPrimaryBlockChain(jsonWorkspace,
+                            objectMethod.name);
+
+                        // Recompose new workspace.
+                        var jsonNewWorkspace = { 
+
+                            nodeName:"xml", 
+                            xmlns:"http://www.w3.org/1999/xhtml",
+                            children: [jsonPrimaryBlockChain]
+                        };
+
+                        var strPrimaryBlockWorkspace = converter.toXML(jsonNewWorkspace);
+                        alert(strPrimaryBlockWorkspace);
                         
-                        strConstructorFunction += ") { " + objectMethod.code + " }; ";
+                        // Get the code from blockly.
+                        var blockly = $("#BlocklyIFrame")[0].contentWindow;
+                        blockly.setWorkspaceString(strPrimaryBlockWorkspace);
+                        var strCode = blockly.getMethodString();
+                        alert(strCode);
+
+                        // Set in the method.
+                        strConstructorFunction += " ) { " + strCode + " }; ";
                     }
 
                     // If there is a base class, do the function injection.
@@ -182,12 +299,7 @@ define([],
 
                     strConstructorFunction += " }; ";
 
-                    // If there is a base class, do the function injection.
-                    if (objectType.baseTypeName) {
-        
-                        strConstructorFunction += " /* Do function injection. */ window." + objectType.name + ".inheritsFrom(" + objectType.baseTypeName + "); ";
-                    }
-
+                    // Create actual Javascript type.
                     eval(strConstructorFunction);
 
                     return null;

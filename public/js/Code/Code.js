@@ -36,6 +36,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 					// Control the display or non-display of the left-most column of the code pane (the schema categories).
 					self.displaySchemaCategories = true;
 
+					// Indicates that this object does not care about blockly code changes.
+					self.deaf = false;
+
 					////////////////////////////////
 					// Pulbic methods.
 
@@ -562,6 +565,12 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 						try {
 
+							// If don't want to listen, then just leave early.
+							if (self.deaf) {
+
+								return null;
+							}
+
                             // Get the new workspace and code.
                             self.workspace = $("#BlocklyIFrame")[0].contentWindow.getWorkspaceString();
 
@@ -570,6 +579,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
                             var exceptionRet = types.update(self.workspace);
 							if (exceptionRet) { throw exceptionRet; }
 
+							return null;
 						} catch (e) {
 
 							errorHelper.show(e);

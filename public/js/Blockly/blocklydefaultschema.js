@@ -427,7 +427,7 @@ var defaultSchema = {
         ToString: true
     },
     Variables: true,
-    Functions: true
+    Functions: false
 };
 
 // Allow projects.jade and blocklyframe.js to retrieve the full strDefaultSchema.
