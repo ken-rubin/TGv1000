@@ -362,13 +362,13 @@ begin
 				;
             
 		/* These system base Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
-		insert into TGv1000.`types` (id,`name`,altImagePath)
+		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal)
 			VALUES 
-				(1,'Game Base Type','media/images/gameProject.png'),
-				(2,'Console Base Type','media/images/consoleProject.png'),
-				(3,'Website Base Type','media/images/websiteProject.png'),
-				(4,'Hololens Base Type','media/images/hololensProject.png'),
-				(5,'Map Base Type','media/images/mappingProject.png')
+				(1,'Game Base Type','media/images/gameProject.png',10000),
+				(2,'Console Base Type','media/images/consoleProject.png',10000),
+				(3,'Website Base Type','media/images/websiteProject.png',10000),
+				(4,'Hololens Base Type','media/images/hololensProject.png',10000),
+				(5,'Map Base Type','media/images/mappingProject.png',10000)
                 ;
             
 		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
