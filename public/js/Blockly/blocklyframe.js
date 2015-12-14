@@ -313,7 +313,7 @@ function DefineDefaultBlocks() {
         };
         Blockly.JavaScript["system_DesignerCanvasContext"] = function(block) {
             
-            var strCode = " (Designer.canvasContext) ";
+            var strCode = " (designer.canvasContext) ";
             return [strCode, Blockly.JavaScript.ORDER_MEMBER];
         };
 

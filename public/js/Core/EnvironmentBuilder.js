@@ -112,7 +112,7 @@ define(["SourceScanner/converter",
                         // Get the ith type.
                         var objectType = objectComic.types.items[i];
 
-                        var strRemoveType = "delete window." + objectType.name + ";";
+                        var strRemoveType = "delete window['" + objectType.name + "'];";
                         eval(strRemoveType);
                     }
 
@@ -145,10 +145,10 @@ define(["SourceScanner/converter",
                         var objectBaseType = null;
 
                         // Test each type.
-                        for (var i = 0; i < objectComic.types.items.length; i++) {
+                        for (var i = 0; i < self.comic.types.items.length; i++) {
 
                             // Get the ith type.
-                            var objectTypeInner = objectComic.types.items[i];
+                            var objectTypeInner = self.comic.types.items[i];
 
                             if (objectTypeInner.name === objectType.baseTypeName) {
 
@@ -196,14 +196,14 @@ define(["SourceScanner/converter",
                 try {
 
                     // Build the constructor function for the type.
-                    var strConstructorFunction = " window." + objectType.name + 
-                        " = function (app) { " + 
+                    var strConstructorFunction = " window['" + objectType.name +
+                        "'] = function (app) { " + 
                         " /* Closure. */ var self = this; " + 
                         " /* Register with system. */ window.instances.push(self); " + 
                         " /* Reference to the application object. */ self.app = app; ";
 
                     // Recursively build up the collection of properties to add.
-                    var objectAccumulator = { properties: [], methods: [] };
+                    var objectAccumulator = { properties: {}, methods: {} };
                     var exceptionRet = m_functionAccumulate(objectType,
                         objectAccumulator);
                     if (exceptionRet) {
@@ -267,7 +267,8 @@ define(["SourceScanner/converter",
                         // Get the primary block chain.
                         var strWorkspace = objectMethod.workspace;
                         var jsonWorkspace = converter.toJSON(strWorkspace);
-                        var jsonPrimaryBlockChain = processor.getWorkBlock(jsonWorkspace);
+                        var jsonPrimaryBlockChain = processor.getPrimaryBlockChain(jsonWorkspace,
+                            objectMethod.name);
 
                         // Recompose new workspace.
                         var jsonNewWorkspace = { 
