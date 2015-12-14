@@ -1503,6 +1503,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     if (weInserted) {
                                         passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
+                                        m_log("1. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                                         type.id = rows[0].insertId;
                                     }
 
@@ -1533,6 +1534,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } else {
                         // Even though we didn't write it out, we'll have it for lookups.
                         passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+                        m_log("2. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                         
                         if (--passObj.typesCount === 0) { callback(null); }
                     }
@@ -1572,11 +1574,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                             } else {
 
                                 var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+                                // m_log("updating type with [name,id]=[" + typeIth.name + "," + typeIth.id + "]. Changing baseTypeId from " + typeIth.baseTypeId + " to " + xlateIth.newId + ".");
+                                typeIth.baseTypeId = xlateIth.newId;
                                 sql.queryWithCxn(passObj.connection, strQuery,
-                                    function(err, rows) {
+                                    function(err, rows, type) {
 
                                         try {
                                             if (err) { throw err; }
+
                                             if (--numUpdatesToDo === 0) { callback(null); }
                                         } catch (ex) { throw ex; }
                                     }
