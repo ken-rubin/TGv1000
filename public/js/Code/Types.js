@@ -645,7 +645,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 							m_functionSetTypewellHeader();
 							$("#TWimage").attr("src", m_clTypeActive.data.altImagePath.length ? m_clTypeActive.data.altImagePath : resourceHelper.toURL('resources', m_clTypeActive.data.imageId, 'image', ''));
 
-							// App type and system base types cannot be deleted.
+							// App type and system types cannot be deleted.
 							if (m_clTypeActive.data.isApp || m_clTypeActive.data.ordinal === 10000) {
 
 								$("#TWdeleteTypeBtn").prop("disabled", true);
@@ -655,7 +655,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								$("#TWdeleteTypeBtn").prop("disabled", false);
 							}
 
-							// System base types cannot be editing, but all other types can be.
+							// System types cannot be editing, but all other types can be.
 							if (m_clTypeActive.data.ordinal === 10000) {
 
 								$("#TWEditTypeLink").prop("disabled", true);

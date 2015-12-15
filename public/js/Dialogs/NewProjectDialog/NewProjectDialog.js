@@ -168,7 +168,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_dialog = dialogItself;
 
 							if (true) {
-								$("#SBTCheckBox").css("display", "block");
+								$("#SystemTypeCheckBox").css("display", "block");
 							}
 
 							// Set project image.
@@ -253,7 +253,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
-									clProject.data.canEditSBTs = $("#cb1").prop("checked");
+									clProject.data.canEditSystemTypes = $("#cb1").prop("checked");
 
 									// baseTypeName has been set in all Types that have a base Type in ProjectBO.
 

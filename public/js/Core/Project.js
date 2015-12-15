@@ -91,10 +91,10 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									projectJson: self.data
 							};
 
-							// If !data.projectJson.canEditSBTs, then success and error mean that the project was or wasn't saved to the database.
+							// If !data.projectJson.canEditSystemTypes, then success and error mean that the project was or wasn't saved to the database.
 							// If not saved, it was rolled back.
 							//
-							// If data.projectJson.canEditSBTs, the save code will collect and try to write a complete SQL script to the project root
+							// If data.projectJson.canEditSystemTypes, the save code will collect and try to write a complete SQL script to the project root
 							// directory that can be run to propogate any changes or additions to System Types. This script is written to ST.sql.
 							// We attempt to write the SQL script only if the saving of the project to the database succeeded and wasn't rolled back.
 							// This means that we could encounter two cases: the project was saved to the database and the script file was created successfully;
@@ -131,7 +131,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 									if (objectData.success) {
 
-										if (!objectData.project.canEditSBTs) {
+										if (!objectData.project.canEditSystemTypes) {
 											errorHelper.show('Project was saved', 1000);
 										} else {
 											if (objectData.scriptSuccess) {

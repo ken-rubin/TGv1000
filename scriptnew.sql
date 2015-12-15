@@ -76,7 +76,7 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `projectTypeId` int(11) NOT NULL,
-          `canEditSBTs` TINYINT(1) NOT NULL DEFAULT 0,
+          `canEditSystemTypes` TINYINT(1) NOT NULL DEFAULT 0,
 		  PRIMARY KEY (`id`),
           INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -361,7 +361,7 @@ begin
 				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
 				;
             
-		/* These system base Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
+		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
 		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal)
 			VALUES 
 				(1,'Game Base Type','media/images/gameProject.png',10000),

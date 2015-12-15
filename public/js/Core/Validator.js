@@ -122,10 +122,6 @@ define(["Core/errorHelper"],
 						return null;
 					}
 
-					//////////////////////////////
-					// Moved from Types.js
-					//////////////////////////////
-
 					self.isEventNameAvailableInActiveType = function(strName, myIndex) {
 
 						// If myIndex === -1 (or isn't present), it means we're adding, and we have to check the whole array.
@@ -201,10 +197,6 @@ define(["Core/errorHelper"],
 						return null;
 					}
 
-					//////////////////////////////
-					// Moved from Client.js
-					//////////////////////////////
-
 					self.isComicNameAvailable = function(strName) {
 
 						var clProject = client.getProject();
@@ -222,10 +214,6 @@ define(["Core/errorHelper"],
 
 						return null;
 					}
-
-					//////////////////////////////
-					// Moved from Comics.js
-					//////////////////////////////
 
 					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 
@@ -259,6 +247,35 @@ define(["Core/errorHelper"],
 						return self.isToolInstanceIdAvailable(strName);
 					}
 
+					self.isTypeNameAvailableForSystemType = function(strName, myIndex) {
+
+						// Check for reserved names
+						if ($.inArray(strName, ['X','Y', 'Width', 'Height']) > -1) {
+
+							return new Error("X, Y, Width and Height are reserved words and cannot be used as a Type name.");
+						}
+
+						var clComicActive = comics.getActiveComic();
+
+						if (clComicActive) {
+
+							// Check against existing types
+							// If myIndex === -1, it means we're adding, and we have to check the whole array.
+							// Else, we have to skip array[myIndex].
+							// Also, just check against other STs (ordinal===10000).
+							for (var i = 0; i < clComicActive.data.types.items.length; i++) {
+
+								var typeIth = clComicActive.data.types.items[i];	// No data property of typeIth.
+								if (i !== myIndex && typeIth.ordinal === 10000 && typeIth.name === strName) {
+
+									return new Error("That name is already in use. Please enter another.");
+								}
+							}
+						}
+
+						// Check against existing Tool Instances.
+						return self.isToolInstanceIdAvailable(strName);
+					}
 
 					//////////////////////////////
 					// Private methods

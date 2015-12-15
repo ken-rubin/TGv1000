@@ -90,7 +90,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
-                            canEditSBTs: row.canEditSBTs === 1 ? true : false,
+                            canEditSystemTypes: row.canEditSystemTypes === 1 ? true : false,
                             comics:
                             {
                                 items: []
@@ -235,7 +235,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(comic) {
 
                     // We originally has order by ordinal asc, but, probably due to async or something, this didn't always work, so,
-                    // since we want them ordered that way, we'll sort them manually below when we have them all (before fetching system base types).
+                    // since we want them ordered that way, we'll sort them manually below when we have them all (before fetching system types).
                     var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId = " + comic.originalComicId + ";",
                         function(rows) {
 
@@ -299,7 +299,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 // The sort referred to above.
                                                 comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                m_log('typesCount has reached 0--fetching systemBaseTypes.');
+                                                m_log('typesCount has reached 0--fetching systemTypes.');
 
                                                 var ex2 = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId is null order by id asc;",
                                                     function(rows) {
@@ -320,7 +320,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                     isApp: row.isApp === 1 ? true : false,
                                                                     imageId: row.imageId,
                                                                     altImagePath: row.altImagePath,
-                                                                    ordinal: 10000,                  // system base types must always have ordinal === 10000 for sorting and recognition purposes
+                                                                    ordinal: 10000,                  // system types must always have ordinal === 10000 for sorting and recognition purposes
                                                                     description: row.description,
                                                                     parentTypeId: row.parentTypeId,
                                                                     parentPrice: row.parentPrice,
@@ -992,9 +992,9 @@ module.exports = function ProjectBO(app, sql, logger) {
             // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
 
-            // System Base Types (SBTs):
-                // Since there is only one copy in the DB for SBTs, they are treated differently from other new or edited Types.
-                // Whether in a Save or a SaveAs, if an SBT already exists (id>=0), it is not deleted and then added again. It is updated.
+            // System Types:
+                // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
+                // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
                 // Its methods, event and properties are deleted.
                 // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
                 // Methods, events and properties are inserted.
@@ -1170,14 +1170,19 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             m_log('Continuing in m_functionProjectSaveAsPart2');
 
-            if (project.canEditSBTs) {
-                // User turned on project.canEditSBTs. We assume some were edited or added.
-                // Set up array of strings that will hold the System Types sql script.
+            if (project.canEditSystemTypes) {
 
-                project.script = [];
+                // User turned on project.canEditSystemTypes. We assume some were edited or added.
+                // Set up array of strings that will hold the System Types sql script (ST.sql).
 
-                // By delete ST types, we will cascade and also delete their methods, properties, events and tag-related rows.
-                project.script.push("delete from " + self.dbname + "types where ordinal=10000;");
+                project.script = [
+                    "delimiter //",
+                    "create procedure doSystemTypes()",
+                    "begin"
+                ];
+
+                // For each System Type we will add these lines to the script array.
+                // Before finalyzing we will complete this procedure.
             }
 
             var guts = " SET name='" + project.name + "'"
@@ -1192,7 +1197,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 + ",imageId=" + project.imageId
                 + ",altImagePath='" + project.altImagePath + "'"
                 + ",description='" + project.description + "'"
-                + ",canEditSBTs=" + (project.canEditSBTs ? 1 : 0);
+                + ",canEditSystemTypes=" + (project.canEditSystemTypes ? 1 : 0);
 
             m_log("Guts: " + guts);
 
@@ -1251,14 +1256,14 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var comicsCountdown = project.comics.items.length;
-            var totalTypesAcrossAllComicsInclSBTs = 0;
+            var totalTypesAcrossAllComicsInclSystemTypes = 0;
 
             project.comics.items.forEach(
                 function(comicIth) {
 
-                    totalTypesAcrossAllComicsInclSBTs += comicIth.types.items.length;
+                    totalTypesAcrossAllComicsInclSystemTypes += comicIth.types.items.length;
 
-                    m_log("Just counted types. Got " + totalTypesAcrossAllComicsInclSBTs + ".");
+                    m_log("Just counted types. Got " + totalTypesAcrossAllComicsInclSystemTypes + ".");
 
                     comicIth.projectId = project.id;
 
@@ -1277,9 +1282,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 if (--comicsCountdown === 0) {
 
-                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalTypesAcrossAllComicsInclSBTs);
+                                    m_log('Going to m_saveTypesWithCxn with a total number of types to do=' + totalTypesAcrossAllComicsInclSystemTypes);
 
-                                    m_saveTypesWithCxn(connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, function(err) {
+                                    m_saveTypesWithCxn(connection, req, res, project, totalTypesAcrossAllComicsInclSystemTypes, function(err) {
 
                                         if (err) { throw err; }
 
@@ -1302,26 +1307,26 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     } 
 
-    var m_saveTypesWithCxn = function (connection, req, res, project, totalTypesAcrossAllComicsInclSBTs, callback) {
+    var m_saveTypesWithCxn = function (connection, req, res, project, totalTypesAcrossAllComicsInclSystemTypes, callback) {
 
         // All comics have now been inserted and their ids are set in project.comics.items.
         // Time to do types and then move on to type contents: methods, properties and events.
         // Types will require resource, tags and resources_tags. (As will methods.)
 
-        // Here's the situation with System Base Types (SBTs):
-        // (1) The comic's App type has baseTypeId = id of one of the system base types.
-        // (2) All SBTs are recognized by having ordinal === 10000 and comicId === null. There is really nothing special about
-        //     the five special project type SBTs except that they are chosen before the project is created, are the base type of
+        // Here's the situation with System Types:
+        // (1) The comic's App type has baseTypeId = id of one of the system types.
+        // (2) All SystemTypes are recognized by having ordinal === 10000 and comicId === null. There is really nothing special about
+        //     the five special project type SystemTypes except that they are chosen before the project is created, are the base type of
         //     the project's App type and are not changeable when editing the App type.
-        // (3) Any new types (including SBTs) will have id < 0 and this id will be unique. This is so that, if they are then
+        // (3) Any new types (including SystemTypes) will have id < 0 and this id will be unique. This is so that, if they are then
         //     used as a base type, the derived type will have an id (albeit negative) for baseTypeId. So, after new types are written
         //     to the DB and given a positive id (saving their negative and new actual ids to an array of 2-tuples), we need to loop through the other types
         //     and change any where baseTypeId = the saved negative id. Addition, since we ultimately will be writing ALL types to the DB and all but
-        //     pre-existing SBTs will receive a new Id, we need to save them to the array, too, to adjust possible other types that derive from them.
+        //     pre-existing SystemTypes will receive a new Id, we need to save them to the array, too, to adjust possible other types that derive from them.
         //
         // All this means we have several passes to make through the types in each comic in the project.
         // As we loop, we increment the ordinal for each of the project's comic's types, starting at 0 for each comic. Note: we DO NOT assign an ordinal to
-        // as SBT. It is already 10000.
+        // as SystemType. It is already 10000.
         // (Pass 1) We should write out the App type so it gets ordinal 0 and break out of that loop.
         // (Pass 2) We should loop through all types in the comic and write the ones with id < 0. When we get back a real id,
         //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
@@ -1331,7 +1336,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             var passObj = {
-                typesCount: totalTypesAcrossAllComicsInclSBTs,
+                typesCount: totalTypesAcrossAllComicsInclSystemTypes,
                 ordinal: 0,
                 typeIdTranslationArray: [],
                 comicIth: null,
@@ -1439,13 +1444,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     var processTypeIth = true;
 
-                    // If !project.canEditSBTs, there won't be any SBTs with id < 0, but there will be SBTs
+                    // If !project.canEditSystemTypes, there won't be any SystemTypes with id < 0, but there will be SystemTypes
                     // with id > 0 which need to be skipped but counted down.
 
-                    // Don't assign an ordinal to an SBT. It's always 10000.
-                    // Don't set an SBT's comicId either.
+                    // Don't assign an ordinal to an SystemType. It's always 10000.
+                    // Don't set an SystemType's comicId either.
                     if (typeIth.ordinal === 10000) {
-                        if (!passObj.project.canEditSBTs) {
+                        if (!passObj.project.canEditSystemTypes) {
                             processTypeIth = false;
                         }
                     } else {
@@ -1455,7 +1460,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     if (processTypeIth) {
 
-                        // Prepare for insert for new Types, including SBTs; update for existing SBTs.
+                        // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
                         var guts = " SET name='" + typeIth.name + "'"
                             + ",isApp=" + (typeIth.isApp ? 1 : 0)
                             + ",imageId=" + typeIth.imageId
@@ -1494,6 +1499,24 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         m_log('Inserting or updating type with ' + strQuery);
 
+                        // If this is a System Type, push SQL statements onto passObj.project.script.
+                        if (typeIth.ordinal === 10000) {
+
+                            passObj.project.script.push('set @guts := "' + guts + '";');
+                            passObj.project.script.push('set @id := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                            passObj.project.script.push('if @id is not null then');
+                            passObj.project.script.push('   delete from types where id=@id;');
+                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=@id;"));');
+                            passObj.project.script.push('   prepare insstmt from @s;');
+                            passObj.project.script.push('   execute insstmt;');
+                            passObj.project.script.push('else');
+                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
+                            passObj.project.script.push('   prepare insstmt from @s;');
+                            passObj.project.script.push('   execute insstmt;');
+                            passObj.project.script.push('   set @id := (select LAST_INSERT_ID());');
+                            passObj.project.script.push('end if;');
+                        }
+
                         sql.queryWithCxn(passObj.connection, strQuery,
                             function(err, rows, type, queryBack) {
 
@@ -1505,11 +1528,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
                                         m_log("1. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                                         type.id = rows[0].insertId;
-                                    }
-
-                                    // If this is a System Type, push the SQL statement onto passObj.project.script.
-                                    if (type.ordinal === 10000) {
-                                        passObj.project.script.push(queryBack);
                                     }
 
                                     m_setUpAndDoTagsWithCxn(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
@@ -1889,6 +1907,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             var fs = require('fs');
             var os = require('os');
+
+            // Finalize the procedure.
+            project.script.push("end;");
+            project.script.push("//");
+            project.script.push("delimiter ;");
+            project.script.push("call doSystemTypes();");
+            project.script.push("drop procedure doSystemTypes;");
 
             fs.writeFile('ST.sql', project.script.join(os.EOL), function (err) {
                 if (err) {

@@ -11,18 +11,19 @@
 
 ## Jerry
 
-- **Monday**
-    + Fix the system base type SQL script (ST.sql) to work on new and existing DBs.
+- **Tuesday**
+    + Fix the system type SQL script (ST.sql) to work on new and existing DBs.
         + Has to work on a newly created DB and on any existing DB.
         + Must not break FK relationship from any derived type back to a System Type.
         + I believe we have to assume it is run on the production DB immediately after being created. Only then can its mix of updates and inserts of System Types be ok.
         + Still need to solve the referral problems: methods, properties and events to System Types and Tags to System Types and Methods.
-    + Look into IIFE as a type of closure.
-- **Tuesday**
     + Rename TI in PropertyGrid. Is it still broken? If so, fix it.
     + All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
     + Set disabled menu colors to be different from enabled.
     + Still getting delete confirmation dialog if I close a project immediately after saving it.
+    + Make sure to check for ST name uniqueness through all STs.
+    + No projects, types, methods, properties or events can have embedded spaces. Replace with underscore.
+    + Look into IIFE as a type of closure for ProjectBO.js.
 - **Wednesday**
     + Image search for Type (and likely everything) is pulling up all id=0 images. I think.
     + Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
@@ -46,9 +47,9 @@
     - CLick off the comic resizes back to scroll strip.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
 - Need rest of the dialogs to submit on Enter key.
-- In TypeWell: Delete current type should be disabled for: App Type; any SBT; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSBTs.
-- A New SBT should probably require an image.
-- If !project.canEditSBTs, when active type is an SBT, disable just about everything.
+- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes.
+- A New SystemType should probably require an image.
+- If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything.
 
 
 
@@ -91,7 +92,7 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 - Any Type can (but doesn't have to) be derived from a single other Type (adding a baseTypeId column). 
 - App Types will be derived from one of the base Types listed above. This is what actually creates a Project of one of these types.
 - The base Types will, for example, contain the physics engine, a web design framework, etc.
-- *It is undecided if system base types should appear in the ToolStrip for everyone.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
+- *It is undecided if system types should appear in the ToolStrip for everyone.* They cannot be dropped on the Designer. But will it be necessary to make one the active type? Maybe for our dev mode, but not for regular users.
 #### Methods
 - Statements and Expressions
     - Statements are Methods that are visually represented in the Blockly code pane with a top triangular indentation and a bottom triangular extension. This way statements can be stacked together to provide program flow.
@@ -292,13 +293,6 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 -  The database script changes below will necessitate dropping your current TGv1000 schema and recreating it with the updated *scriptnew.sql*.
 -  Basic implementation of base types in the database to faciliate retrieving and saving projects.
     -  User-created Types may only derive from other user-created Types. As such, they will always be in the same Comic and can be retrieved by using a select with a match on comicId. (Ordering is an issue that can be handled outside the query.)
-    -  Only the Comic's App Type can be based upon a system Type. So, the App Type's baseTypeId column is never null and is the entry point into a chain of system base Types that provide all of the "Project type" functionality to a Comic.
-        - Recall that (at this time) there are 5 first-level system base Types.
-        - Lower down in the chain of system base Types the chains may merge. This will especially be true if the lowest Type is *object*.
-        - We will use the App Type's baseTypeId to retrieve the full list of system base Types from a new table: *systemBaseTypes*.
-            - *systemBaseTypes* will have 2 columns: id and parentId, both NOT NULL.
-            - Since the chains can merge toward the bottom, there may be multiple rows with the same parentId.
-            - For now, this table will be maintained manually in the database setup script. Initially (while the base Type of each of the 5 App Types is being set up and the 5 base Types have no functionality) there will be 5 rows in *systemBaseTypes*: [1,1], [2,2], etc.
 
 
 ### The TypeWell

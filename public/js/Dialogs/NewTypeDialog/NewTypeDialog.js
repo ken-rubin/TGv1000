@@ -125,15 +125,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							$("#TypeName").keyup(m_functionBlurTypeName);
 
-							// How to deal with System Base Types (SBTs):
+							// How to deal with System Types:
 							// After usergroups exist, replace 'true' in the next if statement with a test for valid usergroup.
-							// An SBT is recognized by having ordinal === 10000.
+							// A SystemType is recognized by having ordinal === 10000.
 							// If we come in here and check #cb1 to create one, we will give it the normal negative id in addition to ordinal = 10000.
-							// **An SBT requires a non-zero imageId.**
+							// **A SystemType requires a non-zero imageId.**
 							
-							if (true && client.getProject().data.canEditSBTs) {
+							if (true && client.getProject().data.canEditSystemTypes) {
 
-								$("#SBTCheckBox").css("display", "block");
+								$("#SystemTypeCheckBox").css("display", "block");
 								if (m_strNewOrEdit === "Edit" && m_typeForEdit.ordinal === 10000) {
 
 									$("#cb1").prop("checked", true);
@@ -163,12 +163,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								var strUrl = resourceHelper.toURL('resources', m_typeForEdit.imageId, 'image', '');
 								$("#TypeImage").attr("src", strUrl);
 
-								// User may be editing (1) a user Type (not a system base Type or the App Type)
+								// User may be editing (1) a user Type (not a system Type or the App Type)
 								// or (2) the App Type.
 								// In case (1) prepare a base Type select list of all user Type names plus "None"
 								// and select either "None" of this Type's base Type name.
 								// In case (2) user cannot change the base Type since this is the project type.
-								// But user will be shown the system base Type's name. User can edit all other fields.
+								// But user will be shown the system Type's name. User can edit all other fields.
 								var strSelectName = "None";
 								if (m_typeForEdit.baseTypeId) {
 
@@ -278,8 +278,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var typeTags = $("#TypeTags").val() || "";
 
-							var exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, m_strNewOrEdit === "New" ? -1 : m_iIndexIfEdit);
-							if (exceptionRet) { throw exceptionRet; }
+							var bIsSystemType = $("#cb1").prop("checked");
+
+							var exceptionRet;
+							if (bIsSystemType){
+
+								exceptionRet = validator.isTypeNameAvailableForSystemType(typeName, m_strNewOrEdit === "New" ? -1 : m_iIndexIfEdit);
+								if (exceptionRet) { throw exceptionRet; }
+
+							} else {
+
+								exceptionRet = validator.isTypeNameAvailableInActiveComic(typeName, m_strNewOrEdit === "New" ? -1 : m_iIndexIfEdit);
+								if (exceptionRet) { throw exceptionRet; }
+							}
 
 							// First, handle the possible setting of a base type.
 							var setBaseTypeId;
@@ -313,7 +324,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							}
 
 							var clType = new Type();
-							var bIsSBT = $("#cb1").prop("checked");
 
 							if (m_strNewOrEdit === "New") {
 
@@ -345,7 +355,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									isApp: false,
 									imageId: m_imageId,
 									altImagePath: '',
-									ordinal: !bIsSBT ? client.getNumberOfTypesInActiveComic() : 10000,
+									ordinal: !bIsSystemType ? client.getNumberOfTypesInActiveComic() : 10000,
 									description: '',
 									parentTypeId: 0,
 									parentPrice: 0.00,
