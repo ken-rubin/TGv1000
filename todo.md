@@ -13,15 +13,11 @@
 
 - **Tuesday**
     + Fix the system type SQL script (ST.sql) to work on new and existing DBs.
-        + Has to work on a newly created DB and on any existing DB.
-        + Must not break FK relationship from any derived type back to a System Type.
-        + I believe we have to assume it is run on the production DB immediately after being created. Only then can its mix of updates and inserts of System Types be ok.
         + Still need to solve the referral problems: methods, properties and events to System Types and Tags to System Types and Methods.
     + Rename TI in PropertyGrid. Is it still broken? If so, fix it.
     + All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
     + Set disabled menu colors to be different from enabled.
     + Still getting delete confirmation dialog if I close a project immediately after saving it.
-    + Make sure to check for ST name uniqueness through all STs.
     + No projects, types, methods, properties or events can have embedded spaces. Replace with underscore.
     + Look into IIFE as a type of closure for ProjectBO.js.
 - **Wednesday**
