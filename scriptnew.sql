@@ -5,13 +5,13 @@ USE TGv1000;
 
 delimiter //
 
-create procedure doTags(tags varchar(255), itemId int, strItemType varchar(20))
+create procedure doTags(tagsconcat varchar(255), itemId int, strItemType varchar(20))
 
 begin
 
 	set @delim = '~';
     set @inipos = 1;
-    set @fullstr = tags;
+    set @fullstr = tagsconcat;
     set @maxlen = LENGTH(@fullstr);
     
     REPEAT
@@ -33,6 +33,7 @@ begin
 				insert method_tags values (itemId, @id);
 			end if;
         END IF;
+        SET @inipos = @endpos + 1;
 	UNTIL @inipos >= @maxlen END REPEAT;
 
 end;
