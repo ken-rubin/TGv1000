@@ -11,23 +11,19 @@
 
 ## Jerry
 
-- **Tuesday**
-    + Fix the system type SQL script (ST.sql) to work on new and existing DBs.
-        + Still need to solve the referral problems: methods, properties and events to System Types and Tags to System Types and Methods.
-    + Rename TI in PropertyGrid. Is it still broken? If so, fix it.
-    + All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
-    + Set disabled menu colors to be different from enabled.
-    + Still getting delete confirmation dialog if I close a project immediately after saving it.
-    + No projects, types, methods, properties or events can have embedded spaces. Replace with underscore.
-    + Look into IIFE as a type of closure for ProjectBO.js.
-- **Wednesday**
-    + Image search for Type (and likely everything) is pulling up all id=0 images. I think.
-    + Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
-    + Add usergroups.
-- **Thursday**
-    + Do we want to have to search for System Types that aren't base types for any other type? Probably.
-- **Friday**
-    - Type color schema (for schema blocks)--Generate a random (unused) color for each Type (see Code.js in the 700s)--That same color goes to the type's methods, properties and events.
+- Fix the system type SQL script (ST.sql) to work on new and existing DBs.
+    - Still need to solve the referral problems: methods, properties and events to System Types and Tags to System Types and Methods.
+- **Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.**
+- **All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.**
+- **Set disabled menu colors to be different from enabled.**
+- **Still getting delete confirmation dialog if I close a project immediately after saving it.**
+- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore.
+- Look into IIFE as a type of closure for ProjectBO.js.
+- Image search for Type (and likely everything) is pulling up all id=0 images. I think.
+- **Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.**
+- Add usergroups.
+- Do we want to have to search for System Types that aren't base types for any other type? Probably.
+- Type color schema (for schema blocks)--Generate a random (unused) color for each Type (see Code.js in the 700s)--That same color goes to the type's methods, properties and events.
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
     - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
@@ -57,6 +53,7 @@
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
 - **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
+- **Ken:** The immense amount of work that gets done in BlocklyChangeListener means that dragging in Designer is quite crippled if App initialized is selected and being displayed in Code. It's still ok if anything else is displayed.
 
 
 

@@ -213,9 +213,9 @@ define(["Core/errorHelper"],
 							// because Save As allows entering all fields and setting a project image, even changing the project's name.
 							m_functionEnable("SaveProjectAs");
 
-							if (status.allRequiredFieldsFilled) {
+							if (status.allRequiredFieldsFilled && status.projectIsDirty) {
 
-								// Since all fields are filled, one-click "quick" Save is enabled.
+								// Since all fields are filled, one-click "quick" Save is enabled along with the dialog version of Save.
 								m_functionEnable("QuickSaveProject");
 								m_functionEnable("SaveProject");
 							}

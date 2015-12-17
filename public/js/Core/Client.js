@@ -1021,10 +1021,7 @@ define(["Core/errorHelper",
 						try {
 
 							var exceptionRet = m_clProject.saveToDatabase('save');
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 

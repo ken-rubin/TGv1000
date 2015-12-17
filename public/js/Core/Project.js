@@ -145,6 +145,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// We need to replace this with that. Let's try:
 										
 										client.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
+																			// This is the only place that calls client.unloadProject with 2nd param = false.
 										
 										// cause whichever dialog was open to close.
 										client.closeCurrentDialog();
@@ -154,6 +155,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 										// Set dirty bool to false in client
 										client.projectIsClean();
+
+										client.setBrowserTabAndBtns();
 
 									} else {
 
@@ -167,8 +170,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									errorHelper.show(strError);
 								}
 							});
-
-							client.setBrowserTabAndBtns();
 
 							return null;
 						
@@ -189,7 +190,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
 											&& (self.data.imageId > 0 || self.data.altImagePath.length > 0)
 										),
-							projectNameIsFilled: (self.data.name.trim().length > 0)
+							projectNameIsFilled: (self.data.name.trim().length > 0),
+							projectIsDirty: client.isProjectDirty()
 						};
 					};
 

@@ -5,32 +5,35 @@ USE TGv1000;
 
 delimiter //
 
-create procedure doTag(tag varchar(255), itemId int, strItemType varchar(20))
+create procedure doTags(tags varchar(255), itemId int, strItemType varchar(20))
 
 begin
 
-	set @id := (select id from tags where description=tag);
+	set @delim = '~';
+    set @inipos = 1;
+    set @fullstr = tags;
+    set @maxlen = LENGTH(@fullstr);
     
-    if @id IS NULL THEN
-    
-		insert tags (description) values (tag);
-        set @id := (select LAST_INSERT_ID());
-    
-    end if;
-    
-    if strItemType = 'project' THEN
-    
-		insert project_tags values (itemId, @id);
-    
-    elseif strItemType = 'type' THEN
-    
-		insert type_tags values (itemId, @id);
-    
-    else
-    
-		insert method_tags values (itemId, @id);
-    
-    end if;
+    REPEAT
+		set @endpos = LOCATE(@delim, @fullstr, @inipos);
+        set @tag = SUBSTR(@fullstr, @inipos, @endpos - @inipos);
+        
+        if @tag <> '' AND @tag IS NOT NULL THEN
+			set @id := (select id from tags where description=@tag);
+			if @id IS NULL THEN
+				insert tags (description) values (@tag);
+				set @id := (select LAST_INSERT_ID());
+			end if;
+			
+			if strItemType = 'project' THEN
+				insert project_tags values (itemId, @id);
+			elseif strItemType = 'type' THEN
+				insert type_tags values (itemId, @id);
+			else
+				insert method_tags values (itemId, @id);
+			end if;
+        END IF;
+	UNTIL @inipos >= @maxlen END REPEAT;
 
 end;
 
