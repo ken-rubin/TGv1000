@@ -1270,52 +1270,37 @@ module.exports = function ProjectBO(app, sql, logger) {
         // Now the project has been inserted into the DB and its id is in project.id.
         // Also, a row has been added to resource and tags have been handled, too.
 
-        // This routine will loop through the project's comics, saving (inserting) each while counting down to 0.
-        // At that point it will call the Types routine.
+        // This routine will iterate through the project's comics, saving (inserting) each and processing its types, etc.
 
         try {
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
-            var comicsCountdown = project.comics.items.length;
 
-            for (var i = 0; i < project.comics.items.length; i++) {
-                m_log("In the loop through comics. i=" + i);
-                var comicIth = project.comics.items[i];
+            async.eachSeries(project.comics.items, function(comicIth, cb) {
 
                 comicIth.projectId = project.id;
-
                 var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
-                // // m_log('In m_saveComicsToDB with ' + strQuery);
-                sql.queryWithCxn(connection, 
+                sql.queryWithCxn(connection,
                     strQuery,
-                    function(err, rows, comic, queryBack) {
+                    function(err, rows) {
 
-                        try {
-                            if (err) { throw err; }
-
-                            if (rows.length === 0) { throw new Error("Error writing comic to database."); }
-
-                            comic.id = rows[0].insertId;
-
-                            if (--comicsCountdown === 0) {
-
-                                m_log('Going to m_saveTypesInComicIthToDB');
-
-                                m_saveTypesInComicIthToDB(connection, req, res, project, comic, function(err) {
-                                    m_log("In callback from m_saveTypesInComicIthToDB. " + (err ? "Got an err" : "Got null err"));
-                                    if (err) { throw err; }
-
-                                    // Done.
-                                    callback(null);
-                                });
-                            }
-                        } catch (e1) {
-
-                            throw e1;
-                        }
-                    },
-                    comicIth
+                        if (err) { return cb(err.message); }
+                        if (rows.length === 0) { return cb("Error writing comic to database."; )}
+                        
+                        comicIth.id = rows[0].insertId;
+                        m_saveTypesInComicIthToDB(connection, req, res, project, comic, function(err){
+                            return cb(err ? err.message : null); }
+                        });
+                    }
                 );
-            }
+            }, 
+            function(errString) {
+                if (errString) { 
+                    return callback(new Error(errString)); 
+                }
+
+                // Signal we're done with all comics.
+                return callback(null);
+            });
         } catch (e) {
 
             callback(e);
@@ -1323,30 +1308,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     } 
 
     var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
-
-        // All comics have now been inserted and their ids are set in project.comics.items.
-        // Time to do types and then move on to type contents: methods, properties and events.
-        // Types will require resource, tags and resources_tags. (As will methods.)
-
-        // Here's the situation with System Types:
-        // (1) The comic's App type has baseTypeId = id of one of the system types.
-        // (2) All SystemTypes are recognized by having ordinal === 10000 and comicId === null. There is really nothing special about
-        //     the five special project type SystemTypes except that they are chosen before the project is created, are the base type of
-        //     the project's App type and are not changeable when editing the App type.
-        // (3) Any new types (including SystemTypes) will have id < 0 and this id will be unique. This is so that, if they are then
-        //     used as a base type, the derived type will have an id (albeit negative) for baseTypeId. So, after new types are written
-        //     to the DB and given a positive id (saving their negative and new actual ids to an array of 2-tuples), we need to loop through the other types
-        //     and change any where baseTypeId = the saved negative id. Addition, since we ultimately will be writing ALL types to the DB and all but
-        //     pre-existing SystemTypes will receive a new Id, we need to save them to the array, too, to adjust possible other types that derive from them.
-        //
-        // All this means we have several passes to make through the types in each comic in the project.
-        // As we loop, we increment the ordinal for each of the project's comic's types, starting at 0 for each comic. Note: we DO NOT assign an ordinal to
-        // as SystemType. It is already 10000.
-        // (Pass 1) We should write out the App type so it gets ordinal 0 and break out of that loop.
-        // (Pass 2) We should loop through all types in the comic and write the ones with id < 0. When we get back a real id,
-        //     we need to loop through all the types and update any whose baseTypeId matches the saved negative id.
-        // (Pass 3) We should then loop through all the types again, skipping the App type and skipping any types with
-        //     ordinal === 10000, and write the rest to the db.
 
         try {
 
@@ -1361,40 +1322,37 @@ module.exports = function ProjectBO(app, sql, logger) {
                 project: project
             };
 
-            m_log("Going off to do App type in comic " + passObj.comicIth.name);
-            m_saveAppTypeInComicIthToDB(passObj, function(err) {
-                try {
-                    if (err) { throw err; }
-
-                    m_log("Going off to do remaining types in comic " + passObj.comicIth.name);
-                    m_saveNonAppTypesInComicIthToDB(passObj, function(err) {
-                        try {
-                            if (err) { throw err; }
-
-                            m_log("Going off to do fixUp pass in comic " + passObj.comicIth.name);
-                            m_fixUpBaseTypeIdsInComicIth(passObj, function(err) {
-
-                                try {
-                                    if (err) { throw err; }
-
-                                    if (passObj.typesCount === 0) {
-                                        
-                                        m_log("comicIth and its types are done. Should mean total success unless there are more comics. Which there aren't at this time.");
-
-                                        // Total success. We can call back to the outer comics loop.
-                                        callback(null);
-                                    }
-                                } catch(ef) {
-                                    throw ef;
-                                }
+            async.series([
+                    {
+                        function(cb) {
+                            m_saveAppTypeInComicIthToDB(passObj, function(err) {
+                                return cb(err ? err.message : null); }
                             });
-                        } catch (eRest) {
-                            throw eRest;
                         }
-                    });
-                } catch (eApp) {
-                    throw eApp;
+                    },
+                    {
+                        function(cb) {
+                            m_saveNonAppTypesInComicIthToDB(passObj, function(err) {
+                                return cb(err ? err.message : null); }
+                            });
+                        }
+                    },
+                    {
+                        function(cb) {
+                            m_fixUpBaseTypeIdsInComicIth(passObj, function(err) {
+                                return cb(err ? err.message : null); }
+                            });
+                        }
+                    }
+                ], 
+                function(errString){
+                    if (errString) { 
+                        // An error occurred processing comicIth.
+                        return callback(new Error(errString)); 
                 }
+
+                // Return that comicIth processed successfully.
+                return callback(null);
             });
         } catch (e) {
             callback(e);
