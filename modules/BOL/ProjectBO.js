@@ -1275,6 +1275,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
 
+            // async.eachSeries iterates over a collection, perform a single async task at a time.
             async.eachSeries(project.comics.items, function(comicIth, cb) {
 
                 comicIth.projectId = project.id;
@@ -1311,6 +1312,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
+            m_log("***In m_saveTypesInComicIthToDB***");
             var passObj = {
                 typesCount: comicIth.types.items.length,
                 ordinal: 0,
@@ -1322,6 +1324,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 project: project
             };
 
+            // async.series runs each of an array of functions in order, waiting for each to finish in turn.
             async.series([
                     {
                         function(cb) {
@@ -1363,7 +1366,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            m_log("***********In m_saveAppTypeInComicIthToDB with typesCount=" + passObj.typesCount);
+            m_log("***In m_saveAppTypeInComicIthToDB***");
             for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
 
                 var typeIth = passObj.comicIth.types.items[i];
@@ -1373,11 +1376,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                     typeIth.comicId = passObj.comicIth.id;
                     typeIth.ordinal = 0;
                     passObj.ordinal++;
-                    passObj.typesCount--;
                     var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                     
-                    // m_log('Inserting App type with ' + strQuery);
-                    // m_log("Doing App type. passObj.typesCount now is " + passObj.typesCount);
+                    m_log('Inserting App type with ' + strQuery);
                     sql.queryWithCxn(passObj.connection, strQuery,
                         function(err, rows, type, queryBack) {
 
@@ -1413,7 +1414,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            m_log("***********In m_saveNonAppTypesInComicIthToDB with typesCount=" + passObj.typesCount);
+            m_log("***In m_saveNonAppTypesInComicIthToDB***");
+
+            
 
             for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
 
