@@ -1015,54 +1015,67 @@ module.exports = function ProjectBO(app, sql, logger) {
             //  save DELETES (cascading the project from the database) and then calls SaveAs to re-insert it.
             // Everything is done in a single transaction.
 
-            sql.getCxnFromPool(function(err, connection) {
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            // Special note about error returns throughout routeSaveProject
+            //
+            // All methods in SQL.js return an exception or null in their callback EXCEPT queryWithCxn returns an error string.
+            // connection returns exceptions or null.
+            // All out own methods return error strings.
+            // Remember: always have a try/catch block inside an async callback, and it cannot throw further, because
+            // the external context may n0 longer exist.
+            //
+            /////////////////////////////////////////////////////////////////////////////////////////////////
 
-                try {
-                    if (err) {
+            sql.getCxnFromPool(
+                function(err, connection) {
 
-                        throw new Error('Could not get a database connection: ' + err.message);
-
-                    } else {
+                    try {
+                        if (err) { throw new Error('Could not get a database connection: ' + err.message); }
 
                         m_log('Have a connection');
 
-                        connection.beginTransaction(function(err) {
+                        connection.beginTransaction(
+                            function(err) {
 
-                            try {
-                                if (err) {
+                                try {
+                                    if (err) {
 
-                                    throw new Error('Could not "begin" database connection: ' + err.message);
-                                
-                                } else {
-
-                                    // // m_log('Connection has a transaction');
-
-                                    if (typeOfSave === 'save') {
-
-                                        m_log('Going into m_functionSaveProject');
-                                        m_functionSaveProject(connection, req, res, project);
+                                        throw new Error('Could not "begin" database connection: ' + err.message);
                                     
-                                    } else {    // 'saveAs'
+                                    } else {
 
-                                        m_log('Going into m_functionSaveProjectAs');
-                                        m_functionSaveProjectAs(connection, req, res, project);
+                                        // m_log('Connection has a transaction');
+                                        var errorString;
+                                        if (typeOfSave === 'save') {
+
+                                            m_log('Going into m_functionSaveProject');
+                                            m_functionSaveProject(connection, req, res, project, function(err) { errorString = err; });
+                                        
+                                        } else {    // 'saveAs'
+
+                                            m_log('Going into m_functionSaveProjectAs');
+                                            m_functionSaveProjectAs(connection, req, res, project, function(err) { errorString = err; });
+                                        }
+
+                                        if (errorString) { throw new Error(errorString); }
+
+                                        // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
+                                        m_functionFinalCallback(null, res, connection, project);
                                     }
+                                } catch(e1) { 
+                                    m_functionFinalCallback(e1, res, null, null);
                                 }
-                            } catch (e1) {
-
-                                m_functionFinalCallback(e1, res, null, null);
                             }
-                        });
+                        );
+                    } catch (e2) { 
+                        m_functionFinalCallback(e2, res, null, null); 
                     }
-                } catch (e2) {
-
-                    m_functionFinalCallback(e2, res, null, null);
                 }
-            });
+            );
         } catch(e) {
 
-            // // m_log('Top level exception saving project');
-            m_functionFinalCallback(new Error("Database failure"), res, null, null);
+            m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null);
         }
     }
 
@@ -1072,41 +1085,52 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProject = function (connection, req, res, project) {
+    var m_functionSaveProject = function (connection, req, res, project, callback) {
 
         try {
+            // async.series runs each of an array of functions in order, waiting for each to finish in turn.
+            // (1) Delete the old project.
+            // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
+            async.series([
+                    {
+                        function(cb) {
+                            // The following will delete the former project completely from the database using cascading delete.
+                            var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
 
-            // The following will delete the former project completely from the database using cascading delete.
-            var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
-
-            m_log('Save project step 1; deleting old version with ' + strQuery);
-            
-            // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
-            sql.queryWithCxn(connection, 
-                strQuery, 
-                function(err, rows) {
-
-                    try {
-                        if (err) { 
-
-                            // m_log('err back from delete project');
+                            m_log('Save project step 1; deleting old version with ' + strQuery);
                             
-                            // Rollback has happened already.
-                            throw new Error(err); 
+                            // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
+                            sql.queryWithCxn(connection, 
+                                strQuery, 
+                                function(err, rows) {   // rows is ignored for this deletion. err will be enough.
+                                    return cb(err); // err will be null if delete worked. That will cause part (2) to run.
+                                }
+                            );
                         }
-
-                        // Now we can just INSERT the project as passed from the client side.
-                        m_functionProjectSaveAsPart2(connection, req, res, project);
-
-                    } catch (e1) {
-
-                        m_functionFinalCallback(e1, res, null, null);
+                    },
+                    {
+                        function(cb) {
+                            // Now we can just INSERT the project as passed from the client side.
+                            m_functionProjectSaveAsPart2(connection, req, res, project, 
+                                function(err) {
+                                    return cb(err);
+                                }
+                            );
+                        }
                     }
+                ], 
+                function(errString){
+                    if (errString) { 
+                        return callback(errString); 
+                    }
+
+                    // Return that we've processed successfully.
+                    return callback(null);
                 }
             );
         } catch (e) {
 
-            m_functionFinalCallback(e, res, null, null);
+            return callback(e.message);
         }
     }
 
@@ -1117,7 +1141,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProjectAs = function (connection, req, res, project) {
+    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
         
         // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
         // If we are doing a Save, we've already deleted the original project and can just insert a new version.
