@@ -1000,6 +1000,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
                 // Methods, events and properties are inserted.
 
+            m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
             var typeOfSave = req.body.saveType;
             if (typeOfSave === 'save') {
@@ -1027,13 +1028,14 @@ module.exports = function ProjectBO(app, sql, logger) {
             //
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
+            m_log("Getting a connection to MySql");
             sql.getCxnFromPool(
                 function(err, connection) {
 
                     try {
                         if (err) { throw new Error('Could not get a database connection: ' + err.message); }
 
-                        m_log('Have a connection');
+                        m_log('Have a connection. Beginning a transaction.');
 
                         connection.beginTransaction(
                             function(err) {
@@ -1068,15 +1070,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
                             }
                         );
-                    } catch (e2) { 
-                        m_functionFinalCallback(e2, res, null, null); 
-                    }
+                    } catch (e2) { m_functionFinalCallback(e2, res, null, null); }
                 }
             );
-        } catch(e) {
-
-            m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null);
-        }
+        } catch(e) { m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null); }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1087,47 +1084,38 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionSaveProject = function (connection, req, res, project, callback) {
 
+        m_log("***In m_functionSaveProject***");
         try {
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
             // (1) Delete the old project.
             // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
             async.series(
                 [
-                    {
-                        function(cb) {
-                            // The following will delete the former project completely from the database using cascading delete.
-                            var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
-
-                            m_log('Save project step 1; deleting old version with ' + strQuery);
-                            
-                            // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
-                            sql.queryWithCxn(connection, 
-                                strQuery, 
-                                function(err, rows) {   // rows is ignored for this deletion. err will be enough.
-                                    return cb(err); // err will be null if delete worked. That will cause part (2) to run.
-                                }
-                            );
-                        }
+                    function(cb) {
+                        // The following will delete the former project completely from the database using cascading delete.
+                        var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
+                        m_log('Doing save project step 1: deleting old version with ' + strQuery);
+                        
+                        // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
+                        sql.queryWithCxn(connection, 
+                            strQuery, 
+                            function(err, rows) {   
+                                // rows is ignored for this deletion. err will be enough. err will be null if delete worked. That will cause part (2) to run.
+                                return cb(err);
+                            }
+                        );
                     },
-                    {
-                        function(cb) {
-                            // Now we can just INSERT the project as passed from the client side.
-                            m_functionProjectSaveAsPart2(connection, req, res, project, 
-                                function(err) {
-                                    return cb(err);
-                                }
-                            );
-                        }
+                    function(cb) {
+                        // Now we can just INSERT the project as passed from the client side.
+                        m_log("Going off to m_functionProjectSaveAsPart2");
+                        m_functionProjectSaveAsPart2(connection, req, res, project, 
+                            function(err) { return cb(err); }
+                        );
                     }
                 ], 
-                function(errString){
-                    return callback(errString); 
-                }
+                function(errString){ return callback(errString); }
             );
-        } catch (e) {
-
-            callback(e.message);
-        }
+        } catch (e) { callback(e.message); }
     }
 
 
@@ -1142,56 +1130,48 @@ module.exports = function ProjectBO(app, sql, logger) {
         // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
         // If we are doing a Save, we've already deleted the original project and can just insert a new version.
         // All this is in a transaction and it can all be rolled back until it is comitted.
-
+        m_log("***In m_functionSaveProjectAs***");
         try {
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
             // (1) Check for duplicate project name.
             // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
             async.series(
                 [
-                    {
-                        function(cb) {
-                            // Look for and reject an attempt to add a 2nd project for same user with same name.
-                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
-                            
-                            m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
-                            sql.queryWithCxn(connection, strQuery, 
-                                function(err, rows) {
-
-                                    try {                
-                                        if (err) { return cb(err); }
-                                        if (rows.length === 0) { return cb('Failed database action checking for duplicate project name.'); }
-
-                                        if (rows[0].cnt > 0) { return cb('You already have a project with that name.'); }
-                                            
-                                        project.public = 0;                 // Any saved project needs review by an admin or instructor
-                                                                            // before being searchable by other ordinary users.
-                                        return cb(null);
-                                    
-                                    } catch (e1) { return cb(e1.message); }
-                                }
-                            );
-                        }
+                    function(cb) {
+                        // Look for and reject an attempt to add a 2nd project for same user with same name.
+                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+                        
+                        m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
+                        sql.queryWithCxn(connection, strQuery, 
+                            function(err, rows) {
+                                try {                
+                                    if (err) { return cb(err); }
+                                    if (rows.length === 0) { return cb('Failed database action checking for duplicate project name.'); }
+                                    if (rows[0].cnt > 0) { return cb('You already have a project with that name.'); }
+                                        
+                                    project.public = 0;                 // Any saved project needs review by an admin or instructor
+                                                                        // before being searchable by other ordinary users.
+                                    return cb(null);
+                                
+                                } catch (e1) { return cb(e1.message); }
+                            }
+                        );
                     },
-                    {
-                        function(cb) {
-                            // Now we can just INSERT the project as passed from the client side.
-                            m_functionProjectSaveAsPart2(connection, req, res, project, 
-                                function(err) {
-                                    return cb(err);
-                                }
-                            );
-                        }
+                    function(cb) {
+                        // Now we can just INSERT the project as passed from the client side.
+                        m_log("Going off to m_functionProjectSaveAsPart2");
+                        m_functionProjectSaveAsPart2(connection, req, res, project, 
+                            function(err) {
+                                return cb(err);
+                            }
+                        );
                     }
                 ], 
                 function(errString){
                     return callback(errString); 
                 }
             );
-        } catch (e) {
-
-            callback(e.message);
-        }
+        } catch (e) { callback(e.message); }
     }
 
     var m_functionProjectSaveAsPart2 = function (connection, req, res, project, callback) {
@@ -1203,106 +1183,95 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             m_log('Continuing in m_functionProjectSaveAsPart2');
 
-            if (project.canEditSystemTypes) {
+            // We'll use async.series serially to (1) insert project and 
+            // (2) use async.parallel to
+            //  (2a) write the project's tags and
+            //  (2b) call off to do all of the project's comics
+            async.series(
+                [
+                    function(cb) {
 
-                // User (a special user) turned on project.canEditSystemTypes. We assume some were edited or added.
-                // Set up array of strings that will hold the System Types sql script (ST.sql) which will be written to
-                // project root when we commit the transaction.
+                        if (project.canEditSystemTypes) {
 
-                project.script = [
-                    "delimiter //",
-                    "create procedure doSystemTypes()",
-                    "begin"
-                ];
+                            // User (a special user) turned on project.canEditSystemTypes. We assume some were edited or added.
+                            // Set up array of strings that will hold the System Types sql script (ST.sql) which will be written to
+                            // project root when we commit the transaction.
 
-                // For each System Type we will add these lines to the script array.
-                // Before finalyzing we will complete this procedure.
+                            project.script = [
+                                "delimiter //",
+                                "create procedure doSystemTypes()",
+                                "begin"
+                            ];
 
-                // project.idnum is incremented and concatenated with "id" to
-                // let the script use a unique id for each type. Then this can be used
-                // with methods, props, events and tags.
-                project.idnum = 0;
-            }
+                            // For each System Type we will add these lines to the script array.
+                            // Before finalyzing we will complete this procedure.
 
-            var guts = " SET name='" + project.name + "'"
-                + ",ownedByUserId=" + req.body.userId
-                + ",public=" + project.public
-                + ",isProduct=" + project.isProduct
-                + ",projectTypeId=" + project.projectTypeId
-                + ",quarantined=" + project.quarantined
-                + ",parentPrice=" + project.parentPrice
-                + ",parentProjectId=" + project.parentProjectId
-                + ",priceBump=" + project.priceBump
-                + ",imageId=" + project.imageId
-                + ",altImagePath='" + project.altImagePath + "'"
-                + ",description='" + project.description + "'"
-                + ",canEditSystemTypes=" + (project.canEditSystemTypes ? 1 : 0);
+                            // project.idnum is incremented and concatenated with "id" to
+                            // let the script use a unique id for each type. Then this can be used
+                            // with methods, props, events and tags.
+                            project.idnum = 0;
+                        }
 
-            // m_log("Guts: " + guts);
+                        var guts = " SET name='" + project.name + "'"
+                            + ",ownedByUserId=" + req.body.userId
+                            + ",public=" + project.public
+                            + ",isProduct=" + project.isProduct
+                            + ",projectTypeId=" + project.projectTypeId
+                            + ",quarantined=" + project.quarantined
+                            + ",parentPrice=" + project.parentPrice
+                            + ",parentProjectId=" + project.parentProjectId
+                            + ",priceBump=" + project.priceBump
+                            + ",imageId=" + project.imageId
+                            + ",altImagePath='" + project.altImagePath + "'"
+                            + ",description='" + project.description + "'"
+                            + ",canEditSystemTypes=" + (project.canEditSystemTypes ? 1 : 0);
 
-            var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
+                        var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
+                        m_log('Inserting project record with ' + strQuery);
+                        sql.queryWithCxn(connection, strQuery, 
+                            function(err, rows) {
+                                if (err) { return cb(err); }
+                                if (rows.length === 0) { return cb('Error saving project to database.'); }
 
-            m_log('Inserting project record with ' + strQuery);
-
-            sql.queryWithCxn(connection, strQuery, 
-                function(err, rows) {
-
-                    try {
-                        m_log("Back from inserting project");
-                        if (err) { throw new Error(err); }
-
-                        if (rows.length === 0) { throw new Error('Error saving project to database.'); }
-
-                        project.id = rows[0].insertId;
+                                project.id = rows[0].insertId;
+                                return cb(null);
+                            }
+                        );
+                    },
+                    function(cb) {
 
                         // Use async.parallel to save the project's tags and start doing its comics in parallel.
                         async.parallel(
                             [
-                                {
+                                function(cb) {
                                     m_log("Going to write project tags");
                                     m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
                                         null,   // this says not to push to project.script
                                         function(err) {
-
-                                            try{
-                                                m_log("Back from writing project tags");
-                                                if (err) { throw err; }
-
-                                            } catch (e) {
-                                                throw e;
-                                            }
+                                            return cb(err);
                                         }
                                     );
                                 },
-                                {
+                                function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
                                         function(err) {
-                                            try{
-
-                                                if (err) { throw err; }
-                                                m_functionFinalCallback(null, res, connection, project);
-                                                return;
-
-                                            } catch (ec) { throw ec; }
-                                         }
+                                            return cb(err);
+                                        }
                                     );
                                 }
                             ],
-                            function(err){
-
+                            function(errString){
+                                return cb(errString);
                             }
                         );
-                    } catch (e1) {
-
-                        throw e1;
                     }
+                ],
+                function(errString) {
+                    return callback(errString);
                 }
             );
-        } catch(e) {
-
-            m_functionFinalCallback(e, res, null, null);
-        }
+        } catch(e) { callback(e.message); }
     }
 
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
@@ -1325,12 +1294,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                         strQuery,
                         function(err, rows) {
                             try {
-                                if (err) { return cb(err.message); }
+                                if (err) { return cb(err); }
                                 if (rows.length === 0) { return cb("Error writing comic to database."); }
                                 
                                 comicIth.id = rows[0].insertId;
                                 m_saveTypesInComicIthToDB(connection, req, res, project, comic, function(err){
-                                    return cb(err ? err.message : null); }
+                                    return cb(err); }
                                 );
                             } catch (eq) {
                                 return cb(eq.message);
@@ -1339,18 +1308,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                     );
                 }, 
                 function(errString) {
-                    if (errString) { 
-                        return callback(new Error(errString)); 
-                    }
-
-                    // We're done with all comics.
-                    return callback(null);
+                    return callback(errString);
                 }
             );
-        } catch (e) {
-
-            callback(e);
-        }
+        } catch (e) { callback(e.message); }
     } 
 
     var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
@@ -1374,40 +1335,30 @@ module.exports = function ProjectBO(app, sql, logger) {
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
             // Actually, the first and second could be done in parallel, but the third must come after those two are done.
             // We should try that after all settles down.
-            async.series([
-                    {
-                        function(cb) {
-                            m_saveAppTypeInComicIthToDB(passObj, function(err) {
-                                return cb(err ? err.message : null); }
-                            });
-                        }
+            async.series(
+                [
+                    function(cb) {
+                        m_saveAppTypeInComicIthToDB(passObj, function(err) {
+                            return cb(err); }
+                        );
                     },
-                    {
-                        function(cb) {
-                            m_saveNonAppTypesInComicIthToDB(passObj, function(err) {
-                                return cb(err ? err.message : null); }
-                            });
-                        }
+                    function(cb) {
+                        m_saveNonAppTypesInComicIthToDB(passObj, function(err) {
+                            return cb(err); }
+                        );
                     },
-                    {
-                        function(cb) {
-                            m_fixUpBaseTypeIdsInComicIth(passObj, function(err) {
-                                return cb(err ? err.message : null); }
-                            });
-                        }
+                    function(cb) {
+                        m_fixUpBaseTypeIdsInComicIth(passObj, function(err) {
+                            return cb(err); }
+                        );
                     }
                 ], 
                 function(errString){
-                    if (errString) { 
-                        // An error occurred processing comicIth.
-                        return callback(new Error(errString)); 
+                    return callback(errString);
                 }
-
-                // Return that comicIth processed successfully.
-                return callback(null);
-            });
+            );
         } catch (e) {
-            callback(e);
+            callback(e.message);
         }
     }
 
@@ -1432,7 +1383,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     //  (2b) write the App type's arrays (methods, properties and events).
                     async.series(
                         [
-                            {
+                            function(cb) {
                                 typeIth.comicId = passObj.comicIth.id;
                                 typeIth.ordinal = 1;
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
@@ -1452,44 +1403,32 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 );
 
                             },
-                            {
+                            function(cb) {
                                 async.parallel(
                                     [
-                                        {
+                                        function(cb) {
                                             m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
                                                 null,   // This says not to push to project.script
-                                                function(err) {
-
-                                                    if (err) { throw err; }
-
-                                                }
+                                                function(err) { return cb(err); }
                                             );
                                         },
-                                        {
-                                            m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, function(err) {
-
-                                                throw err; 
-                                            });
+                                        function(cb) {
+                                            m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
+                                                function(err) { return cb(err) }
+                                            );
                                         }
                                     ],
                                     function(errString) {
-
+                                        return cb(errString);
                                     }
                                 );
                             }
                         ],
-                        function(errString){
-                            if (errString) { return callback(new Error(errString)); }
-
-                            // Signal we're done with the App type.
-                            return callback(null);
-                        }
+                        function(errString){ return callback(errString); }
                     );
-
-
                 }
             }
-        } catch (e) { callback(e); }
+        } catch (e) { callback(e.message); }
     }
 
     var m_saveNonAppTypesInComicIthToDB = function(passObj, callback) {
