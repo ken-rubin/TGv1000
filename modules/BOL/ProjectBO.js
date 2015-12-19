@@ -1091,7 +1091,8 @@ module.exports = function ProjectBO(app, sql, logger) {
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
             // (1) Delete the old project.
             // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
-            async.series([
+            async.series(
+                [
                     {
                         function(cb) {
                             // The following will delete the former project completely from the database using cascading delete.
@@ -1120,17 +1121,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                     }
                 ], 
                 function(errString){
-                    if (errString) { 
-                        return callback(errString); 
-                    }
-
-                    // Return that we've processed successfully.
-                    return callback(null);
+                    return callback(errString); 
                 }
             );
         } catch (e) {
 
-            return callback(e.message);
+            callback(e.message);
         }
     }
 
@@ -1148,47 +1144,57 @@ module.exports = function ProjectBO(app, sql, logger) {
         // All this is in a transaction and it can all be rolled back until it is comitted.
 
         try {
+            // async.series runs each of an array of functions in order, waiting for each to finish in turn.
+            // (1) Check for duplicate project name.
+            // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
+            async.series(
+                [
+                    {
+                        function(cb) {
+                            // Look for and reject an attempt to add a 2nd project for same user with same name.
+                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+                            
+                            m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
+                            sql.queryWithCxn(connection, strQuery, 
+                                function(err, rows) {
 
-            // Look for and reject an attempt to add a 2nd project for same user with same name.
-            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
-            
-            m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
-            sql.queryWithCxn(connection, strQuery, 
-                function(err, rows) {
+                                    try {                
+                                        if (err) { return cb(err); }
+                                        if (rows.length === 0) { return cb('Failed database action checking for duplicate project name.'); }
 
-                    try {                
-                        if (err) { throw new Error(err); }
-
-                        if (rows.length === 0) {
-
-                            throw new Error('Failed database action checking for duplicate project name.');
-
-                        } else {
-
-                            if (rows[0].cnt > 0) {
-
-                                throw new Error('You already have a project with that name.');
-
-                            } else {
-                                
-                                project.public = 0;                 // Any saved project needs review by an admin or instructor
-                                                                    // before being searchable by other ordinary users.
-                                m_functionProjectSaveAsPart2(connection, req, res, project);
-                            }
+                                        if (rows[0].cnt > 0) { return cb('You already have a project with that name.'); }
+                                            
+                                        project.public = 0;                 // Any saved project needs review by an admin or instructor
+                                                                            // before being searchable by other ordinary users.
+                                        return cb(null);
+                                    
+                                    } catch (e1) { return cb(e1.message); }
+                                }
+                            );
                         }
-                    } catch (e1) {
-
-                        throw e1;
+                    },
+                    {
+                        function(cb) {
+                            // Now we can just INSERT the project as passed from the client side.
+                            m_functionProjectSaveAsPart2(connection, req, res, project, 
+                                function(err) {
+                                    return cb(err);
+                                }
+                            );
+                        }
                     }
+                ], 
+                function(errString){
+                    return callback(errString); 
                 }
             );
         } catch (e) {
 
-            m_functionFinalCallback(e, res, null, null);
+            callback(e.message);
         }
     }
 
-    var m_functionProjectSaveAsPart2 = function (connection, req, res, project) {
+    var m_functionProjectSaveAsPart2 = function (connection, req, res, project, callback) {
 
         // If we came in doing a Save, we've deleted the old project and jumped in here to re-INSERT the project as sent from client-side.
         // If we came in doing a SaveAs, we stopped off at m_functionSaveProjectAs to check for name uniqueness.
