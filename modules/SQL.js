@@ -51,7 +51,9 @@ module.exports = function SQL(app) {
         }
     }
 
-    self.queryWithCxn = function (connection, strQuery, callback, passbackWithCallback) {
+    // On success, returns by callback(null, resultArray);
+    // On error, it rolls the transaction back and then does callback(error.message, null);    <== Note that the message part of the exception is returned.
+    self.queryWithCxn = function (connection, strQuery, callback) {
 
         try {
             
@@ -67,23 +69,23 @@ module.exports = function SQL(app) {
                     // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
                     if (rows.constructor === Array) {
 
-                        callback(null, rows, passbackWithCallback, strQuery);
+                        callback(null, rows);
                     
                     } else {
 
                         // rows is a non-array js object. Turn it into an array.
                         var newRows = [];
                         newRows.push(rows);
-                        callback(null, newRows, passbackWithCallback, strQuery);
+                        callback(null, newRows);
                     }
                 } catch (e) {
 
-                    connection.rollback(function() { callback(e, null);});
+                    connection.rollback(function() { callback(e.message, null);});
                 }
             });
         } catch (e) {
 
-            connection.rollback(function() { callback(e, null);});
+            connection.rollback(function() { callback(e.message, null);});
         }
     }
 

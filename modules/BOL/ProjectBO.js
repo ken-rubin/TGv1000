@@ -1081,17 +1081,18 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             m_log('Save project step 1; deleting old version with ' + strQuery);
             
+            // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
             sql.queryWithCxn(connection, 
                 strQuery, 
-                function(err, rows, dummy, queryBack) {
+                function(err, rows) {
 
                     try {
                         if (err) { 
 
-                            // // m_log('err back from delete project');
+                            // m_log('err back from delete project');
                             
                             // Rollback has happened already.
-                            throw err; 
+                            throw new Error(err); 
                         }
 
                         // Now we can just INSERT the project as passed from the client side.
@@ -1101,8 +1102,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         m_functionFinalCallback(e1, res, null, null);
                     }
-                },
-                null
+                }
             );
         } catch (e) {
 
@@ -1130,10 +1130,10 @@ module.exports = function ProjectBO(app, sql, logger) {
             
             m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
             sql.queryWithCxn(connection, strQuery, 
-                function(err, rows, dummy, queryBack) {
+                function(err, rows) {
 
                     try {                
-                        if (err) { throw err; }
+                        if (err) { throw new Error(err); }
 
                         if (rows.length === 0) {
 
@@ -1156,8 +1156,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         throw e1;
                     }
-                },
-                null
+                }
             );
         } catch (e) {
 
@@ -1216,26 +1215,36 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log('Inserting project record with ' + strQuery);
 
             sql.queryWithCxn(connection, strQuery, 
-                function(err, rows, dummy, queryBack) {
+                function(err, rows) {
 
                     try {
                         m_log("Back from inserting project");
-                        if (err) { throw err; }
+                        if (err) { throw new Error(err); }
 
                         if (rows.length === 0) { throw new Error('Error saving project to database.'); }
 
                         project.id = rows[0].insertId;
 
-                        // Handle tags and project_tags.
-                        m_log("Going to write project tags");
-                        m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
-                            null,   // this says not to push to project.script
-                            function(err) {
+                        // Use async.parallel to save the project's tags and start doing its comics in parallel.
+                        async.parallel(
+                            [
+                                {
+                                    m_log("Going to write project tags");
+                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
+                                        null,   // this says not to push to project.script
+                                        function(err) {
 
-                                try{
-                                    m_log("Back from writing project tags");
-                                    if (err) { throw err; }
+                                            try{
+                                                m_log("Back from writing project tags");
+                                                if (err) { throw err; }
 
+                                            } catch (e) {
+                                                throw e;
+                                            }
+                                        }
+                                    );
+                                },
+                                {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
                                         function(err) {
@@ -1246,18 +1255,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 return;
 
                                             } catch (ec) { throw ec; }
-                                         });
-                                } catch (e) {
-                                    throw e;
+                                         }
+                                    );
                                 }
+                            ],
+                            function(err){
+
                             }
                         );
                     } catch (e1) {
 
                         throw e1;
                     }
-                },
-                null
+                }
             );
         } catch(e) {
 
@@ -1268,40 +1278,45 @@ module.exports = function ProjectBO(app, sql, logger) {
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
-        // Also, a row has been added to resource and tags have been handled, too.
+        // A row has been added to resource and tags have been handled for the project, too.
 
         // This routine will iterate through the project's comics, saving (inserting) each and processing its types, etc.
-
         try {
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
 
             // async.eachSeries iterates over a collection, perform a single async task at a time.
-            async.eachSeries(project.comics.items, function(comicIth, cb) {
+            // Actually, we could process all comics in parallel. Maybe we'll change to that in the future.
+            async.eachSeries(project.comics.items, 
+                function(comicIth, cb) {
 
-                comicIth.projectId = project.id;
-                var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
-                sql.queryWithCxn(connection,
-                    strQuery,
-                    function(err, rows) {
-
-                        if (err) { return cb(err.message); }
-                        if (rows.length === 0) { return cb("Error writing comic to database."; )}
-                        
-                        comicIth.id = rows[0].insertId;
-                        m_saveTypesInComicIthToDB(connection, req, res, project, comic, function(err){
-                            return cb(err ? err.message : null); }
-                        });
+                    comicIth.projectId = project.id;
+                    var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
+                    sql.queryWithCxn(connection,
+                        strQuery,
+                        function(err, rows) {
+                            try {
+                                if (err) { return cb(err.message); }
+                                if (rows.length === 0) { return cb("Error writing comic to database."); }
+                                
+                                comicIth.id = rows[0].insertId;
+                                m_saveTypesInComicIthToDB(connection, req, res, project, comic, function(err){
+                                    return cb(err ? err.message : null); }
+                                );
+                            } catch (eq) {
+                                return cb(eq.message);
+                            }
+                        }
+                    );
+                }, 
+                function(errString) {
+                    if (errString) { 
+                        return callback(new Error(errString)); 
                     }
-                );
-            }, 
-            function(errString) {
-                if (errString) { 
-                    return callback(new Error(errString)); 
-                }
 
-                // Signal we're done with all comics.
-                return callback(null);
-            });
+                    // We're done with all comics.
+                    return callback(null);
+                }
+            );
         } catch (e) {
 
             callback(e);
@@ -1313,9 +1328,11 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             m_log("***In m_saveTypesInComicIthToDB***");
+            // Using passObj to (1) easily pass the many values needed in multiple places; and
+            // (2) to allow for passing by reference (which scalars don't do) where needed--like ordinal.
             var passObj = {
                 typesCount: comicIth.types.items.length,
-                ordinal: 0,
+                ordinal: 1,     // App type will get ordinal 0; System Types are forced to ordinal 10000; all others in comic count up from 1.
                 typeIdTranslationArray: [],
                 comicIth: comicIth,
                 connection: connection,
@@ -1325,6 +1342,8 @@ module.exports = function ProjectBO(app, sql, logger) {
             };
 
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
+            // Actually, the first and second could be done in parallel, but the third must come after those two are done.
+            // We should try that after all settles down.
             async.series([
                     {
                         function(cb) {
@@ -1367,44 +1386,77 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             m_log("***In m_saveAppTypeInComicIthToDB***");
+
+            // We don't use async for this loop because we're looking for only one type. The loop is to find it amongst the comic's types.
+            // (Of course, we know it will be the first.)
             for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
 
                 var typeIth = passObj.comicIth.types.items[i];
 
                 if (typeIth.isApp) {
 
-                    typeIth.comicId = passObj.comicIth.id;
-                    typeIth.ordinal = 0;
-                    passObj.ordinal++;
-                    var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
-                    
-                    m_log('Inserting App type with ' + strQuery);
-                    sql.queryWithCxn(passObj.connection, strQuery,
-                        function(err, rows, type, queryBack) {
+                    // But we can use nested async calls here to do (1) and (2) serially:
+                    // (1) insert the App type
+                    // (2) and then do (2a) and (2b) in parallel:
+                    //  (2a) write tags
+                    //  (2b) write the App type's arrays (methods, properties and events).
+                    async.series(
+                        [
+                            {
+                                typeIth.comicId = passObj.comicIth.id;
+                                typeIth.ordinal = 1;
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                m_log('Inserting App type with ' + strQuery);
+                                sql.queryWithCxn(passObj.connection, strQuery,
+                                    function(err, rows) {
 
-                            try {
-                                if (err) { throw err; }
-                                if (rows.length === 0) { throw new Error("Error writing type to database."); }
+                                        try {
+                                            if (err) { throw err; }
+                                            if (rows.length === 0) { throw new Error("Error writing type to database."); }
 
-                                // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
-                                // But we do have to set the newly assign id.
-                                type.id = rows[0].insertId;
-                                m_setUpAndWriteTags(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
-                                    null,   // this says not to push to project.script
-                                    function(err) {
-
-                                        if (err) { throw err; }
-
-                                        m_saveMethPropEvArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, function(err) {
-
-                                            throw err; 
-                                        });
+                                            // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
+                                            // But we do have to set the newly assign id.
+                                            type.id = rows[0].insertId;
+                                        } catch (e1) { throw e1; }
                                     }
                                 );
-                            } catch (e1) { throw e1; }
-                        },
-                        typeIth
+
+                            },
+                            {
+                                async.parallel(
+                                    [
+                                        {
+                                            m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
+                                                null,   // This says not to push to project.script
+                                                function(err) {
+
+                                                    if (err) { throw err; }
+
+                                                }
+                                            );
+                                        },
+                                        {
+                                            m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, function(err) {
+
+                                                throw err; 
+                                            });
+                                        }
+                                    ],
+                                    function(errString) {
+
+                                    }
+                                );
+                            }
+                        ],
+                        function(errString){
+                            if (errString) { return callback(new Error(errString)); }
+
+                            // Signal we're done with the App type.
+                            return callback(null);
+                        }
                     );
+
+
                 }
             }
         } catch (e) { callback(e); }
@@ -1416,11 +1468,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             m_log("***In m_saveNonAppTypesInComicIthToDB***");
 
-            
-
-            for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
-
-                var typeIth = passObj.comicIth.types.items[i];
+            // async.eachSeries iterates over a collection, perform a single async task at a time.
+            // Actually, we could process all types in parallel, but we'd have to pre-assign their ordinals.
+            // Maybe we'll change to that in the future.
+            async.eachSeries(passObj.comicIth.types.items, function(typeIth, cb) {
 
                 if (!typeIth.isApp) {
 
@@ -1433,7 +1484,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Don't set an SystemType's comicId either.
                     if (typeIth.ordinal === 10000) {
 
-                        if (!passObj.project.canEditSystemTypes) { processTypeIth = false; }
+                        if (!passObj.project.canEditSystemTypes || passObj.comicIth.ordinal > 0) {
+                            // We process System Types only if the setting is on in the project AND we're in the first comic of the project. 
+                            processTypeIth = false; 
+                        }
 
                     } else {
 
@@ -1464,7 +1518,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         var weInserted;
                         if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
 
-                            // Update an existing System Type so as not to lose its id. But kill its referrents and add them later. No need to preserve their ids.
+                            // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
 
                             // First the update statement.
                             strQuery = "update " + self.dbname + "types" + guts + " where id=" + typeIth.id + ";";
@@ -1509,19 +1563,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                         }
 
                         sql.queryWithCxn(passObj.connection, strQuery,
-                            function(err, rows, type, queryBack) {
+                            function(err, rows) {
 
                                 try {
-                                    if (err) { throw err; }
-                                    if (rows.length === 0) { throw new Error("Error writing type to database."); }
+                                    if (err) { return cb(err.message); }
+                                    if (rows.length === 0) { return cb("Error writing comic to database."); }
 
                                     if (weInserted) {
-                                        passObj.typeIdTranslationArray.push({origId:type.id, newId:rows[0].insertId});
-                                        // // m_log("1.1 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
-                                        type.id = rows[0].insertId;
+                                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
+                                        // m_log("1.1 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
+                                        typeIth.id = rows[0].insertId;
                                     } else {
                                         // We updated.
-                                        passObj.typeIdTranslationArray.push({origId:type.id, newId:type.id});
+                                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
                                         // // m_log("1.2 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                                     }
 
@@ -1531,7 +1585,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             if (err) { throw err; }
 
-                                            m_saveMethPropEvArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, function(err) {
+                                            m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, function(err) {
 
                                                 if (err) { throw err; }
 
@@ -1548,11 +1602,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     );
                                 } catch (e3) {
-
-                                    throw e3;
+                                    return cb(e3.message);
                                 }
-                            },
-                            typeIth
+                            }
                         );
                     } else {
                         // Even though we didn't write it out, we'll have it for lookups.
@@ -1566,7 +1618,39 @@ module.exports = function ProjectBO(app, sql, logger) {
                         if (--passObj.typesCount === 0) { callback(null); }
                     }
                 }
-            }
+
+
+
+            }, 
+            function(errString) {
+                if (errString) { 
+                    return callback(new Error(errString)); 
+                }
+
+                // Signal we're done with all comics.
+                return callback(null);
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+
+
         } catch (e) { callback(e); }
     }
 
@@ -1630,12 +1714,12 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch (e) { callback(e); }
     }
 
-    var m_saveMethPropEvArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
+    var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
 
         try {
 
 
-            // m_log("Arrived in m_saveMethPropEvArraysInTypeIthToDB for type named " + typeIth.name + ".");
+            // m_log("Arrived in m_saveArraysInTypeIthToDB for type named " + typeIth.name + ".");
 
 
 
