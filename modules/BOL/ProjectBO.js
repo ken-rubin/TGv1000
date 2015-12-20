@@ -1047,20 +1047,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     
                                     } else {
 
-                                        // m_log('Connection has a transaction');
-                                        var errorString;
+                                        m_log('Connection has a transaction');
                                         if (typeOfSave === 'save') {
 
                                             m_log('Going into m_functionSaveProject');
-                                            m_functionSaveProject(connection, req, res, project, function(err) { errorString = err; });
+                                            m_functionSaveProject(connection, req, res, project, 
+                                                function(err) { 
+                                                    if(err) { throw err; }
+                                                }
+                                            );
                                         
                                         } else {    // 'saveAs'
 
                                             m_log('Going into m_functionSaveProjectAs');
-                                            m_functionSaveProjectAs(connection, req, res, project, function(err) { errorString = err; });
+                                            m_functionSaveProjectAs(connection, req, res, project, 
+                                                function(err) { 
+                                                    if(err) { throw err; }
+                                                }
+                                            );
                                         }
-
-                                        if (errorString) { throw new Error(errorString); }
 
                                         // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
                                         m_functionFinalCallback(null, res, connection, project);
@@ -1113,9 +1118,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                         );
                     }
                 ], 
-                function(errString){ return callback(errString); }
+                function(err){ return callback(err); }
             );
-        } catch (e) { callback(e.message); }
+        } catch (e) { callback(e); }
     }
 
 
@@ -1146,14 +1151,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                             function(err, rows) {
                                 try {                
                                     if (err) { return cb(err); }
-                                    if (rows.length === 0) { return cb('Failed database action checking for duplicate project name.'); }
-                                    if (rows[0].cnt > 0) { return cb('You already have a project with that name.'); }
+                                    if (rows.length === 0) { return cb(new Error('Failed database action checking for duplicate project name.')); }
+                                    if (rows[0].cnt > 0) { return cb(new Error('You already have a project with that name.')); }
                                         
                                     project.public = 0;                 // Any saved project needs review by an admin or instructor
                                                                         // before being searchable by other ordinary users.
-                                    return cb(null);
-                                
-                                } catch (e1) { return cb(e1.message); }
+                                    cb(null);
+
+                                } catch (e1) { return cb(e1); }
                             }
                         );
                     },
@@ -1167,11 +1172,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                         );
                     }
                 ], 
-                function(errString){
-                    return callback(errString); 
+                function(err){
+                    return callback(err); 
                 }
             );
-        } catch (e) { callback(e.message); }
+        } catch (e) { callback(e); }
     }
 
     var m_functionProjectSaveAsPart2 = function (connection, req, res, project, callback) {
@@ -1231,10 +1236,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                         sql.queryWithCxn(connection, strQuery, 
                             function(err, rows) {
                                 if (err) { return cb(err); }
-                                if (rows.length === 0) { return cb('Error saving project to database.'); }
+                                if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
 
                                 project.id = rows[0].insertId;
-                                return cb(null);
+                                cb(null);
                             }
                         );
                     },
@@ -1261,17 +1266,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     );
                                 }
                             ],
-                            function(errString){
-                                return cb(errString);
-                            }
+                            cb
                         );
                     }
                 ],
-                function(errString) {
-                    return callback(errString);
+                function(err) {
+                    return callback(err);
                 }
             );
-        } catch(e) { callback(e.message); }
+        } catch(e) { callback(e); }
     }
 
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
@@ -1290,30 +1293,37 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     comicIth.projectId = project.id;
                     var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
+                    
+
+turn these into a series.
+
+
+
+
                     sql.queryWithCxn(connection,
                         strQuery,
                         function(err, rows) {
                             try {
                                 if (err) { return cb(err); }
-                                if (rows.length === 0) { return cb("Error writing comic to database."); }
+                                if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
                                 
                                 comicIth.id = rows[0].insertId;
-                                m_saveTypesInComicIthToDB(connection, req, res, project, comic, 
+                                m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
                                     function(err) {
                                         return cb(err); 
                                     }
                                 );
                             } catch (eq) {
-                                return cb(eq.message);
+                                return cb(eq);
                             }
                         }
                     );
                 }, 
-                function(errString) {
-                    return callback(errString);
+                function(err) {
+                    return callback(err);
                 }
             );
-        } catch (e) { callback(e.message); }
+        } catch (e) { callback(e); }
     } 
 
     var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
@@ -1340,27 +1350,33 @@ module.exports = function ProjectBO(app, sql, logger) {
             async.series(
                 [
                     function(cb) {
-                        m_saveAppTypeInComicIthToDB(passObj, function(err) {
-                            return cb(err); }
+                        m_saveAppTypeInComicIthToDB(passObj, 
+                            function(err) {
+                                return cb(err); 
+                            }
                         );
                     },
                     function(cb) {
-                        m_saveNonAppTypesInComicIthToDB(passObj, function(err) {
-                            return cb(err); }
+                        m_saveNonAppTypesInComicIthToDB(passObj, 
+                            function(err) {
+                                return cb(err); 
+                            }
                         );
                     },
                     function(cb) {
-                        m_fixUpBaseTypeIdsInComicIth(passObj, function(err) {
-                            return cb(err); }
+                        m_fixUpBaseTypeIdsInComicIth(passObj, 
+                            function(err) {
+                                return cb(err); 
+                            }
                         );
                     }
                 ], 
-                function(errString){
-                    return callback(errString);
+                function(err){
+                    return callback(err);
                 }
             );
         } catch (e) {
-            callback(e.message);
+            callback(e);
         }
     }
 
@@ -1386,8 +1402,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                     async.series(
                         [
                             function(cb) {
+
                                 typeIth.comicId = passObj.comicIth.id;
-                                typeIth.ordinal = 1;
+                                typeIth.ordinal = 0;
                                 var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                                 m_log('Inserting App type with ' + strQuery);
                                 sql.queryWithCxn(passObj.connection, strQuery,
@@ -1395,13 +1412,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         try {
                                             if (err) { return cb(err); }
-                                            if (rows.length === 0) { return cb("Error writing type to database."); }
+                                            if (rows.length === 0) { return cb(new Error("Error writing type to database.")); }
 
                                             // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
                                             // But we do have to set the newly assign id.
-                                            type.id = rows[0].insertId;
-                                            return cb(null);
-                                        } catch (e1) { return cb(e1.message); }
+                                            typeIth.id = rows[0].insertId;
+
+                                        } catch (e1) { return cb(e1); }
                                     }
                                 );
                             },
@@ -1420,17 +1437,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             );
                                         }
                                     ],
-                                    function(errString) {
-                                        return cb(errString);
-                                    }
+                                    cb
                                 );
                             }
                         ],
-                        function(errString){ return callback(errString); }
+                        function(err){ return callback(err); }
                     );
+                    break;
                 }
             }
-        } catch (e) { callback(e.message); }
+        } catch (e) { callback(e); }
     }
 
     var m_saveNonAppTypesInComicIthToDB = function(passObj, callback) {
@@ -1547,8 +1563,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             function(err, rows) {
 
                                                 try {
-                                                    if (err) { return cb(err.message); }
-                                                    if (rows.length === 0) { return cb("Error writing comic to database."); }
+                                                    if (err) { return cb(err); }
+                                                    if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
 
                                                     if (weInserted) {
                                                         passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
@@ -1561,7 +1577,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     }
 
                                                 } catch (e3) {
-                                                    return cb(e3.message);
+                                                    return cb(e3);
                                                 }
                                             }
                                         );
@@ -1587,27 +1603,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     });
                                                 }
                                             ],
-                                            function(strError) {
-                                                
-                                            }
+                                            cb
                                         );
                                     }
                                 ],
-                                function(strError) {
-                                    return cb(strError);
+                                function(err) {
+                                    return cb(err);
                                 }
                             );
-
                         } else {
                             // Even though we didn't write it out, we'll have it for lookups.
                             passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
                             // // m_log("2. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
+                            return cb(null);
                         }
                     }
                 }, 
-                function(errString) { return callback(errString); }
+                function(err) { return callback(err); }
             );
-        } catch (e) { callback(e.message); }
+        } catch (e) { callback(e); }
     }
 
     var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
@@ -1640,11 +1654,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                         };
                     }
                 },
-                function(strError) {
-                    return callback(strError);
+                function(err) {
+                    return callback(err);
                 }
             );
-        } catch (e) { callback(e.message); }
+        } catch (e) { callback(e); }
     }
 
     var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
@@ -1690,7 +1704,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                     try {
                                                         if (err) { return cb(err); }
-                                                        if (rows.length === 0) { return cb("Error inserting method into database"); }
+                                                        if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
                                                         method.id = rows[0].insertId;
 
@@ -1698,11 +1712,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                         if (typeIth.ordinal === 10000) {
                                                             project.script.push(strQuery);
                                                         }
-                                                        return cb(null);
-
                                                     } catch (em) {
 
-                                                        return cb(em.message);
+                                                        return cb(em);
                                                     }
                                                 }
                                             );
@@ -1717,12 +1729,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             );
                                         }
                                     ],
-                                    function(strError) {
-                                        return cb(strError);
+                                    function(err) {
+                                        return cb(err);
                                     }
                                 );
                             },
-                            function(strError) { return cb(strError); }
+                            function(err) { return cb(err); }
                         );
                     },
                     function(cb) {
@@ -1740,7 +1752,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         try {
                                             if (err) { return cb(err); }
-                                            if (rows.length === 0) { return cb("Error inserting property into database"); }
+                                            if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
 
                                             property.id = rows[0].insertId;
 
@@ -1748,13 +1760,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             if (typeIth.ordinal === 10000) {
                                                 project.script.push(strQuery);
                                             }
-                                            return cb(null);
-
-                                        } catch (ep) { return cb(ep.message); }
+                                        } catch (ep) { return cb(ep); }
                                     }
                                 );
                             },
-                            function(strError) { return cb(strError); }
+                            function(err) { return cb(err); }
                         );
                     },
                     function(cb) {
@@ -1771,7 +1781,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         try {
                                             if (err) { throw err; }
-                                            if (rows.length === 0) { throw new Error("Error inserting method into database"); }
+                                            if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
                                             event.id = rows[0].insertId;
 
@@ -1779,24 +1789,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             if (typeIth.ordinal === 10000) {
                                                 project.script.push(strQuery);
                                             }
-
-                                            return cb(null);
-
-                                        } catch (ee) { return cb(ee.message); }
+                                        } catch (ee) { return cb(ee); }
                                     }
                                 );
                             },
-                            function(strError) { return cb(strError); }
+                            function(err) { return cb(err); }
                         );
                     }
                 ],
-                function(strError) {
-                    return callback(strError);
-                }
+                callback
             );
         } catch (e) {
 
-            callback(e.message);
+            callback(e);
         }
     }
 
@@ -1860,16 +1865,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                             // projectScript is passed in if it is meant for us to push the procedure call. So we will.
                             projectScript.push(strSql);
                         }
-
-                        return callback(null);
-
-                    } catch(et) { return callback(et.message); }
+                    } catch(et) { return callback(et); }
                 }
             );
-        } catch(e) {
-
-            callback(e.message);
-        }
+        } catch(e) { callback(e); }
     }
 
     var m_functionFinalCallback = function (err, res, connection, project) {

@@ -52,40 +52,42 @@ module.exports = function SQL(app) {
     }
 
     // On success, returns by callback(null, resultArray);
-    // On error, it rolls the transaction back and then does callback(error.message, null);    <== Note that the message part of the exception is returned.
+    // On error, it rolls the transaction back and then does callback(error, null);
     self.queryWithCxn = function (connection, strQuery, callback) {
 
         try {
             
-            connection.query(strQuery, function(err, rows) {
+            connection.query(strQuery, 
+                function(err, rows) {
 
-                try {
-                    if (err) { throw err; }
+                    try {
+                        if (err) { throw err; }
 
-                    // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
-                    //          INSERT returns rows.insertId (primary key of inserted row)
-                    //          UPDATE returns rows.changedRows (# of changed rows)
-                    //          DELETE returns rows.affectedRows (# of deleted rows)
-                    // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
-                    if (rows.constructor === Array) {
+                        // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
+                        //          INSERT returns rows.insertId (primary key of inserted row)
+                        //          UPDATE returns rows.changedRows (# of changed rows)
+                        //          DELETE returns rows.affectedRows (# of deleted rows)
+                        // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
+                        if (rows.constructor === Array) {
 
-                        callback(null, rows);
-                    
-                    } else {
+                            callback(null, rows);
+                        
+                        } else {
 
-                        // rows is a non-array js object. Turn it into an array.
-                        var newRows = [];
-                        newRows.push(rows);
-                        callback(null, newRows);
+                            // rows is a non-array js object. Turn it into an array.
+                            var newRows = [];
+                            newRows.push(rows);
+                            callback(null, newRows);
+                        }
+                    } catch (e) {
+
+                        connection.rollback(function() { callback(e, null);});
                     }
-                } catch (e) {
-
-                    connection.rollback(function() { callback(e.message, null);});
                 }
-            });
+            );
         } catch (e) {
 
-            connection.rollback(function() { callback(e.message, null);});
+            connection.rollback(function() { callback(e, null);});
         }
     }
 
