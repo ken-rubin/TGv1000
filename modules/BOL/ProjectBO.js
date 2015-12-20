@@ -1478,10 +1478,114 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 [
                                     function(cb) {
 
+                                        // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
+                                        var guts = " SET name='" + typeIth.name + "'"
+                                            + ",isApp=0"
+                                            + ",imageId=" + typeIth.imageId
+                                            + ",altImagePath='" + typeIth.altImagePath + "'"
+                                            + ",ordinal=" + typeIth.ordinal
+                                            + ",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
+                                            + ",description='" + typeIth.description + "'"
+                                            + ",parentTypeId=" + typeIth.parentTypeId
+                                            + ",parentPrice=" + typeIth.parentPrice
+                                            + ",priceBump=" + typeIth.priceBump
+                                            + ",ownedByUserId=" + typeIth.ownedByUserId
+                                            + ",public=" + typeIth.public
+                                            + ",quarantined=" + typeIth.quarantined
+                                            + ",baseTypeId=" + typeIth.baseTypeId
+                                            ;
+
+                                        var strQuery;
+                                        var weInserted;
+                                        if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
+
+                                            // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
+
+                                            // First the update statement.
+                                            strQuery = "update " + self.dbname + "types" + guts + " where id=" + typeIth.id + ";";
+                                            
+                                            // Then delete methods, properties and events which will be re-inserted.
+                                            strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
+                                            strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
+                                            strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
+                                            
+                                            // Then type_tags.
+                                            strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
+                                            weInserted = false;
+
+                                        } else {
+
+                                            // It's either a new System Type or a non-System Type that was deleted or never existed.
+                                            strQuery = "insert " + self.dbname + "types" + guts + ";";
+                                            weInserted = true;
+                                        }
+
+                                        m_log('Inserting or updating type with ' + strQuery);
+
+                                        // If this is a System Type, push SQL statements onto passObj.project.script.
+                                        if (typeIth.ordinal === 10000) {
+
+                                            passObj.project.idnum += 1;
+                                            var atid = "@id" + passObj.project.idnum;
+                                            // m_log('Pushing SQL with atid=' + atid + '.');
+                                            passObj.project.script.push('set @guts := "' + guts + '";');
+                                            passObj.project.script.push('set ' + atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                                            passObj.project.script.push('if ' + atid + ' is not null then');
+                                            passObj.project.script.push('   delete from types where id=' + atid + ';');
+                                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + atid + ';"));');
+                                            passObj.project.script.push('   prepare insstmt from @s;');
+                                            passObj.project.script.push('   execute insstmt;');
+                                            passObj.project.script.push('else');
+                                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
+                                            passObj.project.script.push('   prepare insstmt from @s;');
+                                            passObj.project.script.push('   execute insstmt;');
+                                            passObj.project.script.push('   set ' + atid + ' := (select LAST_INSERT_ID());');
+                                            passObj.project.script.push('end if;');
+                                        }
+
+                                        sql.queryWithCxn(passObj.connection, strQuery,
+                                            function(err, rows) {
+
+                                                try {
+                                                    if (err) { return cb(err.message); }
+                                                    if (rows.length === 0) { return cb("Error writing comic to database."); }
+
+                                                    if (weInserted) {
+                                                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
+                                                        // m_log("1.1 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
+                                                        typeIth.id = rows[0].insertId;
+                                                    } else {
+                                                        // We updated.
+                                                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+                                                        // // m_log("1.2 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
+                                                    }
+
+                                                } catch (e3) {
+                                                    return cb(e3.message);
+                                                }
+                                            }
+                                        );
                                     },
                                     function(cb) {
                                         async.parallel(
                                             [
+                                                function(cb) {
+
+                                                    m_setUpAndWriteTags(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
+                                                        (type.ordinal === 10000 ? passObj.project.script : null),
+                                                        function(err) {
+
+                                                            return cb(err);
+                                                        }
+                                                    );
+                                                },
+                                                function(cb) {
+
+                                                    m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, function(err) {
+
+                                                        return cb(err);
+                                                    });
+                                                }
                                             ],
                                             function(strError) {
                                                 
@@ -1494,125 +1598,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
                             );
 
-                            // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
-                            var guts = " SET name='" + typeIth.name + "'"
-                                + ",isApp=0"
-                                + ",imageId=" + typeIth.imageId
-                                + ",altImagePath='" + typeIth.altImagePath + "'"
-                                + ",ordinal=" + typeIth.ordinal
-                                + ",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
-                                + ",description='" + typeIth.description + "'"
-                                + ",parentTypeId=" + typeIth.parentTypeId
-                                + ",parentPrice=" + typeIth.parentPrice
-                                + ",priceBump=" + typeIth.priceBump
-                                + ",ownedByUserId=" + typeIth.ownedByUserId
-                                + ",public=" + typeIth.public
-                                + ",quarantined=" + typeIth.quarantined
-                                + ",baseTypeId=" + typeIth.baseTypeId
-                                ;
-
-                            var strQuery;
-                            var weInserted;
-                            if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
-
-                                // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
-
-                                // First the update statement.
-                                strQuery = "update " + self.dbname + "types" + guts + " where id=" + typeIth.id + ";";
-                                
-                                // Then delete methods, properties and events which will be re-inserted.
-                                strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
-                                strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
-                                strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
-                                
-                                // Then type_tags.
-                                strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
-                                weInserted = false;
-
-                            } else {
-
-                                // It's either a new System Type or a non-System Type that was deleted or never existed.
-                                strQuery = "insert " + self.dbname + "types" + guts + ";";
-                                weInserted = true;
-                            }
-
-                            m_log('Inserting or updating type with ' + strQuery);
-
-                            // If this is a System Type, push SQL statements onto passObj.project.script.
-                            if (typeIth.ordinal === 10000) {
-
-                                passObj.project.idnum += 1;
-                                var atid = "@id" + passObj.project.idnum;
-                                // m_log('Pushing SQL with atid=' + atid + '.');
-                                passObj.project.script.push('set @guts := "' + guts + '";');
-                                passObj.project.script.push('set ' + atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
-                                passObj.project.script.push('if ' + atid + ' is not null then');
-                                passObj.project.script.push('   delete from types where id=' + atid + ';');
-                                passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + atid + ';"));');
-                                passObj.project.script.push('   prepare insstmt from @s;');
-                                passObj.project.script.push('   execute insstmt;');
-                                passObj.project.script.push('else');
-                                passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
-                                passObj.project.script.push('   prepare insstmt from @s;');
-                                passObj.project.script.push('   execute insstmt;');
-                                passObj.project.script.push('   set ' + atid + ' := (select LAST_INSERT_ID());');
-                                passObj.project.script.push('end if;');
-                            }
-
-                            sql.queryWithCxn(passObj.connection, strQuery,
-                                function(err, rows) {
-
-                                    try {
-                                        if (err) { return cb(err.message); }
-                                        if (rows.length === 0) { return cb("Error writing comic to database."); }
-
-                                        if (weInserted) {
-                                            passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
-                                            // m_log("1.1 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
-                                            typeIth.id = rows[0].insertId;
-                                        } else {
-                                            // We updated.
-                                            passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-                                            // // m_log("1.2 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
-                                        }
-
-                                        m_setUpAndWriteTags(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
-                                            (type.ordinal === 10000 ? passObj.project.script : null),
-                                            function(err) {
-
-                                                if (err) { throw err; }
-
-                                                m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, function(err) {
-
-                                                    if (err) { throw err; }
-
-                                                    // m_log("passObj.typesCount now is " + passObj.typesCount + ". We are about to decrement it.");
-                                                    if (passObj.typesCount === 0) {
-
-                                                        throw new Error("ERROR1: passObj.typesCount already = 0 and we're about to decrement it into negative territory.");
-                                                    }
-                                                    if (--passObj.typesCount === 0) { 
-
-                                                        callback(null);
-                                                    }
-                                                });
-                                            }
-                                        );
-                                    } catch (e3) {
-                                        return cb(e3.message);
-                                    }
-                                }
-                            );
                         } else {
                             // Even though we didn't write it out, we'll have it for lookups.
                             passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
                             // // m_log("2. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
-                            
-                            if (passObj.typesCount === 0) {
-
-                                throw new Error("ERROR1: passObj.typesCount already = 0 and we're about to decrement it into negative territory.");
-                            }
-                            if (--passObj.typesCount === 0) { callback(null); }
                         }
                     }
                 }, 
