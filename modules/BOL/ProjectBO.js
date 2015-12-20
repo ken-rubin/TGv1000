@@ -1804,7 +1804,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
             
-            m_log("In m_setUpAndWriteTags for " + strItemType + " " + strName);
+            m_log("***In m_setUpAndWriteTags for " + strItemType + " " + strName + "***");
 
             // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
             var tagArray = [];
@@ -1850,7 +1850,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 
             m_log("Sending this sql: " + strSql);
             sql.queryWithCxn(connection, strSql, 
-                function(err, rows, dummy, queryBack) {
+                function(err, rows) {
 
                     try{
 
@@ -1858,20 +1858,17 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         if (projectScript) {
                             // projectScript is passed in if it is meant for us to push the procedure call. So we will.
-                            projectScript.push(queryBack);
+                            projectScript.push(strSql);
                         }
 
-                        callback(null);
+                        return callback(null);
 
-                    } catch(et) {
-                        throw et;
-                    }
-                },
-                1
+                    } catch(et) { return callback(et.message); }
+                }
             );
         } catch(e) {
 
-            callback(e);
+            callback(e.message);
         }
     }
 
