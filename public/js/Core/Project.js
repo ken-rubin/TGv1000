@@ -137,7 +137,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 											if (objectData.scriptSuccess) {
 												errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
 											} else {
-												errorHelper.show("Your project was saved to the database and the System Type script COULD NOT be created.");
+												errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + saveError.message + ".");
 											}
 										}
 

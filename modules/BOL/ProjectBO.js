@@ -1054,31 +1054,38 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             m_functionSaveProject(connection, req, res, project, 
                                                 function(err) { 
                                                     if(err) { throw err; }
+                                                    // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
+                                                    m_functionFinalCallback(null, res, connection, project);
                                                 }
                                             );
-                                        
                                         } else {    // 'saveAs'
 
                                             m_log('Going into m_functionSaveProjectAs');
                                             m_functionSaveProjectAs(connection, req, res, project, 
                                                 function(err) { 
-                                                    if(err) { throw err; }
+                                                    m_log("B--" + (err ? "with non-null err" : "with null err"));
+                                                    if(err) { 
+                                                        m_log("B1");
+                                                        m_functionFinalCallback(err, res, null, null); 
+                                                    }else {
+                                                        // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
+                                                        m_log("B2");
+                                                        m_functionFinalCallback(null, res, connection, project);
+                                                    }
                                                 }
                                             );
                                         }
-
-                                        // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
-                                        m_functionFinalCallback(null, res, connection, project);
                                     }
                                 } catch(e1) { 
+                                    m_log("C");
                                     m_functionFinalCallback(e1, res, null, null);
                                 }
                             }
                         );
-                    } catch (e2) { m_functionFinalCallback(e2, res, null, null); }
+                    } catch (e2) { m_log("C2"); m_functionFinalCallback(e2, res, null, null); }
                 }
             );
-        } catch(e) { m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null); }
+        } catch(e) { m_log("C3"); m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null); }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1181,8 +1188,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                         );
                     }
                 ],
-                // final callback for series
+                // final callback for async.series
                 function(err){
+                    m_log("A");
                     return callback(err); 
                 }
             );
@@ -1348,7 +1356,6 @@ module.exports = function ProjectBO(app, sql, logger) {
             // Using passObj to (1) easily pass the many values needed in multiple places; and
             // (2) to allow for passing by reference (which scalars don't do) where needed--like ordinal.
             var passObj = {
-                typesCount: comicIth.types.items.length,
                 ordinal: 1,     // App type will get ordinal 0; System Types are forced to ordinal 10000; all others in comic count up from 1.
                 typeIdTranslationArray: [],
                 comicIth: comicIth,
@@ -1469,6 +1476,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                         function(err){ return callback(err); }
                     );
                     break;
+                } else {
+                    return cb(null);
                 }
             }
         } catch (e) { callback(e); }
@@ -1565,11 +1574,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         m_log('Inserting or updating type with ' + strQuery);
 
                                         // If this is a System Type, push SQL statements onto passObj.project.script.
+
+                                        // atid is to be used as a unique id in the doTags MySql procedure to
+                                        // let subsequent steps insert according to a specific type's id.
+                                        var atid;
                                         if (typeIth.ordinal === 10000) {
 
                                             passObj.project.idnum += 1;
-                                            var atid = "@id" + passObj.project.idnum;
-                                            // m_log('Pushing SQL with atid=' + atid + '.');
+                                            atid = "@id" + passObj.project.idnum;
+
                                             passObj.project.script.push('set @guts := "' + guts + '";');
                                             passObj.project.script.push('set ' + atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
                                             passObj.project.script.push('if ' + atid + ' is not null then');
@@ -1617,8 +1630,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 // (2a)
                                                 function(cb) {
 
-                                                    m_setUpAndWriteTags(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
-                                                        (type.ordinal === 10000 ? passObj.project.script : null),
+                                                    m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
+                                                        (typeIth.ordinal === 10000 ? passObj.project.script : null),
                                                         function(err) {
 
                                                             return cb(err);
@@ -1628,7 +1641,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 // (2b)
                                                 function(cb) {
 
-                                                    m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, 
+                                                    m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
                                                         function(err) { return cb(err); }
                                                     );
                                                 }
@@ -1647,6 +1660,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             // // m_log("2. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                             return cb(null);
                         }
+                    } else {
+                        return cb(null);
                     }
                 }, 
                 // final callback
@@ -1683,6 +1698,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
                             }
                         };
+                        return cb(null);
+                    } else {
+                        return cb(null);
                     }
                 },
                 // final callback for eachSeries
@@ -1939,23 +1957,24 @@ module.exports = function ProjectBO(app, sql, logger) {
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
-
+            m_log("D");
             res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
        } else {
-
+            m_log("E");
             sql.commitCxn(connection,
                 function(err){
 
                     if (err) {
+                        m_log("F");
                         res.json({
                             success: false,
                             message: 'Committing transaction failed with ' + err.message
                         });
                     } else {
-
+                        m_log("G");
                         if (project.hasOwnProperty("script")) {
                             // There's a sql script that needs to be written to project root.
                             // In the callback from that file creation, we'll return to the client.
@@ -1967,13 +1986,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (err) {
                                     // Writing the file didn't work, but saving the project has already been committed to the DB.
                                     // We'll inform the user, but do so in a way that the project is saved.
+                                    m_log("H");
                                     res.json({
                                         success: true,
                                         project: project,
-                                        scriptSuccess: false
+                                        scriptSuccess: false,
+                                        saveError: err
                                     });
                                 } else {
-
+                                    m_log("I");
                                     res.json({
                                         success: true,
                                         project: project,
@@ -1982,7 +2003,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
                             });
                         } else {
-
+                            m_log("J");
                             res.json({
                                 success: true,
                                 project: project
@@ -2008,13 +2029,11 @@ module.exports = function ProjectBO(app, sql, logger) {
             project.script.push("call doSystemTypes();");
             project.script.push("drop procedure doSystemTypes;");
 
-            fs.writeFile('ST.sql', project.script.join(os.EOL), function (err) {
-                if (err) {
+            fs.writeFile('ST.sql', project.script.join(os.EOL), 
+                function (err) {
                     callback(err);
-                } else {
-                    callback(null);
                 }
-            });
+            );
         } catch(e) {
             callback(e);
         }
