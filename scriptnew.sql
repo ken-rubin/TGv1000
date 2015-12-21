@@ -5,7 +5,7 @@ USE TGv1000;
 
 delimiter //
 
-create procedure doTags(tagsconcat varchar(255), itemId int, strItemType varchar(20))
+create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
 
 begin
 
@@ -26,11 +26,11 @@ begin
 			end if;
 			
 			if strItemType = 'project' THEN
-				insert project_tags values (itemId, @id);
+				insert project_tags values (itemIdVarName, @id);
 			elseif strItemType = 'type' THEN
-				insert type_tags values (itemId, @id);
+				insert type_tags values (itemIdVarName, @id);
 			else
-				insert method_tags values (itemId, @id);
+				insert method_tags values (itemIdVarName, @id);
 			end if;
         END IF;
         SET @inipos = @endpos + 1;

@@ -1577,25 +1577,28 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         // atid is to be used as a unique id in the doTags MySql procedure to
                                         // let subsequent steps insert according to a specific type's id.
-                                        var atid;
+                                        typeIth.atid = null;
                                         if (typeIth.ordinal === 10000) {
 
                                             passObj.project.idnum += 1;
-                                            atid = "@id" + passObj.project.idnum;
+                                            typeIth.atid = "@id" + passObj.project.idnum;
 
                                             passObj.project.script.push('set @guts := "' + guts + '";');
-                                            passObj.project.script.push('set ' + atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
-                                            passObj.project.script.push('if ' + atid + ' is not null then');
-                                            passObj.project.script.push('   delete from types where id=' + atid + ';');
-                                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + atid + ';"));');
+                                            passObj.project.script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                                            passObj.project.script.push('if ' + typeIth.atid + ' is not null then');
+                                            passObj.project.script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                            passObj.project.script.push('   delete from types where id=' + typeIth.atid + ';');
+                                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
                                             passObj.project.script.push('   prepare insstmt from @s;');
                                             passObj.project.script.push('   execute insstmt;');
                                             passObj.project.script.push('else');
+                                            passObj.project.script.push('   /* New System Types are inserted with a new id. */');
                                             passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
                                             passObj.project.script.push('   prepare insstmt from @s;');
                                             passObj.project.script.push('   execute insstmt;');
-                                            passObj.project.script.push('   set ' + atid + ' := (select LAST_INSERT_ID());');
+                                            passObj.project.script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
                                             passObj.project.script.push('end if;');
+                                            passObj.project.script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
                                         }
 
                                         sql.queryWithCxn(passObj.connection, strQuery,
@@ -1607,12 +1610,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                     if (weInserted) {
                                                         passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
-                                                        // m_log("1.1 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                                                         typeIth.id = rows[0].insertId;
                                                     } else {
                                                         // We updated.
                                                         passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-                                                        // // m_log("1.2 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                                                     }
 
                                                     return cb(null);
@@ -1632,17 +1633,16 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                     m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
                                                         (typeIth.ordinal === 10000 ? passObj.project.script : null),
-                                                        function(err) {
-
-                                                            return cb(err);
-                                                        }
+                                                        function(err) { return cb(err); },
+                                                        typeIth.atid
                                                     );
                                                 },
                                                 // (2b)
                                                 function(cb) {
 
                                                     m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
-                                                        function(err) { return cb(err); }
+                                                        function(err) { return cb(err); },
+                                                        typeIth.atid
                                                     );
                                                 }
                                             ],
@@ -1711,7 +1711,8 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch (e) { callback(e); }
     }
 
-    var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
+    // atid is null or undefined unless typeIth is needed for a System Type. In that case it is the identifier to be used in ST.sql.
+    var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback, atid) {
 
         try {
 
@@ -1733,9 +1734,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             method.typeId = typeIth.id;
                                             method.ordinal = ordinal++;
-                                            // m_log("Just set method.typeId=" + method.typeId + " and method.ordinal=" + method.ordinal);
 
-                                            var guts = " SET typeId=" + method.typeId
+                                            var guts = " SET typeId=" + typeIth.id
                                                         + ",name='" + method.name + "'"
                                                         + ",ordinal=" + method.ordinal
                                                         + ",workspace='" + method.workspace + "'"
@@ -1764,7 +1764,26 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                         // If this is a System Type method, push onto passObj.project.script.
                                                         if (typeIth.ordinal === 10000) {
-                                                            project.script.push(strQuery);
+
+                                                            // Re-do guts for use in ST.sql.
+                                                            // We could just patch the original guts, but....
+                                                            var guts = " SET typeId=" + atid
+                                                                        + ",name='" + method.name + "'"
+                                                                        + ",ordinal=" + method.ordinal
+                                                                        + ",workspace='" + method.workspace + "'"
+                                                                        + ",imageId=" + method.imageId
+                                                                        + ",description='" + method.description + "'"
+                                                                        + ",parentMethodId=" + method.parentMethodId
+                                                                        + ",parentPrice=" + method.parentPrice
+                                                                        + ",priceBump=" + method.priceBump
+                                                                        + ",ownedByUserId=" + method.ownedByUserId
+                                                                        + ",public=" + method.public
+                                                                        + ",quarantined=" + method.quarantined
+                                                                        + ",methodTypeId=" + method.methodTypeId
+                                                                        + ",parameters='" + method.parameters + "'"
+                                                                        ;
+                                                            project.script.push("insert " + self.dbname + "methods" + guts + ";");
+                                                            project.script.push('set @idm := (select LAST_INSERT_ID());')
                                                         }
                                                         return cb(null);
 
@@ -1777,9 +1796,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                             m_setUpAndWriteTags(connection, res, method.id, 'method', req.body.userName, method.tags, method.name, 
                                                 (typeIth.ordinal === 10000 ? project.script : null),
-                                                function(err) {
-                                                    return cb(err);
-                                                }
+                                                function(err) { return cb(err); },
+                                                '@idm'
                                             );
                                         }
                                     ],
@@ -1803,8 +1821,15 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     property.typeId = typeIth.id;
                                     property.ordinal = ordinal++;
-                                    strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + property.ordinal + "," + property.isHidden + ");";
-                                    
+
+                                    var guts = " SET typeId=" + typeIth.id
+                                                + ",propertyTypeId=" + property.propertyTypeId
+                                                + ",name='" + property.name + "'"
+                                                + ",initialValue='" + property.initialValue + "'"
+                                                + ",ordinal=" + property.ordinal
+                                                + ",isHidden=" + (property.isHidden ? 1 : 0)
+                                                ;
+                                    strQuery = "insert " + self.dbname + "propertys" + guts + ";";
                                     m_log('Inserting property with ' + strQuery);
                                     sql.queryWithCxn(connection, strQuery,
                                         function(err, rows) {
@@ -1817,7 +1842,14 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 // If this is a System Type property, push onto passObj.project.script.
                                                 if (typeIth.ordinal === 10000) {
-                                                    project.script.push(strQuery);
+                                                    var guts = " SET typeId=" + atid
+                                                                + ",propertyTypeId=" + property.propertyTypeId
+                                                                + ",name='" + property.name + "'"
+                                                                + ",initialValue='" + property.initialValue + "'"
+                                                                + ",ordinal=" + property.ordinal
+                                                                + ",isHidden=" + (property.isHidden ? 1 : 0)
+                                                                ;
+                                                    project.script.push("insert " + self.dbname + "propertys" + guts + ";");
                                                 }
                                                 return cb(null);
 
@@ -1845,8 +1877,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                     event.typeId = typeIth.id;
                                     event.ordinal = ordinal++;
-                                    strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "'," + event.ordinal + ");";
-                                    
+
+                                    var guts = " SET typeId=" + typeIth.id
+                                                + ",name='" + event.name + "'"
+                                                + ",ordinal=" + event.ordinal
+                                                ;
+                                    strQuery = "insert " + self.dbname + "events" + guts + ";";
                                     m_log('Inserting event with ' + strQuery);
                                     sql.queryWithCxn(connection, strQuery,
                                         function(err, rows) {
@@ -1859,7 +1895,11 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 // If this is a System Type event, push onto passObj.project.script.
                                                 if (typeIth.ordinal === 10000) {
-                                                    project.script.push(strQuery);
+                                                    var guts = " SET typeId=" + atid
+                                                                + ",name='" + event.name + "'"
+                                                                + ",ordinal=" + event.ordinal
+                                                                ;
+                                                    project.script.push("insert " + self.dbname + "events" + guts + ";");
                                                 }
                                                 return cb(null);
 
@@ -1885,7 +1925,9 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_setUpAndWriteTags = function(connection, res, itemId, strItemType, userName, strTags, strName, projectScript, callback) {
+    // atid is null or undefined unless an id is needed for a System Type or one of its components.
+    // In that case it is the identifier to be used in ST.sql.
+    var m_setUpAndWriteTags = function(connection, res, itemId, strItemType, userName, strTags, strName, projectScript, callback, atid) {
 
         try {
             
@@ -1931,7 +1973,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             }
 
-            var strSql = "call " + self.dbname + "doTags('" + uniqueArray.join('~') + "~'," + itemId + ",'" + strItemType + "');";
+            var tagsString = uniqueArray.join('~') + '~';
+            var strSql = "call " + self.dbname + "doTags('" + tagsString + "'," + itemId + ",'" + strItemType + "');";
                 
             m_log("Sending this sql: " + strSql);
             sql.queryWithCxn(connection, strSql, 
@@ -1941,9 +1984,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         if (err) { throw err; }
 
+                        // projectScript is passed in if it is meant for us to push the procedure call. So we will.
                         if (projectScript) {
-                            // projectScript is passed in if it is meant for us to push the procedure call. So we will.
-                            projectScript.push(strSql);
+                            projectScript.push("call " + self.dbname + "doTags('" + tagsString + "'," + atid + ",'" + strItemType + "');");
                         }
                         return callback(null);
                     } catch(et) { return callback(et); }
