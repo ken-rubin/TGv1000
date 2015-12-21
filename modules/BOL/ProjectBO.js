@@ -1096,6 +1096,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
             async.series(
                 [
+                    // (1)
                     function(cb) {
                         // The following will delete the former project completely from the database using cascading delete.
                         var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
@@ -1105,19 +1106,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                         sql.queryWithCxn(connection, 
                             strQuery, 
                             function(err, rows) {   
-                                // rows is ignored for this deletion. err will be enough. err will be null if delete worked. That will cause part (2) to run.
+                                // rows is ignored for deletion. err will be null if delete worked. That will cause part (2) to run.
                                 return cb(err);
                             }
                         );
                     },
+                    // (2)
                     function(cb) {
                         // Now we can just INSERT the project as passed from the client side.
                         m_log("Going off to m_functionProjectSaveAsPart2");
                         m_functionProjectSaveAsPart2(connection, req, res, project, 
-                            function(err) { return cb(err); }
+                            function(err) { 
+                                return cb(err); 
+                            }
                         );
                     }
-                ], 
+                ],
+                // final callback for series
                 function(err){ return callback(err); }
             );
         } catch (e) { callback(e); }
@@ -1142,6 +1147,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
             async.series(
                 [
+                    // (1)
                     function(cb) {
                         // Look for and reject an attempt to add a 2nd project for same user with same name.
                         var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
@@ -1156,12 +1162,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         
                                     project.public = 0;                 // Any saved project needs review by an admin or instructor
                                                                         // before being searchable by other ordinary users.
-                                    cb(null);
+                                    
+                                    // Need explicit call to end this function.
+                                    return cb(null);
 
                                 } catch (e1) { return cb(e1); }
                             }
                         );
                     },
+                    // (2)
                     function(cb) {
                         // Now we can just INSERT the project as passed from the client side.
                         m_log("Going off to m_functionProjectSaveAsPart2");
@@ -1171,7 +1180,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         );
                     }
-                ], 
+                ],
+                // final callback for series
                 function(err){
                     return callback(err); 
                 }
@@ -1194,6 +1204,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             //  (2b) call off to do all of the project's comics
             async.series(
                 [
+                    // (1)
                     function(cb) {
 
                         if (project.canEditSystemTypes) {
@@ -1239,15 +1250,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
 
                                 project.id = rows[0].insertId;
-                                cb(null);
+                                return cb(null);
                             }
                         );
                     },
+                    // (2)
                     function(cb) {
 
                         // Use async.parallel to save the project's tags and start doing its comics in parallel.
                         async.parallel(
                             [
+                                // (2a)
                                 function(cb) {
                                     m_log("Going to write project tags");
                                     m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
@@ -1257,6 +1270,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     );
                                 },
+                                // (2b)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
@@ -1266,10 +1280,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     );
                                 }
                             ],
-                            cb
+                            // final callback for (2)
+                            function(err) { return cb(err); }
                         );
                     }
                 ],
+                // final callback for (1)
                 function(err) {
                     return callback(err);
                 }
@@ -1293,13 +1309,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     comicIth.projectId = project.id;
                     var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
-                    
 
-turn these into a series.
-
-
-
-
+                    m_log("Writing comicIth with " + strQuery);
+                    // Turn these into a series?
                     sql.queryWithCxn(connection,
                         strQuery,
                         function(err, rows) {
@@ -1308,6 +1320,7 @@ turn these into a series.
                                 if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
                                 
                                 comicIth.id = rows[0].insertId;
+                                m_log("Going to m_saveTypesInComicIthToDB");
                                 m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
                                     function(err) {
                                         return cb(err); 
@@ -1318,7 +1331,8 @@ turn these into a series.
                             }
                         }
                     );
-                }, 
+                },
+                // final callback for series
                 function(err) {
                     return callback(err);
                 }
@@ -1349,6 +1363,7 @@ turn these into a series.
             // We should try that after all settles down.
             async.series(
                 [
+                    // (1)
                     function(cb) {
                         m_saveAppTypeInComicIthToDB(passObj, 
                             function(err) {
@@ -1356,6 +1371,7 @@ turn these into a series.
                             }
                         );
                     },
+                    // (2)
                     function(cb) {
                         m_saveNonAppTypesInComicIthToDB(passObj, 
                             function(err) {
@@ -1363,6 +1379,7 @@ turn these into a series.
                             }
                         );
                     },
+                    // (3)
                     function(cb) {
                         m_fixUpBaseTypeIdsInComicIth(passObj, 
                             function(err) {
@@ -1371,6 +1388,7 @@ turn these into a series.
                         );
                     }
                 ], 
+                // final callback
                 function(err){
                     return callback(err);
                 }
@@ -1401,6 +1419,7 @@ turn these into a series.
                     //  (2b) write the App type's arrays (methods, properties and events).
                     async.series(
                         [
+                            // (1)
                             function(cb) {
 
                                 typeIth.comicId = passObj.comicIth.id;
@@ -1417,30 +1436,36 @@ turn these into a series.
                                             // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
                                             // But we do have to set the newly assign id.
                                             typeIth.id = rows[0].insertId;
+                                            return cb(null);
 
                                         } catch (e1) { return cb(e1); }
                                     }
                                 );
                             },
+                            // (2)
                             function(cb) {
                                 async.parallel(
                                     [
+                                        // (2a)
                                         function(cb) {
                                             m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
                                                 null,   // This says not to push to project.script
                                                 function(err) { return cb(err); }
                                             );
                                         },
+                                        // (2b)
                                         function(cb) {
                                             m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
                                                 function(err) { return cb(err) }
                                             );
                                         }
                                     ],
-                                    cb
+                                    // parallel final callback
+                                    function(err) { return cb(err); }
                                 );
                             }
                         ],
+                        // series final callback
                         function(err){ return callback(err); }
                     );
                     break;
@@ -1492,6 +1517,7 @@ turn these into a series.
 
                             async.series(
                                 [
+                                    // (1)
                                     function(cb) {
 
                                         // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
@@ -1576,15 +1602,19 @@ turn these into a series.
                                                         // // m_log("1.2 xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                                                     }
 
+                                                    return cb(null);
+
                                                 } catch (e3) {
                                                     return cb(e3);
                                                 }
                                             }
                                         );
                                     },
+                                    // (2)
                                     function(cb) {
                                         async.parallel(
                                             [
+                                                // (2a)
                                                 function(cb) {
 
                                                     m_setUpAndWriteTags(passObj.connection, passObj.res, type.id, 'type', passObj.req.body.userName, type.tags, type.name, 
@@ -1595,21 +1625,21 @@ turn these into a series.
                                                         }
                                                     );
                                                 },
+                                                // (2b)
                                                 function(cb) {
 
-                                                    m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, function(err) {
-
-                                                        return cb(err);
-                                                    });
+                                                    m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, type, passObj.req, passObj.res, 
+                                                        function(err) { return cb(err); }
+                                                    );
                                                 }
                                             ],
-                                            cb
+                                            // final callback for parallel
+                                            function(err) { return cb(err); }
                                         );
                                     }
                                 ],
-                                function(err) {
-                                    return cb(err);
-                                }
+                                // final callback for series
+                                function(err) { return cb(err); }
                             );
                         } else {
                             // Even though we didn't write it out, we'll have it for lookups.
@@ -1619,6 +1649,7 @@ turn these into a series.
                         }
                     }
                 }, 
+                // final callback
                 function(err) { return callback(err); }
             );
         } catch (e) { callback(e); }
@@ -1654,6 +1685,7 @@ turn these into a series.
                         };
                     }
                 },
+                // final callback for eachSeries
                 function(err) {
                     return callback(err);
                 }
@@ -1669,12 +1701,16 @@ turn these into a series.
 
             async.parallel(
                 [
+                    // (1) methods
                     function(cb) {
+
+                        m_log("Doing methods");
                         var ordinal = 0;
                         async.eachSeries(typeIth.methods,
                             function(method, cb) {
                                 async.series(
                                     [
+                                        // (1a)
                                         function(cb) {
 
                                             method.typeId = typeIth.id;
@@ -1698,7 +1734,7 @@ turn these into a series.
                                                         ;
 
                                             var strQuery = "insert " + self.dbname + "methods" + guts + ";";
-                                            // m_log('Inserting method with ' + strQuery);
+                                            m_log('Inserting method with ' + strQuery);
                                             sql.queryWithCxn(connection, strQuery,
                                                 function(err, rows) {
 
@@ -1712,16 +1748,16 @@ turn these into a series.
                                                         if (typeIth.ordinal === 10000) {
                                                             project.script.push(strQuery);
                                                         }
-                                                    } catch (em) {
+                                                        return cb(null);
 
-                                                        return cb(em);
-                                                    }
+                                                    } catch (em) { return cb(em); }
                                                 }
                                             );
                                         },
+                                        // (1b)
                                         function(cb) {
 
-                                            m_setUpAndWriteTags(connection, res, meth.id, 'method', req.body.userName, meth.tags, meth.name, 
+                                            m_setUpAndWriteTags(connection, res, method.id, 'method', req.body.userName, method.tags, method.name, 
                                                 (typeIth.ordinal === 10000 ? project.script : null),
                                                 function(err) {
                                                     return cb(err);
@@ -1729,75 +1765,101 @@ turn these into a series.
                                             );
                                         }
                                     ],
-                                    function(err) {
-                                        return cb(err);
-                                    }
+                                    // final callback for series (1)
+                                    function(err) { return cb(err); }
                                 );
                             },
+                            // final callback for eachSeries (1)
                             function(err) { return cb(err); }
                         );
                     },
+                    // (2)
                     function(cb) {
-                        var ordinal = 0;
-                        async.eachSeries(typeIth.properties,
-                            function(property, cb) {
 
-                                property.typeId = typeIth.id;
-                                property.ordinal = ordinal++;
-                                strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + property.ordinal + "," + property.isHidden + ");";
-                                
-                                // m_log('Inserting property with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                        if (typeIth.properties.length) {
 
-                                        try {
-                                            if (err) { return cb(err); }
-                                            if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
+                            m_log("Doing properties");
+                            var ordinal = 0;
+                            async.eachSeries(typeIth.properties,
+                                function(property, cb) {
 
-                                            property.id = rows[0].insertId;
+                                    property.typeId = typeIth.id;
+                                    property.ordinal = ordinal++;
+                                    strQuery = "insert " + self.dbname + "propertys (typeId,propertyTypeId,name,initialValue,ordinal,isHidden) values (" + property.typeId + "," + property.propertyTypeId + ",'" + property.name + "','" + property.initialValue + "'," + property.ordinal + "," + property.isHidden + ");";
+                                    
+                                    m_log('Inserting property with ' + strQuery);
+                                    sql.queryWithCxn(connection, strQuery,
+                                        function(err, rows) {
 
-                                            // If this is a System Type property, push onto passObj.project.script.
-                                            if (typeIth.ordinal === 10000) {
-                                                project.script.push(strQuery);
-                                            }
-                                        } catch (ep) { return cb(ep); }
-                                    }
-                                );
-                            },
-                            function(err) { return cb(err); }
-                        );
+                                            try {
+                                                if (err) { return cb(err); }
+                                                if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
+
+                                                property.id = rows[0].insertId;
+
+                                                // If this is a System Type property, push onto passObj.project.script.
+                                                if (typeIth.ordinal === 10000) {
+                                                    project.script.push(strQuery);
+                                                }
+                                                return cb(null);
+
+                                            } catch (ep) { return cb(ep); }
+                                        }
+                                    );
+                                },
+                                // final callback for eachSeries (2)
+                                function(err) { return cb(err); }
+                            );
+                        } else {
+                            m_log("No properties to do");
+                            return cb(null);
+                        }
                     },
+                    // (3)
                     function(cb) {
-                        var ordinal = 0;
-                        async.eachSeries(typeIth.events,
-                            function(event, cb) {
 
-                                event.typeId = typeIth.id;
-                                event.ordinal = ordinal++;
-                                strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "'," + event.ordinal + ");";
-                                // m_log('Inserting event with ' + strQuery);
-                                sql.queryWithCxn(connection, strQuery,
-                                    function(err, rows) {
+                        if (typeIth.events.length) {
 
-                                        try {
-                                            if (err) { throw err; }
-                                            if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+                            m_log("Doing events");
+                            var ordinal = 0;
+                            async.eachSeries(typeIth.events,
+                                function(event, cb) {
 
-                                            event.id = rows[0].insertId;
+                                    event.typeId = typeIth.id;
+                                    event.ordinal = ordinal++;
+                                    strQuery = "insert " + self.dbname + "events (typeId,name,ordinal) values (" + event.typeId + ",'" + event.name + "'," + event.ordinal + ");";
+                                    
+                                    m_log('Inserting event with ' + strQuery);
+                                    sql.queryWithCxn(connection, strQuery,
+                                        function(err, rows) {
 
-                                            // If this is a System Type event, push onto passObj.project.script.
-                                            if (typeIth.ordinal === 10000) {
-                                                project.script.push(strQuery);
-                                            }
-                                        } catch (ee) { return cb(ee); }
-                                    }
-                                );
-                            },
-                            function(err) { return cb(err); }
-                        );
+                                            try {
+                                                if (err) { throw err; }
+                                                if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+
+                                                event.id = rows[0].insertId;
+
+                                                // If this is a System Type event, push onto passObj.project.script.
+                                                if (typeIth.ordinal === 10000) {
+                                                    project.script.push(strQuery);
+                                                }
+                                                return cb(null);
+
+                                            } catch (ee) { return cb(ee); }
+                                        }
+                                    );
+                                },
+                                // final callback for eachSeries (3)
+                                function(err) { return cb(err); }
+                            );
+                        } else {
+                            m_log("No events to do");
+                            return cb(null);
+                        }
                     }
                 ],
-                callback
+                // final callback for parallel
+                function(err) { return callback(err); }
             );
         } catch (e) {
 
@@ -1865,6 +1927,7 @@ turn these into a series.
                             // projectScript is passed in if it is meant for us to push the procedure call. So we will.
                             projectScript.push(strSql);
                         }
+                        return callback(null);
                     } catch(et) { return callback(et); }
                 }
             );
