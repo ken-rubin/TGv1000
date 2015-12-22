@@ -11,16 +11,15 @@
 
 ## Jerry
 
-- Fix the system type SQL script (ST.sql) to work on new and existing DBs.
-    - Still need to solve the referral problems: methods, properties and events to System Types and Tags to System Types and Methods.
-- **Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.**
-- **All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.**
-- **Set disabled menu colors to be different from enabled.**
-- **Still getting delete confirmation dialog if I close a project immediately after saving it.**
+- Test routeProjectSave some more.
+- Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
+- All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
+- I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu.
+- Set disabled menu colors to be different from enabled.
+- Still getting delete confirmation dialog if I close a project immediately after saving it.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore.
-- Look into IIFE as a type of closure for ProjectBO.js.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
-- **Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.**
+- Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
 - Add usergroups.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably.
 - Type color schema (for schema blocks)--Generate a random (unused) color for each Type (see Code.js in the 700s)--That same color goes to the type's methods, properties and events.
@@ -38,7 +37,7 @@
     - Slide full panel over half (resizable) the main window
     - CLick off the comic resizes back to scroll strip.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
-- Need rest of the dialogs to submit on Enter key.
+- Need rest of the dialogs to submit on Enter key. These are already done: EnrollDialog, NewEventDialog, NewMethodDialog, NewProjectDialog, NewPropertyDialog, NewTypeDialog, SaveProjectAsDialog.
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes.
 - A New SystemType should probably require an image.
 - If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything.
