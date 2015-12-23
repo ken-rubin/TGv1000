@@ -11,17 +11,21 @@
 
 ## Jerry
 
-- Test routeProjectSave some more.
+#### Bugs
 - Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
 - All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
 - I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu.
-- Set disabled menu colors to be different from enabled.
 - Still getting delete confirmation dialog if I close a project immediately after saving it.
-- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore.
 - Image search for Type (and likely everything) is pulling up all id=0 images. I think.
+- If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
+
+#### Things
+- Test ProjectBO.js#routeSaveProject some more.
+- Set disabled menu colors to be different from enabled.
+- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Discuss with Ken.**
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
 - Add usergroups.
-- Do we want to have to search for System Types that aren't base types for any other type? Probably.
+- Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Type color schema (for schema blocks)--Generate a random (unused) color for each Type (see Code.js in the 700s)--That same color goes to the type's methods, properties and events.
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
@@ -30,18 +34,37 @@
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; 
     - close window or browser (possible?)
-- Call client.projectIsDirty() after ANYTHING the user does while in a project. Anything at all. Is there s better way to do this than putting the call in dozens of places??? What does Ken have to do here?
+- Call client.projectIsDirty() after ANYTHING the user does while in a project. 
+    - Anything at all. 
+    - Is there a better way to do this than putting the call in dozens of places??? 
+    - What does Ken have to do here? 
+    - Should a new project be clean or dirty when just loaded?
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Comic click
     - Slide full panel over half (resizable) the main window
     - CLick off the comic resizes back to scroll strip.
 - We might want to set a red background for the current Type in the left vertical scroll region, too.
-- Need rest of the dialogs to submit on Enter key. These are already done: EnrollDialog, NewEventDialog, NewMethodDialog, NewProjectDialog, NewPropertyDialog, NewTypeDialog, SaveProjectAsDialog.
+- Need rest of the dialogs to submit on Enter key.
+    - These are already done:
+        + EnrollDialog
+        + NewEventDialog
+        + NewMethodDialog
+        + NewProjectDialog
+        + NewPropertyDialog
+        + NewTypeDialog
+        + SaveProjectAsDialog
+    - Still have to look at these to see if it makes sense: 
+        - DeleteConfirmDialog
+        - GenericRenameDialog
+        - Image*Dialog(s)
+        - MethodSearchDialog
+        - OpenProjectDialog
+        - PropertyGrid
+        - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes.
-- A New SystemType should probably require an image.
+- A New SystemType should probably require an image. **Discuss with Ken.**
 - If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything.
-
 
 
 
@@ -52,7 +75,6 @@
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
 - **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- **Ken:** The immense amount of work that gets done in BlocklyChangeListener means that dragging in Designer is quite crippled if App initialized is selected and being displayed in Code. It's still ok if anything else is displayed.
 
 
 
