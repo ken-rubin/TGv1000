@@ -14,13 +14,14 @@
 #### Bugs
 - Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
 - All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
-- I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu.
 - Still getting delete confirmation dialog if I close a project immediately after saving it.
-- Image search for Type (and likely everything) is pulling up all id=0 images. I think.
+- **ImageSearchDialog seems to be putting the tooltip "Photo" on most images--but not all.**
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
 
 #### Things
+- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
 - Test ProjectBO.js#routeSaveProject some more.
+- I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu. **This is because the project was clean so it was purposefully done. Don't know if this should be the case or not, but, if it should, then Quick Save should be the same--and it isn't.**
 - Set disabled menu colors to be different from enabled.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Discuss with Ken.**
 - Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
@@ -54,10 +55,12 @@
         + NewPropertyDialog
         + NewTypeDialog
         + SaveProjectAsDialog
+        + ImageDiskDialog
     - Still have to look at these to see if it makes sense: 
         - DeleteConfirmDialog
         - GenericRenameDialog
-        - Image*Dialog(s)
+        - ImageSearchDialog
+        - ImageURLDialog
         - MethodSearchDialog
         - OpenProjectDialog
         - PropertyGrid

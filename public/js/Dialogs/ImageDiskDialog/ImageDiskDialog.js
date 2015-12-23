@@ -118,7 +118,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Wire things up.
 						    $("#imageFile").change(m_functionFileHasBeenChosen);
 						    $("#ISSaveBtn").click(m_functionSaveLocalResource);
+						    $("#ISSaveBtn").keydown(function(e) {
+						    	if (e.which === 13) { m_functionSaveLocalResource(); }
+						    });
 						    $("#ISResetBtn").click(m_functionReset);
+						    $("#imageFile").focus();
 
 						} catch (e) {
 
@@ -179,6 +183,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						        url.revokeObjectURL(src);
 
 								$("#ISPhase2").css("display", "block");
+								$("#ISSaveBtn").focus();
 						    }
 						} catch (e) {
 
@@ -256,6 +261,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							$("#ISNewLocalWell").empty();
 
 							$("#ISPhase2").css("display", "none");
+							$("#imageFile").focus();
 
 						} catch (e) {
 
