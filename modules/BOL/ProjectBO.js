@@ -1064,13 +1064,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             m_log('Going into m_functionSaveProjectAs');
                                             m_functionSaveProjectAs(connection, req, res, project, 
                                                 function(err) { 
-                                                    m_log("B--" + (err ? "with non-null err" : "with null err"));
                                                     if(err) { 
-                                                        m_log("B1");
                                                         m_functionFinalCallback(err, res, null, null); 
                                                     }else {
                                                         // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
-                                                        m_log("B2");
                                                         m_functionFinalCallback(null, res, connection, project);
                                                     }
                                                 }
@@ -1078,15 +1075,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     }
                                 } catch(e1) { 
-                                    m_log("C");
                                     m_functionFinalCallback(e1, res, null, null);
                                 }
                             }
                         );
-                    } catch (e2) { m_log("C2"); m_functionFinalCallback(e2, res, null, null); }
+                    } catch (e2) { m_functionFinalCallback(e2, res, null, null); }
                 }
             );
-        } catch(e) { m_log("C3"); m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null); }
+        } catch(e) { m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null); }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1191,7 +1187,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                 ],
                 // final callback for async.series
                 function(err){
-                    m_log("A");
                     return callback(err); 
                 }
             );
@@ -1674,35 +1669,37 @@ module.exports = function ProjectBO(app, sql, logger) {
     var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
 
         try {
-            m_log("***In m_fixUpBaseTypeIdsInComicIth***");
+            // m_log("***In m_fixUpBaseTypeIdsInComicIth*** with passObj.typeIdTranslationArray=" + JSON.stringify(passObj.typeIdTranslationArray));
 
             async.eachSeries(passObj.comicIth.types.items, 
                 function(typeIth, cb) {
 
-                    if (typeIth.baseTypeId !== null) {
-
-                        for (var j = 0; j < passObj.typeIdTranslationArray.length; j++) {
-
-                            var xlateIth = passObj.typeIdTranslationArray[j];
-
-                            if (xlateIth.origId === typeIth.baseTypeId) {
-
-                                if (xlateIth.newId !== xlateIth.origId){
-
-                                    var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
-                                    typeIth.baseTypeId = xlateIth.newId;
-                                    sql.queryWithCxn(passObj.connection, strQuery,
-                                        function(err, rows) {
-                                            return cb(err);
-                                        }
-                                    );
-                                }
-                            }
-                        };
-                        return cb(null);
-                    } else {
-                        return cb(null);
+                    if (!typeIth.baseTypeId) { 
+                        return cb(null); 
                     }
+
+                    // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
+                    var didOne = false;
+                    for (var j = 0; j < passObj.typeIdTranslationArray.length; j++) {
+
+                        var xlateIth = passObj.typeIdTranslationArray[j];
+                        if (xlateIth.origId === typeIth.baseTypeId) {
+                            if (xlateIth.newId !== xlateIth.origId) {
+                                var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+                                didOne = true;
+
+                                // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
+                                typeIth.baseTypeId = xlateIth.newId;
+                                sql.queryWithCxn(passObj.connection, strQuery,
+                                    function(err, rows) {
+                                        if (err) { return cb(err); }
+                                        return cb(null);
+                                    }
+                                );
+                            }
+                        }
+                    };
+                    if (!didOne) { return cb(null); }
                 },
                 // final callback for eachSeries
                 function(err) {
@@ -1753,7 +1750,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                         ;
 
                                             var strQuery = "insert " + self.dbname + "methods" + guts + ";";
-                                            m_log('Inserting method with ' + strQuery);
+                                            // m_log('Inserting method with ' + strQuery);
                                             sql.queryWithCxn(connection, strQuery,
                                                 function(err, rows) {
 
@@ -1831,7 +1828,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                 ;
                                     strQuery = "insert " + self.dbname + "propertys" + guts + ";";
-                                    m_log('Inserting property with ' + strQuery);
+                                    // m_log('Inserting property with ' + strQuery);
                                     sql.queryWithCxn(connection, strQuery,
                                         function(err, rows) {
 
@@ -1884,7 +1881,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 + ",ordinal=" + event.ordinal
                                                 ;
                                     strQuery = "insert " + self.dbname + "events" + guts + ";";
-                                    m_log('Inserting event with ' + strQuery);
+                                    // m_log('Inserting event with ' + strQuery);
                                     sql.queryWithCxn(connection, strQuery,
                                         function(err, rows) {
 
@@ -2001,24 +1998,20 @@ module.exports = function ProjectBO(app, sql, logger) {
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
-            m_log("D");
             res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
        } else {
-            m_log("E");
             sql.commitCxn(connection,
                 function(err){
 
                     if (err) {
-                        m_log("F");
                         res.json({
                             success: false,
                             message: 'Committing transaction failed with ' + err.message
                         });
                     } else {
-                        m_log("G");
                         if (project.hasOwnProperty("script")) {
                             // There's a sql script that needs to be written to project root.
                             // In the callback from that file creation, we'll return to the client.
@@ -2030,7 +2023,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (err) {
                                     // Writing the file didn't work, but saving the project has already been committed to the DB.
                                     // We'll inform the user, but do so in a way that the project is saved.
-                                    m_log("H");
                                     res.json({
                                         success: true,
                                         project: project,
@@ -2038,7 +2030,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         saveError: err
                                     });
                                 } else {
-                                    m_log("I");
                                     res.json({
                                         success: true,
                                         project: project,
@@ -2047,7 +2038,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
                             });
                         } else {
-                            m_log("J");
                             res.json({
                                 success: true,
                                 project: project
@@ -2081,7 +2071,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     }
 
     var m_log = function(msg) {
-        console.log(' ');
+        // console.log(' ');
         console.log(msg);
     }
 

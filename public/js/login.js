@@ -172,6 +172,7 @@ var m_functionSignInButtonClick = function(errorHelper) {
 
 	            if (data.success) {
 
+	            	// The following is included just to remind us in the future how to log from client to server.
 					JL().info("<<< successful login occurred >>>");
 
 					// These cookies don't expire, but they mau be overridden if a different user logs in.
