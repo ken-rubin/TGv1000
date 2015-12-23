@@ -4,6 +4,7 @@
 //////////////////////////////////
 var fs = require("fs");
 var async = require("async");
+var os = require("os");
 
 module.exports = function ProjectBO(app, sql, logger) {
 
@@ -2061,9 +2062,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     var m_functionWriteSqlScript = function(project, callback) {
 
         try {
-
-            var fs = require('fs');
-            var os = require('os');
 
             // Finalize the procedure.
             project.script.push("end;");
