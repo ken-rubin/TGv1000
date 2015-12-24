@@ -15,7 +15,7 @@
 - Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
 - All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
 - Still getting delete confirmation dialog if I close a project immediately after saving it.
-- **ImageSearchDialog seems to be putting the tooltip "Photo" on most images--but not all.**
+- **Since I enabled enter key in ImageDiskDialog, I'm getting two records added to the resources table (when I use enter), but only one of them is saved as an image in the resources folder.**
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
 
 #### Things
