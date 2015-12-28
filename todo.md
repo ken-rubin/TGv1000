@@ -13,22 +13,22 @@
 
 #### Bugs
 - Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
-- All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
-- Still getting delete confirmation dialog if I close a project immediately after saving it.
+- Saving and menu problems
+    + Test ProjectBO.js#routeSaveProject some more. Just a bit. Should I put async anyplace in the project fetching code?
+    + All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
+    + Still getting delete confirmation dialog if I close a project immediately after saving it.
+    + Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
+    + I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu. **This is because the project was clean so it was purposefully done. Don't know if this should be the case or not, but, if it should, then Quick Save should be the same--and it isn't.**
+    + Set disabled menu colors to be different from enabled.
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
-- Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
 
 #### Things
+- Project/Save As presents an error if the user tries to save a project *without* changing to a new name. Maybe it should be more lenient.
 - A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
-- Test ProjectBO.js#routeSaveProject some more.
-- I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu. **This is because the project was clean so it was purposefully done. Don't know if this should be the case or not, but, if it should, then Quick Save should be the same--and it isn't.**
-- Set disabled menu colors to be different from enabled.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Add usergroups.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Regarding duplicate project name within userId: I can see a scenario where a user goes into the save as dialog, changes the name to one already used (which does update the project in memory on the blur event), backs out (which doesn't reset the project's name back) and then uses straight Save with this duplicate name. This must be prevented.
-    - I think that the blur handlers in Save As need to update the project only if Save Project is called. Otherwise, they set member variables. That will handle this.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; 

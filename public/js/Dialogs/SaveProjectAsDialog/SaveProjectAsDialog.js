@@ -164,8 +164,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var txt = $("#ProjectName").val().trim();
 						if (txt !== m_project.data.name) {
 
-							m_project.data.name = txt;
-							client.setBrowserTabAndBtns();
+							m_project_data_name = txt;
 							m_setStateSaveAsBtn();
 						}
 					}
@@ -195,6 +194,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionSaveProject = function () {
 
 						try {
+
+							if (m_saveOrSaveAs === "") {
+
+								m_project.data.name = m_project_data_name;
+								client.setBrowserTabAndBtns();
+
+							}
 
 							exceptionRet = client.saveProject(m_saveOrSaveAs);
 							if (exceptionRet) { throw exceptionRet; }
@@ -273,6 +279,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_project = null;
 				var m_saveOrSaveAs;
+				var m_project_data_name = "";
 			};
 
 			// Return the constructor function as the module object.
