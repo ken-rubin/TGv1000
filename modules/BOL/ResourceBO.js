@@ -198,7 +198,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
         try {
 
-            console.log("Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
+            console.log("******Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
             // req.body.resourceTypeId

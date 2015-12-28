@@ -118,11 +118,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Wire things up.
 						    $("#imageFile").change(m_functionFileHasBeenChosen);
 						    $("#ISSaveBtn").click(m_functionSaveLocalResource);
-						    $("#ISSaveBtn").keydown(function(e) {
-						    	if (e.which === 13) { m_functionSaveLocalResource(); }
-						    });
 						    $("#ISResetBtn").click(m_functionReset);
-						    $("#imageFile").focus();
 
 						} catch (e) {
 
@@ -183,6 +179,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						        url.revokeObjectURL(src);
 
 								$("#ISPhase2").css("display", "block");
+							    $("#ISSaveBtn").keydown(function(e) {
+							    	if (e.which === 13) { m_functionSaveLocalResource(); }
+							    });
 								$("#ISSaveBtn").focus();
 						    }
 						} catch (e) {
@@ -200,6 +199,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// User may have empty tags.
 							// Grab userId.
 							// On successful return, call callback with resourceId.
+							if (m_resourceHasBeenSent) { return; }
 							var tags = $("#ISTags").val().trim();
 							var strResourceName = $("#ISName").val().trim();	// required
 							if (strResourceName.length === 0) {
@@ -223,6 +223,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							request.open("POST", "/BOL/ResourceBO/SaveResource");
 							request.responseType = 'json';
 							request.send(formData);
+							m_resourceHasBeenSent = true;
 
 	    					request.onload = function(oEvent){
 
@@ -261,7 +262,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							$("#ISNewLocalWell").empty();
 
 							$("#ISPhase2").css("display", "none");
-							$("#imageFile").focus();
 
 						} catch (e) {
 
@@ -299,6 +299,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				var m_dialog = null;
 				var m_bImage = null;
 				var m_functionOK = null;
+				var m_resourceHasBeenSent = false;
 			};
 
 			// Return the constructor function as the module object.
