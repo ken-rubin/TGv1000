@@ -12,18 +12,67 @@
 ## Jerry
 
 #### Bugs
-- Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
 - Saving and menu problems
     + Test ProjectBO.js#routeSaveProject some more. Just a bit. Should I put async anyplace in the project fetching code?
-    + All Projects menu items are available after closing a Project. This is a complex chain of calls that has to be analyzed carefully. Also, closing a project has to clear the browser tab.
-    + Still getting delete confirmation dialog if I close a project immediately after saving it.
-    + Project / Quick Save may save twice--it flashes the Save is complete pop-up twice and the self-closing pop-up doesn't go away the second time.
-    + I created and saved a new project with one Type added. Added another Type and Save was disabled in the menu. **This is because the project was clean so it was purposefully done. Don't know if this should be the case or not, but, if it should, then Quick Save should be the same--and it isn't.**
     + Set disabled menu colors to be different from enabled.
+    + Projects menu items handling:
+
+<table>
+    <tr>
+        <td>Menu item</td>
+        <td>Enabled when</td>
+        <td>Disabled when</td>
+        <td>Show abandon dialog if</td>
+        <td>Special handling</td>
+    </tr>
+    <tr>
+        <td>New</td>
+        <td>Always</td>
+        <td>Never</td>
+        <td>Project exists</td>
+        <td>Update browser tab if user assigns name at creation time.</td>
+    </tr>
+    <tr>
+        <td>Search for/Open</td>
+        <td>Always</td>
+        <td>Never</td>
+        <td>Project exists</td>
+        <td>Update browser tab.</td>
+    </tr>
+    <tr>
+        <td>Save</td>
+        <td>Project exists with a name.</td>
+        <td>No project exists; project exists but has no name.</td>
+        <td>Never</td>
+        <td>Should now be able to save even if it was just saved and no changes were made.</td>
+    </tr>
+    <tr>
+        <td>Save As</td>
+        <td>Project exists</td>
+        <td>Never</td>
+        <td>Never</td>
+        <td>Disable Save button if no name. Can Save with same name, but a changed name must be unique to the user. Update browser tab.</td>
+    </tr>
+    <tr>
+        <td>Quick Save</td>
+        <td>Project exists with a name.</td>
+        <td>No project exists; project exists but has no name.</td>
+        <td>Never</td>
+        <td>Should now be able to save even if it was just saved and no changes were made. **Quick save may be saving twice.**</td>
+    </tr>
+    <tr>
+        <td>Close project</td>
+        <td>Project exists</td>
+        <td>No project exists.</td>
+        <td>Project exists and is dirty.</td>
+        <td></td>
+    </tr>
+</table>
+
+- Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
 
 #### Things
-- Project/Save As presents an error if the user tries to save a project *without* changing to a new name. Maybe it should be more lenient.
 - A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Add usergroups.
