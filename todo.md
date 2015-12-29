@@ -12,10 +12,55 @@
 ## Jerry
 
 #### Bugs
-- Saving and menu problems
-    + Test ProjectBO.js#routeSaveProject some more. Just a bit. Should I put async anyplace in the project fetching code?
-    + Set disabled menu colors to be different from enabled.
-    + Projects menu items handling:
+- A *saveAs* with same name and id of a project already in the DB needs to be switched to a *save*. This is similar to (but opposite) the case where a *save* where either project.id === 0 and project.ownedByUserId !=== req.body.userId is switched to a *saveAs*. BTW, a *saveAs* with an existing id but a different name is saved as a new project. OK. I'll summarize:
+
+<table>
+    <tr>
+        <td>save or saveAs</td>
+        <td>id</td>
+        <td>name</td>
+        <td>Action</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+- Set disabled menu colors to be different from enabled.
+- Projects menu items handling:
 
 <table>
     <tr>
@@ -29,14 +74,14 @@
         <td>New</td>
         <td>Always</td>
         <td>Never</td>
-        <td>Project exists</td>
+        <td>Project exists and is dirty</td>
         <td>Update browser tab if user assigns name at creation time.</td>
     </tr>
     <tr>
         <td>Search for/Open</td>
         <td>Always</td>
         <td>Never</td>
-        <td>Project exists</td>
+        <td>Project exists and is dirty</td>
         <td>Update browser tab.</td>
     </tr>
     <tr>
@@ -69,7 +114,9 @@
     </tr>
 </table>
 
-- Rename TI in PropertyGrid. Very broken. Added a single character and lost contents of App initialize block. For starters.
+- Test ProjectBO.js#routeSaveProject some more. Just a bit. 
+- Also in ProjectBO: should I put async anyplace in the project fetching code?
+- Rename TI in PropertyGrid is very broken. Added a single character and lost contents of App initialize block. For starters.
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
 
 #### Things

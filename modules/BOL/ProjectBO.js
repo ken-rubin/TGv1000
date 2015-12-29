@@ -1019,11 +1019,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
-            // Special note about error returns throughout routeSaveProject
-            //
-            // All methods in SQL.js return an exception or null in their callback EXCEPT queryWithCxn returns an error string.
-            // connection returns exceptions or null.
-            // All out own methods return error strings.
             // Remember: always have a try/catch block inside an async callback, and it cannot throw further, because
             // the external context may n0 longer exist.
             //
@@ -1142,7 +1137,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
         
         // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
-        // If we are doing a Save, we've already deleted the original project and can just insert a new version.
+        // If we are doing a Save, we've already deleted the original project and will jump over this method to run m_functionSaveProjectAsPart2.
         // All this is in a transaction and it can all be rolled back until it is comitted.
         m_log("***In m_functionSaveProjectAs***");
         try {
@@ -1154,20 +1149,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (1)
                     function(cb) {
                         // Look for and reject an attempt to add a 2nd project for same user with same name.
-                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
+                        var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
                         
                         m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
                         sql.queryWithCxn(connection, strQuery, 
                             function(err, rows) {
                                 try {                
                                     if (err) { return cb(err); }
-                                    if (rows.length === 0) { return cb(new Error('Failed database action checking for duplicate project name.')); }
-                                    if (rows[0].cnt > 0) { return cb(new Error('You already have a project with that name.')); }
+
+                                    if (rows.length === 0) { 
+
+                                        project.public = 0;
+                                        return cb(null);
+                                    }
+
+                                    if (rows[0].id !== project.id) { return cb(new Error('You already have a project with that name.')); }
                                         
-                                    project.public = 0;                 // Any saved project needs review by an admin or instructor
-                                                                        // before being searchable by other ordinary users.
-                                    
-                                    // Need explicit call to end this function.
+                                    project.public = 0;
                                     return cb(null);
 
                                 } catch (e1) { return cb(e1); }

@@ -18,28 +18,24 @@ define(function () {
 
 				// Expose method which displays an error to the user.
 				// Parameters:
-				// Error to display.
+				// Error to display. Can be an exception, {responseText: 'xxx'}, 'xxx'
 				self.show = function (error, autoCloseMS) {
 
 					try {
 
 						m_autoCloseMS = autoCloseMS || 0;
 
-						// Possibly convert from various objects to string.
-						if (error.responseText) {
-
-							error = error.responseText;
-
-						} else if (error.message) {
-
-							error = error.message;
+						var dispError;
+						if (error.responseText) { dispError = error.responseText; 
+						} else if (error.message) { dispError = error.message;
+						} else { dispError = error;
 						}
 
 						// Show the dialog.
 						BootstrapDialog.show({
 
 				            title: m_autoCloseMS === 0 ? "Error" : "Note",
-				            message: error,
+				            message: dispError,
 				            buttons: [{
 
 				            	label: "Close",
@@ -85,8 +81,5 @@ define(function () {
 		return new functionErrorHelper();
 
 
-	} catch (e) {
-
-		alert(e.message);
-	}
+	} catch (e) { alert(e.message); }
 });

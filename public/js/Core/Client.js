@@ -652,16 +652,16 @@ define(["Core/errorHelper",
 								if (data.success) {
 
 									var exceptionRet = self.loadedProject(data.project, callback);
-									if (exceptionRet) { return exceptionRet; }
-
-									return null;
+									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
 								} else {
 
 									// !data.success
-									return new Error(data.message);
+									errorHelper.show(data.message);
 								}
 							});
+							return null;
+
 						} catch (e) {
 
 							return e;
@@ -1139,26 +1139,19 @@ define(["Core/errorHelper",
 					// Project helper methods.
 					self.setBrowserTabAndBtns = function () {
 
+						document.title = "TechGroms";
 						if (m_clProject) {
 
-							document.title = "TechGroms";
-							if (m_clProject.data.name.length > 0) {
-
-								document.title = document.title + " / " + m_clProject.data.name;
-
-							}
-						} else {
-
-							document.title = "TechGroms";
+							if (m_clProject.data.name.length > 0) { document.title = document.title + " / " + m_clProject.data.name; }
 						}
 
-						// Something happened. Refresh the navbar.
+						// Something happened so refresh the navbar.
 						navbar.enableDisableProjectsMenuItems();
 					}
 
-					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1 from the DB),
+					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1-5 from the DB),
 					// the following method is called after saving a project, since it needs to be reloaded following the setting of probably
-					// new id's for all of the parts of the project.
+					// new id's for the project and all of its parts.
 					self.loadedProject = function (project, callback) {
 
 						try {
@@ -1175,6 +1168,7 @@ define(["Core/errorHelper",
 				    		// Play App Type's initialize Method to set the initial state of the designer frame
 		    				designer.initializeWithWorkspace();
 
+		    				// Any newly loaded project is Dirty.
 				    		self.projectIsDirty();
 
 							// Fire bootstrap tooltip opt-in.

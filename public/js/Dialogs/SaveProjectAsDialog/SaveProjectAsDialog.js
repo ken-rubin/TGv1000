@@ -104,6 +104,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							m_project = client.getProject();
+							m_project_data_name = m_project.data.name;
 
 							// Set project image.
 							if (m_project.data.altImagePath.length) {
@@ -131,7 +132,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 								$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
 								$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
-								$("#ProjectName").blur(m_functionNameBlur);
+								$("#ProjectName").keyup(m_functionNameBlur);
 								$("#ProjectName").val(m_project.data.name);
 							}
 
@@ -195,11 +196,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							if (m_saveOrSaveAs === "") {
+							if (m_saveOrSaveAs === "saveAs") {
 
+								// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
+								// with same name due to user typing it in and closing the dialog once; then coming back.
 								m_project.data.name = m_project_data_name;
 								client.setBrowserTabAndBtns();
-
 							}
 
 							exceptionRet = client.saveProject(m_saveOrSaveAs);

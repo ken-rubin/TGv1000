@@ -67,7 +67,7 @@ define(["Core/errorHelper"],
 
 											} else {
 
-												throw new Error("Invalid project id returned.")
+												throw new Error("Invalid project id returned.");
 											}
 										});
 										if (exceptionRet) { throw exceptionRet; }
@@ -213,9 +213,9 @@ define(["Core/errorHelper"],
 							// because Save As allows entering all fields and setting a project image, even changing the project's name.
 							m_functionEnable("SaveProjectAs");
 
-							if (status.allRequiredFieldsFilled && status.projectIsDirty) {
+							if (status.projectNameIsFilled) {
 
-								// Since all fields are filled, one-click "quick" Save is enabled along with the dialog version of Save.
+								// Since all req'd fields are filled (image may be added), one-click "quick" Save is enabled along with the dialog version of Save.
 								m_functionEnable("QuickSaveProject");
 								m_functionEnable("SaveProject");
 							}

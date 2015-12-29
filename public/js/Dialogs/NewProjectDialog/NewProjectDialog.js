@@ -255,7 +255,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
 									clProject.data.canEditSystemTypes = $("#cb1").prop("checked");
 
-									// baseTypeName has been set in all Types that have a base Type in ProjectBO.
+									// clProject.data.baseTypeName has been set in all Types that have a base Type in ProjectBO.
 
 									client.setBrowserTabAndBtns();
 								}
