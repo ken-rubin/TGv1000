@@ -1088,17 +1088,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                 [
                     function(cb) {
                         var project = req.body.projectJson;
-                        return cb(null, project);
+                        return cb(null, [project, (project.id === 0), (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10))]);
                     },
-                    function(project, cb) {
-                        var bProjectIsNew = (project.id === 0);
-                        return cb(null, project, bProjectIsNew);
-                    },
-                    function(project, bProjectIsNew, cb) {
-                        var bProjectIsSomeoneElses = (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10));
-                        return cb(null, project, bProjectIsNew, bProjectIsSomeoneElses);
-                    },
-                    function(project, bProjectIsNew, bProjectIsSomeoneElses, cb) {
+                    function(resultArray, cb) {
                         var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.body.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -1107,11 +1099,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 1) {
                                     idOfUsersProjWithThisName = rows[0].id;
                                 }
-                                return cb(null, project, bProjectIsNew, bProjectIsSomeoneElses, idOfUsersProjWithThisName);
+                                return cb(null, resultArray.push(idOfUsersProjWithThisName));
                             }
                         );
                     },
-                    function(project, bProjectIsNew, bProjectIsSomeoneElses, idOfUsersProjWithThisName, cb) {
+                    function(resultArray, cb) {
                         var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.body.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -1120,7 +1112,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 1) {
                                     nameOfUsersProjWithThisId = rows[0].name;
                                 }
-                                return cb(null, project, bProjectIsNew, bProjectIsSomeoneElses, idOfUsersProjWithThisName, nameOfUsersProjWithThisId);
+                                return cb(null, resultArray.push(nameOfUsersProjWithThisId));
                             }
                         );
                     }
@@ -1133,11 +1125,34 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // resultArray[3] is idOfUsersProjWithThisName
                     // resultArray[4] is nameOfUsersProjWithThisId
 
-                    var typeOfSave;
+                    var typeOfSave = null;
 
+                    // New project or saving someone else's project must have a unique name for current user.
+                    if (resultArray[1] || resultArray[2] ) {
+                        if (resultArray[3] > -1) {
+                            return callback(new Error("You already have a project with this name."));
+                        } else {
+                            typeOfSave = "saveAs";
+                        }
+                    } else {
 
+                        // If saving project with same id as another of user's projects with same name, then save.
+                        if (resultArray[3] === resultArray[0].id) {
+                            typeOfSave = "save";
+                        } else {
+                            return callback(new Error("You already have a project with this name."));
+                        }
+                    } 
 
-                    
+                    if (!typeOfSave) {  // no decision yet
+
+                        // If saving project with same id and name then save; else saveAs.
+                        if (resultArray[4] === resultArray[0].name) {
+                            typeOfSave = "save";
+                        } else {
+                            typeOfSave = "saveAs";
+                        }
+                    }
 
                     if (typeOfSave === 'save') {
 
