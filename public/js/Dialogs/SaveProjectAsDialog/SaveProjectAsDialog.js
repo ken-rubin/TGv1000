@@ -204,10 +204,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								client.setBrowserTabAndBtns();
 							}
 
-							exceptionRet = client.saveProject(m_saveOrSaveAs);
+							exceptionRet = client.saveProject();
 							if (exceptionRet) { throw exceptionRet; }
-
-							// m_dialog.close();
 
 						} catch(e) {
 

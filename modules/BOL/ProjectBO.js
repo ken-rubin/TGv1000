@@ -985,37 +985,20 @@ module.exports = function ProjectBO(app, sql, logger) {
             // m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.body.userId
             // req.body.userName
-            // req.body.saveType - 'save' or 'saveAs' but needs further refinement below.
             // req.body.projectJson
 
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
 
-            // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
-            // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
-
-            // System Types:
+            // How to handle System Types:
                 // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
                 // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
-                // Its methods, event and properties are deleted.
+                // Its methods, event and properties are deleted and re-inserted.
                 // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
                 // Methods, events and properties are inserted.
 
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
-            var typeOfSave = req.body.saveType;
-            if (typeOfSave === 'save') {
-
-                if (project.id === 0 || (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10))) {
-                    m_log("Changing typeOfSave from 'save' to 'saveAs'.");
-                    typeOfSave = 'saveAs';
-                }
-            }
-
-            // typeOfSave info:
-            //  saveAs INSERTs new rows for everything.
-            //  save DELETES (cascading the project from the database) and then calls SaveAs to re-insert it.
-            // Everything is done in a single transaction.
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
@@ -1027,57 +1010,110 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log("Getting a connection to MySql");
             sql.getCxnFromPool(
                 function(err, connection) {
-
                     try {
-                        if (err) { throw new Error('Could not get a database connection: ' + err.message); }
+                        if (err) { 
 
-                        m_log('Have a connection. Beginning a transaction.');
+                            // Cannot finish in m_functionFinalCallback until we have a connection and is has begun.
+                            res.json({
+                                success: false,
+                                message: 'Could not get a database connection: ' + err.message
+                            });
+                        } else {
 
-                        connection.beginTransaction(
-                            function(err) {
+                            m_log('Have a connection. Beginning a transaction.');
+                            connection.beginTransaction(
+                                function(err) {
 
-                                try {
-                                    if (err) {
+                                    try {
+                                        if (err) {
 
-                                        throw new Error('Could not "begin" database connection: ' + err.message);
-                                    
-                                    } else {
+                                            res.json({
+                                                success: false,
+                                                message: 'Could not "begin" database transaction: ' + err.message
+                                            });
+                                        } else {
 
-                                        m_log('Connection has a transaction');
-                                        if (typeOfSave === 'save') {
-
-                                            m_log('Going into m_functionSaveProject');
-                                            m_functionSaveProject(connection, req, res, project, 
-                                                function(err) { 
-                                                    if(err) { throw err; }
-                                                    // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
-                                                    m_functionFinalCallback(null, res, connection, project);
-                                                }
-                                            );
-                                        } else {    // 'saveAs'
-
-                                            m_log('Going into m_functionSaveProjectAs');
-                                            m_functionSaveProjectAs(connection, req, res, project, 
-                                                function(err) { 
-                                                    if(err) { 
-                                                        m_functionFinalCallback(err, res, null, null); 
-                                                    }else {
-                                                        // Done. Commit transaction and, if project.canEditSystemTypes, write out ST.sql.
+                                            m_log('Connection has a transaction');
+                                            m_functionBranchOnSaveOrSaveAs(connection, req, res,
+                                                function(err) {
+                                                    if (err) {
+                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), res, null, null);
+                                                    } else {
+                                                        m_log("***Full success***");
                                                         m_functionFinalCallback(null, res, connection, project);
                                                     }
                                                 }
                                             );
                                         }
+                                    } catch(e1) { 
+                                        res.json({
+                                            success: false,
+                                            message: 'Could not "begin" database transaction: ' + e1.message
+                                        });
                                     }
-                                } catch(e1) { 
-                                    m_functionFinalCallback(e1, res, null, null);
                                 }
-                            }
-                        );
-                    } catch (e2) { m_functionFinalCallback(e2, res, null, null); }
+                            );
+                        }
+                    } catch (e2) { 
+                        res.json({
+                            success: false,
+                            message: 'Could not get a database connection: ' + e2.message
+                        });
+                    }
                 }
             );
-        } catch(e) { m_functionFinalCallback(new Error("Could not save project due to error: " + e.message), res, null, null); }
+        } catch(e) { 
+            res.json({
+                success: false,
+                message: 'Could not save project due to error: ' + e.message
+            });
+        }
+    }
+
+    var m_functionBranchOnSaveOrSaveAs = function(connection, req, res, callback) {
+
+        try {
+
+            // typeOfSave info:
+            //  saveAs INSERTs new rows for everything.
+            //  save DELETES (cascading the project from the database) and then calls SaveAs(part2) to insert it.
+            // Everything is done in a single transaction which is rolled back if an error occurs.
+
+            // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
+            // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
+            // One or two buts here: a save will be changed to a saveAs if it's a new project or the user is saving a project gotten from another user;
+            // a saveAs will be changed to a save if the name and id are the same as one of the user's existing projects.
+
+            // typeOfSave info:
+            //  saveAs INSERTs new rows for everything.
+            //  save DELETES (cascading the project from the database) and then calls SaveAs to re-insert it.
+            // Everything is done in a single transaction.
+
+            var project = req.body.projectJson;
+            var typeOfSave;
+            var bProjectIsNew = (project.id === 0);
+            var bProjectIsSomeoneElses = (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10));
+
+
+
+
+            if (typeOfSave === 'save') {
+
+                m_log('Going into m_functionSaveProject');
+                m_functionSaveProject(connection, req, res, project, 
+                    function(err) { callback(err); }
+                );
+            } else {    // 'saveAs'
+
+                m_log('Going into m_functionSaveProjectAs');
+                m_functionSaveProjectAs(connection, req, res, project, 
+                    function(err) { callback(err); }
+                );
+            }
+        } catch (e) {
+
+            callback(e);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

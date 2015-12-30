@@ -12,61 +12,15 @@
 ## Jerry
 
 #### Bugs
-- A *saveAs* with same name and id of a project already in the DB needs to be switched to a *save*. This is similar to (but opposite) the case where a *save* where either project.id === 0 and project.ownedByUserId !=== req.body.userId is switched to a *saveAs*. BTW, a *saveAs* with an existing id but a different name is saved as a new project. OK. I'll summarize:
-
-<table>
-    <tr>
-        <td>save or saveAs</td>
-        <td>id</td>
-        <td>name</td>
-        <td>Action</td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
-
+- A *saveAs* with same name and id of a project already in the DB needs to be switched to a *save*. This is similar to (but opposite) the case where a *save* where either project.id === 0 and project.ownedByUserId !=== req.body.userId is switched to a *saveAs*. BTW, a *saveAs* with an existing id but a different name is saved as a new project.
 - Set disabled menu colors to be different from enabled.
 - Projects menu items handling:
 
 <table>
     <tr>
         <td>Menu item</td>
-        <td>Enabled when</td>
-        <td>Disabled when</td>
+        <td>Menu item is enabled when</td>
+        <td>Menu item is disabled when</td>
         <td>Show abandon dialog if</td>
         <td>Special handling</td>
     </tr>

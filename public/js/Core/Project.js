@@ -80,14 +80,13 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 					// The following will not be called with any gaps or errors in the Project's structure.
 					// All images are already resources with their id's in the items in the Project. Etc.
-					self.saveToDatabase = function (strSaveType) {
+					self.saveToDatabase = function () {
 
 						try {
 
 							var data = {
 									userId: g_strUserId,
 									userName: g_strUserName,
-									saveType: strSaveType,
 									projectJson: self.data
 							};
 

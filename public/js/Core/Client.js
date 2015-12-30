@@ -1199,11 +1199,11 @@ define(["Core/errorHelper",
 						return m_clProject;
 					};
 
-					self.saveProject = function (strSaveOrSaveAs) {
+					self.saveProject = function () {
 
 						try {
 
-							return m_clProject.saveToDatabase(strSaveOrSaveAs);
+							return m_clProject.saveToDatabase();
 
 						} catch (e) {
 
