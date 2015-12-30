@@ -275,42 +275,17 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showSaveProjectDialog = function () {
+					self.showSaveProjectDialog = function (saveOrSaveAs) {
 
 						try {
 
-							m_openDialog = new SaveProjectAsDialog('save');
+							m_openDialog = new SaveProjectAsDialog(saveOrSaveAs);
 							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
-					}
-
-					self.showSaveProjectAsDialog = function () {
-
-						try {
-
-							m_openDialog = new SaveProjectAsDialog('saveAs');
-							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showNewTypeDialog = function () {
@@ -1020,7 +995,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var exceptionRet = m_clProject.saveToDatabase('save');
+							var exceptionRet = m_clProject.saveToDatabase();
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;

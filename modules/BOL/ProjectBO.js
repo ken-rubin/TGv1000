@@ -1084,32 +1084,76 @@ module.exports = function ProjectBO(app, sql, logger) {
             // One or two buts here: a save will be changed to a saveAs if it's a new project or the user is saving a project gotten from another user;
             // a saveAs will be changed to a save if the name and id are the same as one of the user's existing projects.
 
-            // typeOfSave info:
-            //  saveAs INSERTs new rows for everything.
-            //  save DELETES (cascading the project from the database) and then calls SaveAs to re-insert it.
-            // Everything is done in a single transaction.
+            async.waterfall(
+                [
+                    function(cb) {
+                        var project = req.body.projectJson;
+                        return cb(null, project);
+                    },
+                    function(project, cb) {
+                        var bProjectIsNew = (project.id === 0);
+                        return cb(null, project, bProjectIsNew);
+                    },
+                    function(project, bProjectIsNew, cb) {
+                        var bProjectIsSomeoneElses = (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10));
+                        return cb(null, project, bProjectIsNew, bProjectIsSomeoneElses);
+                    },
+                    function(project, bProjectIsNew, bProjectIsSomeoneElses, cb) {
+                        var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.body.userId + ";";
+                        sql.queryWithCxn(connection, strQuery,
+                            function(err, rows) {
+                                if (err) { return cb(err, null); }
+                                var idOfUsersProjWithThisName = -1;  // -1 if none exists
+                                if (rows.length === 1) {
+                                    idOfUsersProjWithThisName = rows[0].id;
+                                }
+                                return cb(null, project, bProjectIsNew, bProjectIsSomeoneElses, idOfUsersProjWithThisName);
+                            }
+                        );
+                    },
+                    function(project, bProjectIsNew, bProjectIsSomeoneElses, idOfUsersProjWithThisName, cb) {
+                        var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.body.userId + ";";
+                        sql.queryWithCxn(connection, strQuery,
+                            function(err, rows) {
+                                if (err) { return cb(err, null); }
+                                var nameOfUsersProjWithThisId = null;   // null if none exists 
+                                if (rows.length === 1) {
+                                    nameOfUsersProjWithThisId = rows[0].name;
+                                }
+                                return cb(null, project, bProjectIsNew, bProjectIsSomeoneElses, idOfUsersProjWithThisName, nameOfUsersProjWithThisId);
+                            }
+                        );
+                    }
+                ],
+                function(err, resultArray) {
+                    if (err) { return callback(err); }
+                    // resultArray[0] is project
+                    // resultArray[1] is bProjectIsNew
+                    // resultArray[2] is bProjectIsSomeoneElses
+                    // resultArray[3] is idOfUsersProjWithThisName
+                    // resultArray[4] is nameOfUsersProjWithThisId
 
-            var project = req.body.projectJson;
-            var typeOfSave;
-            var bProjectIsNew = (project.id === 0);
-            var bProjectIsSomeoneElses = (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10));
+                    var typeOfSave;
 
 
 
+                    
 
-            if (typeOfSave === 'save') {
+                    if (typeOfSave === 'save') {
 
-                m_log('Going into m_functionSaveProject');
-                m_functionSaveProject(connection, req, res, project, 
-                    function(err) { callback(err); }
-                );
-            } else {    // 'saveAs'
+                        m_log('Going into m_functionSaveProject');
+                        m_functionSaveProject(connection, req, res, req.body.projectJson, 
+                            function(err) { callback(err); }
+                        );
+                    } else {    // 'saveAs'
 
-                m_log('Going into m_functionSaveProjectAs');
-                m_functionSaveProjectAs(connection, req, res, project, 
-                    function(err) { callback(err); }
-                );
-            }
+                        m_log('Going into m_functionSaveProjectAs');
+                        m_functionSaveProjectAs(connection, req, res, req.body.projectJson, 
+                            function(err) { callback(err); }
+                        );
+                    }
+                }
+            );
         } catch (e) {
 
             callback(e);

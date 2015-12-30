@@ -83,7 +83,7 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showSaveProjectDialog();
+									var exceptionRet = client.showSaveProjectDialog('save');
 									if (exceptionRet) { throw exceptionRet; }
 
 								} catch (e) {
@@ -113,7 +113,7 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showSaveProjectAsDialog();
+									var exceptionRet = client.showSaveProjectDialog('saveAs');
 									if (exceptionRet) { throw exceptionRet; }
 
 								} catch (e) {
