@@ -1034,13 +1034,38 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         } else {
 
                                             m_log('Connection has a transaction');
-                                            m_functionBranchOnSaveOrSaveAs(connection, req, res,
-                                                function(err) {
+                                            m_functionDetermineSaveOrSaveAs(connection, req, res,
+                                                function(err, typeOfSave) {
                                                     if (err) {
                                                         m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), res, null, null);
                                                     } else {
-                                                        m_log("***Full success***");
-                                                        m_functionFinalCallback(null, res, connection, project);
+                                                        if (typeOfSave === 'save') {
+
+                                                            m_log('Going into m_functionSaveProject');
+                                                            m_functionSaveProject(connection, req, res, project, 
+                                                                function(err) {
+                                                                    if (err) {
+                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                    } else {
+                                                                        m_log("***Full success***");
+                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                    }
+                                                                }
+                                                            );
+                                                        } else {    // 'saveAs'
+
+                                                            m_log('Going into m_functionSaveProjectAs');
+                                                            m_functionSaveProjectAs(connection, req, res, project, 
+                                                                function(err) {
+                                                                    if (err) {
+                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                    } else {
+                                                                        m_log("***Full success***");
+                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                    }
+                                                                }
+                                                            );
+                                                        }
                                                     }
                                                 }
                                             );
@@ -1070,10 +1095,11 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_functionBranchOnSaveOrSaveAs = function(connection, req, res, callback) {
+    var m_functionDetermineSaveOrSaveAs = function(connection, req, res, callback) {
 
         try {
 
+            m_log("***In m_functionDetermineSaveOrSaveAs***");
             // typeOfSave info:
             //  saveAs INSERTs new rows for everything.
             //  save DELETES (cascading the project from the database) and then calls SaveAs(part2) to insert it.
@@ -1088,9 +1114,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                 [
                     function(cb) {
                         var project = req.body.projectJson;
-                        return cb(null, [project, (project.id === 0), (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10))]);
+                        return cb(null, 
+                            {
+                                project: project, 
+                                newProj: (project.id === 0), 
+                                notMine: (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10))
+                            }
+                        );
                     },
                     function(resultArray, cb) {
+                        var project = req.body.projectJson;
                         var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.body.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -1099,11 +1132,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 1) {
                                     idOfUsersProjWithThisName = rows[0].id;
                                 }
-                                return cb(null, resultArray.push(idOfUsersProjWithThisName));
+                                resultArray["idOfUsersProjWithThisName"] = idOfUsersProjWithThisName;
+                                return cb(null, resultArray);
                             }
                         );
                     },
                     function(resultArray, cb) {
+                        var project = req.body.projectJson;
                         var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.body.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -1112,24 +1147,29 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 1) {
                                     nameOfUsersProjWithThisId = rows[0].name;
                                 }
-                                return cb(null, resultArray.push(nameOfUsersProjWithThisId));
+                                resultArray["nameOfUsersProjWithThisId"] = nameOfUsersProjWithThisId;
+                                return cb(null, resultArray);
                             }
                         );
                     }
                 ],
                 function(err, resultArray) {
-                    if (err) { return callback(err); }
-                    // resultArray[0] is project
-                    // resultArray[1] is bProjectIsNew
-                    // resultArray[2] is bProjectIsSomeoneElses
-                    // resultArray[3] is idOfUsersProjWithThisName
-                    // resultArray[4] is nameOfUsersProjWithThisId
+                    m_log("***At end of waterfall***");
+                    m_log(JSON.stringify(resultArray));
+                    m_log("resultArray.newProj=" + resultArray.newProj);
+                    m_log("resultArray.notMine=" + resultArray.notMine);
+                    m_log("resultArray.idOfUsersProjWithThisName=" + resultArray.idOfUsersProjWithThisName);
+                    m_log("resultArray.nameOfUsersProjWithThisId=" + resultArray.nameOfUsersProjWithThisId);
+                    if (err) { 
+                        m_log("Came into end of waterfall with err non-null."); 
+                        return callback(err); 
+                    }
 
                     var typeOfSave = null;
 
                     // New project or saving someone else's project must have a unique name for current user.
-                    if (resultArray[1] || resultArray[2] ) {
-                        if (resultArray[3] > -1) {
+                    if (resultArray.newProj || resultArray.notMine ) {
+                        if (resultArray.idOfUsersProjWithThisName > -1) {
                             return callback(new Error("You already have a project with this name."));
                         } else {
                             typeOfSave = "saveAs";
@@ -1137,36 +1177,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                     } else {
 
                         // If saving project with same id as another of user's projects with same name, then save.
-                        if (resultArray[3] === resultArray[0].id) {
+                        if (resultArray.idOfUsersProjWithThisName === resultArray.project.id) {
                             typeOfSave = "save";
-                        } else {
-                            return callback(new Error("You already have a project with this name."));
                         }
                     } 
 
                     if (!typeOfSave) {  // no decision yet
 
                         // If saving project with same id and name then save; else saveAs.
-                        if (resultArray[4] === resultArray[0].name) {
+                        if (resultArray.nameOfUsersProjWithThisId === resultArray.project.name) {
                             typeOfSave = "save";
                         } else {
                             typeOfSave = "saveAs";
                         }
                     }
-
-                    if (typeOfSave === 'save') {
-
-                        m_log('Going into m_functionSaveProject');
-                        m_functionSaveProject(connection, req, res, req.body.projectJson, 
-                            function(err) { callback(err); }
-                        );
-                    } else {    // 'saveAs'
-
-                        m_log('Going into m_functionSaveProjectAs');
-                        m_functionSaveProjectAs(connection, req, res, req.body.projectJson, 
-                            function(err) { callback(err); }
-                        );
-                    }
+                    
+                    m_log("typeOfSave=" + typeOfSave);
+                    return callback(null, typeOfSave);
                 }
             );
         } catch (e) {
@@ -1208,8 +1235,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (2)
                     function(cb) {
                         // Now we can just INSERT the project as passed from the client side.
-                        m_log("Going off to m_functionProjectSaveAsPart2");
-                        m_functionProjectSaveAsPart2(connection, req, res, project, 
+                        m_log("Going off to m_functionProjectSaveAs");
+                        m_functionProjectSaveAs(connection, req, res, project, 
                             function(err) { 
                                 return cb(err); 
                             }
@@ -1230,70 +1257,10 @@ module.exports = function ProjectBO(app, sql, logger) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
-        
-        // If we are just doing a SaveAs, we'll come in here with a connection that has a transaction started.
-        // If we are doing a Save, we've already deleted the original project and will jump over this method to run m_functionSaveProjectAsPart2.
-        // All this is in a transaction and it can all be rolled back until it is comitted.
-        m_log("***In m_functionSaveProjectAs***");
-        try {
-            // async.series runs each of an array of functions in order, waiting for each to finish in turn.
-            // (1) Check for duplicate project name.
-            // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
-            async.series(
-                [
-                    // (1)
-                    function(cb) {
-                        // Look for and reject an attempt to add a 2nd project for same user with same name.
-                        var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and name='" + project.name + "';";
-                        
-                        m_log('In SaveAs step 1; checking for name uniqueness with ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery, 
-                            function(err, rows) {
-                                try {                
-                                    if (err) { return cb(err); }
-
-                                    if (rows.length === 0) { 
-
-                                        project.public = 0;
-                                        return cb(null);
-                                    }
-
-                                    if (rows[0].id !== project.id) { return cb(new Error('You already have a project with that name.')); }
-                                        
-                                    project.public = 0;
-                                    return cb(null);
-
-                                } catch (e1) { return cb(e1); }
-                            }
-                        );
-                    },
-                    // (2)
-                    function(cb) {
-                        // Now we can just INSERT the project as passed from the client side.
-                        m_log("Going off to m_functionProjectSaveAsPart2");
-                        m_functionProjectSaveAsPart2(connection, req, res, project, 
-                            function(err) {
-                                return cb(err);
-                            }
-                        );
-                    }
-                ],
-                // final callback for async.series
-                function(err){
-                    return callback(err); 
-                }
-            );
-        } catch (e) { callback(e); }
-    }
-
-    var m_functionProjectSaveAsPart2 = function (connection, req, res, project, callback) {
-
-        // If we came in doing a Save, we've deleted the old project and jumped in here to re-INSERT the project as sent from client-side.
-        // If we came in doing a SaveAs, we stopped off at m_functionSaveProjectAs to check for name uniqueness.
 
         try {
 
-            m_log('Continuing in m_functionProjectSaveAsPart2');
+            m_log('***Continuing in m_functionSaveProjectAs***');
 
             // We'll use async.series serially to (1) insert project and 
             // (2) use async.parallel to
