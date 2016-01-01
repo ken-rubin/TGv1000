@@ -20,8 +20,11 @@ color: #080904;
 .navbar-default .navbar-nav > li > .dropdown-menu {
 background-color: #a7204a;
 }
-.navbar-default .navbar-nav > li > .dropdown-menu > li > a {
+.navbar-default .navbar-nav > li > .dropdown-menu > .enabled > a {
 color: #f2ea5d;
+}
+.navbar-default .navbar-nav > li > .dropdown-menu > .disabled > a {
+color: #000;
 }
 .navbar-default .navbar-nav > li > .dropdown-menu > li > a:hover,
 .navbar-default .navbar-nav > li > .dropdown-menu > li > a:focus {

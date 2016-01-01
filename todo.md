@@ -12,7 +12,6 @@
 ## Jerry
 
 #### Bugs
-- Set disabled menu colors to be different from enabled.
 - Projects menu items handling:
 
 <table>
