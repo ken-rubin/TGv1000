@@ -1102,7 +1102,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log("***In m_functionDetermineSaveOrSaveAs***");
             // typeOfSave info:
             //  saveAs INSERTs new rows for everything.
-            //  save DELETES (cascading the project from the database) and then calls SaveAs(part2) to insert it.
+            //  save DELETES (cascading the project from the database) and then calls SaveAs to insert it.
             // Everything is done in a single transaction which is rolled back if an error occurs.
 
             // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
@@ -1214,7 +1214,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
             // (1) Delete the old project.
-            // (2) Call m_functionProjectSaveAsPart2 to insert the new project.
+            // (2) Call m_functionSaveProjectAs to insert the new project.
             async.series(
                 [
                     // (1)
@@ -1235,8 +1235,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (2)
                     function(cb) {
                         // Now we can just INSERT the project as passed from the client side.
-                        m_log("Going off to m_functionProjectSaveAs");
-                        m_functionProjectSaveAs(connection, req, res, project, 
+                        m_log("Going off to m_functionSaveProjectAs");
+                        m_functionSaveProjectAs(connection, req, res, project, 
                             function(err) { 
                                 return cb(err); 
                             }
