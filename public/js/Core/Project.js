@@ -152,9 +152,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// Set up the modified project.
 										client.loadedProject(objectData.project);
 
-										// Set dirty bool to false in client
 										client.projectIsClean();
-
 										client.setBrowserTabAndBtns();
 
 									} else {

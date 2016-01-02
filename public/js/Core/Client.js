@@ -609,17 +609,16 @@ define(["Core/errorHelper",
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
 					// Not all of these come back through client. Some places handle the processing internally.
 
-					// If iProjectId = 1 (New Project), then projectType will be defined as a string telling
+					// If iProjectId = 1-5 (New Projects), then projectType will be defined as a string telling
 					// the BO what kind of Project to build. Otherwise, it will be undefined.
-					self.openProjectFromDB = function (iProjectId, callback, projectType) {
+					self.openProjectFromDB = function (iProjectId, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
 									projectId: iProjectId,
-									userId: g_strUserId,
-									projectType: projectType || ''
+									userId: g_strUserId
 								},
 								'json');
 							posting.done(function(data){
