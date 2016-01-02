@@ -12,6 +12,9 @@
 ## Jerry
 
 #### Bugs
+- Call client.projectIsDirty() after EVERYTHING the user does while in a project. 
+    - Is there a better way to do this than putting the call in dozens of places??? Maybe all changes go thru either client or project.js.
+    - Should a new project be clean or dirty when just loaded? Logic says it should be DIRTY since we might miss marking it dirty in some esoteric case. But LOGIC also says that we should be able to catch all those and a new or just loaded project should be CLEAN. Which one????? I'm choosing CLEAN.
 - Projects menu items handling:
 
 <table>
@@ -81,11 +84,6 @@
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; 
     - close window or browser (possible?)
-- Call client.projectIsDirty() after ANYTHING the user does while in a project. 
-    - Anything at all. 
-    - Is there a better way to do this than putting the call in dozens of places??? 
-    - What does Ken have to do here? 
-    - Should a new project be clean or dirty when just loaded?
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Comic click

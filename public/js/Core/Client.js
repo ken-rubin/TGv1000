@@ -1143,8 +1143,8 @@ define(["Core/errorHelper",
 				    		// Play App Type's initialize Method to set the initial state of the designer frame
 		    				designer.initializeWithWorkspace();
 
-		    				// Any newly loaded project is Dirty.
-				    		self.projectIsDirty();
+		    				// Any newly loaded project is Clean.
+				    		self.projectIsClean();
 
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").powerTip({
@@ -1224,7 +1224,7 @@ define(["Core/errorHelper",
 									}
 								},
 								{
-									label: 'No, let me save it first',
+									label: 'No, take me back',
 									action: function(dialog) {
 										dialog.close();
 									}
