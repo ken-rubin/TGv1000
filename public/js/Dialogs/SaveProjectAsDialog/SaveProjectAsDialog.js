@@ -17,12 +17,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var self = this;			// Uber closure.
 
-
-xxx
-
-
-					m_saveOrSaveAs = saveOrSaveAs;
-
 					//////////////////////////////////
 					// Public methods.
 
@@ -68,7 +62,7 @@ xxx
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: m_saveOrSaveAs === "save" ? "Save Project" : "Save Project As",
+								title: "Save Project",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -128,18 +122,10 @@ xxx
 
 							$("#SaveProjectBtn").click(m_functionSaveProject);
 
-							if (m_saveOrSaveAs === "save") {
-
-								$("#SaveAsH4").append("<span>Change project description or tags and click the <em>Save Project</em> button to save.</span>");
-								$("#PlaceForProjectName").append("<span>" + m_project.data.name + "</span>");
-
-							} else {
-
-								$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
-								$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
-								$("#ProjectName").keyup(m_functionNameBlur);
-								$("#ProjectName").val(m_project.data.name);
-							}
+							$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
+							$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
+							$("#ProjectName").keyup(m_functionNameBlur);
+							$("#ProjectName").val(m_project.data.name);
 
 							$("#ProjectDescription").val(m_project.data.description);
 							$("#ProjectTags").val(m_project.data.tags);
@@ -201,13 +187,10 @@ xxx
 
 						try {
 
-							if (m_saveOrSaveAs === "saveAs") {
-
-								// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
-								// with same name due to user typing it in and closing the dialog once; then coming back.
-								m_project.data.name = m_project_data_name;
-								client.setBrowserTabAndBtns();
-							}
+							// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
+							// with same name due to user typing it in and closing the dialog once; then coming back.
+							m_project.data.name = m_project_data_name;
+							client.setBrowserTabAndBtns();
 
 							exceptionRet = client.saveProject();
 							if (exceptionRet) { throw exceptionRet; }
@@ -283,7 +266,6 @@ xxx
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_project = null;
-				var m_saveOrSaveAs;
 				var m_project_data_name = "";
 			};
 
