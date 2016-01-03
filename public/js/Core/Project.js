@@ -68,8 +68,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							exceptionRet = code.reset(true);
 							if (exceptionRet) { throw exceptionRet; }
 
-							client.projectIsClean();
-
 							return designer.unload();
 
 						} catch(e) {
@@ -152,7 +150,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// Set up the modified project.
 										client.loadedProject(objectData.project);
 
-										client.projectIsClean();
 										client.setBrowserTabAndBtns();
 
 									} else {
@@ -187,8 +184,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
 											&& (self.data.imageId > 0 || self.data.altImagePath.length > 0)
 										),
-							projectNameIsFilled: (self.data.name.trim().length > 0),
-							projectIsDirty: client.isProjectDirty()
+							projectNameIsFilled: (self.data.name.trim().length > 0)
 						};
 					};
 

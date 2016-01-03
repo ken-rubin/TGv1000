@@ -275,11 +275,11 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.showSaveProjectDialog = function (saveOrSaveAs) {
+					self.showSaveProjectDialog = function () {
 
 						try {
 
-							m_openDialog = new SaveProjectAsDialog(saveOrSaveAs);
+							m_openDialog = new SaveProjectAsDialog();
 							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) { throw exceptionRet; }
 
@@ -661,7 +661,6 @@ define(["Core/errorHelper",
 
 						try {
 
-							self.projectIsDirty();
 							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
 
 							var origClType = new Type();
@@ -754,7 +753,6 @@ define(["Core/errorHelper",
 
 						try {
 
-							self.projectIsDirty();
 							activeClType.data.methods[iMethodIndex] = updatedMethod;
 
 							var exceptionRet = types.regenTWMethodsTable();
@@ -990,20 +988,6 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Non-dialog menu handlers
-					self.quickSaveProject = function () {
-
-						try {
-
-							var exceptionRet = m_clProject.saveToDatabase();
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
 
 					self.navToAdminzone = function() {
 
@@ -1078,21 +1062,6 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.projectIsClean = function () {
-
-						m_bProjectIsDirty = false;
-					}
-
-					self.projectIsDirty = function () {
-
-						m_bProjectIsDirty = true;
-					}
-
-					self.isProjectDirty = function () {
-
-						return m_bProjectIsDirty;
-					}
-
 					self.getTGCookie = function (name) {
 
 					    var value = "; " + document.cookie;
@@ -1141,9 +1110,6 @@ define(["Core/errorHelper",
 
 				    		// Play App Type's initialize Method to set the initial state of the designer frame
 		    				designer.initializeWithWorkspace();
-
-		    				// Any newly loaded project is Clean.
-				    		self.projectIsClean();
 
 							// Fire bootstrap tooltip opt-in.
 							$(".disabledifnoproj").powerTip({
@@ -1202,7 +1168,7 @@ define(["Core/errorHelper",
 					var m_functionAbandonProjectDialog = function (abandonCallback, bShowAbandonDlg) {
 
 						// The following seems stupid, but it may be the best way to prevent showing this dlg after a project save.
-						if (!bShowAbandonDlg || !m_bProjectIsDirty) {
+						if (!bShowAbandonDlg) {
 
 							abandonCallback();
 							return;
@@ -1235,7 +1201,6 @@ define(["Core/errorHelper",
 					// Private variables.
 					var m_clProject = null;
 					var m_openDialog = null;
-					var m_bProjectIsDirty = false;
 
 					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.
 					var m_openDialog2 = null;

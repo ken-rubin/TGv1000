@@ -11,11 +11,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 		try {
 
 			// Define the NewProjectDialog constructor function.
-			var functionSaveProjectAsDialog = function (saveOrSaveAs) {
+			var functionSaveProjectAsDialog = function () {
 
 				try {
 
 					var self = this;			// Uber closure.
+
+
+xxx
+
+
 					m_saveOrSaveAs = saveOrSaveAs;
 
 					//////////////////////////////////

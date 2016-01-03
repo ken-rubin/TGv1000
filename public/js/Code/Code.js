@@ -1468,8 +1468,6 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 					// Reference to the blockly frame.
 					var m_ifBlockly = null;
-					// Indicates there is something to save.
-					var m_bDirty = false;
 					// Indicates load has been called on this instance.
 					// var m_bLoaded = false;
 					// The code scanner, updates the designer when the app initialize code is modified.

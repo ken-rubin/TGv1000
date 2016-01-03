@@ -83,37 +83,7 @@ define(["Core/errorHelper"],
 
 								try {
 
-									var exceptionRet = client.showSaveProjectDialog('save');
-									if (exceptionRet) { throw exceptionRet; }
-
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
-
-							$("#QuickSaveProjectButton").click(function () {
-
-								try {
-
-									var exceptionRet = client.quickSaveProject();
-									if (exceptionRet) { throw exceptionRet; }
-
-									self.enableDisableProjectsMenuItems();
-
-									errorHelper.show("Project was saved.", 3000);
-
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
-
-							$("#SaveProjectAsButton").click(function () {
-
-								try {
-
-									var exceptionRet = client.showSaveProjectDialog('saveAs');
+									var exceptionRet = client.showSaveProjectDialog();
 									if (exceptionRet) { throw exceptionRet; }
 
 								} catch (e) {
@@ -197,28 +167,13 @@ define(["Core/errorHelper"],
 						m_functionEnable("NewProject");
 						m_functionEnable("OpenProject");
 						m_functionDisable("SaveProject");
-						m_functionDisable("SaveProjectAs");
-						m_functionDisable("QuickSaveProject");
 						m_functionDisable("CloseProject");
 
 						if (project !== null) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
-
-							// See definition of status in Project.js method self.getStatus().
-							var status = project.getStatus();
-
-							// Any project can be saved as--even if not all fields are filled in yet,
-							// because Save As allows entering all fields and setting a project image, even changing the project's name.
-							m_functionEnable("SaveProjectAs");
-
-							if (status.projectNameIsFilled) {
-
-								// Since all req'd fields are filled (image may be added), one-click "quick" Save is enabled along with the dialog version of Save.
-								m_functionEnable("QuickSaveProject");
-								m_functionEnable("SaveProject");
-							}
+							m_functionEnable("SaveProject");
 						}
 					}
 

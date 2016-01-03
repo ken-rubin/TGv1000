@@ -255,8 +255,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
 									clProject.data.canEditSystemTypes = $("#cb1").prop("checked");
 
-									client.projectIsClean();
-
 									client.setBrowserTabAndBtns();
 								}
 							);

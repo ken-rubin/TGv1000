@@ -12,6 +12,7 @@
 ## Jerry
 
 #### Bugs
+- Projects are always DIRTY.
 - Call client.projectIsDirty() after EVERYTHING the user does while in a project. 
     - Is there a better way to do this than putting the call in dozens of places??? Maybe all changes go thru either client or project.js.
     - Should a new project be clean or dirty when just loaded? Logic says it should be DIRTY since we might miss marking it dirty in some esoteric case. But LOGIC also says that we should be able to catch all those and a new or just loaded project should be CLEAN. Which one????? I'm choosing CLEAN.
