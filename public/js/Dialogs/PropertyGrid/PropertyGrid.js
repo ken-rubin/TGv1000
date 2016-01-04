@@ -114,7 +114,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// 	}
 							// });
 
-							$("#NewName").blur(m_functionChangeTIName);
+							$("#NewName").keyup( function(){m_functionChangeTIName();});
 
 							m_arrayProperties = [];
 

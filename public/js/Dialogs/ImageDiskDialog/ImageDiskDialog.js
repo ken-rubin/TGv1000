@@ -179,7 +179,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						        url.revokeObjectURL(src);
 
 								$("#ISPhase2").css("display", "block");
-							    $("#ISSaveBtn").keydown(function(e) {
+							    $("#ISSaveBtn").keypress(function(e) {
 							    	if (e.which === 13) { m_functionSaveLocalResource(); }
 							    });
 								$("#ISSaveBtn").focus();

@@ -114,7 +114,7 @@ define(["Core/errorHelper"],
 
 								if (strId === toolInstances[i].id) {
 
-									return new Error("That is the name of one of your tool instances. Please enother a different name.");
+									return new Error("That is the name of one of your tool instances. Please enter a different name.");
 								}
 							}
 						}
