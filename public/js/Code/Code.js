@@ -1158,7 +1158,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Blocks.
 							var strOriginalName = strOriginalTypeName + "_get" + strOriginal;
 							var strGetName = clType.data.name + "_get" + property.name;
-							delete self.blocks[strOriginalName];
+							// delete self.blocks[strOriginalName];
 
 							if (clType.data.isApp) {
 
@@ -1170,7 +1170,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// JavaScript.
-							delete self.javaScript[strOriginalName];
+							// delete self.javaScript[strOriginalName];
 
 							if (clType.data.isApp) {
 
@@ -1182,15 +1182,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Workspace.
-							// if (self.workspace) {
-
-							// 	var re = new RegExp('"' + strOriginalName + '"',"g");
-							// 	self.workspace = self.workspace.replace(re,
-							// 		'"' + strGetName + '"');
-								var exceptionRet = types.replaceInWorkspaces(strOriginalName,
-									strGetName);
-								if (exceptionRet) { throw exceptionRet; }
-							// }
+							var exceptionRet = types.replaceInAllTypesWorkspaces(strOriginalName,
+								strGetName);
+							if (exceptionRet) { throw exceptionRet; }
 
 							////////////////////////
 							// Schema.
@@ -1210,7 +1204,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								objectType[strGetName] = true;
 							}
-							// delete objectTypes[strOriginalTypeName];
+							// delete objectTypes[strOriginalTypeName][strOriginalName];
 
 							////////////////////////
 							////////////////////////
@@ -1221,7 +1215,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							// Blocks.
 							var strOriginalSetName = strOriginalTypeName + "_set" + strOriginal;
 							var strSetName = clType.data.name + "_set" + property.name;
-							delete self.blocks[strOriginalSetName];
+							// delete self.blocks[strOriginalSetName];
 
 							if (clType.data.isApp) {
 
@@ -1233,7 +1227,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// JavaScript.
-							delete self.javaScript[strOriginalSetName];
+							// delete self.javaScript[strOriginalSetName];
 
 							if (clType.data.isApp) {
 
@@ -1245,15 +1239,9 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 							////////////////////////
 							// Workspace.
-							// if (self.workspace) {
-
-							// 	var re = new RegExp('"' + strOriginalSetName + '"',"g");
-							// 	self.workspace = self.workspace.replace(re,
-							// 		'"' + strSetName + '"');
-								var exceptionRet = types.replaceInWorkspaces(strOriginalSetName,
-									strSetName);
-								if (exceptionRet) { throw exceptionRet; }
-							// }
+							var exceptionRet = types.replaceInAllTypesWorkspaces(strOriginalSetName,
+								strSetName);
+							if (exceptionRet) { throw exceptionRet; }
 
 							////////////////////////
 							// Schema.
@@ -1273,7 +1261,7 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 
 								objectType[strSetName] = true;
 							}
-							// delete objectTypes[strOriginalTypeName];
+							// delete objectTypes[strOriginalTypeName][strOriginalSetName];
 
 							return null;
 

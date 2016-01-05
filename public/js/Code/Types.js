@@ -283,7 +283,7 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 					// Loop over all Types, update any occurrences  
 					// of the specified unique proper string.
-					self.replaceInWorkspaces = function (strOld, strNew) {
+					self.replaceInAllTypesWorkspaces = function (strOld, strNew) {
 
 						try {
 
@@ -293,12 +293,9 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 								var typeIth = m_arrayClTypes[i];
 
 								// Get the method which references the string, if any.
-								var exceptionRet = typeIth.replaceInWorkspaces(strOld, 
+								var exceptionRet = typeIth.replaceInAllMethodsWorkspaces(strOld, 
 									strNew);
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							return null;

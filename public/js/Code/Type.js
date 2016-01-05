@@ -148,7 +148,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 					// Loop over all methods, updates their workspace with the replacement.
 					// Returns the method referenced or null.
 // used					
-					self.replaceInWorkspaces = function (strOld, strNew) {
+					self.replaceInAllMethodsWorkspaces = function (strOld, strNew) {
 
 						// Loop over the collection of methods.
 						for (var i = 0; i < self.data.methods.length; i++) {
@@ -157,7 +157,7 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 
 							// Construct the global RegExp and apply to workspace.
 							// In keeping with convention, concatenating surrounding quotation marks has not been done yet, but is put off till the replace.
-							var re = new RegExp('"' + strOld + '+',"g");
+							var re = new RegExp('"' + strOld + '"',"g");
 							if (methodIth.workspace) {
 
 								methodIth.workspace = methodIth.workspace.replace(re,

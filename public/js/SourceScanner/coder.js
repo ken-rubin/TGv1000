@@ -251,31 +251,31 @@ define(["SourceScanner/converter", "SourceScanner/processor"],
 
                 try {
 
-                    var xmlWorkspace = processor.getAppInitializeXMLDoc();
-                    if (!xmlWorkspace) {
+                    // var xmlWorkspace = processor.getAppInitializeXMLDoc();
+                    // if (!xmlWorkspace) {
 
-                        throw { message: "Failed to get the workspace xml." };
-                    }
+                    //     throw { message: "Failed to get the workspace xml." };
+                    // }
 
-                    var strAppTypeName = clAppType.data.name;
-                    var reOldSet = new RegExp('"' + strAppTypeName + "_set" + strOldId + '"', 'g');
-                    var strNewSet = strAppTypeName + "_set" + strNewId;
-                    var reOldGet = new RegExp('"' + strAppTypeName + "_get" + strOldId + '"', 'g');
-                    var strNewGet = strAppTypeName + "_get" + strNewId;
+                    // var strAppTypeName = clAppType.data.name;
+                    // var reOldSet = new RegExp('"' + strAppTypeName + "_set" + strOldId + '"', 'g');
+                    // var strNewSet = strAppTypeName + "_set" + strNewId;
+                    // var reOldGet = new RegExp('"' + strAppTypeName + "_get" + strOldId + '"', 'g');
+                    // var strNewGet = strAppTypeName + "_get" + strNewId;
 
-                    xmlWorkspace = xmlWorkspace.replace(reOldSet, '"' + strNewSet + '"');
-                    xmlWorkspace = xmlWorkspace.replace(reOldGet, '"' + strNewGet + '"');
+                    // xmlWorkspace = xmlWorkspace.replace(reOldSet, '"' + strNewSet + '"');
+                    // xmlWorkspace = xmlWorkspace.replace(reOldGet, '"' + strNewGet + '"');
 
-                    // Update in initialize method of App type.
-                    // Get the initialize method.
-                    var methodInitialize = clAppType.getMethod("initialize");
-                    if (!methodInitialize) {
+                    // // Update in initialize method of App type.
+                    // // Get the initialize method.
+                    // var methodInitialize = clAppType.getMethod("initialize");
+                    // if (!methodInitialize) {
 
-                        throw { message: "Failed to find initialize method of App type." };
-                    }
+                    //     throw { message: "Failed to find initialize method of App type." };
+                    // }
 
-                    // Set the workspace.
-                    methodInitialize.workspace = xmlWorkspace;
+                    // // Set the workspace.
+                    // methodInitialize.workspace = xmlWorkspace;
 
                     return code.renameProperty(clAppType, property, strOldId);
 
