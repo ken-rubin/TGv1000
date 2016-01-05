@@ -328,13 +328,16 @@ define(["Core/errorHelper", "SourceScanner/processor", "SourceScanner/coder"],
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Rebuild blockly.
-							$("#BlocklyIFrame")[0].contentWindow.location.reload();
+							// $("#BlocklyIFrame")[0].contentWindow.location.reload();
+							var iMethodIndex = types.getActiveClType(false).getActiveMethodIndex();
+							if (iMethodIndex > -1) {
+								// should always be an active method
+								$("#method_" + iMethodIndex.toString()).click();
+							}
 
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					// Method adds an event to a type to blockly.

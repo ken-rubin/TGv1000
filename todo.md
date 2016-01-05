@@ -14,7 +14,6 @@
 #### Bugs
 - Test ProjectBO.js#routeSaveProject some more. Just a bit. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
-- Rename TI in PropertyGrid is very broken. Added a single character and lost contents of App initialize block. For starters.
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
 
 #### Things

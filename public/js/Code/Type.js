@@ -204,6 +204,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Navbar/Comics", "SourceScanner/conv
 						m_functionOnGotResourceId(imageId);
 					}
 
+					self.getActiveMethodIndex = function() {
+
+						return m_iActiveIndex;
+					}
+
 					///////////////////////////////////////
 					// Private methods
 
