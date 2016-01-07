@@ -50,7 +50,8 @@ begin
 
 		CREATE TABLE `TGv1000`.`control` (
           `id` tinyint NOT NULL,
-		  `dbstate` decimal(5,2) NOT NULL
+		  `dbstate` decimal(5,2) NOT NULL,
+          PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 		insert `TGv1000`.`control` (id, dbstate) values (1, 0.0);
@@ -468,7 +469,8 @@ begin
                 (15,6)
                 ;
 		
-        UPDATE `TGv1000`.`control` set dbstate=2.0 where id=1;
+        /* Skip dbstate 2.0, jumping right to 3.0, but keep the 2.0 code here for possible use later */
+        UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
     end if;
 

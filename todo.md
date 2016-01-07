@@ -1,7 +1,3 @@
-## Either of us
-- Round X,Y to 0, 1 or 2 decimals (Are they pixels? If so, why not 0 decimals?)
-- Comic should slide in from the right, taking up half the screen; slide back out to strip-size when appropriate or click away; remember where they were in comic
-
 ## Ken
 
 - **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
@@ -11,15 +7,18 @@
 
 ## Jerry
 
-#### Bugs
 - Test ProjectBO.js#routeSaveProject some more. Just a bit. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
 - If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
-
-#### Things
+    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
 - A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
-- Add usergroups.
+- Administrative stuff
+    + Usergroups
+    + AdminZone
+    + Allow parent to view child's work (read-only)
+    + Save place (like for student working in a project) and jump right back to it if the user signs in again.
+    + Better authentication, session control, prevent jumping into middle of site.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
@@ -28,10 +27,11 @@
     - close window or browser (possible?)
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
-- Comic click
-    - Slide full panel over half (resizable) the main window
-    - CLick off the comic resizes back to scroll strip.
-- We might want to set a red background for the current Type in the left vertical scroll region, too.
+- The Comic/Help system
+    + Comic click
+        + Slide full panel over half (resizable) the main window
+        + CLick off the comic resizes back to scroll strip.
+        + Comic should slide in from the right, taking up half the screen; slide back out to strip-size when appropriate or click away; remember where they were in comic- We might want to set a red background for the current Type in the left vertical scroll region, too.
 - Need rest of the dialogs to submit on Enter key.
     - These are already done:
         + EnrollDialog
@@ -42,7 +42,7 @@
         + NewTypeDialog
         + SaveProjectAsDialog
         + ImageDiskDialog
-    - Still have to look at these to see if it makes sense: 
+    - Still may want to do these (where it makes sense): 
         - DeleteConfirmDialog
         - GenericRenameDialog
         - ImageSearchDialog
@@ -53,17 +53,17 @@
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes.
 - A New SystemType should probably require an image. **Discuss with Ken.**
-- If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything.
+- If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything in TypeWell.
 
 
 
 ## To discuss
 
+- Do we want to (or can we) round X,Y to 0, 1 or 2 decimals?
 - All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 - **Ken:** If I open a new project, the App Type is the Current Type and initialize is the Current Method, but, since we don't display app_initialize or the getter and setters for X, Y, Width and Height, the App category doesn't even appear in the schema category list.
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
-- **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
 
 
 
