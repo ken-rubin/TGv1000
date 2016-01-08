@@ -7,9 +7,9 @@
 
 ## Jerry
 
-- Test ProjectBO.js#routeSaveProject some more. Just a bit. 
+- Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
-- If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
+- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
 - A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
