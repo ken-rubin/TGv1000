@@ -1,6 +1,8 @@
+/*
 DROP SCHEMA IF EXISTS `TGv1000`;
 CREATE SCHEMA `TGv1000`;
 SELECT database();
+*/
 USE TGv1000;
 
 delimiter //
@@ -648,15 +650,65 @@ begin
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
     end if;
-/*
+
     if @dbstate = 3.0 THEN
 
+		CREATE TABLE TGv1000.usergroups (
+		  `id` int(11) NOT NULL,
+		  `name` varchar(255) NOT NULL,
+		  PRIMARY KEY (id),
+		  UNIQUE KEY `id_UNIQUE` (id)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+		CREATE TABLE TGv1000.permissions (
+		  `id` int(11) NOT NULL,
+		  `name` varchar(255) NOT NULL,
+		  PRIMARY KEY (id),
+		  UNIQUE KEY `id_UNIQUE` (id)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		CREATE TABLE TGv1000.ug_permissions (
+		  `usergroupId` int(11) NOT NULL,
+		  `permissionId` int(11) NOT NULL,
+		  PRIMARY KEY (`usergroupId`, `permissionId`),
+		  UNIQUE KEY `id_UNIQUE` (id)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		ALTER TABLE TGv1000.user
+		  ADD COLUMN usergroupId int(11);
+		  
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (1, 'ken');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (2, 'jerry');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (3, 'john');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (4, 'instructor');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (5, 'child');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (6, 'parent');
+
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (1, 'edit comics');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (2, 'edit system types');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (3, 'approve for public');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (4, 'use system');
+
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,1);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,2);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,3);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,4);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,1);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,3);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,4);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,1);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,3);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,4);
+		  
+		UPDATE TGv1000.user SET usergroupId=1 WHERE userName='ken.rubin@live.com';
+		UPDATE TGv1000.user SET usergroupId=2 WHERE userName='jerry@rubintech.com';
+		UPDATE TGv1000.user SET usergroupId=3 WHERE userName='techgroms@gmail.com';
+		UPDATE e4Groms.user SET usergroupId=4 WHERE usergroupId IS NULL;
 
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
     end if;
-*/
+
 end;
 
 //
