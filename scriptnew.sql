@@ -1,12 +1,12 @@
-/*
+
 DROP SCHEMA IF EXISTS `TGv1000`;
 CREATE SCHEMA `TGv1000`;
 SELECT database();
-*/
 USE TGv1000;
 
 delimiter //
 
+/*drop procedure if exists `doTags`//*/
 create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
 
 begin
@@ -60,7 +60,7 @@ begin
         
 	end if;
     set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
-    
+    select @dbstate;
     if @dbstate = 0.0 THEN
     
 		CREATE TABLE `TGv1000`.`tags` (
@@ -346,6 +346,7 @@ begin
 
         UPDATE `TGv1000`.`control` set dbstate=1.0 where id=1;
 		set @dbstate := 1.0;
+		select @dbstate;
     end if;
 
     if @dbstate = 1.0 THEN
@@ -474,6 +475,7 @@ begin
         /* Skip dbstate 2.0, jumping right to 3.0, but keep the 2.0 code here for possible use later */
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
+		select @dbstate;
     end if;
 
     if @dbstate = 2.0 THEN
@@ -649,6 +651,7 @@ begin
 		
         UPDATE `TGv1000`.`control` set dbstate=3.0 where id=1;
 		set @dbstate := 3.0;
+		select @dbstate;
     end if;
 
     if @dbstate = 3.0 THEN
@@ -670,8 +673,7 @@ begin
 		CREATE TABLE TGv1000.ug_permissions (
 		  `usergroupId` int(11) NOT NULL,
 		  `permissionId` int(11) NOT NULL,
-		  PRIMARY KEY (`usergroupId`, `permissionId`),
-		  UNIQUE KEY `id_UNIQUE` (id)
+		  PRIMARY KEY (`usergroupId`, `permissionId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 		ALTER TABLE TGv1000.user
@@ -684,10 +686,10 @@ begin
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (5, 'child');
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (6, 'parent');
 
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (1, 'edit comics');
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (2, 'edit system types');
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (3, 'approve for public');
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (4, 'use system');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (1, 'can_edit_comics');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (2, 'can_edit_system_types');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (3, 'can_approve_for_public');
+		INSERT TGv1000.permissions (`id`, `name`) VALUES (4, 'can_use_system');
 
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,1);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,2);
@@ -707,6 +709,7 @@ begin
 
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
+		select @dbstate;
     end if;
 
 end;

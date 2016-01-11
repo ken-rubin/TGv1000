@@ -5,6 +5,8 @@
 
 var bcrypt = require("bcrypt-nodejs");
 var nodemailer = require("nodemailer");
+var jwt = require('jsonwebtoken');
+
 module.exports = function ValidateBO(app, sql, logger) {
 
     var self = this;                // Über closure.
@@ -336,9 +338,22 @@ module.exports = function ValidateBO(app, sql, logger) {
                                                     message: 'Error received inserting first user in user table.'
                                                 });
                                             } else {
+                                                var profile = {
+                                                    email: req.body.userName,
+                                                    id: rows[0].insertId,
+                                                    permissions: {
+                                                        can_edit_comics: true,
+                                                        can_edit_system_types: true,
+                                                        can_approve_for_public: true,
+                                                        can_use_system
+                                                    }
+                                                };
+                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresInMinutes: 60*5});
+                                                console.log("token=" + token);
                                                 res.json({
                                                     success: true,
-                                                    userId: rows[0].insertId
+                                                    userId: rows[0].insertId,
+                                                    token: token
                                                 });
                                             }
                                         },
@@ -385,9 +400,20 @@ module.exports = function ValidateBO(app, sql, logger) {
                                                     message: 'Error received validating user.'
                                                 });
                                             } else {
+                                                var profile = {
+                                                    email: req.body.userName,
+                                                    id: id,
+                                                    can_edit_comics: true,
+                                                    can_edit_system_types: true,
+                                                    can_approve_for_public: true,
+                                                    can_use_system: true
+                                                };
+                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresInMinutes: 60*5});
+                                                console.log("token=" + token);
                                                 res.json({
                                                     success: true,
-                                                    userId: id
+                                                    userId: id,
+                                                    token: token
                                                 });
                                             }
                                         });
