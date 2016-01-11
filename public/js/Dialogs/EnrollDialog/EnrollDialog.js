@@ -21,11 +21,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function(callbackNewEnrollee) {
+					self.create = function() {
 
 						try {
-
-							m_callbackNewEnrollee = callbackNewEnrollee;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -229,8 +227,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				// Invoked when the dialog is dismissed for a new Type.
-				var m_callbackNewEnrollee = null;
 			};
 
 			// Return the constructor function as the module object.

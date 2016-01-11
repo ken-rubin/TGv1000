@@ -11,6 +11,8 @@ var lessMiddleware = require("less-middleware");
 var favicon = require('serve-favicon');
 var JL = require("jsnlog").JL;
 var jsnlog_nodejs = require('jsnlog-nodejs').jsnlog_nodejs;
+var expressJwt = require('express-jwt');
+var jwt = require('jsonwebtoken');
 
 /////////////////////////////////////
 console.log("Allocate application (express).");
@@ -19,6 +21,18 @@ var app = express();
 /////////////////////////////////////
 app.set("development", process.argv[2] === "development");
 console.log("Set development (" + app.get("development") + ").");
+
+////////////////////////////////////
+// Protect all routes starting with '/BOL' with JWT unless they start with "/BOL/ValidateBO".
+// The routes in /BOL/ValidateBO are used in these 4 cases: enroll, login, forgot p/w, fetch marketing page data.
+var SECRET = process.env.TGv1000_JWT_Secret || "temp_secret";
+app.set("jwt_secret", SECRET);
+if (SECRET === "temp_secret") {
+    console.log("***You need to set environment variable TGv1000_JWT_Secret. Using 'temp_secret'***");
+} else {
+    console.log("Have jwt_secret: " + SECRET);
+}
+app.use('/BOL', expressJwt({ secret: SECRET}).unless( { path: [ /^\/BOL\/Validate.*$/ ] } ));
 
 /////////////////////////////////////
 console.log("Configure body-parser.");
@@ -224,7 +238,6 @@ sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order b
                 console.log('*************** ERROR ****************');
                 console.log('Error setting up route for ' + rowi.route + '; skipping it.');
                 console.log(e.message);
-                console.log('*************** ERROR ****************');
                 console.log(' ');
             }
         }

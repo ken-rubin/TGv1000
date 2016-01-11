@@ -56,18 +56,15 @@ define(["Core/errorHelper",
 					};
 
 					// Open popup--map callbacks to private functions.
-					self.showEnrollDialog = function (functionNewEnrollee) {
+					self.showEnrollDialog = function () {
 
 						try {
 
 							var td = new EnrollDialog();
-							var exceptionRet = td.create(functionNewEnrollee);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
-
+							var exceptionRet = td.create();
+							if (exceptionRet) { throw exceptionRet; }
 							return null;
+
 						} catch (e) {
 
 							return e;

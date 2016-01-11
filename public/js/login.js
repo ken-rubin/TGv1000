@@ -128,24 +128,12 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	try {
 
 		// Ask client to show the enroll dialog.
-		var exceptionRet = m_clientLogin.showEnrollDialog(m_functionOnGotNewEnrollee);
-		if (exceptionRet) {
-
-			throw exceptionRet;
-		}
+		var exceptionRet = m_clientLogin.showEnrollDialog();
+		if (exceptionRet) { throw exceptionRet; }
+		
 	} catch (e) {
 
     	errorHelper.show(e.message);
-	}
-}
-
-var m_functionOnGotNewEnrollee = function(userName, password) {
-
-	try {
-
-	} catch (e) {
-
-		errorHelper.show(e.message);
 	}
 }
 
@@ -202,7 +190,7 @@ var m_functionLoadThreeLists = function(errorHelper) {
 
 	try {
 
-		var posting = $.post("/BOL/ProjectBO/RetrieveProjectsForLists", 
+		var posting = $.post("/BOL/ValidateBO/RetrieveProjectsForLists", 
 			{},
 			'json');
 		posting.done(function(data){

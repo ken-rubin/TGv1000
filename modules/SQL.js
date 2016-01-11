@@ -33,8 +33,7 @@ module.exports = function SQL(app) {
             password: strPassword,
             multipleStatements: true
         });  
-        console.log("Created pool for " + strUser + "/'" + strPassword + "' for database: " + self.dbname + ".");
-        
+        console.log("Created pool for database: " + self.dbname + ".");
     };
 
     self.getCxnFromPool = function (callback) {
