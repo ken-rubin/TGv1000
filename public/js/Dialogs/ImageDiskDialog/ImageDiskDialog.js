@@ -219,32 +219,60 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						    // Now the file.
 						    formData.append("userFile", m_file);
 
-						    var request = new XMLHttpRequest();
-							request.open("POST", "/BOL/ResourceBO/SaveResource");
-							request.responseType = 'json';
-							request.send(formData);
-							m_resourceHasBeenSent = true;
+						 //    var request = new XMLHttpRequest();
+							// request.open("POST", "/BOL/ResourceBO/SaveResource");
+							// request.responseType = 'json';
+							// request.send(formData);
+							// m_resourceHasBeenSent = true;
 
-	    					request.onload = function(oEvent){
+	    		// 			request.onload = function(oEvent){
 
-	        					if (request.status === 200) {
+	      //   					if (request.status === 200) {
 
-	        						var res = request.response;
-	        						if (res.success) {
+	      //   						var res = request.response;
+	      //   						if (res.success) {
 
-	        							self.callFunctionOK(res.id);
+	      //   							self.callFunctionOK(res.id);
 
-	        						} else {
+	      //   						} else {
 
-	        							// !res.success
-	        							m_wellMessage(res.message, null);
-	        						}
-	        					} else {
+	      //   							// !res.success
+	      //   							m_wellMessage(res.message, null);
+	      //   						}
+	      //   					} else {
 
-	        						// request.status !== 200
-	        						m_wellMessage("Could not upload file to server.", null);
-	        					}
-	        				};
+	      //   						// request.status !== 200
+	      //   						m_wellMessage("Could not upload file to server.", null);
+	      //   					}
+	      //   				};
+							$.ajax({
+
+								type: 'POST',
+								url: '/BOL/ResourceBO/SaveResource',
+								processData: false,
+								contentType: false,
+								data: formData,
+								beforeSend: function(xhr) {
+									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
+								},
+								success: function (data) {
+
+									if (data.success) {
+
+										self.callFunctionOK(data.id);
+
+									} else {
+
+										// !data.success -- error message in objectData.message
+										m_wellMessage(res.message, null);
+									}
+								},
+								error: function (jqxhr, strTextStatus, strError) {
+
+									// Non-computational error in strError
+									m_wellMessage("Could not upload file to server.", null);
+								}
+							});
 						} catch (e) {
 
 							errorHelper.show(e);
