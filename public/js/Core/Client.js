@@ -71,12 +71,14 @@ define(["Core/errorHelper",
 							// Set globals for everyone to use.
 							g_strUserId = self.getTGCookie('userId');
 							g_strUserName = self.getTGCookie('userName');
-
+							g_strToken = self.getTGCookie('token');
+							g_bcan_approve_for_public = (self.getTGCookie('can_approve_for_public') === 'true');
+							g_bcan_edit_comics = (self.getTGCookie('can_edit_comics') === 'true');
+							g_bcan_edit_system_types = (self.getTGCookie('can_edit_system_types') === 'true');
+							g_bcan_use_system = (self.getTGCookie('can_use_system') === 'true');
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					// Run (play) the Project

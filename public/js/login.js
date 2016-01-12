@@ -166,11 +166,19 @@ var m_functionSignInButtonClick = function(errorHelper) {
 					// These cookies don't expire, but they mau be overridden if a different user logs in.
 					var strDate = "; expires=Tue, 19 Jan 2038 03:14:07 GMT";
 
-	                document.cookie = "userId=" + data.userId.toString() + strDate;
-	                document.cookie = "userName=" + userName + strDate;
+	                var payload = window.atob(data.token.split('.')[1]);
+	                var profile = JSON.parse(payload);
 
-	                // var token = jwtbundle.decode(data.token);
-	                // JL().info("Client side version of token: " + JSON.stringify(token));
+	                // Save data.token to cookie or localstorage for return with all subsequent ajax posts.
+	                document.cookie = "token=" + data.token + strDate;
+
+	                // Save profile to cookie for use downstream (user id and permissions).
+	                document.cookie = "userId=" + profile.id.toString() + strDate;
+	                document.cookie = "userName=" + profile.email + strDate;
+                    document.cookie = "can_edit_comics=" + profile.can_edit_comics.toString() + strDate;
+                    document.cookie = "can_edit_system_types=" + profile.can_edit_system_types.toString() + strDate;
+                    document.cookie = "can_approve_for_public=" + profile.can_approve_for_public.toString() + strDate;
+                    document.cookie = "can_use_system=" + profile.can_use_system.toString() + strDate;
 
 	            	location.href = '/index';
 
