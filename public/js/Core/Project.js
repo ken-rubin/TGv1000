@@ -124,6 +124,9 @@ define(["Core/errorHelper", "Navbar/Comics"],
 								contentType: 'application/json',
 								data: JSON.stringify(data),
 								dataType: 'json',
+								beforeSend: function(xhr) {
+									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
+								},
 								success: function (objectData, strTextStatus, jqxhr) {
 
 									if (objectData.success) {
