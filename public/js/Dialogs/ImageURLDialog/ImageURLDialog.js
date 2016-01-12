@@ -138,28 +138,63 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								return;
 							}
 
-							var posting = $.post("/BOL/ResourceBO/SaveURLResource", 
-								{
+							// var posting = $.post("/BOL/ResourceBO/SaveURLResource", 
+							// 	{
+							// 		userId: g_strUserId, 
+							// 		userName: g_strUserName,
+							// 		url: m_url,
+							// 		tags: tags,
+							// 		resourceTypeId: 1,
+							// 		resourceName: strResourceName
+							// 	}, 
+							// 	'json');
+	    		// 			posting.done(function(data){
+
+	      //   					if (data.success) {
+
+	      //   						self.callFunctionOK(data.id);
+
+	      //   					} else {
+
+	      //   						// !data.success
+	      //   						errorHelper.show(data.message);
+	      //   					}
+	      //   				});
+							$.ajax({
+
+								type: 'POST',
+								url: '/BOL/ResourceBO/SaveURLResource',
+								contentType: 'application/json',
+								data: {
 									userId: g_strUserId, 
 									userName: g_strUserName,
 									url: m_url,
 									tags: tags,
 									resourceTypeId: 1,
 									resourceName: strResourceName
-								}, 
-								'json');
-	    					posting.done(function(data){
+								},
+								dataType: 'json',
+								beforeSend: function(xhr) {
+									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
+								},
+								success: function (data) {
 
-	        					if (data.success) {
+									if (data.success) {
 
-	        						self.callFunctionOK(data.id);
+		        						self.callFunctionOK(data.id);
 
-	        					} else {
+									} else {
 
-	        						// !data.success
-	        						errorHelper.show(data.message);
-	        					}
-	        				});
+										// !data.success -- error message in objectData.message
+										errorHelper.show(data.message);
+									}
+								},
+								error: function (jqxhr, strTextStatus, strError) {
+
+									// Non-computational error in strError
+									errorHelper.show(strError);
+								}
+							});
 						} catch (e) {
 
 							errorHelper.show(e);

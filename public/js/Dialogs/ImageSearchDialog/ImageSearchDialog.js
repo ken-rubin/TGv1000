@@ -143,46 +143,97 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					    try {
 
 						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
-					        var posting = $.post("/BOL/UtilityBO/SearchResources", 
-					        	{
+					        // var posting = $.post("/BOL/UtilityBO/SearchResources", 
+					        // 	{
+					        // 		tags: tags, 
+					        // 		userId: g_strUserId,
+					        // 		userName: g_strUserName,
+					        // 		resourceTypeId: 1,
+					        // 		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
+					        // 	},
+					        // 	'json');
+					        // posting.done(function(data){
+
+					        //     if (data.success) {
+
+					        //         m_searchResultProcessedArray = new Array();
+					        //         m_searchResultRawArray = data.arrayRows;
+					        //         for (var i = 0; i < m_searchResultRawArray.length; i++) {
+
+					        //             var rowIth = m_searchResultRawArray[i];
+					        //             m_searchResultProcessedArray.push({
+
+					        //             	index: i, 
+					        //             	name: rowIth.name,
+					        //             	url: resourceHelper.toURL('resources', 
+					        //             		rowIth.id, 
+					        //             		'image', 
+					        //             		''), 
+					        //             	resourceTypeId: rowIth.resourceTypeId});
+					        //         }
+
+					        //         var exceptionRet = m_rebuildCarousel();
+					        //         if (exceptionRet) {
+
+					        //         	throw exceptionRet;
+					        //         }
+					        //     } else {
+
+					        //         // !data.success
+					        //         m_wellMessage("An error has occurred: " + data.message);
+					        //     }
+					        // });
+							$.ajax({
+
+								type: 'POST',
+								url: '/BOL/UtilityBO/SearchResources',
+								contentType: 'application/json',
+								data: {
 					        		tags: tags, 
 					        		userId: g_strUserId,
 					        		userName: g_strUserName,
 					        		resourceTypeId: 1,
 					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},
-					        	'json');
-					        posting.done(function(data){
+								dataType: 'json',
+								beforeSend: function(xhr) {
+									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
+								},
+								success: function (data) {
 
-					            if (data.success) {
+									if (data.success) {
 
-					                m_searchResultProcessedArray = new Array();
-					                m_searchResultRawArray = data.arrayRows;
-					                for (var i = 0; i < m_searchResultRawArray.length; i++) {
+						                m_searchResultProcessedArray = new Array();
+						                m_searchResultRawArray = data.arrayRows;
+						                for (var i = 0; i < m_searchResultRawArray.length; i++) {
 
-					                    var rowIth = m_searchResultRawArray[i];
-					                    m_searchResultProcessedArray.push({
+						                    var rowIth = m_searchResultRawArray[i];
+						                    m_searchResultProcessedArray.push({
 
-					                    	index: i, 
-					                    	name: rowIth.name,
-					                    	url: resourceHelper.toURL('resources', 
-					                    		rowIth.id, 
-					                    		'image', 
-					                    		''), 
-					                    	resourceTypeId: rowIth.resourceTypeId});
-					                }
+						                    	index: i, 
+						                    	name: rowIth.name,
+						                    	url: resourceHelper.toURL('resources', 
+						                    		rowIth.id, 
+						                    		'image', 
+						                    		''), 
+						                    	resourceTypeId: rowIth.resourceTypeId});
+						                }
 
-					                var exceptionRet = m_rebuildCarousel();
-					                if (exceptionRet) {
+						                var exceptionRet = m_rebuildCarousel();
+						                if (exceptionRet) { throw exceptionRet; }
 
-					                	throw exceptionRet;
-					                }
-					            } else {
+									} else {
 
-					                // !data.success
-					                m_wellMessage("An error has occurred: " + data.message);
-					            }
-					        });
+										// !data.success -- error message in objectData.message
+										m_wellMessage("An error has occurred: " + data.message);
+									}
+								},
+								error: function (jqxhr, strTextStatus, strError) {
+
+									// Non-computational error in strError
+									m_wellMessage("An error has occurred: " + strError);
+								}
+							});
 					    } catch(e) {
 
 					        m_wellMessage("An error has occurred: " + e.message, null);
