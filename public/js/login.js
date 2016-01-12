@@ -169,6 +169,9 @@ var m_functionSignInButtonClick = function(errorHelper) {
 	                document.cookie = "userId=" + data.userId.toString() + strDate;
 	                document.cookie = "userName=" + userName + strDate;
 
+	                // var token = jwtbundle.decode(data.token);
+	                // JL().info("Client side version of token: " + JSON.stringify(token));
+
 	            	location.href = '/index';
 
 	            } else {
