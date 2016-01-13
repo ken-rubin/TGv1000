@@ -180,21 +180,35 @@ var m_functionSignInButtonClick = function(errorHelper) {
                     document.cookie = "can_approve_for_public=" + profile.can_approve_for_public.toString() + strDate;
                     document.cookie = "can_use_system=" + profile.can_use_system.toString() + strDate;
 
-	            	location.href = '/index';
+	            	// location.href = '/index';
+	            	$.ajax(
+	            		{
+							type: 'GET',
+							url: '/index',
+							contentType: false,
+							beforeSend: function(xhr) {
+								xhr.setRequestHeader("Authorization", "Bearer " + data.token);
+							},
+							success: function(htmlData) {
+								// var wnd = window.open("about:blank", "", "_blank");
+								window.document.write(htmlData);
+							},
+							error: function (jqxhr, strTextStatus, strError) {
 
+								// Non-computational error in strError
+								throw new Error(strError);
+							}
+						}
+	            	);
 	            } else {
 
 	                // !data.success
 					JL().info("<<< unsuccessful login attempt >>>");
-
-	                errorHelper.show(data.message);
+	                throw new Error(data.message);
 	            }
 	        });
 		}
-    } catch(e) {
-
-    	errorHelper.show(e.message);
-    }
+    } catch(e) { errorHelper.show(e.message); }
 }
 
 var m_functionLoadThreeLists = function(errorHelper) {

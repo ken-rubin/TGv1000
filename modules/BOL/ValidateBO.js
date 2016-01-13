@@ -348,7 +348,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                                                         can_use_system
                                                     }
                                                 };
-                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresInMinutes: 60*5});
+                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5 });
                                                 console.log("token=" + token);
                                                 res.json({
                                                     success: true,
@@ -408,7 +408,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                                                     can_approve_for_public: true,
                                                     can_use_system: true
                                                 };
-                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresInMinutes: 60*5});
+                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
                                                 console.log("token=" + token);
                                                 res.json({
                                                     success: true,

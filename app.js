@@ -32,12 +32,46 @@ if (SECRET === "temp_secret") {
 } else {
     console.log("Have jwt_secret: " + SECRET);
 }
-app.use('/BOL', expressJwt({ secret: SECRET}).unless( { path: [ /^\/BOL\/Validate.*$/ ] } ));
+
+// var jwtErrCheck = function(err, req, res, next) {
+//     if (err) {
+//         console.log("expressJwt err: " + JSON.stringify(err));
+//         res.json({
+//             success: false,
+//             message: err.constructor.name
+//         });
+//         return;
+//     }
+//     next();
+// }
+// var jwtErrCheck = function(err, req, res, next) {
+//     if (err) {
+//         return res.json({
+//             success: false,
+//             message: err.message
+//         })
+//     }
+//     next();
+// }
+// app.use('/BOL', expressJwt({ secret: SECRET}).unless( { path: [ /^\/BOL\/Validate.*$/ ] } ), jwtErrCheck);
+// app.use('/adminzone', expressJwt({ secret: SECRET}), jwtErrCheck);
 
 /////////////////////////////////////
 console.log("Configure body-parser.");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+/////////////////////////////////////
+// expressJwt error catcher (although the following middleware will be executed for every request to the app)
+// app.use(function(err, req, res, next){
+//     if (err) {
+//         console.log("expressJwt err: " + JSON.stringify(err));
+//         res.json({
+//             success: false,
+//             message: err.constructor.name
+//         });
+//     }
+// });
 
 /////////////////////////////////////
 console.log("Configure view folder (views) and view engine (jade).");
@@ -60,12 +94,33 @@ if (app.get("development")) {
 }
 
 /////////////////////////////////////
+app.set("dbname","TGv1000.");
+console.log("dbname is " +  app.get("dbname"));
+
+/////////////////////////////////////
 console.log("Map static request folder (public).");
 app.use(express.static(__dirname + "/public"));
 
-/////////////////////////////////////
-app.set("dbname","TGv1000.");
-console.log("dbname is " +  app.get("dbname"));
+app.use(
+    expressJwt({ secret: SECRET }).unless({
+            path:[
+                __dirname + "/public",
+                '/',
+                /^\/BOL\/Validate.*$/,
+                '*.public',
+                '*.logger',
+                "/renderJadeSnippet"
+            ]})
+    // ,
+    // function(req, res) {
+    //     if(!req.user) {
+    //         return res.json({
+    //             success: false,
+    //             message: "JWT error"
+    //         });
+    //     }
+    // }
+);
 
 /////////////////////////////////////
 console.log("Configuring jsnlog to listen for client-side messages and logging to console.");
@@ -127,35 +182,30 @@ console.log("Map main route login.jade.");
 app.get("/", function (req, res) {
 
     try {
-
-        // Render the jade file to the client.
         res.render("Login/login", { 
-
-            // Pass in jade context property just for the hell of it.
             title : "TGv1000" 
         });
-    } catch (e) {
-
-        res.send(e.message);
-    }
+    } catch (e) { res.send(e.message); }
 });
 
 /////////////////////////////////////
 console.log("Map main route index.jade.");
-app.get("/index", function (req, res) {
+app.get('/index', function (req, res) {
 
     try {
+        console.log('In app.get(index)');
+        console.log('req.headers=' + JSON.stringify(req.headers));
+        console.log('req.user=' + JSON.stringify(req.user));
+        // if (!req.user) {
+        //     return res.send(err.message);
+        // }
 
         // Render the jade file to the client.
         res.render("Index/index", { 
-
             // Pass in jade context property just for the hell of it.
             title : "TGv1000" 
         });
-    } catch (e) {
-
-        res.send(e.message);
-    }
+    } catch (e) { res.send(e.message); }
 });
 
 /////////////////////////////////////
@@ -166,14 +216,9 @@ app.get("/adminzone", function (req, res) {
 
         // Render the jade file to the client.
         res.render("Adminzone/adminzone", { 
-
-            // Pass in jade context property just for the hell of it.
             title : "TGv1000" 
         });
-    } catch (e) {
-
-        res.send(e.message);
-    }
+    } catch (e) { res.send(e.message); }
 });
 
 /////////////////////////////////////
