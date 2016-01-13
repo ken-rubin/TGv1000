@@ -111,15 +111,16 @@ app.use(
                 '*.logger',
                 "/renderJadeSnippet"
             ]})
-    // ,
-    // function(req, res) {
-    //     if(!req.user) {
-    //         return res.json({
-    //             success: false,
-    //             message: "JWT error"
-    //         });
-    //     }
-    // }
+    ,
+    function(err, req, res, next) {
+        if(err) {
+            return res.json({
+                success: false,
+                message: "JWT error"
+            });
+        }
+        next();
+    }
 );
 
 /////////////////////////////////////
