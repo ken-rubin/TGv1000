@@ -17,12 +17,18 @@ var validator = null;
 var g_strUserId = '';
 var g_strUserName = '';
 var g_clTypeApp = null;
+var g_strToken = '';
+var g_bcan_approve_for_public = false;
+var g_bcan_edit_comics = false;
+var g_bcan_edit_system_types = false;
+var g_bcan_use_system = false;
 
 // Invoke callback when DOM is fully loaded.
-$(document).ready(function () {
+document.body.addEventListener("myEventName", doMain, false);
+function doMain(ev) {
 	
 	try {
-
+		alert("main ready function triggered");
 		// Require the error handler for all functions.
 		require(["Core/errorHelper", 
 				"Core/Client", 
@@ -101,4 +107,5 @@ $(document).ready(function () {
 
 		alert(e.message);
 	}
-});
+}
+

@@ -192,6 +192,14 @@ var m_functionSignInButtonClick = function(errorHelper) {
 							success: function(htmlData) {
 								// var wnd = window.open("about:blank", "", "_blank");
 								window.document.write(htmlData);
+								window.setTimeout(
+									function(){
+										alert("about to trigger myEventName");
+										var myEvent = new CustomEvent("myEventName");
+										document.body.dispatchEvent(myEvent);
+									}, 
+									1000
+								);
 							},
 							error: function (jqxhr, strTextStatus, strError) {
 
