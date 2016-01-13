@@ -10,8 +10,8 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/ClientLogin"], 
-			function (errorHelper, ClientLogin) {
+		require(["Core/errorHelper", "Core/ClientLogin", "./main"], 
+			function (errorHelper, ClientLogin, main) {
 
 				try {
 
@@ -43,23 +43,24 @@ $(document).ready(function () {
 	                }
 
 	                // Wire up the signIn button
+	                var mn = new main();
 	                $("#signinBtn").click(function () {
 	                    
-	                    m_functionSignInButtonClick(errorHelper);
+	                    m_functionSignInButtonClick(errorHelper, mn);
 
 	                });
 	                $("#signinBtn").keypress(function(event){
 
 	                    if (event.which == 13) {
 
-		                    m_functionSignInButtonClick(errorHelper);
+		                    m_functionSignInButtonClick(errorHelper, mn);
 	                    }
 	                });
 	                $("#inputPassword").keypress(function(event){
 
 	                    if (event.which == 13) {
 
-		                    m_functionSignInButtonClick(errorHelper);
+		                    m_functionSignInButtonClick(errorHelper, mn);
 	                    }
 	                });
 	                
@@ -137,7 +138,7 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	}
 }
 
-var m_functionSignInButtonClick = function(errorHelper) {
+var m_functionSignInButtonClick = function(errorHelper, mn) {
 
 	try {
 
@@ -194,11 +195,9 @@ var m_functionSignInButtonClick = function(errorHelper) {
 								window.document.write(htmlData);
 								window.setTimeout(
 									function(){
-										alert("about to trigger myEventName");
-										var myEvent = new CustomEvent("myEventName");
-										document.body.dispatchEvent(myEvent);
+										mn.create();
 									}, 
-									1000
+									500
 								);
 							},
 							error: function (jqxhr, strTextStatus, strError) {
