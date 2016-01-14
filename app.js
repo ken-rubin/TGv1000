@@ -38,45 +38,10 @@ if (SECRET === "temp_secret") {
     console.log("Have jwt_secret: " + SECRET);
 }
 
-// var jwtErrCheck = function(err, req, res, next) {
-//     if (err) {
-//         console.log("expressJwt err: " + JSON.stringify(err));
-//         res.json({
-//             success: false,
-//             message: err.constructor.name
-//         });
-//         return;
-//     }
-//     next();
-// }
-// var jwtErrCheck = function(err, req, res, next) {
-//     if (err) {
-//         return res.json({
-//             success: false,
-//             message: err.message
-//         })
-//     }
-//     next();
-// }
-// app.use('/BOL', expressJwt({ secret: SECRET}).unless( { path: [ /^\/BOL\/Validate.*$/ ] } ), jwtErrCheck);
-// app.use('/adminzone', expressJwt({ secret: SECRET}), jwtErrCheck);
-
 /////////////////////////////////////
 console.log("Configure body-parser.");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-/////////////////////////////////////
-// expressJwt error catcher (although the following middleware will be executed for every request to the app)
-// app.use(function(err, req, res, next){
-//     if (err) {
-//         console.log("expressJwt err: " + JSON.stringify(err));
-//         res.json({
-//             success: false,
-//             message: err.constructor.name
-//         });
-//     }
-// });
 
 /////////////////////////////////////
 console.log("Configure view folder (views) and view engine (jade).");
@@ -106,45 +71,18 @@ console.log("dbname is " +  app.get("dbname"));
 console.log("Map static request folder (public).");
 app.use(express.static(__dirname + "/public"));
 
-app.use(
-    expressJwt({ secret: SECRET,
-                getToken: function fromHeaderOrQuerystring (req) {
-                    if (req.cookies && req.cookies['token']) {
-                      return req.cookies['token'];
-                    }
-                    return null;
-                }
-            }).unless({
-            path:[
-                __dirname + "/public",
-                '/',
-                /^\/BOL\/Validate.*$/,
-                '*.public',
-                '*.logger',
-                "/renderJadeSnippet"
-            ]})
-    ,
-    function(err, req, res, next) {
-        if(err) {
-            return res.json({
-                success: false,
-                message: "JWT error"
-            });
-        }
-        next();
-    }
-);
-
 /////////////////////////////////////
 console.log("Configuring jsnlog to listen for client-side messages and logging to console.");
 // jsnlog.js on the client by default sends log messages to /jsnlog.logger, using POST.
-app.post('*.logger', function (req, res) { 
+app.post('*.logger',
+        function (req, res) { 
     
-    jsnlog_nodejs(JL, req.body);
+            jsnlog_nodejs(JL, req.body);
 
-    // Send empty response. This is ok, because client side jsnlog does not use response from server.
-    res.send(''); 
-});
+            // Send empty response. This is ok, because client side jsnlog does not use response from server.
+            res.send(''); 
+        }
+);
 
 // Test server-generated jsnlog message.
 JL().info('<<< log message from server to show logging is live >>>');
@@ -152,7 +90,8 @@ JL().info('<<< log message from server to show logging is live >>>');
 /////////////////////////////////////
 console.log("Map renderJadeSnippet route.");
 var objectInstantiatedModules = {};
-app.post("/renderJadeSnippet", function (req, res) {
+app.post("/renderJadeSnippet",
+        function (req, res) {
 
 	try {
 
@@ -203,30 +142,54 @@ app.get("/", function (req, res) {
 
 /////////////////////////////////////
 console.log("Map main route index.jade.");
-app.get('/index', function (req, res) {
+app.get('/index', 
+        expressJwt({ secret: SECRET,
+                getToken: function fromHeaderOrQuerystring (req) {
+                    
+                    console.log('Got token: ' + req.cookies.token);
+                    if (req.cookies && req.cookies.token) {
+                      return req.cookies.token;
+                    }
+                    return null;
+                }
+            }),
+        function (req, res) {
 
-    try {
+            try {
 
-        // Render the jade file to the client.
-        res.render("Index/index", { 
-            // Pass in jade context property just for the hell of it.
-            title : "TGv1000" 
-        });
-    } catch (e) { res.send(e.message); }
-});
+                // Render the jade file to the client.
+                res.render("Index/index", { 
+                    // Pass in jade context property just for the hell of it.
+                    title : "TGv1000" 
+                });
+            } catch (e) { res.send(e.message); }
+        }
+);
 
 /////////////////////////////////////
 console.log("Map main route adminzone.jade.");
-app.get("/adminzone", function (req, res) {
+app.get("/adminzone", 
+        expressJwt({ secret: SECRET,
+                getToken: function fromHeaderOrQuerystring (req) {
+                    
+                    console.log('Got token: ' + req.cookies.token);
+                    if (req.cookies && req.cookies.token) {
+                      return req.cookies.token;
+                    }
+                    return null;
+                }
+            }),
+    function (req, res) {
 
-    try {
+        try {
 
-        // Render the jade file to the client.
-        res.render("Adminzone/adminzone", { 
-            title : "TGv1000" 
-        });
-    } catch (e) { res.send(e.message); }
-});
+            // Render the jade file to the client.
+            res.render("Adminzone/adminzone", { 
+                title : "TGv1000" 
+            });
+        } catch (e) { res.send(e.message); }
+    }
+);
 
 /////////////////////////////////////
 console.log("Set up SQL module.");
@@ -258,7 +221,7 @@ app.use(multer(
 /////////////////////////////////////
 console.log("Setting up routes from database.");
 var moduleInstances = {};
-sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order by id asc;",
+sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
     function(rows){
 
         var moduleInstance = null;
@@ -282,7 +245,22 @@ sql.execute("select * from " + app.get("dbname") + "routes where inuse=1 order b
                 }
 
                 var methodInstance = moduleInstance[rowi.method];
-                app[rowi.verb](rowi.route, methodInstance);
+                if (rowi.requiresJWT === 1) {
+                    app[rowi.verb](rowi.route, 
+                        expressJwt({ secret: SECRET,
+                                getToken: function fromHeaderOrQuerystring (req) {
+                                    
+                                    console.log('Got token: ' + req.cookies.token);
+                                    if (req.cookies && req.cookies.token) {
+                                      return req.cookies.token;
+                                    }
+                                    return null;
+                                }
+                            }),
+                        methodInstance);
+                } else {
+                    app[rowi.verb](rowi.route, methodInstance);
+                }
 
             } catch (e) {
 

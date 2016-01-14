@@ -111,7 +111,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				                    localStorage.setItem("can_approve_for_public", data.profile.can_approve_for_public.toString());
 				                    localStorage.setItem("can_use_system", data.profile.can_use_system.toString());
 
-
                 					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
                 									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
             					} else {

@@ -18,7 +18,7 @@ module.exports = function ValidateBO(app, sql, logger) {
     
     // Router handler function.
     self.routeNewEnrollment = function (req, res) {
-        // req.body.userName
+        // req.body.userName -- child email
         // req.body.parentEmail
 
         try {
@@ -75,15 +75,31 @@ module.exports = function ValidateBO(app, sql, logger) {
                     
                         if (error) {
                         
-                            res.json({
+                            return res.json({
                                 success: false,
                                 message: "Error sending enrollment e-mail: " + error.toString()
                             });
                         }
 
+                        // res.json({
+                        //     success: true,
+                        //     userId: userId
+                        // });
+                        var profile = {
+                            email: req.body.userName,
+                            id: userId,
+                            can_edit_comics: true,
+                            can_edit_system_types: true,
+                            can_approve_for_public: true,
+                            can_use_system: true
+                        };
+                        var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
+                        console.log("token=" + token);
+                        // See above for reason why we're sending info twice.
+                        res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
                         res.json({
                             success: true,
-                            userId: userId
+                            profile: profile
                         });
 
                         // if you don't want to use this transport object anymore, uncomment following line
@@ -296,161 +312,64 @@ module.exports = function ValidateBO(app, sql, logger) {
         
             console.log("Entered routeUserAuthenticate with req.body=" + JSON.stringify(req.body));
 
-            var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user;",
-                function(rows) {
+            // Retrieve and validate password against hash.
+            exceptionRet = sql.execute("select id, pwHash from " + self.dbname + "user where userName='" + req.body.userName + "';",
+                function(rows){
 
                     if (!rows) {
                         res.json({
-                            success:false,
-                            message:'Could not access user table to get record count'
+                            success: false,
+                            message: 'Error received validating user.'
                         });
-                    } else if (rows.length === 0) {
+                    } else if (rows.length === 0){
                         res.json({
-                            success:false,
-                            message:'Could not access user table to get record count'
+                            success: false,
+                            message: 'Error received validating user.'
                         });
                     } else {
 
-                        var cnt = rows[0].cnt;
+                        var id = rows[0].id;
+                        var pwHash = rows[0].pwHash;
 
-                        if (cnt === 0) {
+                        bcrypt.compare(req.body.password, pwHash, function(err, result){
 
-                            // First user. Auto-enroll, setting password hash.
-                            bcrypt.hash(req.body.password, null, null, function(err, hash){
-
-                                if (err) {
-                                    res.json({success:false,
-                                        message:'Error received hashing password: ' + err
-                                    });
-                                } else {
-
-                                    exceptionRet = sql.execute("insert " + self.dbname + "user (userName, pwHash) values ('" + req.body.userName + "','" + hash + "');",
-                                        function(rows){
-
-                                            if (!rows) {
-                                                res.json({
-                                                    success: false,
-                                                    message: 'Error received inserting first user in user table.'
-                                                });
-                                            } else if (rows.length === 0){
-                                                res.json({
-                                                    success: false,
-                                                    message: 'Error received inserting first user in user table.'
-                                                });
-                                            } else {
-                                                var profile = {
-                                                    email: req.body.userName,
-                                                    id: rows[0].insertId,
-                                                    permissions: {
-                                                        can_edit_comics: true,
-                                                        can_edit_system_types: true,
-                                                        can_approve_for_public: true,
-                                                        can_use_system
-                                                    }
-                                                };
-                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5 });
-                                                console.log("token=" + token);
-
-                                                // To prepare for httpOnly and secure (non-dev environment) we'll send the token twice,
-                                                // once as a cookie and once in the json response.
-                                                res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
-                                                // and sending the profile here allows client side to parse and use it from JS.
-                                                res.json({
-                                                    success: true,
-                                                    profile: profile
-                                                });
-                                            }
-                                        },
-                                        function(strError){
-                                            res.json({
-                                                success: false,
-                                                message: 'Error received inserting first user in user table: ' + strError
-                                            });
-                                        });
-                                    if (exceptionRet) {
-                                        res.json({
-                                            success: false,
-                                            message: 'Error received inserting first user in user table: ' + exceptionRet.message
-                                        });
-                                    }
-                                }
-                            });
-                        } else {
-
-                            // Retrieve and validate password against hash.
-                            exceptionRet = sql.execute("select id, pwHash from " + self.dbname + "user where userName='" + req.body.userName + "';",
-                                function(rows){
-
-                                    if (!rows) {
-                                        res.json({
-                                            success: false,
-                                            message: 'Error received validating user.'
-                                        });
-                                    } else if (rows.length === 0){
-                                        res.json({
-                                            success: false,
-                                            message: 'Error received validating user.'
-                                        });
-                                    } else {
-
-                                        var id = rows[0].id;
-                                        var pwHash = rows[0].pwHash;
-
-                                        bcrypt.compare(req.body.password, pwHash, function(err, result){
-
-                                            if (!result) {
-                                                res.json({
-                                                    success: false,
-                                                    message: 'Error received validating user.'
-                                                });
-                                            } else {
-                                                var profile = {
-                                                    email: req.body.userName,
-                                                    id: id,
-                                                    can_edit_comics: true,
-                                                    can_edit_system_types: true,
-                                                    can_approve_for_public: true,
-                                                    can_use_system: true
-                                                };
-                                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
-                                                console.log("token=" + token);
-                                                // See above for reason why we're sending info twice.
-                                                res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
-                                                res.json({
-                                                    success: true,
-                                                    profile: profile
-                                                });
-                                            }
-                                        });
-                                    }
-                                },
-                                function(strError){
-                                    res.json({
-                                        success: false,
-                                        message: 'Error received validating user: ' + strError
-                                    });
-                                });
-                            if (exceptionRet) {
+                            if (!result) {
                                 res.json({
                                     success: false,
-                                    message: 'Error received validating user: ' + exceptionRet.message
+                                    message: 'Error received validating user.'
+                                });
+                            } else {
+                                var profile = {
+                                    email: req.body.userName,
+                                    id: id,
+                                    can_edit_comics: true,
+                                    can_edit_system_types: true,
+                                    can_approve_for_public: true,
+                                    can_use_system: true
+                                };
+                                var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
+                                console.log("token=" + token);
+                                // See above for reason why we're sending info twice.
+                                res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
+                                res.json({
+                                    success: true,
+                                    profile: profile
                                 });
                             }
-                        }
+                        });
                     }
                 },
                 function(strError){
                     res.json({
-                        success:false,
-                        message:'Could not access user table to get record count: ' + strError
+                        success: false,
+                        message: 'Error received validating user: ' + strError
                     });
                 });
-
             if (exceptionRet) {
-                    res.json({
-                        success:false,
-                        message:'Could not access user table to get record count: ' + exceptionRet.message
-                    });
+                res.json({
+                    success: false,
+                    message: 'Error received validating user: ' + exceptionRet.message
+                });
             }
         } catch (e) {
         
