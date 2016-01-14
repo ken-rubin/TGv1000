@@ -98,11 +98,19 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
             					if (data.success) {
 
-            						// These cookies don't expire, but they mau be overridden if a different user logs in.
-            						var strDate = "; expires=Tue, 19 Jan 2038 03:14:07 GMT";
+					            	// The JWT has been saved to a cookie so it will be sent with each subsequent request.
 
-                					document.cookie = "userId=" + data.userId.toString() + strDate;
-                					document.cookie = "userName=" + emailChild + strDate;
+					            	// The following is included just to remind us in the future how to log from client into server console.
+									JL().info("<<< successful login occurred >>>");
+
+					                // Save data.profile info to localStorage for use downstream (user id and permissions).
+					                localStorage.setItem("userId", data.profile.id.toString());
+					                localStorage.setItem("userName", data.profile.email);
+				                    localStorage.setItem("can_edit_comics", data.profile.can_edit_comics.toString());
+				                    localStorage.setItem("can_edit_system_types", data.profile.can_edit_system_types.toString());
+				                    localStorage.setItem("can_approve_for_public", data.profile.can_approve_for_public.toString());
+				                    localStorage.setItem("can_use_system", data.profile.can_use_system.toString());
+
 
                 					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
                 									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});

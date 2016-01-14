@@ -167,12 +167,12 @@ var m_functionSignInButtonClick = function(errorHelper, mn) {
 					JL().info("<<< successful login occurred >>>");
 
 	                // Save data.profile info to localStorage for use downstream (user id and permissions).
-	                localStorage.setItem("userId=", profile.id.toString());
-	                localStorage.setItem("userName=", profile.email);
-                    localStorage.setItem("can_edit_comics=", profile.can_edit_comics.toString());
-                    localStorage.setItem("can_edit_system_types=", profile.can_edit_system_types.toString());
-                    localStorage.setItem("can_approve_for_public=", profile.can_approve_for_public.toString());
-                    localStorage.setItem("can_use_system=", profile.can_use_system.toString());
+	                localStorage.setItem("userId", data.profile.id.toString());
+	                localStorage.setItem("userName", data.profile.email);
+                    localStorage.setItem("can_edit_comics", data.profile.can_edit_comics.toString());
+                    localStorage.setItem("can_edit_system_types", data.profile.can_edit_system_types.toString());
+                    localStorage.setItem("can_approve_for_public", data.profile.can_approve_for_public.toString());
+                    localStorage.setItem("can_use_system", data.profile.can_use_system.toString());
 
 	            	// location.href = '/index';
 	            	$.ajax(
