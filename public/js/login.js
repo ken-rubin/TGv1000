@@ -161,25 +161,18 @@ var m_functionSignInButtonClick = function(errorHelper, mn) {
 
 	            if (data.success) {
 
-	            	// The following is included just to remind us in the future how to log from client to server.
+	            	// The JWT has been saved to a cookie so it will be sent with each subsequent request.
+
+	            	// The following is included just to remind us in the future how to log from client into server console.
 					JL().info("<<< successful login occurred >>>");
 
-					// These cookies don't expire, but they mau be overridden if a different user logs in.
-					var strDate = "; expires=Tue, 19 Jan 2038 03:14:07 GMT";
-
-	                var payload = window.atob(data.token.split('.')[1]);
-	                var profile = JSON.parse(payload);
-
-	                // Save data.token to cookie or localstorage for return with all subsequent ajax posts.
-	                document.cookie = "token=" + data.token + strDate;
-
-	                // Save profile to cookie for use downstream (user id and permissions).
-	                document.cookie = "userId=" + profile.id.toString() + strDate;
-	                document.cookie = "userName=" + profile.email + strDate;
-                    document.cookie = "can_edit_comics=" + profile.can_edit_comics.toString() + strDate;
-                    document.cookie = "can_edit_system_types=" + profile.can_edit_system_types.toString() + strDate;
-                    document.cookie = "can_approve_for_public=" + profile.can_approve_for_public.toString() + strDate;
-                    document.cookie = "can_use_system=" + profile.can_use_system.toString() + strDate;
+	                // Save data.profile info to localStorage for use downstream (user id and permissions).
+	                localStorage.setItem("userId=", profile.id.toString());
+	                localStorage.setItem("userName=", profile.email);
+                    localStorage.setItem("can_edit_comics=", profile.can_edit_comics.toString());
+                    localStorage.setItem("can_edit_system_types=", profile.can_edit_system_types.toString());
+                    localStorage.setItem("can_approve_for_public=", profile.can_approve_for_public.toString());
+                    localStorage.setItem("can_use_system=", profile.can_use_system.toString());
 
 	            	// location.href = '/index';
 	            	$.ajax(
@@ -187,14 +180,21 @@ var m_functionSignInButtonClick = function(errorHelper, mn) {
 							type: 'GET',
 							url: '/index',
 							contentType: false,
-							beforeSend: function(xhr) {
-								xhr.setRequestHeader("Authorization", "Bearer " + data.token);
-							},
 							success: function(htmlData) {
 								// var wnd = window.open("about:blank", "", "_blank");
 								window.document.write(htmlData);
 								window.setTimeout(
 									function(){
+										// $.getScript('frameworks/jquery/2.1.3/jquery-2.1.3.min.js');
+										// $.getScript('frameworks/jqueryui/1.11.2/jquery-ui.min.js');
+										// $.getScript('frameworks/bootstrap/3.3.5/js/bootstrap.min.js');
+										// $.getScript('frameworks/bootstrap-dialog/1.34.5/js/bootstrap-dialog.min.js');
+										// $.getScript('frameworks/jquery.form/3.51/jquery.form.min.js');
+										// $.getScript('frameworks/jquery.xpath/0.3.1/jquery.xpath.min.js');
+										// $.getScript('frameworks/miscellaneous/jquery.scrollintoview.min.js');
+										// $.getScript('frameworks/powertip/1.2.0/js/jquery.powertip.min.js');
+										// $.getScript('frameworks/jsnlog/2.14.0/jsnlog.min.js');
+										// $.getScript('frameworks/require/2.1.15/require.min.js');
 										mn.create();
 									}, 
 									500

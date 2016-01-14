@@ -646,9 +646,6 @@ define(["Core/errorHelper",
 									userId: g_strUserId
 								},
 								dataType: 'json',
-								beforeSend: function(xhr) {
-									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
-								},
 								success: function (data) {
 
 									if (data.success) {
@@ -743,9 +740,6 @@ define(["Core/errorHelper",
 									typeId: iTypeId
 								},
 								dataType: 'json',
-								beforeSend: function(xhr) {
-									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
-								},
 								success: function (data) {
 
 									if (data.success) {
@@ -979,9 +973,6 @@ define(["Core/errorHelper",
 									methodId: iMethodId
 								},
 								dataType: 'json',
-								beforeSend: function(xhr) {
-									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
-								},
 								success: function (data) {
 
 									if (data.success) {

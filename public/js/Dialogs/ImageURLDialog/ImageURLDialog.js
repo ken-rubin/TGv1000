@@ -174,9 +174,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 									resourceName: strResourceName
 								},
 								dataType: 'json',
-								beforeSend: function(xhr) {
-									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
-								},
 								success: function (data) {
 
 									if (data.success) {

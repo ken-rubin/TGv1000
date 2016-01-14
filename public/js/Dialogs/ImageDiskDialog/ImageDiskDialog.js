@@ -252,9 +252,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								processData: false,
 								contentType: false,
 								data: formData,
-								beforeSend: function(xhr) {
-									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
-								},
 								success: function (data) {
 
 									if (data.success) {

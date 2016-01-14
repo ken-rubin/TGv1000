@@ -191,9 +191,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},
 								dataType: 'json',
-								beforeSend: function(xhr) {
-									xhr.setRequestHeader("Authorization", "Bearer " + g_strToken);
-								},
 								success: function (data) {
 
 									if (data.success) {
