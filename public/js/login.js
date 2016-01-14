@@ -10,8 +10,8 @@ $(document).ready(function () {
 	try {
 
 		// Require the error handler for all functions.
-		require(["Core/errorHelper", "Core/ClientLogin", "./main"], 
-			function (errorHelper, ClientLogin, main) {
+		require(["Core/errorHelper", "Core/ClientLogin"], 
+			function (errorHelper, ClientLogin) {
 
 				try {
 
@@ -43,24 +43,23 @@ $(document).ready(function () {
 	                }
 
 	                // Wire up the signIn button
-	                var mn = new main();
 	                $("#signinBtn").click(function () {
 	                    
-	                    m_functionSignInButtonClick(errorHelper, mn);
+	                    m_functionSignInButtonClick(errorHelper);
 
 	                });
 	                $("#signinBtn").keypress(function(event){
 
 	                    if (event.which == 13) {
 
-		                    m_functionSignInButtonClick(errorHelper, mn);
+		                    m_functionSignInButtonClick(errorHelper);
 	                    }
 	                });
 	                $("#inputPassword").keypress(function(event){
 
 	                    if (event.which == 13) {
 
-		                    m_functionSignInButtonClick(errorHelper, mn);
+		                    m_functionSignInButtonClick(errorHelper);
 	                    }
 	                });
 	                
@@ -138,7 +137,7 @@ var m_functionEnrollButtonClick = function(errorHelper) {
 	}
 }
 
-var m_functionSignInButtonClick = function(errorHelper, mn) {
+var m_functionSignInButtonClick = function(errorHelper) {
 
 	try {
 
@@ -174,39 +173,8 @@ var m_functionSignInButtonClick = function(errorHelper, mn) {
                     localStorage.setItem("can_approve_for_public", data.profile.can_approve_for_public.toString());
                     localStorage.setItem("can_use_system", data.profile.can_use_system.toString());
 
-	            	// location.href = '/index';
-	            	$.ajax(
-	            		{
-							type: 'GET',
-							url: '/index',
-							contentType: false,
-							success: function(htmlData) {
-								// var wnd = window.open("about:blank", "", "_blank");
-								window.document.write(htmlData);
-								window.setTimeout(
-									function(){
-										// $.getScript('frameworks/jquery/2.1.3/jquery-2.1.3.min.js');
-										// $.getScript('frameworks/jqueryui/1.11.2/jquery-ui.min.js');
-										// $.getScript('frameworks/bootstrap/3.3.5/js/bootstrap.min.js');
-										// $.getScript('frameworks/bootstrap-dialog/1.34.5/js/bootstrap-dialog.min.js');
-										// $.getScript('frameworks/jquery.form/3.51/jquery.form.min.js');
-										// $.getScript('frameworks/jquery.xpath/0.3.1/jquery.xpath.min.js');
-										// $.getScript('frameworks/miscellaneous/jquery.scrollintoview.min.js');
-										// $.getScript('frameworks/powertip/1.2.0/js/jquery.powertip.min.js');
-										// $.getScript('frameworks/jsnlog/2.14.0/jsnlog.min.js');
-										// $.getScript('frameworks/require/2.1.15/require.min.js');
-										mn.create();
-									}, 
-									500
-								);
-							},
-							error: function (jqxhr, strTextStatus, strError) {
+	            	location.href = '/index';
 
-								// Non-computational error in strError
-								throw new Error(strError);
-							}
-						}
-	            	);
 	            } else {
 
 	                // !data.success

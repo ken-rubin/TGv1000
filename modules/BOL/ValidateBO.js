@@ -353,7 +353,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                                                 // To prepare for httpOnly and secure (non-dev environment) we'll send the token twice,
                                                 // once as a cookie and once in the json response.
-                                                res.cookie('access-token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
+                                                res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
                                                 // and sending the profile here allows client side to parse and use it from JS.
                                                 res.json({
                                                     success: true,
@@ -415,7 +415,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                                                 var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
                                                 console.log("token=" + token);
                                                 // See above for reason why we're sending info twice.
-                                                res.cookie('access-token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
+                                                res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
                                                 res.json({
                                                     success: true,
                                                     profile: profile

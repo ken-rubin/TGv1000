@@ -5,6 +5,7 @@
 /////////////////////////////////////
 console.log("Require dependencies (express, body-parser, morgan and less-middleware).");
 var express = require("express");
+var cookieParser = require('cookie-parser');
 var bodyParser = require("body-parser");
 var morgan = require("morgan");
 var lessMiddleware = require("less-middleware");
@@ -17,6 +18,10 @@ var jwt = require('jsonwebtoken');
 /////////////////////////////////////
 console.log("Allocate application (express).");
 var app = express();
+
+/////////////////////////////////////
+console.log("Set up use of cookieParser");
+app.use(cookieParser());
 
 /////////////////////////////////////
 app.set("development", process.argv[2] === "development");
@@ -102,7 +107,14 @@ console.log("Map static request folder (public).");
 app.use(express.static(__dirname + "/public"));
 
 app.use(
-    expressJwt({ secret: SECRET }).unless({
+    expressJwt({ secret: SECRET,
+                getToken: function fromHeaderOrQuerystring (req) {
+                    if (req.cookies && req.cookies['token']) {
+                      return req.cookies['token'];
+                    }
+                    return null;
+                }
+            }).unless({
             path:[
                 __dirname + "/public",
                 '/',
@@ -194,12 +206,6 @@ console.log("Map main route index.jade.");
 app.get('/index', function (req, res) {
 
     try {
-        console.log('In app.get(index)');
-        console.log('req.headers=' + JSON.stringify(req.headers));
-        console.log('req.user=' + JSON.stringify(req.user));
-        // if (!req.user) {
-        //     return res.send(err.message);
-        // }
 
         // Render the jade file to the client.
         res.render("Index/index", { 
