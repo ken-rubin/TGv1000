@@ -10,8 +10,46 @@ var jwt = require('jsonwebtoken');
 module.exports = function ValidateBO(app, sql, logger) {
 
     var self = this;                // Über closure.
-
     self.dbname = app.get("dbname");
+
+    // Private fields
+    var m_permissions = ['0-unused'];
+
+    
+    // Fill m_permissions from database.
+    try {
+
+        var exceptionRet = sql.execute("select * from " + self.dbname + "permissions order by id asc",
+            function(rows) {
+
+                if (rows.length === 0) {
+
+                    throw new Error('Failed to read permissions from database. Cannot proceed.');
+
+                } else {
+
+                    // Make sure rows are sorted by id.
+                    rows.sort(function(a,b){return a.id - b.id;})
+                    for (var i = 0; i < rows.length; i++) {
+
+                        m_permissions.push(rows[i].description);
+                    }
+                }
+            },
+            function (strError) {
+
+                throw new Error("Received error reading permissions from database. Cannot proceed. " + strError);
+
+            });
+        if (exceptionRet) {
+
+            throw exceptionRet;
+        }
+
+    } catch (e) {
+
+        throw e;
+    }
     
     ////////////////////////////////////
     // Public methods

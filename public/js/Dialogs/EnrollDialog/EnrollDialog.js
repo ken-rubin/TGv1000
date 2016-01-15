@@ -121,12 +121,13 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					                if (token) {
 
 					                	var profileJSON = window.atob(token.split('.')[1]);
-					                	var profile = JSON.parse(profileJSON);
-					                	for (var property in profile) {
-					                		if (profile.hasOwnProperty(property)) {
-					                			localStorage.setItem(property, profile[property].toString());
-					                		}
-					                	}
+					                	localStorage.setItem("profile", profileJSON);
+					                	// var profile = JSON.parse(profileJSON);
+					                	// for (var property in profile) {
+					                	// 	if (profile.hasOwnProperty(property)) {
+					                	// 		localStorage.setItem(property, profile[property].toString());
+					                	// 	}
+					                	// }
 					                }
 
                 					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 

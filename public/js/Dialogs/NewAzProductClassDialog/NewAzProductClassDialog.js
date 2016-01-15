@@ -139,7 +139,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.tags = strProjectTags;
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
-									clProject.data.ownedByUserId = parseInt(g_strUserId, 10);
+									clProject.data.ownedByUserId = parseInt(g_profile["userId"], 10);
 								}
 							);
 							if (exceptionRet) { throw exceptionRet; }

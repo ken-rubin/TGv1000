@@ -28,8 +28,7 @@ app.set("development", process.argv[2] === "development");
 console.log("Set development (" + app.get("development") + ").");
 
 ////////////////////////////////////
-// Protect all routes starting with '/BOL' with JWT unless they start with "/BOL/ValidateBO".
-// The routes in /BOL/ValidateBO are used in these 4 cases: enroll, login, forgot p/w, fetch marketing page data.
+// Set up JWT signing secret phrase.
 var SECRET = process.env.TGv1000_JWT_Secret || "temp_secret";
 app.set("jwt_secret", SECRET);
 if (SECRET === "temp_secret") {

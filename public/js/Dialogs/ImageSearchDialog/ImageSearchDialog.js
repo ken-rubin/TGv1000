@@ -190,8 +190,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 								contentType: 'application/json',
 								data: {
 					        		tags: tags, 
-					        		userId: g_strUserId,
-					        		userName: g_strUserName,
+					        		userId: g_profile["userId"],
+					        		userName: g_profile["userName"],
 					        		resourceTypeId: 1,
 					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},

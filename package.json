@@ -24,7 +24,6 @@
     "serve-favicon": "~2.2.0"
   },
   "scripts": {
-    "//start": "node-dev --debug app.js development",
-    "start": "node app.js development"
+    "start": "node-dev --debug app.js development"
   }
 }

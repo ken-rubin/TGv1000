@@ -4,6 +4,9 @@
 // Return null--no module object.
 //
 
+// Define some login app globals.
+var g_profile = {};
+
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
 	
@@ -17,7 +20,7 @@ $(document).ready(function () {
 
 					// Allocate and initialize the client.
 					m_clientLogin = new ClientLogin();
-					var exceptionRet = m_clientLogin.create(/*iUserId -- eventually from server specified cookie*/);
+					var exceptionRet = m_clientLogin.create();
 					if (exceptionRet) { throw exceptionRet; }
 
 					exceptionRet = m_functionLoadThreeLists(errorHelper);
@@ -31,7 +34,7 @@ $(document).ready(function () {
 	                });
 
 	                // Get the last signed in userName from profile in localStorage.
-	                var strUserName = m_clientLogin.getTGCookie("userName");
+	                var strUserName = g_profile("userName");	// may not be set yet; will return undefined if not.
 	                if (strUserName && strUserName.length > 0) {
 
 	                    $("#inputName").val(strUserName);
@@ -63,8 +66,6 @@ $(document).ready(function () {
 	                    }
 	                });
 	                
-					// $("#inputName").val('ken'); $("#inputPassword").val('a'); $("#signinBtn").click();
-
 	                // Wire up the forgot link.
 	                $("#forgotLink").click(function () {
 	                    
@@ -183,12 +184,8 @@ var m_functionSignInButtonClick = function(errorHelper) {
 	                if (token) {
 
 	                	var profileJSON = window.atob(token.split('.')[1]);
-	                	var profile = JSON.parse(profileJSON);
-	                	for (var property in profile) {
-	                		if (profile.hasOwnProperty(property)) {
-	                			localStorage.setItem(property, profile[property].toString());
-	                		}
-	                	}
+	                	localStorage.setItem("profile", profileJSON);
+	                	g_profile = JSON.parse(profileJSON);
 	                }
 
 	            	location.href = '/index';

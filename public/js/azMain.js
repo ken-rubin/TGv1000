@@ -7,8 +7,7 @@
 // Define some app-globals.
 var azClient = null;
 var azNavbar = null;
-var g_strUserId = '';
-var g_strUserName = '';
+var g_profile = {};
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {

@@ -210,7 +210,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							{
 								id: 0,
 								name: methodName,
-								ownedByUserId: g_strUserId,
+								ownedByUserId: g_profile["userId"],
 								public: 0,
 								quarantined: 0,
 								workspace: "",

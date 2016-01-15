@@ -83,8 +83,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							var data = {
-									userId: g_strUserId,
-									userName: g_strUserName,
+									userId: g_profile["userId"],
+									userName: g_profile["userName"],
 									projectJson: self.data
 							};
 
@@ -176,7 +176,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 					self.getStatus = function () {
 
 
-						var test = parseInt(client.getTGCookie('userId'), 10);
+						var test = parseInt(g_profile['userId'], 10);
 						return {
 
 							inDBAlready: (self.data.id > 0),

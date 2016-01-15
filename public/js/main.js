@@ -5,7 +5,7 @@
 //
 // This is the entry point.  GZ globals are defined, allocated and initialized here.
 
-// Define some app-globals.
+// Define some index app globals.
 var client = null;
 var navbar = null;
 var comics = null;
@@ -14,14 +14,9 @@ var tools = null;
 var code = null;
 var types = null;
 var validator = null;
-var g_strUserId = '';
-var g_strUserName = '';
 var g_clTypeApp = null;
-var g_strToken = '';
-var g_bcan_approve_for_public = false;
-var g_bcan_edit_comics = false;
-var g_bcan_edit_system_types = false;
-var g_bcan_use_system = false;
+
+var g_profile = {};
 
 $(document).ready(function() {
 

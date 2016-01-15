@@ -210,8 +210,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						    var formData = new FormData();
 
-						    formData.append("userId", g_strUserId);
-						    formData.append("userName", g_strUserName);
+						    formData.append("userId", g_profile["userId"]);
+						    formData.append("userName", g_profile["userName"]);
 						    formData.append("tags", tags);
 						    formData.append("resourceTypeId", "1");
 						    formData.append("resourceName", strResourceName);

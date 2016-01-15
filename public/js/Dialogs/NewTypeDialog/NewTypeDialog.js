@@ -130,7 +130,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// If we come in here and check #cb1 to create one, we will give it the normal negative id in addition to ordinal = 10000.
 							// **A SystemType requires a non-zero imageId.**
 							
-							if ((g_bcan_edit_system_types) && (client.getProject().data.canEditSystemTypes)) {
+							if ((g_profile["can_edit_system_types"] === "true") && (client.getProject().data.canEditSystemTypes)) {
 
 								$("#SystemTypeCheckBox").css("display", "block");
 								if (m_strNewOrEdit === "Edit" && m_typeForEdit.ordinal === 10000) {
@@ -348,7 +348,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									id: typeId,
 									originalTypeId: 0,
 									name: typeName,
-									ownedByUserId: g_strUserId,
+									ownedByUserId: g_profile["userId"],
 									public: 0,
 									quarantined: 0,
 									isApp: false,
@@ -371,7 +371,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 											id: 0, 
 											name: 'construct', 
 											ordinal: 0, 
-											ownedByUserId: g_strUserId, 
+											ownedByUserId: g_profile["userId"], 
 											public: 0, 
 											quarantined: 0,
 											workspace: '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>', 

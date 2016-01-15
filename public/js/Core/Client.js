@@ -68,14 +68,9 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Set globals for everyone to use.
-							g_strUserId = self.getTGCookie('userId');
-							g_strUserName = self.getTGCookie('userName');
-							g_strToken = self.getTGCookie('token');
-							g_bcan_approve_for_public = (self.getTGCookie('can_approve_for_public') === 'true');
-							g_bcan_edit_comics = (self.getTGCookie('can_edit_comics') === 'true');
-							g_bcan_edit_system_types = (self.getTGCookie('can_edit_system_types') === 'true');
-							g_bcan_use_system = (self.getTGCookie('can_use_system') === 'true');
+							// Set global profile for everyone to use.
+							var profileJSON = localStorage.getItem("profile");
+							g_profile = JSON.parse(profileJSON);
 							return null;
 
 						} catch (e) { return e; }
@@ -643,7 +638,7 @@ define(["Core/errorHelper",
 								contentType: 'application/json',
 								data: {
 									projectId: iProjectId,
-									userId: g_strUserId
+									userId: g_profile["userId"]
 								},
 								dataType: 'json',
 								success: function (data) {
@@ -1148,11 +1143,6 @@ define(["Core/errorHelper",
 
 						}
 					}
-
-					self.getTGCookie = function (name) {
-
-						return localStorage.getItem(name);
-					};
 
 					// Helper method replaces spaces with underscores.
 					self.removeSpaces = function (strPossiblyWithSpaces) {

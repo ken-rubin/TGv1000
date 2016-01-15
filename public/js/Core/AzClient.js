@@ -34,9 +34,8 @@ define(["Core/errorHelper",
 
 						try {
 							// Set globals for everyone to use.
-							g_strUserId = self.getTGCookie('userId');
-							g_strUserName = self.getTGCookie('userName');
-
+							var profileJSON = localStorage.getItem("profile");
+							g_profile = JSON.parse(profileJSON);
 							return null;
 						} catch (e) {
 
@@ -76,11 +75,6 @@ define(["Core/errorHelper",
 							m_openDialog2 = null;
 						}
 					}
-
-					self.getTGCookie = function (name) {
-
-						return localStorage.getItem(name);
-					};
 
 					///////////////////////////////
 					// Private functions.

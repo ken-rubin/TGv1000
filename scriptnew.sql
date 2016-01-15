@@ -665,7 +665,7 @@ begin
 
 		CREATE TABLE TGv1000.permissions (
 		  `id` int(11) NOT NULL,
-		  `name` varchar(255) NOT NULL,
+		  `description` varchar(255) NOT NULL,
 		  PRIMARY KEY (id),
 		  UNIQUE KEY `id_UNIQUE` (id)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -686,10 +686,11 @@ begin
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (5, 'child');
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (6, 'parent');
 
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (1, 'can_edit_comics');
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (2, 'can_edit_system_types');
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (3, 'can_approve_for_public');
-		INSERT TGv1000.permissions (`id`, `name`) VALUES (4, 'can_use_system');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (1, 'can_edit_comics');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (2, 'can_edit_system_types');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (3, 'can_approve_for_public');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (4, 'can_use_system');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (5, 'can_view_system');
 
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
