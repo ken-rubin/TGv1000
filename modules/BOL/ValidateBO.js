@@ -86,20 +86,17 @@ module.exports = function ValidateBO(app, sql, logger) {
                         //     userId: userId
                         // });
                         var profile = {
-                            email: req.body.userName,
-                            id: userId,
+                            userName: req.body.userName,
+                            userId: userId,
                             can_edit_comics: true,
                             can_edit_system_types: true,
                             can_approve_for_public: true,
                             can_use_system: true
                         };
                         var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
-                        console.log("token=" + token);
-                        // See above for reason why we're sending info twice.
-                        res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
+                        res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
                         res.json({
-                            success: true,
-                            profile: profile
+                            success: true
                         });
 
                         // if you don't want to use this transport object anymore, uncomment following line
@@ -340,20 +337,17 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 });
                             } else {
                                 var profile = {
-                                    email: req.body.userName,
-                                    id: id,
+                                    userName: req.body.userName,
+                                    userId: id,
                                     can_edit_comics: true,
                                     can_edit_system_types: true,
                                     can_approve_for_public: true,
                                     can_use_system: true
                                 };
                                 var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
-                                console.log("token=" + token);
-                                // See above for reason why we're sending info twice.
-                                res.cookie('token', token, {maxAge: 60*60*1000 /*, httpOnly: true, secure: true*/});    // Expires in 1 hour (in ms)
+                                res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
                                 res.json({
-                                    success: true,
-                                    profile: profile
+                                    success: true
                                 });
                             }
                         });

@@ -691,22 +691,6 @@ begin
 		INSERT TGv1000.permissions (`id`, `name`) VALUES (3, 'can_approve_for_public');
 		INSERT TGv1000.permissions (`id`, `name`) VALUES (4, 'can_use_system');
 
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,1);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,2);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,3);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,4);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,1);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,3);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,4);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,1);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,3);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,4);
-		  
-		UPDATE TGv1000.user SET usergroupId=1 WHERE userName='ken.rubin@live.com';
-		UPDATE TGv1000.user SET usergroupId=2 WHERE userName='jerry@rubintech.com';
-		UPDATE TGv1000.user SET usergroupId=3 WHERE userName='techgroms@gmail.com';
-		UPDATE e4Groms.user SET usergroupId=4 WHERE usergroupId IS NULL;
-
         UPDATE `TGv1000`.`control` set dbstate=4.0 where id=1;
 		set @dbstate := 4.0;
 		select @dbstate;

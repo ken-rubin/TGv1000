@@ -98,18 +98,36 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
             					if (data.success) {
 
-					            	// The JWT has been saved to a cookie so it will be sent with each subsequent request.
-
 					            	// The following is included just to remind us in the future how to log from client into server console.
-									JL().info("<<< successful login occurred >>>");
+									JL().info("<<< Successful enrollment occurred >>>");
 
-					                // Save data.profile info to localStorage for use downstream (user id and permissions).
-					                localStorage.setItem("userId", data.profile.id.toString());
-					                localStorage.setItem("userName", data.profile.email);
-				                    localStorage.setItem("can_edit_comics", data.profile.can_edit_comics.toString());
-				                    localStorage.setItem("can_edit_system_types", data.profile.can_edit_system_types.toString());
-				                    localStorage.setItem("can_approve_for_public", data.profile.can_approve_for_public.toString());
-				                    localStorage.setItem("can_use_system", data.profile.can_use_system.toString());
+					            	// The JWT has been saved to a cookie ("token") so it will be sent with each subsequent request.
+					                // Save JWT profile info to localStorage for use on client side (user id and permissions).
+					                var ca = document.cookie.split(';');
+					                var getCookie = function(name) {
+					                	var nameEQ = name + "=";
+					                	for (var i = 0; i < ca.length; i++) {
+        									var cIth = ca[i];
+        									while (cIth.charAt(0) == ' ') {
+        										cIth = cIth.substring(1, cIth.length);
+        									}
+        									if (cIth.indexOf(nameEQ) === 0) {
+        										return cIth.substring(nameEQ.length, cIth.length);
+        									}
+        								}
+        								return null;
+					                };
+					                var token = getCookie("token");
+					                if (token) {
+
+					                	var profileJSON = window.atob(token.split('.')[1]);
+					                	var profile = JSON.parse(profileJSON);
+					                	for (var property in profile) {
+					                		if (profile.hasOwnProperty(property)) {
+					                			localStorage.setItem(property, profile[property].toString());
+					                		}
+					                	}
+					                }
 
                 					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
                 									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
