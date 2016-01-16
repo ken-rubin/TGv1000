@@ -34,7 +34,7 @@ $(document).ready(function () {
 	                });
 
 	                // Get the last signed in userName from profile in localStorage.
-	                var strUserName = g_profile("userName");	// may not be set yet; will return undefined if not.
+	                var strUserName = g_profile["userName"];	// may not be set yet; will return undefined if not.
 	                if (strUserName && strUserName.length > 0) {
 
 	                    $("#inputName").val(strUserName);

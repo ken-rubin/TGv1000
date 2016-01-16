@@ -13,13 +13,12 @@ module.exports = function ValidateBO(app, sql, logger) {
     self.dbname = app.get("dbname");
 
     // Private fields
-    var m_permissions = ['0-unused'];
+    var m_permissions = [];
 
-    
-    // Fill m_permissions from database.
+    // Fill m_permissions from database for quick use during login.
     try {
 
-        var exceptionRet = sql.execute("select * from " + self.dbname + "permissions order by id asc",
+        var exceptionRet = sql.execute("select * from " + self.dbname + "permissions",
             function(rows) {
 
                 if (rows.length === 0) {
@@ -31,14 +30,51 @@ module.exports = function ValidateBO(app, sql, logger) {
                     // Make sure rows are sorted by id.
                     rows.sort(function(a,b){return a.id - b.id;})
                     for (var i = 0; i < rows.length; i++) {
-
-                        m_permissions.push(rows[i].description);
+                        var rowIth = rows[i];
+                        m_permissions.push({id: rowIth.id, description: rowIth.description});
                     }
                 }
             },
             function (strError) {
 
                 throw new Error("Received error reading permissions from database. Cannot proceed. " + strError);
+
+            });
+        if (exceptionRet) {
+
+            throw exceptionRet;
+        }
+
+    } catch (e) {
+
+        throw e;
+    }
+    
+    var m_ug_permissions = [];
+
+    // Fill m_ug_permissions from database for quick use during login.
+    try {
+
+        var exceptionRet = sql.execute("select * from " + self.dbname + "ug_permissions",
+            function(rows) {
+
+                if (rows.length === 0) {
+
+                    throw new Error('Failed to read ug_permissions from database.');
+
+                } else {
+
+                    // Make sure rows are sorted by usergroupId.
+                    rows.sort(function(a,b){return a.usergroupId - b.usergroupId;})
+                    for (var i = 0; i < rows.length; i++) {
+                        var rowIth = rows[i];
+                        m_ug_permissions.push({usergroupId: rowIth.usergroupId, permissionId: rowIth.permissionId});
+                    }
+                }
+            },
+            function (strError) {
+
+                throw new Error("Received error reading ug_permissions from database. Cannot proceed. " + strError);
 
             });
         if (exceptionRet) {

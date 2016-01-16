@@ -481,13 +481,10 @@ begin
 		  PRIMARY KEY (`usergroupId`, `permissionId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-		ALTER TABLE TGv1000.user
-		  ADD COLUMN usergroupId int(11);
-		  
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (1, 'devs');
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (2, 'instructor');
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (3, 'child');
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (4, 'parent');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (2, 'instructors');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (3, 'children');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (4, 'parents');
 
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (1, 'can_edit_comics');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (2, 'can_edit_system_types');
@@ -505,14 +502,14 @@ begin
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,6);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,3);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,4);
+/*		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-
+*/
         UPDATE `TGv1000`.`control` set dbstate=1 where id=1;
 		set @dbstate := 1;
     end if;
