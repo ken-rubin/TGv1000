@@ -296,12 +296,6 @@ begin
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-		CREATE TABLE `TGv1000`.`parent_child` (
-		  `userIdParent` INT NOT NULL,
-		  `userIdChild` INT NOT NULL,
-		  PRIMARY KEY (`userIdParent`,`userIdChild`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        
         INSERT INTO `TGv1000`.`user` (`id`,`userName`,`pwHash`,`usergroupId`) VALUES (1,'templates@techgroms.com','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1);
             
 		insert TGv1000.propertyTypes (id,description) values (1,'Number');
@@ -481,18 +475,17 @@ begin
 		  PRIMARY KEY (`usergroupId`, `permissionId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (1, 'devs');
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (2, 'instructors');
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (3, 'children');
-		INSERT TGv1000.usergroups (`id`, `name`) VALUES (4, 'parents');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (1, 'developer');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (2, 'instructor');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (3, 'registered_user');
+		INSERT TGv1000.usergroups (`id`, `name`) VALUES (4, 'unregistered_user');
 
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (1, 'can_edit_comics');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (2, 'can_edit_system_types');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (3, 'can_make_public');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (4, 'can_visit_adminzone');
-		INSERT TGv1000.permissions (`id`, `description`) VALUES (5, 'can_save_free_projects');
-		INSERT TGv1000.permissions (`id`, `description`) VALUES (6, 'can_save_paid_projects');
-		INSERT TGv1000.permissions (`id`, `description`) VALUES (7, 'can_view_childs_projects');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (5, 'can_open_free_projects');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (6, 'can_buy_projects');
 
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,1);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,2);
@@ -502,14 +495,12 @@ begin
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,6);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,3);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,4);
-/*		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (,);
-*/
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,5);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,6);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,5);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,6);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (4,5);
+
         UPDATE `TGv1000`.`control` set dbstate=1 where id=1;
 		set @dbstate := 1;
     end if;

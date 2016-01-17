@@ -45,108 +45,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Expose enroll event.
-					self.enroll = function () {
-
-						try {
-
-							// Initial validation. emailChild not empty. E-mail address passes regexp test.
-							var errMsg = "";
-							var emailChild = $("#EmailChild").val().trim().toLowerCase();
-							var emailParent = $("#EmailParent").val().trim().toLowerCase();
-							if (emailChild.length === 0) {
-
-								errMsg = "You must enter an e-mail address for your child.";
-							}
-							if (emailParent.length === 0) {
-
-								errMsg += "You must enter an e-mail address for yourself.";
-							} else {
-
-								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
-								var childOK = emailChild.match(eReg);
-								var parentOK = emailParent.match(eReg);
-
-								if (!childOK && !parentOK) {
-
-									errMsg += "Neither e-mail address appears valid.";
-
-								} else if (!childOK) {
-
-									errMsg += "The child's e-mail address appears invalid.";
-
-								} else if (!parentOK) {
-
-									errMsg += "The parent's e-mail address appears invalid.";
-								}
-							}
-
-							if (errMsg.length) {
-
-								m_wellMessage(errMsg, null);
-								return null;
-							}
-
-							// Things look good. Time to go to the server.
-							var posting = $.post("/BOL/ValidateBO/NewEnrollment", 
-												{
-													userName: emailChild,
-													parentEmail: emailParent
-												}, 
-												'json');
-        					posting.done(function(data){
-
-            					if (data.success) {
-
-					            	// The following is included just to remind us in the future how to log from client into server console.
-									JL().info("<<< Successful enrollment occurred >>>");
-
-					            	// The JWT has been saved to a cookie ("token") so it will be sent with each subsequent request.
-					                // Save JWT profile info to localStorage for use on client side (user id and permissions).
-					                var ca = document.cookie.split(';');
-					                var getCookie = function(name) {
-					                	var nameEQ = name + "=";
-					                	for (var i = 0; i < ca.length; i++) {
-        									var cIth = ca[i];
-        									while (cIth.charAt(0) == ' ') {
-        										cIth = cIth.substring(1, cIth.length);
-        									}
-        									if (cIth.indexOf(nameEQ) === 0) {
-        										return cIth.substring(nameEQ.length, cIth.length);
-        									}
-        								}
-        								return null;
-					                };
-					                var token = getCookie("token");
-					                if (token) {
-
-					                	var profileJSON = window.atob(token.split('.')[1]);
-					                	localStorage.setItem("profile", profileJSON);
-					                	// var profile = JSON.parse(profileJSON);
-					                	// for (var property in profile) {
-					                	// 	if (profile.hasOwnProperty(property)) {
-					                	// 		localStorage.setItem(property, profile[property].toString());
-					                	// 	}
-					                	// }
-					                }
-
-                					m_wellMessage("Your child has been enrolled. Please follow the log-in instructions just sent to you.", 
-                									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
-            					} else {
-
-                					// !data.success
-                					m_wellMessage(data.message, null);
-            					}
-        					});
-
-					    	return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					};
-
 					//////////////////////////////////
 					// Private methods.
 
@@ -192,23 +90,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
-					// Invoked when the new button is clicked.
-					var m_functionEnrollButtonClick = function () {
-
-						try {
-
-					        // Call this object's enroll handler.
-					        var exceptionRet = self.enroll();
-					        if (exceptionRet) {
-
-					        	throw exceptionRet;
-					        }
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					};
-
 					// Wire up event handlers to dialog controls.
 					var m_functionOnShownDialog = function (dialogItself) {
 
@@ -217,11 +98,89 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 							// focus
-							$("#EmailChild").focus();
+							$("#email").focus();
 
 						} catch (e) {
 
 							errorHelper.show(e.message);
+						}
+					};
+
+					// Expose enroll event.
+					m_functionEnrollButtonClick = function () {
+
+						try {
+
+							// Initial validation. email not empty. E-mail address passes regexp test.
+							var errMsg = "";
+							var email = $("#email").val().trim().toLowerCase();
+							if (email.length === 0) {
+
+								errMsg = "You must enter an e-mail address.";
+							}
+
+							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
+							var emailOK = email.match(eReg);
+
+							if (!emailOK) {
+
+								errMsg += "That email address does not pass our validation test. Please enter another.";
+
+							}
+
+							if (errMsg.length) {
+
+								m_wellMessage(errMsg, null);
+								return;
+							}
+
+							// Things look good. Time to go to the server.
+							var posting = $.post("/BOL/ValidateBO/NewEnrollment", 
+												{
+													userName: email
+												}, 
+												'json');
+        					posting.done(function(data){
+
+            					if (data.success) {
+
+					            	// The following is included just to remind us in the future how to log from client into server console.
+									JL().info("<<< Successful enrollment occurred >>>");
+
+					            	// The JWT has been saved to a cookie ("token") so it will be sent with each subsequent request.
+					                // Save JWT profile info to localStorage for use on client side (user id and permissions).
+					                var ca = document.cookie.split(';');
+					                var getCookie = function(name) {
+					                	var nameEQ = name + "=";
+					                	for (var i = 0; i < ca.length; i++) {
+        									var cIth = ca[i];
+        									while (cIth.charAt(0) == ' ') {
+        										cIth = cIth.substring(1, cIth.length);
+        									}
+        									if (cIth.indexOf(nameEQ) === 0) {
+        										return cIth.substring(nameEQ.length, cIth.length);
+        									}
+        								}
+        								return null;
+					                };
+					                var token = getCookie("token");
+					                if (token) {
+
+					                	var profileJSON = window.atob(token.split('.')[1]);
+					                	localStorage.setItem("profile", profileJSON);
+					                }
+
+                					m_wellMessage("You hav been enrolled. Please check for the email with log-in instructions we just sent to you.", 
+                									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
+            					} else {
+
+                					// !data.success
+                					m_wellMessage(data.message, null);
+            					}
+        					});
+						} catch (e) {
+
+							m_wellMessage(e.message, null);
 						}
 					};
 

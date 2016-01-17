@@ -92,25 +92,104 @@ module.exports = function ValidateBO(app, sql, logger) {
     
     // Router handler function.
     self.routeNewEnrollment = function (req, res) {
-        // req.body.userName -- child email
-        // req.body.parentEmail
+        // req.body.userName -- user email address
 
         try {
         
             console.log("Entered routeNewEnrollment with req.body=" + JSON.stringify(req.body));
 
+            // Use async.waterfall to perform these steps in series, passing results from step to step:
+            async.waterfall([
+
+                function(cb) {
+                    // (1) Check for username availability.
+                    profile = {
+                        userName: req.body.userName
+                    };
+
+
+
+
+
+                    cb(null, profile);
+                },
+                function(profile, cb) {
+                    // (2) Generate password, set usergroupId and insert user into DB.
+
+
+
+
+                    profile.usergroupId = usergroupId;
+                    profile.userId = userId;
+                    profile.password = password;
+                    cb(null, profile);
+                },
+                function(profile, cb) {
+                    // (3) Send email informing user of password.
+
+
+
+                    delete profile.password;
+                    cb(null, profile);
+                }
+            ], function(err, profile) {
+                // (4) If err, return failure with message. Else generate JWT and return success.
+                if (err) {
+                    res.json({
+                        success: false,
+                        message: err.message
+                    });
+                } else {
+
+                    // Add permissions to profile, based on usergroupId.
+                    m_ug_permissions.forEach(function(ug_permission) {
+                        if (ug_permission.usergroupId === profile.usergroupId) {
+                            var permissionId = ug_permission.permissionId;
+                            m_permissions.forEach(function(permission) {
+                                if (permission.id === permissionId) {
+                                    permission[permission.description] = true;
+                                }
+                            });
+                        }
+                    });
+
+                    var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
+                    res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
+                    res.json({
+                        success: true
+                    });
+                }
+            });
+        } catch (e) {
+
+            res.json({
+                
+                success: false,
+                message: 'Enrollment exception: ' + e.message
+            });
+        }
+    }
+
+
+
+
+
+
+
+
+
             var request = req;
 
-            // 1. See if parent exists. If so, grab id. Otherwise, create parent; grab id.
-            // 2. Gen password for user. Hash the password. Create the user. Grab the id as userId.
-            // 3. Return success and userId.
+            // 1. Gen password for user. Hash the password. Create the user. Grab the id as userId.
+            // 2. Send enrollment email with password.
+            // 2. Return success and JWT containing user profile.
 
             var exceptionRet1 = null;
             var exceptionRet2 = null;
             var exceptionRet3 = null;
             var exceptionRet4 = null;
 
-            var functionSendEnrollmentEmail = function(strPassword, userId) {
+            var functionSendEnrollmentEmail = function(strPassword, userId, usergroupId) {
 
                 try {
 
@@ -135,13 +214,13 @@ module.exports = function ValidateBO(app, sql, logger) {
                         to: req.body.parentEmail, // list of receivers
                         subject: "TechGroms Registration ✔", // Subject line
                         text: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "\r\n\r\nWe have created a login user for your child. Your child will use the e-mail address you entered along with" +
+                        "\r\n\r\nWe have created a login user for you. You will use the e-mail address you entered along with" +
                         " this password: " + strPassword + ". Go to " + fullUrl + " to sign in." +
-                        "\r\n\r\nThank you for signing your child up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
+                        "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
                         html: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "<br><br>We have created a login user for your child. Your child will use the e-mail address you entered along with" +
+                        "<br><br>We have created a login user for you. You will use the e-mail address you entered along with" +
                         " this password: " + strPassword + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
-                        "<br><br>Thank you for signing your child up with TechGroms!<br><br>Warm regards, The Grom Team"
+                        "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
                     };
 
                     // send mail with defined transport object
@@ -161,12 +240,11 @@ module.exports = function ValidateBO(app, sql, logger) {
                         // });
                         var profile = {
                             userName: req.body.userName,
-                            userId: userId,
-                            can_edit_comics: true,
-                            can_edit_system_types: true,
-                            can_approve_for_public: true,
-                            can_use_system: true
+                            userId: userId
                         };
+
+
+
                         var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
                         res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
                         res.json({
@@ -185,11 +263,10 @@ module.exports = function ValidateBO(app, sql, logger) {
                 }
             }
 
-            var functionEnrollmentStep2 = function (parentId) {
+            var functionEnrollmentStep2 = function () {
 
                 try {
 
-                    // Have new or old parentId (based on email).
                     // Check to make sure userId isn't in use yet.
                     exceptionRet1 = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';",
                         function(rows){
@@ -211,11 +288,13 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 // userName is ok.
                                 // Generate and encrypt a password.
                                 var strPassword = (Math.random() * 10000).toFixed(0);
+                                var usergroupId = 3;
 
                                 // Change john, ken and jerry password to 'a'.
                                 var uName = req.body.userName.toLowerCase();
                                 if (req.body.userName === 'jerry@rubintech.com' || req.body.userName === 'ken.rubin@live.com' || req.body.userName === 'techgroms@gmail.com') {
                                     strPassword = 'a';
+                                    usergroupId = 1;
                                 }
                                 bcrypt.hash(strPassword, null, null, function(err, hash){
 
@@ -228,7 +307,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                                     } else {
 
-                                        exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,parentId) values ('" + req.body.userName + "','" + hash + "'," + parentId + ");",
+                                        exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,usergroupId) values ('" + req.body.userName + "','" + hash + "'," + usergroupId + ");",
                                             function(rows){
 
                                                 if (rows.length === 0) {
@@ -238,7 +317,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                                                         message: "Database error inserting new user into database."
                                                     });
                                                 }
-                                                functionSendEnrollmentEmail(strPassword, rows[0].insertId);
+                                                functionSendEnrollmentEmail(strPassword, rows[0].insertId, usergroupId);
                                             },
                                             function(strError) {
 
@@ -335,15 +414,6 @@ module.exports = function ValidateBO(app, sql, logger) {
                     message: exceptionRet1.message
                 });
             }
-        } catch (e) {
-
-            res.json({
-                
-                success: false,
-                message: 'Enrollment exception: ' + e.message
-            });
-        }
-    }
 
     self.routeForgotPassword = function (req, res) {
         // req.body.userName
