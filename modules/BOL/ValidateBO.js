@@ -6,6 +6,7 @@
 var bcrypt = require("bcrypt-nodejs");
 var nodemailer = require("nodemailer");
 var jwt = require('jsonwebtoken');
+var async = require("async");
 
 module.exports = function ValidateBO(app, sql, logger) {
 
@@ -104,33 +105,138 @@ module.exports = function ValidateBO(app, sql, logger) {
                 function(cb) {
                     // (1) Check for username availability.
                     profile = {
-                        userName: req.body.userName
+                        userName: req.body.userName.toLowerCase();
                     };
+                    
+                    var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + profile.userName + "';",
+                        function(rows){
 
+                            if (rows.length === 0) {
 
+                                return cb(new("Error checking database for prior use of email address."), null);
 
+                            } else if (rows[0].cnt > 0) {
 
+                                return cb(new Error("The email address " + req.body.userName + " is already in use."), null);
+                            }
 
-                    cb(null, profile);
+                            return cb(null, profile);
+                        },
+                        function(strError) {
+
+                            return cb(new Error("Error checking database for prior use of email address: " + strError), null);
+                        }
+                    );
+                    if (exceptionRet){
+
+                        return cb(new Error("Error checking database for prior use of email address: " + exceptionRet.message), null);
+                    }
                 },
                 function(profile, cb) {
                     // (2) Generate password, set usergroupId and insert user into DB.
+                    try {
 
+                        // Generate and encrypt a password.
+                        var password = (Math.random() * 10000).toFixed(0);
+                        var usergroupId = 3;
 
+                        // Change john, ken and jerry password to 'a' and assign to "developer" usergroup.
+                        if (profile.userName === 'jerry@rubintech.com' || profile.userName === 'ken.rubin@live.com' || profile.userName === 'techgroms@gmail.com') {
+                            password = 'a';
+                            usergroupId = 1;
+                        }
 
+                        bcrypt.hash(password, null, null, function(err, hash){
 
-                    profile.usergroupId = usergroupId;
-                    profile.userId = userId;
-                    profile.password = password;
-                    cb(null, profile);
+                            if (err) {
+
+                                return cb(new Error("Error received encrypting password."), null);
+
+                            } else {
+
+                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,pwHash,usergroupId) values ('" + profile.userName + "','" + hash + "'," + usergroupId + ");",
+                                    function(rows){
+
+                                        if (rows.length === 0) {
+
+                                            return cb(new Error("Database error inserting new user into database."), null);
+                                        }
+
+                                        profile.usergroupId = usergroupId;
+                                        profile.userId = rows[0].insertId;
+                                        profile.password = password;
+                                        cb(null, profile);
+                                    },
+                                    function(strError) {
+
+                                        return cb(new Error("Database error inserting new user into database: " + strError), null);
+                                    }
+                                );
+
+                                if (exceptionRet) {
+
+                                    return cb(new Error("Database error inserting new user into database: " + exceptionRet.message), null);
+                                }
+                            }
+                        });
+                    } catch(e) {
+
+                        return cb(new Error("Database error inserting new user into database: " + e.message), null);
+                    }
                 },
                 function(profile, cb) {
                     // (3) Send email informing user of password.
+                    try {
 
+                        var smtpTransport = nodemailer.createTransport("SMTP", {
+                        
+                            service: "Gmail",
+                            auth: {
+                            
+                                user: "techgroms@gmail.com",
+                                pass: "Albatross!1"
+                            }
+                        });
 
+                        // setup e-mail data with unicode symbols
+                        var mailOptions = null;
 
-                    delete profile.password;
-                    cb(null, profile);
+                        var fullUrl = request.protocol + '://' + request.get('host'); // + request.originalUrl;
+
+                        mailOptions = {
+                 
+                            from: "TechGroms <techgroms@gmail.com>", // sender address
+                            to: req.body.parentEmail, // list of receivers
+                            subject: "TechGroms Registration ✔", // Subject line
+                            text: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                            "\r\n\r\nWe have created a login user for you. You will use the e-mail address you entered along with" +
+                            " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
+                            "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
+                            html: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                            "<br><br>We have created a login user for you. You will use the e-mail address you entered along with" +
+                            " this password: " + profile.password + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
+                            "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
+                        };
+
+                        // send mail with defined transport object
+                        smtpTransport.sendMail(mailOptions, function(error, response){
+                        
+                            if (error) {
+                            
+                                return cb(new Error("Error sending enrollment e-mail: " + error.toString()), null);
+                            }
+
+                            // If you don't want to use this transport object anymore, uncomment following line
+                            //smtpTransport.close(); // shut down the connection pool, no more messages
+
+                            delete profile.password;
+                            return cb(null, profile);
+
+                        });
+                    } catch (e) {
+
+                        return cb(new Error("Error sending enrollment e-mail: " + e.message), null);
+                    }
                 }
             ], function(err, profile) {
                 // (4) If err, return failure with message. Else generate JWT and return success.
@@ -170,250 +276,169 @@ module.exports = function ValidateBO(app, sql, logger) {
         }
     }
 
+            // var request = req;
+
+            // // 1. Gen password for user. Hash the password. Create the user. Grab the id as userId.
+            // // 2. Send enrollment email with password.
+            // // 2. Return success and JWT containing user profile.
+
+            // var exceptionRet1 = null;
+            // var exceptionRet2 = null;
+            // var exceptionRet3 = null;
+            // var exceptionRet4 = null;
 
 
+            // var functionEnrollmentStep2 = function () {
 
+            //     try {
 
+            //         // Check to make sure userId isn't in use yet.
+            //         exceptionRet1 = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';",
+            //             function(rows){
 
+            //                 if (rows.length === 0) {
 
+            //                     res.json({
+            //                         success: false,
+            //                         message: "Error checking database for prior use of user Id."
+            //                     });
+            //                 } else if (rows[0].cnt > 0) {
 
+            //                     res.json({
+            //                         success: false,
+            //                         message: "The e-mail address " + req.body.userName + " is already in use."
+            //                     });
+            //                 } else {
 
-            var request = req;
+            //                     // userName is ok.
+            //                     // Generate and encrypt a password.
+            //                     var strPassword = (Math.random() * 10000).toFixed(0);
+            //                     var usergroupId = 3;
 
-            // 1. Gen password for user. Hash the password. Create the user. Grab the id as userId.
-            // 2. Send enrollment email with password.
-            // 2. Return success and JWT containing user profile.
+            //                     // Change john, ken and jerry password to 'a'.
+            //                     var profile.userName = req.body.userName.toLowerCase();
+            //                     if (req.body.userName === 'jerry@rubintech.com' || req.body.userName === 'ken.rubin@live.com' || req.body.userName === 'techgroms@gmail.com') {
+            //                         strPassword = 'a';
+            //                         usergroupId = 1;
+            //                     }
+            //                     bcrypt.hash(strPassword, null, null, function(err, hash){
 
-            var exceptionRet1 = null;
-            var exceptionRet2 = null;
-            var exceptionRet3 = null;
-            var exceptionRet4 = null;
+            //                         if (err) {
 
-            var functionSendEnrollmentEmail = function(strPassword, userId, usergroupId) {
+            //                             res.json({
+            //                                 success: false,
+            //                                 message: "Error received encrypting password."
+            //                             });
 
-                try {
+            //                         } else {
 
-                    var smtpTransport = nodemailer.createTransport("SMTP", {
-                    
-                        service: "Gmail",
-                        auth: {
-                        
-                            user: "techgroms@gmail.com",
-                            pass: "Albatross!1"
-                        }
-                    });
+            //                             exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,usergroupId) values ('" + req.body.userName + "','" + hash + "'," + usergroupId + ");",
+            //                                 function(rows){
 
-                    // setup e-mail data with unicode symbols
-                    var mailOptions = null;
+            //                                     if (rows.length === 0) {
 
-                    var fullUrl = request.protocol + '://' + request.get('host'); // + request.originalUrl;
+            //                                         res.json({
+            //                                             success: false,
+            //                                             message: "Database error inserting new user into database."
+            //                                         });
+            //                                     }
+            //                                     functionSendEnrollmentEmail(strPassword, rows[0].insertId, usergroupId);
+            //                                 },
+            //                                 function(strError) {
 
-                    mailOptions = {
-             
-                        from: "TechGroms <techgroms@gmail.com>", // sender address
-                        to: req.body.parentEmail, // list of receivers
-                        subject: "TechGroms Registration ✔", // Subject line
-                        text: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "\r\n\r\nWe have created a login user for you. You will use the e-mail address you entered along with" +
-                        " this password: " + strPassword + ". Go to " + fullUrl + " to sign in." +
-                        "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
-                        html: "Hi. You have successfully enrolled " + req.body.userName + " in TechGroms." + 
-                        "<br><br>We have created a login user for you. You will use the e-mail address you entered along with" +
-                        " this password: " + strPassword + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
-                        "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
-                    };
+            //                                     res.json({
+            //                                         success: false,
+            //                                         message: strError
+            //                                     });
+            //                                 }
+            //                             );
 
-                    // send mail with defined transport object
-                    smtpTransport.sendMail(mailOptions, function(error, response){
-                    
-                        if (error) {
-                        
-                            return res.json({
-                                success: false,
-                                message: "Error sending enrollment e-mail: " + error.toString()
-                            });
-                        }
+            //                             if (exceptionRet2) {
 
-                        // res.json({
-                        //     success: true,
-                        //     userId: userId
-                        // });
-                        var profile = {
-                            userName: req.body.userName,
-                            userId: userId
-                        };
+            //                                 res.json({
+            //                                     success: false,
+            //                                     message: exceptionRet2.message
+            //                                 });
+            //                             }
+            //                         }
+            //                     });
+            //                 }
+            //             },
+            //             function(strError) {
 
+            //                 res.json({
+            //                     success: false,
+            //                     message: "Error checking database for prior use of user Id."
+            //                 });
+            //             }
+            //         );
+            //         if (exceptionRet1){
 
+            //             res.json({
+            //                 success: false,
+            //                 message: exceptionRet1.message
+            //             });
+            //         }
+            //     } catch (e) {
 
-                        var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
-                        res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
-                        res.json({
-                            success: true
-                        });
+            //         res.json({
+            //             success: false,
+            //             message: e.message
+            //         });
+            //     }
+            // }
 
-                        // if you don't want to use this transport object anymore, uncomment following line
-                        //smtpTransport.close(); // shut down the connection pool, no more messages
-                    });
-                } catch (e) {
+            // exceptionRet1 = sql.execute("select id from " + self.dbname + "parent where email='" + req.body.parentEmail + "';",
+            //     function(rows) {
 
-                    res.json({
-                        success: false,
-                        message: "Error sending enrollment e-mail: " + e.message
-                    });
-                }
-            }
+            //         if (rows.length === 0) {
 
-            var functionEnrollmentStep2 = function () {
+            //             // Need to insert parent
+            //             exceptionRet2 = sql.execute("insert " + self.dbname + "parent (email) values ('" + req.body.parentEmail + "');",
+            //                 function(rows) {
 
-                try {
+            //                     if (rows.length > 0) {
 
-                    // Check to make sure userId isn't in use yet.
-                    exceptionRet1 = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';",
-                        function(rows){
+            //                         functionEnrollmentStep2(rows[0].insertId);
+            //                     }
+            //                 },
+            //                 function(strError) {
 
-                            if (rows.length === 0) {
+            //                     res.json({
+            //                         success: false,
+            //                         message: "Error gotten adding parent to database: " + strError
+            //                     });
+            //                 }
+            //             );
+            //             if (exceptionRet2) {
 
-                                res.json({
-                                    success: false,
-                                    message: "Error checking database for prior use of user Id."
-                                });
-                            } else if (rows[0].cnt > 0) {
+            //                 res.json({
+            //                     success: false,
+            //                     message: "Error gotten adding parent to database: " + exceptionRet2.message
+            //                 });
+            //             }
+            //         } else {
 
-                                res.json({
-                                    success: false,
-                                    message: "The e-mail address " + req.body.userName + " is already in use."
-                                });
-                            } else {
+            //             // parent already existed
+            //             functionEnrollmentStep2(rows[0].id);
+            //         }
+            //     },
+            //     function(strError) {
 
-                                // userName is ok.
-                                // Generate and encrypt a password.
-                                var strPassword = (Math.random() * 10000).toFixed(0);
-                                var usergroupId = 3;
+            //         res.json({
+            //             success: false,
+            //             message: "Error gotten retrieving parent from database: " + strError
+            //         });
+            //     }
+            // );
 
-                                // Change john, ken and jerry password to 'a'.
-                                var uName = req.body.userName.toLowerCase();
-                                if (req.body.userName === 'jerry@rubintech.com' || req.body.userName === 'ken.rubin@live.com' || req.body.userName === 'techgroms@gmail.com') {
-                                    strPassword = 'a';
-                                    usergroupId = 1;
-                                }
-                                bcrypt.hash(strPassword, null, null, function(err, hash){
+            // if (exceptionRet1) {
 
-                                    if (err) {
-
-                                        res.json({
-                                            success: false,
-                                            message: "Error received encrypting password."
-                                        });
-
-                                    } else {
-
-                                        exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,usergroupId) values ('" + req.body.userName + "','" + hash + "'," + usergroupId + ");",
-                                            function(rows){
-
-                                                if (rows.length === 0) {
-
-                                                    res.json({
-                                                        success: false,
-                                                        message: "Database error inserting new user into database."
-                                                    });
-                                                }
-                                                functionSendEnrollmentEmail(strPassword, rows[0].insertId, usergroupId);
-                                            },
-                                            function(strError) {
-
-                                                res.json({
-                                                    success: false,
-                                                    message: strError
-                                                });
-                                            }
-                                        );
-
-                                        if (exceptionRet2) {
-
-                                            res.json({
-                                                success: false,
-                                                message: exceptionRet2.message
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        },
-                        function(strError) {
-
-                            res.json({
-                                success: false,
-                                message: "Error checking database for prior use of user Id."
-                            });
-                        }
-                    );
-                    if (exceptionRet1){
-
-                        res.json({
-                            success: false,
-                            message: exceptionRet1.message
-                        });
-                    }
-                } catch (e) {
-
-                    res.json({
-                        success: false,
-                        message: e.message
-                    });
-                }
-            }
-
-            exceptionRet1 = sql.execute("select id from " + self.dbname + "parent where email='" + req.body.parentEmail + "';",
-                function(rows) {
-
-                    if (rows.length === 0) {
-
-                        // Need to insert parent
-                        exceptionRet2 = sql.execute("insert " + self.dbname + "parent (email) values ('" + req.body.parentEmail + "');",
-                            function(rows) {
-
-                                if (rows.length > 0) {
-
-                                    functionEnrollmentStep2(rows[0].insertId);
-                                }
-                            },
-                            function(strError) {
-
-                                res.json({
-                                    success: false,
-                                    message: "Error gotten adding parent to database: " + strError
-                                });
-                            }
-                        );
-                        if (exceptionRet2) {
-
-                            res.json({
-                                success: false,
-                                message: "Error gotten adding parent to database: " + exceptionRet2.message
-                            });
-                        }
-                    } else {
-
-                        // parent already existed
-                        functionEnrollmentStep2(rows[0].id);
-                    }
-                },
-                function(strError) {
-
-                    res.json({
-                        success: false,
-                        message: "Error gotten retrieving parent from database: " + strError
-                    });
-                }
-            );
-
-            if (exceptionRet1) {
-
-                res.json({
-                    success: false,
-                    message: exceptionRet1.message
-                });
-            }
+            //     res.json({
+            //         success: false,
+            //         message: exceptionRet1.message
+            //     });
+            // }
 
     self.routeForgotPassword = function (req, res) {
         // req.body.userName

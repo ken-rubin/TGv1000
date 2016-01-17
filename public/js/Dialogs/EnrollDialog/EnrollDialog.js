@@ -111,21 +111,23 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							// Initial validation. email not empty. E-mail address passes regexp test.
+							// Initial validation. email not empty. Email address passes regexp test.
 							var errMsg = "";
 							var email = $("#email").val().trim().toLowerCase();
 							if (email.length === 0) {
 
-								errMsg = "You must enter an e-mail address.";
-							}
+								errMsg = "You must enter an email address.";
+							
+							} else {
 
-							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
-							var emailOK = email.match(eReg);
+								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
+								var emailOK = email.match(eReg);
 
-							if (!emailOK) {
+								if (!emailOK) {
 
-								errMsg += "That email address does not pass our validation test. Please enter another.";
+									errMsg = "That email address does not pass our validation test. Please enter another.";
 
+								}
 							}
 
 							if (errMsg.length) {
