@@ -170,6 +170,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					                	var profileJSON = window.atob(token.split('.')[1]);
 					                	localStorage.setItem("profile", profileJSON);
+					                	g_profile = JSON.parse(profileJSON);
 					                }
 
                 					m_wellMessage("You hav been enrolled. Please check for the email with log-in instructions we just sent to you.", 

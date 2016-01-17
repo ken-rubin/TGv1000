@@ -104,8 +104,8 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                 function(cb) {
                     // (1) Check for username availability.
-                    profile = {
-                        userName: req.body.userName.toLowerCase();
+                    var profile = {
+                        userName: req.body.userName.toLowerCase()
                     };
                     
                     var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + profile.userName + "';",
@@ -117,7 +117,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                             } else if (rows[0].cnt > 0) {
 
-                                return cb(new Error("The email address " + req.body.userName + " is already in use."), null);
+                                return cb(new Error("The email address " + profile.userName + " is already in use."), null);
                             }
 
                             return cb(null, profile);
@@ -198,22 +198,22 @@ module.exports = function ValidateBO(app, sql, logger) {
                             }
                         });
 
-                        // setup e-mail data with unicode symbols
+                        // setup email data with unicode symbols
                         var mailOptions = null;
 
-                        var fullUrl = request.protocol + '://' + request.get('host'); // + request.originalUrl;
+                        var fullUrl = req.protocol + '://' + req.get('host'); // + req.originalUrl;
 
                         mailOptions = {
                  
                             from: "TechGroms <techgroms@gmail.com>", // sender address
-                            to: req.body.parentEmail, // list of receivers
+                            to: profile.userName, // list of receivers
                             subject: "TechGroms Registration ✔", // Subject line
                             text: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
-                            "\r\n\r\nWe have created a login user for you. You will use the e-mail address you entered along with" +
+                            "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +
                             " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
                             "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
                             html: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
-                            "<br><br>We have created a login user for you. You will use the e-mail address you entered along with" +
+                            "<br><br>We have created a login user for you. You will use the email address you entered along with" +
                             " this password: " + profile.password + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
                             "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
                         };
@@ -223,7 +223,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                         
                             if (error) {
                             
-                                return cb(new Error("Error sending enrollment e-mail: " + error.toString()), null);
+                                return cb(new Error("1Error sending enrollment email: " + error.toString()), null);
                             }
 
                             // If you don't want to use this transport object anymore, uncomment following line
@@ -235,7 +235,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                         });
                     } catch (e) {
 
-                        return cb(new Error("Error sending enrollment e-mail: " + e.message), null);
+                        return cb(new Error("2Error sending enrollment email: " + e.message), null);
                     }
                 }
             ], function(err, profile) {

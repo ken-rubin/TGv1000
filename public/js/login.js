@@ -4,9 +4,6 @@
 // Return null--no module object.
 //
 
-// Define some login app globals.
-var g_profile = {};
-
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
 	
@@ -34,7 +31,10 @@ $(document).ready(function () {
 	                });
 
 	                // Get the last signed in userName from profile in localStorage.
-	                var strUserName = g_profile["userName"];	// may not be set yet; will return undefined if not.
+	                var strUserName = null;
+	                if (g_profile && g_profile.hasOwnProperty("userName")) {
+	                	strUserName = g_profile["userName"];
+	                }
 	                if (strUserName && strUserName.length > 0) {
 
 	                    $("#inputName").val(strUserName);
