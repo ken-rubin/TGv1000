@@ -3,6 +3,7 @@
 //
 // Return null--no module object.
 //
+var g_profile = {};
 
 // Invoke callback when DOM is fully loaded.
 $(document).ready(function () {
@@ -31,6 +32,7 @@ $(document).ready(function () {
 	                });
 
 	                // Get the last signed in userName from profile in localStorage.
+             		m_functionSetGProfileFromLS();
 	                var strUserName = null;
 	                if (g_profile && g_profile.hasOwnProperty("userName")) {
 	                	strUserName = g_profile["userName"];
@@ -185,7 +187,7 @@ var m_functionSignInButtonClick = function(errorHelper) {
 
 	                	var profileJSON = window.atob(token.split('.')[1]);
 	                	localStorage.setItem("profile", profileJSON);
-	                	g_profile = JSON.parse(profileJSON);
+		                m_functionSetGProfileFromLS();
 	                }
 
 	            	location.href = '/index';
@@ -199,6 +201,11 @@ var m_functionSignInButtonClick = function(errorHelper) {
 	        });
 		}
     } catch(e) { errorHelper.show(e.message); }
+}
+var m_functionSetGProfileFromLS = function() {
+
+	var profileJSON = localStorage.getItem("profile");
+	g_profile = JSON.parse(profileJSON);
 }
 
 var m_functionLoadThreeLists = function(errorHelper) {

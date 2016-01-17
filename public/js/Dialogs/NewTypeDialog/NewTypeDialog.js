@@ -130,7 +130,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// If we come in here and check #cb1 to create one, we will give it the normal negative id in addition to ordinal = 10000.
 							// **A SystemType requires a non-zero imageId.**
 							
-							if ((g_profile["can_edit_system_types"] === "true") && (client.getProject().data.canEditSystemTypes)) {
+							if ((g_profile["can_edit_system_types"]) && (client.getProject().data.canEditSystemTypes)) {
 
 								$("#SystemTypeCheckBox").css("display", "block");
 								if (m_strNewOrEdit === "Edit" && m_typeForEdit.ordinal === 10000) {

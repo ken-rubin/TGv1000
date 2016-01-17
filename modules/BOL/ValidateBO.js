@@ -253,7 +253,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                             var permissionId = ug_permission.permissionId;
                             m_permissions.forEach(function(permission) {
                                 if (permission.id === permissionId) {
-                                    permission[permission.description] = true;
+                                    profile[permission.description] = true;
                                 }
                             });
                         }
@@ -479,7 +479,7 @@ module.exports = function ValidateBO(app, sql, logger) {
             console.log("Entered routeUserAuthenticate with req.body=" + JSON.stringify(req.body));
 
             // Retrieve and validate password against hash.
-            exceptionRet = sql.execute("select id, pwHash from " + self.dbname + "user where userName='" + req.body.userName + "';",
+            exceptionRet = sql.execute("select id, pwHash, usergroupId from " + self.dbname + "user where userName='" + req.body.userName + "';",
                 function(rows){
 
                     if (!rows) {
@@ -496,6 +496,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         var id = rows[0].id;
                         var pwHash = rows[0].pwHash;
+                        var usergroupId = rows[0].usergroupId;
 
                         bcrypt.compare(req.body.password, pwHash, function(err, result){
 
@@ -508,11 +509,21 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 var profile = {
                                     userName: req.body.userName,
                                     userId: id,
-                                    can_edit_comics: true,
-                                    can_edit_system_types: true,
-                                    can_approve_for_public: true,
-                                    can_use_system: true
+                                    usergroupId: usergroupId
                                 };
+
+                                // Add permissions to profile, based on usergroupId.
+                                m_ug_permissions.forEach(function(ug_permission) {
+                                    if (ug_permission.usergroupId === profile.usergroupId) {
+                                        var permissionId = ug_permission.permissionId;
+                                        m_permissions.forEach(function(permission) {
+                                            if (permission.id === permissionId) {
+                                                profile[permission.description] = true;
+                                            }
+                                        });
+                                    }
+                                });
+                                
                                 var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
                                 res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
                                 res.json({

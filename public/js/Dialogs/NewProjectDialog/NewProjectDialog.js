@@ -167,7 +167,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
-							if (g_profile["can_edit_system_types"] === "true") {
+							if (g_profile["can_edit_system_types"]) {
 								$("#SystemTypeCheckBox").css("display", "block");
 							}
 
