@@ -16,6 +16,11 @@ $(document).ready(function () {
 
 				try {
 
+					var strFromURL = m_functionCheckForURLEncoding("error");
+					if (strFromURL) {
+						errorHelper.show(strFromURL);
+					}
+
 					// Allocate and initialize the client.
 					m_clientLogin = new ClientLogin();
 					var exceptionRet = m_clientLogin.create();
@@ -125,6 +130,17 @@ $(document).ready(function () {
 		alert(e.message);
 	}
 });
+
+var m_functionCheckForURLEncoding = function( name ) {
+  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regexS = "[\\?&]"+name+"=([^&#]*)";
+  var regex = new RegExp( regexS );
+  var results = regex.exec( window.location.href );
+  if( results == null )
+    return "";
+  else
+    return results[1];
+}
 
 var m_functionEnrollButtonClick = function(errorHelper) {
 	

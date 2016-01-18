@@ -145,7 +145,7 @@ app.get('/index',
         expressJwt({ secret: SECRET,
                 getToken: function fromHeaderOrQuerystring (req) {
                     
-                    console.log('Got token: ' + req.cookies.token);
+                    // console.log('Got token: ' + req.cookies.token);
                     if (req.cookies && req.cookies.token) {
                       return req.cookies.token;
                     }
@@ -157,7 +157,9 @@ app.get('/index',
             try {
 
                 if (err) {
-                    return res.send('You got a JWT error: ' + err.message);
+                    // return res.send('You got a JWT error: ' + err.message);
+                    console.log('express-jwt error: ' + err.message + ". Redirecting to '/'");
+                    return res.redirect('/?error=denied');
                 }
                 next();
             } catch (e) { res.send(e.message); }
@@ -181,7 +183,7 @@ app.get("/adminzone",
         expressJwt({ secret: SECRET,
                 getToken: function fromHeaderOrQuerystring (req) {
                     
-                    console.log('Got token: ' + req.cookies.token);
+                    // console.log('Got token: ' + req.cookies.token);
                     if (req.cookies && req.cookies.token) {
                       return req.cookies.token;
                     }
@@ -193,7 +195,9 @@ app.get("/adminzone",
             try {
 
                 if (err) {
-                    return res.send('You got a JWT error: ' + err.message);
+                    // return res.send('You got a JWT error: ' + err.message);
+                    console.log('express-jwt error: ' + err.message + ". Redirecting to '/index'");
+                    return res.redirect('/index?error=denied');
                 }
                 next();
             } catch (e) { res.send(e.message); }
@@ -270,7 +274,7 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                             { 
                                 secret: SECRET,
                                 getToken: function fromHeaderOrQuerystring (req) {
-                                    console.log('Got token: ' + req.cookies.token);
+                                    // console.log('Got token: ' + req.cookies.token);
                                     if (req.cookies && req.cookies.token) {
                                       return req.cookies.token;
                                     }
