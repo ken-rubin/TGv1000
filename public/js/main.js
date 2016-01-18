@@ -108,6 +108,6 @@ var m_functionCheckForURLEncoding = function( name ) {
   if( results == null )
     return "";
   else
-    return results[1];
+    return decodeURI(results[1]);
 }
 

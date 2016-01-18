@@ -18,7 +18,7 @@ $(document).ready(function () {
 
 					var strFromURL = m_functionCheckForURLEncoding("error");
 					if (strFromURL) {
-						errorHelper.show(strFromURL);
+						errorHelper.show(strFromURL + '. Please login again.');
 					}
 
 					// Allocate and initialize the client.
@@ -139,7 +139,7 @@ var m_functionCheckForURLEncoding = function( name ) {
   if( results == null )
     return "";
   else
-    return results[1];
+    return decodeURI(results[1]);
 }
 
 var m_functionEnrollButtonClick = function(errorHelper) {
@@ -212,7 +212,7 @@ var m_functionSignInButtonClick = function(errorHelper) {
 
 	                // !data.success
 					JL().info("<<< unsuccessful login attempt >>>");
-	                throw new Error(data.message);
+	                errorHelper.show(data.message);
 	            }
 	        });
 		}

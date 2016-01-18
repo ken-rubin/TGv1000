@@ -145,7 +145,6 @@ app.get('/index',
         expressJwt({ secret: SECRET,
                 getToken: function fromHeaderOrQuerystring (req) {
                     
-                    // console.log('Got token: ' + req.cookies.token);
                     if (req.cookies && req.cookies.token) {
                       return req.cookies.token;
                     }
@@ -157,9 +156,9 @@ app.get('/index',
             try {
 
                 if (err) {
-                    // return res.send('You got a JWT error: ' + err.message);
-                    console.log('express-jwt error: ' + err.message + ". Redirecting to '/'");
-                    return res.redirect('/?error=denied');
+
+                    console.log('express-jwt error: ' + JSON.stringify(err) + ". Redirecting to '/'");
+                    return res.redirect('/?error=' + encodeURI(err.message).replace(/%5B/g, '[').replace(/%5D/g, ']'));
                 }
                 next();
             } catch (e) { res.send(e.message); }
@@ -183,7 +182,6 @@ app.get("/adminzone",
         expressJwt({ secret: SECRET,
                 getToken: function fromHeaderOrQuerystring (req) {
                     
-                    // console.log('Got token: ' + req.cookies.token);
                     if (req.cookies && req.cookies.token) {
                       return req.cookies.token;
                     }
@@ -195,9 +193,9 @@ app.get("/adminzone",
             try {
 
                 if (err) {
-                    // return res.send('You got a JWT error: ' + err.message);
-                    console.log('express-jwt error: ' + err.message + ". Redirecting to '/index'");
-                    return res.redirect('/index?error=denied');
+
+                    console.log('express-jwt error: ' + JSON.stringify(err) + ". Redirecting to '/index'");
+                    return res.redirect('/index?error=' + encodeURI(err.message).replace(/%5B/g, '[').replace(/%5D/g, ']'));
                 }
                 next();
             } catch (e) { res.send(e.message); }
