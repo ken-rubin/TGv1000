@@ -152,9 +152,19 @@ app.get('/index',
                     return null;
                 }
             }),
-        function (req, res) {
+        function (err, req, res, next) {
 
             try {
+
+                if (err) {
+                    return res.send('You got a JWT error: ' + err.message);
+                }
+                next();
+            } catch (e) { res.send(e.message); }
+        },
+        function(req, res) {
+
+            try{
 
                 // Render the jade file to the client.
                 res.render("Index/index", { 
@@ -178,16 +188,26 @@ app.get("/adminzone",
                     return null;
                 }
             }),
-    function (req, res) {
+        function (err, req, res, next) {
 
-        try {
+            try {
 
-            // Render the jade file to the client.
-            res.render("Adminzone/adminzone", { 
-                title : "TGv1000" 
-            });
-        } catch (e) { res.send(e.message); }
-    }
+                if (err) {
+                    return res.send('You got a JWT error: ' + err.message);
+                }
+                next();
+            } catch (e) { res.send(e.message); }
+        },
+        function (req, res) {
+
+            try {
+
+                // Render the jade file to the client.
+                res.render("Adminzone/adminzone", { 
+                    title : "TGv1000" 
+                });
+            } catch (e) { res.send(e.message); }
+        }
 );
 
 /////////////////////////////////////
@@ -258,6 +278,16 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                                 }
                             }
                         ),
+                        function (err, req, res, next) {
+
+                            try {
+
+                                if (err) {
+                                    return res.send('You got an error: ' + err.message);
+                                }
+                                next();
+                            } catch (e) { res.send(e.message); }
+                        },
                         methodInstance);
                 } else {
                     app[rowi.verb](rowi.route, methodInstance);

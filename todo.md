@@ -7,6 +7,9 @@
 
 ## Jerry
 
+- In all BOL routes that get passed a token, use userId from that instead of passing in in req.body.userId.
+- Should I expires JWTs in, say, 15 minutes, but issue a new one with every request?
+- Implement forgot password feature.
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
@@ -14,11 +17,9 @@
 - A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Administrative stuff
-    + Usergroups
     + AdminZone
-    + Allow parent to view child's work (read-only)
     + Save place (like for student working in a project) and jump right back to it if the user signs in again.
-    + Better authentication, session control, prevent jumping into middle of site.
+    + Better authentication, session control, prevent jumping into middle of site. Done. **Needs testing.**
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
