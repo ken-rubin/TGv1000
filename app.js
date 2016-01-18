@@ -246,16 +246,18 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                 var methodInstance = moduleInstance[rowi.method];
                 if (rowi.requiresJWT === 1) {
                     app[rowi.verb](rowi.route, 
-                        expressJwt({ secret: SECRET,
+                        expressJwt(
+                            { 
+                                secret: SECRET,
                                 getToken: function fromHeaderOrQuerystring (req) {
-                                    
                                     console.log('Got token: ' + req.cookies.token);
                                     if (req.cookies && req.cookies.token) {
                                       return req.cookies.token;
                                     }
                                     return null;
                                 }
-                            }),
+                            }
+                        ),
                         methodInstance);
                 } else {
                     app[rowi.verb](rowi.route, methodInstance);

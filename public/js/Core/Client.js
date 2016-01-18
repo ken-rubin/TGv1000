@@ -612,54 +612,54 @@ define(["Core/errorHelper",
 
 						try {
 
-							// var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
-							// 	{
-							// 		projectId: iProjectId,
-							// 		userId: g_strUserId
-							// 	},
-							// 	'json');
-							// posting.done(function(data){
-
-							// 	if (data.success) {
-
-							// 		var exceptionRet = self.loadedProject(data.project, callback);
-							// 		if (exceptionRet) { errorHelper.show(exceptionRet); }
-
-							// 	} else {
-
-							// 		// !data.success
-							// 		errorHelper.show(data.message);
-							// 	}
-							// });
-							$.ajax({
-
-								type: 'POST',
-								url: '/BOL/ProjectBO/RetrieveProject',
-								contentType: 'application/json',
-								data: {
+							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
+								{
 									projectId: iProjectId,
 									userId: g_profile["userId"]
 								},
-								dataType: 'json',
-								success: function (data) {
+								'json');
+							posting.done(function(data){
 
-									if (data.success) {
+								if (data.success) {
 
-										var exceptionRet = self.loadedProject(data.project, callback);
-										if (exceptionRet) { errorHelper.show(exceptionRet); }
+									var exceptionRet = self.loadedProject(data.project, callback);
+									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
-									} else {
+								} else {
 
-										// !data.success -- error message in objectData.message
-										errorHelper.show(data.message);
-									}
-								},
-								error: function (jqxhr, strTextStatus, strError) {
-
-									// Non-computational error in strError
-									errorHelper.show(strError);
+									// !data.success
+									errorHelper.show(data.message);
 								}
 							});
+							// $.ajax({
+
+							// 	type: 'POST',
+							// 	url: '/BOL/ProjectBO/RetrieveProject',
+							// 	contentType: 'application/json',
+							// 	data: {
+							// 		projectId: iProjectId,
+							// 		userId: g_profile["userId"]
+							// 	},
+							// 	dataType: 'json',
+							// 	success: function (data) {
+
+							// 		if (data.success) {
+
+							// 			var exceptionRet = self.loadedProject(data.project, callback);
+							// 			if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+							// 		} else {
+
+							// 			// !data.success -- error message in objectData.message
+							// 			errorHelper.show(data.message);
+							// 		}
+							// 	},
+							// 	error: function (jqxhr, strTextStatus, strError) {
+
+							// 		// Non-computational error in strError
+							// 		errorHelper.show(strError);
+							// 	}
+							// });
 							return null;
 
 						} catch (e) {
@@ -707,54 +707,54 @@ define(["Core/errorHelper",
 
 						try {
 
-							// var posting = $.post("/BOL/ProjectBO/RetrieveType", 
-							// 	{
-							// 		typeId: iTypeId
-							// 	},
-							// 	'json');
-							// posting.done(function(data){
-
-							// 	if (data.success) {
-
-							// 		var clType = new Type();
-							// 		clType.load(data.type);
-							// 		return m_clProject.addType(clType);
-
-							// 	} else {
-
-							// 		// !data.success
-							// 		return new Error(data.message);
-							// 	}
-							// });
-							$.ajax({
-
-								type: 'POST',
-								url: '/BOL/ProjectBO/RetrieveType',
-								contentType: 'application/json',
-								data: {
+							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
+								{
 									typeId: iTypeId
 								},
-								dataType: 'json',
-								success: function (data) {
+								'json');
+							posting.done(function(data){
 
-									if (data.success) {
+								if (data.success) {
 
-										var clType = new Type();
-										clType.load(data.type);
-										return m_clProject.addType(clType);
+									var clType = new Type();
+									clType.load(data.type);
+									return m_clProject.addType(clType);
 
-									} else {
+								} else {
 
-										// !data.success -- error message in objectData.message
-										return new Error(data.message);
-									}
-								},
-								error: function (jqxhr, strTextStatus, strError) {
-
-									// Non-computational error in strError
-									return new Error(strError);
+									// !data.success
+									return new Error(data.message);
 								}
 							});
+							// $.ajax({
+
+							// 	type: 'POST',
+							// 	url: '/BOL/ProjectBO/RetrieveType',
+							// 	contentType: 'application/json',
+							// 	data: {
+							// 		typeId: iTypeId
+							// 	},
+							// 	dataType: 'json',
+							// 	success: function (data) {
+
+							// 		if (data.success) {
+
+							// 			var clType = new Type();
+							// 			clType.load(data.type);
+							// 			return m_clProject.addType(clType);
+
+							// 		} else {
+
+							// 			// !data.success -- error message in objectData.message
+							// 			return new Error(data.message);
+							// 		}
+							// 	},
+							// 	error: function (jqxhr, strTextStatus, strError) {
+
+							// 		// Non-computational error in strError
+							// 		return new Error(strError);
+							// 	}
+							// });
 
 							return null;
 
@@ -942,50 +942,50 @@ define(["Core/errorHelper",
 
 						try {
 
-							// var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
-							// 	{
-							// 		methodId: iMethodId
-							// 	},
-							// 	'json');
-							// posting.done(function(data){
-
-							// 	if (data.success) {
-
-							// 		return self.addMethodToActiveType(data.method);
-
-							// 	} else {
-
-							// 		// !data.success
-							// 		return new Error(data.message);
-							// 	}
-							// });
-							$.ajax({
-
-								type: 'POST',
-								url: '/BOL/ProjectBO/RetrieveMethod',
-								contentType: 'application/json',
-								data: {
+							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
+								{
 									methodId: iMethodId
 								},
-								dataType: 'json',
-								success: function (data) {
+								'json');
+							posting.done(function(data){
 
-									if (data.success) {
+								if (data.success) {
 
-										return self.addMethodToActiveType(data.method);
+									return self.addMethodToActiveType(data.method);
 
-									} else {
+								} else {
 
-										// !data.success -- error message in objectData.message
-										return new Error(data.message);
-									}
-								},
-								error: function (jqxhr, strTextStatus, strError) {
-
-									// Non-computational error in strError
-									return new Error(strError);
+									// !data.success
+									return new Error(data.message);
 								}
 							});
+							// $.ajax({
+
+							// 	type: 'POST',
+							// 	url: '/BOL/ProjectBO/RetrieveMethod',
+							// 	contentType: 'application/json',
+							// 	data: {
+							// 		methodId: iMethodId
+							// 	},
+							// 	dataType: 'json',
+							// 	success: function (data) {
+
+							// 		if (data.success) {
+
+							// 			return self.addMethodToActiveType(data.method);
+
+							// 		} else {
+
+							// 			// !data.success -- error message in objectData.message
+							// 			return new Error(data.message);
+							// 		}
+							// 	},
+							// 	error: function (jqxhr, strTextStatus, strError) {
+
+							// 		// Non-computational error in strError
+							// 		return new Error(strError);
+							// 	}
+							// });
 
 							return null;
 

@@ -223,7 +223,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                         
                             if (error) {
                             
-                                return cb(new Error("1Error sending enrollment email: " + error.toString()), null);
+                                return cb(new Error("Error sending enrollment email: " + error.toString()), null);
                             }
 
                             // If you don't want to use this transport object anymore, uncomment following line
@@ -235,7 +235,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                         });
                     } catch (e) {
 
-                        return cb(new Error("2Error sending enrollment email: " + e.message), null);
+                        return cb(new Error("Error sending enrollment email: " + e.message), null);
                     }
                 }
             ], function(err, profile) {
