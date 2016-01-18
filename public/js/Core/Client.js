@@ -615,7 +615,7 @@ define(["Core/errorHelper",
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
 									projectId: iProjectId,
-									userId: g_profile["userId"]
+									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
 							posting.done(function(data){

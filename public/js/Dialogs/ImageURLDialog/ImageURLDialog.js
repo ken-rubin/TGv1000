@@ -140,8 +140,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							var posting = $.post("/BOL/ResourceBO/SaveURLResource", 
 								{
-									userId: g_profile["userId"], 
-									userName: g_profile["userName"],
+									// userId: g_profile["userId"], not needed; sent in JWT
+									// userName: g_profile["userName"], not needed; sent in JWT
 									url: m_url,
 									tags: tags,
 									resourceTypeId: 1,

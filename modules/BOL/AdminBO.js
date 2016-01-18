@@ -436,12 +436,12 @@ module.exports = function AdminBO(app, sql, logger) {
 
     //     try {
 
-    //         console.log("Entered AdminBO/routeFetchAllOfUsersProjects with req.body=" + JSON.stringify(req.body));
-    //         // req.body.userId
+    //         console.log("Entered AdminBO/routeFetchAllOfUsersProjects with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
+    //         // req.user.userId
 
     //         // Fetch all of userId's projects projects.
 
-    //         var exceptionRet = sql.execute("select * from " + self.dbname + "projects where userId in (" + req.body.userId + ") order by name asc;",
+    //         var exceptionRet = sql.execute("select * from " + self.dbname + "projects where userId in (" + req.user.userId + ") order by name asc;",
     //             function(rows){
 
     //                 res.json({

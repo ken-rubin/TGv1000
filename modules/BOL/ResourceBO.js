@@ -59,8 +59,8 @@ module.exports = function ResourceBO(app, sql, logger) {
         try {
 
             console.log("Entered AdminBO/routeSaveURLResource with req.body=" + JSON.stringify(req.body));
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // req.body.url             image or sound to retrieve
             // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
             // req.body.resourceTypeId
@@ -127,7 +127,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                     // body is a buffer containing the resource.
 
-                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + req.body.resourceName + "');";
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0,'" + req.body.resourceName + "');";
                     sql.execute(sqlString,
                         function(rows){
 
@@ -143,7 +143,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                                 // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
                                 // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                                m_setUpAndDoTags(id, req.body.resourceTypeId, req.body.userName, req.body.tags, req.body.resourceName, function(err) {
+                                m_setUpAndDoTags(id, req.body.resourceTypeId, req.user.userName, req.body.tags, req.body.resourceName, function(err) {
 
                                     if (err) {
 
@@ -199,8 +199,8 @@ module.exports = function ResourceBO(app, sql, logger) {
         try {
 
             console.log("******Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // req.body.resourceTypeId
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
             // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
@@ -213,7 +213,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             var ext = (req.body.resourceTypeId === "1") ? 'png' : "mp3";
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.body.userId + "," + req.body.resourceTypeId + ",0,'" + req.body.resourceName + "');";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0,'" + req.body.resourceName + "');";
             sql.execute(sqlString,
                 function(rows){
 
@@ -227,7 +227,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                         var id = rows[0].insertId;
 
-                        m_setUpAndDoTags(id, req.body.resourceTypeId, req.body.userName, req.body.tags, req.body.resourceName, function(err) {
+                        m_setUpAndDoTags(id, req.body.resourceTypeId, req.user.userName, req.body.tags, req.body.resourceName, function(err) {
 
                             if (err) {
 

@@ -60,9 +60,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.projectId
-            // req.body.userId
+            // req.user.userId
             // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
 
             var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
@@ -101,10 +101,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         // If the user is not editing his own project, then we will set project.id = 0 and project.ownedByUserId to so indicate.
                         // We'll be able to check project.id for 0 during further processing for the same treatment.
-                        if (project.ownedByUserId != req.body.userId) {
+                        if (project.ownedByUserId != req.user.userId) {
 
                             project.id = 0;
-                            project.ownedByUserId = parseInt(req.body.userId, 10);
+                            project.ownedByUserId = parseInt(req.user.userId, 10);
                         }
 
                         m_functionFetchTags(
@@ -873,7 +873,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             parameters: row.parameters
                         };
 
-                        // We don't know whose method this is (req.body.userId's or someone else's). So we're going to make like it's someone else's.
+                        // We don't know whose method this is (req.user.userId's or someone else's). So we're going to make like it's someone else's.
                         method.id = 0;
 
                         m_functionFetchTags(
@@ -983,8 +983,8 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             // m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // req.body.projectJson
 
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
@@ -1118,13 +1118,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                             {
                                 project: project, 
                                 newProj: (project.id === 0), 
-                                notMine: (project.id !== 0 && project.ownedByUserId !== parseInt(req.body.userId, 10))
+                                notMine: (project.id !== 0 && project.ownedByUserId !== parseInt(req.user.userId, 10))
                             }
                         );
                     },
                     function(resultArray, cb) {
                         var project = req.body.projectJson;
-                        var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.body.userId + ";";
+                        var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
                                 if (err) { return cb(err, null); }
@@ -1139,7 +1139,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     },
                     function(resultArray, cb) {
                         var project = req.body.projectJson;
-                        var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.body.userId + ";";
+                        var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
                                 if (err) { return cb(err, null); }
@@ -1293,7 +1293,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         }
 
                         var guts = " SET name='" + project.name + "'"
-                            + ",ownedByUserId=" + req.body.userId
+                            + ",ownedByUserId=" + req.user.userId
                             + ",public=" + project.public
                             + ",isProduct=" + project.isProduct
                             + ",projectTypeId=" + project.projectTypeId
@@ -1487,7 +1487,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 typeIth.comicId = passObj.comicIth.id;
                                 typeIth.ordinal = 0;
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.body.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.user.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
                                 m_log('Inserting App type with ' + strQuery);
                                 sql.queryWithCxn(passObj.connection, strQuery,
                                     function(err, rows) {

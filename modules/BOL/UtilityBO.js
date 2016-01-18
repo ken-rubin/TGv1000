@@ -61,8 +61,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
             console.log("Entered UtilityBO/routeSearchResources with req.body = " + JSON.stringify(req.body));
             // req.body.tags
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // req.body.resourceTypeId  1,2,
             // req.body.onlyOwnedByUser   '0' or '1'
 
@@ -75,7 +75,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // If we're retrieving only items created by user, add userName to tags.
             if (req.body.onlyOwnedByUser === "1") {
 
-                tags += " " + req.body.userName;
+                tags += " " + req.user.userName;
             }
             console.log("tags massaged='" + tags + "'");
 
@@ -126,9 +126,9 @@ module.exports = function UtilityBO(app, sql, logger) {
                         }
 
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
-                        // But to do so, we need something like: (createdByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
+                        // But to do so, we need something like: (createdByUserId=req.user.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.body.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
+                        sqlString = "select r.* from " + self.dbname + "resources r where (r.createdByUserId=" + req.user.userId + " or r.public=1) and id in (select distinct resourceId from " + self.dbname + "resources_tags rt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "resources_tags rt2 where rt2.resourceId=rt.resourceId and tagId in (" + idString + ")));";
 
                         // console.log(' ');
                         // console.log('Query: ' + sqlString);
@@ -191,8 +191,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
             console.log("Entered UtilityBO/routeSearchProjects with req.body = " + JSON.stringify(req.body));
             // req.body.tags
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // Exactly one of the following 3 will = "1"
             // req.body.onlyOwnedByUser   
             // req.body.onlyOthersProjects
@@ -249,11 +249,11 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         if (req.body.onlyOwnedByUser === "1") {
                         
-                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.body.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
                         
                         } else if (req.body.onlyOthersProjects === "1") {
                         
-                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.body.userId + " and p.public=1 and p.isProduct=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isProduct=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
                         
                         } else {    // onlyProducts
                         
@@ -322,8 +322,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
             console.log("Entered UtilityBO/routeSearchTypes with req.body = " + JSON.stringify(req.body));
             // req.body.tags
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // req.body.onlyOwnedByUser   '0' or '1'
 
             // Add resource type description to the tags the user (may have) entered.
@@ -332,7 +332,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // If we're retrieving only items created by user, add userName to tags.
             if (req.body.onlyOwnedByUser === "1") {
 
-                tags += " " + req.body.userName;
+                tags += " " + req.user.userName;
             }
             // console.log("tags massaged='" + tags + "'");
 
@@ -383,9 +383,9 @@ module.exports = function UtilityBO(app, sql, logger) {
                         }
 
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
-                        // But to do so, we need something like: (ownedByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
+                        // But to do so, we need something like: (ownedByUserId=req.user.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select distinct t.* from " + self.dbname + "types t where (t.ownedByUserId=" + req.body.userId + " or t.public=1) and t.id in (select distinct typeId from " + self.dbname + "type_tags tt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "type_tags tt2 where tt2.typeId=tt.typeId and tagId in (" + idString + ")));";
+                        sqlString = "select distinct t.* from " + self.dbname + "types t where (t.ownedByUserId=" + req.user.userId + " or t.public=1) and t.id in (select distinct typeId from " + self.dbname + "type_tags tt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "type_tags tt2 where tt2.typeId=tt.typeId and tagId in (" + idString + ")));";
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);
@@ -448,8 +448,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
             console.log("Entered UtilityBO/routeSearchMethods with req.body = " + JSON.stringify(req.body));
             // req.body.tags
-            // req.body.userId
-            // req.body.userName
+            // req.user.userId
+            // req.user.userName
             // req.body.onlyOwnedByUser   '0' or '1'
 
             // Add resource type description to the tags the user (may have) entered.
@@ -458,7 +458,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // If we're retrieving only items created by user, add userName to tags.
             if (req.body.onlyOwnedByUser === "1") {
 
-                tags += " " + req.body.userName;
+                tags += " " + req.user.userName;
             }
             // console.log("tags massaged='" + tags + "'");
 
@@ -511,7 +511,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // By including userName in tags if req.body.onlyOwnedByUser, we automatically make the "only mine" and "choose all matching" work.
                         // But to do so, we need something like: (ownedByUserId=req.body.userId or public=1) along with the tag matching. Note: public=1 works all the time, because of the userName match requirement.
 
-                        sqlString = "select distinct m.* from " + self.dbname + "methods m where (m.ownedByUserId=" + req.body.userId + " or m.public=1) and m.id in (select distinct methodId from " + self.dbname + "method_tags mt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "method_tags mt2 where mt2.methodId=mt.methodId and tagId in (" + idString + ")));";
+                        sqlString = "select distinct m.* from " + self.dbname + "methods m where (m.ownedByUserId=" + req.user.userId + " or m.public=1) and m.id in (select distinct methodId from " + self.dbname + "method_tags mt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "method_tags mt2 where mt2.methodId=mt.methodId and tagId in (" + idString + ")));";
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);

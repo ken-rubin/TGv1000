@@ -142,8 +142,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        var posting = $.post("/BOL/UtilityBO/SearchTypes", 
 					        	{
 					        		tags: tags, 
-					        		userId: g_profile["userId"],
-					        		userName: g_profile["userName"],
+					        		// userId: g_profile["userId"], not needed; sent in JWT
+					        		// userName: g_profile["userName"], not needed; sent in JWT
 					        		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
 					        	},
 					        	'json');

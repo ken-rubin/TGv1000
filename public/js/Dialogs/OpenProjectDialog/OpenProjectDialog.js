@@ -142,8 +142,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					        var posting = $.post("/BOL/UtilityBO/SearchProjects", 
 					        	{
 					        		tags: tags, 
-					        		userId: g_profile["userId"],
-					        		userName: g_profile["userName"],
+					        		// userId: g_profile["userId"], not needed; sent in JWT
+					        		// userName: g_profile["userName"], not needed; sent in JWT
 					        		onlyOwnedByUser: $("#rad1").prop("checked") ? 1 : 0,
 					        		onlyOthersProjects: $("#rad2").prop("checked") ? 1 : 0,
 					        		onlyProducts: $("#rad3").prop("checked") ? 1 : 0,

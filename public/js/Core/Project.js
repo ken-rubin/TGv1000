@@ -83,8 +83,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						try {
 
 							var data = {
-									userId: g_profile["userId"],
-									userName: g_profile["userName"],
+									// userId: g_profile["userId"], not needed; sent in JWT
+									// userName: g_profile["userName"], not needed; sent in JWT
 									projectJson: self.data
 							};
 
