@@ -7,7 +7,7 @@
 
 ## Jerry
 
-- Should I expires JWTs in, say, 15 minutes, but issue a new one with every request?
+- Should I expire JWTs in, say, 15 minutes, but issue a new one with every request?
 - Implement forgot password feature.
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?

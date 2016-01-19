@@ -285,7 +285,10 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                             try {
 
                                 if (err) {
-                                    return res.send('You got an error: ' + err.message);
+                                    return res.json({
+                                        success: false,
+                                        message: rowi.JWTerrorMsg
+                                    });
                                 }
                                 next();
                             } catch (e) { res.send(e.message); }

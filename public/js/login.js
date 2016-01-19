@@ -32,7 +32,7 @@ $(document).ready(function () {
 	                // Wire up the enroll button
 	                $("#enrollBtn").click(function () {
 	                    
-	                    m_functionEnrollButtonClick(errorHelper);
+	                    m_functionEnrollButtonClk(errorHelper);
 
 	                });
 
@@ -142,7 +142,7 @@ var m_functionCheckForURLEncoding = function( name ) {
     return decodeURI(results[1]);
 }
 
-var m_functionEnrollButtonClick = function(errorHelper) {
+var m_functionEnrollButtonClk = function(errorHelper) {
 	
 	try {
 

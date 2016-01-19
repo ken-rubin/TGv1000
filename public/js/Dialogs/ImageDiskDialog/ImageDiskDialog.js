@@ -261,7 +261,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 									} else {
 
 										// !data.success -- error message in objectData.message
-										m_wellMessage(res.message, null);
+										m_wellMessage(data.message, null);
 									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
