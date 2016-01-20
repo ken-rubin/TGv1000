@@ -6,9 +6,13 @@
 
 // Define module and require dependencies.
 define(["Core/errorHelper", 
-		"Dialogs/EnrollDialog/EnrollDialog"],
+		"Dialogs/EnrollDialog/EnrollDialog",
+		"Dialogs/ForgotPWDialog/ForgotPWDialog",
+		"Dialogs/PWResetDialog/PWResetDialog"],
 	function (errorHelper, 
-				EnrollDialog) {
+				EnrollDialog,
+				ForgotPWDialog,
+				PWResetDialog) {
 
 		try {
 
@@ -71,10 +75,39 @@ define(["Core/errorHelper",
 						}
 					};
 
-					self.getTGCookie = function (name) {
+					self.showForgotPWDialog = function () {
 
-						return localStorage.getItem(name);
+						try {
+
+							var td = new ForgotPWDialog();
+			                var strUserName = null;
+			                if (g_profile && g_profile.hasOwnProperty("userName")) {
+			                	strUserName = g_profile["userName"];
+			                }
+							var exceptionRet = td.create(strUserName);
+							if (exceptionRet) { throw exceptionRet; }
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
 					};
+
+					self.showPWResetDialog = function (token) {
+
+						try {
+
+							var td = new PWResetDialog();
+							var exceptionRet = td.create(token);
+							if (exceptionRet) { throw exceptionRet; }
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
 
 					///////////////////////////////
 					// Private functions.

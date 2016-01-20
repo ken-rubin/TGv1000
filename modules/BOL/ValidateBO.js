@@ -276,196 +276,131 @@ module.exports = function ValidateBO(app, sql, logger) {
         }
     }
 
-            // var request = req;
-
-            // // 1. Gen password for user. Hash the password. Create the user. Grab the id as userId.
-            // // 2. Send enrollment email with password.
-            // // 2. Return success and JWT containing user profile.
-
-            // var exceptionRet1 = null;
-            // var exceptionRet2 = null;
-            // var exceptionRet3 = null;
-            // var exceptionRet4 = null;
-
-
-            // var functionEnrollmentStep2 = function () {
-
-            //     try {
-
-            //         // Check to make sure userId isn't in use yet.
-            //         exceptionRet1 = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';",
-            //             function(rows){
-
-            //                 if (rows.length === 0) {
-
-            //                     res.json({
-            //                         success: false,
-            //                         message: "Error checking database for prior use of user Id."
-            //                     });
-            //                 } else if (rows[0].cnt > 0) {
-
-            //                     res.json({
-            //                         success: false,
-            //                         message: "The e-mail address " + req.body.userName + " is already in use."
-            //                     });
-            //                 } else {
-
-            //                     // userName is ok.
-            //                     // Generate and encrypt a password.
-            //                     var strPassword = (Math.random() * 10000).toFixed(0);
-            //                     var usergroupId = 3;
-
-            //                     // Change john, ken and jerry password to 'a'.
-            //                     var profile.userName = req.body.userName.toLowerCase();
-            //                     if (req.body.userName === 'jerry@rubintech.com' || req.body.userName === 'ken.rubin@live.com' || req.body.userName === 'techgroms@gmail.com') {
-            //                         strPassword = 'a';
-            //                         usergroupId = 1;
-            //                     }
-            //                     bcrypt.hash(strPassword, null, null, function(err, hash){
-
-            //                         if (err) {
-
-            //                             res.json({
-            //                                 success: false,
-            //                                 message: "Error received encrypting password."
-            //                             });
-
-            //                         } else {
-
-            //                             exceptionRet2 = sql.execute("insert " + self.dbname + "user (userName,pwHash,usergroupId) values ('" + req.body.userName + "','" + hash + "'," + usergroupId + ");",
-            //                                 function(rows){
-
-            //                                     if (rows.length === 0) {
-
-            //                                         res.json({
-            //                                             success: false,
-            //                                             message: "Database error inserting new user into database."
-            //                                         });
-            //                                     }
-            //                                     functionSendEnrollmentEmail(strPassword, rows[0].insertId, usergroupId);
-            //                                 },
-            //                                 function(strError) {
-
-            //                                     res.json({
-            //                                         success: false,
-            //                                         message: strError
-            //                                     });
-            //                                 }
-            //                             );
-
-            //                             if (exceptionRet2) {
-
-            //                                 res.json({
-            //                                     success: false,
-            //                                     message: exceptionRet2.message
-            //                                 });
-            //                             }
-            //                         }
-            //                     });
-            //                 }
-            //             },
-            //             function(strError) {
-
-            //                 res.json({
-            //                     success: false,
-            //                     message: "Error checking database for prior use of user Id."
-            //                 });
-            //             }
-            //         );
-            //         if (exceptionRet1){
-
-            //             res.json({
-            //                 success: false,
-            //                 message: exceptionRet1.message
-            //             });
-            //         }
-            //     } catch (e) {
-
-            //         res.json({
-            //             success: false,
-            //             message: e.message
-            //         });
-            //     }
-            // }
-
-            // exceptionRet1 = sql.execute("select id from " + self.dbname + "parent where email='" + req.body.parentEmail + "';",
-            //     function(rows) {
-
-            //         if (rows.length === 0) {
-
-            //             // Need to insert parent
-            //             exceptionRet2 = sql.execute("insert " + self.dbname + "parent (email) values ('" + req.body.parentEmail + "');",
-            //                 function(rows) {
-
-            //                     if (rows.length > 0) {
-
-            //                         functionEnrollmentStep2(rows[0].insertId);
-            //                     }
-            //                 },
-            //                 function(strError) {
-
-            //                     res.json({
-            //                         success: false,
-            //                         message: "Error gotten adding parent to database: " + strError
-            //                     });
-            //                 }
-            //             );
-            //             if (exceptionRet2) {
-
-            //                 res.json({
-            //                     success: false,
-            //                     message: "Error gotten adding parent to database: " + exceptionRet2.message
-            //                 });
-            //             }
-            //         } else {
-
-            //             // parent already existed
-            //             functionEnrollmentStep2(rows[0].id);
-            //         }
-            //     },
-            //     function(strError) {
-
-            //         res.json({
-            //             success: false,
-            //             message: "Error gotten retrieving parent from database: " + strError
-            //         });
-            //     }
-            // );
-
-            // if (exceptionRet1) {
-
-            //     res.json({
-            //         success: false,
-            //         message: exceptionRet1.message
-            //     });
-            // }
-
-    self.routeForgotPassword = function (req, res) {
+    self.routeSendPasswordResetEmail = function (req, res) {
         // req.body.userName
 
         try {
         
-            console.log("Entered routeForgotPassword with req.body=" + JSON.stringify(req.body));
+            console.log("Entered routeSendPasswordResetEmail with req.body=" + JSON.stringify(req.body));
 
-            var exceptionRet = logger.logItem(1, {"userName":req.body.userName});
+            async.series(
+                [
+                    // (1)
+                    function(cb) {
 
-            if (exceptionRet) {
+                        // Verify that userName is in the DB.
+                        var strQuery = "select count(*) as cnt from " + self.dbname + "user where userName='" + req.body.userName + "';";
+                        
+                        var exceptionRet = sql.execute(
+                            strQuery, 
+                            function(rows) {   
+                                if (rows.length === 0) { return cb(new Error('Sorry. We received an error accessing our database.')); }
+                                if (rows[0].cnt !== 1) { return cb(new Error('That email address is not registered as a user name in TechGroms.')); }
+                                return cb(null);
+                            },
+                            function(strError) { return cb(new Error(strError)); }
+                        );
+                        if (exceptionRet) { return cb(err); }
+                    },
+                    // (2)
+                    function(cb) {
 
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-            } else {
+                        // Compose and send the email.
+                        try {
 
-                res.json({
-                    success: true
-                });
-            }
+                            var smtpTransport = nodemailer.createTransport("SMTP", {
+                            
+                                service: "Gmail",
+                                auth: {
+                                
+                                    user: "techgroms@gmail.com",
+                                    pass: "Albatross!1"
+                                }
+                            });
+
+                            // setup email data with unicode symbols
+                            var mailOptions = null;
+
+                            var profile = { userName: req.body.userName};
+                            var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60});  // expires in one hour.
+                            // token is a base64 encoded JWT to append to email URL.
+
+                            var fullUrl = req.protocol + '://' + req.get('host') + '/?reset=' + token;
+
+                            mailOptions = {
+                     
+                                from: "TechGroms <techgroms@gmail.com>", // sender address
+                                to: profile.userName, // list of receivers
+                                subject: "TechGroms User Name Reset", // Subject line
+                                text: "Hi. Per your request we have generated a password reset link for " + profile.userName + "." + 
+                                "\r\n\r\nPlease click the link below or paste it into a browser address line. Then enter your new password." +
+                                "\r\nFor your account's security the link expires in 60 minutes." +
+                                "\r\n\r\nReset link: " + fullUrl +
+                                "\r\n\r\n\r\n\r\nRegards from The Grom Team",
+                                html: "Hi. Per your request we have generated a password reset link for " + profile.userName + "." + 
+                                "<br><br>Please click the link below or paste it into a browser address line. Then enter your new password." +
+                                "<br>For your account's security the link expires in 60 minutes." +
+                                "<br><br>Reset link:  <a href='" + fullUrl + "'>" + fullUrl + "</a>" +
+                                "<br><br><br>Regards from The Grom Team"
+                            };
+
+                            // send mail with defined transport object
+                            smtpTransport.sendMail(mailOptions, function(error, response){
+                            
+                                if (error) {
+                                
+                                    return cb(new Error("Error sending password reset email: " + error.toString()));
+                                }
+
+                                // If you don't want to use this transport object anymore, uncomment following line
+                                //smtpTransport.close(); // shut down the connection pool, no more messages
+
+                                return cb(null);
+
+                            });
+                        } catch (e) {
+
+                            return cb(new Error("Error sending reset email: " + e.message), null);
+                        }
+                    }
+                ],
+                // final callback for series
+                function(err){ 
+                    
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err.message
+                        }) ;
+                    } else {
+                        res.json({ success: true });
+                    }
+                }
+            );
         } catch (e) {
 
             res.json({
                 success: false,
-                message: 'Forgot exception: ' + e.message
+                message: e.message
+            });
+        }
+    }
+
+    self.routePasswordReset = function (req, res) {
+        // req.body.userName
+        // req.body.newPassword
+
+        try {
+        
+            console.log("Entered routePasswordReset with req.body=" + JSON.stringify(req.body));
+
+            
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
             });
         }
     }
@@ -479,7 +414,7 @@ module.exports = function ValidateBO(app, sql, logger) {
             console.log("Entered routeUserAuthenticate with req.body=" + JSON.stringify(req.body));
 
             // Retrieve and validate password against hash.
-            exceptionRet = sql.execute("select id, pwHash, usergroupId from " + self.dbname + "user where userName='" + req.body.userName + "';",
+            var exceptionRet = sql.execute("select id, pwHash, usergroupId from " + self.dbname + "user where userName='" + req.body.userName + "';",
                 function(rows){
 
                     if (!rows) {

@@ -16,6 +16,7 @@ $(document).ready(function () {
 
 				try {
 
+					// Look for JWT redirect.
 					var strFromURL = m_functionCheckForURLEncoding("error");
 					if (strFromURL) {
 						errorHelper.show(strFromURL + '. Please login again.');
@@ -76,49 +77,18 @@ $(document).ready(function () {
 	                // Wire up the forgot link.
 	                $("#forgotLink").click(function () {
 	                    
-	                    // var userName = $("#inputName").val();
-	                    // if (userName.length === 0) {
-	                        
-	                    //     alert("Close this message. Then enter your name and click the 'forgot' link again.");
-	                    // } else {
-
-	                    //     $.ajax({
-	                            
-	                    //         type: "POST",
-	                    //         url: "/BOL/UtilityBO/ForgotPW",
-	                    //         data: { 
-	                    //                 userName: userName
-	                    //         },
-	                    //         success: function (objectData,
-	                    //             strTextStatus,
-	                    //             jqxhr) {
-
-	                    //                 try {
-	                                        
-	                    //                     if (!objectData.success) {
-	                                            
-	                    //                         alert("We had a problem recording your reset request. Please....");
-	                    //                     } else {
-
-	                    //                         alert("After your password is reset, you will be notified.");
-	                    //                     }
-	                    //                 } catch (e) {
-
-	                    //                     alert("We had a problem recording your reset request. Please....");
-	                    //                 }},
-	                    //         error: function (jqxhr,
-	                    //             strTextStatus,
-	                    //             strError) {
-
-	                    //                 alert("We had a problem recording your reset request. Please....");
-	                    //             }
-	                    //     });
-	                    // }
+	                    m_functionForgotLinkClick(errorHelper);
 	                });
 
 					// Cause the code and designer panels to size themselves.
 					$(window).resize();
 
+					// Look for password reset token.
+					strFromURL = m_functionCheckForURLEncoding("reset");
+					if (strFromURL) {
+						
+						m_functionShowPasswordResetDialog(strFromURL, errorHelper);
+					}
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -148,6 +118,34 @@ var m_functionEnrollButtonClk = function(errorHelper) {
 
 		// Ask client to show the enroll dialog.
 		var exceptionRet = m_clientLogin.showEnrollDialog();
+		if (exceptionRet) { throw exceptionRet; }
+		
+	} catch (e) {
+
+    	errorHelper.show(e.message);
+	}
+}
+
+var m_functionForgotLinkClick = function(errorHelper) {
+	
+	try {
+
+		// Ask client to show the forgot p/w dialog.
+		var exceptionRet = m_clientLogin.showForgotPWDialog();
+		if (exceptionRet) { throw exceptionRet; }
+		
+	} catch (e) {
+
+    	errorHelper.show(e.message);
+	}
+}
+
+var m_functionShowPasswordResetDialog = function(token, errorHelper) {
+	
+	try {
+
+		// Ask client to show the forgot p/w dialog.
+		var exceptionRet = m_clientLogin.showPWResetDialog(token);
 		if (exceptionRet) { throw exceptionRet; }
 		
 	} catch (e) {
@@ -218,6 +216,7 @@ var m_functionSignInButtonClick = function(errorHelper) {
 		}
     } catch(e) { errorHelper.show(e.message); }
 }
+
 var m_functionSetGProfileFromLS = function() {
 
 	var profileJSON = localStorage.getItem("profile");

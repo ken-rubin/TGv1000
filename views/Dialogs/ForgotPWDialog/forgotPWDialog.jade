@@ -1,0 +1,24 @@
+//- Jade DOM for the ForgotPW dialog. 
+//-
+//-
+
+.well
+  .row
+    .col-xs-12
+      h4 
+        | Verify that the email address below is the one whose password you want to reset. That
+        | email address must already be enrolled in TechGroms. Then click the <em>Send Email</em> button.
+      br
+
+  .row
+    .col-xs-12
+          br
+          .col-xs-2
+            label.control-label(for="email", style="margin-top:6px;") Email address:
+          .col-xs-4
+            input.form-control#email(type="text")
+          .col-xs-6
+  .row
+    .col-xs-12
+          br
+          .well#EnrollWell
