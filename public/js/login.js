@@ -18,7 +18,7 @@ $(document).ready(function () {
 
 					// Look for JWT redirect.
 					var strFromURL = m_functionCheckForURLEncoding("error");
-					if (strFromURL) {
+					if (strFromURL !== "") {
 						errorHelper.show(strFromURL + '. Please login again.');
 					}
 
@@ -85,7 +85,7 @@ $(document).ready(function () {
 
 					// Look for password reset token.
 					strFromURL = m_functionCheckForURLEncoding("reset");
-					if (strFromURL) {
+					if (strFromURL !== "") {
 						
 						m_functionShowPasswordResetDialog(strFromURL, errorHelper);
 					}

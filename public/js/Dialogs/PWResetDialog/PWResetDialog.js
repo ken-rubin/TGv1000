@@ -25,6 +25,11 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
+							var isValid = KJUR.jws.JWS.verifyJWT(token, "jwt_secret", {alg: ["HS256"]});
+							if (!isValid) {
+								return new Error("Your link appears invalid. Perhaps it is more than an hour old. Please request a new email.");
+							}
+
 							var profileJSON = window.atob(token.split('.')[1]);
 							var profile = JSON.parse(profileJSON);
 							m_userName = profile.userName;
@@ -61,18 +66,18 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// the PWResetDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Request Password Reset",
+								title: "Password Reset - Step 2",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		id: 'SendButton',
-					            		label: "Send Email",
+					            		id: 'ResetButton',
+					            		label: "Reset Password",
 					            		cssClass: 'btn-primary',
 					            		hotkey: 13,
 					            		action: function () {
 
-					            			m_functionSendButtonClick();
+					            			m_functionResetButtonClick();
 					            		}
 					            	},
 					            	{
@@ -101,9 +106,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+							
 							// set and focus
-							$("#email").val(m_userName);
-							$("#email").focus();
+							$("#email").text(m_userName + '.');
+							$("#password").focus();
 
 						} catch (e) {
 
@@ -112,29 +118,21 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					};
 
 					// Expose enroll event.
-					m_functionSendButtonClick = function () {
+					m_functionResetButtonClick = function () {
 
 						try {
 
 							// Initial validation. email not empty. Email address passes regexp test.
 							var errMsg = "";
-							var email = $("#email").val().trim().toLowerCase();
-							if (email.length === 0) {
+							var password = $("#password").val().trim();
+							if (password.length === 0) {
 
-								errMsg = "You must enter an email address.";
+								errMsg = "You must enter a new password.";
 							
-							} else {
+							} else if (password.includes("'" || password.includes('"'))) {
 
-								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
-								var emailOK = email.match(eReg);
-
-								if (!emailOK) {
-
-									errMsg = "That email address does not pass our validation test. Please enter another.";
-
-								}
+								errMsg = "Didn't we tell you not to use one of those two characters?"
 							}
-
 							if (errMsg.length) {
 
 								m_wellMessage(errMsg, null);
@@ -142,17 +140,18 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							}
 
 							// Things look good. Time to go to the server.
-							var posting = $.post("/BOL/ValidateBO/SendPasswordResetEmail", 
+							var posting = $.post("/BOL/ValidateBO/ResetPassword", 
 												{
-													userName: email
+													userName: m_userName,
+													newPassword: password
 												}, 
 												'json');
         					posting.done(function(data){
 
             					if (data.success) {
 
-                					m_wellMessage("Please check for the email we just sent for further instructions.", 
-                									{waittime: 20000, callback: function(){	m_dialog.close(); /*location.href = '/';*/}});
+                					m_wellMessage("You may now sign in with your new password.", 
+                									{waittime: 2000, callback: function(){	m_dialog.close(); /*location.href = '/';*/}});
             					} else {
 
                 					// !data.success

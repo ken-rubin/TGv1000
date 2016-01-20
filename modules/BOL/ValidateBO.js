@@ -322,7 +322,9 @@ module.exports = function ValidateBO(app, sql, logger) {
                             var mailOptions = null;
 
                             var profile = { userName: req.body.userName};
-                            var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60});  // expires in one hour.
+                            // Note: we do not sign this token with our special, server-side secret.
+                            // Instead, we use one that can be employed client-side for token verification. No big deal.
+                            var token = jwt.sign(profile, "jwt_secret", { expiresIn: 60*60});  // expires in one hour.
                             // token is a base64 encoded JWT to append to email URL.
 
                             var fullUrl = req.protocol + '://' + req.get('host') + '/?reset=' + token;
