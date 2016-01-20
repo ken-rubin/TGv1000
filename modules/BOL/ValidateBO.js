@@ -394,13 +394,44 @@ module.exports = function ValidateBO(app, sql, logger) {
         
             console.log("Entered routePasswordReset with req.body=" + JSON.stringify(req.body));
 
-            
+            bcrypt.hash(req.body.newPassword, null, null, function(err, hash){
 
+                if (err) {
+
+                    res.json({
+                        success: false,
+                        message: "Error received encrypting password."
+                    });
+                } else {
+
+                    var exceptionRet = sql.execute("update " + self.dbname + "user set pwHash='" + hash + "' where userName='" + req.body.userName + "';",
+                        function(rows){
+
+                            res.json({ success: true });
+                        },
+                        function(strError) {
+
+                            res.json({
+                                success: false,
+                                message: "Database error updating user in database."
+                            });
+                        }
+                    );
+
+                    if (exceptionRet) {
+
+                        res.json({
+                            success: false,
+                            message: "Database error updating user in database."
+                        });
+                    }
+                }
+            });
         } catch (e) {
 
             res.json({
                 success: false,
-                message: e.message
+                message: "Database error updating user in database."
             });
         }
     }

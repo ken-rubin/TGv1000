@@ -1,5 +1,5 @@
 ////////////////////////////////////
-// ForgotPWDialog module.
+// PWResetDialog module.
 // 
 // Return constructor function.
 //
@@ -10,8 +10,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 		try {
 
-			// Define the ForgotPWDialog constructor function.
-			var functionForgotPWDialog = function () {
+			// Define the PWResetDialog constructor function.
+			var functionPWResetDialog = function () {
 
 				try {
 
@@ -21,11 +21,13 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function(userName) {
+					self.create = function(token) {
 
 						try {
 
-							m_userName = userName;
+							var profileJSON = window.atob(token.split('.')[1]);
+							var profile = JSON.parse(profileJSON);
+							m_userName = profile.userName;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -33,7 +35,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 								cache: false,
 								data: { 
 
-									templateFile: "Dialogs/ForgotPWDialog/forgotPWDialog"
+									templateFile: "Dialogs/PWResetDialog/pWResetDialog"
 								}, 
 								dataType: "HTML",
 								method: "POST",
@@ -56,7 +58,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						try {
 
 							// Show the dialog--load the content from 
-							// the ForgotPWDialog jade HTML-snippet.
+							// the PWResetDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
 								title: "Request Password Reset",
@@ -195,7 +197,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 			};
 
 			// Return the constructor function as the module object.
-			return functionForgotPWDialog;
+			return functionPWResetDialog;
 
 		} catch (e) {
 
