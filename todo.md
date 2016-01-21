@@ -6,9 +6,8 @@
 
 ## Jerry
 
-- In some dialogs (password reset, etc.) disable the main button once it's been clicked. And enable/disable according to keyup where it's not being done and should be--like in the 2 p/w reset dialogs.
-- When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript.
-- Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request?
+- When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript. **Discuss with Ken & John.**
+- Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types.
 - Test image stuff now that I've put JWT in the middle.
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
