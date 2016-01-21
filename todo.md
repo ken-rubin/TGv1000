@@ -1,17 +1,16 @@
 ## Ken
 
-- **Look for questions in the documentation below containing "Ken:" and respond, changing "Ken:" to "Jerry:".**
 - Replace Blockly.
 - Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
 
 
 ## Jerry
 
-- After coming in with dialog for password reset open, try to set focus to Password textbox on main button click.
-- In some dialogs (password reset, etc.) disable the main button once it's been clicked. And enable/disable according to keyup where it's not being done and should be.
-- In 2 new P/W reset dialogs, enable main button based on contents of textbox.
-- Should I expire JWTs in, say, 15 minutes, but issue a new one with every request?
-- Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types. 
+- In some dialogs (password reset, etc.) disable the main button once it's been clicked. And enable/disable according to keyup where it's not being done and should be--like in the 2 p/w reset dialogs.
+- When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript.
+- Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request?
+- Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types.
+- Test image stuff now that I've put JWT in the middle.
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
@@ -20,7 +19,6 @@
 - Administrative stuff
     + AdminZone
     + Save place (like for student working in a project) and jump right back to it if the user signs in again.
-    + Better authentication, session control, prevent jumping into middle of site. Done. **Needs testing.**
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
@@ -53,7 +51,7 @@
         - OpenProjectDialog
         - PropertyGrid
         - TypeSearchDialog
-- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes.
+- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
 - A New SystemType should probably require an image. **Discuss with Ken.**
 - If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything in TypeWell.
 

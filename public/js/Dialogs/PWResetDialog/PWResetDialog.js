@@ -110,6 +110,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// set and focus
 							$("#email").text(m_userName + '.');
 							$("#password").focus();
+							$("#password").keyup(m_setStatePrimaryBtn);
+							m_setStatePrimaryBtn();
 
 						} catch (e) {
 
@@ -117,33 +119,27 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
+					var m_setStatePrimaryBtn = function () {
+
+						var password = $("#password").val().trim();
+						var bValid = (password.length > 0) && !(password.includes("'" || password.includes('"')));
+						if (!bValid) {
+							$("#ResetButton").addClass("disabled");
+						} else {
+							$("#ResetButton").removeClass("disabled");
+						}
+					}
+
 					// Expose enroll event.
 					m_functionResetButtonClick = function () {
 
 						try {
 
-							// Initial validation. email not empty. Email address passes regexp test.
-							var errMsg = "";
-							var password = $("#password").val().trim();
-							if (password.length === 0) {
-
-								errMsg = "You must enter a new password.";
-							
-							} else if (password.includes("'" || password.includes('"'))) {
-
-								errMsg = "Didn't we tell you not to use one of those two characters?"
-							}
-							if (errMsg.length) {
-
-								m_wellMessage(errMsg, null);
-								return;
-							}
-
-							// Things look good. Time to go to the server.
+							$("#ResetButton").addClass("disabled");
 							var posting = $.post("/BOL/ValidateBO/ResetPassword", 
 												{
 													userName: m_userName,
-													newPassword: password
+													newPassword: $("#password").val().trim()
 												}, 
 												'json');
         					posting.done(function(data){
@@ -151,15 +147,22 @@ define(["Core/snippetHelper", "Core/errorHelper"],
             					if (data.success) {
 
                 					m_wellMessage("You may now sign in with your new password.", 
-                									{waittime: 2000, callback: function(){	m_dialog.close(); /*location.href = '/';*/}});
+                									{waittime: 2000, callback: function(){	
+                										$("#inputName").val(m_userName);
+                										m_dialog.close(); 
+                										$("#inputPassword").focus(); }
+                									}
+                								);
             					} else {
 
                 					// !data.success
+                					$("#ResetButton").removeClass("disabled");
                 					m_wellMessage(data.message, null);
             					}
         					});
 						} catch (e) {
 
+							$("#ResetButton").removeClass("disabled");
 							m_wellMessage(e.message, null);
 						}
 					};

@@ -102,6 +102,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// set and focus
 							$("#email").val(m_userName);
 							$("#email").focus();
+							$("#email").keyup(m_setStatePrimaryBtn);
+							m_setStatePrimaryBtn();
 
 						} catch (e) {
 
@@ -109,40 +111,32 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						}
 					};
 
+					var m_setStatePrimaryBtn = function () {
+
+						var email = $("#email").val().trim();
+						var bValid = (email.length > 0);
+						if (!bValid) {
+							$("#SendButton").addClass("disabled");
+						} else {
+							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
+							bValid = email.match(eReg);
+							if (!bValid) {
+								$("#SendButton").addClass("disabled");
+							} else {
+								$("#SendButton").removeClass("disabled");
+							}
+						}
+					}
+
 					// Expose enroll event.
 					m_functionSendButtonClick = function () {
 
 						try {
 
-							// Initial validation. email not empty. Email address passes regexp test.
-							var errMsg = "";
-							var email = $("#email").val().trim().toLowerCase();
-							if (email.length === 0) {
-
-								errMsg = "You must enter an email address.";
-							
-							} else {
-
-								var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
-								var emailOK = email.match(eReg);
-
-								if (!emailOK) {
-
-									errMsg = "That email address does not pass our validation test. Please enter another.";
-
-								}
-							}
-
-							if (errMsg.length) {
-
-								m_wellMessage(errMsg, null);
-								return;
-							}
-
-							// Things look good. Time to go to the server.
+							$("#SendButton").addClass("disabled");
 							var posting = $.post("/BOL/ValidateBO/SendPasswordResetEmail", 
 												{
-													userName: email
+													userName: $("#email").val().trim().toLowerCase()
 												}, 
 												'json');
         					posting.done(function(data){
@@ -150,15 +144,21 @@ define(["Core/snippetHelper", "Core/errorHelper"],
             					if (data.success) {
 
                 					m_wellMessage("Please check for the email we just sent for further instructions.", 
-                									{waittime: 20000, callback: function(){	m_dialog.close(); /*location.href = '/';*/}});
+                									{waittime: 10000, callback: function() {	
+                																				m_dialog.close();
+                																		   }
+                									}
+                					);
             					} else {
 
                 					// !data.success
+                					$("#SendButton").removeClass("disabled");
                 					m_wellMessage(data.message, null);
             					}
         					});
 						} catch (e) {
 
+							$("#SendButton").removeClass("disabled");
 							m_wellMessage(e.message, null);
 						}
 					};
