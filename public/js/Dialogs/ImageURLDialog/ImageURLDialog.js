@@ -160,38 +160,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 	        						errorHelper.show(data.message);
 	        					}
 	        				});
-							// $.ajax({
-
-							// 	type: 'POST',
-							// 	url: '/BOL/ResourceBO/SaveURLResource',
-							// 	contentType: 'application/json',
-							// 	data: {
-							// 		userId: g_profile["userId"], 
-							// 		userName: g_profile["userName"],
-							// 		url: m_url,
-							// 		tags: tags,
-							// 		resourceTypeId: 1,
-							// 		resourceName: strResourceName
-							// 	},
-							// 	dataType: 'json',
-							// 	success: function (data) {
-
-							// 		if (data.success) {
-
-		     //    						self.callFunctionOK(data.id);
-
-							// 		} else {
-
-							// 			// !data.success -- error message in objectData.message
-							// 			errorHelper.show(data.message);
-							// 		}
-							// 	},
-							// 	error: function (jqxhr, strTextStatus, strError) {
-
-							// 		// Non-computational error in strError
-							// 		errorHelper.show(strError);
-							// 	}
-							// });
 						} catch (e) {
 
 							errorHelper.show(e);

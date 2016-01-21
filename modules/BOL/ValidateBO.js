@@ -328,6 +328,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                             // token is a base64 encoded JWT to append to email URL.
 
                             var fullUrl = req.protocol + '://' + req.get('host') + '/?reset=' + token;
+                            var partialUrl = req.protocol + '://' + req.get('host');
 
                             mailOptions = {
                      
@@ -342,7 +343,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 html: "Hi. Per your request we have generated a password reset link for " + profile.userName + "." + 
                                 "<br><br>Please click the link below or paste it into a browser address line. Then enter your new password." +
                                 "<br>For your account's security the link expires in 60 minutes." +
-                                "<br><br>Reset link:  <a href='" + fullUrl + "'>" + fullUrl + "</a>" +
+                                "<br><br>Reset link:  <a href='" + fullUrl + "'>" + partialUrl + "</a>" +
                                 "<br><br><br>Regards from The Grom Team"
                             };
 

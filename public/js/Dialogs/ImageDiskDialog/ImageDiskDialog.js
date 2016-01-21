@@ -219,32 +219,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						    // Now the file.
 						    formData.append("userFile", m_file);
 
-						 //    var request = new XMLHttpRequest();
-							// request.open("POST", "/BOL/ResourceBO/SaveResource");
-							// request.responseType = 'json';
-							// request.send(formData);
-							// m_resourceHasBeenSent = true;
-
-	    		// 			request.onload = function(oEvent){
-
-	      //   					if (request.status === 200) {
-
-	      //   						var res = request.response;
-	      //   						if (res.success) {
-
-	      //   							self.callFunctionOK(res.id);
-
-	      //   						} else {
-
-	      //   							// !res.success
-	      //   							m_wellMessage(res.message, null);
-	      //   						}
-	      //   					} else {
-
-	      //   						// request.status !== 200
-	      //   						m_wellMessage("Could not upload file to server.", null);
-	      //   					}
-	      //   				};
 							$.ajax({
 
 								type: 'POST',

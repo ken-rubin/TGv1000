@@ -7,7 +7,9 @@
 
 ## Jerry
 
-- In some dialogs (password reset, etc.) disable the main button once it's been clicked.
+- After coming in with dialog for password reset open, try to set focus to Password textbox on main button click.
+- In some dialogs (password reset, etc.) disable the main button once it's been clicked. And enable/disable according to keyup where it's not being done and should be.
+- In 2 new P/W reset dialogs, enable main button based on contents of textbox.
 - Should I expire JWTs in, say, 15 minutes, but issue a new one with every request?
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
@@ -23,7 +25,7 @@
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
-    - click "TGv1000" to return to sign-in page; 
+    - click "TGv1000" to return to sign-in page; **should this be taken as a singout and invalidate the JWT?**
     - close window or browser (possible?)
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.

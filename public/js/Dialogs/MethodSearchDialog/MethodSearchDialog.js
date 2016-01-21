@@ -179,54 +179,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					                m_wellMessage("An error has occurred: " + data.message);
 					            }
 					        });
-							// $.ajax({
-
-							// 	type: 'POST',
-							// 	url: '/BOL/UtilityBO/SearchMethods',
-							// 	contentType: 'application/json',
-							// 	data: {
-					  //       		tags: tags, 
-					  //       		userId: g_profile["userId"],
-					  //       		userName: g_profile["userName"],
-					  //       		onlyOwnedByUser: $("#cb1").prop("checked") ? 1 : 0
-					  //       	},
-							// 	dataType: 'json',
-							// 	success: function (data) {
-
-							// 		if (data.success) {
-
-						 //                m_searchResultProcessedArray = new Array();
-						 //                m_searchResultRawArray = data.arrayRows;
-						 //                for (var i = 0; i < m_searchResultRawArray.length; i++) {
-
-						 //                    var rowIth = m_searchResultRawArray[i];
-						 //                    m_searchResultProcessedArray.push({
-
-						 //                    	index: i,
-						 //                    	name: rowIth.name,
-						 //                    	url: resourceHelper.toURL('resources', 
-						 //                    		rowIth.imageId, 
-						 //                    		'image', 
-						 //                    		'') 
-						 //                    	}
-						 //                    );
-						 //                }
-
-						 //                var exceptionRet = m_rebuildCarousel();
-						 //                if (exceptionRet) { throw exceptionRet; }
-
-							// 		} else {
-
-							// 			// !data.success -- error message in objectData.message
-							// 			m_wellMessage("An error has occurred: " + data.message);
-							// 		}
-							// 	},
-							// 	error: function (jqxhr, strTextStatus, strError) {
-
-							// 		// Non-computational error in strError
-							// 		m_wellMessage("An error has occurred: " + strError);
-							// 	}
-							// });
 					    } catch(e) {
 
 					        m_wellMessage("An error has occurred: " + e.message, null);

@@ -108,22 +108,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 							var strType = m_strObjectType.charAt(0).toUpperCase() + m_strObjectType.substring(1);
 
-							// if (m_strObjectType === 'type') {
-
-							// 	m_strOriginalName = types.getActiveClType().data.name;
-
-							// } else if (m_strObjectType === 'method') {
-
-							// 	m_strOriginalName = types.getActiveClType().data.methods[m_iIndex].name;
-
-							// } else if (m_strObjectType === 'event') {
-
-								m_strOriginalName = types.getActiveClType().data.events[m_iIndex].name;
-
-							// } else {
-
-							// 	throw new Error('Invalid objectType passed to Rename Dialog.');
-							// }
+							m_strOriginalName = types.getActiveClType().data.events[m_iIndex].name;
 
 							$("#RenameLabel").text("Enter a new name for the " + strType + ":");
 							$("#RenameInput").val(m_strOriginalName);
