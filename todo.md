@@ -7,8 +7,8 @@
 
 ## Jerry
 
+- In some dialogs (password reset, etc.) disable the main button once it's been clicked.
 - Should I expire JWTs in, say, 15 minutes, but issue a new one with every request?
-- Implement forgot password feature.
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types. 
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.

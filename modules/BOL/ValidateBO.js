@@ -333,7 +333,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                      
                                 from: "TechGroms <techgroms@gmail.com>", // sender address
                                 to: profile.userName, // list of receivers
-                                subject: "TechGroms User Name Reset", // Subject line
+                                subject: "TechGroms Password Reset", // Subject line
                                 text: "Hi. Per your request we have generated a password reset link for " + profile.userName + "." + 
                                 "\r\n\r\nPlease click the link below or paste it into a browser address line. Then enter your new password." +
                                 "\r\nFor your account's security the link expires in 60 minutes." +
