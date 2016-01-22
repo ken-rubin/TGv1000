@@ -97,22 +97,28 @@ define(["Core/errorHelper"],
 								client.unloadProject(function(){ self.enableDisableProjectsMenuItems(); }, true);
 							});
 
-							// Wire Adminzone button click.
-							$("#AdminzoneButton").click(function () {
+							if (g_profile.can_visit_adminzone) {
 
-								try {
+								// Show Adminzone button.
+								$("#AdminzoneLI").css("display", "block");
 
-									// Switch to Adminzone.
-									var exceptionRet = client.navToAdminzone();
-									if (exceptionRet) {
+								// Wire Adminzone button click.
+								$("#AdminzoneButton").click(function () {
 
-										throw exceptionRet;
+									try {
+
+										// Switch to Adminzone.
+										var exceptionRet = client.navToAdminzone();
+										if (exceptionRet) {
+
+											throw exceptionRet;
+										}
+									} catch (e) {
+
+										errorHelper.show(e);
 									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-							});
+								});
+							}
 
 							// Wire Play button click.
 							$("#PlayBtn").click(function () {

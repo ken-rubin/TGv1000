@@ -138,6 +138,9 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         // Generate and encrypt a password.
                         var password = (Math.random() * 10000).toFixed(0);
+                        if (profile.userName === 'a@a.com') {
+                            console.log('Generated password: ' + password.toString());
+                        }
                         var usergroupId = 3;
 
                         // Change john, ken and jerry password to 'a' and assign to "developer" usergroup.
@@ -188,51 +191,59 @@ module.exports = function ValidateBO(app, sql, logger) {
                     // (3) Send email informing user of password.
                     try {
 
-                        var smtpTransport = nodemailer.createTransport("SMTP", {
-                        
-                            service: "Gmail",
-                            auth: {
+                        // A special bypass.
+                        if (profile.userName !== 'a@a.com') {
+
+                            var smtpTransport = nodemailer.createTransport("SMTP", {
                             
-                                user: "techgroms@gmail.com",
-                                pass: "Albatross!1"
-                            }
-                        });
+                                service: "Gmail",
+                                auth: {
+                                
+                                    user: "techgroms@gmail.com",
+                                    pass: "Albatross!1"
+                                }
+                            });
 
-                        // setup email data with unicode symbols
-                        var mailOptions = null;
+                            // setup email data with unicode symbols
+                            var mailOptions = null;
 
-                        var fullUrl = req.protocol + '://' + req.get('host'); // + req.originalUrl;
+                            var fullUrl = req.protocol + '://' + req.get('host'); // + req.originalUrl;
 
-                        mailOptions = {
-                 
-                            from: "TechGroms <techgroms@gmail.com>", // sender address
-                            to: profile.userName, // list of receivers
-                            subject: "TechGroms Registration ✔", // Subject line
-                            text: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
-                            "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +
-                            " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
-                            "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
-                            html: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
-                            "<br><br>We have created a login user for you. You will use the email address you entered along with" +
-                            " this password: " + profile.password + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
-                            "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
-                        };
+                            mailOptions = {
+                     
+                                from: "TechGroms <techgroms@gmail.com>", // sender address
+                                to: profile.userName, // list of receivers
+                                subject: "TechGroms Registration ✔", // Subject line
+                                text: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                                "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +
+                                " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
+                                "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
+                                html: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                                "<br><br>We have created a login user for you. You will use the email address you entered along with" +
+                                " this password: " + profile.password + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
+                                "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
+                            };
 
-                        // send mail with defined transport object
-                        smtpTransport.sendMail(mailOptions, function(error, response){
-                        
-                            if (error) {
+                            // send mail with defined transport object
+                            smtpTransport.sendMail(mailOptions, function(error, response){
                             
-                                return cb(new Error("Error sending enrollment email: " + error.toString()), null);
-                            }
+                                if (error) {
+                                
+                                    return cb(new Error("Error sending enrollment email: " + error.toString()), null);
+                                }
 
-                            // If you don't want to use this transport object anymore, uncomment following line
-                            //smtpTransport.close(); // shut down the connection pool, no more messages
+                                // If you don't want to use this transport object anymore, uncomment following line
+                                //smtpTransport.close(); // shut down the connection pool, no more messages
+
+                                delete profile.password;
+                                return cb(null, profile);
+
+                            });
+                        } else {
 
                             delete profile.password;
                             return cb(null, profile);
-
-                        });
+                        }
                     } catch (e) {
 
                         return cb(new Error("Error sending enrollment email: " + e.message), null);
