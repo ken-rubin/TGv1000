@@ -6,8 +6,13 @@
 
 ## Jerry
 
-- When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript. **Discuss with Ken & John.**
-- Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
+- The comics:
+    + Will actually be run by (interpreted by) Ken and drawn over the same canvas as his code.
+    + We will use an Albert Inestine ("AI") icon to "speak" and do things.
+    + A comic will be a series of steps for AI to follow.
+    + Ken will put meta-information ("m-i") into his code and AI will be able to refer to that m-i to move and interact with the code pane.
+    + AI will speak with the user via a text bubblenear his icon or in, say, a rectangle in the top right corner of the pane.
+    + AI will have several modes, depending on the amount of help the user needs.
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types.
 - Test image stuff now that I've put JWT in the middle.
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
@@ -51,15 +56,17 @@
         - PropertyGrid
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
-- A New SystemType should probably require an image. **Discuss with Ken.**
 - If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything in TypeWell.
 
 
 
 ## To discuss
 
+- When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript. **Discuss with Ken & John.**
+- Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - Do we want to (or can we) round X,Y to 0, 1 or 2 decimals?
 - All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
+- A New SystemType should probably require an image. **Discuss with Ken.**
 - **Ken:** If I open a new project, the App Type is the Current Type and initialize is the Current Method, but, since we don't display app_initialize or the getter and setters for X, Y, Width and Height, the App category doesn't even appear in the schema category list.
     - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
     - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
