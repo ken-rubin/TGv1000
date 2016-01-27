@@ -6,13 +6,6 @@
 
 ## Jerry
 
-- The comics:
-    + Will actually be run by (interpreted by) Ken and drawn over the same canvas as his code.
-    + We will use an Albert Inestine ("AI") icon to "speak" and do things.
-    + A comic will be a series of steps for AI to follow.
-    + Ken will put meta-information ("m-i") into his code and AI will be able to refer to that m-i to move and interact with the code pane.
-    + AI will speak with the user via a text bubblenear his icon or in, say, a rectangle in the top right corner of the pane.
-    + AI will have several modes, depending on the amount of help the user needs.
 - Test ProjectBO.js#routeSaveProject some more. Just a bit, maybe concentrating on System Types.
 - Test image stuff now that I've put JWT in the middle.
 - Also in ProjectBO: should I put async anyplace in the project fetching code?
@@ -58,6 +51,33 @@
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
 - If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything in TypeWell.
 
+## Comics / Help
+
+- The comics:
+    + Will actually be run by (interpreted by) Ken and drawn over the same canvas as his code.
+    + We will use an Albert Inestine ("AI") icon to "speak" and do things.
+    + A comic will be a series of steps for AI to follow.
+    + Ken will put meta-information ("m-i") into his code and AI will be able to refer to that m-i to move and interact with the code pane.
+    + AI will speak with the user via a text bubblenear his icon or in, say, a rectangle in the top right corner of the pane.
+    + AI will have several modes, depending on the amount of help the user needs.
+- AI commands
+    + Appear
+    + Disappear
+    + Move []
+    + Point []
+    + Say "..."
+        + AI speaks in a bubble; the bubble is either a cartoon bubble or a rectangle in the corner; it has a way for the user to close it; perhaps it will have a way for the user to read the content out loud
+    + Quiet [n]
+        + Close the bubble after n ms; 0 means stay open until user closes bubble
+    + Click []
+    + ClickDrag [] to []
+    + Home
+    + End
+    + DClk
+    + Bksp
+    + Bksp*
+        + Erases everything to the left
+    + Type "..."
 
 
 ## To discuss
