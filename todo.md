@@ -78,6 +78,13 @@
     + Bksp*
         + Erases everything to the left
     + Type "..."
+    + Start comic n
+    + Test code state
+    + Ctrl-Z
+    + Show me slowly
+    + Do it for me
+    + Teach me
+    + Why?
 
 
 ## To discuss
