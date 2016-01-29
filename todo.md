@@ -85,6 +85,15 @@
     + Do it for me
     + Teach me
     + Why?
+- Users with can_edit_comics permission can work on comics.
+    + The user opens a project.
+    + The project contains 1+ comics. The comics still show up in the vertical strip on the right. A comic (in the DB) has an image and an id. There is another table, comiccode, that has these fields:
+        + id
+        + description
+        + comicId
+        + ordinal
+        + JSONsteps
+    + 
 
 
 ## To discuss

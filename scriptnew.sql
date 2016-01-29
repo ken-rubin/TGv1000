@@ -1,25 +1,31 @@
-
-DROP SCHEMA IF EXISTS `TGv1000`;
-CREATE SCHEMA `TGv1000`;
-SELECT database();
-USE TGv1000;
-DROP PROCEDURE IF EXISTS doTags;
-
 delimiter //
+
+-- If necessary to start TGv1000 from scratch, uncomment the following:
+-- /*
+	DROP SCHEMA IF EXISTS `TGv1000`//
+	CREATE DATABASE IF NOT EXISTS `TGv1000`//
+-- */
+
+USE TGv1000//
+SELECT database()//
+
+-- If necessary to change doTags, uncomment the following:
+-- /*
+DROP PROCEDURE IF EXISTS doTags//
 
 create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
 begin
 
 	set @delim = '~';
-    set @inipos = 1;
-    set @fullstr = tagsconcat;
-    set @maxlen = LENGTH(@fullstr);
-    
-    REPEAT
+	set @inipos = 1;
+	set @fullstr = tagsconcat;
+	set @maxlen = LENGTH(@fullstr);
+	
+	REPEAT
 		set @endpos = LOCATE(@delim, @fullstr, @inipos);
-        set @tag = SUBSTR(@fullstr, @inipos, @endpos - @inipos);
-        
-        if @tag <> '' AND @tag IS NOT NULL THEN
+		set @tag = SUBSTR(@fullstr, @inipos, @endpos - @inipos);
+		
+		if @tag <> '' AND @tag IS NOT NULL THEN
 			set @id := (select id from tags where description=@tag);
 			if @id IS NULL THEN
 				insert tags (description) values (@tag);
@@ -33,18 +39,18 @@ begin
 			else
 				insert method_tags values (itemIdVarName, @id);
 			end if;
-        END IF;
-        SET @inipos = @endpos + 1;
+		END IF;
+		SET @inipos = @endpos + 1;
 	UNTIL @inipos >= @maxlen END REPEAT;
-end;
+end //
 
-//
+-- */
 
 create procedure maintainDB()
 begin
 
-	set @cnt := (select count(*) from information_schema.tables where table_schema = 'TGv1000' and table_name = 'control');
-
+	select @cnt := count(*) from information_schema.tables where table_schema = 'TGv1000' and table_name = 'control';
+    
 	if @cnt = 0 THEN
 
 		CREATE TABLE `TGv1000`.`control` (
@@ -54,11 +60,11 @@ begin
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 		insert `TGv1000`.`control` (id, dbstate) values (1, 0);
+
+		set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
         
 	end if;
-
-    set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
-
+    
     if @dbstate = 0 THEN
     
 		CREATE TABLE `TGv1000`.`tags` (
@@ -507,14 +513,31 @@ begin
 		set @dbstate := 1;
     end if;
 
-end;
+    if @dbstate = 1 THEN
 
-//
+    	ALTER TABLE `tgv1000`.`comics` 
+			DROP COLUMN `url`;
 
-delimiter ;
+		CREATE TABLE TGv1000.comiccode (
+		  `id` int(11) NOT NULL,
+		  `comicId` int(11) NOT NULL,
+		  `ordinal` int(11) NOT NULL,
+		  `description` text NOT NULL,
+		  `JSONsteps` mediumtext NOT NULL,
+		  PRIMARY KEY (`id`, `comicId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        UPDATE `TGv1000`.`control` set dbstate=2 where id=1;
+		set @dbstate := 2;
+    end if;
+
+end//
+
 
 -- Execute the procedure
-call maintainDB();
+call maintainDB()//
 
 -- Drop the procedure.
-drop procedure maintainDB;
+drop procedure maintainDB;//
+
+delimiter ;
