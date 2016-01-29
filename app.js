@@ -177,42 +177,6 @@ app.get('/index',
 );
 
 /////////////////////////////////////
-console.log("Map main route adminzone.jade.");
-app.get("/adminzone", 
-        expressJwt({ secret: SECRET,
-                getToken: function fromHeaderOrQuerystring (req) {
-                    
-                    if (req.cookies && req.cookies.token) {
-                      return req.cookies.token;
-                    }
-                    return null;
-                }
-            }),
-        function (err, req, res, next) {
-
-            try {
-
-                if (err) {
-
-                    console.log('express-jwt error: ' + JSON.stringify(err) + ". Redirecting to '/index'");
-                    return res.redirect('/index?error=' + encodeURI(err.message).replace(/%5B/g, '[').replace(/%5D/g, ']'));
-                }
-                next();
-            } catch (e) { res.send(e.message); }
-        },
-        function (req, res) {
-
-            try {
-
-                // Render the jade file to the client.
-                res.render("Adminzone/adminzone", { 
-                    title : "TGv1000" 
-                });
-            } catch (e) { res.send(e.message); }
-        }
-);
-
-/////////////////////////////////////
 console.log("Set up SQL module.");
 var SQL = require("./modules/SQL");
 var sql = new SQL(app);

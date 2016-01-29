@@ -1,16 +1,16 @@
 delimiter //
 
 -- If necessary to start TGv1000 from scratch, uncomment the following:
--- /*
+ /*
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
--- */
+ */
 
 USE TGv1000//
 SELECT database()//
 
 -- If necessary to change doTags, uncomment the following:
--- /*
+ /*
 DROP PROCEDURE IF EXISTS doTags//
 
 create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
@@ -44,7 +44,7 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
--- */
+ */
 
 create procedure maintainDB()
 begin
@@ -106,12 +106,9 @@ begin
 		CREATE TABLE `TGv1000`.`comics` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` VARCHAR(255) NOT NULL,
-		  `projectId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
-          `thumbnail` VARCHAR(255) NOT NULL,
-          `url` VARCHAR(255) NOT NULL,
+          `thumbnail` VARCHAR(255) NOT NULL
 		  PRIMARY KEY (`id`),
-          INDEX idx_projectId (projectId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
         ALTER TABLE `TGv1000`.`comics`
@@ -515,6 +512,9 @@ begin
 
     if @dbstate = 1 THEN
 
+    	-- In which we prepare for the new form of comics that are actual an array of steps to be carried 
+    	-- out by our AI.
+
     	ALTER TABLE `tgv1000`.`comics` 
 			DROP COLUMN `url`;
 
@@ -529,6 +529,19 @@ begin
 
         UPDATE `TGv1000`.`control` set dbstate=2 where id=1;
 		set @dbstate := 2;
+    end if;
+
+    if @dbstate = 2 THEN
+
+    	-- In which we switch to the state where comics are not saved with each project.
+    	-- There is only one set of comics for all projects derived from a single project type.
+    	-- Types will now point to project.
+    	-- We will have a junction table to link projects with comics.
+
+
+
+        UPDATE `TGv1000`.`control` set dbstate=3 where id=1;
+		set @dbstate := 3;
     end if;
 
 end//

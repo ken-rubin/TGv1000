@@ -25,16 +25,6 @@ define(["Core/errorHelper"],
 
 						try {
 
-							// Wire theme buttons:
-							$("#UnicornButton").click(function () {
-
-								$("body").css("background-image", "url('../media/images/ru.jpg')");
-							});
-							$("#TechButton").click(function () {
-
-								$("body").css("background-image", "url('../media/images/t.png')");
-							});
-
 							// Wire projects buttons.
 							$("#NewProjectButton").click(function () {
 
@@ -103,16 +93,13 @@ define(["Core/errorHelper"],
 								$("#AdminzoneLI").css("display", "block");
 
 								// Wire Adminzone button click.
-								$("#AdminzoneButton").click(function () {
+								$("#ComicsButton").click(function () {
 
 									try {
 
 										// Switch to Adminzone.
-										var exceptionRet = client.navToAdminzone();
-										if (exceptionRet) {
-
-											throw exceptionRet;
-										}
+										var exceptionRet = client.showComicsDialog();
+										if (exceptionRet) { throw exceptionRet; }
 									} catch (e) {
 
 										errorHelper.show(e);

@@ -230,6 +230,18 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Dialog creators/openers
+					self.showComicsDialog() = function() {
+
+						try {
+
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.showNewProjectDialog = function () {
 
 						try {
