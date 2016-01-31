@@ -22,6 +22,7 @@ define(["Core/errorHelper",
 		"Dialogs/NewMethodDialog/NewMethodDialog",
 		"Dialogs/NewPropertyDialog/NewPropertyDialog",
 		"Dialogs/PropertyGrid/PropertyGrid",
+		"Dialogs/ComicsDialog/ComicsDialog",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -41,6 +42,7 @@ define(["Core/errorHelper",
 				NewMethodDialog,
 				NewPropertyDialog,
 				PropertyGrid,
+				ComicsDialog,
 				Project,
 				Type) {
 
@@ -230,18 +232,6 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Dialog creators/openers
-					self.showComicsDialog() = function() {
-
-						try {
-
-							return null;
-
-						} catch (e) {
-
-							return e;
-						}
-					}
-
 					self.showNewProjectDialog = function () {
 
 						try {
@@ -295,6 +285,24 @@ define(["Core/errorHelper",
 							return null;
 
 						} catch (e) { return e; }
+					}
+
+					self.showComicsDialog = function() {
+
+						try {
+
+							m_openDialog = new ComicsDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+							return null;
+
+						} catch (e) {
+
+							return e;
+						}
 					}
 
 					self.showNewTypeDialog = function () {
@@ -1174,6 +1182,11 @@ define(["Core/errorHelper",
 
 						// Something happened so refresh the navbar.
 						navbar.enableDisableProjectsMenuItems();
+
+						if (g_profile.can_visit_adminzone) {
+
+							navbar.enableDIsableAdminZoneMenuItems();
+						}
 					}
 
 					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1-5 from the DB),

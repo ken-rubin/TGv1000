@@ -170,6 +170,11 @@ define(["Core/errorHelper"],
 						}
 					}
 
+					self.enableDIsableAdminZoneMenuItems = function () {
+
+						m_functionEnable("Comics");
+					}
+
 					// Private methods
 					var m_functionEnable = function (part) {
 

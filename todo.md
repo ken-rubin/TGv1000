@@ -56,7 +56,7 @@
     + We will use an Albert Inestine ("AI") icon to "speak" and do things.
     + A comic will be a series of steps for AI to follow.
     + Ken will put meta-information ("m-i") into his code and AI will be able to refer to that m-i to move and interact with the code pane.
-    + AI will speak with the user via a text bubblenear his icon or in, say, a rectangle in the top right corner of the pane.
+    + AI will speak with the user via a text bubblenear his icon or in, say, a rectangle in the top right corner of the pane. Or maybe we'll find a text-to-speech engine.
     + AI will have several modes, depending on the amount of help the user needs.
 - AI commands
     + Appear

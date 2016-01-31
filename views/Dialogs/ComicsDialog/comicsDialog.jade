@@ -1,0 +1,28 @@
+//- Jade DOM for the Comics dialog. 
+//-
+//-
+
+//- All in a well--should be panel?
+.well
+  .row
+    .col-xs-12
+      h4 
+        | To use TechGroms you need to register by providing your email address.
+        | You will be able to log in after you receive an enrollment email with your password.
+      h4
+        | If you are enrolling a child without an email address, please use yours. TechGroms will
+        | never abuse your privacy.
+      br
+
+  .row
+    .col-xs-12
+          br
+          .col-xs-2
+            label.control-label(for="email", style="margin-top:6px;") Email address:
+          .col-xs-4
+            input.form-control#email(type="text")
+          .col-xs-6
+  .row
+    .col-xs-12
+          br
+          .well#EnrollWell
