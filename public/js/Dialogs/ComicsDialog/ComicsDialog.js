@@ -62,16 +62,6 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		id: 'EnrollButton',
-					            		label: "Enroll",
-					            		cssClass: 'btn-primary',
-					            		hotkey: 13,
-					            		action: function () {
-
-					            			m_functionEnrollButtonClick();
-					            		}
-					            	},
-					            	{
 						                label: "Close",
 						                icon: "glyphicon glyphicon-remove-circle",
 						                cssClass: "btn-warning",
@@ -97,89 +87,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							// focus
-							$("#email").focus();
-							$("#email").keyup(m_setStatePrimaryBtn);
-							m_setStatePrimaryBtn();
 
 						} catch (e) {
 
 							errorHelper.show(e.message);
-						}
-					};
-
-					var m_setStatePrimaryBtn = function () {
-
-						var email = $("#email").val().trim();
-						var bValid = (email.length > 0);
-						if (!bValid) {
-							$("#EnrollButton").addClass("disabled");
-						} else {
-							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
-							bValid = email.match(eReg);
-							if (!bValid) {
-								$("#EnrollButton").addClass("disabled");
-							} else {
-								$("#EnrollButton").removeClass("disabled");
-							}
-						}
-					}
-
-					// Expose enroll event.
-					m_functionEnrollButtonClick = function () {
-
-						try {
-
-							$("#EnrollButton").addClass("disabled");
-							var posting = $.post("/BOL/ValidateBO/NewEnrollment", 
-												{
-													userName: $("#email").val().trim().toLowerCase()
-												}, 
-												'json');
-        					posting.done(function(data){
-
-            					if (data.success) {
-
-					            	// The following is included just to remind us in the future how to log from client into server console.
-									JL().info("<<< Successful enrollment occurred >>>");
-
-					            	// The JWT has been saved to a cookie ("token") so it will be sent with each subsequent request.
-					                // Save JWT profile info to localStorage for use on client side (user id and permissions).
-					                var ca = document.cookie.split(';');
-					                var getCookie = function(name) {
-					                	var nameEQ = name + "=";
-					                	for (var i = 0; i < ca.length; i++) {
-        									var cIth = ca[i];
-        									while (cIth.charAt(0) == ' ') {
-        										cIth = cIth.substring(1, cIth.length);
-        									}
-        									if (cIth.indexOf(nameEQ) === 0) {
-        										return cIth.substring(nameEQ.length, cIth.length);
-        									}
-        								}
-        								return null;
-					                };
-					                var token = getCookie("token");
-					                if (token) {
-
-					                	var profileJSON = window.atob(token.split('.')[1]);
-					                	localStorage.setItem("profile", profileJSON);
-					                	g_profile = JSON.parse(profileJSON);
-					                }
-
-                					m_wellMessage("You have been enrolled. Please check for the email with log-in instructions we just sent to you.", 
-                									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
-            					} else {
-
-                					// !data.success
-                					$("#EnrollButton").removeClass("disabled");
-                					m_wellMessage(data.message, null);
-            					}
-        					});
-						} catch (e) {
-
-							$("#EnrollButton").removeClass("disabled");
-							m_wellMessage(e.message, null);
 						}
 					};
 
@@ -188,8 +99,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							$("#EnrollWell").empty();
-							$("#EnrollWell").append("<p class='text-danger'>" + msg + "</p>");
+							$("#ComicsWell").empty();
+							$("#ComicsWell").append("<p class='text-danger'>" + msg + "</p>");
 
 							if (timeoutAction !== null) {
 
