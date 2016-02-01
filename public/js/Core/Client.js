@@ -1185,7 +1185,7 @@ define(["Core/errorHelper",
 
 						if (g_profile.can_visit_adminzone) {
 
-							navbar.enableDIsableAdminZoneMenuItems();
+							navbar.enableDisableAdminZoneMenuItems();
 						}
 					}
 

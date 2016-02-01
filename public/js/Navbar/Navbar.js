@@ -84,7 +84,10 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
-								client.unloadProject(function(){ self.enableDisableProjectsMenuItems(); }, true);
+								client.unloadProject(function(){ 
+									self.enableDisableProjectsMenuItems(); 
+									self.enableDisableAdminZoneMenuItems(); 
+								}, true);
 							});
 
 							if (g_profile.can_visit_adminzone) {
@@ -103,6 +106,25 @@ define(["Core/errorHelper"],
 									} catch (e) {
 
 										errorHelper.show(e);
+									}
+								});
+
+								// Wire special tooltip functionality.
+								$("#ComicsButton").powerTip({ manual: true });
+								$("#ComicsButton").on({
+									mouseenter: function(event) {
+
+										if ($("#ComicsLI").hasClass("disabled")) {
+											$("#ComicsButton").data('powertip', 'You have to open a project before you can work on comics.');
+											$.powerTip.show(this, event);
+										} else {
+											$("#ComicsButton").data('powertip', '');
+											$.powerTip.hide(this);
+										}
+
+									},
+									mouseleave: function() {
+										$.powerTip.hide(this);
 									}
 								});
 							}
@@ -170,9 +192,15 @@ define(["Core/errorHelper"],
 						}
 					}
 
-					self.enableDIsableAdminZoneMenuItems = function () {
+					self.enableDisableAdminZoneMenuItems = function () {
 
-						m_functionEnable("Comics");
+						var project = client.getProject();
+						if (project !== null) {
+							m_functionEnable("Comics");
+						}
+						else {
+							m_functionDisable("Comics");
+						}
 					}
 
 					// Private methods
