@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"], 
-	function (snippetHelper, errorHelper, resourceHelper, ScrollRegion) {
+define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"], 
+	function (errorHelper, resourceHelper, ScrollRegion) {
 
 		try {
 
@@ -173,10 +173,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 					                }
 
 					                var exceptionRet = m_rebuildCarousel();
-					                if (exceptionRet) {
-
-					                	throw exceptionRet;
-					                }
+					                if (exceptionRet) { throw exceptionRet; }
 					            } else {
 
 					                // !data.success

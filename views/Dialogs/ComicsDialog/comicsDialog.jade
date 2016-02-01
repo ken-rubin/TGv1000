@@ -6,14 +6,22 @@
 .well
   .row
     .col-xs-12
-      h4 1. The project whose comic(s) you want to create or edit is already open. (If not, close this dialog and open it.)
-      h4 2. 
-      br
+      h4 1. You will be working on comics for the project that is currently open in the background (and, subsequently, all projects derived from it).
+      h4 2. Adding comics directly to a project is what designates the project as <i>core</i>--to be bought (as a product or class) or used for free (as the basis of a free-form project).
+      #NoComics(style="display:none;")
+        h4 3. Your project currently has no comics. You will have to begin by adding one.
+      #YesComics(style="display:none;")
+        h4 3. Your project current has&nbsp;
+          span#NumComicsMsg
+          br
+          .row
+            .well#ISWellMsg
+            .col-xs-12#IStoolstriprow
+              #IStoolstrip.ScrollRegionRow
 
+      br
+  br
   .row
-    .col-xs-12
-          br
-  .row
-    .col-xs-12
-          br
-          .well#ComicsWell
+    .well#ISWellMsg(style="display:none;")
+    .col-xs-12#IStoolstriprow
+      #IStoolstrip.ScrollRegionRow
