@@ -63,9 +63,22 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.projectId
             // req.user.userId
-            // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
 
-            var ex = sql.execute("select * from " + self.dbname + "projects where id = " + req.body.projectId + ";",
+            // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
+            // However, since they could have been edited (and will have a different id), it's necessary to use a query that matches
+            // req.body.projectId against projectTypeId and restricts matches to those where isCore = 1.
+
+            var sqlQuery;
+            if (['1','2','3','4','5'].indexOf(req.body.projectId) === -1 ) {    // non-core project
+
+                sqlQuery = "select * from " + self.dbname + "projects where id = " + req.body.projectId + " and isCoreProject=0;";
+
+            } else {    // core project
+
+                sqlQuery = "select * from " + self.dbname + "projects where projectTypeId = " + req.body.projectId + " and isCoreProject=1;";
+            }
+
+            var ex = sql.execute(,
                 function(rows) {
 
                     if (rows.length !== 1) {
@@ -86,13 +99,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                             description: row.description,
                             imageId: row.imageId,
                             altImagePath: row.altImagePath,
-                            isProduct: 0,
                             parentProjectId: row.parentProjectId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
                             canEditSystemTypes: row.canEditSystemTypes === 1 ? true : false,
+                            isProduct: row.isProduct === 1 ? true : false,
+                            isClass: row.isClass === 1 ? true : false,
+                            isCoreProject: row.isCoreProject === 1 ? true : false,
                             comics:
                             {
                                 items: []
@@ -1295,7 +1310,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                         var guts = " SET name='" + project.name + "'"
                             + ",ownedByUserId=" + req.user.userId
                             + ",public=" + project.public
-                            + ",isProduct=" + project.isProduct
                             + ",projectTypeId=" + project.projectTypeId
                             + ",quarantined=" + project.quarantined
                             + ",parentPrice=" + project.parentPrice
@@ -1304,7 +1318,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                             + ",imageId=" + project.imageId
                             + ",altImagePath='" + project.altImagePath + "'"
                             + ",description='" + project.description + "'"
-                            + ",canEditSystemTypes=" + (project.canEditSystemTypes ? 1 : 0);
+                            + ",canEditSystemTypes=" + (project.canEditSystemTypes ? 1 : 0)
+                            + ",isProduct=" + (project.isProduct ? 1 : 0)
+                            + ",isClass=" + (project.isClass ? 1 : 0)
+                            + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                            ;
 
                         var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
                         m_log('Inserting project record with ' + strQuery);

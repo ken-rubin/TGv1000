@@ -251,14 +251,14 @@ module.exports = function UtilityBO(app, sql, logger) {
                         
                             sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
                         
-                        } else if (req.body.onlyOthersProjects === "1") {
+                        } else /*if (req.body.onlyOthersProjects === "1")*/ {
                         
-                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isProduct=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
                         
-                        } else {    // onlyProducts
+                        } /*else {    // onlyProducts -- needa little more planning to determine what this means
                         
                             sqlString = "select distinct p.* from " + self.dbname + "projects p where p.isProduct=1 and p.id<>1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        }
+                        }*/
 
                         console.log(' ');
                         console.log('Query: ' + sqlString);

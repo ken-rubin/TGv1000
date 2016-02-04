@@ -79,17 +79,19 @@ begin
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `name` varchar(255) NOT NULL,
           `ownedByUserId` int(11) NOT NULL,
-		  `public` tinyint(1) NOT NULL DEFAULT '0',
-		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
+		  `public` tinyint(1) NOT NULL DEFAULT FALSE,
+		  `quarantined` tinyint(1) NOT NULL DEFAULT FALSE,
           `description` VARCHAR(255) NULL,
           `imageId` int(11) NOT NULL DEFAULT '0',
           `altImagePath` varchar(255) NOT NULL DEFAULT '',
-          `isProduct` TINYINT(1) NOT NULL,
           `parentProjectId` INT(11) NULL,
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `projectTypeId` int(11) NOT NULL,
-          `canEditSystemTypes` TINYINT(1) NOT NULL DEFAULT 0,
+          `canEditSystemTypes` TINYINT(1) NOT NULL DEFAULT FALSE,
+          `isProduct` TINYINT(1) NOT NULL DEFAULT FALSE,
+          `isClass` TINYINT(1) NOT NULL DEFAULT FALSE,
+          `isCoreProject` TINYINT(1) NOT NULL DEFAULT FALSE,
 		  PRIMARY KEY (`id`),
           INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -117,6 +119,19 @@ begin
 			ADD CONSTRAINT FK_comics
             FOREIGN KEY (projectId) REFERENCES projects(id)
             ON DELETE CASCADE;
+
+		CREATE TABLE TGv1000.comiccode (
+		  `id` int(11) NOT NULL,
+		  `comicId` int(11) NOT NULL,
+		  `ordinal` int(11) NOT NULL,
+		  `description` text NOT NULL,
+		  `JSONsteps` mediumtext NOT NULL,
+		  PRIMARY KEY (`id`, `comicId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		/* Most likely should add cascading delete parameters here so that when a base project--one with its own comics--is deleted,
+		   not only the comics will go, but also will the comiccode go. But what if there are derived projects that need those comics.
+		   I would think we have to be very careful there. */
 
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -341,13 +356,13 @@ begin
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0);        
 
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,isProduct,parentProjectId,parentPrice,priceBump,public,projectTypeId)
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,isCoreProject)
 			VALUES 
-				(1,'New Game Project',1,'','media/images/gameProject.png',1,0,0.00,0.00,1,1),
-				(2,'New Console Project',1,'','media/images/consoleProject.png',1,0,0.00,0.00,1,2),
-				(3,'New Website Project',1,'','media/images/websiteProject.png',1,0,0.00,0.00,1,3),
-				(4,'New Hololens Project',1,'','media/images/hololensProject.png',1,0,0.00,0.00,1,4),
-				(5,'New Map Project',1,'','media/images/mappingProject.png',1,0,0.00,0.00,1,5)
+				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,TRUE),
+				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,TRUE),
+				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,TRUE),
+				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,TRUE),
+				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,TRUE)
                 ;
             
 		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
@@ -516,18 +531,6 @@ begin
 
     	-- In which we prepare for the new form of comics that are actual an array of steps to be carried 
     	-- out by our AI.
-
-    	ALTER TABLE `tgv1000`.`comics` 
-			DROP COLUMN `url`;
-
-		CREATE TABLE TGv1000.comiccode (
-		  `id` int(11) NOT NULL,
-		  `comicId` int(11) NOT NULL,
-		  `ordinal` int(11) NOT NULL,
-		  `description` text NOT NULL,
-		  `JSONsteps` mediumtext NOT NULL,
-		  PRIMARY KEY (`id`, `comicId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
         UPDATE `TGv1000`.`control` set dbstate=2 where id=1;
 		set @dbstate := 2;
