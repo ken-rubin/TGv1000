@@ -136,6 +136,7 @@ begin
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` varchar(255) NOT NULL,
+          `projectId` int(11) NULL,
 		  `comicId` int(11) NULL,
           `ordinal` int(11) NULL,
           `ownedByUserId` int(11) NULL,
