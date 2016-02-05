@@ -80,7 +80,7 @@ begin
 		  `name` varchar(255) NOT NULL,
           `ownedByUserId` int(11) NOT NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT FALSE,
-		  `quarantined` tinyint(1) NOT NULL DEFAULT FALSE,
+		  `quarantined` tinyint(1) NOT NULL DEFAULT TRUE,
           `description` VARCHAR(255) NULL,
           `imageId` int(11) NOT NULL DEFAULT '0',
           `altImagePath` varchar(255) NOT NULL DEFAULT '',
@@ -88,6 +88,7 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `projectTypeId` int(11) NOT NULL,
+          `origProjectId` int(11) NOT NULL DEFAULT 0,
           `canEditSystemTypes` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isProduct` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isClass` TINYINT(1) NOT NULL DEFAULT FALSE,
@@ -102,6 +103,39 @@ begin
 		  PRIMARY KEY (`projectId`,`tagId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
+		CREATE TABLE `TGv1000`.`classes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `name` varchar(255) NOT NULL,
+          `baseProjectId` int(11) NOT NULL DEFAULT '0',
+          `instructorUserId` int(11) NOT NULL,
+          `instructorFirstName` VARCHAR(255) NOT NULL,
+          `instructorLastName` VARCHAR(255) NOT NULL,
+          `instructorEmail` VARCHAR(255) NOT NULL,
+          `instructorPhone` VARCHAR(255) NOT NULL,
+          `classDescription` TEXT NOT NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `price` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `meetingPlace` JSON NOT NULL,
+          `schedule` JSON NOT NULL,
+		  `active` tinyint(1) NOT NULL DEFAULT FALSE,
+		  PRIMARY KEY (`id`),
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`products` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `name` varchar(255) NOT NULL,
+          `baseProjectId` int(11) NOT NULL DEFAULT '0',
+          `designerUserId` int(11) NOT NULL,
+          `designerFirstName` VARCHAR(255) NOT NULL,
+          `designerLastName` VARCHAR(255) NOT NULL,
+          `designerEmail` VARCHAR(255) NOT NULL,
+          `description` TEXT NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `price` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+          `active` TINYINT(1) NOT NULL DEFAULT FALSE,
+		  PRIMARY KEY (`id`),
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
         ALTER TABLE `TGv1000`.`project_tags`
 			ADD CONSTRAINT FK_project_tags
             FOREIGN KEY (projectId) REFERENCES projects(id)
@@ -110,6 +144,7 @@ begin
 		CREATE TABLE `TGv1000`.`comics` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` VARCHAR(255) NOT NULL,
+          `projectId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
           `thumbnail` VARCHAR(255) NOT NULL
 		  PRIMARY KEY (`id`),
@@ -128,10 +163,6 @@ begin
 		  `JSONsteps` mediumtext NOT NULL,
 		  PRIMARY KEY (`id`, `comicId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-		/* Most likely should add cascading delete parameters here so that when a base project--one with its own comics--is deleted,
-		   not only the comics will go, but also will the comiccode go. But what if there are derived projects that need those comics.
-		   I would think we have to be very careful there. */
 
 		CREATE TABLE `TGv1000`.`types` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -293,10 +324,10 @@ begin
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
 		CREATE TABLE `TGv1000`.`resourceTypes` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` int(11) NOT NULL,
 		  `description` varchar(255) NOT NULL,
 		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
 		CREATE TABLE `TGv1000`.`routes` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
