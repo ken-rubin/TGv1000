@@ -416,13 +416,13 @@ begin
 				(5,'Map Base Type','media/images/mappingProject.png',10000)
                 ;
             
-		insert into TGv1000.`types` (id,`name`,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
+		insert into TGv1000.`types` (id,`name`,projectId,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
 			VALUES 
-				(6,'App',1,1,0,0,1,'',0,0.00,0.00,1,1,1),
-				(7,'App',1,1,0,0,2,'',0,0.00,0.00,1,2,1),
-				(8,'App',1,1,0,0,3,'',0,0.00,0.00,1,3,1),
-				(9,'App',1,1,0,0,4,'',0,0.00,0.00,1,4,1),
-				(10,'App',1,1,0,0,5,'',0,0.00,0.00,1,5,1)
+				(6,'App',1,1,1,0,0,1,'',0,0.00,0.00,1,1,1),
+				(7,'App',2,1,1,0,0,2,'',0,0.00,0.00,1,2,1),
+				(8,'App',3,1,1,0,0,3,'',0,0.00,0.00,1,3,1),
+				(9,'App',4,1,1,0,0,4,'',0,0.00,0.00,1,4,1),
+				(10,'App',5,1,1,0,0,5,'',0,0.00,0.00,1,5,1)
                 ;
                 
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)

@@ -636,3 +636,6 @@ LIMIT 10 OFFSET 990)
 AS my_results USING(id);
 ```
 
+## How to configure MySQL Workbench access to www.techgroms.com after re-installing locally
+
+### Wasn't necessary after I uninstalled 5.7 and installed 5.7.11. Luckily. But if it's ever necessary, I'll put everything here.
