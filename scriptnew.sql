@@ -118,7 +118,7 @@ begin
           `meetingPlace` JSON NOT NULL,
           `schedule` JSON NOT NULL,
 		  `active` tinyint(1) NOT NULL DEFAULT FALSE,
-		  PRIMARY KEY (`id`),
+		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
 		CREATE TABLE `TGv1000`.`products` (
@@ -133,7 +133,7 @@ begin
           `imageId` int(11) NOT NULL DEFAULT '0',
           `price` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `active` TINYINT(1) NOT NULL DEFAULT FALSE,
-		  PRIMARY KEY (`id`),
+		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
         ALTER TABLE `TGv1000`.`project_tags`
@@ -146,8 +146,8 @@ begin
           `name` VARCHAR(255) NOT NULL,
           `projectId` int(11) NOT NULL,
           `ordinal` int(11) NOT NULL,
-          `thumbnail` VARCHAR(255) NOT NULL
-		  PRIMARY KEY (`id`),
+          `thumbnail` VARCHAR(255) NOT NULL,
+		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
         ALTER TABLE `TGv1000`.`comics`
@@ -397,13 +397,13 @@ begin
 				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,TRUE)
                 ;
             
-		INSERT INTO TGv1000.comics (id, projectId, ordinal, thumbnail, `name`, url)
+		INSERT INTO TGv1000.comics (id, `name`,  projectId, ordinal, thumbnail)
 			VALUES 
-				(1,1,0,'tn3.png','TechGroms Game Project Help','http://www.techgroms.com'),
-				(2,2,0,'tn3.png','TechGroms Console Project Help','http://www.techgroms.com'),
-				(3,3,0,'tn3.png','TechGroms Website Project Help','http://www.techgroms.com'),
-				(4,4,0,'tn3.png','TechGroms Hololens Project Help','http://www.techgroms.com'),
-				(5,5,0,'tn3.png','TechGroms Map Project Help','http://www.techgroms.com')
+				(1,'TechGroms Game Project Help',1,0,'tn3.png'),
+				(2,'TechGroms Console Project Help',2,0,'tn3.png'),
+				(3,'TechGroms Website Project Help',3,0,'tn3.png'),
+				(4,'TechGroms Hololens Project Help',4,0,'tn3.png'),
+				(5,'TechGroms Map Project Help',5,0,'tn3.png')
 				;
             
 		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
