@@ -388,13 +388,13 @@ begin
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0);        
 
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,isCoreProject)
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,origProjectId,isCoreProject)
 			VALUES 
-				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,TRUE),
-				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,TRUE),
-				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,TRUE),
-				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,TRUE),
-				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,TRUE)
+				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,1,TRUE),
+				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,2,TRUE),
+				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,3,TRUE),
+				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,4,TRUE),
+				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,5,TRUE)
                 ;
             
 		INSERT INTO TGv1000.comics (id, `name`,  projectId, ordinal, thumbnail)

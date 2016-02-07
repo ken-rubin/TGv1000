@@ -64,19 +64,8 @@ module.exports = function ProjectBO(app, sql, logger) {
             // req.body.projectId
             // req.user.userId
 
-            // Note that projectIds 1-5 are used to open new projects, based on project type selected by the user.
-            // However, since they could have been edited (and will have a different id), it's necessary to use a query that matches
-            // req.body.projectId against projectTypeId and restricts matches to those where isCore = 1.
-
             var sqlQuery;
-            if (['1','2','3','4','5'].indexOf(req.body.projectId) === -1 ) {    // non-core project
-
-                sqlQuery = "select * from " + self.dbname + "projects where id = " + req.body.projectId + " and isCoreProject=0;";
-
-            } else {    // core project
-
-                sqlQuery = "select * from " + self.dbname + "projects where projectTypeId = " + req.body.projectId + " and isCoreProject=1;";
-            }
+            sqlQuery = "select * from " + self.dbname + "projects where id = " + req.body.projectId + ";";
 
             var ex = sql.execute(sqlQuery,
                 function(rows) {
@@ -104,6 +93,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
+                            origProjectId: row.origProjectId,
                             canEditSystemTypes: row.canEditSystemTypes === 1 ? true : false,
                             isProduct: row.isProduct === 1 ? true : false,
                             isClass: row.isClass === 1 ? true : false,
@@ -114,13 +104,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         };
 
+                        // THE FOLLOWING WILL BE MOVED TO THE CLIENT SIDE:
                         // If the user is not editing his own project, then we will set project.id = 0 and project.ownedByUserId to so indicate.
                         // We'll be able to check project.id for 0 during further processing for the same treatment.
-                        if (project.ownedByUserId != req.user.userId) {
+                        // if (project.ownedByUserId != req.user.userId) {
 
-                            project.id = 0;
-                            project.ownedByUserId = parseInt(req.user.userId, 10);
-                        }
+                        //     project.id = 0;
+                        //     project.ownedByUserId = parseInt(req.user.userId, 10);
+                        // }
+
+                        // Note that we haven't zeroed out isProduct, isClass or isCoreProject (or even checked if one of them === 1).
+                        // That will be done (or not) when we get back to the client side, since it affects the UI.
 
                         m_functionFetchTags(
                             project.originalProjectId, 
@@ -155,7 +149,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // m_log('In m_functionRetProjDoComics');
 
-            var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.originalProjectId + ";",
+            // Note that we're using project.origProjectId to fetch comics, since that's where they're attached and all derived projects
+            // retain their furthest ancestor.
+            var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.origProjectId + ";",
                 function(rows)
                 {
 
@@ -166,63 +162,95 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     } 
 
-                    var comicsCounter = rows.length;
-                    // m_log('Got ' + comicsCounter + ' comics.');
-                    var strComicIds = '';
+                    // var comicsCounter = rows.length;
+                    // var strComicIds = '';
 
-                    rows.forEach(
-                        function(row)
-                        {
+                    // Use async to process each comic in the project and fetch their internals.
+                    async.each(rows,
+                        function(comicIth, cb) {
 
-                            var comic = 
-                            {
-                                id: row.id,
-                                originalComicId: row.id,
-                                ordinal: row.ordinal,
-                                thumbnail: row.thumbnail,
-                                name: row.name,
-                                url: row.url,
-                                types: 
-                                {
-                                    items: []
+                            comicIth.originalComicId = comicIth.id;
+                            comicIth.comiccode = { items: [] };
+                            comicIth.types = { items: [] };
+
+                            // We would have done this here, but PUSH IT TO THE CLIENT SIDE:
+                            // if (project.id === 0) { comicIth.id = 0; }
+
+                            project.comics.items.push(comicIth);
+
+                            // Use async.parallel to fill comicIth's comiccode and types.
+                            async.parallel(
+                                [
+
+                                ],
+                                function(err, results) {
+
                                 }
-                            };
-
-                            if (strComicIds.length === 0)
-                                strComicIds = comic.id.toString();
-                            else
-                                strComicIds = strComicIds + ',' + comic.id;
-
-                            if (project.id === 0) {
-
-                                comic.id = 0;   // So SaveProject will insert it.
-                            }
-
-                            project.comics.items.push(comic);
-
-                            if (--comicsCounter === 0) {
-
-                                // m_log('strComicIds = "' + strComicIds + '"');
-                                var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where comicId in (" + strComicIds + ");",
-                                    function(rows){
-
-                                        if (rows.length !== 1) {
-
-                                            res.json({success:false, message: "Could not retrieve type count for project with id=" + req.body.id});
-                                            return;
-                                        }
-
-                                        m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
-                                    },
-                                    function(strError) {
-
-                                        res.json({success: false, message: strError});
-                                        return;
-                                    }
-                                );
-                            }
+                            );
                         }
                     );
+                    // rows.forEach(
+                    //     function(row)
+                    //     {
+
+                    //         var comic = 
+                    //         {
+                    //             id: row.id,
+                    //             originalComicId: row.id,
+                    //             name: row.name,
+                    //             ordinal: row.ordinal,
+                    //             thumbnail: row.thumbnail,
+                    //             comiccode:
+                    //             {
+                    //                 items: []
+                    //             },
+                    //             types: 
+                    //             {
+                    //                 items: []
+                    //             }
+                    //         };
+
+                    //         if (strComicIds.length === 0)
+                    //             strComicIds = comic.id.toString();
+                    //         else
+                    //             strComicIds = strComicIds + ',' + comic.id;
+
+                    //         // THE FOLLOWING WILL BE MOVED TO THE CLIENT SIDE:
+                    //         // if (project.id === 0) {
+
+                    //         //     comic.id = 0;   // So SaveProject will insert it.
+                    //         // }
+
+                    //         project.comics.items.push(comic);
+
+                    //         if (--comicsCounter === 0) {
+
+                    //             // m_log('strComicIds = "' + strComicIds + '"');
+
+                    //             // Use async.parallel to retrieve all of the comics' types and comiccodes.
+                    //             // They can be done in parallel (as if), since they have nothing to do with one another.
+                    //             async.parallel();
+
+                    //             var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where comicId in (" + strComicIds + ");",
+                    //                 function(rows){
+
+                    //                     if (rows.length !== 1) {
+
+                    //                         res.json({success:false, message: "Could not retrieve type count for project with id=" + req.body.id});
+                    //                         return;
+                    //                     }
+
+                    //                     m_functionRetProjDoTypes(req, res, project, rows[0].cnt);
+                    //                 },
+                    //                 function(strError) {
+
+                    //                     res.json({success: false, message: strError});
+                    //                     return;
+                    //                 }
+                    //             );
+                    //         }
+                    //     }
+                    // );
                 },
                 function(strError) {
 
@@ -256,6 +284,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId = " + comic.originalComicId + ";",
                         function(rows) {
 
+                            // I THINK THE FOLLOWING IS FALSE AND THE CODE SHOULD BE UNCOMMENTED:
                             // At least for now there can be comics with no types, so we disable the following test:
                             // if (rows.length === 0) {
 
@@ -312,9 +341,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             comic.types.items.push(type);
 
                                             if (--typesCount === 0) {
-
-                                                // The sort referred to above.
-                                                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
 
                                                 // m_log('typesCount has reached 0--fetching systemTypes.');
 
@@ -1018,7 +1044,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
             // Remember: always have a try/catch block inside an async callback, and it cannot throw further, because
-            // the external context may n0 longer exist.
+            // the external context may no longer exist.
             //
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
