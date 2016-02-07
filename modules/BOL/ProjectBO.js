@@ -78,7 +78,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 sqlQuery = "select * from " + self.dbname + "projects where projectTypeId = " + req.body.projectId + " and isCoreProject=1;";
             }
 
-            var ex = sql.execute(,
+            var ex = sql.execute(sqlQuery,
                 function(rows) {
 
                     if (rows.length !== 1) {
