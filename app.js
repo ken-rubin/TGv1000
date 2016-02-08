@@ -182,8 +182,13 @@ var SQL = require("./modules/SQL");
 var sql = new SQL(app);
 sql.setPool('root', '');
 
+/////////////////////////////////////
+console.log("Set up Logger.");
 var Logger = require("./modules/Logger");
 var logger = new Logger(app, sql);
+
+/////////////////////////////////////
+console.log("Set up multer.");
 var multer = require("multer");
 var done = false;
 app.use(multer(
