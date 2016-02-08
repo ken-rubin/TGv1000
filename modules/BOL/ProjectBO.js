@@ -119,10 +119,45 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_functionFetchTags(
                             project.originalProjectId, 
                             'project', 
-                            function(tags)  {
+                            function(err, tags)  {
+
+                                if (err) {
+                                    return res.json({ success: false, message: err.message});
+                                }
 
                                 project.tags = tags;
-                                m_functionRetProjDoComics(req, res, project);
+                                m_functionRetProjDoComics(req, 
+                                                            res, 
+                                                            project,
+                                                            function(err) {
+                                                                if (err) {
+                                                                    return res.json({success: false, message: err.message});
+                                                                }
+
+                                                                // Sort everything possible by ordinal.
+                                                                project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                project.comics.items.forEach(
+                                                                    function(comic) {
+
+                                                                        comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                        comic.types.items.forEach(
+                                                                            function(type) {
+                                                                                type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                                type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                                type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                            }
+                                                                        );
+                                                                        comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                    }
+                                                                );
+
+                                                                // Return successfully.
+                                                                return res.json({
+                                                                    success: true,
+                                                                    project: project
+                                                                });
+                                                            }
+                                );
                             }
                         );
                     }
@@ -143,7 +178,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
-    var m_functionRetProjDoComics = function(req, res, project) {
+    var m_functionRetProjDoComics = function(req, res, project, callback) {
 
         try {
 
@@ -152,21 +187,19 @@ module.exports = function ProjectBO(app, sql, logger) {
             // Note that we're using project.origProjectId to fetch comics, since that's where they're attached and all derived projects
             // retain their furthest ancestor.
             var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.origProjectId + ";",
-                function(rows)
-                {
+                function(rows) {
 
                     if (rows.length === 0) {
 
-                        res.json({success: false, message: "Could not retrieve comics for project with id=" + req.body.id});
-                        return;
-
+                        return callback(new Error("Could not retrieve comics for project with id=" + req.body.id));
                     } 
 
                     // var comicsCounter = rows.length;
                     // var strComicIds = '';
 
                     // Use async to process each comic in the project and fetch their internals.
-                    async.each(rows,
+                    // After review, could change each to eachSeries perhaps.
+                    async.eachSeries(rows,
                         function(comicIth, cb) {
 
                             comicIth.originalComicId = comicIth.id;
@@ -181,12 +214,22 @@ module.exports = function ProjectBO(app, sql, logger) {
                             // Use async.parallel to fill comicIth's comiccode and types.
                             async.parallel(
                                 [
-
+                                    function(cb) {
+                                        var exceptionRet = m_functionRetProjDoTypes(req, res, project, comicIth);
+                                        cb(exceptionRet);
+                                    },
+                                    function(cb) {
+                                        var exceptionRet = m_functionRetProjDoComiccode(req, res, project, comicIth);
+                                        cb(exceptionRet);
+                                    }
                                 ],
-                                function(err, results) {
-
+                                function(err) {
+                                    cb(err);
                                 }
                             );
+                        },
+                        function(err) {
+                            return callback(err);   // This will cause a res.json with success: true or false, depending on the null-ness of err.
                         }
                     );
                     // rows.forEach(
@@ -227,10 +270,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     //             // m_log('strComicIds = "' + strComicIds + '"');
 
-                    //             // Use async.parallel to retrieve all of the comics' types and comiccodes.
-                    //             // They can be done in parallel (as if), since they have nothing to do with one another.
-                    //             async.parallel();
-
                     //             var ex2 = sql.execute("select count(*) as cnt from " + self.dbname + "types where comicId in (" + strComicIds + ");",
                     //                 function(rows){
 
@@ -252,20 +291,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                     //     }
                     // );
                 },
-                function(strError) {
-
-                    res.json( {success:false, message: strError} );
-                }
+                function(strError) { return callback(new Error(strError)); }
             );
 
-            if (ex) {
-
-                res.json({success: false, message: e.message});
-            }
-        } catch(e) {
-
-            res.json({success: false, message: e.message});
-        }
+            if (ex) { return callback(e); }
+        
+        } catch(e) { return callback(e); }
     }
 
     var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
@@ -335,7 +366,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     m_functionFetchTags(
                                         type.originalTypeId,
                                         'type',
-                                        function(tags) {
+                                        function(err, tags) {
 
                                             type.tags = tags;
                                             comic.types.items.push(type);
@@ -385,15 +416,13 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                                             if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
 
-                                                                                res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-                                                                                return;
+                                                                                return res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
                                                                             }
 
                                                                             m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
                                                                         },
                                                                         function(strError){
-                                                                            res.json({success: false, message: strError});
-                                                                            return;
+                                                                            return res.json({success: false, message: strError});
                                                                         }
                                                                     );
                                                                 }
@@ -402,11 +431,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     },
                                                     function(strError) {
 
-                                                        res.json({
+                                                        return res.json({
                                                             success: false,
                                                             message: strError
                                                         });
-                                                        return;
                                                     }
                                                 );
 
@@ -418,25 +446,23 @@ module.exports = function ProjectBO(app, sql, logger) {
                         },
                         function(strError) {
 
-                            res.json({
+                            return res.json({
                                 success: false,
                                 message: strError
                             });
-                            return;
                         }
                     );
                     if (ex) {
-                        res.json({
+                        return res.json({
                             success: false,
                             message: ex.message
                         });
-                        return;
                     }
                 }
             );
         } catch(e) {
 
-            res.json({success: false, message: e.message});
+            return res.json({success: false, message: e.message});
         }
     }
 
@@ -503,7 +529,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             m_functionFetchTags(
                                                 method.originalMethodId,
                                                 'method',
-                                                function(tags) {
+                                                function(err, tags) {
 
                                                     method.tags = tags;
                                                     // // m_log('Method fetched: ' + JSON.stringify(method));
@@ -672,7 +698,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_functionFetchTags(
                             type.originalTypeId,
                             'type',
-                            function(tags) {
+                            function(err, tags) {
 
                                 type.tags = tags;
 
@@ -776,7 +802,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             m_functionFetchTags(
                                 method.originalMethodId,
                                 'method',
-                                function(tags) {
+                                function(err, tags) {
 
                                     method.tags = tags;
                                     type.methods.push(method);
@@ -920,7 +946,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         m_functionFetchTags(
                             method.originalMethodId,
                             'method',
-                            function(tags) {
+                            function(err, tags) {
 
                                 method.tags = tags;
 
@@ -995,21 +1021,20 @@ module.exports = function ProjectBO(app, sql, logger) {
                         });
                     }
 
-                    callback(tags);
-                    return;
+                    return callback(null, tags);
                 },
                 function(strError){
 
-                    throw new Error(strError);
+                    return callback(new Error(strError), null);
                 }
             );
             if (exceptionRet){
 
-                throw exceptionRet;
+                return callback(exceptionRet, null);
             }
         } catch(e) {
 
-            throw e;
+            return callback(e, null);
         }
     }
 
