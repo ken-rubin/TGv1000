@@ -65,9 +65,9 @@ module.exports = function ProjectBO(app, sql, logger) {
             // req.user.userId
 
             var sqlQuery;
-            sqlQuery = "select * from " + self.dbname + "projects where id = " + req.body.projectId + ";";
+            sqlQuery = "select * from " + self.dbname + "projects where id=" + req.body.projectId + ";";
 
-            var ex = sql.execute(sqlQuery,
+            var exceptionRet = sql.execute(sqlQuery,
                 function(rows) {
 
                     if (rows.length !== 1) {
@@ -104,7 +104,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         };
 
-                        // THE FOLLOWING WILL BE MOVED TO THE CLIENT SIDE:
+                        // THE FOLLOWING WILL BE MOVED TO THE CLIENT SIDE--AND PROBABLY RE-DESIGNED:
                         // If the user is not editing his own project, then we will set project.id = 0 and project.ownedByUserId to so indicate.
                         // We'll be able to check project.id for 0 during further processing for the same treatment.
                         // if (project.ownedByUserId != req.user.userId) {
@@ -113,7 +113,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         //     project.ownedByUserId = parseInt(req.user.userId, 10);
                         // }
 
-                        // Note that we haven't zeroed out isProduct, isClass or isCoreProject (or even checked if one of them === 1).
+                        // NOTE THAT we haven't zeroed out isProduct, isClass or isCoreProject (or even checked if one of them === 1).
                         // That will be done (or not) when we get back to the client side, since it affects the UI.
 
                         m_functionFetchTags(
@@ -126,37 +126,46 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
 
                                 project.tags = tags;
-                                m_functionRetProjDoComics(req, 
-                                                            res, 
-                                                            project,
-                                                            function(err) {
-                                                                if (err) {
-                                                                    return res.json({success: false, message: err.message});
-                                                                }
+                                m_functionRetProjDoComics(  
+                                    req, 
+                                    res, 
+                                    project,
+                                    function(err) {
+                                        if (err) {
+                                            return res.json({success: false, message: err.message});
+                                        }
 
-                                                                // Sort everything possible by ordinal.
-                                                                project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                project.comics.items.forEach(
-                                                                    function(comic) {
+                                        // Sucess. The project is filled.
 
-                                                                        comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                        comic.types.items.forEach(
-                                                                            function(type) {
-                                                                                type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                                type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                                type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                            }
-                                                                        );
-                                                                        comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                    }
-                                                                );
+                                        // Sort comics by ordinal.
+                                        project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                                // Return successfully.
-                                                                return res.json({
-                                                                    success: true,
-                                                                    project: project
-                                                                });
-                                                            }
+                                        // Sort lists inside comics by their own ordinals.
+                                        project.comics.items.forEach(
+                                            function(comic) {
+
+                                                // Types. 
+                                                // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort.
+                                                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                comic.types.items.forEach(
+                                                    function(type) {
+                                                        // Methods.
+                                                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                        // Properties.
+                                                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                        // Events.
+                                                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                    }
+                                                );
+                                                comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                            }
+                                        );
+
+                                        return res.json({
+                                            success: true,
+                                            project: project
+                                        });
+                                    }
                                 );
                             }
                         );
@@ -168,9 +177,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             );
 
-            if (ex) {
+            if (exceptionRet) {
 
-                res.json({success: false, message: e.message});
+                res.json({success: false, message: exceptionRet.message});
             }
         } catch(e) {
 
@@ -185,86 +194,149 @@ module.exports = function ProjectBO(app, sql, logger) {
             // m_log('In m_functionRetProjDoComics');
 
             // Note that we're using project.origProjectId to fetch comics, since that's where they're attached and all derived projects
-            // retain their furthest ancestor.
-            var ex = sql.execute("select * from " + self.dbname + "comics where projectId = " + project.origProjectId + ";",
+            // retain their furthest ancestor's comics.
+            var exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.origProjectId + ";",
                 function(rows) {
 
+                    // Every project has to have at least 1 comic.
                     if (rows.length === 0) {
 
                         return callback(new Error("Could not retrieve comics for project with id=" + req.body.id));
                     } 
 
                     // Use async to process each comic in the project and fetch their internals.
-                    // After review, could change each to eachSeries perhaps.
+                    // After review, could change eachSeries to each.
                     async.eachSeries(rows,
-                        function(comicIth, cb) {
+                        function(comicIth, cbe) {
 
                             comicIth.originalComicId = comicIth.id;
                             comicIth.comiccode = { items: [] };
                             comicIth.types = { items: [] };
 
-                            // We would have done this here, but PUSH IT TO THE CLIENT SIDE:
+                            // We would have done this here, but PUSH IT TO THE CLIENT SIDE if we're still going to use it:
                             // if (project.id === 0) { comicIth.id = 0; }
 
-                            project.comics.items.push(comicIth);
-
-                            // Use async.parallel to fill comicIth's comiccode and types.
-                            async.parallel(
-                                [
-                                    function(cb) {
-                                        m_functionRetProjDoTypes(req, 
+                            // Fill comicIth's comiccode and types (including System Types).
+                            m_functionRetProjDoComicInternals(  req, 
                                                                 res, 
                                                                 project, 
                                                                 comicIth,
-                                                                function(err) { return cb(err); }
-                                        );
-                                    },
-                                    function(cb) {
-                                        m_functionRetProjDoComiccode(req, 
-                                                                res, 
-                                                                project, 
-                                                                comicIth,
-                                                                function(err) { return cb(err); }
-                                        );
-                                    }
-                                ],
-                                function(err) {
-                                    cb(err);
-                                }
+                                                                function(err) { return cbe(err); }
                             );
+
+                            // Add the filled comic to the project.
+                            project.comics.items.push(comicIth);
                         },
-                        function(err) {
-                            return callback(err);   // This will cause a res.json with success: true or false, depending on the null-ness of err.
+                        function(err) { // Main callback for async.eachSeries.
+                            return callback(err);
                         }
                     );
                 },
                 function(strError) { return callback(new Error(strError)); }
             );
 
-            if (ex) { return callback(e); }
+            if (exceptionRet) { return callback(exceptionRet); }
         
         } catch(e) { return callback(e); }
     }
 
-    var m_functionRetProjDoTypes = function(req, 
-                                            res, 
-                                            project, 
-                                            comicIth,
-                                            callback
-                                        ) {
+    var m_functionRetProjDoComicInternals = function(   req, 
+                                                        res, 
+                                                        project, 
+                                                        comicIth,
+                                                        callback
+                                                    ) {
         try {
 
-        } catch(e) { return callback(e); }
-    }
+            // Using async.parallel, load comicIth's types, all System Types and comiccode.
+            // Non-System Types have both a projectId and a comicId.
 
-    var m_functionRetProjDoComiccode = function(req, 
-                                            res, 
-                                            project, 
-                                            comicIth,
-                                            callback
-                                        ) {
-        try {
+            async.parallel([
+                    function(cbp1) {    // comicIth's types
 
+                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + ";";
+                        var exceptionRet = sql.execute(sqlQuery,
+                            function(rows) {
+                                
+                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Failed because comic containing no types.")); }
+
+                                // Use async to process each type and fetch its internals.
+                                // After review, could change eachSeries to each perhaps.
+                                async.eachSeries(rows,
+                                    function(typeIth, cbe) {
+
+                                        // REPLACE WITH TYPE-SPECIFIC STUFF
+                                        // comicIth.originalComicId = comicIth.id;
+                                        // comicIth.comiccode = { items: [] };
+                                        // comicIth.types = { items: [] };
+
+                                    },
+                                    function(err) { // Main callback for outer async.eachSeries.
+                                        return cbp1(err);
+                                    }
+                                );
+
+                                // Add the filled type to the comicIth.
+                                comicIth.types.items.push(typeIth);
+                            },
+                            function(strError) { return cbp1(new Error(strError)); }
+                        );
+                    },
+                    function(cbp2) {    // System types.
+
+                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + ";";
+                        var exceptionRet = sql.execute(sqlQuery,
+                            function(rows) {
+                                
+                                if (rows.length === 0) { return cbp2(new Error("Unable to retrieve project. Failed to load any System Types types.")); }
+
+                                // Use async to process each type and fetch its internals.
+                                // After review, could change eachSeries to each perhaps.
+                                async.eachSeries(rows,
+                                    function(typeIth, cbe2) {
+
+                                        // REPLACE WITH TYPE-SPECIFIC STUFF
+                                        // comicIth.originalComicId = comicIth.id;
+                                        // comicIth.comiccode = { items: [] };
+                                        // comicIth.types = { items: [] };
+
+                                    },
+                                    function(err) { // Main callback for outer async.eachSeries.
+                                        return cbp2(err);
+                                    }
+                                );
+
+                                // Add the filled type to the comicIth.
+                                comicIth.types.items.push(typeIth);
+                            },
+                            function(strError) { return cbp1(new Error(strError)); }
+                        );
+                    },
+                    function(cbp3) {    // comiccode rows
+
+                        var exceptionRet = sql.query("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
+                            function(rows) {
+
+                                // 0 rows is fine during project/comic development.
+                                async.eachSeries(rows,
+                                    function(comiccodeIth, cbe3) {
+
+                                        comicIth.comiccode.items.push(comiccodeIth);
+                                        return cbe3(null);
+                                    },
+                                    function(err) {
+                                        return cbp3(err);
+                                    }
+                                );
+                            },
+                            function(strError) {}
+                        );
+                    }
+                ],
+                function(err) {
+                    return callback(err);
+                }
+            );
         } catch(e) { return callback(e); }
     }
 
@@ -280,8 +352,6 @@ module.exports = function ProjectBO(app, sql, logger) {
     //         project.comics.items.forEach(
     //             function(comic) {
 
-    //                 // We originally has order by ordinal asc, but, probably due to async or something, this didn't always work, so,
-    //                 // since we want them ordered that way, we'll sort them manually below when we have them all (before fetching system types).
     //                 var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId = " + comic.originalComicId + ";",
     //                     function(rows) {
 
