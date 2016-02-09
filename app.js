@@ -209,13 +209,12 @@ app.use(multer(
 ));
 
 /////////////////////////////////////
-console.log("Setting up routes from database.");
 var moduleInstances = {};
 sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
     function(rows){
 
         var moduleInstance = null;
-        console.log('Setting up ' + rows.length + ' routes.')
+        console.log('Setting up ' + rows.length + ' routes from database.')
 
         for (var i = 0; i < rows.length; i++) {
 
