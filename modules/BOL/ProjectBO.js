@@ -263,13 +263,29 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // Use async to process each type and fetch its internals.
                                 // After review, could change eachSeries to each perhaps.
                                 async.eachSeries(rows,
-                                    function(typeIth, cbe) {
+                                    function(typeIth, cbe1) {
 
-                                        // REPLACE WITH TYPE-SPECIFIC STUFF
-                                        // comicIth.originalComicId = comicIth.id;
-                                        // comicIth.comiccode = { items: [] };
-                                        // comicIth.types = { items: [] };
+                                        typeIth.originalTypeId = typeIth.id;
+                                        typeIth.isApp = typeIth.isApp === 1 ? true : false;
+                                        typeIth.methods = [];
+                                        typeIth.properties = [];
+                                        typeIth.events = [];
 
+                                        m_log('a1');
+                                        m_functionFetchTags(
+                                            typeIth.id,
+                                            'type',
+                                            function(err, tags) {
+                                                m_log('b1');
+                                                if (err) { return cbe1(err); }
+                                                typeIth.tags = tags;
+
+                                                m_functionRetProjDoMethodsPropertiesEvents(
+                                                    typeIth,
+                                                    function(err) { m_log('c1');return cbe1(err); }
+                                                );
+                                            }
+                                        );
                                     },
                                     function(err) { // Main callback for outer async.eachSeries.
                                         return cbp1(err);
@@ -277,6 +293,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 );
 
                                 // Add the filled type to the comicIth.
+                                m_log('d1');
                                 comicIth.types.items.push(typeIth);
                             },
                             function(strError) { return cbp1(new Error(strError)); }
@@ -284,7 +301,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     },
                     function(cbp2) {    // System types.
 
-                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + ";";
+                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId IS NULL;";
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
                                 
@@ -295,26 +312,43 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 async.eachSeries(rows,
                                     function(typeIth, cbe2) {
 
-                                        // REPLACE WITH TYPE-SPECIFIC STUFF
-                                        // comicIth.originalComicId = comicIth.id;
-                                        // comicIth.comiccode = { items: [] };
-                                        // comicIth.types = { items: [] };
+                                        typeIth.originalTypeId = typeIth.id;
+                                        typeIth.isApp = typeIth.isApp === 1 ? true : false;
+                                        typeIth.methods = [];
+                                        typeIth.properties = [];
+                                        typeIth.events = [];
 
+                                        m_log('a2');
+                                        m_functionFetchTags(
+                                            typeIth.id,
+                                            'type',
+                                            function(err, tags) {
+                                                m_log('b2');
+                                                if (err) { return cbe2(err); }
+                                                typeIth.tags = tags;
+
+                                                m_functionRetProjDoMethodsPropertiesEvents(
+                                                    typeIth,
+                                                    function(err) { m_log('c2');return cbe2(err); }
+                                                );
+                                            }
+                                        );
                                     },
                                     function(err) { // Main callback for outer async.eachSeries.
-                                        return cbp2(err);
+                                        return cbp1(err);
                                     }
                                 );
 
                                 // Add the filled type to the comicIth.
+                                m_log('d2');
                                 comicIth.types.items.push(typeIth);
                             },
-                            function(strError) { return cbp1(new Error(strError)); }
+                            function(strError) { return cbp2(new Error(strError)); }
                         );
                     },
                     function(cbp3) {    // comiccode rows
 
-                        var exceptionRet = sql.query("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
+                        var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
                             function(rows) {
 
                                 // 0 rows is fine during project/comic development.
@@ -340,6 +374,10 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch(e) { return callback(e); }
     }
 
+    var m_functionRetProjDoMethodsPropertiesEvents = function(typeIth, callback) {
+
+        callback(null);
+    }
 
     // var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
 
@@ -352,7 +390,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     //         project.comics.items.forEach(
     //             function(comic) {
 
-    //                 var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId = " + comic.originalComicId + ";",
+    //                 var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId IS NULL;",
     //                     function(rows) {
 
     //                         // I THINK THE FOLLOWING IS FALSE AND THE CODE SHOULD BE UNCOMMENTED:
