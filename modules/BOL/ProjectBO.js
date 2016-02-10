@@ -310,7 +310,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             function(strError) { return cbp1(new Error(strError)); }
                         );
-                        return cbp1(exceptionRet);
+                        if (exceptionRet) { return cbp1(exceptionRet); }
                     },
                     function(cbp2) {    // System types.
 
@@ -363,7 +363,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             function(strError) { return cbp2(new Error(strError)); }
                         );
-                        return cbp2(exceptionRet);
+                        if (exceptionRet) { return cbp2(exceptionRet); }
                     },
                     function(cbp3) {    // comiccode rows
 
@@ -384,7 +384,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             function(strError) { return cbp3(new Error(strError)); }
                         );
-                        return cbp3(exceptionRet);
+                        if (exceptionRet) { return cbp3(exceptionRet); }
                     }
                 ],
                 function(err) {
@@ -428,7 +428,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 return callbackMethods(new Error(strError));
                             }
                         );
-                        return callbackMethods(ex);
+                        if (ex) { return callbackMethods(ex); }
                     },
                     function(callbackProperties) {
 
@@ -455,7 +455,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 return callbackProperties(new Error(strError));
                             }
                         );
-                        return callbackProperties(ex);
+                        if (ex) { return callbackProperties(ex); }
                     },
                     function(callbackEvents) {
 
@@ -483,7 +483,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 return callbackEvents(new Error(strError));
                             }
                         );
-                        return callbackEvents(ex);
+                        if (ex) { return callbackEvents(ex); }
                     }
                 ],
                 function(err) { return callback(err); }
