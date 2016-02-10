@@ -226,6 +226,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                             // Add the filled comic to the project.
                             project.comics.items.push(comicIth);
+                            return cbe(null);
                         },
                         function(err) { // Main callback for async.eachSeries.
                             return callback(err);
@@ -295,6 +296,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // Add the filled type to the comicIth.
                                 m_log('d1');
                                 comicIth.types.items.push(typeIth);
+                                return cbp1(null);
                             },
                             function(strError) { return cbp1(new Error(strError)); }
                         );
@@ -342,6 +344,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // Add the filled type to the comicIth.
                                 m_log('d2');
                                 comicIth.types.items.push(typeIth);
+                                return cbp2(null);
                             },
                             function(strError) { return cbp2(new Error(strError)); }
                         );
@@ -363,8 +366,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     }
                                 );
                             },
-                            function(strError) {}
+                            function(strError) { return cbp3(new Error(strError)); }
                         );
+                        return cbp3(null);
                     }
                 ],
                 function(err) {
