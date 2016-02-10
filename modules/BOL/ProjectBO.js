@@ -281,7 +281,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             function(err, tags) {
 
                                                 if (err) { 
-                                                    m_log("Had error fetching tags for non-system type");
+
                                                     return cbe1(err); 
                                                 }
                                                 typeIth.tags = tags;
@@ -294,8 +294,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                             
                                                             // Add the filled type to the comicIth.
                                                             comicIth.types.items.push(typeIth);
-                                                        } else {
-                                                            m_log("had error fetching non-existent type arrays for non-system type");
                                                         }
                                                         return cbe1(err);
                                                     }
@@ -331,18 +329,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         typeIth.methods = [];
                                         typeIth.properties = [];
                                         typeIth.events = [];
-
+if (typeIth.id === 5){m_log('In system type id 5 going to fetch tags');}
                                         m_functionFetchTags(
                                             typeIth.id,
                                             'type',
                                             function(err, tags) {
 
                                                 if (err) { 
-                                                    m_log("Had error fetching tags for system type: " + err.message);
+
                                                     return cbe2(err); 
                                                 }
                                                 typeIth.tags = tags;
 
+if (typeIth.id === 5){m_log('In system type id 5 going to fetch arrays');}
                                                 m_functionRetProjDoMethodsPropertiesEvents(
                                                     typeIth,
                                                     function(err) { 
@@ -350,8 +349,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                         if (!err) {
                                                             // Add the filled type to the comicIth.
                                                             comicIth.types.items.push(typeIth);
-                                                        } else {
-                                                            m_log("had error fetching non-existent type arrays for system type");
                                                         }
                                                         return cbe2(err); 
                                                     }
@@ -397,7 +394,116 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     var m_functionRetProjDoMethodsPropertiesEvents = function(typeIth, callback) {
 
-        callback(null);
+        try {
+
+            var ex = sql.execute("select * from " + self.dbname + "methods where typeId=" + typeIth.id + "; select * from " + self.dbname + "propertys where typeId=" + typeIth.id + "; select * from " + self.dbname + "events where typeId=" + typeIth.id + ";",
+                function(rows){
+
+                    if (rows.length !== 3) {
+                        throw new Error('Unable to retrieve selected methods, properties and events for type in project.');
+                    }
+
+if (typeIth.id === 5){m_log('In system type id 5 in arrays--got counts ' + rows[0].length + ' ' + rows[1].length + ' ' + rows[2].length + ' ');}
+
+                    // methods
+                    rows[0].forEach(
+                        function(row) {
+
+                            var method = 
+                            { 
+                                id: row.id,
+                                originalMethodId: row.id,
+                                name: row.name,
+                                ownedByUserId: row.ownedByUserId,
+                                public: row.public,
+                                quarantined: row.quarantined,
+                                ordinal: row.ordinal,
+                                workspace: row.workspace, 
+                                imageId: row.imageId,
+                                description: row.description,
+                                parentMethodId: row.parentMethodId,
+                                parentPrice: row.parentPrice,
+                                priceBump: row.priceBump,
+                                tags: '',
+                                methodTypeId: row.methodTypeId,
+                                parameters: row.parameters
+                            };
+
+                            // NOT USED HERE ANY MORE:
+                            // if (project.id === 0) {
+
+                            //     method.id = 0;
+                            // }
+
+                            m_functionFetchTags(
+                                method.id,
+                                'method',
+                                function(err, tags) {
+if (typeIth.id === 5 && err !== null){m_log('back from getting tags with error: ' + err.message);}
+else {m_log('back from getting tags with tags = ' + tags);}
+                                    if (err) { throw err; }
+                                    method.tags = tags;
+                                    typeIth.methods.push(method);
+                                }
+                            );
+                        }
+                    );
+
+                    // properties
+                    rows[1].forEach(
+                        function(row) {
+
+                            var property = 
+                            {
+                                id: row.id,
+                                originalPropertyId: row.id,
+                                propertyTypeId: row.propertyTypeId,
+                                name: row.name,
+                                initialValue: row.initialValue,
+                                ordinal: row.ordinal,
+                                isHidden: row.isHidden
+                            };
+
+                            // NOT USED HERE ANY MORE:
+                            // if (project.id === 0) {
+
+                            //     property.id = 0;
+                            // }
+
+                            typeIth.properties.push(property);
+                        }
+                    );
+
+                    // events
+                    rows[2].forEach(
+                        function(row) {
+
+                            var event = 
+                            {
+                                id: row.id,
+                                originalEventId: row.id,
+                                name: row.name,
+                                ordinal: row.ordinal
+                            };
+
+                            // NOT USED HERE ANY MORE:
+                            // if (project.id === 0) {
+
+                            //     event.id = 0;
+                            // }
+
+                            typeIth.events.push(event);
+                        }
+                    );
+                    return callback(null);
+                },
+                function(strError){
+                    throw new error(strError);
+                }
+            );
+        } catch(e) {
+            return callback(e);
+        }
     }
 
     // var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
