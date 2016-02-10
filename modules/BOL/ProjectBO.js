@@ -117,7 +117,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         // That will be done (or not) when we get back to the client side, since it affects the UI.
 
                         m_functionFetchTags(
-                            project.originalProjectId, 
+                            project.id, 
                             'project', 
                             function(err, tags)  {
 
@@ -310,6 +310,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             function(strError) { return cbp1(new Error(strError)); }
                         );
+                        return cbp1(exceptionRet);
                     },
                     function(cbp2) {    // System types.
 
@@ -329,7 +330,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         typeIth.methods = [];
                                         typeIth.properties = [];
                                         typeIth.events = [];
-if (typeIth.id === 5){m_log('In system type id 5 going to fetch tags');}
+
                                         m_functionFetchTags(
                                             typeIth.id,
                                             'type',
@@ -341,7 +342,6 @@ if (typeIth.id === 5){m_log('In system type id 5 going to fetch tags');}
                                                 }
                                                 typeIth.tags = tags;
 
-if (typeIth.id === 5){m_log('In system type id 5 going to fetch arrays');}
                                                 m_functionRetProjDoMethodsPropertiesEvents(
                                                     typeIth,
                                                     function(err) { 
@@ -363,6 +363,7 @@ if (typeIth.id === 5){m_log('In system type id 5 going to fetch arrays');}
                             },
                             function(strError) { return cbp2(new Error(strError)); }
                         );
+                        return cbp2(exceptionRet);
                     },
                     function(cbp3) {    // comiccode rows
 
@@ -383,6 +384,7 @@ if (typeIth.id === 5){m_log('In system type id 5 going to fetch arrays');}
                             },
                             function(strError) { return cbp3(new Error(strError)); }
                         );
+                        return cbp3(exceptionRet);
                     }
                 ],
                 function(err) {
@@ -396,110 +398,95 @@ if (typeIth.id === 5){m_log('In system type id 5 going to fetch arrays');}
 
         try {
 
-            var ex = sql.execute("select * from " + self.dbname + "methods where typeId=" + typeIth.id + "; select * from " + self.dbname + "propertys where typeId=" + typeIth.id + "; select * from " + self.dbname + "events where typeId=" + typeIth.id + ";",
-                function(rows){
+            async.parallel(
+                [
+                    function(callbackMethods) {
 
-                    if (rows.length !== 3) {
-                        throw new Error('Unable to retrieve selected methods, properties and events for type in project.');
+                        var ex = sql.execute("select * from " + self.dbname + "methods where typeId=" + typeIth.id + ";",
+                            function(rows) {
+
+                                async.eachSeries(rows,
+                                    function(method, cb) {
+                                        method.originalMethodId = method.id;
+                                        method.tags = '';
+
+                                        m_functionFetchTags(
+                                            method.id,
+                                            'method',
+                                            function(err, tags) {
+                                                if (!err) {
+                                                    method.tags = tags;
+                                                    typeIth.methods.push(method);
+                                                }
+                                                return cb(err);
+                                            }
+                                        );
+                                    },
+                                    function(err) { return callbackMethods(err); }                               );
+                            },
+                            function(strError) {
+                                return callbackMethods(new Error(strError));
+                            }
+                        );
+                        return callbackMethods(ex);
+                    },
+                    function(callbackProperties) {
+
+                        var ex = sql.execute("select * from " + self.dbname + "propertys where typeId=" + typeIth.id + ";",
+                            function(rows){
+
+                                async.eachSeries(rows,
+                                    function(property, cb) {
+                                        property.originalPropertyId = property.id,
+
+                                        // NOT USED HERE ANY MORE:
+                                        // if (project.id === 0) {
+
+                                        //     property.id = 0;
+                                        // }
+
+                                        typeIth.properties.push(property);
+                                        return cb(null);
+                                    },
+                                    function(err) { return callbackProperties(err); }
+                                );
+                            },
+                            function(strError){
+                                return callbackProperties(new Error(strError));
+                            }
+                        );
+                        return callbackProperties(ex);
+                    },
+                    function(callbackEvents) {
+
+                        var ex = sql.execute("select * from " + self.dbname + "events where typeId=" + typeIth.id + ";",
+                            function(rows){
+
+                                async.eachSeries(rows,
+                                    function(event, cb) {
+
+                                        event.originalEventId = event.id;
+
+                                        // NOT USED HERE ANY MORE:
+                                        // if (project.id === 0) {
+
+                                        //     event.id = 0;
+                                        // }
+
+                                        typeIth.events.push(event);
+                                        return cb(null);
+                                    },
+                                    function(err) { return callbackEvents(err); }
+                                );
+                            },
+                            function(strError){
+                                return callbackEvents(new Error(strError));
+                            }
+                        );
+                        return callbackEvents(ex);
                     }
-
-if (typeIth.id === 5){m_log('In system type id 5 in arrays--got counts ' + rows[0].length + ' ' + rows[1].length + ' ' + rows[2].length + ' ');}
-
-                    // methods
-                    rows[0].forEach(
-                        function(row) {
-
-                            var method = 
-                            { 
-                                id: row.id,
-                                originalMethodId: row.id,
-                                name: row.name,
-                                ownedByUserId: row.ownedByUserId,
-                                public: row.public,
-                                quarantined: row.quarantined,
-                                ordinal: row.ordinal,
-                                workspace: row.workspace, 
-                                imageId: row.imageId,
-                                description: row.description,
-                                parentMethodId: row.parentMethodId,
-                                parentPrice: row.parentPrice,
-                                priceBump: row.priceBump,
-                                tags: '',
-                                methodTypeId: row.methodTypeId,
-                                parameters: row.parameters
-                            };
-
-                            // NOT USED HERE ANY MORE:
-                            // if (project.id === 0) {
-
-                            //     method.id = 0;
-                            // }
-
-                            m_functionFetchTags(
-                                method.id,
-                                'method',
-                                function(err, tags) {
-if (typeIth.id === 5 && err !== null){m_log('back from getting tags with error: ' + err.message);}
-else {m_log('back from getting tags with tags = ' + tags);}
-                                    if (err) { throw err; }
-                                    method.tags = tags;
-                                    typeIth.methods.push(method);
-                                }
-                            );
-                        }
-                    );
-
-                    // properties
-                    rows[1].forEach(
-                        function(row) {
-
-                            var property = 
-                            {
-                                id: row.id,
-                                originalPropertyId: row.id,
-                                propertyTypeId: row.propertyTypeId,
-                                name: row.name,
-                                initialValue: row.initialValue,
-                                ordinal: row.ordinal,
-                                isHidden: row.isHidden
-                            };
-
-                            // NOT USED HERE ANY MORE:
-                            // if (project.id === 0) {
-
-                            //     property.id = 0;
-                            // }
-
-                            typeIth.properties.push(property);
-                        }
-                    );
-
-                    // events
-                    rows[2].forEach(
-                        function(row) {
-
-                            var event = 
-                            {
-                                id: row.id,
-                                originalEventId: row.id,
-                                name: row.name,
-                                ordinal: row.ordinal
-                            };
-
-                            // NOT USED HERE ANY MORE:
-                            // if (project.id === 0) {
-
-                            //     event.id = 0;
-                            // }
-
-                            typeIth.events.push(event);
-                        }
-                    );
-                    return callback(null);
-                },
-                function(strError){
-                    throw new error(strError);
-                }
+                ],
+                function(err) { return callback(err); }
             );
         } catch(e) {
             return callback(e);
@@ -1184,39 +1171,47 @@ else {m_log('back from getting tags with tags = ' + tags);}
 
             /* ' */
 
-            var exceptionRet = sql.execute("select t.description from " + self.dbname + "tags t where id in (select tagId from " + self.dbname + strItemType + "_tags where " + strItemType + "Id = " + thingId + ");",
+            var strQuery = "select t.description from " + self.dbname + "tags t where id in (select tagId from " + self.dbname + strItemType + "_tags where " + strItemType + "Id = " + thingId + ");";
+            var exceptionRet = sql.execute(strQuery,
                 function(rows){
 
-                    // Concatenate tags while at the same time skipping strItemType and e-mail-like tags.
-                    var tags = "";
-                    if (rows.length > 0) {
+                    try {
 
-                        rows.forEach(function(row) {
+                        // Concatenate tags while at the same time skipping strItemType and e-mail-like tags.
+                        var tags = "";
+                        if (rows.length > 0) {
 
-                            if (row.description !== strItemType) {
+                            rows.forEach(function(row) {
 
-                                if (!row.description.match(eReg)) {
+                                if (row.description !== strItemType) {
 
-                                    tags += row.description + ' ';
+                                    if (!row.description.match(eReg)) {
+
+                                        tags += row.description + ' ';
+                                    }
                                 }
-                            }
-                        });
-                    }
+                            });
+                        }
 
-                    return callback(null, tags);
+                        return callback(null, tags);
+
+                    } catch(ee) {
+
+                        return callback(ee, '');
+                    }
                 },
                 function(strError){
 
-                    return callback(new Error(strError), null);
+                    return callback(new Error(strError), '');
                 }
             );
             if (exceptionRet){
 
-                return callback(exceptionRet, null);
+                return callback(exceptionRet, '');
             }
         } catch(e) {
 
-            return callback(e, null);
+            return callback(e, '');
         }
     }
 
