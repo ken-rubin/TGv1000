@@ -221,12 +221,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                 res, 
                                                                 project, 
                                                                 comicIth,
-                                                                function(err) { return cbe(err); }
-                            );
+                                                                function(err) { 
 
-                            // Add the filled comic to the project.
-                            project.comics.items.push(comicIth);
-                            return cbe(null);
+                                                                    if (!err) {
+
+                                                                        // Add the filled comic to the project.
+                                                                        project.comics.items.push(comicIth);
+                                                                    }
+                                                                    return cbe(err); 
+                                                                }
+                            );
                         },
                         function(err) { // Main callback for async.eachSeries.
                             return callback(err);
@@ -235,7 +239,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                 },
                 function(strError) { return callback(new Error(strError)); }
             );
-
             if (exceptionRet) { return callback(exceptionRet); }
         
         } catch(e) { return callback(e); }
@@ -272,31 +275,40 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         typeIth.properties = [];
                                         typeIth.events = [];
 
-                                        m_log('a1');
                                         m_functionFetchTags(
                                             typeIth.id,
                                             'type',
                                             function(err, tags) {
-                                                m_log('b1');
-                                                if (err) { return cbe1(err); }
+
+                                                if (err) { 
+                                                    m_log("Had error fetching tags for non-system type");
+                                                    return cbe1(err); 
+                                                }
                                                 typeIth.tags = tags;
 
                                                 m_functionRetProjDoMethodsPropertiesEvents(
                                                     typeIth,
-                                                    function(err) { m_log('c1');return cbe1(err); }
+                                                    function(err) { 
+
+                                                        if (!err) {
+                                                            
+                                                            // Add the filled type to the comicIth.
+                                                            comicIth.types.items.push(typeIth);
+                                                        } else {
+                                                            m_log("had error fetching non-existent type arrays for non-system type");
+                                                        }
+                                                        return cbe1(err);
+                                                    }
                                                 );
                                             }
                                         );
                                     },
-                                    function(err) { // Main callback for outer async.eachSeries.
+                                    function(err) { // Main callback for inner async.eachSeries.
+
+                                        // But return to outer async.parallel for next step or jump to ITS error function.
                                         return cbp1(err);
                                     }
                                 );
-
-                                // Add the filled type to the comicIth.
-                                m_log('d1');
-                                comicIth.types.items.push(typeIth);
-                                return cbp1(null);
                             },
                             function(strError) { return cbp1(new Error(strError)); }
                         );
@@ -320,31 +332,37 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         typeIth.properties = [];
                                         typeIth.events = [];
 
-                                        m_log('a2');
                                         m_functionFetchTags(
                                             typeIth.id,
                                             'type',
                                             function(err, tags) {
-                                                m_log('b2');
-                                                if (err) { return cbe2(err); }
+
+                                                if (err) { 
+                                                    m_log("Had error fetching tags for system type: " + err.message);
+                                                    return cbe2(err); 
+                                                }
                                                 typeIth.tags = tags;
 
                                                 m_functionRetProjDoMethodsPropertiesEvents(
                                                     typeIth,
-                                                    function(err) { m_log('c2');return cbe2(err); }
+                                                    function(err) { 
+
+                                                        if (!err) {
+                                                            // Add the filled type to the comicIth.
+                                                            comicIth.types.items.push(typeIth);
+                                                        } else {
+                                                            m_log("had error fetching non-existent type arrays for system type");
+                                                        }
+                                                        return cbe2(err); 
+                                                    }
                                                 );
                                             }
                                         );
                                     },
                                     function(err) { // Main callback for outer async.eachSeries.
-                                        return cbp1(err);
+                                        return cbp2(err);
                                     }
                                 );
-
-                                // Add the filled type to the comicIth.
-                                m_log('d2');
-                                comicIth.types.items.push(typeIth);
-                                return cbp2(null);
                             },
                             function(strError) { return cbp2(new Error(strError)); }
                         );
@@ -368,7 +386,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             },
                             function(strError) { return cbp3(new Error(strError)); }
                         );
-                        return cbp3(null);
                     }
                 ],
                 function(err) {
@@ -1660,10 +1677,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                         function(err){ return callback(err); }
                     );
                     break;
-                } else {
-                    return cb(null);
                 }
+                //  else {
+                //     return cb(null);
+                // }
             }
+            // If we fall through this loop, it means we didn't find an App type in the comic. This is, hopefully, quite impossible. But . . . 
+            throw new Error("No App type found in comic");
+            
         } catch (e) { callback(e); }
     }
 
