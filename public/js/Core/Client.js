@@ -642,6 +642,30 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
+									// The following are no longer done on the server and have to be handled here or in a little while:
+
+				                        // After SELECT * FROM projects:
+					                        // If the user is not editing his own project, then we will set project.id = 0 and project.ownedByUserId to so indicate.
+					                        // We'll be able to check project.id for 0 during further processing for the same treatment.
+					                        // if (project.ownedByUserId != req.user.userId) {
+
+					                        //     project.id = 0;
+					                        //     project.ownedByUserId = parseInt(req.user.userId, 10);
+					                        // }
+
+					                        // NOTE THAT we haven't zeroed out isProduct, isClass or isCoreProject (or even checked if one of them === 1).
+					                        // That will be done (or not) when we get back to the client side, since it affects the UI.
+
+				                        // After SELECT * FROM COMICS:
+					                        // We would have done this here, but PUSH IT TO THE CLIENT SIDE if we're still going to use it:
+					                        // if (project.id === 0) { comicIth.id = 0; }
+
+					                    // After SELECT * FROM METHODS, PROPERTYS, EVENTS:
+	                                        // if (project.id === 0) {
+
+	                                        //     method.id = 0; OR property.id = 0; OR event.id = 0;
+	                                        // }
+
 									var exceptionRet = self.loadedProject(data.project, callback);
 									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
@@ -651,35 +675,7 @@ define(["Core/errorHelper",
 									errorHelper.show(data.message);
 								}
 							});
-							// $.ajax({
 
-							// 	type: 'POST',
-							// 	url: '/BOL/ProjectBO/RetrieveProject',
-							// 	contentType: 'application/json',
-							// 	data: {
-							// 		projectId: iProjectId,
-							// 		userId: g_profile["userId"]
-							// 	},
-							// 	dataType: 'json',
-							// 	success: function (data) {
-
-							// 		if (data.success) {
-
-							// 			var exceptionRet = self.loadedProject(data.project, callback);
-							// 			if (exceptionRet) { errorHelper.show(exceptionRet); }
-
-							// 		} else {
-
-							// 			// !data.success -- error message in objectData.message
-							// 			errorHelper.show(data.message);
-							// 		}
-							// 	},
-							// 	error: function (jqxhr, strTextStatus, strError) {
-
-							// 		// Non-computational error in strError
-							// 		errorHelper.show(strError);
-							// 	}
-							// });
 							return null;
 
 						} catch (e) {

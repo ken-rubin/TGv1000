@@ -104,18 +104,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         };
 
-                        // THE FOLLOWING WILL BE MOVED TO THE CLIENT SIDE--AND PROBABLY RE-DESIGNED:
-                        // If the user is not editing his own project, then we will set project.id = 0 and project.ownedByUserId to so indicate.
-                        // We'll be able to check project.id for 0 during further processing for the same treatment.
-                        // if (project.ownedByUserId != req.user.userId) {
-
-                        //     project.id = 0;
-                        //     project.ownedByUserId = parseInt(req.user.userId, 10);
-                        // }
-
-                        // NOTE THAT we haven't zeroed out isProduct, isClass or isCoreProject (or even checked if one of them === 1).
-                        // That will be done (or not) when we get back to the client side, since it affects the UI.
-
                         m_functionFetchTags(
                             project.id, 
                             'project', 
@@ -145,7 +133,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             function(comic) {
 
                                                 // Types. 
-                                                // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort.
+                                                // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
                                                 comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
                                                 comic.types.items.forEach(
                                                     function(type) {
@@ -213,9 +201,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             comicIth.comiccode = { items: [] };
                             comicIth.types = { items: [] };
 
-                            // We would have done this here, but PUSH IT TO THE CLIENT SIDE if we're still going to use it:
-                            // if (project.id === 0) { comicIth.id = 0; }
-
                             // Fill comicIth's comiccode and types (including System Types).
                             m_functionRetProjDoComicInternals(  req, 
                                                                 res, 
@@ -254,7 +239,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // Using async.parallel, load comicIth's types, all System Types and comiccode.
             // Non-System Types have both a projectId and a comicId.
-
             async.parallel([
                     function(cbp1) {    // comicIth's types
 
@@ -280,13 +264,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             'type',
                                             function(err, tags) {
 
-                                                if (err) { 
-
-                                                    return cbe1(err); 
-                                                }
+                                                if (err) { return cbe1(err); }
                                                 typeIth.tags = tags;
 
-                                                m_functionRetProjDoMethodsPropertiesEvents(
+                                                m_functionDoTypeArrays(
                                                     typeIth,
                                                     function(err) { 
 
@@ -342,7 +323,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 }
                                                 typeIth.tags = tags;
 
-                                                m_functionRetProjDoMethodsPropertiesEvents(
+                                                m_functionDoTypeArrays(
                                                     typeIth,
                                                     function(err) { 
 
@@ -394,7 +375,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch(e) { return callback(e); }
     }
 
-    var m_functionRetProjDoMethodsPropertiesEvents = function(typeIth, callback) {
+    var m_functionDoTypeArrays = function(typeIth, callback) {
 
         try {
 
@@ -437,13 +418,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 async.eachSeries(rows,
                                     function(property, cb) {
+
                                         property.originalPropertyId = property.id,
-
-                                        // NOT USED HERE ANY MORE:
-                                        // if (project.id === 0) {
-
-                                        //     property.id = 0;
-                                        // }
 
                                         typeIth.properties.push(property);
                                         return cb(null);
@@ -467,12 +443,6 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                         event.originalEventId = event.id;
 
-                                        // NOT USED HERE ANY MORE:
-                                        // if (project.id === 0) {
-
-                                        //     event.id = 0;
-                                        // }
-
                                         typeIth.events.push(event);
                                         return cb(null);
                                     },
@@ -492,325 +462,6 @@ module.exports = function ProjectBO(app, sql, logger) {
             return callback(e);
         }
     }
-
-    // var m_functionRetProjDoTypes = function(req, res, project, typesCount) {
-
-    //     try {
-
-    //         // m_log('In m_functionRetProjDoTypes with typesCount = ' + typesCount);
-
-    //         var strTypeIds = '';    // Will be used for a count(*) query.
-
-    //         project.comics.items.forEach(
-    //             function(comic) {
-
-    //                 var ex = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId IS NULL;",
-    //                     function(rows) {
-
-    //                         // I THINK THE FOLLOWING IS FALSE AND THE CODE SHOULD BE UNCOMMENTED:
-    //                         // At least for now there can be comics with no types, so we disable the following test:
-    //                         // if (rows.length === 0) {
-
-    //                         //     res.json({
-    //                         //         success: false,
-    //                         //         message: 'Unable to retrieve selected project.'
-    //                         //     });
-    //                         //     return;
-    //                         // }
-
-    //                         rows.forEach(
-    //                             function(row) {
-
-    //                                 var type = 
-    //                                 {
-    //                                     id: row.id,
-    //                                     originalTypeId: row.id,
-    //                                     name: row.name,
-    //                                     ownedByUserId: row.ownedByUserId,
-    //                                     public: row.public,
-    //                                     quarantined: row.quarantined,
-    //                                     isApp: row.isApp === 1 ? true : false,
-    //                                     imageId: row.imageId,
-    //                                     altImagePath: row.altImagePath,
-    //                                     ordinal: row.ordinal,
-    //                                     description: row.description,
-    //                                     parentTypeId: row.parentTypeId,
-    //                                     parentPrice: row.parentPrice,
-    //                                     priceBump: row.priceBump,
-    //                                     baseTypeId: row.baseTypeId, // may be null
-    //                                     baseTypeName: row.baseTypeName, // this, too
-    //                                     tags: '',
-    //                                     properties: [],
-    //                                     methods: [],
-    //                                     events: []
-    //                                 };
-
-    //                                 if (strTypeIds.length === 0)
-    //                                     strTypeIds = type.id.toString();
-    //                                 else
-    //                                     strTypeIds = strTypeIds + ',' + type.id;
-
-    //                                 if (project.id === 0) {
-
-    //                                     type.id = 0;
-    //                                 }
-
-    //                                 m_functionFetchTags(
-    //                                     type.originalTypeId,
-    //                                     'type',
-    //                                     function(err, tags) {
-
-    //                                         type.tags = tags;
-    //                                         comic.types.items.push(type);
-
-    //                                         if (--typesCount === 0) {
-
-    //                                             // m_log('typesCount has reached 0--fetching systemTypes.');
-
-    //                                             var ex2 = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId is null order by id asc;",
-    //                                                 function(rows) {
-
-    //                                                     typesCount = rows.length;
-
-    //                                                     rows.forEach(
-    //                                                         function(row) {
-
-    //                                                             var baseType = 
-    //                                                             {
-    //                                                                 id: row.id,
-    //                                                                 originalTypeId: row.id,
-    //                                                                 name: row.name,
-    //                                                                 ownedByUserId: row.ownedByUserId,
-    //                                                                 public: row.public,
-    //                                                                 quarantined: row.quarantined,
-    //                                                                 isApp: row.isApp === 1 ? true : false,
-    //                                                                 imageId: row.imageId,
-    //                                                                 altImagePath: row.altImagePath,
-    //                                                                 ordinal: 10000,                  // system types must always have ordinal === 10000 for sorting and recognition purposes
-    //                                                                 description: row.description,
-    //                                                                 parentTypeId: row.parentTypeId,
-    //                                                                 parentPrice: row.parentPrice,
-    //                                                                 priceBump: row.priceBump,
-    //                                                                 baseTypeId: row.baseTypeId, // may be null
-    //                                                                 baseTypeName: row.baseTypeName, // ditto
-    //                                                                 tags: '',
-    //                                                                 properties: [],
-    //                                                                 methods: [],
-    //                                                                 events: []
-    //                                                             };
-    //                                                             strTypeIds = strTypeIds + ',' + baseType.id;
-    //                                                             comic.types.items.push(baseType);
-
-    //                                                             if (--typesCount === 0) {
-
-    //                                                                 var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId in (" + strTypeIds + "); select count(*) as pcnt from " + self.dbname + "propertys where typeId in (" + strTypeIds + "); select count(*) as ecnt from " + self.dbname + "events where typeId in (" + strTypeIds + ");",
-    //                                                                     function(rows) {
-
-    //                                                                         if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
-
-    //                                                                             return res.json({success:false, message: "Could not retrieve project with id=" + req.body.id});
-    //                                                                         }
-
-    //                                                                         m_functionRetProjDoMethodsPropertiesEvents(req, res, project, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
-    //                                                                     },
-    //                                                                     function(strError){
-    //                                                                         return res.json({success: false, message: strError});
-    //                                                                     }
-    //                                                                 );
-    //                                                             }
-    //                                                         }
-    //                                                     );
-    //                                                 },
-    //                                                 function(strError) {
-
-    //                                                     return res.json({
-    //                                                         success: false,
-    //                                                         message: strError
-    //                                                     });
-    //                                                 }
-    //                                             );
-
-    //                                         }
-    //                                     }
-    //                                 );
-    //                             }
-    //                         );
-    //                     },
-    //                     function(strError) {
-
-    //                         return res.json({
-    //                             success: false,
-    //                             message: strError
-    //                         });
-    //                     }
-    //                 );
-    //                 if (ex) {
-    //                     return res.json({
-    //                         success: false,
-    //                         message: ex.message
-    //                     });
-    //                 }
-    //             }
-    //         );
-    //     } catch(e) {
-
-    //         return res.json({success: false, message: e.message});
-    //     }
-    // }
-
-    // var m_functionRetProjDoMethodsPropertiesEvents = function(req, res, project, mcnt, pcnt, ecnt) {
-
-    //     try {
-
-    //         // m_log('In m_functionRetProjDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
-    //         project.comics.items.forEach(
-    //             function(comic) {
-    //                 // // m_log('in comic ' + JSON.stringify(comic));
-    //                 comic.types.items.forEach(
-    //                     function(type) {
-    //                         // // m_log('in type ' + JSON.stringify(type));
-    //                         var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
-    //                             function(rows){
-
-    //                                 // // m_log(' ');
-    //                                 // // m_log('************** Start of triple select ******************');
-    //                                 // // m_log(' ');
-    //                                 // // m_log(JSON.stringify(rows));
-    //                                 // // m_log(' ');
-    //                                 // // m_log('************** Start of triple select ******************');
-    //                                 // // m_log(' ');
-
-    //                                 if (rows.length !== 3) {
-    //                                     // m_log('The triple select did not return rows.length === 3');
-    //                                     res.json({
-    //                                         success: false,
-    //                                         message: 'Unable to retrieve selected project.'
-    //                                     });
-    //                                     return;
-    //                                 }
-
-    //                                 // methods
-    //                                 rows[0].forEach(
-    //                                     function(row) {
-    //                                         // // m_log('method row: ' + JSON.stringify(row));
-    //                                         var method = 
-    //                                         { 
-    //                                             id: row.id,
-    //                                             originalMethodId: row.id,
-    //                                             name: row.name,
-    //                                             ownedByUserId: row.ownedByUserId,
-    //                                             public: row.public,
-    //                                             quarantined: row.quarantined,
-    //                                             ordinal: row.ordinal,
-    //                                             workspace: row.workspace, 
-    //                                             imageId: row.imageId,
-    //                                             description: row.description,
-    //                                             parentMethodId: row.parentMethodId,
-    //                                             parentPrice: row.parentPrice,
-    //                                             priceBump: row.priceBump,
-    //                                             tags: '',
-    //                                             methodTypeId: row.methodTypeId,
-    //                                             parameters: row.parameters
-    //                                         };
-
-    //                                         if (project.id === 0) {
-
-    //                                             method.id = 0;
-    //                                         }
-
-    //                                         m_functionFetchTags(
-    //                                             method.originalMethodId,
-    //                                             'method',
-    //                                             function(err, tags) {
-
-    //                                                 method.tags = tags;
-    //                                                 // // m_log('Method fetched: ' + JSON.stringify(method));
-    //                                                 type.methods.push(method);
-
-    //                                                 mcnt--;
-    //                                                 if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
-
-    //                                                     m_functionSetSuccessProjectReturn(res, project);
-    //                                                     return;
-    //                                                 }
-    //                                             }
-    //                                         );
-    //                                     }
-    //                                 );
-
-    //                                 // properties
-    //                                 rows[1].forEach(
-    //                                     function(row) {
-    //                                         // // m_log('property row: ' + JSON.stringify(row));
-    //                                         var property = 
-    //                                         {
-    //                                             id: row.id,
-    //                                             originalPropertyId: row.id,
-    //                                             propertyTypeId: row.propertyTypeId,
-    //                                             name: row.name,
-    //                                             initialValue: row.initialValue,
-    //                                             ordinal: row.ordinal,
-    //                                             isHidden: row.isHidden
-    //                                         };
-
-    //                                         if (project.id === 0) {
-
-    //                                             property.id = 0;
-    //                                         }
-
-    //                                         type.properties.push(property);
-
-    //                                         pcnt--;
-    //                                         if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
-
-    //                                             m_functionSetSuccessProjectReturn(res, project);
-    //                                             return;
-    //                                         }
-    //                                     }
-    //                                 );
-
-    //                                 // events
-    //                                 rows[2].forEach(
-    //                                     function(row) {
-    //                                         // // m_log('event row: ' + JSON.stringify(row));
-    //                                         var event = 
-    //                                         {
-    //                                             id: row.id,
-    //                                             originalEventId: row.id,
-    //                                             name: row.name,
-    //                                             ordinal: row.ordinal
-    //                                         };
-
-    //                                         if (project.id === 0) {
-
-    //                                             event.id = 0;
-    //                                         }
-
-    //                                         type.events.push(event);
-
-    //                                         ecnt--;
-    //                                         if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
-
-    //                                             m_functionSetSuccessProjectReturn(res, project);
-    //                                             return;
-    //                                         }
-    //                                     }
-    //                                 );
-    //                             },
-    //                             function(strError){
-    //                                 res.json({success: false, message: strError});
-    //                                 return;
-    //                             }
-    //                         );
-    //                     }
-    //                 );
-    //             }
-    //         );
-    //     } catch (e) {
-
-    //         res.json({success: false, message: e.message});
-    //     }
-    // }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -869,22 +520,24 @@ module.exports = function ProjectBO(app, sql, logger) {
                             'type',
                             function(err, tags) {
 
+                                if (err) { return res.json({success: false, message: err.message}); }
+
                                 type.tags = tags;
 
-                                var ex2 = sql.execute("select count(*) as mcnt from " + self.dbname + "methods where typeId = " + type.originalTypeId + "; select count(*) as pcnt from " + self.dbname + "propertys where typeId = " + type.originalTypeId + "; select count(*) as ecnt from " + self.dbname + "events where typeId = " + type.originalTypeId + ";",
-                                    function(rows) {
+                                m_functionDoTypeArrays(
+                                    type,
+                                    function(err) { 
 
-                                        if (rows.length !== 3 || rows[0].length !== 1 || rows[1].length !== 1 || rows[2].length !== 1) {
+                                        if (err) { return res.json({success: false, message: err.message}); }
 
-                                            res.json({success:false, message: "Could not retrieve type with id=" + type.id});
-                                            return;
-                                        }
+                                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                        m_functionRetTypeDoMethodsPropertiesEvents(req, res, type, rows[0][0].mcnt, rows[1][0].pcnt, rows[2][0].ecnt);
-                                    },
-                                    function(strError){
-                                        res.json({success: false, message: strError});
-                                        return;
+                                        res.json({
+                                            success: true,
+                                            type: type
+                                        });
                                     }
                                 );
                             }
@@ -915,153 +568,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                 message: e.message
             });
         }
-    }
-
-    var m_functionRetTypeDoMethodsPropertiesEvents = function(req, res, type, mcnt, pcnt, ecnt) {
-
-        try {
-
-            // m_log('In m_functionRetTypeDoMethodsPropertiesEvents with mcnt=' + mcnt + ', pcnt=' + pcnt + ', ecnt=' + ecnt);
-            var ex = sql.execute("select * from " + self.dbname + "methods where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "propertys where typeId =" + type.originalTypeId + "; select * from " + self.dbname + "events where typeId =" + type.originalTypeId + ";",
-                function(rows){
-
-                    // // m_log(' ');
-                    // // m_log('************** Start of triple select ******************');
-                    // // m_log(' ');
-                    // // m_log(JSON.stringify(rows));
-                    // // m_log(' ');
-                    // // m_log('************** Start of triple select ******************');
-                    // // m_log(' ');
-
-                    if (rows.length !== 3) {
-                        // m_log('The triple select did not return rows.length === 3');
-                        res.json({
-                            success: false,
-                            message: 'Unable to retrieve selected type.'
-                        });
-                        return;
-                    }
-
-                    // methods
-                    rows[0].forEach(
-                        function(row) {
-                            // // m_log('method row: ' + JSON.stringify(row));
-                            var method = 
-                            { 
-                                id: row.id,
-                                originalMethodId: row.id,
-                                name: row.name, 
-                                ownedByUserId: row.ownedByUserId,
-                                public: row.public,
-                                quarantined: row.quarantined,
-                                ordinal: row.ordinal,
-                                workspace: row.workspace, 
-                                imageId: row.imageId,
-                                description: row.description,
-                                parentMethodId: row.parentMethodId,
-                                parentPrice: row.parentPrice,
-                                priceBump: row.priceBump,
-                                tags: '',
-                                methodTypeId: row.methodTypeId,
-                                parameters: row.parameters
-                            };
-
-                            method.id = 0;
-
-                            m_functionFetchTags(
-                                method.originalMethodId,
-                                'method',
-                                function(err, tags) {
-
-                                    method.tags = tags;
-                                    type.methods.push(method);
-
-                                    mcnt--;
-                                    if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
-
-                                        m_functionSetSuccessTypeReturn(res, type);
-                                        return;
-                                    }
-                                }
-                            );
-                        }
-                    );
-
-                    // properties
-                    rows[1].forEach(
-                        function(row) {
-                            // // m_log('property row: ' + JSON.stringify(row));
-                            var property = 
-                            {
-                                id: row.id,
-                                originalPropertyId: row.id,
-                                propertyTypeId: row.propertyTypeId,
-                                name: row.name,
-                                initialValue: row.initialValue,
-                                ordinal: row.ordinal,
-                                isHidden: row.isHidden
-                            };
-
-                            property.id = 0;
-
-                            type.properties.push(property);
-
-                            pcnt--;
-                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
-
-                                m_functionSetSuccessTypeReturn(res, type);
-                                return;
-                            }
-                        }
-                    );
-
-                    // events
-                    rows[2].forEach(
-                        function(row) {
-                            // // m_log('event row: ' + JSON.stringify(row));
-                            var event = 
-                            {
-                                id: row.id,
-                                originalEventId: row.id,
-                                name: row.name,
-                                ordinal: row.ordinal
-                            };
-
-                            event.id = 0;
-
-                            type.events.push(event);
-
-                            ecnt--;
-                            if (mcnt === 0 && pcnt === 0 && ecnt === 0) {
-
-                                m_functionSetSuccessTypeReturn(res, type);
-                                return;
-                            }
-                        }
-                    );
-                },
-                function(strError){
-                    res.json({success: false, message: strError});
-                    return;
-                }
-            );
-        } catch (e) {
-
-            res.json({success: false, message: e.message});
-        }
-    }
-
-    var m_functionSetSuccessTypeReturn = function(res, type) {
-
-        // m_log('They have all reached 0. Returning type after sorting arrays by ordinal.');
-        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
-        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
-        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
-
-        res.json({
-            success: true,
-            type: type
-        });
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
