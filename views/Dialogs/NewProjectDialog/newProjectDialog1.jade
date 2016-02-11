@@ -19,3 +19,25 @@
       .col-xs-2
         img#MappingImage.tt-selector.img-responsive(alt="Mapping Project" title="Mapping Project")
       .col-xs-1
+    .row#PrivilegedUsersDiv(style="display:none;")
+      br
+      .col-xs-12
+        | As a privileged user, besides being able to create Normal projects, you may be allowed to create a Class or a Product. Choose here:
+        br
+      .col-xs-1
+      .col-xs-10(style='margin-left:5px;')
+          .tt-selector(title="Create a new project based upon the selected Core project. No comic editing. No System Type editing. You will assign a name and Saving will save it as an entirely new project. The project will have the one comic it gets from the selected Core project.")
+            input#rad1(type='radio' name='sr' value='1' checked)
+            span#NormalSpan
+              | &nbsp;Normal project
+            br
+          #CreateClassesDiv.tt-selector(style="display:none;" title="Create a new Class project based on the selected Core project. Class information (location, schedule, description, etc.) will be entered (but can be edited later). Comics can be added, edited and deleted. The Class will be saved as inactive (invisible to students) untiled opened and made active. System Types may be edited.")
+            input#rad2(type='radio' name='sr' value='2')
+            span#ClassSpan
+              | &nbsp;Class
+            br
+          #CreateProductsDiv.tt-selector(style="display:none;" title="Create a new Product project based on the selected Core project. Product information (name, description, price, pictures, etc.) will be entered (but can be edited later). Comics can be added, edited and deleted. The Product will be saved as inactive. System Types may be edited.")
+            input#rad3(type='radio' name='sr' value='3')
+            span#ClassSpan
+              | &nbsp;Product
+      .col-xs-1

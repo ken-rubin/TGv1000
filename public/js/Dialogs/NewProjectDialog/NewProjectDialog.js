@@ -63,17 +63,89 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Show the dialog--load the content from 
 							// the TypesDialog jade HTML-snippet.
-							//
-							// There will be buttons for creating different project configurations:
-							// (1) 
+
+							// Normal users choose a Core project type by clicking on the picture.
+							// Privileged users have to click on a Core image (which will highlight it),
+							// choose a project type (Normal, Class or Product--as permitted) and then click
+							// the primary button or press Enter.
+
+							var buttons = [];
+							if (g_profile["can_create_classes"] || g_profile["can_create_classes"]) {
+
+							    buttons = [
+					            	{
+					            		label: "Continue",
+					            		cssClass: "btn-primary",
+					            		hotkey: 13,
+					            		action: function(){
+
+					            			m_functionContinue();
+					            		}
+					            	},
+					            	{
+						                label: "Close",
+						                icon: "glyphicon glyphicon-remove-circle",
+						                cssClass: "btn-warning",
+						                action: function(dialogItself){
+
+						                    dialogItself.close();
+						                }
+					            	}
+					            ];
+					        }
+
 							BootstrapDialog.show({
 
 								title: "Choose Project Type",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            draggable: false,
-					            onshown: m_functionOnShownDialog1
+					            onshown: m_functionOnShownDialog1,
+					            buttons: buttons
 					        });
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					};
+
+					// Wire up event handlers to dialog controls.
+					var m_functionOnShownDialog1 = function (dialogItself) {
+
+						try {
+
+							$(".tt-selector").powerTip({
+								smartPlacement: true
+							});
+							$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
+							$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
+							$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
+							$("#HoloLensImage").attr("src", resourceHelper.toURL("images", null, null, "hololensProject.png"));
+							$("#MappingImage").attr("src", resourceHelper.toURL("images", null, null, "mappingProject.png"));
+
+							$("#GameImage").click(function(){m_functionProjectTypeSelected("Game");});
+							$("#ConsoleImage").click(function(){m_functionProjectTypeSelected("Console");});
+							$("#WebSiteImage").click(function(){m_functionProjectTypeSelected("Web Site");});
+							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
+							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
+
+							if (g_profile["can_create_classes"]) {
+								$("#PrivilegedUsersDiv").css("display", "block");
+								$("#CreateClassesDiv").css("display", "block");
+							}
+
+							if (g_profile["can_create_classes"]) {
+								$("#PrivilegedUsersDiv").css("display", "block");
+								$("#CreateProductsDiv").css("display", "block");
+							}
+
+							$(".tt-selector").powerTip({
+								smartPlacement: true
+							});
+
+							// Save the dailog object reference.
+							m_dialog = dialogItself;
+							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -120,35 +192,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            draggable: false,
 					            onshown: m_functionOnShownDialog2
 					        });
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
-					};
-
-					// Wire up event handlers to dialog controls.
-					var m_functionOnShownDialog1 = function (dialogItself) {
-
-						try {
-
-							$(".tt-selector").powerTip({
-								smartPlacement: true
-							});
-							$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
-							$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
-							$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
-							$("#HoloLensImage").attr("src", resourceHelper.toURL("images", null, null, "hololensProject.png"));
-							$("#MappingImage").attr("src", resourceHelper.toURL("images", null, null, "mappingProject.png"));
-
-							$("#GameImage").click(function(){m_functionProjectTypeSelected("Game");});
-							$("#ConsoleImage").click(function(){m_functionProjectTypeSelected("Console");});
-							$("#WebSiteImage").click(function(){m_functionProjectTypeSelected("Web Site");});
-							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
-							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
-
-							// Save the dailog object reference.
-							m_dialog = dialogItself;
-							
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -204,6 +247,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionContinue = function() {}
 
 					var m_functionProjectTypeSelected = function(strProjectType) {
 

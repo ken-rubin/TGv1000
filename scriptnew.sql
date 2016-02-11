@@ -534,12 +534,14 @@ begin
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (3, 'registered_user');
 		INSERT TGv1000.usergroups (`id`, `name`) VALUES (4, 'unregistered_user');
 
-		INSERT TGv1000.permissions (`id`, `description`) VALUES (1, 'can_edit_comics');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (1, 'can_edit_core_comics');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (2, 'can_edit_system_types');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (3, 'can_make_public');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (4, 'can_visit_adminzone');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (5, 'can_open_free_projects');
 		INSERT TGv1000.permissions (`id`, `description`) VALUES (6, 'can_buy_projects');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (7, 'can_create_classes');
+		INSERT TGv1000.permissions (`id`, `description`) VALUES (8, 'can_create_products');
 
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,1);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,2);
@@ -547,10 +549,13 @@ begin
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,4);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,5);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,6);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,7);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,8);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,3);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,4);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,5);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,6);
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (2,7);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,5);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,6);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (4,5);
