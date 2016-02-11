@@ -94,7 +94,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             tags: '',
                             projectTypeId: row.projectTypeId,
                             origProjectId: row.origProjectId,
-                            canEditSystemTypes: row.canEditSystemTypes === 1 ? true : false,
                             isProduct: row.isProduct === 1 ? true : false,
                             isClass: row.isClass === 1 ? true : false,
                             isCoreProject: row.isCoreProject === 1 ? true : false,
@@ -1020,6 +1019,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (1)
                     function(cb) {
 
+                        // CHANGE THIS TEST ONCE CLIENT SIDE IS CHANGED:
                         if (project.canEditSystemTypes) {
 
                             // User (a special user) turned on project.canEditSystemTypes. We assume some were edited or added.
@@ -1052,7 +1052,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                             + ",imageId=" + project.imageId
                             + ",altImagePath='" + project.altImagePath + "'"
                             + ",description='" + project.description + "'"
-                            + ",canEditSystemTypes=" + (project.canEditSystemTypes ? 1 : 0)
                             + ",isProduct=" + (project.isProduct ? 1 : 0)
                             + ",isClass=" + (project.isClass ? 1 : 0)
                             + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
@@ -1318,6 +1317,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         // Don't set an SystemType's comicId either.
                         if (typeIth.ordinal === 10000) {
 
+                            // SET THIS ONCE WE KNOW WHAT CLIENT SIDE IS PASSING IN:
                             if (!passObj.project.canEditSystemTypes || passObj.comicIth.ordinal > 0) {
                                 // We process System Types only if the setting is on in the project AND we're in the first comic of the project. 
                                 processTypeIth = false; 

@@ -89,7 +89,6 @@ begin
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `projectTypeId` int(11) NOT NULL,
           `origProjectId` int(11) NOT NULL DEFAULT 0,
-          `canEditSystemTypes` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isProduct` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isClass` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isCoreProject` TINYINT(1) NOT NULL DEFAULT FALSE,

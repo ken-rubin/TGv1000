@@ -74,6 +74,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							    buttons = [
 					            	{
+					            		id: 'ContinueBtn',
 					            		label: "Continue",
 					            		cssClass: "btn-primary",
 					            		hotkey: 13,
@@ -129,13 +130,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
 							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
 
-							if (g_profile["can_create_classes"]) {
+							if (g_profile["can_create_classes"] || g_profile["can_create_products"]) {
 								$("#PrivilegedUsersDiv").css("display", "block");
-								$("#CreateClassesDiv").css("display", "block");
+								$("#ContinueBtn").addClass('disabled');
 							}
 
 							if (g_profile["can_create_classes"]) {
-								$("#PrivilegedUsersDiv").css("display", "block");
+								$("#CreateClassesDiv").css("display", "block");
+							}
+
+							if (g_profile["can_create_products"]) {
 								$("#CreateProductsDiv").css("display", "block");
 							}
 
@@ -210,10 +214,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
-							if (g_profile["can_edit_system_types"]) {
-								$("#SystemTypeCheckBox").css("display", "block");
-							}
-
 							// Set project image.
 							var imgSrc;
 							switch (m_projectType) {
@@ -248,27 +248,104 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					};
 
-					var m_functionContinue = function() {}
+					var m_functionContinue = function() {
+
+						// Core project type is already in m_projectType.
+
+						// Record type of project:
+						if ($("#rad1").prop("checked"))
+							m_bNormalProject = 1;
+						else if ($("#rad2").prop("checked"))
+							m_bClassProject = 1;
+						else
+							m_bProductProject = 1;
+
+						// Get the dialog DOM.
+						$.ajax({
+
+							cache: false,
+							data: { 
+
+								templateFile: "Dialogs/NewProjectDialog/newProjectDialog2"
+							}, 
+							dataType: "HTML",
+							method: "POST",
+							url: "/renderJadeSnippet"
+						}).done(m_functionRenderJadeSnippetResponse2).error(errorHelper.show);
+					}
 
 					var m_functionProjectTypeSelected = function(strProjectType) {
 
 						try {
 
-							m_projectType = strProjectType;
+							if (g_profile["can_create_classes"] || g_profile["can_create_products"]) {
 
-							// Get the dialog DOM.
-							$.ajax({
+								if (m_projectType) {
 
-								cache: false,
-								data: { 
+									// Remove the border around the previously selected image.
+									var jq;
+									switch(m_projectType) {
+										case "Game":
+											jq = $("#GameImage");
+											break;
+										case "Console":
+											jq = $("#ConsoleImage");
+											break;
+										case "Web Site":
+											jq = $("#WebSiteImage");
+											break;
+										case "HoloLens":
+											jq = $("#HoloLensImage");
+											break;
+										case "Mapping":
+											jq = $("#MappingImage");
+											break;
+									}
+									jq.css("border", "");
+								}
 
-									templateFile: "Dialogs/NewProjectDialog/newProjectDialog2"
-								}, 
-								dataType: "HTML",
-								method: "POST",
-								url: "/renderJadeSnippet"
-							}).done(m_functionRenderJadeSnippetResponse2).error(errorHelper.show);
+								m_projectType = strProjectType;
 
+								$("#ContinueBtn").removeClass('disabled');
+
+								// Draw a big red border around the selected Core Project Image.
+								var jq;
+								switch(m_projectType) {
+									case "Game":
+										jq = $("#GameImage");
+										break;
+									case "Console":
+										jq = $("#ConsoleImage");
+										break;
+									case "Web Site":
+										jq = $("#WebSiteImage");
+										break;
+									case "HoloLens":
+										jq = $("#HoloLensImage");
+										break;
+									case "Mapping":
+										jq = $("#MappingImage");
+										break;
+								}
+								jq.css("border", "5px solid red");
+
+							} else { // not a privileged user.
+
+								m_projectType = strProjectType;
+
+								// Get the dialog DOM.
+								$.ajax({
+
+									cache: false,
+									data: { 
+
+										templateFile: "Dialogs/NewProjectDialog/newProjectDialog2"
+									}, 
+									dataType: "HTML",
+									method: "POST",
+									url: "/renderJadeSnippet"
+								}).done(m_functionRenderJadeSnippetResponse2).error(errorHelper.show);
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -298,7 +375,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_profile["userId"], 10);
-									clProject.data.canEditSystemTypes = $("#cb1").prop("checked");
 
 									client.setBrowserTabAndBtns();
 								}
@@ -377,6 +453,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_imageId = 0;
 				var m_projectType = null;
+				var m_bNormalProject = 0;
+				var m_bClassProject = 0;
+				var m_bProductProject = 0;
 			};
 
 			// Return the constructor function as the module object.
