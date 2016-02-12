@@ -420,6 +420,26 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										openMode: 'new'
 									};
 
+									if (m_bClassProject) {
+
+										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
+
+
+
+										clProject.data.specialProjectData.classData = {
+											active: false
+										};
+
+									} else if (m_bProductProject) {
+
+										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
+
+
+										clProject.data.specialProjectData.productData = {
+											active: false
+										};
+									}
+
 									client.setBrowserTabAndBtns();
 								}
 							);
