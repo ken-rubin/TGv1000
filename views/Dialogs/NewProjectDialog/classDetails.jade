@@ -3,7 +3,6 @@
 //-
 
 br
-br
 .col-xs-2
     label.control-label(for="ProjectDescription", style="margin-top:6px;") Class Description
 .col-xs-10
@@ -14,9 +13,9 @@ br
 .col-xs-2
     label.control-label(for="InstructorFirst", style="margin-top:6px;") Instructor
 .col-xs-2
-    input.form-control#InstructorFirst(placeholder="first name")
+    input.form-control#InstructorFirst(placeholder="First name")
 .col-xs-2
-    input.form-control#InstructorLast(placeholder="last name")
+    input.form-control#InstructorLast(placeholder="Last name")
 .col-xs-2
     label.control-label(for="Phone", style="margin-top:6px;") Phone for info
 .col-xs-3
@@ -27,61 +26,62 @@ br
 .col-xs-2
     label.control-label(for="Where1", style="margin-top:6px;") Where
 .col-xs-4
-    input.form-control#Where1
+    input.form-control#Where1(placeholder="Facility name")
 .col-xs-2
     label.control-label(for="When1", style="margin-top:6px;") When
 .col-xs-4
-    input.form-control#When1(placeholder="Full date (start time-end time)")
+    input.form-control#When1(placeholder="Class 1 date (start time-end time)")
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Where2
+    input.form-control#Where2(placeholder="Address line 1")
 .col-xs-2
 .col-xs-4
-    input.form-control#When2
+    input.form-control#When2(placeholder="Class 2 date (start time-end time)")
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Where3
+    input.form-control#Where3(placeholder="Room #")
 .col-xs-2
 .col-xs-4
-    input.form-control#When3
+    input.form-control#When3(placeholder="Class 3 date (start time-end time)")
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Where4
+    input.form-control#Where4(placeholder="City, State Zip")
 .col-xs-2
 .col-xs-4
-    input.form-control#When4
+    input.form-control#When4(placeholder="Class 4 date (start time-end time)")
 br
 br
-.col-xs-2
+.col-xs-8
 .col-xs-4
-    input.form-control#Where5
-.col-xs-2
-.col-xs-4
-    input.form-control#When5
+    input.form-control#When5(placeholder="Class 5 date (start time-end time)")
 br
 br
 .col-xs-2
     label.control-label(for="Level", style="margin-top:6px;") Level
 .col-xs-4
-    input.form-control#Level
+    select.form-control#Level
+        each val,index in ['Elementary school','Middle School','High school and beyond']
+            option(value=index)= val
 .col-xs-2
 .col-xs-4
-    input.form-control#When6
+    input.form-control#When6(placeholder="Class 6 date (start time-end time)")
 br
 br
 .col-xs-2
     label.control-label(for="Difficulty", style="margin-top:6px;") Difficulty
 .col-xs-4
-    input.form-control#Difficulty
+    select.form-control#Difficulty
+        each val,index in ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
+            option(value=index)= val
 .col-xs-2
 .col-xs-4
-    input.form-control#When7
+    input.form-control#When7(placeholder="Class 7 date (start time-end time)")
 br
 br
 .col-xs-2
@@ -90,7 +90,7 @@ br
     input.form-control#Price
 .col-xs-2
 .col-xs-4
-    input.form-control#When8
+    input.form-control#When8(placeholder="Class 8 date (start time-end time)")
 br
 br
 .col-xs-2

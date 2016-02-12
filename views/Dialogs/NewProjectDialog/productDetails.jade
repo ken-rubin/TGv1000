@@ -3,7 +3,6 @@
 //-
 
 br
-br
 .col-xs-2
     label.control-label(for="ProjectDescription", style="margin-top:6px;") Product Description
 .col-xs-10
@@ -11,16 +10,26 @@ br
 br
 br
 br
-br
-.col-xs-1
+.col-xs-2
     label.control-label(for="Level", style="margin-top:6px;") Level
-.col-xs-3
-    input.form-control#Level
-.col-xs-1
+.col-xs-4
+    select.form-control#Level
+        each val,index in ['Elementary school','Middle School','High school and beyond']
+            option(value=index)= val
+.col-xs-6
+br
+br
+.col-xs-2
     label.control-label(for="Difficulty", style="margin-top:6px;") Difficulty
-.col-xs-3
-    input.form-control#Difficulty
-.col-xs-1
+.col-xs-4
+    select.form-control#Difficulty
+        each val,index in ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
+            option(value=index)= val
+.col-xs-6
+br
+br
+.col-xs-2
     label.control-label(for="Price", style="margin-top:6px;") Price
-.col-xs-3
+.col-xs-4
     input.form-control#Price
+.col-xs-6
