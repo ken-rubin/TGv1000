@@ -70,7 +70,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the primary button or press Enter.
 
 							var buttons = [];
-							if (g_profile["can_create_classes"] || g_profile["can_create_classes"]) {
+							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_classes"];
+							if (m_bPrivilegedUser) {
 
 							    buttons = [
 					            	{
@@ -130,7 +131,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
 							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
 
-							if (g_profile["can_create_classes"] || g_profile["can_create_products"]) {
+							if (m_bPrivilegedUser) {
 								$("#PrivilegedUsersDiv").css("display", "block");
 								$("#ContinueBtn").addClass('disabled');
 							}
@@ -196,6 +197,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            draggable: false,
 					            onshown: m_functionOnShownDialog2
 					        });
+
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -241,12 +243,42 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 							$("#ProjectName").focus();
-							
+
+							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
+							var templateToGet = null;
+							if (m_bClassProject) {
+
+								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
+
+							} else if (m_bProductProject) {
+
+								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
+							}
+							if (templateToGet) {
+
+								// Get the dialog DOM.
+								$.ajax({
+
+									cache: false,
+									data: { 
+
+										templateFile: templateToGet
+									}, 
+									dataType: "HTML",
+									method: "POST",
+									url: "/renderJadeSnippet"
+								}).done(m_functionRenderJadeSnippetResponse2b).error(errorHelper.show);
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionRenderJadeSnippetResponse2b = function(htmlData) {
+
+						$("#DescriptionDiv").html(htmlData);
+					}
 
 					var m_functionContinue = function() {
 
@@ -254,11 +286,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						// Record type of project:
 						if ($("#rad1").prop("checked"))
-							m_bNormalProject = 1;
+							m_bNormalProject = true;
 						else if ($("#rad2").prop("checked"))
-							m_bClassProject = 1;
+							m_bClassProject = true;
 						else
-							m_bProductProject = 1;
+							m_bProductProject = true;
 
 						// Get the dialog DOM.
 						$.ajax({
@@ -278,7 +310,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							if (g_profile["can_create_classes"] || g_profile["can_create_products"]) {
+							if (m_bPrivilegedUser) {
 
 								if (m_projectType) {
 
@@ -332,6 +364,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							} else { // not a privileged user.
 
 								m_projectType = strProjectType;
+								m_bNormalProject = true;
 
 								// Get the dialog DOM.
 								$.ajax({
@@ -375,6 +408,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
 									clProject.data.ownedByUserId = parseInt(g_profile["userId"], 10);
+
+									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
+									clProject.data.specialProjectData = {
+										privilegedUser: m_bPrivilegedUser,
+										normalProject: m_bNormalProject,
+										classProject: m_bClassProject,
+										productProject: m_bProductProject,
+										comicsEdited: false,
+										systemTypesEdited: false,
+										openMode: 'new'
+									};
 
 									client.setBrowserTabAndBtns();
 								}
@@ -453,9 +497,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_imageId = 0;
 				var m_projectType = null;
-				var m_bNormalProject = 0;
-				var m_bClassProject = 0;
-				var m_bProductProject = 0;
+				var m_bNormalProject = true;
+				var m_bClassProject = false;
+				var m_bProductProject = false;
+				var m_bPrivilegedUser = false;
 			};
 
 			// Return the constructor function as the module object.

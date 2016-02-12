@@ -16,11 +16,13 @@
               input.form-control#ProjectName(type="text", placeholder="Enter project name.")
           .col-xs-6
           br
-          br
-          .col-xs-2
-              label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
-          .col-xs-10
-              textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
+          #DescriptionDiv
+            br
+            br
+            .col-xs-2
+                label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
+            .col-xs-10
+                textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
           br
           br
           br
