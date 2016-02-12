@@ -423,20 +423,59 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (m_bClassProject) {
 
 										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
-
-
+										var strInstructorFirst = $("#InstructorFirst").val().trim();
+										var strInstructorLast = $("#InstructorLast").val().trim();
+										var strPhone = $("#Phone").val().trim();
+										var arrWhere = [];
+										for (var i = 1; i <=4; i++) {
+											var str = $("#Where" + i).val().trim();
+											if (str.length) { arrWhere.push(str); }
+										}
+										var arrWhen = [];
+										for (var i = 1; i <=8; i++) {
+											var str = $("#When" + i).val().trim();
+											if (str.length) { arrWhen.push(str); }
+										}
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#InstructorLast").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
+										var strNotes = $("#Notes").val().trim();
 
 										clProject.data.specialProjectData.classData = {
-											active: false
+											active: false,
+											classDescription: strProjectDescription,
+											instructorFirst: strInstructorFirst,
+											instructorLast: strInstructorLast,
+											phone: strPhone,
+											where: arrWhere,
+											when: arrWhen,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											classNotes: strNotes
 										};
 
 									} else if (m_bProductProject) {
 
 										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
-
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#InstructorLast").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
 
 										clProject.data.specialProjectData.productData = {
-											active: false
+											active: false,
+											productDescription: strProjectDescription,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice
 										};
 									}
 
