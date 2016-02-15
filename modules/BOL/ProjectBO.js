@@ -93,10 +93,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
-                            origProjectId: row.origProjectId,
+                            comicProjectId: row.comicProjectId,
+                            isCoreProject: row.isCoreProject === 1 ? true : false,
                             isProduct: row.isProduct === 1 ? true : false,
                             isClass: row.isClass === 1 ? true : false,
-                            isCoreProject: row.isCoreProject === 1 ? true : false,
                             comics:
                             {
                                 items: []
@@ -180,9 +180,9 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // m_log('In m_functionRetProjDoComics');
 
-            // Note that we're using project.origProjectId to fetch comics, since that's where they're attached and all derived projects
+            // Note that we're using project.comicProjectId to fetch comics, since that's where they're attached and all derived projects
             // retain their furthest ancestor's comics.
-            var exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.origProjectId + ";",
+            var exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.comicProjectId + ";",
                 function(rows) {
 
                     // Every project has to have at least 1 comic.

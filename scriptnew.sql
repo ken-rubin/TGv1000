@@ -88,10 +88,10 @@ begin
           `parentPrice` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `priceBump` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `projectTypeId` int(11) NOT NULL,
-          `origProjectId` int(11) NOT NULL DEFAULT 0,
+          `comicProjectId` int(11) NOT NULL DEFAULT 0,
+          `isCoreProject` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isProduct` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isClass` TINYINT(1) NOT NULL DEFAULT FALSE,
-          `isCoreProject` TINYINT(1) NOT NULL DEFAULT FALSE,
 		  PRIMARY KEY (`id`),
           INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -385,7 +385,7 @@ begin
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0);        
 
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,origProjectId,isCoreProject)
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,comicProjectId,isCoreProject)
 			VALUES 
 				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,1,TRUE),
 				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,2,TRUE),
