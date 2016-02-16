@@ -9,115 +9,115 @@ h5
 .col-xs-2
       label.control-label(for="ProjectName", style="margin-top:6px;") Name
 .col-xs-4
-      input.form-control#ProjectName(type="text", placeholder="Enter Class name.")
+      input.form-control#ProjectName(type="text" placeholder="Enter Class name." tabindex=1)
 .col-xs-6
 br
 br
 .col-xs-2
     label.control-label(for="ProjectDescription", style="margin-top:6px;") Class Description
 .col-xs-10
-    textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Enter a complete description of your Class.")
+    textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Enter a complete description of your Class." tabindex=2)
 br
 br
 br
 .col-xs-2
         label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
 .col-xs-10
-        textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help people search for this Class.")
+        textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help people search for this Class." tabindex=3)
 br
 br
 br
 .col-xs-2
     label.control-label(for="InstructorFirst", style="margin-top:6px;") Instructor
 .col-xs-2
-    input.form-control#InstructorFirst(placeholder="First name", style="width:100%;")
+    input.form-control#InstructorFirst(placeholder="First name" style="width:100%;" tabindex=4)
 .col-xs-2
-    input.form-control#InstructorLast(placeholder="Last name", style="width:100%;")
+    input.form-control#InstructorLast(placeholder="Last name" style="width:100%;" tabindex=5)
 .col-xs-2
     label.control-label(for="Phone", style="margin-top:6px;") Phone
 .col-xs-3
-    input.form-control#Phone(placeholder="Info line")
+    input.form-control#Phone(placeholder="Info line" tabindex=15)
 .col-xs-1
 br
 br
 .col-xs-2
     label.control-label(for="Facility", style="margin-top:6px;") Where
 .col-xs-4
-    input.form-control#Facility(placeholder="Facility name")
+    input.form-control#Facility(placeholder="Facility name" tabindex=6)
 .col-xs-2
     label.control-label(for="When1", style="margin-top:6px;") When
 .col-xs-4
-    input.form-control#When1(placeholder="Class 1 date  / start time-end time")
+    input.form-control#When1(placeholder="Class 1 date  / start time-end time" tabindex=16)
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Address(placeholder="Address line 1")
+    input.form-control#Address(placeholder="Address line 1" tabindex=7)
 .col-xs-2
 .col-xs-4
-    input.form-control#When2(placeholder="Class 2 date  / start time-end time")
+    input.form-control#When2(placeholder="Class 2 date  / start time-end time" tabindex=17)
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Room(placeholder="Room #")
+    input.form-control#Room(placeholder="Room #" tabindex=8)
 .col-xs-2
 .col-xs-4
-    input.form-control#When3(placeholder="Class 3 date  / start time-end time")
+    input.form-control#When3(placeholder="Class 3 date  / start time-end time" tabindex=18)
 br
 br
 .col-xs-2
 .col-xs-4
   #dc(style="width: 44%; float: left;")
-    input.form-control#City(placeholder="City" )
+    input.form-control#City(placeholder="City" tabindex=9)
   #ds(style="width: 27.7%; float: left;")
-    select.form-control#State(style="width: 5.0em;")
+    select.form-control#State(style="width: 5.0em;" tabindex=10)
         each val,index in ['AK','AL','AR','AS','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI','WV','WY']
             option(value=index)= val
   #dz(style="width: 27.7%; float: right;")
-    input.form-control#Zip(placeholder="Zip" )
+    input.form-control#Zip(placeholder="Zip" tabindex=11)
 .col-xs-2
 .col-xs-4
-    input.form-control#When4(placeholder="Class 4 date  / start time-end time")
+    input.form-control#When4(placeholder="Class 4 date  / start time-end time" tabindex=19)
 br
 br
 .col-xs-8
 .col-xs-4
-    input.form-control#When5(placeholder="Class 5 date  / start time-end time")
+    input.form-control#When5(placeholder="Class 5 date  / start time-end time" tabindex=20)
 br
 br
 .col-xs-2
     label.control-label(for="Level", style="margin-top:6px;") Level
 .col-xs-4
-    select.form-control#Level
+    select.form-control#Level(tabindex=12)
         each val,index in ['Elementary school','Middle School','High school and beyond']
             option(value=index)= val
 .col-xs-2
 .col-xs-4
-    input.form-control#When6(placeholder="Class 6 date  / start time-end time")
+    input.form-control#When6(placeholder="Class 6 date  / start time-end time" tabindex=21)
 br
 br
 .col-xs-2
     label.control-label(for="Difficulty", style="margin-top:6px;") Difficulty
 .col-xs-4
-    select.form-control#Difficulty
+    select.form-control#Difficulty(tabindex=13)
         each val,index in ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
             option(value=index)= val
 .col-xs-2
 .col-xs-4
-    input.form-control#When7(placeholder="Class 7 date  / start time-end time")
+    input.form-control#When7(placeholder="Class 7 date  / start time-end time" tabindex=22)
 br
 br
 .col-xs-2
     label.control-label(for="Price", style="margin-top:6px;") Price
 .col-xs-4
-    input.form-control#Price(placeholder="$xxx.xx")
+    input.form-control#Price(placeholder="$xxx.xx" tabindex=14)
 .col-xs-2
 .col-xs-4
-    input.form-control#When8(placeholder="Class 8 date  / start time-end time")
+    input.form-control#When8(placeholder="Class 8 date  / start time-end time" tabindex=23)
 br
 br
 .col-xs-2
     label.control-label(for="Notes", style="margin-top:6px;") Notes
 .col-xs-10
-    textarea.form-control#Notes(spellcheck=true cols=40 rows=2 placeholder="Enter special details about your Class.")
+    textarea.form-control#Notes(spellcheck=true cols=40 rows=2 placeholder="Enter special details about your Class." tabindex=24)
