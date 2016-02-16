@@ -6,7 +6,7 @@
 
 ## Jerry
 
-- Add first, last names to enroll.
+- Kill all the crap below the navbar on login.jade. Delete ValidateBO routeRetrieveProjectsForLists and from routes table.
 - Test image (multer) stuff now that I've put JWT in the middle.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
@@ -14,8 +14,7 @@
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Administrative stuff
     + AdminZone functionality
-        + Comics--actually, I don't think so anymore.
-        + User maintenance
+        + User, usergroup maintenance
     + Save place (like for student working in a project) and jump right back to it if the user signs in again.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.

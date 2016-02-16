@@ -27,8 +27,8 @@ $(document).ready(function () {
 					var exceptionRet = m_clientLogin.create();
 					if (exceptionRet) { throw exceptionRet; }
 
-					exceptionRet = m_functionLoadThreeLists(errorHelper);
-					if (exceptionRet) { throw exceptionRet; }
+					// exceptionRet = m_functionLoadThreeLists(errorHelper);
+					// if (exceptionRet) { throw exceptionRet; }
 
 	                // Wire up the enroll button
 	                $("#enrollBtn").click(function () {
@@ -223,167 +223,167 @@ var m_functionSetGProfileFromLS = function() {
 	g_profile = JSON.parse(profileJSON);
 }
 
-var m_functionLoadThreeLists = function(errorHelper) {
+// var m_functionLoadThreeLists = function(errorHelper) {
 
-	try {
+// 	try {
 
-		var posting = $.post("/BOL/ValidateBO/RetrieveProjectsForLists", 
-			{},
-			'json');
-		posting.done(function(data){
+// 		var posting = $.post("/BOL/ValidateBO/RetrieveProjectsForLists", 
+// 			{},
+// 			'json');
+// 		posting.done(function(data){
 
-			if (data.success) {
+// 			if (data.success) {
 
-				m_frees = data.frees.items;
-				m_products = data.products.items;
-				m_classes = data.classes.items;
+// 				m_frees = data.frees.items;
+// 				m_products = data.products.items;
+// 				m_classes = data.classes.items;
 
-				$.ajax({
+// 				$.ajax({
 
-					cache: false,
-					data: { 
+// 					cache: false,
+// 					data: { 
 
-						templateFile: "Login/Listboxes/freeBox"
-					}, 
-					dataType: "HTML",
-					method: "POST",
-					url: "/renderJadeSnippet"
-				}).done(m_functionRenderJadeSnippetResponseFree).error(errorHelper.show);
+// 						templateFile: "Login/Listboxes/freeBox"
+// 					}, 
+// 					dataType: "HTML",
+// 					method: "POST",
+// 					url: "/renderJadeSnippet"
+// 				}).done(m_functionRenderJadeSnippetResponseFree).error(errorHelper.show);
 
-				$.ajax({
+// 				$.ajax({
 
-					cache: false,
-					data: { 
+// 					cache: false,
+// 					data: { 
 
-						templateFile: "Login/Listboxes/productBox"
-					}, 
-					dataType: "HTML",
-					method: "POST",
-					url: "/renderJadeSnippet"
-				}).done(m_functionRenderJadeSnippetResponseProduct).error(errorHelper.show);
+// 						templateFile: "Login/Listboxes/productBox"
+// 					}, 
+// 					dataType: "HTML",
+// 					method: "POST",
+// 					url: "/renderJadeSnippet"
+// 				}).done(m_functionRenderJadeSnippetResponseProduct).error(errorHelper.show);
 
-				$.ajax({
+// 				$.ajax({
 
-					cache: false,
-					data: { 
+// 					cache: false,
+// 					data: { 
 
-						templateFile: "Login/Listboxes/classBox"
-					}, 
-					dataType: "HTML",
-					method: "POST",
-					url: "/renderJadeSnippet"
-				}).done(m_functionRenderJadeSnippetResponseClass).error(errorHelper.show);
+// 						templateFile: "Login/Listboxes/classBox"
+// 					}, 
+// 					dataType: "HTML",
+// 					method: "POST",
+// 					url: "/renderJadeSnippet"
+// 				}).done(m_functionRenderJadeSnippetResponseClass).error(errorHelper.show);
 
-				return null;
+// 				return null;
 
-			} else {
+// 			} else {
 
-				// !data.success
-				return new Error(data.message);
-			}
-		});
-	} catch (e) {
+// 				// !data.success
+// 				return new Error(data.message);
+// 			}
+// 		});
+// 	} catch (e) {
 
-		return e;
-	}
-}
+// 		return e;
+// 	}
+// }
 
-var m_functionRenderJadeSnippetResponseFree = function(htmlData) {
+// var m_functionRenderJadeSnippetResponseFree = function(htmlData) {
 
-	m_freeHTML = htmlData;
-	if (m_productHTML && m_classHTML) {
+// 	m_freeHTML = htmlData;
+// 	if (m_productHTML && m_classHTML) {
 
-		m_functionFillTheLists();
-	}
-}
+// 		m_functionFillTheLists();
+// 	}
+// }
 
-var m_functionRenderJadeSnippetResponseProduct = function(htmlData) {
+// var m_functionRenderJadeSnippetResponseProduct = function(htmlData) {
 
-	m_productHTML = htmlData;
-	if (m_freeHTML && m_classHTML) {
+// 	m_productHTML = htmlData;
+// 	if (m_freeHTML && m_classHTML) {
 
-		m_functionFillTheLists();
-	}
-}
+// 		m_functionFillTheLists();
+// 	}
+// }
 
-var m_functionRenderJadeSnippetResponseClass = function(htmlData) {
+// var m_functionRenderJadeSnippetResponseClass = function(htmlData) {
 
-	m_classHTML = htmlData;
-	if (m_productHTML && m_freeHTML) {
+// 	m_classHTML = htmlData;
+// 	if (m_productHTML && m_freeHTML) {
 
-		m_functionFillTheLists();
-	}
-}
+// 		m_functionFillTheLists();
+// 	}
+// }
 
-var m_functionFillTheLists = function() {
+// var m_functionFillTheLists = function() {
 
 
-	$("#FreeList").empty();
-	for(var i = 0; i < m_frees.length; i++) {
+// 	$("#FreeList").empty();
+// 	for(var i = 0; i < m_frees.length; i++) {
 
-		var freeIth = m_frees[i];
-		$("#FreeList").append('<div id="Free_' + i + '">' + m_freeHTML + '</div>');
+// 		var freeIth = m_frees[i];
+// 		$("#FreeList").append('<div id="Free_' + i + '">' + m_freeHTML + '</div>');
 
-		// Fill the data in Free_i.
-		$("#Free_" + i + " #Name").text(freeIth.name);
-		$("#Free_" + i + " #Img").attr("src", freeIth.imgsrc);
-		$("#Free_" + i + " #Description").text(freeIth.description);
-	}
+// 		// Fill the data in Free_i.
+// 		$("#Free_" + i + " #Name").text(freeIth.name);
+// 		$("#Free_" + i + " #Img").attr("src", freeIth.imgsrc);
+// 		$("#Free_" + i + " #Description").text(freeIth.description);
+// 	}
 
-	$("#ProductList").empty();
-	for(var i = 0; i < m_products.length; i++) {
+// 	$("#ProductList").empty();
+// 	for(var i = 0; i < m_products.length; i++) {
 
-		var productIth = m_products[i];
-		$("#ProductList").append('<div id="Product_' + i + '">' + m_productHTML + '</div>');
+// 		var productIth = m_products[i];
+// 		$("#ProductList").append('<div id="Product_' + i + '">' + m_productHTML + '</div>');
 
-		// Fill the data in Product_i.
-		$("#Product_" + i + " #Name").text(productIth.name);
-		$("#Product_" + i + " #Img").attr("src", productIth.imgsrc);
-		$("#Product_" + i + " #Description").text(productIth.description);
-		$("#Product_" + i + " #Level").text("Level: " + productIth.level);
-		$("#Product_" + i + " #Difficulty").text("Rating: " + productIth.difficulty);
-		$("#Product_" + i + " #Price").text("Price: $" + productIth.price);
-	}
+// 		// Fill the data in Product_i.
+// 		$("#Product_" + i + " #Name").text(productIth.name);
+// 		$("#Product_" + i + " #Img").attr("src", productIth.imgsrc);
+// 		$("#Product_" + i + " #Description").text(productIth.description);
+// 		$("#Product_" + i + " #Level").text("Level: " + productIth.level);
+// 		$("#Product_" + i + " #Difficulty").text("Rating: " + productIth.difficulty);
+// 		$("#Product_" + i + " #Price").text("Price: $" + productIth.price);
+// 	}
 
-	$("#ClassList").empty();
-	for(var i = 0; i < m_classes.length; i++) {
+// 	$("#ClassList").empty();
+// 	for(var i = 0; i < m_classes.length; i++) {
 
-		var classIth = m_classes[i];
-		$("#ClassList").append('<div id="Class_' + i + '">' + m_classHTML + '</div>');
+// 		var classIth = m_classes[i];
+// 		$("#ClassList").append('<div id="Class_' + i + '">' + m_classHTML + '</div>');
 
-		// Fill the data in Class_i.
-		$("#Class_" + i + " #Name").text(classIth.name);
-		$("#Class_" + i + " #Img").attr("src", classIth.imgsrc);
-		$("#Class_" + i + " #Description").text(classIth.description);
-		$("#Class_" + i + " #Level").text("Level: " + classIth.level);
-		$("#Class_" + i + " #Difficulty").text("Rating: " + classIth.difficulty);
-		$("#Class_" + i + " #Price").text("Price: $" + classIth.price);
-		$("#Class_" + i + " #Instructor").text("Instructor: " + classIth.instructor);
-		$("#Class_" + i + " #Phone").text("Questions: " + classIth.phone);
-		var locations = classIth.location.split('~');
-		while(locations.length < 5) {
-			locations.push('');
-		}
-		for (var j = 0; j < 5; j++) {
+// 		// Fill the data in Class_i.
+// 		$("#Class_" + i + " #Name").text(classIth.name);
+// 		$("#Class_" + i + " #Img").attr("src", classIth.imgsrc);
+// 		$("#Class_" + i + " #Description").text(classIth.description);
+// 		$("#Class_" + i + " #Level").text("Level: " + classIth.level);
+// 		$("#Class_" + i + " #Difficulty").text("Rating: " + classIth.difficulty);
+// 		$("#Class_" + i + " #Price").text("Price: $" + classIth.price);
+// 		$("#Class_" + i + " #Instructor").text("Instructor: " + classIth.instructor);
+// 		$("#Class_" + i + " #Phone").text("Questions: " + classIth.phone);
+// 		var locations = classIth.location.split('~');
+// 		while(locations.length < 5) {
+// 			locations.push('');
+// 		}
+// 		for (var j = 0; j < 5; j++) {
 
-			$("#Class_" + i + " #Where" + (j+1)).text(locations[j]);
-		}
-		while(classIth.schedule.items.length < 8) {
-			classIth.schedule.items.push({when:''});
-		}
-		for (var j = 1; j < 8; j++) {
+// 			$("#Class_" + i + " #Where" + (j+1)).text(locations[j]);
+// 		}
+// 		while(classIth.schedule.items.length < 8) {
+// 			classIth.schedule.items.push({when:''});
+// 		}
+// 		for (var j = 1; j < 8; j++) {
 
-			$("#Class_" + i + " #When" + (j+1)).text(classIth.schedule.items[j].when);
-		}
-		$("#Class_" + i + " #Note").text(classIth.notes);
-	}
-}
+// 			$("#Class_" + i + " #When" + (j+1)).text(classIth.schedule.items[j].when);
+// 		}
+// 		$("#Class_" + i + " #Note").text(classIth.notes);
+// 	}
+// }
 
 // Define some app-globals.
 var m_clientLogin = null;
-var m_frees = [];
-var m_products = [];
-var m_classes = [];
-var m_freeHTML = null;
-var m_productHTML = null;
-var m_classHTML = null;
+// var m_frees = [];
+// var m_products = [];
+// var m_classes = [];
+// var m_freeHTML = null;
+// var m_productHTML = null;
+// var m_classHTML = null;

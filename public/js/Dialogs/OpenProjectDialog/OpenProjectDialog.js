@@ -27,6 +27,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 							// Save callback in private field.
 							m_functionOK = functionOK;
+							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_products"];
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -109,10 +110,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
 							$("#ISSearchInput").focus();
 
-							jQuery(function($){
-								$("#Zip").mask("99999");
-							});
-
 							// Attach the region to the DOM.
 							m_scISImageStrip = new ScrollRegion();
 							var exceptionRet = m_scISImageStrip.create(
@@ -128,8 +125,25 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						    	});
 							if (exceptionRet) { throw exceptionRet; }
 
+							if (m_bPrivilegedUser) {
+
+								jQuery(function($){
+									$("#ZipP").mask("99999");
+								});
+								$(".nonprivileged").css("display", "none");
+								$(".privileged").css("display", "block");
+
+							} else {
+
+								jQuery(function($){
+									$("#Zip").mask("99999");
+								});
+								$(".privileged").css("display", "none");
+								$(".nonprivileged").css("display", "block");
+							}
+
 							// Click the search button on the way in to fetch user's own projects.
-							m_functionSearchBtnClicked();
+							// m_functionSearchBtnClicked();
 
 						} catch (e) {
 
@@ -143,22 +157,36 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 					    try {
 
 						    var m_tags = $("#ISSearchInput").val().toLowerCase().trim();
-			        		m_onlyOwnedByUser = $("#rad1").prop("checked") ? 1 : 0;
-			        		m_onlyOthersProjects = $("#rad2").prop("checked") ? 1 : 0;
-			        		m_onlyProducts = $("#rad3").prop("checked") ? 1 : 0;
-			        		m_onlyClasses = $("#rad4").prop("checked") ? 1 : 0;
-						    m_strZip = $("#Zip").val().trim();
+						    if (m_bPrivilegedUser) {
 
-						    if (m_onlyClasses && m_strZip.length < 5) {
-						    	m_wellMessage("When searching for upcoming classes, you must enter your zipcode.", null);
-						    	return;
-						    }
+				        		m_onlyCoreProjects = $("#rad0P").prop("checked") ? 1 : 0;
+				        		m_onlyOwnedByUser = $("#rad1P").prop("checked") ? 1 : 0;
+				        		m_onlyOthersProjects = $("#rad2P").prop("checked") ? 1 : 0;
+				        		m_onlyProducts = $("#rad3P").prop("checked") ? 1 : 0;
+				        		m_onlyClasses = $("#rad4P").prop("checked") ? 1 : 0;
+							    m_strZip = $("#ZipP").val().trim();
+
+						    } else {
+
+						    	m_onlyCoreProjects = 0;
+				        		m_onlyOwnedByUser = $("#rad1").prop("checked") ? 1 : 0;
+				        		m_onlyOthersProjects = $("#rad2").prop("checked") ? 1 : 0;
+				        		m_onlyProducts = $("#rad3").prop("checked") ? 1 : 0;
+				        		m_onlyClasses = $("#rad4").prop("checked") ? 1 : 0;
+							    m_strZip = $("#Zip").val().trim();
+							    
+							    if (m_onlyClasses && m_strZip.length < 5) {
+							    	m_wellMessage("When searching for upcoming classes, you must enter your zipcode.", null);
+							    	return;
+							    }
+							}
 
 					        var posting = $.post("/BOL/UtilityBO/SearchProjects", 
 					        	{
 					        		tags: m_tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
+					        		onlyCoreProjects: m_onlyCoreProjects,
 					        		onlyOwnedByUser: m_onlyOwnedByUser,
 					        		onlyOthersProjects: m_onlyOthersProjects,
 					        		onlyProducts: m_onlyProducts,
@@ -306,11 +334,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 				var m_searchResultRawArray;
 				var m_scISImageStrip;
 				var m_tags;
+				var m_onlyCoreProjects;
         		var m_onlyOwnedByUser;
         		var m_onlyOthersProjects;
         		var m_onlyProducts;
         		var m_onlyClasses;
 			    var m_strZip;
+			    var m_bPrivilegedUser;
 			};
 
 			// Return the constructor function as the module object.
