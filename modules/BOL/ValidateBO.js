@@ -94,6 +94,8 @@ module.exports = function ValidateBO(app, sql, logger) {
     // Router handler function.
     self.routeNewEnrollment = function (req, res) {
         // req.body.userName -- user email address
+        // req.body.firstName
+        // req.body.lastName
 
         try {
         
@@ -105,7 +107,9 @@ module.exports = function ValidateBO(app, sql, logger) {
                 function(cb) {
                     // (1) Check for username availability.
                     var profile = {
-                        userName: req.body.userName.toLowerCase()
+                        userName: req.body.userName,
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName
                     };
                     
                     var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + profile.userName + "';",
@@ -157,7 +161,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                             } else {
 
-                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,pwHash,usergroupId) values ('" + profile.userName + "','" + hash + "'," + usergroupId + ");",
+                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,pwHash,usergroupId) values ('" + profile.userName + "','" + profile.firstName + "','" + profile.lastName + "','" + hash + "'," + usergroupId + ");",
                                     function(rows){
 
                                         if (rows.length === 0) {
@@ -191,7 +195,9 @@ module.exports = function ValidateBO(app, sql, logger) {
                     // (3) Send email informing user of password.
                     try {
 
-                        // A special bypass.
+                        console.log(JSON.stringify(profile));
+
+                        // A special bypass. We don't send an email to a@a.com. Instead, we write his p/w to console.log.
                         if (profile.userName !== 'a@a.com') {
 
                             var smtpTransport = nodemailer.createTransport("SMTP", {
@@ -214,13 +220,13 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 from: "TechGroms <techgroms@gmail.com>", // sender address
                                 to: profile.userName, // list of receivers
                                 subject: "TechGroms Registration ✔", // Subject line
-                                text: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                                text: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
                                 "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +
                                 " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
                                 "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
-                                html: "Hi. You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                                html: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
                                 "<br><br>We have created a login user for you. You will use the email address you entered along with" +
-                                " this password: " + profile.password + ". Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
+                                " this password: <b>" + profile.password + "</b>. Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
                                 "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
                             };
 

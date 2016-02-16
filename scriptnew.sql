@@ -346,12 +346,14 @@ begin
 		CREATE TABLE `TGv1000`.`user` (
 		  `id` INT NOT NULL AUTO_INCREMENT,
 		  `userName` VARCHAR(45) NOT NULL,	/* an e-mail address */
+		  `firstName` VARCHAR(45) NOT NULL,
+		  `lastName` VARCHAR(45) NOT NULL,
 		  `pwHash` VARCHAR(16000) NOT NULL,
           `usergroupId` INT(11) NOT NULL,
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-        INSERT INTO `TGv1000`.`user` (`id`,`userName`,`pwHash`,`usergroupId`) VALUES (1,'templates@techgroms.com','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1);
+        INSERT INTO `TGv1000`.`user` (`id`,`userName`,`firstName`,`lastName`,`pwHash`,`usergroupId`) VALUES (1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1);
             
 		insert TGv1000.propertyTypes (id,description) values (1,'Number');
 		insert TGv1000.propertyTypes (id,description) values (2,'Number range (e.g., 3-27)');

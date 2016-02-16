@@ -2,8 +2,9 @@
 // UtilityBO.js module
 //
 //////////////////////////////////
-fs = require("fs");
-jade = require("jade");
+var fs = require("fs");
+var jade = require("jade");
+var async = require("async");
 
 module.exports = function UtilityBO(app, sql, logger) {
 
@@ -197,6 +198,13 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.onlyOwnedByUser   
             // req.body.onlyOthersProjects
             // req.body.onlyProducts
+            // req.body.onlyClasses If === 1, retrieve all classes about to start in next 3 months and then loop thru them, saving 
+            //                          only those within 30 miles of req.body.nearZip.
+            // req.body.nearZip     This is the user's home zipcode.
+            //                      GET from https://www.zipcodeapi.com/rest/<zipcodekey>/distance.json/<zip_code1>/<zip_code2>/mile where
+            //                          <zipcodekey> is replaced by app.get("zipcodekey")
+            //                          <zip_code1> is replaced by req.body.nearZip
+            //                      result is of form { distance: 34.5 }
 
             // Add resource type description to the tags the user (may have) entered.
             var tags = req.body.tags + " project";

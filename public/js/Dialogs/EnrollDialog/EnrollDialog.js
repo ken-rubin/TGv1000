@@ -100,6 +100,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// focus
 							$("#email").focus();
 							$("#email").keyup(m_setStatePrimaryBtn);
+							$("#first").keyup(m_setStatePrimaryBtn);
+							$("#last").keyup(m_setStatePrimaryBtn);
 							m_setStatePrimaryBtn();
 
 						} catch (e) {
@@ -110,13 +112,15 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 					var m_setStatePrimaryBtn = function () {
 
-						var email = $("#email").val().trim();
-						var bValid = (email.length > 0);
+						m_email = $("#email").val().trim().toLowerCase();
+						m_first = $("#first").val().trim();
+						m_last = $("#last").val().trim();
+						var bValid = (m_email.length > 0 && m_first.length > 0 && m_last.length > 0);
 						if (!bValid) {
 							$("#EnrollButton").addClass("disabled");
 						} else {
 							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
-							bValid = email.match(eReg);
+							bValid = m_email.match(eReg);
 							if (!bValid) {
 								$("#EnrollButton").addClass("disabled");
 							} else {
@@ -133,7 +137,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							$("#EnrollButton").addClass("disabled");
 							var posting = $.post("/BOL/ValidateBO/NewEnrollment", 
 												{
-													userName: $("#email").val().trim().toLowerCase()
+													userName: m_email,
+													firstName: m_first,
+													lastName: m_last
 												}, 
 												'json');
         					posting.done(function(data){
@@ -211,6 +217,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
+				var m_email;
+				var m_first;
+				var m_last;
 			};
 
 			// Return the constructor function as the module object.
