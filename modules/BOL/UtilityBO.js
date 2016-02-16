@@ -229,7 +229,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         }
 
                         var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-                        var exceptionRet = sql.execute(sqlString,
+                        sql.execute(sqlString,
                             function (arrayRows) {
                             
                                 // We have to get the same number of rows back from the query as ccArray.length.
@@ -249,49 +249,63 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     idString = idString + arrayRows[i].id.toString();
                                 }
 
-                                return cb(null, {tagIds: idString});
+                                var passOn = {idString: idString};
+                                return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
                         );
-                        if (exceptionRet) { return cb(exceptionRet, null); }
                     },
                     // (2)
                     function(passOn, cb) {
 
-                        // var strQuery;
+                        var strQuery;
 
-                        // if (req.body.onlyCoreProjects === "1") {
+                        if (req.body.onlyCoreProjects === "1") {
 
-                        // } else if (req.body.onlyOwnedByUser === "1") {
+                            // Only for privileged users.
+                            strQuery = "select * from " + self.dbname + "projects where isCoreProject=1;";
 
-                        // } else if (req.body.onlyOthersProjects === "1") {
+                        } else if (req.body.onlyOwnedByUser === "1") {
 
-                        // } else if (req.body.onlyProducts === "1") {
+                            strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
-                        // } else { // req.body.onlyClasses === "1"
+                        } else if (req.body.onlyOthersProjects === "1") {
 
-                        // }
+                            if (req.body.privilegedUser === "1") {
+                                // A privileged user doesn't care about public/private.
+                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
-                        // var exceptionRet = sql.execute(sqlString,
-                        //     function(rows){
+                            } else {
+                                // A non-privileged user can retrieve only public projects
+                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            }
+                        } else if (req.body.onlyProducts === "1") {
 
-                        //         // Sort rows on name, since async retrieval doesn't let us sort in the query.
-                        //         rows.sort(function(a,b){
+                            strQuery = "select distinct p.* from " + self.dbname + "projects p where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
-                        //             if (a.name > b.name)
-                        //                 return 1;
-                        //             if (a.name < b.name)
-                        //                 return -1;
-                        //             return 0;
-                        //         });
+                        } else { // req.body.onlyClasses === "1"
 
-                        //         passOn.projects = rows;
-                                passOn.projects = new Array();
+                            strQuery = "select distinct p.* from " + self.dbname + "projects p where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        }
+
+                        sql.execute(strQuery,
+                            function(rows){
+
+                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                rows.sort(function(a,b){
+
+                                    if (a.name > b.name)
+                                        return 1;
+                                    if (a.name < b.name)
+                                        return -1;
+                                    return 0;
+                                });
+
+                                passOn.projects = rows;
                                 return cb(null, passOn);
-                        //     },
-                        //     function(strError) { return cb(new Error(strError), null); }
-                        // );
-                        // if (exceptionRet) { return cb(exceptionRet, null); }
+                            },
+                            function(strError) { return cb(new Error(strError), null); }
+                        );
                     },
                     // (3)
                     function(passOn, cb) {
