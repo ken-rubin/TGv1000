@@ -194,7 +194,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.user.userId
             // req.user.userName
-            // Exactly one of the following 3 will = "1"
+            // req.body.onlyCoreProjects
             // req.body.onlyOwnedByUser   
             // req.body.onlyOthersProjects
             // req.body.onlyProducts
@@ -205,114 +205,112 @@ module.exports = function UtilityBO(app, sql, logger) {
             //                          <zipcodekey> is replaced by app.get("zipcodekey")
             //                          <zip_code1> is replaced by req.body.nearZip
             //                      result is of form { distance: 34.5 }
+            // req.body.privilegedUser
 
-            // Add resource type description to the tags the user (may have) entered.
-            var tags = req.body.tags + " project";
+            // Will use async.series to (1) get string of tag id's; (2) perform one of many select statements to get matching projects; 
+            // (3) if req.body.onlyClasses, then possibly winnow class projects down by date and distance.
 
-            // Turn tags into string with commas between tags and tags surrounded by single quotes.
-            var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
+            async.waterfall(
+                [
+                    // (1)
+                    function(cb) {
 
-            var ccString = '';
-            for (var i = 0; i < ccArray.length; i++) {
+                        // Add resource type description to the tags the user (may have) entered.
+                        var tags = req.body.tags + " project";
 
-                if (i > 0) {
+                        // Turn tags into string with commas between tags and tags surrounded by single quotes.
+                        var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
 
-                    ccString = ccString + ',';
-                }
+                        var ccString = '';
+                        for (var i = 0; i < ccArray.length; i++) {
 
-                ccString = ccString + "'" + ccArray[i] + "'";
-            }
-
-            var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-
-            // console.log(' ');
-            // console.log('Query to get tag ids: ' + sqlString);
-            // console.log(' ');
-
-            var exceptionRet = sql.execute(sqlString,
-                function (arrayRows) {
-                
-                    // We have to get the same number of rows back from the query as ccArray.length.
-                    if (arrayRows.length !== ccArray.length) {
-
-                        // Success as far as the function is concerned but no result array
-                        res.json({
-                            success:true,
-                            arrayRows: new Array()
-                        });
-                    } else {
-
-                        // We can proceed since all tags exist and their id's are in arrayRows.
-                        // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
-                        var idString = '';
-                        for (var i = 0; i < arrayRows.length; i++) {
-
-                            if (i > 0) {
-
-                                idString = idString + ',';
-                            }
-
-                            idString = idString + arrayRows[i].id.toString();
+                            if (i > 0) { ccString = ccString + ','; }
+                            ccString = ccString + "'" + ccArray[i] + "'";
                         }
 
-                        if (req.body.onlyOwnedByUser === "1") {
-                        
-                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        
-                        } else /*if (req.body.onlyOthersProjects === "1")*/ {
-                        
-                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        
-                        } /*else {    // onlyProducts -- needa little more planning to determine what this means
-                        
-                            sqlString = "select distinct p.* from " + self.dbname + "projects p where p.isProduct=1 and p.id<>1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        }*/
+                        var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+                        var exceptionRet = sql.execute(sqlString,
+                            function (arrayRows) {
+                            
+                                // We have to get the same number of rows back from the query as ccArray.length.
+                                if (arrayRows.length !== ccArray.length) {
 
-                        console.log(' ');
-                        console.log('Query: ' + sqlString);
-                        console.log(' ');
+                                    // Success as far as the function is concerned but no result array.
+                                    return cb(null, {tagIds: ''});
 
-                        exceptionRet = sql.execute(sqlString,
-                            function(rows){
+                                }
 
-                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
-                                rows.sort(function(a,b){
+                                // We can proceed since all tags exist and their id's are in arrayRows.
+                                // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
+                                var idString = '';
+                                for (var i = 0; i < arrayRows.length; i++) {
 
-                                    if (a.name > b.name)
-                                        return 1;
-                                    if (a.name < b.name)
-                                        return -1;
-                                    return 0;
-                                });
+                                    if (i > 0) { idString = idString + ','; }
+                                    idString = idString + arrayRows[i].id.toString();
+                                }
 
-                                res.json({
-                                    success:true,
-                                    arrayRows: rows
-                                });
+                                return cb(null, {tagIds: idString});
                             },
-                            function(err){
-                                res.json({
-                                    success:false,
-                                    message: err
-                                });
-                            }
+                            function(strError) { return cb(new Error(strError), null); }
                         );
-                    }
-                },
-                function (strError) {
-                
-                    res.json({
-                        success: false,
-                        message: strError
-                    });
-            });
-            if (exceptionRet !== null) {
+                        if (exceptionRet) { return cb(exceptionRet, null); }
+                    },
+                    // (2)
+                    function(passOn, cb) {
 
-                res.json({
-                    success: false,
-                    message: exceptionRet.message
-                });
-            }
+                        // var strQuery;
+
+                        // if (req.body.onlyCoreProjects === "1") {
+
+                        // } else if (req.body.onlyOwnedByUser === "1") {
+
+                        // } else if (req.body.onlyOthersProjects === "1") {
+
+                        // } else if (req.body.onlyProducts === "1") {
+
+                        // } else { // req.body.onlyClasses === "1"
+
+                        // }
+
+                        // var exceptionRet = sql.execute(sqlString,
+                        //     function(rows){
+
+                        //         // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                        //         rows.sort(function(a,b){
+
+                        //             if (a.name > b.name)
+                        //                 return 1;
+                        //             if (a.name < b.name)
+                        //                 return -1;
+                        //             return 0;
+                        //         });
+
+                        //         passOn.projects = rows;
+                                passOn.projects = new Array();
+                                return cb(null, passOn);
+                        //     },
+                        //     function(strError) { return cb(new Error(strError), null); }
+                        // );
+                        // if (exceptionRet) { return cb(exceptionRet, null); }
+                    },
+                    // (3)
+                    function(passOn, cb) {
+
+                        return cb(null, passOn);
+                    }
+                ],
+                function(err, passOn) {
+
+                    if (err) {
+                        return res.json({success:false, message:err.message});
+                    }
+
+                    return res.json({
+                        success: true,
+                        arrayRows: passOn.projects
+                    });
+                }
+            );
         } catch (e) {
 
             res.json({
@@ -321,6 +319,19 @@ module.exports = function UtilityBO(app, sql, logger) {
             });
         }
     }
+
+                        // if (req.body.onlyOwnedByUser === "1") {
+                        
+                        //     sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        
+                        // } else /*if (req.body.onlyOthersProjects === "1")*/ {
+                        
+                        //     sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        
+                        // } /*else {    // onlyProducts -- needa little more planning to determine what this means
+                        
+                        //     sqlString = "select distinct p.* from " + self.dbname + "projects p where p.isProduct=1 and p.id<>1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
+                        // }*/
 
     self.routeSearchTypes = function (req, res) {
 

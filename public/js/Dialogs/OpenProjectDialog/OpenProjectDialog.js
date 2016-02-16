@@ -191,7 +191,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 					        		onlyOthersProjects: m_onlyOthersProjects,
 					        		onlyProducts: m_onlyProducts,
 					        		onlyClasses: m_onlyClasses,
-					        		nearZip: m_strZip
+					        		nearZip: m_strZip,
+					        		privilegedUser: m_bPrivilegedUser ? 1 : 0
 					        	}, 
 					        	'json');
 					        posting.done(function(data){
