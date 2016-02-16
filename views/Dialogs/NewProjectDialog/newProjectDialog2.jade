@@ -1,42 +1,37 @@
 //- Jade DOM for the New Project dialog. 
 //-
 .well
-    .row
-      .col-xs-12
-        h4 
-          | A TechGroms project has a <em>name</em>, an identifying <em>image</em> and a number of <em>tags</em> that will help you or others search for it later.
-          | You may also enter a longer description of your project.
+    #DescriptionDiv.row
+        h4(style="margin-top:-5px;")
+          | <b>Enter details for your new Project.</b>
         h5
-          | You may enter them now or you may wait until you've started working on the project and understand what it does.
-    .row
-      .col-xs-12
-        .row
-          .col-xs-2
+          | Only Name is required.
+        br
+        .col-xs-2
               label.control-label(for="ProjectName", style="margin-top:6px;") Name
-          .col-xs-4
+        .col-xs-4
               input.form-control#ProjectName(type="text", placeholder="Enter project name.")
-          .col-xs-6
-        #DescriptionDiv.row
-          br
-          .row
-              .col-xs-2
+        .col-xs-6
+        br
+        br
+        .col-xs-2
                   label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
-              .col-xs-10
+        .col-xs-10
                   textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
-          br
-          .row
-            .col-xs-2
+        br
+        br
+        br
+        .col-xs-2
                 label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
-            .col-xs-10
+        .col-xs-10
                 textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Optionally enter words to help you search for this project later.")
     .row.tt-selector
       br
-      .col-xs-12
-        .col-xs-2
+      .col-xs-2
           label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
-        .col-xs-2
+      .col-xs-2
           img#ProjectImage.img-responsive
-        .col-xs-8
+      .col-xs-8
           br
           button#ImageSearchLink.btn.btn-default.disabledifnoproj(type="button" title="Search for a Project Image")
             span.glyphicon.glyphicon-search(aria-hidden="true")

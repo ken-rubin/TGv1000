@@ -426,11 +426,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
 										var strInstructorLast = $("#InstructorLast").val().trim();
 										var strPhone = $("#Phone").val().trim();
-										var arrWhere = [];
-										for (var i = 1; i <=4; i++) {
-											var str = $("#Where" + i).val().trim();
-											if (str.length) { arrWhere.push(str); }
-										}
+										var strFacility = $("#Facility").val().trim();
+										var strAddress = $("#Address").val().trim();
+										var strRoom = $("#Room").val().trim();
+										var strCity = $("#City").val().trim();
+										var strState = $("#State option:selected").text();
+										var strZip = $("#Zip").val().trim();
 										var arrWhen = [];
 										for (var i = 1; i <=8; i++) {
 											var str = $("#When" + i).val().trim();
@@ -451,7 +452,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											instructorFirst: strInstructorFirst,
 											instructorLast: strInstructorLast,
 											phone: strPhone,
-											where: arrWhere,
+											facility: strFacility,
+											address: strAddress,
+											room: strRoom,
+											city: strCity,
+											state: strState,
+											zip: strZip,
 											when: arrWhen,
 											level: strLevel,
 											difficulty: strDifficulty,
@@ -465,7 +471,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var strLevel = $("#Level option:selected").text();
 										var strDifficulty = $("#Difficulty option:selected").text();
 										var dPrice = 0.00;
-										var strPrice = $("#InstructorLast").val().trim();
+										var strPrice = $("#Price").val().trim();
 										if (strPrice.length) {
 											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 										}

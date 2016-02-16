@@ -37,6 +37,15 @@ if (SECRET === "temp_secret") {
     console.log("Have jwt_secret: " + SECRET);
 }
 
+////////////////////////////////////
+// Set ZipCodeAPI.com Application Key
+//  This will be used to find nearby classes. The API call is GET to
+//  https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
+//  E.g., https://www.zipcodeapi.com/rest/JqeFzcchTq20bW6lB42PB3Tv6uwLc9YVAcBaoOrheuhqqoL2sOS4SMzYg5KtfIpQ/distance.json/02912/10601/mile
+//  Result comes back as { distance: 134.093 }.
+//  We are registered at { Domain: "www.zipcodeapi.com", ApplicationName: "TechGroms", User: "Jerry Rubin", Email: "jerry@rubintech.com" }.
+app.set("zipcodekey", "JqeFzcchTq20bW6lB42PB3Tv6uwLc9YVAcBaoOrheuhqqoL2sOS4SMzYg5KtfIpQ");
+
 /////////////////////////////////////
 console.log("Configure body-parser.");
 app.use(bodyParser.urlencoded({ extended: true }));

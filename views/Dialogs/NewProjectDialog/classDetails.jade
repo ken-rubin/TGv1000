@@ -2,6 +2,16 @@
 //-
 //-
 
+h4(style="margin-top:-5px;")
+  | <b>Enter details for your new Class.</b>
+h5
+  | All but Name are optional until the Class is made <i>active</i>, and it's time for students to sign up.
+.col-xs-2
+      label.control-label(for="ProjectName", style="margin-top:6px;") Name
+.col-xs-4
+      input.form-control#ProjectName(type="text", placeholder="Enter Class name.")
+.col-xs-6
+br
 br
 .col-xs-2
     label.control-label(for="ProjectDescription", style="margin-top:6px;") Class Description
@@ -11,55 +21,69 @@ br
 br
 br
 .col-xs-2
+        label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
+.col-xs-10
+        textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help people search for this Class.")
+br
+br
+br
+.col-xs-2
     label.control-label(for="InstructorFirst", style="margin-top:6px;") Instructor
 .col-xs-2
-    input.form-control#InstructorFirst(placeholder="First name")
+    input.form-control#InstructorFirst(placeholder="First name", style="width:100%;")
 .col-xs-2
-    input.form-control#InstructorLast(placeholder="Last name")
+    input.form-control#InstructorLast(placeholder="Last name", style="width:100%;")
 .col-xs-2
-    label.control-label(for="Phone", style="margin-top:6px;") Phone for info
+    label.control-label(for="Phone", style="margin-top:6px;") Phone
 .col-xs-3
     input.form-control#Phone
 .col-xs-1
 br
 br
 .col-xs-2
-    label.control-label(for="Where1", style="margin-top:6px;") Where
+    label.control-label(for="Facility", style="margin-top:6px;") Where
 .col-xs-4
-    input.form-control#Where1(placeholder="Facility name")
+    input.form-control#Facility(placeholder="Facility name")
 .col-xs-2
     label.control-label(for="When1", style="margin-top:6px;") When
 .col-xs-4
-    input.form-control#When1(placeholder="Class 1 date (start time-end time)")
+    input.form-control#When1(placeholder="Class 1 date  / start time-end time")
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Where2(placeholder="Address line 1")
+    input.form-control#Address(placeholder="Address line 1")
 .col-xs-2
 .col-xs-4
-    input.form-control#When2(placeholder="Class 2 date (start time-end time)")
+    input.form-control#When2(placeholder="Class 2 date  / start time-end time")
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Where3(placeholder="Room #")
+    input.form-control#Room(placeholder="Room #")
 .col-xs-2
 .col-xs-4
-    input.form-control#When3(placeholder="Class 3 date (start time-end time)")
+    input.form-control#When3(placeholder="Class 3 date  / start time-end time")
 br
 br
 .col-xs-2
 .col-xs-4
-    input.form-control#Where4(placeholder="City, State Zip")
+  #dc(style="width: 44%; float: left;")
+    input.form-control#City(placeholder="City" )
+  #ds(style="width: 27.7%; float: left;")
+    select.form-control#State(style="width: 5.0em;")
+        each val,index in ['AK','AL','AR','AS','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI','WV','WY']
+            option(value=index)= val
+  #dz(style="width: 27.7%; float: right;")
+    input.form-control#Zip(placeholder="Zip" )
 .col-xs-2
 .col-xs-4
-    input.form-control#When4(placeholder="Class 4 date (start time-end time)")
+    input.form-control#When4(placeholder="Class 4 date  / start time-end time")
 br
 br
 .col-xs-8
 .col-xs-4
-    input.form-control#When5(placeholder="Class 5 date (start time-end time)")
+    input.form-control#When5(placeholder="Class 5 date  / start time-end time")
 br
 br
 .col-xs-2
@@ -70,7 +94,7 @@ br
             option(value=index)= val
 .col-xs-2
 .col-xs-4
-    input.form-control#When6(placeholder="Class 6 date (start time-end time)")
+    input.form-control#When6(placeholder="Class 6 date  / start time-end time")
 br
 br
 .col-xs-2
@@ -81,16 +105,16 @@ br
             option(value=index)= val
 .col-xs-2
 .col-xs-4
-    input.form-control#When7(placeholder="Class 7 date (start time-end time)")
+    input.form-control#When7(placeholder="Class 7 date  / start time-end time")
 br
 br
 .col-xs-2
     label.control-label(for="Price", style="margin-top:6px;") Price
 .col-xs-4
-    input.form-control#Price
+    input.form-control#Price(placeholder="$xxx.xx")
 .col-xs-2
 .col-xs-4
-    input.form-control#When8(placeholder="Class 8 date (start time-end time)")
+    input.form-control#When8(placeholder="Class 8 date  / start time-end time")
 br
 br
 .col-xs-2
