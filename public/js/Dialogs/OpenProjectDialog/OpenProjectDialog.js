@@ -109,6 +109,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
 							$("#ISSearchInput").focus();
 
+							jQuery(function($){
+								$("#Zip").mask("99999");
+							});
+
 							// Attach the region to the DOM.
 							m_scISImageStrip = new ScrollRegion();
 							var exceptionRet = m_scISImageStrip.create(
@@ -138,15 +142,28 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 					    try {
 
-						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
+						    var m_tags = $("#ISSearchInput").val().toLowerCase().trim();
+			        		m_onlyOwnedByUser = $("#rad1").prop("checked") ? 1 : 0;
+			        		m_onlyOthersProjects = $("#rad2").prop("checked") ? 1 : 0;
+			        		m_onlyProducts = $("#rad3").prop("checked") ? 1 : 0;
+			        		m_onlyClasses = $("#rad4").prop("checked") ? 1 : 0;
+						    m_strZip = $("#Zip").val().trim();
+
+						    if (m_onlyClasses && m_strZip.length < 5) {
+						    	m_wellMessage("When searching for upcoming classes, you must enter your zipcode.", null);
+						    	return;
+						    }
+
 					        var posting = $.post("/BOL/UtilityBO/SearchProjects", 
 					        	{
-					        		tags: tags, 
+					        		tags: m_tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
-					        		onlyOwnedByUser: $("#rad1").prop("checked") ? 1 : 0,
-					        		onlyOthersProjects: $("#rad2").prop("checked") ? 1 : 0,
-					        		onlyProducts: $("#rad3").prop("checked") ? 1 : 0,
+					        		onlyOwnedByUser: m_onlyOwnedByUser,
+					        		onlyOthersProjects: m_onlyOthersProjects,
+					        		onlyProducts: m_onlyProducts,
+					        		onlyClasses: m_onlyClasses,
+					        		nearZip: m_strZip
 					        	}, 
 					        	'json');
 					        posting.done(function(data){
@@ -193,7 +210,28 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 						    if (m_searchResultProcessedArray.length === 0) {
 
-						    	m_wellMessage("There were no matches to ALL of your tags.", null);
+						    	if (m_tags.length) {
+
+						    		if (m_onlyOwnedByUser)
+								    	m_wellMessage("There were no matches to ALL of your tags.", null);
+								    else if (m_onlyOthersProjects)
+								    	m_wellMessage("", null);
+								    else if (m_onlyProducts)
+								    	m_wellMessage("", null);
+								    else
+								    	m_wellMessage("", null);
+
+							    } else {
+
+						    		if (m_onlyOwnedByUser)
+								    	m_wellMessage("", null);
+								    else if (m_onlyOthersProjects)
+								    	m_wellMessage("", null);
+								    else if (m_onlyProducts)
+								    	m_wellMessage("", null);
+								    else
+								    	m_wellMessage("", null);
+							    }
 
 						    } else {
 
@@ -267,6 +305,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 				var m_searchResultProcessedArray = [];
 				var m_searchResultRawArray;
 				var m_scISImageStrip;
+				var m_tags;
+        		var m_onlyOwnedByUser;
+        		var m_onlyOthersProjects;
+        		var m_onlyProducts;
+        		var m_onlyClasses;
+			    var m_strZip;
 			};
 
 			// Return the constructor function as the module object.

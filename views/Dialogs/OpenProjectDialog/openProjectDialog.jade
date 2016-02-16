@@ -7,9 +7,9 @@
     .row
       br
       .col-xs-2
-        label.control-label(for="ISSearchInput", style="margin-top:8px;") Search string
+        label.control-label(for="ISSearchInput", style="margin-top:8px;") Search tags
       .col-xs-6
-        input.form-control#ISSearchInput(type="text", placeholder="Type your set of tags to match here")
+        input.form-control#ISSearchInput(type="text" placeholder="Type tags to match here." tabindex=1)
       .col-xs-4
         button.btn.btn-info#ISInnerSearchButton Search
       br
@@ -17,17 +17,22 @@
       br
       .col-xs-1
       .col-xs-10(style='margin-left:25px;')
-          input#rad1(type='radio' name='sr' value='1' checked)
+          input#rad1(type='radio' name='sr' value='1' checked tabindex=2)
           span
             | &nbsp;Search only projects that I created.
           br
-          input#rad2(type='radio' name='sr' value='2')
+          input#rad2(type='radio' name='sr' value='2' tabindex=3)
           span
             | &nbsp;Search others' public projects.
           br
-          input#rad3(type='radio' name='sr' value='3')
+          input#rad3(type='radio' name='sr' value='3' tabindex=4)
           span
-            | &nbsp;Search <em>Products</em> and <em>Classes</em>.
+            | &nbsp;Search <em>Products</em>.
+          br
+          input#rad4(type='radio' name='sr' value='4' tabindex=5)
+          span
+            | &nbsp;Search <em>Classes</em> near zipcode&nbsp;&nbsp;
+          input#Zip(type='text' style="width:3.2em;" placeholder='Zip' tabindex=6)
       .col-xs-1
     br
     .row
