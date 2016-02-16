@@ -278,6 +278,21 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionRenderJadeSnippetResponse2b = function(htmlData) {
 
 						$("#DescriptionDiv").html(htmlData);
+
+						if (m_bClassProject) {
+							jQuery(function($){
+								$("#Phone").mask("(999) 999-9999? x99999");
+								$("#Zip").mask("99999");
+								$("#Price").mask("$999.99");
+								for (var i=1; i<=8; i++) {
+									$("#When" + i).mask("99/99/9999         99:99 - 99.99")
+								}
+							});
+						} else {
+							jQuery(function($){
+								$("#Price").mask("$999.99");
+							});
+						}
 					}
 
 					var m_functionContinue = function() {
