@@ -285,7 +285,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("99/99/9999         99:99 - 99.99")
+									$("#When" + i).mask("99/99/9999         99:99 - 99:99")
 								}
 							});
 						} else {
@@ -459,7 +459,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var strLevel = $("#Level option:selected").text();
 										var strDifficulty = $("#Difficulty option:selected").text();
 										var dPrice = 0.00;
-										var strPrice = $("#InstructorLast").val().trim();
+										var strPrice = $("#Price").val().trim();
 										if (strPrice.length) {
 											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 										}
@@ -517,15 +517,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					// Takes a when string of form 02/05/2016 07:00 - 07:50 and
-					// returns { date: '02/05/2016', from: '19:00', thru: '19:50'}.
+					// Takes a when string of form 02/01/2016.........19:00.-.19.55 and
+					// returns { date: '02/01/2016', from: '19:00', thru: '19:55'}.
 					// Incompletes and incorrects are set to ''.
 					var m_funcWhenProcess = function(strWhen) {
 
-						var strDate = '';
-						var strFrom = '';
-						var strThru = '';
-
+						var strDate = strWhen.substring(0, 10);
+						var strFrom = strWhen.substring(19, 24);
+						var strThru = strWhen.substring(27, 32);
 
 						return { date: strDate, from: strFrom, thru: strThru};
 					}
