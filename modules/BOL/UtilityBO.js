@@ -283,20 +283,20 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.*,pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.*,pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery = "select distinct p.*,pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.*,pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                         } else { // req.body.onlyClasses === "1"
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.*,cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.*,cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A privileged user just sees active classes.
-                                strQuery = "select distinct p.*,cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.*,cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
                         }
 
@@ -322,6 +322,80 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
+                        if (req.body.onlyClasses === "1" && req.body.privilegedUser === "0") {
+                            // A normal user, retrieving classes, gets only active ones (already handled in the query) and
+                            // only only those starting within 3 months and within 35 miles of req.body.nearZip.
+                            // Any non-qualified are removed from passOn.projects.
+
+                            var today = new Date();
+                            async.each(passOn.projects,
+                                function(projectIth, cb) {
+
+                                    var bRemove = false;
+                                    var class1Date = projectIth.schedule[0].date;
+                                    // This date must exist or the class could not have been made active.
+                                    // As must the zipcode used below.
+
+                                    var class1DateDate = new Date(class1Date);
+                                    var diffSeconds = (class1DateDate - today) / 1000;
+                                    if (diffSeconds < 0) {
+                                        // Class was in the past
+                                        bRemove = true;
+                                    } else {
+                                        var diffDays = diffSeconds / (24*60*60);
+                                        if (diffDays > 92) {
+
+                                            bRemove = true;
+                                        }
+                                    }
+
+                                    if (!bRemove) {
+                                        // Class is not disqualified due to start date. We'll do the zipcode distance check.
+                                        // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
+                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + ".json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open("GET", url, true);
+                                        xhr.onload = function (e) {
+
+                                            if (xhr.readyState === 4) {
+
+                                                if (xhr.status === 200) {
+
+                                                    var distanceJSON = JSON.parse(xhr.responseText);
+                                                    if (distanceJSON.hasOwnProperty("distance")) {
+
+                                                        if (distanceJSON.distance > 35) {
+
+                                                            bRemove = true;
+                                                        }
+                                                    } else {
+
+                                                        bRemove = true;
+                                                    }
+                                                } else {
+                                                    bRemove = true;
+                                                }
+                                            }
+                                        };
+                                        xhr.onerror = function (e) {
+                                            bRemove = true;
+                                        };
+                                        xhr.send(null);
+                                    }
+
+                                    if (bRemove) {
+                                        projectIth.remove = true;
+                                    }
+                                    cb(null);
+                                }
+                            );
+                            for (var i = passOn.projects.length - 1; i >= 0; i--) {
+                                if (passOn.projects[i].hasOwnProperty(remove)) {
+                                    passOn.projects.splice(i, 1);
+                                }
+                            }
+                        }
+
                         return cb(null, passOn);
                     }
                 ],
@@ -345,19 +419,6 @@ module.exports = function UtilityBO(app, sql, logger) {
             });
         }
     }
-
-                        // if (req.body.onlyOwnedByUser === "1") {
-                        
-                        //     sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        
-                        // } else /*if (req.body.onlyOthersProjects === "1")*/ {
-                        
-                        //     sqlString = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        
-                        // } /*else {    // onlyProducts -- needa little more planning to determine what this means
-                        
-                        //     sqlString = "select distinct p.* from " + self.dbname + "projects p where p.isProduct=1 and p.id<>1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + idString + ")));";
-                        // }*/
 
     self.routeSearchTypes = function (req, res) {
 

@@ -119,7 +119,7 @@ begin
           `room` VARCHAR(255),
           `city` VARCHAR(255),
           `state` VARCHAR(2),
-          `zip` VARCHAR(10),
+          `zip` VARCHAR(5),
           `schedule` JSON,
 		  `active` tinyint(1) DEFAULT FALSE,
 		  PRIMARY KEY (`id`)

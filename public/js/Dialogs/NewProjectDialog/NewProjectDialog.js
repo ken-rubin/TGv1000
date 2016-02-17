@@ -285,7 +285,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("99/99/9999         99:99 - 99:99")
+									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
 								}
 							});
 						} else {
@@ -517,8 +517,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					// Takes a when string of form 02/01/2016.........19:00.-.19.55 and
-					// returns { date: '02/01/2016', from: '19:00', thru: '19:55'}.
+					// Takes a when string of form 2016/02/01.........19:00.-.19:55 and
+					// returns { date: '2016/02/01', from: '19:00', thru: '19:55'}.
 					// Incompletes and incorrects are set to ''.
 					var m_funcWhenProcess = function(strWhen) {
 
