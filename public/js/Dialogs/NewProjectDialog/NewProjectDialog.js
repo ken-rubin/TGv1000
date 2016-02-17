@@ -450,7 +450,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var arrWhen = [];
 										for (var i = 1; i <=8; i++) {
 											var str = $("#When" + i).val().trim();
-											if (str.length) { arrWhen.push(str); }
+											if (str.length) { 
+												arrWhen.push(m_funcWhenProcess(str)); 
+											} else {
+												arrWhen.push({ date: '', from: '', thru: ''});
+											}
 										}
 										var strLevel = $("#Level option:selected").text();
 										var strDifficulty = $("#Difficulty option:selected").text();
@@ -511,6 +515,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							errorHelper.show(e);
 						}
+					}
+
+					// Takes a when string of form 02/05/2016 07:00 - 07:50 and
+					// returns { date: '02/05/2016', from: '19:00', thru: '19:50'}.
+					// Incompletes and incorrects are set to ''.
+					var m_funcWhenProcess = function(strWhen) {
+
+						var strDate = '';
+						var strFrom = '';
+						var strThru = '';
+
+
+						return { date: strDate, from: strFrom, thru: strThru};
 					}
 
 					// 3 functions to handle the Image changing link clicks.
