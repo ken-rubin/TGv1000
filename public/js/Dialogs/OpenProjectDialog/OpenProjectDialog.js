@@ -143,7 +143,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							}
 
 							// Click the search button on the way in to fetch user's own projects.
-							// m_functionSearchBtnClicked();
+							m_functionSearchBtnClicked();
 
 						} catch (e) {
 
@@ -333,7 +333,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						try {
 
 							$("#ISWellMsg").empty();
-							$("#ISWellMsg").append("<p class='text-danger'>" + msg + "</p>");
+							$("#ISWellMsg").append("<p class='text-danger' style='text-align:center;'>" + msg + "</p>");
 						    $("#ISWellMsg").css("display", "block");
 						    $("#IStoolstriprow").css("display", "none");
 
