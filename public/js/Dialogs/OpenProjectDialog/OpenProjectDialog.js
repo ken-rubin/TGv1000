@@ -156,7 +156,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 					    try {
 
-						    var m_tags = $("#ISSearchInput").val().toLowerCase().trim();
+						    m_tags = $("#ISSearchInput").val().toLowerCase().trim();
 						    if (m_bPrivilegedUser) {
 
 				        		m_onlyCoreProjects = $("#rad0P").prop("checked") ? 1 : 0;
@@ -239,29 +239,56 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 						    if (m_searchResultProcessedArray.length === 0) {
 
-						    	if (m_tags.length) {
+						    	if (m_bPrivilegedUser) {
 
-						    		if (m_onlyOwnedByUser)
-								    	m_wellMessage("There were no matches to ALL of your tags.", null);
-								    else if (m_onlyOthersProjects)
-								    	m_wellMessage("", null);
-								    else if (m_onlyProducts)
-								    	m_wellMessage("", null);
-								    else
-								    	m_wellMessage("", null);
+							    	if (m_tags.length) {
 
-							    } else {
+							    		if (m_onlyOwnedByUser)
+									    	m_wellMessage("None of your projects match all of the tags: " + m_tags + ".", null);
+									    else if (m_onlyOthersProjects)
+									    	m_wellMessage("None of others' projects match all of the tags: " + m_tags + ".", null);
+									    else if (m_onlyProducts)
+									    	m_wellMessage("No Products match all of the tags: " + m_tags + ".", null);
+									    else	// classes
+									    	m_wellMessage("No Classes match all of the tags: " + m_tags + ".", null);
 
-						    		if (m_onlyOwnedByUser)
-								    	m_wellMessage("", null);
-								    else if (m_onlyOthersProjects)
-								    	m_wellMessage("", null);
-								    else if (m_onlyProducts)
-								    	m_wellMessage("", null);
-								    else
-								    	m_wellMessage("", null);
-							    }
+								    } else {
 
+							    		if (m_onlyOwnedByUser)
+									    	m_wellMessage("We could not find any projects that you created and saved.", null);
+									    else if (m_onlyOthersProjects)
+									    	m_wellMessage("We could not find any projects that others created and saved.", null);
+									    else if (m_onlyProducts)
+									    	m_wellMessage("We found no Products.", null);
+									    else	// classes
+									    	m_wellMessage("We found no Classes.", null);
+								    }
+								} else {	// normal user
+
+							    	if (m_tags.length) {
+
+							    		if (m_onlyOwnedByUser)
+									    	m_wellMessage("None of your projects match all of the tags: " + m_tags + ".", null);
+									    else if (m_onlyOthersProjects)
+									    	m_wellMessage("None of others' projects match all of the tags: " + m_tags + ".", null);
+									    else if (m_onlyProducts)
+									    	m_wellMessage("No active Products match all of the tags: " + m_tags + ".", null);
+									    else	// classes
+									    	m_wellMessage("No Classes starting in the next 3 months and within 35 miles of your zipcode match all of the tags: " + m_tags + ".", null);
+
+								    } else {
+
+							    		if (m_onlyOwnedByUser)
+									    	m_wellMessage("We could not find any projects that you created and saved.", null);
+									    else if (m_onlyOthersProjects)
+									    	m_wellMessage("We could not find any public projects that others created and saved.", null);
+									    else if (m_onlyProducts)
+									    	m_wellMessage("We found no active Products.", null);
+									    else	// classes
+									    	m_wellMessage("We found no active Classes starting in the next 3 months and within 35 miles of your zipcode.", null);
+								    }
+								}
+								return;
 						    } else {
 
 							    $("#ISWellMsg").css("display", "none");
@@ -314,11 +341,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 								setTimeout(timeoutAction.callback, timeoutAction.waittime);
 							}
-
-						} catch (e) {
-
-							errorHelper.show(msg);
-						}
+						} catch (e) { errorHelper.show(msg); }
 					}
 				} catch (e) {
 

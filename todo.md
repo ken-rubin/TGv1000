@@ -6,7 +6,9 @@
 
 ## Jerry
 
-- Kill all the crap below the navbar on login.jade. Delete ValidateBO routeRetrieveProjectsForLists and from routes table.
+- After search for and retrieving a project, all of the new special fields have to be added to influence processing permissions. Also, these processing permissions have to be implemented.
+    + Also have to record if comics or System types had been changed. This will thell ProjectBO whether or not to update them.
+- Need to update routeSaveProject wrt permission, classes, etc.
 - Test image (multer) stuff now that I've put JWT in the middle.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?

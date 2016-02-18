@@ -249,7 +249,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     idString = idString + arrayRows[i].id.toString();
                                 }
 
-                                var passOn = {idString: idString};
+                                var passOn = {idString: idString, arrayRows: arrayRows};
                                 return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
@@ -273,11 +273,11 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             } else {
                                 // A non-privileged user can retrieve only public projects
-                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
                         } else if (req.body.onlyProducts === "1") {
 
@@ -322,7 +322,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        if (req.body.onlyClasses === "1" && req.body.privilegedUser === "0") {
+                        if (req.body.onlyClasses === "1" && req.body.privilegedUser === "0" && passOn.projects.length > 0) {
                             // A normal user, retrieving classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months and within 35 miles of req.body.nearZip.
                             // Any non-qualified are removed from passOn.projects.
