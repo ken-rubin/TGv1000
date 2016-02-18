@@ -215,6 +215,11 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (1)
                     function(cb) {
 
+                        if (req.body.onlyCoreProjects === "1") {
+
+                            return cb(null, {});
+                        }
+
                         // Add resource type description to the tags the user (may have) entered.
                         var tags = req.body.tags + " project";
 
@@ -229,15 +234,20 @@ module.exports = function UtilityBO(app, sql, logger) {
                         }
 
                         var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+                        console.log("");
+                        console.log(sqlString);
+                        console.log("");
                         sql.execute(sqlString,
                             function (arrayRows) {
                             
                                 // We have to get the same number of rows back from the query as ccArray.length.
                                 if (arrayRows.length !== ccArray.length) {
 
-                                    // Success as far as the function is concerned but no result array.
-                                    return cb(null, {tagIds: ''});
-
+                                    // Success as far as the POST is concerned but an empty array of projects will be returned.
+                                    return res.json({
+                                        success: true,
+                                        arrayRows: []
+                                    });
                                 }
 
                                 // We can proceed since all tags exist and their id's are in arrayRows.

@@ -238,10 +238,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewProjectDialog();
 							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -261,10 +258,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new OpenProjectDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -293,10 +287,8 @@ define(["Core/errorHelper",
 
 							m_openDialog = new ComicsDialog();
 							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
 							return null;
 
 						} catch (e) {
@@ -311,10 +303,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewTypeDialog();
 							var exceptionRet = m_openDialog.create("New", -1);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -330,10 +319,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewTypeDialog();
 							var exceptionRet = m_openDialog.create("Edit", index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -349,10 +335,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new TypeSearchDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -368,10 +351,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewMethodDialog();
 							var exceptionRet = m_openDialog.create("New", -1);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -387,10 +367,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewMethodDialog();
 							var exceptionRet = m_openDialog.create("Edit", index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -406,10 +383,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new MethodSearchDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -425,10 +399,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewPropertyDialog();
 							var exceptionRet = m_openDialog.create('New', -1);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -444,10 +415,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewPropertyDialog();
 							var exceptionRet = m_openDialog.create('Edit', index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -463,10 +431,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewEventDialog();
 							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -532,10 +497,7 @@ define(["Core/errorHelper",
 
 							m_openDialog = new DeleteConfirmDialog();
 							var exceptionRet = m_openDialog.create(objectType, index);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 
@@ -553,10 +515,7 @@ define(["Core/errorHelper",
 							m_openDialog2 = new ImageDiskDialog();
 							var exceptionRet = m_openDialog2.create(bImage,
 								functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 						} catch (e) {
@@ -573,10 +532,7 @@ define(["Core/errorHelper",
 							m_openDialog2 = new ImageSearchDialog();
 							var exceptionRet = m_openDialog2.create(bImage,
 								functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 						} catch (e) {
@@ -593,10 +549,7 @@ define(["Core/errorHelper",
 							m_openDialog2 = new ImageURLDialog();
 							var exceptionRet = m_openDialog2.create(bImage,
 								functionOK);
-							if (exceptionRet) {
-
-								throw exceptionRet;
-							}
+							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
 						} catch (e) {
@@ -742,36 +695,6 @@ define(["Core/errorHelper",
 									return new Error(data.message);
 								}
 							});
-							// $.ajax({
-
-							// 	type: 'POST',
-							// 	url: '/BOL/ProjectBO/RetrieveType',
-							// 	contentType: 'application/json',
-							// 	data: {
-							// 		typeId: iTypeId
-							// 	},
-							// 	dataType: 'json',
-							// 	success: function (data) {
-
-							// 		if (data.success) {
-
-							// 			var clType = new Type();
-							// 			clType.load(data.type);
-							// 			return m_clProject.addType(clType);
-
-							// 		} else {
-
-							// 			// !data.success -- error message in objectData.message
-							// 			return new Error(data.message);
-							// 		}
-							// 	},
-							// 	error: function (jqxhr, strTextStatus, strError) {
-
-							// 		// Non-computational error in strError
-							// 		return new Error(strError);
-							// 	}
-							// });
-
 							return null;
 
 						} catch (e) {
@@ -975,33 +898,6 @@ define(["Core/errorHelper",
 									return new Error(data.message);
 								}
 							});
-							// $.ajax({
-
-							// 	type: 'POST',
-							// 	url: '/BOL/ProjectBO/RetrieveMethod',
-							// 	contentType: 'application/json',
-							// 	data: {
-							// 		methodId: iMethodId
-							// 	},
-							// 	dataType: 'json',
-							// 	success: function (data) {
-
-							// 		if (data.success) {
-
-							// 			return self.addMethodToActiveType(data.method);
-
-							// 		} else {
-
-							// 			// !data.success -- error message in objectData.message
-							// 			return new Error(data.message);
-							// 		}
-							// 	},
-							// 	error: function (jqxhr, strTextStatus, strError) {
-
-							// 		// Non-computational error in strError
-							// 		return new Error(strError);
-							// 	}
-							// });
 
 							return null;
 
