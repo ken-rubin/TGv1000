@@ -270,43 +270,46 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         var strQuery;
 
+                        // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
+                        // We're just selecting enough to create the image (with project.id) in the carousel and to decide (in the case of classes and products)
+                        // if the project should be retrieved in the first place. 
                         if (req.body.onlyCoreProjects === "1") {
 
                             // Only for privileged users.
-                            strQuery = "select * from " + self.dbname + "projects where isCoreProject=1;";
+                            strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=1;";
 
                         } else if (req.body.onlyOwnedByUser === "1") {
 
-                            strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                         } else if (req.body.onlyOthersProjects === "1") {
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             } else {
                                 // A non-privileged user can retrieve only public projects
-                                strQuery = "select distinct p.* from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
                         } else if (req.body.onlyProducts === "1") {
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.*,pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery = "select distinct p.*,pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                         } else { // req.body.onlyClasses === "1"
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.*,cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A privileged user just sees active classes.
-                                strQuery = "select distinct p.*,cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
                         }
 
