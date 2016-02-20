@@ -254,13 +254,11 @@ define(["Core/errorHelper",
 
 							// functionOK is an anonymous function in Navbar.js.
 							// It will be called with iProjectId if a project is selected.
-							// It will call client to fetch and open the project.
+							// It will then call client to fetch and open the project.
 
 							m_openDialog = new OpenProjectDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
+							return exceptionRet;
 
 						} catch (e) {
 
@@ -1023,24 +1021,29 @@ define(["Core/errorHelper",
 								m_functionAbandonProjectDialog(function() {	
 
 									// This callback will be called if the user wants to abandon the open project.
-									var exceptionRet = m_clProject.unload();
-									if (exceptionRet) { throw exceptionRet; }
+									try {
+										var exceptionRet = m_clProject.unload();
+										if (exceptionRet) { throw exceptionRet; }
 
-									m_clProject = null;
+										m_clProject = null;
 
-									// Disable the TypeWell icons that are enabled if a project is loaded.
-									$(".disabledifnoproj").prop("disabled", true);
+										// Disable the TypeWell icons that are enabled if a project is loaded.
+										$(".disabledifnoproj").prop("disabled", true);
 
-									// Remove tooltip functionality from TypeWell icons.
-									$(".disabledifnoproj").powerTip({
-										smartPlacement: true,
-										manual: true
-									});
-									// Empty the toolstrip, designer, comicstrip and typewell.
-									tools.empty();
+										// Remove tooltip functionality from TypeWell icons.
+										$(".disabledifnoproj").powerTip({
+											smartPlacement: true,
+											manual: true
+										});
+										
+										// Empty the toolstrip, designer, comicstrip and typewell.
+										tools.empty();
 
-									if ($.isFunction(unloadedCallback))
-										unloadedCallback();
+										if ($.isFunction(unloadedCallback)) {
+ 											unloadedCallback();
+										}
+
+									} catch(e) { errorHelper.show(e); }
 								},
 								bShowAbandonDlg);	// If bShowAbandonDlg is false, will just return. No better way.
 
@@ -1049,11 +1052,7 @@ define(["Core/errorHelper",
 								if ($.isFunction(unloadedCallback))
 									unloadedCallback();
 							}
-						} catch (e) {
-
-							errorHelper.show(e);
-
-						}
+						} catch (e) { errorHelper.show(e); }
 					}
 
 					// Helper method replaces spaces with underscores.

@@ -42,32 +42,54 @@ define(["Core/errorHelper"],
 								}
 							});
 
-							$("#OpenProjectButton").click(function () {
+							$("#OpenProjectButton").click(
+								// This is the click event handler--not strictly a callback.
+								function () {
 
-								try {
+									try {
 
-									client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+										client.unloadProject(
+											// This callback is executed if user decided to abandon or if there was no project to begin with.
+											// If user decides not to abandon the current project, OpenProjectDialog won't call this callback
+											// and he'll continue with the current project as if he never clicked the Search menu item.
+											function() {		
 
-										var exceptionRet = client.showOpenProjectDialog(function (iProjectId) {
+												try {
+													var exceptionRet = client.showOpenProjectDialog(
+														// This callback is executed if the user searches for and chooses a project to open.
+														// It is called m_functionOK in OpenProjectDialog.
+														// iProjectId is the project to fetch. specialProjectData is a JS object
+														// that contains info that will affect the user's interaction with the UI and how the
+														// project is later saved to the DB.
+														function (iProjectId, specialProjectData) {
 
-											if (iProjectId > 0) {
+															try {
+																if (iProjectId > 0) {
 
-												exceptionRet = client.openProjectFromDB(iProjectId);
-												if (exceptionRet) { throw exceptionRet; }
+																	exceptionRet = client.openProjectFromDB(iProjectId,
+																		// This callback is called from client.loadedProject to add specialProjectData to the project.
+																		function(clProject) {
+																			clProject.data.specialProjectData = specialProjectData;
+																		}
+																	);
+																	if (exceptionRet) { throw exceptionRet; }
 
-											} else {
+																} else {
 
-												throw new Error("Invalid project id returned.");
-											}
-										});
-										if (exceptionRet) { throw exceptionRet; }
-									},
-									true);	// true means to show the Abandon dlg if applicable.
-								} catch (e) {
+																	throw new Error("Invalid project id returned.");
+																}
+															} catch (e) { errorHelper.show(e); }
+														}
+													);
+													if (exceptionRet) { throw exceptionRet; }
 
-									errorHelper.show(e);
+												} catch (e) { errorHelper.show(e); }
+											},
+											true		// true means to show the Abandon dlg if applicable.
+										);
+									} catch (e) { errorHelper.show(e); }
 								}
-							});
+							);
 
 							$("#SaveProjectButton").click(function () {
 

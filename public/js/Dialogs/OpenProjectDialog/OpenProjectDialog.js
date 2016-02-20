@@ -54,11 +54,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId) {
+					self.callFunctionOK = function(iProjectId, specialProjectData) {
 
 						try {
 
-							m_functionOK(iProjectId);
+							m_functionOK(iProjectId, specialProjectData);
 							m_dialog.close();
 
 						} catch (e) {
@@ -121,7 +121,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
 						    		var projectId = m_searchResultRawArray[j].id;
-						    		self.callFunctionOK(projectId);
+						    		var specialProjectData = {
+
+						    		};
+						    		self.callFunctionOK(projectId, specialProjectData);
 						    	});
 							if (exceptionRet) { throw exceptionRet; }
 
