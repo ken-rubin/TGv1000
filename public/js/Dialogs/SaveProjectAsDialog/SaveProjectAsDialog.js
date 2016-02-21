@@ -102,17 +102,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							m_project = client.getProject();
-							m_project_data_name = m_project.data.name;
+							m_clProject = client.getProject();
+							m_clProject_data_name = m_clProject.data.name;
 
 							// Set project image.
-							if (m_project.data.altImagePath.length) {
+							if (m_clProject.data.altImagePath.length) {
 
-								$("#ProjectImage").attr("src", m_project.data.altImagePath);
+								$("#ProjectImage").attr("src", m_clProject.data.altImagePath);
 							
 							} else {
 
-								m_functionSetImageSrc(m_project.data.imageId);
+								m_functionSetImageSrc(m_clProject.data.imageId);
 							}
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
@@ -125,10 +125,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
 							$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
 							$("#ProjectName").keyup(m_functionNameBlur);
-							$("#ProjectName").val(m_project.data.name);
+							$("#ProjectName").val(m_clProject.data.name);
 
-							$("#ProjectDescription").val(m_project.data.description);
-							$("#ProjectTags").val(m_project.data.tags);
+							$("#ProjectDescription").val(m_clProject.data.description);
+							$("#ProjectTags").val(m_clProject.data.tags);
 
 							$("#ProjectDescription").blur(m_functionDescriptionBlur);
 							$("#ProjectTags").blur(m_functionTagsBlur);
@@ -143,7 +143,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setStateSaveAsBtn = function () {
 
-						var status = m_project.getStatus();
+						var status = m_clProject.getStatus();
 						if (!status.allRequiredFieldsFilled) {
 							$("#SaveProjectBtn").addClass("disabled");
 						} else {
@@ -154,9 +154,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionNameBlur = function() {
 
 						var txt = $("#ProjectName").val().trim();
-						if (txt !== m_project.data.name) {
+						if (txt !== m_clProject.data.name) {
 
-							m_project_data_name = txt;
+							m_clProject_data_name = txt;
 							m_setStateSaveAsBtn();
 						}
 					}
@@ -164,9 +164,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionDescriptionBlur = function() {
 
 						var txt = $("#ProjectDescription").val().trim();
-						if (txt !== m_project.data.description) {
+						if (txt !== m_clProject.data.description) {
 
-							m_project.data.description = txt;
+							m_clProject.data.description = txt;
 							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
@@ -175,9 +175,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionTagsBlur = function() {
 
 						var txt = $("#ProjectTags").val().trim();
-						if (txt !== m_project.data.tags) {
+						if (txt !== m_clProject.data.tags) {
 
-							m_project.data.tags = txt;
+							m_clProject.data.tags = txt;
 							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
@@ -189,7 +189,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
 							// with same name due to user typing it in and closing the dialog once; then coming back.
-							m_project.data.name = m_project_data_name;
+							m_clProject.data.name = m_clProject_data_name;
 							client.setBrowserTabAndBtns();
 
 							exceptionRet = client.saveProject();
@@ -250,8 +250,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						m_project.imageId = imageId;
-						m_project.altImagePath = '';
+						m_clProject.imageId = imageId;
+						m_clProject.altImagePath = '';
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}
@@ -265,8 +265,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_project = null;
-				var m_project_data_name = "";
+				var m_clProject = null;
+				var m_clProject_data_name = "";
 			};
 
 			// Return the constructor function as the module object.

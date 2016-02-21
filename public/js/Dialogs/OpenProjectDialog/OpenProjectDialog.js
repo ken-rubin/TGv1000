@@ -121,9 +121,16 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
 						    		var projectId = m_searchResultRawArray[j].id;
-						    		var specialProjectData = {
+									specialProjectData = {
+										// privilegedUser: m_bPrivilegedUser,
+										// normalProject: m_bNormalProject,
+										// classProject: m_bClassProject,
+										// productProject: m_bProductProject,
+										comicsEdited: false,
+										systemTypesEdited: false,
+										openMode: 'searched'
+									};
 
-						    		};
 						    		self.callFunctionOK(projectId, specialProjectData);
 						    	});
 							if (exceptionRet) { throw exceptionRet; }

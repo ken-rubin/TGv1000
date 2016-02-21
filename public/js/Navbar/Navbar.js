@@ -198,7 +198,7 @@ define(["Core/errorHelper"],
 					// A bunch of functions that enable/disable navbar menu items.
 					self.enableDisableProjectsMenuItems = function () {
 
-						var project = client.getProject();
+						var clProject = client.getProject();
 
 						// New and search are enabled. others are disabled.
 						m_functionEnable("NewProject");
@@ -206,7 +206,7 @@ define(["Core/errorHelper"],
 						m_functionDisable("SaveProject");
 						m_functionDisable("CloseProject");
 
-						if (project !== null) {
+						if (clProject !== null) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
@@ -216,8 +216,8 @@ define(["Core/errorHelper"],
 
 					self.enableDisableAdminZoneMenuItems = function () {
 
-						var project = client.getProject();
-						if (project !== null) {
+						var clProject = client.getProject();
+						if (clProject !== null) {
 							m_functionEnable("Comics");
 						}
 						else {
