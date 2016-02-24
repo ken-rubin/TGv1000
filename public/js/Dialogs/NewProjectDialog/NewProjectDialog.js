@@ -522,9 +522,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Incompletes and incorrects are set to ''.
 					var m_funcWhenProcess = function(strWhen) {
 
-						var strDate = strWhen.substring(0, 10);
-						var strFrom = strWhen.substring(19, 24);
-						var strThru = strWhen.substring(27, 32);
+						var strDate = '';
+						var strFrom = '';
+						var strThru = '';
+						var l = strWhen.length;
+						if (l >= 10)
+							strDate = strWhen.substring(0, 10);
+						if (l >= 24)
+							strFrom = strWhen.substring(19, 24);
+						if (l >= 32)
+							strThru = strWhen.substring(27, 32);
 
 						return { date: strDate, from: strFrom, thru: strThru};
 					}
