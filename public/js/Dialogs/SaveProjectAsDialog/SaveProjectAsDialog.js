@@ -39,10 +39,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}).done(m_functionRenderJadeSnippetResponse).error(errorHelper.show);
 
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					self.closeYourself = function() {
@@ -85,10 +83,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            draggable: true,
 					            onshown: m_functionOnShownDialog
 					        });
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
+						} catch (e) { errorHelper.show(e); }
 					};
 
 					// Wire up event handlers to dialog controls.
@@ -118,12 +113,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 
-							$("PlaceForProjectName").empty();
-
 							$("#SaveProjectBtn").click(m_functionSaveProject);
 
-							$("#SaveAsH4").append("<span>A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.</span>");
-							$("#PlaceForProjectName").append("<input type='text' class='form-control' id='ProjectName' placeholder='Enter project name.'>");
 							$("#ProjectName").keyup(m_functionNameBlur);
 							$("#ProjectName").val(m_clProject.data.name);
 
@@ -135,11 +126,55 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_setStateSaveAsBtn();
 
-						} catch (e) {
+							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
+							var templateToGet = null;
+							if (m_clProject.data.specialProjectData.classProject) {
 
-							errorHelper.show(e.message);
-						}
+								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
+
+							} else if (m_clProject.data.specialProjectData.productProject) {
+
+								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
+							}
+							if (templateToGet) {
+
+								// Get the dialog DOM.
+								$.ajax({
+
+									cache: false,
+									data: { 
+
+										templateFile: templateToGet
+									}, 
+									dataType: "HTML",
+									method: "POST",
+									url: "/renderJadeSnippet"
+								}).done(m_functionRenderJadeSnippetResponse2).error(errorHelper.show);
+							}
+						} catch (e) { errorHelper.show(e.message); }
 					};
+
+					var m_functionRenderJadeSnippetResponse2 = function(htmlData) {
+
+						$("#DescriptionDiv").html(htmlData);
+
+						if (m_clProject.data.specialProjectData.classProject) {
+							jQuery(function($){
+								$("#Phone").mask("(999) 999-9999? x99999");
+								$("#Zip").mask("99999");
+								$("#Price").mask("$999.99");
+								for (var i=1; i<=8; i++) {
+									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+								}
+							});
+						} else {
+							jQuery(function($){
+								$("#Price").mask("$999.99");
+							});
+						}
+
+						m_setStateSaveAsBtn();
+					}
 
 					var m_setStateSaveAsBtn = function () {
 
@@ -195,10 +230,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							exceptionRet = client.saveProject();
 							if (exceptionRet) { throw exceptionRet; }
 
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
+						} catch(e) { errorHelper.show(e); }
 					}
 
 					// 3 functions to handle the Image changing link clicks.
@@ -207,14 +239,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
+						} catch(e) { errorHelper.show(e); }
 					}
 					
 					var m_functionURLClick = function () {
@@ -222,14 +249,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
+						} catch(e) { errorHelper.show(e); }
 					}
 					
 					var m_functionDiskClick = function () {
@@ -237,14 +259,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
-							if (exceptionRet) {
+							if (exceptionRet) { throw exceptionRet; }
 
-								throw exceptionRet;
-							}
-						} catch(e) {
-
-							errorHelper.show(e);
-						}
+						} catch(e) { errorHelper.show(e); }
 					}
 
 					// Display the chosen image.
@@ -272,8 +289,5 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 			// Return the constructor function as the module object.
 			return functionSaveProjectAsDialog;
 
-		} catch (e) {
-
-			errorHelper.show(e.message);
-		}
+		} catch (e) { errorHelper.show(e.message); }
 	});
