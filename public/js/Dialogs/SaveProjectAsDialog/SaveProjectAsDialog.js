@@ -354,10 +354,106 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// If there was a class or product or online class snippet in the dialog, capture that info into the project.
 							if (m_clProject.data.classProject) {
 
+								// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
+								var strInstructorFirst = $("#InstructorFirst").val().trim();
+								var strInstructorLast = $("#InstructorLast").val().trim();
+								var strPhone = $("#Phone").val().trim();
+								var strFacility = $("#Facility").val().trim();
+								var strAddress = $("#Address").val().trim();
+								var strRoom = $("#Room").val().trim();
+								var strCity = $("#City").val().trim();
+								var strState = $("#State option:selected").text();
+								var strZip = $("#Zip").val().trim();
+								var arrWhen = [];
+								for (var i = 1; i <=8; i++) {
+									var str = $("#When" + i).val().trim();
+									if (str.length) { 
+										arrWhen.push(m_funcWhenProcess(str)); 
+									} else {
+										arrWhen.push({ date: '', from: '', thru: ''});
+									}
+								}
+								var strLevel = $("#Level option:selected").text();
+								var strDifficulty = $("#Difficulty option:selected").text();
+								var dPrice = 0.00;
+								var strPrice = $("#Price").val().trim();
+								if (strPrice.length) {
+									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+								}
+								var strNotes = $("#Notes").val().trim();
+
+								m_clProject.data.specialProjectData.classData = {
+									active: false,
+									classDescription: strProjectDescription,
+									instructorFirst: strInstructorFirst,
+									instructorLast: strInstructorLast,
+									phone: strPhone,
+									facility: strFacility,
+									address: strAddress,
+									room: strRoom,
+									city: strCity,
+									state: strState,
+									zip: strZip,
+									when: arrWhen,
+									level: strLevel,
+									difficulty: strDifficulty,
+									price: dPrice,
+									classNotes: strNotes
+								};
 							} else if (m_clProject.data.productProject) {
 
+								// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
+								var strLevel = $("#Level option:selected").text();
+								var strDifficulty = $("#Difficulty option:selected").text();
+								var dPrice = 0.00;
+								var strPrice = $("#Price").val().trim();
+								if (strPrice.length) {
+									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+								}
+
+								m_clProject.data.specialProjectData.productData = {
+									active: false,
+									productDescription: strProjectDescription,
+									level: strLevel,
+									difficulty: strDifficulty,
+									price: dPrice
+								};
 							} else if (m_clProject.data.onlineClassProject) {
 
+								// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
+								var strInstructorFirst = $("#InstructorFirst").val().trim();
+								var strInstructorLast = $("#InstructorLast").val().trim();
+								var strEmail = $("#Email").val().trim();
+								var arrWhen = [];
+								for (var i = 1; i <=8; i++) {
+									var str = $("#When" + i).val().trim();
+									if (str.length) { 
+										arrWhen.push(m_funcWhenProcess(str)); 
+									} else {
+										arrWhen.push({ date: '', from: '', thru: ''});
+									}
+								}
+								var strLevel = $("#Level option:selected").text();
+								var strDifficulty = $("#Difficulty option:selected").text();
+								var dPrice = 0.00;
+								var strPrice = $("#Price").val().trim();
+								if (strPrice.length) {
+									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+								}
+								var strNotes = $("#Notes").val().trim();
+
+								m_clProject.data.specialProjectData.onlineClassData = {
+									active: false,
+									classDescription: strProjectDescription,
+									instructorFirst: strInstructorFirst,
+									instructorLast: strInstructorLast,
+									email: strEmail,
+									when: arrWhen,
+									level: strLevel,
+									difficulty: strDifficulty,
+									price: dPrice,
+									classNotes: strNotes
+								};
 							}
 
 							client.setBrowserTabAndBtns();
@@ -366,6 +462,25 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (exceptionRet) { throw exceptionRet; }
 
 						} catch(e) { errorHelper.show(e); }
+					}
+
+					// Takes a when string of form 2016/02/01.........19:00.-.19:55 and
+					// returns { date: '2016/02/01', from: '19:00', thru: '19:55'}.
+					// Incompletes and incorrects are set to ''.
+					var m_funcWhenProcess = function(strWhen) {
+
+						var strDate = '';
+						var strFrom = '';
+						var strThru = '';
+						var l = strWhen.length;
+						if (l >= 10)
+							strDate = strWhen.substring(0, 10);
+						if (l >= 24)
+							strFrom = strWhen.substring(19, 24);
+						if (l >= 32)
+							strThru = strWhen.substring(27, 32);
+
+						return { date: strDate, from: strFrom, thru: strThru};
 					}
 
 					// 3 functions to handle the Image changing link clicks.
