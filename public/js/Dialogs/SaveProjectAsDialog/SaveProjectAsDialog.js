@@ -224,7 +224,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								);
 							}
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat);
+							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
 						} else {
 							jQuery(function($){
@@ -257,7 +257,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								);
 							}
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat);
+							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
 						}
 
 						m_setStateSaveAsBtn();
