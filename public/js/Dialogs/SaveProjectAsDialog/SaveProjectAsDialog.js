@@ -135,6 +135,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							} else if (m_clProject.data.specialProjectData.productProject) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
+
+							} else if (m_clProject.data.specialProjectData.onlineClassProject) {
+
+								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
 							}
 							if (templateToGet) {
 
@@ -226,17 +230,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
-						} else {
+						} else if (m_clProject.data.specialProjectData.productProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
-							// clProject.data.specialProjectData.productData = {
-							// 	active: false,
-							// 	productDescription: strProjectDescription,
-							// 	level: strLevel,
-							// 	difficulty: strDifficulty,
-							// 	price: dPrice
-							// };
 							$("#ProjectDescription").val(m_clProject.data.specialProjectData.productData.productDescription);
 							// level combo
 							if(m_clProject.data.specialProjectData.productData.level.length > 0) {
@@ -258,6 +255,47 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
+						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
+							jQuery(function($){
+								$("#Price").mask("$999.99");
+								for (var i=1; i<=8; i++) {
+									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+								}
+							});
+							$("#ProjectDescription").val(m_clProject.data.specialProjectData.onlineClassData.classDescription);
+							$("#InstructorFirst").val(m_clProject.data.specialProjectData.onlineClassData.instructorFirst);
+							$("#InstructorLast").val(m_clProject.data.specialProjectData.onlineClassData.instructorLast);
+							$("#Email").val(m_clProject.data.specialProjectData.onlineClassData.email);
+							// when array
+							for (var i = 1; i <= 8; i++) {
+								$("#When" + i).val('');
+								var whenIth = m_clProject.data.specialProjectData.onlineClassData.when[i-1];
+								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
+									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
+									$("#When" + i).val(when);
+								}
+							}
+							// level combo
+							if(m_clProject.data.specialProjectData.onlineClassData.level.length > 0) {
+								$('#Level > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.level)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							// difficulty combo
+							if(m_clProject.data.specialProjectData.onlineClassData.difficulty.length > 0) {
+								$('#Difficulty > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.difficulty)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							// formatted price
+							$("#Price").val(m_clProject.data.specialProjectData.onlineClassData.price.dollarFormat());
+							$("#Notes").val(m_clProject.data.specialProjectData.onlineClassData.classNotes);
 						}
 
 						m_setStateSaveAsBtn();
@@ -312,6 +350,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
 							// with same name due to user typing it in and closing the dialog once; then coming back.
 							m_clProject.data.name = m_clProject_data_name;
+
+							// If there was a class or product or online class snippet in the dialog, capture that info into the project.
+							if (m_clProject.data.classProject) {
+
+							} else if (m_clProject.data.productProject) {
+
+							} else if (m_clProject.data.onlineClassProject) {
+
+							}
+
 							client.setBrowserTabAndBtns();
 
 							exceptionRet = client.saveProject();
