@@ -144,6 +144,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#CreateProductsDiv").css("display", "block");
 							}
 
+							if (g_profile["can_create_onlineClasses"]) {
+								$("#CreateOnlineClassesDiv").css("display", "block");
+							}
+
 							$(".tt-selector").powerTip({
 								smartPlacement: true
 							});
@@ -253,7 +257,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							} else if (m_bProductProject) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
+							
+							} else if (m_bOnlineClassProject) {
+
+								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
 							}
+
 							if (templateToGet) {
 
 								// Get the dialog DOM.
@@ -288,9 +297,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
 								}
 							});
+						} else if (m_bProductProject) {
+							jQuery(function($){
+								$("#Price").mask("$999.99");
+							});
 						} else {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
+								for (var i=1; i<=8; i++) {
+									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+								}
 							});
 						}
 					}
@@ -302,10 +318,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						// Record type of project:
 						if ($("#rad1").prop("checked"))
 							m_bNormalProject = true;
-						else if ($("#rad2").prop("checked"))
-							m_bClassProject = true;
-						else
-							m_bProductProject = true;
+						else {
+							m_bNormalProject = false;
+
+							if ($("#rad2").prop("checked"))
+								m_bClassProject = true;
+							else if ($("#rad3").prop("checked"))
+								m_bProductProject = true;
+							else
+								m_bOnlineClassProject = true;
+						} 
 
 						// Get the dialog DOM.
 						$.ajax({
@@ -502,6 +524,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											difficulty: strDifficulty,
 											price: dPrice
 										};
+									} else if (m_bOnlineClassProject) {
+
 									}
 
 									client.setBrowserTabAndBtns();
@@ -603,6 +627,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_bNormalProject = true;
 				var m_bClassProject = false;
 				var m_bProductProject = false;
+				var m_bOnlineClassProject = false;
 				var m_bPrivilegedUser = false;
 			};
 

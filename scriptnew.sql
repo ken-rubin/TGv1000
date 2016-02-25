@@ -1,17 +1,17 @@
 delimiter //
 
 -- If necessary to start TGv1000 from scratch, uncomment the following:
-/* */
+/* 
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-/* */
+*/
  
 
 USE TGv1000//
 SELECT database()//
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/* */
+/* 
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -46,7 +46,7 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
- /* */
+ */
 
 create procedure maintainDB()
 begin
@@ -119,7 +119,7 @@ begin
           `room` VARCHAR(255),
           `city` VARCHAR(255),
           `state` VARCHAR(2),
-          `zip` VARCHAR(5),
+          `zip` VARCHAR(10),
           `schedule` JSON,
 		  `active` tinyint(1) DEFAULT FALSE,
 		  PRIMARY KEY (`id`)
@@ -589,6 +589,37 @@ begin
         UPDATE `TGv1000`.`control` set dbstate=3 where id=1;
 		set @dbstate := 3;
     end if;
+    
+    if @dbstate = 3 THEN
+    
+		ALTER TABLE `tgv1000`.`projects` 
+		ADD COLUMN `isOnlineClass` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isClass`;
+        
+		CREATE TABLE `TGv1000`.`onlineclasses` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `name` varchar(255),
+          `baseProjectId` int(11) DEFAULT '0',
+          `instructorFirstName` VARCHAR(255),
+          `instructorLastName` VARCHAR(255),
+          `instructorEmail` VARCHAR(255),
+          `level` VARCHAR(255),
+          `difficulty` VARCHAR(255),
+          `classDescription` TEXT,
+          `imageId` int(11) DEFAULT '0',
+          `price` DECIMAL(9,2) DEFAULT 0.00,
+          `schedule` JSON,
+		  `active` tinyint(1) DEFAULT FALSE,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+   		INSERT TGv1000.permissions (`id`, `description`) VALUES (9, 'can_create_onlineClasses');
+		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,9);
+        
+        
+        UPDATE `TGv1000`.`control` set dbstate=4 where id=1;
+		set @dbstate := 4;
+    end if;
+    
 
 end//
 
