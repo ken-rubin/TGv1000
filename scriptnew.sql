@@ -63,10 +63,10 @@ begin
 
 		insert `TGv1000`.`control` (id, dbstate) values (1, 0);
 
-		set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
-        
 	end if;
     
+	set @dbstate := (select dbstate from `TGv1000`.`control` where id = 1);
+        
     if @dbstate = 0 THEN
     
 		CREATE TABLE `TGv1000`.`tags` (

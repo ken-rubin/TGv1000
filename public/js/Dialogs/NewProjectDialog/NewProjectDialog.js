@@ -301,7 +301,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
-						} else {
+						} else {	// m_bOnlineClassProject
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
@@ -452,6 +452,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										normalProject: m_bNormalProject,
 										classProject: m_bClassProject,
 										productProject: m_bProductProject,
+										onlineClassProject: m_bOnlineClassProject,
 										comicsEdited: false,
 										systemTypesEdited: false,
 										openMode: 'new'
@@ -526,6 +527,40 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										};
 									} else if (m_bOnlineClassProject) {
 
+										// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
+										var strInstructorFirst = $("#InstructorFirst").val().trim();
+										var strInstructorLast = $("#InstructorLast").val().trim();
+										var strEmail = $("#Email").val().trim();
+										var arrWhen = [];
+										for (var i = 1; i <=8; i++) {
+											var str = $("#When" + i).val().trim();
+											if (str.length) { 
+												arrWhen.push(m_funcWhenProcess(str)); 
+											} else {
+												arrWhen.push({ date: '', from: '', thru: ''});
+											}
+										}
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
+										var strNotes = $("#Notes").val().trim();
+
+										clProject.data.specialProjectData.onlineClassData = {
+											active: false,
+											classDescription: strProjectDescription,
+											instructorFirst: strInstructorFirst,
+											instructorLast: strInstructorLast,
+											email: strEmail,
+											when: arrWhen,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											classNotes: strNotes
+										};
 									}
 
 									client.setBrowserTabAndBtns();
