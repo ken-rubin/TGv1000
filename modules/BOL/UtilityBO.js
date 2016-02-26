@@ -198,13 +198,16 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.onlyOwnedByUser   
             // req.body.onlyOthersProjects
             // req.body.onlyProducts
-            // req.body.onlyClasses If === 1, retrieve all classes about to start in next 3 months and then loop thru them, saving 
+            // req.body.onlyClasses If === 1: if req.body.privilegedUser === 0, limit to classes about to start in next 3 months and then loop thru them, saving 
             //                          only those within 30 miles of req.body.nearZip.
-            // req.body.nearZip     This is the user's home zipcode.
+            //                      If req.body.privilegedUser === 1, ignore the 3 month limitation and, since it's optional, use nearZip only if entered.
+            // req.body.nearZip     This is the user's home zipcode. It is optional for a privileged user.
             //                      GET from https://www.zipcodeapi.com/rest/<zipcodekey>/distance.json/<zip_code1>/<zip_code2>/mile where
             //                          <zipcodekey> is replaced by app.get("zipcodekey")
             //                          <zip_code1> is replaced by req.body.nearZip
             //                      result is of form { distance: 34.5 }
+            // req.body.onlyOnlineClasses If === 1: if req.body.privilegedUser === 0, limit to classes about to start in next 3 months.
+            //                      If req.body.privilegedUser === 1, ignore the 3 month limitation.
             // req.body.privilegedUser
 
             // Will use async.series to (1) get string of tag id's; (2) perform one of many select statements to get matching projects; 
@@ -301,15 +304,23 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 // A non-privileged user just sees active projects.
                                 strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
-
-                        } else { // req.body.onlyClasses === "1"
+                        } else if (req.body.onlyClasses === "1") {
 
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
                                 strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
-                                // A privileged user just sees active classes.
+                                // A non-privileged user just sees active classes.
                                 strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            }
+                        } else { // req.body.onlyOnlineClasses === "1"
+
+                            if (req.body.privilegedUser === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
                         }
 
@@ -335,75 +346,123 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        if (req.body.onlyClasses === "1" && req.body.privilegedUser === "0" && passOn.projects.length > 0) {
-                            // A normal user, retrieving classes, gets only active ones (already handled in the query) and
-                            // only only those starting within 3 months and within 35 miles of req.body.nearZip.
-                            // Any non-qualified are removed from passOn.projects.
+                        if ((req.body.onlyClasses === "1" || req.body.onlyOnlineClasses === "1") && passOn.projects.length > 0) {
 
-                            var today = new Date();
-                            async.each(passOn.projects,
-                                function(projectIth, cb) {
+                            if (req.body.privilegedUser === "0") {
+                                // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
+                                // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
+                                // Any non-qualified are removed from passOn.projects.
 
-                                    var bRemove = false;
-                                    var class1Date = projectIth.schedule[0].date;
-                                    // This date must exist or the class could not have been made active.
-                                    // As must the zipcode used below.
+                                var today = new Date();
+                                async.each(passOn.projects,
+                                    function(projectIth, cb) {
 
-                                    var class1DateDate = new Date(class1Date);
-                                    var diffSeconds = (class1DateDate - today) / 1000;
-                                    if (diffSeconds < 0) {
-                                        // Class was in the past
-                                        bRemove = true;
-                                    } else {
-                                        var diffDays = diffSeconds / (24*60*60);
-                                        if (diffDays > 92) {
+                                        var bRemove = false;
+                                        var class1Date = projectIth.schedule[0].date;
+                                        // This date must exist or the class could not have been made active.
+                                        // As must the zipcode used below.
 
+                                        var class1DateDate = new Date(class1Date);
+                                        var diffSeconds = (class1DateDate - today) / 1000;
+                                        if (diffSeconds < 0) {
+                                            // Class was in the past
                                             bRemove = true;
+                                        } else {
+                                            var diffDays = diffSeconds / (24*60*60);
+                                            if (diffDays > 92) {
+
+                                                bRemove = true;
+                                            }
                                         }
-                                    }
 
-                                    if (!bRemove) {
-                                        // Class is not disqualified due to start date. We'll do the zipcode distance check.
-                                        // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + ".json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
-                                        var xhr = new XMLHttpRequest();
-                                        xhr.open("GET", url, true);
-                                        xhr.onload = function (e) {
+                                        if (!bRemove && req.body.onlyClasses === "1") {
+                                            // Class is not disqualified due to start date. We'll do the zipcode distance check.
+                                            // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
+                                            var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + ".json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open("GET", url, true);
+                                            xhr.onload = function (e) {
 
-                                            if (xhr.readyState === 4) {
+                                                if (xhr.readyState === 4) {
 
-                                                if (xhr.status === 200) {
+                                                    if (xhr.status === 200) {
 
-                                                    var distanceJSON = JSON.parse(xhr.responseText);
-                                                    if (distanceJSON.hasOwnProperty("distance")) {
+                                                        var distanceJSON = JSON.parse(xhr.responseText);
+                                                        if (distanceJSON.hasOwnProperty("distance")) {
 
-                                                        if (distanceJSON.distance > 35) {
+                                                            if (distanceJSON.distance > 35) {
+
+                                                                bRemove = true;
+                                                            }
+                                                        } else {
 
                                                             bRemove = true;
                                                         }
                                                     } else {
-
                                                         bRemove = true;
                                                     }
-                                                } else {
-                                                    bRemove = true;
                                                 }
-                                            }
-                                        };
-                                        xhr.onerror = function (e) {
-                                            bRemove = true;
-                                        };
-                                        xhr.send(null);
-                                    }
+                                            };
+                                            xhr.onerror = function (e) {
+                                                bRemove = true;
+                                            };
+                                            xhr.send(null);
+                                        }
 
-                                    if (bRemove) {
-                                        projectIth.remove = true;
+                                        projectIth.remove = bRemove;
+                                        cb(null);
                                     }
-                                    cb(null);
-                                }
-                            );
+                                );
+                            } else {
+                                // A privileged user, retrieving classes or online classes, gets both active and inactive ones. And date doesn't matter.
+                                // For classes (not online) they must be within 35 miles of req.body.nearZip--if that optional parameter is entered.
+                                // Any non-qualified are removed from passOn.projects.
+                                async.each(passOn.projects,
+                                    function(projectIth, cb) {
+
+                                        var bRemove = false;
+                                        if (req.body.nearZip.length > 0 && req.body.onlyClasses === "1") {
+                                            // Do the zipcode distance check.
+                                            // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
+                                            var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + ".json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open("GET", url, true);
+                                            xhr.onload = function (e) {
+
+                                                if (xhr.readyState === 4) {
+
+                                                    if (xhr.status === 200) {
+
+                                                        var distanceJSON = JSON.parse(xhr.responseText);
+                                                        if (distanceJSON.hasOwnProperty("distance")) {
+
+                                                            if (distanceJSON.distance > 35) {
+
+                                                                bRemove = true;
+                                                            }
+                                                        } else {
+
+                                                            bRemove = true;
+                                                        }
+                                                    } else {
+                                                        bRemove = true;
+                                                    }
+                                                }
+                                            };
+                                            xhr.onerror = function (e) {
+                                                bRemove = true;
+                                            };
+                                            xhr.send(null);
+                                        }
+
+                                        projectIth.remove = bRemove;
+                                        cb(null);
+                                    }
+                                );
+                            }
+                            
                             for (var i = passOn.projects.length - 1; i >= 0; i--) {
-                                if (passOn.projects[i].hasOwnProperty(remove)) {
+                                if (passOn.projects[i].remove) {
                                     passOn.projects.splice(i, 1);
                                 }
                             }

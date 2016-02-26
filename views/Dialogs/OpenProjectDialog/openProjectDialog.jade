@@ -34,6 +34,10 @@
           span
             | &nbsp;Search for <em>Classes</em> near zipcode&nbsp;&nbsp;
           input#Zip(type='text' style="width:3.2em;" placeholder='Zip' tabindex=6)
+          br
+          input#rad5(type='radio' name='sr' value='5' tabindex=6)
+          span
+            | &nbsp;Search for <em>Online Classes</em>.
       .col-xs-1
     .row.privileged(style="display:none;")
       br
@@ -59,6 +63,10 @@
           span
             | &nbsp;Search for <em>Classes</em> near (optional) zipcode&nbsp;&nbsp;
           input#ZipP(type='text' style="width:3.2em;" placeholder='Zip' tabindex=7)
+          br
+          input#rad5P(type='radio' name='srP' value='5' tabindex=8)
+          span
+            | &nbsp;Search for <em>Online Classes</em>.
       .col-xs-1
     br
     .row
