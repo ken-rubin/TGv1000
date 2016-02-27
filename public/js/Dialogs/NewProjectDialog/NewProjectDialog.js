@@ -70,7 +70,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the primary button or press Enter.
 
 							var buttons = [];
-							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_products"];
+							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"];
 							if (m_bPrivilegedUser) {
 
 							    buttons = [
