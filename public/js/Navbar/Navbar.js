@@ -60,7 +60,7 @@ define(["Core/errorHelper"],
 														// It is called m_functionOK in OpenProjectDialog.
 														// iProjectId is the project to fetch. specialProjectData is a JS object
 														// that contains info that will affect the user's interaction with the UI and how the
-														// project is later saved to the DB.
+														// project is later saved to the DB. And, most importantly, if the user needs to PAY FOR THE PROJECT.
 														function (iProjectId, specialProjectData) {
 
 															try {
