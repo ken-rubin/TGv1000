@@ -6,6 +6,9 @@
 
 ## Jerry
 
+- Implement purchase system for Products, Classes and Online Classes
+    + Online classes will require translation from UTC
+    + When project has been fetched after its selection in Hor. Scroll Strip in Search for/Open project, if it is a purchasable project with a price > 0, the Open Project Dialog will be replaced with a page that is built with the Product, Class or Online Class extra data. The page will contain everything entered by the project designer and the user will then decide whether or not to complete the purchase. If not, the project is cleared. If so, the project is saved in the background so it belongs to the user forever.
 - After search for and retrieving a project, all of the new special fields have to be added to influence processing permissions. Also, these processing permissions have to be implemented.
     + Also have to record if comics or System types had been changed. This will thell ProjectBO whether or not to update them.
 - Need to update routeSaveProject wrt permission, classes, etc.

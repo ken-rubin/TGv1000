@@ -189,10 +189,8 @@ define(["Core/errorHelper",
 							$(".hiddenifnotrunning").css("display", "inherit");
 
 							return null;
-						} catch (e) {
 
-							errorHelper.show(e);
-						}
+						} catch (e) { return e; }
 					}
 
 					// Method invoked when the nav-bar stop button is pressed.
@@ -209,10 +207,8 @@ define(["Core/errorHelper",
 
 				            $(".hiddenifrunning").css("display", "inherit");
 							$(".hiddenifnotrunning").css("display", "none");
-						} catch (e) {
 
-							errorHelper.show(e);
-						}
+						} catch (e) { errorHelper.show(e); }
 					};
 
 					// Start off the client.
@@ -242,10 +238,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showOpenProjectDialog = function (functionOK) {
@@ -253,17 +246,14 @@ define(["Core/errorHelper",
 						try {
 
 							// functionOK is an anonymous function in Navbar.js.
-							// It will be called with iProjectId if a project is selected.
-							// It will then call client to fetch and open the project.
+							// It will be called with iProjectId and specialProjectData if a project is selected.
+							// It will then call client to fetch and open the project. Then to possibly complete a purchase.
 
 							m_openDialog = new OpenProjectDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
 							return exceptionRet;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showSaveProjectDialog = function () {
@@ -289,10 +279,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showNewTypeDialog = function () {
@@ -305,10 +292,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showEditTypeDialog = function (index) {
@@ -321,10 +305,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showTypeSearchDialog = function (functionOK) {
@@ -337,10 +318,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showNewMethodDialog = function () {
@@ -353,10 +331,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showEditMethodDialog = function (index) {
@@ -369,10 +344,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showMethodSearchDialog = function (functionOK) {
@@ -385,10 +357,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showNewPropertyDialog = function () {
@@ -401,10 +370,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showEditPropertyDialog = function (index) {
@@ -417,10 +383,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showNewEventDialog = function () {
@@ -433,10 +396,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showGenericRenameDialog = function (itemType, index) {
@@ -449,10 +409,7 @@ define(["Core/errorHelper",
 							
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showDeleteConfirmDialog = function (objectType, index) {
@@ -499,10 +456,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.showImageDiskDialog = function (bImage, functionOK) {
@@ -516,10 +470,8 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					self.showImageSearchDialog = function (bImage, functionOK) {
@@ -533,10 +485,8 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					self.showImageURLDialog = function (bImage, functionOK) {
@@ -550,10 +500,8 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					self.showPropertyGrid = function(toolInstance, functionManipulate) {
@@ -566,10 +514,7 @@ define(["Core/errorHelper",
 							
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					//////////////////////////////
@@ -629,10 +574,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -642,10 +584,7 @@ define(["Core/errorHelper",
 
 							return m_clProject.addType(clType);
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -663,10 +602,7 @@ define(["Core/errorHelper",
 							
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -695,10 +631,7 @@ define(["Core/errorHelper",
 							});
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -735,10 +668,9 @@ define(["Core/errorHelper",
 							// Now click the new method in the grid to load the code pane.
 							$("#method_" + iMethodIndex.toString()).click();
 
-						} catch (e) {
+							return null;
 
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 // used
 					self.updateMethodInActiveType = function(updatedMethod, origMethod, iMethodIndex, activeClType) {
@@ -758,10 +690,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -783,10 +712,9 @@ define(["Core/errorHelper",
 							// Now do something to scroll the events grid to the bottom.
 							$("#eventrename_" + (activeClType.data.events.length - 1).toString()).scrollintoview();
 
-						} catch (e) {
+							return null;
 
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -797,10 +725,8 @@ define(["Core/errorHelper",
 							var activeClType = types.getActiveClType();
 							return self.addPropertyToType(property,
 								activeClType);
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.addPropertyToType = function (property, clType) {
@@ -821,10 +747,8 @@ define(["Core/errorHelper",
 							$("#propertyedit_" + (clType.data.properties.length - 1).toString()).scrollintoview();
 
 							return null;
-						} catch (e) {
 
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -846,10 +770,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -868,10 +789,7 @@ define(["Core/errorHelper",
 
 							return types.regenTWEventsTable();
 
-						} catch(e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 //used
@@ -899,10 +817,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					// Delete types.getActiveClType() from ???
@@ -927,10 +842,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						}  catch(e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					// Delete types.getActiveClType().data.methods[index].
@@ -942,10 +854,7 @@ define(["Core/errorHelper",
 
 							return types.deleteMethod(index);
 
-						}  catch(e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					// Delete types.getActiveClType().data.properties[index].
@@ -957,10 +866,7 @@ define(["Core/errorHelper",
 
 							return types.deleteProperty(index);
 
-						}  catch(e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					// Delete types.getActiveClType().data.events[index].
@@ -972,10 +878,7 @@ define(["Core/errorHelper",
 
 							return types.deleteEvent(index);
 
-						}  catch(e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					//////////////////////////////
@@ -987,10 +890,7 @@ define(["Core/errorHelper",
 
 							location.href = "/adminzone"
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					//////////////////////////////
@@ -1001,10 +901,7 @@ define(["Core/errorHelper",
 
 							return types.getLength();
 
-						} catch(e) {
-
-							throw e;
-						}
+						} catch (e) { throw e; }
 					}
 
 					// If no active project, returns call unloadedCallback in order to proceed to New Project or whatever.
@@ -1116,10 +1013,7 @@ define(["Core/errorHelper",
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					self.getProject = function () {
@@ -1133,10 +1027,7 @@ define(["Core/errorHelper",
 
 							return m_clProject.saveToDatabase();
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
 					self.closeCurrentDialog = function () {

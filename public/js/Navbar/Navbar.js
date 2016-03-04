@@ -64,6 +64,7 @@ define(["Core/errorHelper"],
 														function (iProjectId, specialProjectData) {
 
 															try {
+																
 																if (iProjectId > 0) {
 
 																	exceptionRet = client.openProjectFromDB(iProjectId,
