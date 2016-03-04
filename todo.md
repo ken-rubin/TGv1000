@@ -6,6 +6,7 @@
 
 ## Jerry
 
+- Think about adding a click handler to the span next to all radio button and checkboxes and to click them if the text is clicked to have a more expected user experience.
 - Implement purchase system for Products, Classes and Online Classes
     + Online classes will require translation from UTC
     + When project has been fetched after its selection in Hor. Scroll Strip in Search for/Open project, if it is a purchasable project with a price > 0, the Open Project Dialog will be replaced with a page that is built with the Product, Class or Online Class extra data. The page will contain everything entered by the project designer and the user will then decide whether or not to complete the purchase. If not, the project is cleared. If so, the project is saved in the background so it belongs to the user forever.

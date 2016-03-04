@@ -64,13 +64,24 @@ define(["Core/errorHelper"],
 														function (iProjectId, specialProjectData) {
 
 															try {
-																
+
 																if (iProjectId > 0) {
 
-																	exceptionRet = client.openProjectFromDB(iProjectId,
+																	var exceptionRet = client.openProjectFromDB(iProjectId,
 																		// This callback is called from client.loadedProject to add specialProjectData to the project.
+																		// Note: if the project is a Product, Class or Online Class, then that extra information is already
+																		// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
 																		function(clProject) {
-																			clProject.data.specialProjectData = specialProjectData;
+
+																			try {
+
+																				$.extend(true, clProject.data, specialProjectData);
+
+																				if (clProject.data.isProduct || clProject.data.isClass || clProject.data.isOnlineClass) {
+
+																					var exceptionRet = client.showBuyDialog();
+																				}
+																			} catch (e) { errorHelper.show(e); }
 																		}
 																	);
 																	if (exceptionRet) { throw exceptionRet; }

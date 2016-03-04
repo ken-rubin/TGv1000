@@ -23,6 +23,7 @@ define(["Core/errorHelper",
 		"Dialogs/NewPropertyDialog/NewPropertyDialog",
 		"Dialogs/PropertyGrid/PropertyGrid",
 		"Dialogs/ComicsDialog/ComicsDialog",
+		"Dialogs/BuyDialog/BuyDialog",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -43,6 +44,7 @@ define(["Core/errorHelper",
 				NewPropertyDialog,
 				PropertyGrid,
 				ComicsDialog,
+				BuyDialog,
 				Project,
 				Type) {
 
@@ -233,6 +235,19 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new NewProjectDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					self.showBuyDialog = function () {
+
+						try {
+
+							m_openDialog = new BuyDialog();
 							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) { throw exceptionRet; }
 
