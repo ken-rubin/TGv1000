@@ -20,7 +20,7 @@
       .col-xs-10(style='margin-left:25px;')
           input#rad1(type='radio' name='sr' value='1' checked tabindex=2)
           span
-            | &nbsp;Search only projects that I created.
+            | &nbsp;Search only for projects that I created or bought.
           br
           input#rad2(type='radio' name='sr' value='2' tabindex=3)
           span
@@ -32,12 +32,12 @@
           br
           input#rad4(type='radio' name='sr' value='4' tabindex=5)
           span
-            | &nbsp;Search for <em>Classes</em> near zipcode&nbsp;&nbsp;
+            | &nbsp;Search for upcoming <em>Classes</em> near zipcode&nbsp;&nbsp;
           input#Zip(type='text' style="width:3.2em;" placeholder='Zip' tabindex=6)
           br
           input#rad5(type='radio' name='sr' value='5' tabindex=6)
           span
-            | &nbsp;Search for <em>Online Classes</em>.
+            | &nbsp;Search for upcoming <em>Online Classes</em>.
       .col-xs-1
     .row.privileged(style="display:none;")
       br
@@ -45,15 +45,15 @@
       .col-xs-10(style='margin-left:25px;')
           input#rad0P(type='radio' name='srP' value='0' tabindex=2)
           span
-            | &nbsp;Retrieve Core projects, ignoring Search tags.
+            | &nbsp;Retrieve all Core projects, ignoring Search tags.
           br
           input#rad1P(type='radio' name='srP' value='1' checked tabindex=3)
           span
-            | &nbsp;Search only projects that I created.
+            | &nbsp;Search only for projects that I created.
           br
           input#rad2P(type='radio' name='srP' value='2' tabindex=4)
           span
-            | &nbsp;Search others' projects, public or not. (Enter userName as tag to limit.)
+            | &nbsp;Search others' projects, public or not. (Optionally, enter userName as tag to limit.)
           br
           input#rad3P(type='radio' name='srP' value='3' tabindex=5)
           span
@@ -61,7 +61,7 @@
           br
           input#rad4P(type='radio' name='srP' value='4' tabindex=6)
           span
-            | &nbsp;Search for <em>Classes</em> near (optional) zipcode&nbsp;&nbsp;
+            | &nbsp;Search for <em>Classes</em> (optionally) near zipcode&nbsp;&nbsp;
           input#ZipP(type='text' style="width:3.2em;" placeholder='Zip' tabindex=7)
           br
           input#rad5P(type='radio' name='srP' value='5' tabindex=8)

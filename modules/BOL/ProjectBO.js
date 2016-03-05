@@ -63,6 +63,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.projectId
             // req.user.userId
+            // req.body.privilegedUser
 
             var sqlQuery;
             sqlQuery = "select * from " + self.dbname + "projects where id=" + req.body.projectId + ";";
@@ -97,6 +98,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isCoreProject: row.isCoreProject === 1 ? true : false,
                             isProduct: row.isProduct === 1 ? true : false,
                             isClass: row.isClass === 1 ? true : false,
+                            isOnlineClass: row.isOnlineClass === 1 ? true : false,
                             comics:
                             {
                                 items: []
@@ -113,45 +115,106 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 }
 
                                 project.tags = tags;
-                                m_functionRetProjDoComics(  
-                                    req, 
-                                    res, 
-                                    project,
+
+                                // In parallel:
+                                //  1. Potentially retrieve fields from table classes, products or onlineclasses.
+                                //  2. Retrieve project's comics and their content.
+                                async.parallel(
+                                    [
+                                        // 1.
+                                        function(cb) {
+
+                                            // If one of the following is true, it means that the user is opening a purchasable project.
+                                            
+                                            // If this is a non-privileged user, then (1) he hasn't puchased it yet; (2) the fact that it is a
+                                            // purchasable project will be erased on the client side (the 3 fields will be set to false) if he completes the putchase;
+                                            // and (3) the project will immediately be saved, given a new id and reloaded when the purchase is 
+                                            // completed. After that, the project looks just like any other project.
+
+                                            // If this is a privileged user, then the project is being opened for editing (types, comics, etc.),
+                                            // and the specialized data for purchasable projects is added.
+                                            if (req.body.privilegedUser === "0") {
+                                                return cb(null);
+                                            }
+
+                                            // Privileged user.
+                                            if (!project.isProduct && !project.isClass && !project.isOnlineClass) {
+                                                // A normal project.
+                                                return cb(null);
+                                            }
+
+                                            // Privleged user is editing a project.
+                                            // Need to read and insert special Product, Class or OnlineClass data into project.
+                                            var table = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
+                                            strQuery = "select * from " + self.dbname + table + " where baseProjectId=" + project.id + ";";
+                                            var exceptionRet = sql.execute(strQuery,
+                                                function(rows) {
+                                                    if (rows.length !== 1) {
+                                                        return cb(new Error('Error retrieving your project.'));
+                                                    }
+
+                                                    // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.
+                                                    project.specialProjectData = {};
+                                                    for (var p in rows[0]) {
+                                                        project.specialProjectData[p] = rows[0][p];
+                                                    }
+
+                                                    return cb(null);
+                                                },
+                                                function(strError) {
+                                                    return cb(new Error(strError));
+                                                }
+                                            );
+                                            if (exceptionRet) {
+                                                return cb(exceptionRet);
+                                            }
+                                        },
+                                        // 2.
+                                        function(cb) {
+
+                                            m_functionRetProjDoComics(  
+                                                req, 
+                                                res, 
+                                                project,
+                                                function(err) {
+                                                    if (err) { return cb(err); }
+
+                                                    // Sucess. The project is filled.
+
+                                                    // Sort comics by ordinal.
+                                                    project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+
+                                                    // Sort lists inside comics by their own ordinals.
+                                                    project.comics.items.forEach(
+                                                        function(comic) {
+
+                                                            // Types. 
+                                                            // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
+                                                            comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                            comic.types.items.forEach(
+                                                                function(type) {
+                                                                    // Methods.
+                                                                    type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                    // Properties.
+                                                                    type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                    // Events.
+                                                                    type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                }
+                                                            );
+                                                            comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                        }
+                                                    );
+
+                                                    return cb(null);
+                                                }
+                                            );
+                                        }
+                                    ],
                                     function(err) {
                                         if (err) {
-                                            return res.json({success: false, message: err.message});
+                                            return res.json({success:false, message: err.message});
                                         }
-
-                                        // Sucess. The project is filled.
-
-                                        // Sort comics by ordinal.
-                                        project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-
-                                        // Sort lists inside comics by their own ordinals.
-                                        project.comics.items.forEach(
-                                            function(comic) {
-
-                                                // Types. 
-                                                // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
-                                                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                comic.types.items.forEach(
-                                                    function(type) {
-                                                        // Methods.
-                                                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                        // Properties.
-                                                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                        // Events.
-                                                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                    }
-                                                );
-                                                comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                            }
-                                        );
-
-                                        return res.json({
-                                            success: true,
-                                            project: project
-                                        });
+                                        return res.json({success:true, project:project});
                                     }
                                 );
                             }
@@ -160,13 +223,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                 },
                 function(strError) {
 
-                    res.json( {success:false, message: strError} );
+                    return res.json( {success:false, message: strError} );
                 }
             );
 
             if (exceptionRet) {
 
-                res.json({success: false, message: exceptionRet.message});
+                return res.json({success: false, message: exceptionRet.message});
             }
         } catch(e) {
 
