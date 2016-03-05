@@ -1,12 +1,12 @@
 ## Ken
 
-- Replace Blockly.
-- Resizing in the two vertical scroll regions has lost aspect ratio. Toolstrip for sure.
+- Replace Blockly
 
 
 ## Jerry
 
 - Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
+- See below for discussion of Projects and Purchassable Projects.
 - Implement purchase system for Products, Classes and Online Classes
     + Online classes will require translation from UTC
     + When project has been fetched after its selection in Hor. Scroll Strip in Search for/Open project, if it is a purchasable project with a price > 0, the Open Project Dialog will be replaced with a page that is built with the Product, Class or Online Class extra data. The page will contain everything entered by the project designer and the user will then decide whether or not to complete the purchase. If not, the project is cleared. If so, the project is saved in the background so it belongs to the user forever.
@@ -51,6 +51,26 @@
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
 - If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything in TypeWell.
+
+
+
+## A Discussion of Projects and Purchasable Projects
+
+- A *Purchaseable Project* is either a Class, a Product or an Online Class.
+- Free projects are called *Normal projects*.
+- **Use of the New Project Dialog**
+    + A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type (see below). That is the normal user's only choice.
+    + When using the New Project dialog, a privileged (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) user selects a project type and one from: Normal project (ad hoc), Class, Product or Online Class. 
+    + If the privileged user creates a Purchasable Project, a specialized snippet will be inserted in the center of the New Project Dialog. The snippet is where purchasable project information (like schedule, cost, etc.) is entered.
+        * The project is created with as much or as little filled in as the privileged user wants. For now. The information in the snippet is saved in clProject.data.specialProjectData.
+        * Saving the project results in a project being created along with a back-pointing row in classes, products or onlineclasses, as appropriate. The projects table row has one of isClass, isProduct or isOnlineProject set to true.
+        * These projects have their active field set to 0. An entitled user must make the project active in an AdminZone dialog before it can be retrieved by non-privleged users. This will be John.
+        * Any privileged user with the correct entitlement can edit the purchasable project, adding comics, comiccode, types, etc.
+- **Use of the Open/Search for Project Dialog**
+    + 
+- **Use of the Save Project Dialog**
+    + 
+
 
 ## Comics / Help
 

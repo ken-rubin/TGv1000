@@ -545,8 +545,7 @@ define(["Core/errorHelper",
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId,
-									privilegedUser: g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"] ? 1 : 0
+									projectId: iProjectId
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
