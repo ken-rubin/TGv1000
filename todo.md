@@ -56,19 +56,28 @@
 
 ## A Discussion of Projects and Purchasable Projects
 
-- A *Purchaseable Project* is either a Class, a Product or an Online Class.
+- A *Purchasable Project* is either a Class, a Product or an Online Class. A user has to buy it to make a copy and use it.
 - Free projects are called *Normal projects*.
 - **Use of the New Project Dialog**
-    + A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type (see below). That is the normal user's only choice.
+    + All new projects are based on one of the five project types. They always start by retrieving one of these empty *core* projects.
+        * There are five project types for now, but that number will be reduced before we go live. 
+        * A particular project type has a unique set of system types that defines the nature of the project.
+    + A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type. That is the normal user's only choice.
     + When using the New Project dialog, a privileged (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) user selects a project type and one from: Normal project (ad hoc), Class, Product or Online Class. 
-    + If the privileged user creates a Purchasable Project, a specialized snippet will be inserted in the center of the New Project Dialog. The snippet is where purchasable project information (like schedule, cost, etc.) is entered.
+    + If the privileged user creates a Purchasable Project, a specialized snippet will be inserted in the center of the New Project Dialog. The snippet is where purchasable project information (like schedule, cost, etc.) is entered. Its info is saved in clProject.data.specialProjectData.
         * The project is created with as much or as little filled in as the privileged user wants. For now. The information in the snippet is saved in clProject.data.specialProjectData.
         * Saving the project results in a project being created along with a back-pointing row in classes, products or onlineclasses, as appropriate. The projects table row has one of isClass, isProduct or isOnlineProject set to true.
         * These projects have their active field set to 0. An entitled user must make the project active in an AdminZone dialog before it can be retrieved by non-privleged users. This will be John.
         * Any privileged user with the correct entitlement can edit the purchasable project, adding comics, comiccode, types, etc.
+    + **Summary:**
+        * A normal user creating a new project never has specialProjectData and isCore, isProduct, isClass and isOnlineClass are all false.
+        * A privileged user creating a new purchasable project will create a project with one of isProduct, isClass or isOnlineClass set to true, and specialProjectData will be filled in to the extent that the creator fills it in in the dialog snippet.
+- **Use of the Save Project Dialog wrt Purchasable Projects**
+    + *3 cases:*
+        1\. First save of a newly created Purchasable Project.
+        2\. Subsequent save of an opened Purchasable Project when opened by a privileged user for editing.
+        3\. First save of a newly purchased Purchasable Project by a normal user.
 - **Use of the Open/Search for Project Dialog**
-    + 
-- **Use of the Save Project Dialog**
     + 
 
 
