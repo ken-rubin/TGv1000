@@ -101,41 +101,34 @@ var objectInstantiatedModules = {};
 app.post("/renderJadeSnippet",
         function (req, res) {
 
-	try {
+        	try {
+        		// Look for business object--invoke to further specify the request  
+        		// body with arbitrary data to be passed to the jade render call.
+        		var objectBusinessObject = req.body.businessObject;
+        		if (objectBusinessObject) {
 
-		// Look for business object--invoke to further specify the request  
-		// body with arbitrary data to be passed to the jade render call.
-		var objectBusinessObject = req.body.businessObject;
-		if (objectBusinessObject) {
+        			// Get the cached business object instance, or...
+        			var instance = objectInstantiatedModules[objectBusinessObject.module];
+        			if (!instance) {
 
-			// Get the cached business object instance, or...
-			var instance = objectInstantiatedModules[objectBusinessObject.module];
-			if (!instance) {
+        				// ...require module, and...
+        				var module = require("./modules/" + objectBusinessObject.module);
 
-				// ...require module, and...
-				var module = require("./modules/" + 
-					objectBusinessObject.module);
+        				// ...allocate type.
+        				instance = new module();
+        			}
 
-				// ...allocate type.
-				instance = new module();
-			}
+        			// Invoke method to augment the body property.
+        			var exceptionRet = instance[objectBusinessObject.method](req.body);
+        			if (exceptionRet) { throw exceptionRet; }
+        		}
 
-			// Invoke method to augment the body property.
-			var exceptionRet = instance[objectBusinessObject.method](req.body);
-			if (exceptionRet) {
+        		// Render the specified jade file to the client.
+        		res.render(req.body.templateFile, req.body);
 
-				throw exceptionRet;
-			}
-		}
-
-		// Render the specified jade file to the client.
-		res.render(req.body.templateFile, 
-			req.body);
-	} catch (e) {
-
-		res.send(e.message);
-	}
-});
+        	} catch (e) { res.send(e.message); }
+        }
+);
 
 /////////////////////////////////////
 console.log("Map main route login.jade.");
@@ -274,7 +267,6 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                 } else {
                     app[rowi.verb](rowi.route, methodInstance);
                 }
-
             } catch (e) {
 
                 console.log(' ');

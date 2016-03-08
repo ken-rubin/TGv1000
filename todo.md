@@ -4,7 +4,7 @@
 - Free projects are called *Normal projects* or *ad hoc* projects.
 
 
-#### Use of the New Project Dialog
+#### The New Project Dialog
 
 - All new projects are created using the New Project Dialog. A privileged user will have a choice of creating a Normal project or one of the Puchasable Project types. A non-privileged user doesn't get a choice. He can create only Normal projects when using the New Project Dialog.
     + At this time all users must register to get into the site, but a registered user doesn't have to buy anything. He can create Normal projects as long as he wants.
@@ -24,7 +24,7 @@
     + A privileged user creating a new purchasable project will create a project with one of isProduct, isClass or isOnlineClass set to true, and specialProjectData will be filled in to the extent that the creator fills it in in the dialog snippet.
 
 
-#### Use of the Save Project Dialog wrt Purchasable Projects
+#### The Save Project Dialog for Purchasable Projects
 
 - *3 cases:*
     1. The first save of a newly created Purchasable Project by the privileged user who created it.
@@ -43,9 +43,19 @@
 
 
 
-#### Use of the Open/Search for Project Dialog
+#### Use of the Open/Search for Project Dialog to find Purchasable Projects
 
-- 
+- **Normal** users
+    + Besides being able to search for one's own projects along with public projects created by others (such projects are made public only by specially entitled users--like John or an instructor), a normal user can specify that he wants to search for a Purchasable Project to consider buying.
+        * He clicks one of the Products, Classes near [zipcode] or Online Classes radio buttons. For the two types of classes, we look only for active projects scheduled to begin within 3 months. For physical classes we search within 35 miles of the zipcode that was entered.
+        * He clicks Search and hopefully gets one or more projects to choose from. A fairly informative tooltip guides his choice. Remember: he hasn't bought anything yet.
+        * He clicks the image of the project he wants to buy.
+        * Before he gets his copy of the Class, Product or Online Class, he, of course has to pay. But before that we'll pop up a new dialog to display a write-up of what he's chosen, play that movie, etc.
+        * He clicks buy. The dialog morphs into a credit card entry form. And so forth.
+        * Once he pays and is approved, the user's copy of the project opens. It has already been saved to the database as that user's purchased project. The project now is really a normal project, just special because it is linked to a Class or Product Project.
+- **Privileged** users
+    + 
+
 
 
 #### Working with a Purchasable Project, whether just created or opened from search by a privileged user
@@ -59,7 +69,7 @@
 
 ## Ken
 
-- Replace Blockly
+- Replace Blockly.
 
 
 ## Jerry
