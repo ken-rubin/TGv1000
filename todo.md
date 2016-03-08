@@ -46,15 +46,22 @@
 #### Use of the Open/Search for Project Dialog to find Purchasable Projects
 
 - **Normal** users
-    + Besides being able to search for one's own projects along with public projects created by others (such projects are made public only by specially entitled users--like John or an instructor), a normal user can specify that he wants to search for a Purchasable Project to consider buying.
+    + Besides being able to search for one's own projects along with public projects created by others (such projects are made public only by specially entitled users--like John or an instructor), a normal user can specify that he wants to search for a Purchasable Project to consider buying it.
         * He clicks one of the Products, Classes near [zipcode] or Online Classes radio buttons. For the two types of classes, we look only for active projects scheduled to begin within 3 months. For physical classes we search within 35 miles of the zipcode that was entered.
         * He clicks Search and hopefully gets one or more projects to choose from. A fairly informative tooltip guides his choice. Remember: he hasn't bought anything yet.
-        * He clicks the image of the project he wants to buy.
-        * Before he gets his copy of the Class, Product or Online Class, he, of course has to pay. But before that we'll pop up a new dialog to display a write-up of what he's chosen, play that movie, etc.
+        * He clicks the image of the project he wants to buy after reading a description of the project in its to-be-expanded tooltip.
+        * Before he gets his copy of the Class, Product or Online Class, he, of course has to pay. But before that we'll pop up a new dialog to display a write-up of what he's chosen, play a movie, etc.
         * He clicks buy. The dialog morphs into a credit card entry form. And so forth.
-        * Once he pays and is approved, the user's copy of the project opens. It has already been saved to the database as that user's purchased project. The project now is really a normal project, just special because it is linked to a Class or Product Project.
+        * Once he pays and the charge is approved, the user's copy of the project opens. It has already been saved to the database as that user's purchased project, so, in effect, he's now editing his own project. The project now is really a normal project, just special because it is linked to a Purchasable Project and gets its comics from that project.
 - **Privileged** users
-    + 
+    + A privileged user has 6 choices when searching for a project to edit (he cannot buy a product):
+        * A Core project--one used by users to create *ad hoc* projects.
+        * One of his own projects.
+        * Someone else's project, whether public or not.
+        * A Class to edit (optionally entering a proximity zipcode--like the normal user, but in this case non-mandatory). This search also disregards the start date restriction.
+        * A Product to edit.
+        * An Online Class to edit, again disregarding the start date restriction.
+    + Also, pending some more thinking, a privileged user can edit an active or inactive Purchasable Project.
 
 
 
@@ -63,6 +70,12 @@
 - It is expected that a Purchasable Project will have multiple comics, each of which will start with the project in the final state of the comic that preceded it.
 - Tools will be provided to the privileged user who has created or opened the Purchasable Project to build that project, to add additional comics and to add the comic code to each comic that will guide the user along the path of achieving the desired end state of each comic.
 - As will be seen below, a normal user who buys a Purchasable Project gets a copy of the project that points back to the comics that exist only on the Purchasable Project. Therefore, when making changes to a Purchasable Project that has been bought buy one or more users, we'll have to take special steps to update those bought projects. Either that (difficult) or we don't allow editing of a Purchasable Project once anyone has bought it (not likely, since we'll probably discover problems as people use them).
+- Implement purchase system for Products, Classes and Online Classes
+    + Online classes will require translation from UTC
+    + When project has been fetched after its selection in Hor. Scroll Strip in Search for/Open project, if it is a purchasable project with a price > 0, the Open Project Dialog will be replaced with a page that is built with the Product, Class or Online Class extra data. The page will contain everything entered by the project designer and the user will then decide whether or not to complete the purchase. If not, the project is cleared. If so, the project is saved in the background so it belongs to the user forever.
+- After search for and retrieving a project, all of the new special fields have to be added to influence processing permissions. Also, these processing permissions have to be implemented.
+    + Also have to record if comics or System types had been changed. This will tell ProjectBO whether or not to update them.
+- Need to update routeSaveProject wrt permission, classes, etc.
 
 
 
@@ -75,14 +88,8 @@
 ## Jerry
 
 - Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
-- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout.
-- See below for discussion of Projects and Purchassable Projects.
-- Implement purchase system for Products, Classes and Online Classes
-    + Online classes will require translation from UTC
-    + When project has been fetched after its selection in Hor. Scroll Strip in Search for/Open project, if it is a purchasable project with a price > 0, the Open Project Dialog will be replaced with a page that is built with the Product, Class or Online Class extra data. The page will contain everything entered by the project designer and the user will then decide whether or not to complete the purchase. If not, the project is cleared. If so, the project is saved in the background so it belongs to the user forever.
-- After search for and retrieving a project, all of the new special fields have to be added to influence processing permissions. Also, these processing permissions have to be implemented.
-    + Also have to record if comics or System types had been changed. This will tell ProjectBO whether or not to update them.
-- Need to update routeSaveProject wrt permission, classes, etc.
+- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. We need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
+    + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - Test image (multer) stuff now that I've put JWT in the middle.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
@@ -90,8 +97,11 @@
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Administrative stuff
     + AdminZone functionality
-        + User, usergroup maintenance
-    + Save place (like for student working in a project) and jump right back to it if the user signs in again.
+        + User maintenance
+        + Usergroup maintenance
+        + Purchasable Project active flag
+        + Ability to make projects public
+- Save place (like for student working in a project) and jump right back to it if the user signs in again.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
@@ -120,7 +130,7 @@
         - PropertyGrid
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
-- If !project.canEditSystemTypes, when active type is an SystemType, disable just about everything in TypeWell.
+- If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
 
 
@@ -172,7 +182,6 @@
 ## To discuss
 
 - When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript. **Discuss with Ken & John.**
-- Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - Do we want to (or can we) round X,Y to 0, 1 or 2 decimals?
 - All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
 - A New SystemType should probably require an image. **Discuss with Ken.**
