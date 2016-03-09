@@ -61,7 +61,7 @@
         * A Class to edit (optionally entering a proximity zipcode--like the normal user, but in this case non-mandatory). This search also disregards the start date restriction.
         * A Product to edit.
         * An Online Class to edit, again disregarding the start date restriction.
-    + Also, pending some more thinking, a privileged user can edit an active or inactive Purchasable Project.
+    + Also, pending some more thinking, a privileged user can edit an active or inactive Purchasable Project. (See the next section for more about this.)
 
 
 
@@ -77,15 +77,19 @@
     + Also have to record if comics or System types had been changed. This will tell ProjectBO whether or not to update them.
 - Need to update routeSaveProject wrt permission, classes, etc.
 
+#### Extra fields in a Purchasable Project (other than specific purchase-related information) that will help
+
+- Telling routeSaveProject how to save (insert, update, retain id's, etc.).
+- Buying a searched for Purchasable Project.
+- Editing a Purchasable Project; i.e., accessing all the special tools necessary to edit or add comics, etc.
 
 
-
-## Ken
+## Ken's Issues
 
 - Replace Blockly.
 
 
-## Jerry
+## Jerry's Issues
 
 - Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
 - After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. We need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
