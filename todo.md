@@ -20,13 +20,18 @@
     + Saving the project results in a project being created (inserted into the DB, giving it a new id) along with a back-pointing row in classes, products or onlineclasses, as appropriate. The projects table row has one of isClass, isProduct or isOnlineProject set to true.
     + New Purchasable Projects have their active field set to 0. This means that normal users cannot buy them prematurely. An entitled user must make the project active in an AdminZone dialog before it can be accessed (searched for) by non-privleged users. This setting to active status will most likely be done by John in an AdminZone dialog.
     + Any privileged user with the correct entitlement can edit the purchasable project, adding comics, comic code, types, etc.
-- **Summary:**
+- **Summary**
     + A normal user creating a new project never has specialProjectData and isCoreProject, isProduct, isClass and isOnlineClass are all false.
     + A privileged user creating a new Purchasable Project will create a project with one of isProduct, isClass or isOnlineClass set to true, and at least some of specialProjectData will be filled in. A Purchasable Project cannot be made active until all required special project data is complete and validated.
 - **clProject.data.specialProjectData**
-    + There are 2 parts to specialProjectData: (1) the data that will be saved to the products, classes or onlineclasses table; and (2) information that the client side will use to enable/disable user actions in the web site along with information that will help routeSaveProject know how to save the project (i.e., insert, update, preserve ids, etc.).
-        * (1) Data for the products, classes or onlineclasses tables is kept in clProject.data.specialProjectData.productData, ....classData or ....onlineClassData, respectively. Except for the backpointer to the project, all fields from the snippet are kept here and are written to the table. As an example, this is how class information is added to clProject.data.specialProductData:
-        ```
+    + specialProjectData is a new property of clProject.data that exists in two cases:
+        * When a privileged user creates or edits a Purchasable Project.
+        * When a normal user searches for and opens a Purchasable Project before buying it.
+    + specialProjectData doesn't exist in clProject.data in any other circumstance. For example, if a normal user buys a Purchasable Project, specialProjectData is removed from the project.
+    + There are 2 parts to specialProjectData: (a) the data that for the project in the products, classes or onlineclasses table; and (b) information that the client side will use to enable/disable user actions in the web site along with information that will help routeSaveProject know how to save the project (i.e., insert, update, preserve ids, etc.).
+        1. Data for the products, classes or onlineclasses tables is kept in clProject.data.specialProjectData.productData, ....classData or ....onlineClassData, respectively. Except for the backpointer to the project, all fields from the snippet are kept here and are written to the table. (I assume these properties will be added to as the buying dialog is implemented.)
+            + Class data:
+            ```
                 clProject.data.specialProjectData.classData = {
                     active: false,
                     classDescription: strProjectDescription,
@@ -45,9 +50,9 @@
                     price: dPrice,
                     classNotes: strNotes
                 };
-        ```
-        Prouct data:
-        ```
+            ```
+            + Prouct data:
+            ```
                 clProject.data.specialProjectData.productData = {
                     active: false,
                     productDescription: strProjectDescription,
@@ -55,9 +60,9 @@
                     difficulty: strDifficulty,
                     price: dPrice
                 };
-        ```
-        And Online Class data:
-        ```
+            ```
+            + Online Class data:
+            ```
                 clProject.data.specialProjectData.onlineClassData = {
                     active: false,
                     classDescription: strProjectDescription,
@@ -70,8 +75,8 @@
                     price: dPrice,
                     classNotes: strNotes
                 };
-        ```
-        * (2) The other information added to a new Purchasable Project looks like this:
+            ```
+        2. The other information added to a new Purchasable Project looks like this:
         ```
                 clProject.data.specialProjectData = {
                     privilegedUser: m_bPrivilegedUser,
@@ -84,7 +89,33 @@
                     openMode: 'new'
                 };
         ```
-        * As will be discussed below, this structure is maintained whenever a Purchasable Project is opened for editing after initial creation.
+    + This structure is maintained whenever a Purchasable Project is opened for editing by a privileged user after initial creation and when it is opened by a normal user when making a purchase decision.
+
+
+#### Use of the Open/Search for Project Dialog to find Purchasable Projects
+
+- **Normal** users
+    + Besides being able to search for one's own projects along with public projects created by others (such projects are made public only by specially entitled users--like John or an instructor), a normal user can specify that he wants to search for a Purchasable Project to consider buying it.
+        * He clicks one of the Products, Classes near [zipcode] or Online Classes radio buttons. For the two types of classes, we look only for active projects scheduled to begin within 3 months. For physical classes we search within 35 miles of the zipcode that was entered.
+        * He clicks Search and hopefully gets one or more projects to choose from. A fairly informative tooltip guides his choice. Remember: he hasn't bought anything yet.
+        * He clicks the image of the project he wants to buy after reading a description of the project in its to-be-expanded tooltip.
+        * Before he gets his copy of the Class, Product or Online Class, he, of course has to pay. But before that we'll pop up a new dialog to display a write-up of what he's chosen, play a movie, etc.
+        * He clicks buy. The dialog morphs into a credit card entry form. And so forth.
+        * Once he pays and the charge is approved, the user's copy of the project opens. It has already been saved to the database as that user's purchased project, so, in effect, he's now editing his own project. The project now is really a normal project, just special because it is linked to a Purchasable Project and gets its comics from that project.
+    + **clProject.data.specialProjectData**
+        * kkkk
+- **Privileged** users
+    + A privileged user has 6 choices when searching for a project to edit (he cannot buy a product):
+        * A Core project--one used by users to create *ad hoc* projects.
+        * One of his own projects.
+        * Someone else's project, whether public or not.
+        * A Class to edit (optionally entering a proximity zipcode--like the normal user, but in this case non-mandatory). This search also disregards the start date restriction.
+        * A Product to edit.
+        * An Online Class to edit, again disregarding the start date restriction.
+    + Also, pending some more thinking, a privileged user can edit an active or inactive Purchasable Project. (See the next section for more about this.)
+    + **clProject.data.specialProjectData**
+        * kkkk
+
 
 
 #### The Save Project Dialog for Purchasable Projects
@@ -106,28 +137,6 @@
 
 
 
-#### Use of the Open/Search for Project Dialog to find Purchasable Projects
-
-- **Normal** users
-    + Besides being able to search for one's own projects along with public projects created by others (such projects are made public only by specially entitled users--like John or an instructor), a normal user can specify that he wants to search for a Purchasable Project to consider buying it.
-        * He clicks one of the Products, Classes near [zipcode] or Online Classes radio buttons. For the two types of classes, we look only for active projects scheduled to begin within 3 months. For physical classes we search within 35 miles of the zipcode that was entered.
-        * He clicks Search and hopefully gets one or more projects to choose from. A fairly informative tooltip guides his choice. Remember: he hasn't bought anything yet.
-        * He clicks the image of the project he wants to buy after reading a description of the project in its to-be-expanded tooltip.
-        * Before he gets his copy of the Class, Product or Online Class, he, of course has to pay. But before that we'll pop up a new dialog to display a write-up of what he's chosen, play a movie, etc.
-        * He clicks buy. The dialog morphs into a credit card entry form. And so forth.
-        * Once he pays and the charge is approved, the user's copy of the project opens. It has already been saved to the database as that user's purchased project, so, in effect, he's now editing his own project. The project now is really a normal project, just special because it is linked to a Purchasable Project and gets its comics from that project.
-- **Privileged** users
-    + A privileged user has 6 choices when searching for a project to edit (he cannot buy a product):
-        * A Core project--one used by users to create *ad hoc* projects.
-        * One of his own projects.
-        * Someone else's project, whether public or not.
-        * A Class to edit (optionally entering a proximity zipcode--like the normal user, but in this case non-mandatory). This search also disregards the start date restriction.
-        * A Product to edit.
-        * An Online Class to edit, again disregarding the start date restriction.
-    + Also, pending some more thinking, a privileged user can edit an active or inactive Purchasable Project. (See the next section for more about this.)
-
-
-
 #### Working with a Purchasable Project, whether just created or opened from search by a privileged user
 
 - It is expected that a Purchasable Project will have multiple comics, each of which will start with the project in the final state of the comic that preceded it.
@@ -140,11 +149,6 @@
     + Also have to record if comics or System types had been changed. This will tell ProjectBO whether or not to update them.
 - Need to update routeSaveProject wrt permission, classes, etc.
 
-#### Extra fields in a Purchasable Project (other than specific purchase-related information) that will help
-
-- Telling routeSaveProject how to save (insert, update, retain id's, etc.).
-- Buying a searched for Purchasable Project.
-- Editing a Purchasable Project; i.e., accessing all the special tools necessary to edit or add comics, etc.
 
 
 ## Ken's Issues

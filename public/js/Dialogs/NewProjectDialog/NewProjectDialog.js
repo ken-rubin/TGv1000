@@ -42,6 +42,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}).done(m_functionRenderJadeSnippetResponse1).error(errorHelper.show);
 
 							return null;
+							
 						} catch (e) {
 
 							return e;
