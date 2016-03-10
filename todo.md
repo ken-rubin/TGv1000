@@ -9,19 +9,82 @@
 - All new projects are created using the New Project Dialog. A privileged user will have a choice of creating a Normal project or one of the Puchasable Project types. A non-privileged user doesn't get a choice. He can create only Normal projects when using the New Project Dialog.
     + At this time all users must register to get into the site, but a registered user doesn't have to buy anything. He can create Normal projects as long as he wants.
     + Registration doesn't require a credit card. That is entered during the Purchasable Project buying process.
-- A Normal project has only one comic. Never more. That comic contains all the help information needed to teach the very clever user how to create projects starting with one of the core project types. There are currently 5 core types, but that will probably shrink to 2 or 3.
+- A Normal project has exactly one comic. That comic contains all the help information needed to teach the clever user how to create projects starting with one of the core project types. There are currently 5 core types, but that will probably shrink to 2 or 3. I think that the comic (help) will vary a little depending upon the project type (e.g., game vs console app).
     + All projects, Normal and Purchasable, are based on one of the Core project types. These core types differ by being derived from and supplied with somewhat different System Types.
-    + A core project has isCore set to true and all of isProduct, isClass and isOnlineClass set to false.
+    + A core project has isCoreProject set to true, and all of isProduct, isClass and isOnlineClass are set to false.
+    + The core projects are created with the database with ids 1-5. Even after editing, their ids and their comic's ids don't change.
 - A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type. That is the normal user's only choice.
-- When using the New Project dialog, a privileged (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) user selects a project type and one from: Normal project, Class, Product or Online Class. 
-- If the privileged user creates a Purchasable Project, a specialized snippet will be inserted in the center of the New Project Dialog. The snippet is where the privileged user enters purchasable project information (like schedule, cost, extended description, instructor, class location, etc., as appropriate for the Purchase Project type).
-    + When the project is created, the privileged user can enter as much or as little special project data as desired. The information in the snippet is saved in clProject.data.specialProjectData.
+- When using the New Project dialog to create a new Purchasable Project, a privileged (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) user selects a project type and one from: Normal project, Class, Product or Online Class. If the privileged user elects to create a Normal project, he is effectively limited to exactly what a normal user is.
+- If the privileged user elects to create one of the Purchasable Project types, a specialized snippet will be inserted in the New Project Dialog. The snippet is where the privileged user enters Purchasable Project information (like schedule, cost, extended description, instructor, class location, etc., as appropriate for the Purchaseable Project type).
+    + While the Purchasable Project is under development, the privileged user can enter as much or as little special project data as desired. The information in the snippet is saved in clProject.data.specialProjectData.
     + Saving the project results in a project being created (inserted into the DB, giving it a new id) along with a back-pointing row in classes, products or onlineclasses, as appropriate. The projects table row has one of isClass, isProduct or isOnlineProject set to true.
-    + New Purchasable Projects have their active field set to 0. An entitled user must make the project active in an AdminZone dialog before it can be accessed (searched for) by non-privleged users. This setting to active status will be John in an AdminZone dialog.
-    + Any privileged user with the correct entitlement can edit the purchasable project, adding comics, comiccode, types, etc.
+    + New Purchasable Projects have their active field set to 0. This means that normal users cannot buy them prematurely. An entitled user must make the project active in an AdminZone dialog before it can be accessed (searched for) by non-privleged users. This setting to active status will most likely be done by John in an AdminZone dialog.
+    + Any privileged user with the correct entitlement can edit the purchasable project, adding comics, comic code, types, etc.
 - **Summary:**
-    + A normal user creating a new project never has specialProjectData and isCore, isProduct, isClass and isOnlineClass are all false.
-    + A privileged user creating a new purchasable project will create a project with one of isProduct, isClass or isOnlineClass set to true, and specialProjectData will be filled in to the extent that the creator fills it in in the dialog snippet.
+    + A normal user creating a new project never has specialProjectData and isCoreProject, isProduct, isClass and isOnlineClass are all false.
+    + A privileged user creating a new Purchasable Project will create a project with one of isProduct, isClass or isOnlineClass set to true, and at least some of specialProjectData will be filled in. A Purchasable Project cannot be made active until all required special project data is complete and validated.
+- **clProject.data.specialProjectData**
+    + There are 2 parts to specialProjectData: (1) the data that will be saved to the products, classes or onlineclasses table; and (2) information that the client side will use to enable/disable user actions in the web site along with information that will help routeSaveProject know how to save the project (i.e., insert, update, preserve ids, etc.).
+        * (1) Data for the products, classes or onlineclasses tables is kept in clProject.data.specialProjectData.productData, ....classData or ....onlineClassData, respectively. Except for the backpointer to the project, all fields from the snippet are kept here and are written to the table. As an example, this is how class information is added to clProject.data.specialProductData:
+        ```
+                clProject.data.specialProjectData.classData = {
+                    active: false,
+                    classDescription: strProjectDescription,
+                    instructorFirst: strInstructorFirst,
+                    instructorLast: strInstructorLast,
+                    phone: strPhone,
+                    facility: strFacility,
+                    address: strAddress,
+                    room: strRoom,
+                    city: strCity,
+                    state: strState,
+                    zip: strZip,
+                    when: arrWhen,
+                    level: strLevel,
+                    difficulty: strDifficulty,
+                    price: dPrice,
+                    classNotes: strNotes
+                };
+        ```
+        Prouct data:
+        ```
+                clProject.data.specialProjectData.productData = {
+                    active: false,
+                    productDescription: strProjectDescription,
+                    level: strLevel,
+                    difficulty: strDifficulty,
+                    price: dPrice
+                };
+        ```
+        And Online Class data:
+        ```
+                clProject.data.specialProjectData.onlineClassData = {
+                    active: false,
+                    classDescription: strProjectDescription,
+                    instructorFirst: strInstructorFirst,
+                    instructorLast: strInstructorLast,
+                    email: strEmail,
+                    when: arrWhen,
+                    level: strLevel,
+                    difficulty: strDifficulty,
+                    price: dPrice,
+                    classNotes: strNotes
+                };
+        ```
+        * (2) The other information added to a new Purchasable Project looks like this:
+        ```
+                clProject.data.specialProjectData = {
+                    privilegedUser: m_bPrivilegedUser,
+                    normalProject: m_bNormalProject,
+                    classProject: m_bClassProject,
+                    productProject: m_bProductProject,
+                    onlineClassProject: m_bOnlineClassProject,
+                    comicsEdited: false,
+                    systemTypesEdited: false,
+                    openMode: 'new'
+                };
+        ```
+        * As will be discussed below, this structure is maintained whenever a Purchasable Project is opened for editing after initial creation.
 
 
 #### The Save Project Dialog for Purchasable Projects
