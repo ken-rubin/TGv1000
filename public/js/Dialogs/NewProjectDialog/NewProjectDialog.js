@@ -450,7 +450,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
 									clProject.data.specialProjectData = {
 										privilegedUser: m_bPrivilegedUser,
+										ownedByUser: false,
+										othersProjects: false,
 										normalProject: m_bNormalProject,
+										coreProject: false,
 										classProject: m_bClassProject,
 										productProject: m_bProductProject,
 										onlineClassProject: m_bOnlineClassProject,

@@ -139,11 +139,21 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                         return cb(new Error('Error retrieving your project.'));
                                                     }
 
-                                                    // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.
-                                                    project.specialProjectData = {};
+                                                    // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
+                                                    var specialProjectData = {};
                                                     for (var p in rows[0]) {
-                                                        project.specialProjectData[p] = rows[0][p];
+                                                        specialProjectData[p] = rows[0][p];
                                                     }
+                                                    if (project.isProduct) {
+                                                        project.specialProjectData.productData = specialProjectData;
+                                                    } else if (project.isClass) {
+                                                        project.specialProjectData.classData = specialProjectData;
+                                                    } else {
+                                                        project.specialProjectData.onlineClassData = specialProjectData;
+                                                    }
+
+                                                    // Note: the remainder of project.specialProjectData will be added in OpenProjectDialog.js.
+                                                    // Also, project fields such as id will be adjusted there. They used to be handled here.
 
                                                     return cb(null);
                                                 },

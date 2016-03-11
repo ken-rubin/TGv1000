@@ -114,10 +114,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						    		var j = parseInt(jq.context.id.substring(8), 10);
 						    		var projectId = m_searchResultRawArray[j].id;
 									specialProjectData = {
-										// privilegedUser: m_bPrivilegedUser,
-										// normalProject: m_bNormalProject,
-										// classProject: m_bClassProject,
-										// productProject: m_bProductProject,
+										privilegedUser: m_bPrivilegedUser,
+										ownedByUser: m_onlyOwnedByUser === 1,
+										othersProjects: m_onlyOthersProjects === 1,
+										normalProject: m_onlyCoreProjects + m_onlyProducts + m_onlyClasses + m_onlyOnlineClasses === 0,
+										coreProject: m_onlyCoreProjects === 1,
+										classProject: m_onlyClasses === 1,
+										productProject: m_onlyProducts === 1,
+										onlineClassProject: m_onlyOnlineClasses === 1,
 										comicsEdited: false,
 										systemTypesEdited: false,
 										openMode: 'searched'

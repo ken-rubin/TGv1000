@@ -13,7 +13,7 @@
     + All projects, Normal and Purchasable, are based on one of the Core project types. These core types differ by being derived from and supplied with somewhat different System Types.
     + A core project has isCoreProject set to true, and all of isProduct, isClass and isOnlineClass are set to false.
     + The core projects are created with the database with ids 1-5. Even after editing, their ids and their comic's ids don't change.
-- A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type. That is the normal user's only choice.
+- A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type. That is the normal user's only choice--beyond name, tags, etc.
 - When using the New Project dialog to create a new Purchasable Project, a privileged (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) user selects a project type and one from: Normal project, Class, Product or Online Class. If the privileged user elects to create a Normal project, he is effectively limited to exactly what a normal user is.
 - If the privileged user elects to create one of the Purchasable Project types, a specialized snippet will be inserted in the New Project Dialog. The snippet is where the privileged user enters Purchasable Project information (like schedule, cost, extended description, instructor, class location, etc., as appropriate for the Purchaseable Project type).
     + While the Purchasable Project is under development, the privileged user can enter as much or as little special project data as desired. The information in the snippet is saved in clProject.data.specialProjectData.
@@ -29,64 +29,67 @@
         * When a normal user searches for and opens a Purchasable Project before buying it.
     + specialProjectData doesn't exist in clProject.data in any other circumstance. For example, if a normal user buys a Purchasable Project, specialProjectData is removed from the project.
     + There are 2 parts to specialProjectData: (a) the data that for the project in the products, classes or onlineclasses table; and (b) information that the client side will use to enable/disable user actions in the web site along with information that will help routeSaveProject know how to save the project (i.e., insert, update, preserve ids, etc.).
-        1. Data for the products, classes or onlineclasses tables is kept in clProject.data.specialProjectData.productData, ....classData or ....onlineClassData, respectively. Except for the backpointer to the project, all fields from the snippet are kept here and are written to the table. (I assume these properties will be added to as the buying dialog is implemented.)
+        1. Data for the products, classes or onlineclasses tables is kept in clProject.data.specialProjectData.productData, ....classData or ....onlineClassData, respectively. Except for the backpointer to the project, all fields from the snippet are kept here and are written to the table. (I assume these properties will be changed/enhanced as the buying process is implemented.)
             + Class data:
             ```
                 clProject.data.specialProjectData.classData = {
-                    active: false,
-                    classDescription: strProjectDescription,
-                    instructorFirst: strInstructorFirst,
-                    instructorLast: strInstructorLast,
-                    phone: strPhone,
-                    facility: strFacility,
-                    address: strAddress,
-                    room: strRoom,
-                    city: strCity,
-                    state: strState,
-                    zip: strZip,
-                    when: arrWhen,
-                    level: strLevel,
-                    difficulty: strDifficulty,
-                    price: dPrice,
-                    classNotes: strNotes
+                    active: [bool],
+                    classDescription: [str],
+                    instructorFirst: [str],
+                    instructorLast: [str],
+                    phone: [str],
+                    facility: [str],
+                    address: [str],
+                    room: [str],
+                    city: [str],
+                    state: [str],
+                    zip: [numstr,
+                    when: {[]},
+                    level: [str],
+                    difficulty: [str],
+                    price: [num],
+                    classNotes: [str]
                 };
             ```
-            + Prouct data:
+            + Product data:
             ```
                 clProject.data.specialProjectData.productData = {
-                    active: false,
-                    productDescription: strProjectDescription,
-                    level: strLevel,
-                    difficulty: strDifficulty,
-                    price: dPrice
+                    active: [bool],
+                    productDescription: [str],
+                    level: [str],
+                    difficulty: [str],
+                    price: [num]
                 };
             ```
             + Online Class data:
             ```
                 clProject.data.specialProjectData.onlineClassData = {
-                    active: false,
-                    classDescription: strProjectDescription,
-                    instructorFirst: strInstructorFirst,
-                    instructorLast: strInstructorLast,
-                    email: strEmail,
-                    when: arrWhen,
-                    level: strLevel,
-                    difficulty: strDifficulty,
-                    price: dPrice,
-                    classNotes: strNotes
+                    active: [bool],
+                    classDescription: [str],
+                    instructorFirst: [str],
+                    instructorLast: [str],
+                    email: [str],
+                    when: {[]},
+                    level: [str],
+                    difficulty: [str],
+                    price: [num],
+                    classNotes: [str]
                 };
             ```
         2. The other information added to a new Purchasable Project looks like this:
         ```
                 clProject.data.specialProjectData = {
-                    privilegedUser: m_bPrivilegedUser,
-                    normalProject: m_bNormalProject,
-                    classProject: m_bClassProject,
-                    productProject: m_bProductProject,
-                    onlineClassProject: m_bOnlineClassProject,
-                    comicsEdited: false,
-                    systemTypesEdited: false,
-                    openMode: 'new'
+                    privilegedUser: [bool],
+                    ownedByUser: [bool],
+                    othersProject: [bool],
+                    normalProject: [bool],
+                    coreProject: [bool],
+                    classProject: [bool],
+                    productProject: [bool],
+                    onlineClassProject: [bool],
+                    comicsEdited: [bool],
+                    systemTypesEdited: [bool],
+                    openMode: 'new' or 'searched'
                 };
         ```
     + This structure is maintained whenever a Purchasable Project is opened for editing by a privileged user after initial creation and when it is opened by a normal user when making a purchase decision.
