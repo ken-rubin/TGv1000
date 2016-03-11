@@ -89,7 +89,7 @@
                     onlineClassProject: [bool],
                     comicsEdited: [bool],
                     systemTypesEdited: [bool],
-                    openMode: 'new' or 'searched'
+                    openMode: 'new'
                 };
         ```
     + This structure is maintained whenever a Purchasable Project is opened for editing by a privileged user after initial creation and when it is opened by a normal user when making a purchase decision.
@@ -105,8 +105,22 @@
         * Before he gets his copy of the Class, Product or Online Class, he, of course has to pay. But before that we'll pop up a new dialog to display a write-up of what he's chosen, play a movie, etc.
         * He clicks buy. The dialog morphs into a credit card entry form. And so forth.
         * Once he pays and the charge is approved, the user's copy of the project opens. It has already been saved to the database as that user's purchased project, so, in effect, he's now editing his own project. The project now is really a normal project, just special because it is linked to a Purchasable Project and gets its comics from that project.
-    + **clProject.data.specialProjectData**
-        * kkkk
+    + **clProject.data.specialProjectData** for a normal user looking to buy a Purchasable Project:
+        ```
+                clProject.data.specialProjectData = {
+                    privilegedUser: false,
+                    ownedByUser: false,
+                    othersProject: false,
+                    normalProject: false,
+                    coreProject: false,
+                    classProject: [bool],
+                    productProject: [bool],
+                    onlineClassProject: [bool],
+                    comicsEdited: false,
+                    systemTypesEdited: false,
+                    openMode: 'searched'
+                };
+        ```
 - **Privileged** users
     + A privileged user has 6 choices when searching for a project to edit (he cannot buy a product):
         * A Core project--one used by users to create *ad hoc* projects.
@@ -116,8 +130,22 @@
         * A Product to edit.
         * An Online Class to edit, again disregarding the start date restriction.
     + Also, pending some more thinking, a privileged user can edit an active or inactive Purchasable Project. (See the next section for more about this.)
-    + **clProject.data.specialProjectData**
-        * kkkk
+    + **clProject.data.specialProjectData** for a privileged user planning to edit a Purchasable Project:
+        ```
+                clProject.data.specialProjectData = {
+                    privilegedUser: true,
+                    ownedByUser: [bool],
+                    othersProject: [bool],
+                    normalProject: false,
+                    coreProject: false,
+                    classProject: [bool],
+                    productProject: [bool],
+                    onlineClassProject: [bool],
+                    comicsEdited: false, to start
+                    systemTypesEdited: false, to start
+                    openMode: 'searched'
+                };
+        ```
 
 
 
