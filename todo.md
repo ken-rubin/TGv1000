@@ -2,6 +2,10 @@
 
 - A Class, a Product or an Online Class is a project that a user has to buy in order to use it. When we don't need to differentiate between the three types, we'll call them by the collective name *Purchasable Projects*.
 - Free projects are called *Normal projects* or *ad hoc* projects.
+- In a big change *all* projects in memory (new or searched for) contain the property specialProjectData. It contains fields that govern the UI and assist ProjectBO#routeSaveProject in knowing how to save the project. It also tells whether the project has to be bought by a normal user in order to be copied, used and saved.
+- In the case of Purchaseable Projects which are being edited by a privileged user or are being considered for purchase by a normal user, specialProjectData contains one of these properties: productData, classData or onlineClassData.
+- specialProjectData is detailed below.
+- Also note that new and searched for projects are now returned from the database with certain fields intact that used to be zeroed before. For example, project.id used to be set to 0 for a new project or a search for project belonging to another. This is no longer done on reading from the database, since enough information exists in specialProjectData to handle these chores back on the client side.
 
 
 #### The New Project Dialog
@@ -16,13 +20,13 @@
 - A normal ("non-privileged") user uses the New Project dialog to start an ad hoc project of a particular project type. That is the normal user's only choice--beyond name, tags, etc.
 - When using the New Project dialog to create a new Purchasable Project, a privileged (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) user selects a project type and one from: Normal project, Class, Product or Online Class. If the privileged user elects to create a Normal project, he is effectively limited to exactly what a normal user is.
 - If the privileged user elects to create one of the Purchasable Project types, a specialized snippet will be inserted in the New Project Dialog. The snippet is where the privileged user enters Purchasable Project information (like schedule, cost, extended description, instructor, class location, etc., as appropriate for the Purchaseable Project type).
-    + While the Purchasable Project is under development, the privileged user can enter as much or as little special project data as desired. The information in the snippet is saved in clProject.data.specialProjectData.
+    + While the Purchasable Project is under development, the privileged user can enter as much or as little special project data as desired. The information in the snippet is saved in clProject.data.specialProjectData.productData or .classData or .onlineClassData.
     + Saving the project results in a project being created (inserted into the DB, giving it a new id) along with a back-pointing row in classes, products or onlineclasses, as appropriate. The projects table row has one of isClass, isProduct or isOnlineProject set to true.
     + New Purchasable Projects have their active field set to 0. This means that normal users cannot buy them prematurely. An entitled user must make the project active in an AdminZone dialog before it can be accessed (searched for) by non-privleged users. This setting to active status will most likely be done by John in an AdminZone dialog.
     + Any privileged user with the correct entitlement can edit the purchasable project, adding comics, comic code, types, etc.
 - **Summary**
     + A normal user creating a new project never has specialProjectData and isCoreProject, isProduct, isClass and isOnlineClass are all false.
-    + A privileged user creating a new Purchasable Project will create a project with one of isProduct, isClass or isOnlineClass set to true, and at least some of specialProjectData will be filled in. A Purchasable Project cannot be made active until all required special project data is complete and validated.
+    + A privileged user creating a new Purchasable Project will create a project with one of isProduct, isClass or isOnlineClass set to true, and at least some of specialProjectData will be filled in. A Purchasable Project cannot be made active until all requiredSpecialProject Purchasable Project data is complete and validated.
 - **clProject.data.specialProjectData**
     + specialProjectData is a new property of clProject.data that exists in two cases:
         * When a privileged user creates or edits a Purchasable Project.
@@ -189,6 +193,7 @@
 
 ## Jerry's Issues
 
+- **When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.**
 - Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
 - After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. We need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.

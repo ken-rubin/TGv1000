@@ -797,15 +797,33 @@ module.exports = function ProjectBO(app, sql, logger) {
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
 
-            // How to handle System Types:
+            // How to handle System Types if project.specialProjectData.systemTypesEdited === "1":
                 // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
                 // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
                 // Its methods, event and properties are deleted and re-inserted.
                 // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
                 // Methods, events and properties are inserted.
 
+            // Similar approach need if project.specialProjectData.comicsEdited === "1"
+
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
+
+            // If a privileged user is saving a project that contains the property specialProjectData (a normal user cannot),
+            // then all sorts of special things have to happen:
+
+                // Saving data to table products, classes or onlineclasses if this is a Purchasable Project (as opposed to an edited core project).
+
+                // Updating without changing project id or comic id.
+
+                // Handling SystemTypes if project.specialProjectData.systemTypesEdited === "1",
+                    // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
+                    // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
+                    // Its methods, event and properties are deleted and re-inserted.
+                    // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
+                    // Methods, events and properties are inserted.
+
+                // Similar approach need if project.specialProjectData.comicsEdited === "1"
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
