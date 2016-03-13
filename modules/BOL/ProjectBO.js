@@ -809,8 +809,21 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
 
-            // If a privileged user is saving a project that contains the property specialProjectData (a normal user cannot),
-            // then all sorts of special things have to happen:
+            // All projects now have a specialProjectData property. From both normal and privileged users.
+            // If a privileged user is saving a Purchasable Project (whether new or opened for editing), 
+            // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
+            // These three properties contain the info that has to be saved to classes, onlineclasses or products, respectively.
+
+            // A privileged user can also edit and save a core project as such. In this case project.isCoreProject And
+            // project.specialProjectData.coreProject will both be true. Take your pick.
+
+            // project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
+            // 'new' projects are always INSERTed into the database.
+            // 'searched' projects may be INSERTed or UPDATEd. More on this below in m_functionDetermineSaveOrSaveAs.
+
+            // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
+            // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
+            // its project.specialProjectData.openMode will have been changed to 'bought'.
 
                 // Saving data to table products, classes or onlineclasses if this is a Purchasable Project (as opposed to an edited core project).
 
