@@ -592,6 +592,43 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					self.loadedProject = function (project, callback) {
+
+						try {
+
+							// Enable the TypeWell icons that are disabled if no project is loaded.
+							// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
+							$(".disabledifnoproj").prop("disabled", false);
+
+				    		// Allocate project.
+				    		m_clProject = new Project();
+				    		var exceptionRet = m_clProject.load(project);
+				    		if (exceptionRet) { return exceptionRet; }
+
+				    		// Play App Type's initialize Method to set the initial state of the designer frame
+		    				designer.initializeWithWorkspace();
+
+							// Fire bootstrap tooltip opt-in.
+							$(".disabledifnoproj").powerTip({
+								smartPlacement: true,
+								manual: false
+							});
+
+							if ($.isFunction(callback)) {
+
+								callback(m_clProject);
+							
+							} else {
+
+								self.setBrowserTabAndBtns();
+							}
+
+							return null;
+
+						} catch (e) { return e; }
+					};
+
+
 //used
 					self.addTypeToProject = function(clType) {
 
@@ -991,45 +1028,6 @@ define(["Core/errorHelper",
 							navbar.enableDisableAdminZoneMenuItems();
 						}
 					}
-
-					// Even though New Project Dialog no longer calls the following method (since it retrieves the Project with id=1-5 from the DB),
-					// the following method is called after saving a project, since it needs to be reloaded following the setting of probably
-					// new id's for the project and all of its parts.
-					self.loadedProject = function (project, callback) {
-
-						try {
-
-							// Enable the TypeWell icons that are disabled if no project is loaded.
-							// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
-							$(".disabledifnoproj").prop("disabled", false);
-
-				    		// Allocate project.
-				    		m_clProject = new Project();
-				    		var exceptionRet = m_clProject.load(project);
-				    		if (exceptionRet) { return exceptionRet; }
-
-				    		// Play App Type's initialize Method to set the initial state of the designer frame
-		    				designer.initializeWithWorkspace();
-
-							// Fire bootstrap tooltip opt-in.
-							$(".disabledifnoproj").powerTip({
-								smartPlacement: true,
-								manual: false
-							});
-
-							if ($.isFunction(callback)) {
-
-								callback(m_clProject);
-							
-							} else {
-
-								self.setBrowserTabAndBtns();
-							}
-
-							return null;
-
-						} catch (e) { return e; }
-					};
 
 					self.getProject = function () {
 
