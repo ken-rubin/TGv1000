@@ -142,7 +142,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         // Generate and encrypt a password.
                         var password = (Math.random() * 10000).toFixed(0);
-                        if (profile.userName === 'a@a.com') {
+                        if (profile.userName === 'a@a.com' || profile.userName === 'z@z.com') {
                             console.log('Generated password: ' + password.toString());
                         }
                         var usergroupId = 3;
@@ -197,8 +197,8 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         console.log(JSON.stringify(profile));
 
-                        // A special bypass. We don't send an email to a@a.com. Instead, we write his p/w to console.log.
-                        if (profile.userName !== 'a@a.com') {
+                        // A special bypass. We don't send an email to a@a.com or z@z.com. Instead, we write his p/w to console.log.
+                        if (profile.userName !== 'a@a.com' && profile.userName !== 'z@z.com') {
 
                             var smtpTransport = nodemailer.createTransport("SMTP", {
                             

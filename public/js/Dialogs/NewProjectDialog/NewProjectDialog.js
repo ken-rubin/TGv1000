@@ -71,7 +71,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the primary button or press Enter.
 
 							var buttons = [];
-							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"];
+							m_bPrivilegedUser = (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) || false;
 							if (m_bPrivilegedUser) {
 
 							    buttons = [
@@ -440,6 +440,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
 								["Game", "Console", "Web Site", "HoloLens", "Mapping"].indexOf(m_projectType) + 1, 
 								function(clProject){	// callback is used to set fields after async fetch of empty-ish core project from db.
+
+									clProject.data.id = 0;	// just to be sure it doesn't overwrite a core project
+									clProject.data.isCoreProject = false;
+
+									// We could also do these things that used to be done in the BO, but we aren't--at least for now.
+					                        //     comicIth.id = 0; 
+	                                        //     method.id = 0; AND property.id = 0; AND event.id = 0;
 
 									clProject.data.name = strProjectName;
 									clProject.data.tags = strProjectTags;

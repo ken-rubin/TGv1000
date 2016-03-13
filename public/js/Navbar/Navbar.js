@@ -77,7 +77,7 @@ define(["Core/errorHelper"],
 
 																				$.extend(true, clProject.data, specialProjectData);
 
-																				if (clProject.data.isProduct || clProject.data.isClass || clProject.data.isOnlineClass) {
+																				if (clProject.data.specialProjectData.productProject || clProject.data.specialProjectData.classProject || clProject.data.specialProjectData.onlineClassProject) {
 
 																					var exceptionRet = client.showBuyDialog();
 																				}
