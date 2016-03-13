@@ -577,7 +577,7 @@ define(["Core/errorHelper",
 	                                        //     method.id = 0; OR property.id = 0; OR event.id = 0;
 	                                        // }
 
-									var exceptionRet = self.loadedProject(data.project, callback);
+									var exceptionRet = self.load_m_clProject(data.project, callback);
 									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
 								} else {
@@ -592,7 +592,7 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.loadedProject = function (project, callback) {
+					self.load_m_clProject = function (project, callback) {
 
 						try {
 

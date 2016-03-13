@@ -148,7 +148,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										client.closeCurrentDialog();
 
 										// Set up the modified project.
-										client.loadedProject(objectData.project);
+										client.load_m_clProject(objectData.project);
 
 										client.setBrowserTabAndBtns();
 
