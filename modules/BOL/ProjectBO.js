@@ -890,6 +890,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                     }
                                                                 }
                                                             );
+                                                        } else if (typeOfSave = 'saveWithSameId') {
+
+                                                            m_log('Going into m_functionSaveProjectWithSameId');
+                                                            m_functionSaveProjectWithSameId(connection, req, res, project, 
+                                                                function(err) {
+                                                                    if (err) {
+                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                    } else {
+                                                                        m_log("***Full success***");
+                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                    }
+                                                                }
+                                                            );
                                                         } else {    // 'saveAs'
 
                                                             m_log('Going into m_functionSaveProjectAs');
@@ -942,6 +955,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // typeOfSave:
             //  'saveAs' INSERTs new rows for everything.
             //  'save' DELETES (cascading the project from the database) and then calls SaveAs to insert it.
+            //  'saveWithSameId' ....
 
             // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
@@ -963,18 +977,20 @@ module.exports = function ProjectBO(app, sql, logger) {
             var project = req.body.projectJson;
             async.waterfall(
                 [
-                    //
+                    // Simple settings to get started
                     function(cb) {
+
                         return cb(null, 
                             {
-                                project: project, 
-                                newProj: (project.id === 0), 
-                                notMine: (project.id !== 0 && project.ownedByUserId !== parseInt(req.user.userId, 10))
+                                newProj: (project.specialProjectData.openMode === "new" || project.specialProjectData.openMode === "bought"), 
+                                notMine: project.specialProjectData.othersProjects,
+                                editingCoreProject: (project.specialProjectData.privilegedUser && project.specialProjectData.coreProject)
                             }
                         );
                     },
-                    //
+                    // Getting id of any of user's projects with same name as in project.
                     function(resultArray, cb) {
+
                         var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -988,8 +1004,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         );
                     },
-                    //
+                    // Getting name of any of user's projects with this project's id.
                     function(resultArray, cb) {
+
                         var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -1002,16 +1019,29 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 return cb(null, resultArray);
                             }
                         );
+                    },
+                    // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
+                    function(resultArray, cb) {
+
+                        if (project.specialProjectData.privilegedUser && project.specialProjectData.openMode === 'searched') {
+
+                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + project.id + ";";
+                            sql.queryWithCxn(connection, strQuery,
+                                function(err, rows) {
+                                    if (err) { return cb(err, null); }
+                                    resultArray["savingPurchasableProjectThatsBeenBought"] = (rows[0]['cnt'] > 0);
+                                    return cb(null, resultArray);
+                                }
+                            );
+                        } else {
+
+                            return cb(null, resultArray);
+                        }
                     }
                 ],
-                //
+                // new properties in resultArray: editingCoreProject, savingPurchasableProjectThatsBeenBought
                 function(err, resultArray) {
-                    m_log("***At end of waterfall***");
-                    m_log(JSON.stringify(resultArray));
-                    m_log("resultArray.newProj=" + resultArray.newProj);
-                    m_log("resultArray.notMine=" + resultArray.notMine);
-                    m_log("resultArray.idOfUsersProjWithThisName=" + resultArray.idOfUsersProjWithThisName);
-                    m_log("resultArray.nameOfUsersProjWithThisId=" + resultArray.nameOfUsersProjWithThisId);
+
                     if (err) { 
                         m_log("Came into end of waterfall with err non-null."); 
                         return callback(err); 
@@ -1019,32 +1049,46 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     var typeOfSave = null;
 
-                    // New project or saving someone else's project must have a unique name for current user.
-                    if (resultArray.newProj || resultArray.notMine ) {
-                        if (resultArray.idOfUsersProjWithThisName > -1) {
-                            return callback(new Error("You already have a project with this name."));
-                        } else {
-                            typeOfSave = "saveAs";
-                        }
+                    if (resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought) {
+
+                        typeOfSave = "saveWithSameId";
+                    
                     } else {
 
-                        // If saving project with same id as another of user's projects with same name, then save.
-                        if (resultArray.idOfUsersProjWithThisName === resultArray.project.id) {
-                            typeOfSave = "save";
-                        }
-                    } 
+                        // New project or saving someone else's project must have a unique name for current user.
+                        if (resultArray.newProj || resultArray.notMine ) {
+                            if (resultArray.idOfUsersProjWithThisName > -1) {
 
-                    if (!typeOfSave) {  // no decision yet
+                                return callback(new Error("You already have a project with this name."));
 
-                        // If saving project with same id and name then save; else saveAs.
-                        if (resultArray.nameOfUsersProjWithThisId === resultArray.project.name) {
-                            typeOfSave = "save";
+                            } else {
+
+                                typeOfSave = "saveAs";
+
+                            }
                         } else {
-                            typeOfSave = "saveAs";
+
+                            // If saving project with same id as another of user's projects with same name, then save.
+                            if (resultArray.idOfUsersProjWithThisName === resultArray.project.id) {
+
+                                typeOfSave = "save";
+                            }
+                        }
+
+                        if (!typeOfSave) {  // no decision yet
+
+                            // If saving project with same id and name then save; else saveAs.
+                            if (resultArray.nameOfUsersProjWithThisId === resultArray.project.name) {
+
+                                typeOfSave = "save";
+
+                            } else {
+
+                                typeOfSave = "saveAs";
+                            }
                         }
                     }
-                    
-                    m_log("typeOfSave=" + typeOfSave);
+
                     return callback(null, typeOfSave);
                 }
             );
@@ -1113,6 +1157,116 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             m_log('***Continuing in m_functionSaveProjectAs***');
+
+            // We'll use async.series serially to (1) insert project and 
+            // (2) use async.parallel to
+            //  (2a) write the project's tags and
+            //  (2b) call off to do all of the project's comics
+            async.series(
+                [
+                    // (1)
+                    function(cb) {
+
+                        // CHANGE THIS TEST ONCE CLIENT SIDE IS CHANGED:
+                        if (project.canEditSystemTypes) {
+
+                            // User (a special user) turned on project.canEditSystemTypes. We assume some were edited or added.
+                            // Set up array of strings that will hold the System Types sql script (ST.sql) which will be written to
+                            // project root when we commit the transaction.
+
+                            project.script = [
+                                "delimiter //",
+                                "create procedure doSystemTypes()",
+                                "begin"
+                            ];
+
+                            // For each System Type we will add these lines to the script array.
+                            // Before finalyzing we will complete this procedure.
+
+                            // project.idnum is incremented and concatenated with "id" to
+                            // let the script use a unique id for each type. Then this can be used
+                            // with methods, props, events and tags.
+                            project.idnum = 0;
+                        }
+
+                        var guts = " SET name='" + project.name + "'"
+                            + ",ownedByUserId=" + req.user.userId
+                            + ",public=" + project.public
+                            + ",projectTypeId=" + project.projectTypeId
+                            + ",quarantined=" + project.quarantined
+                            + ",parentPrice=" + project.parentPrice
+                            + ",parentProjectId=" + project.parentProjectId
+                            + ",priceBump=" + project.priceBump
+                            + ",imageId=" + project.imageId
+                            + ",altImagePath='" + project.altImagePath + "'"
+                            + ",description='" + project.description + "'"
+                            + ",isProduct=" + (project.isProduct ? 1 : 0)
+                            + ",isClass=" + (project.isClass ? 1 : 0)
+                            + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                            ;
+
+                        var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
+                        m_log('Inserting project record with ' + strQuery);
+                        sql.queryWithCxn(connection, strQuery, 
+                            function(err, rows) {
+                                if (err) { return cb(err); }
+                                if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
+
+                                project.id = rows[0].insertId;
+                                return cb(null);
+                            }
+                        );
+                    },
+                    // (2)
+                    function(cb) {
+
+                        // Use async.parallel to save the project's tags and start doing its comics in parallel.
+                        async.parallel(
+                            [
+                                // (2a)
+                                function(cb) {
+                                    m_log("Going to write project tags");
+                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
+                                        null,   // this says not to push to project.script
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
+                                },
+                                // (2b)
+                                function(cb) {
+                                    m_log("Calling m_saveComicsToDB");
+                                    m_saveComicsToDB(connection, req, res, project,
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
+                                }
+                            ],
+                            // final callback for (2)
+                            function(err) { return cb(err); }
+                        );
+                    }
+                ],
+                // final callback for (1)
+                function(err) {
+                    return callback(err);
+                }
+            );
+        } catch(e) { callback(e); }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                      SaveWithSameId processing 
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    var m_functionSaveProjectWithSameId = function (connection, req, res, project, callback) {
+
+        try {
+
+            m_log('***Continuing in m_functionSaveProjectWithSameId***');
 
             // We'll use async.series serially to (1) insert project and 
             // (2) use async.parallel to
