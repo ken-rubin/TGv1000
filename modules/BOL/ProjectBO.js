@@ -841,7 +841,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
             // Remember: always have a try/catch block inside an async callback, and it cannot throw further, because
-            // the external context may no longer exist.
+            // the external context may no longer exists. That's what each function's callback parameter is for.
             //
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -938,20 +938,33 @@ module.exports = function ProjectBO(app, sql, logger) {
         try {
 
             m_log("***In m_functionDetermineSaveOrSaveAs***");
-            // typeOfSave info:
-            //  saveAs INSERTs new rows for everything.
-            //  save DELETES (cascading the project from the database) and then calls SaveAs to insert it.
-            // Everything is done in a single transaction which is rolled back if an error occurs.
+            // return with callback(err, typeOfSave);
+            // typeOfSave:
+            //  'saveAs' INSERTs new rows for everything.
+            //  'save' DELETES (cascading the project from the database) and then calls SaveAs to insert it.
 
             // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
             // One or two buts here: a save will be changed to a saveAs if it's a new project or the user is saving a project gotten from another user;
             // a saveAs will be changed to a save if the name and id are the same as one of the user's existing projects.
 
+
+            // A privileged user can also edit and save a core project as such. In this case project.isCoreProject And
+            // project.specialProjectData.coreProject will both be true. Take your pick.
+
+            // project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
+            // 'new' projects are always INSERTed into the database.
+            // 'searched' projects may be INSERTed or UPDATEd. More on this below in m_functionDetermineSaveOrSaveAs.
+
+            // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
+            // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
+            // its project.specialProjectData.openMode will have been changed to 'bought'.
+
+            var project = req.body.projectJson;
             async.waterfall(
                 [
+                    //
                     function(cb) {
-                        var project = req.body.projectJson;
                         return cb(null, 
                             {
                                 project: project, 
@@ -960,8 +973,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         );
                     },
+                    //
                     function(resultArray, cb) {
-                        var project = req.body.projectJson;
                         var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -975,8 +988,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         );
                     },
+                    //
                     function(resultArray, cb) {
-                        var project = req.body.projectJson;
                         var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
@@ -991,6 +1004,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         );
                     }
                 ],
+                //
                 function(err, resultArray) {
                     m_log("***At end of waterfall***");
                     m_log(JSON.stringify(resultArray));

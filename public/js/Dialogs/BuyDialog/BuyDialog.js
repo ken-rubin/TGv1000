@@ -20,20 +20,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					//////////////////////////////////
 					// Public methods.
 
-					// Buying shows a series of dialogs:
+					// Buying shows a series of dialogs,each closing the prior, but being able to back up to the prior, including OpenProjectDialog in its state when closed:
 					//
 					// User has already selected a candidate from the ScrollRegion in OpenProjectDialog.
 					//
 					// In Buy1 we will display the contents of m_clProject.specialProjectData.classData or .onlineClassData or .productData.
 					//
-					// If user decides to purchase, we overlay a credit card entry form, Buy2. On Purchase button click, we go to the
+					// If user decides to purchase, we replace dialog with a credit card entry form, Buy2. On Purchase button click, we go to the
 					// server to process the charge the credit card.
 					// If unsuccessful, we show errorHelper.
-					// If successful, we call the server to save the project (with specialProjectData.openMode set to 'bought').
+					// If successful, we call the server to save the project (with specialProjectData.openMode set to 'bought'). Success returns the project
+					// with its new id. We set other specialProjectData, etc.
 					//
-					// This returns a newly saved version of the project which we display in Buy3. Buy3 gives the user a chance to 
+					// On success from the save, we close Buy2 and open Buy3. We display the new version of the project in Buy3. Buy3 gives the user a chance to 
 					// change the name, insert tags, change the picture, etc. These changes are kept in memory until the project is saved.
-					// When Buy3 is closed the workspace is shown with the newly purchased project.
+					// When Buy3 is closed the workspace is shown with the newly purchased project. User cannot back up out of Buy3 since the CC has been charged and
+					// the user's new project has been created and written to the DB.
 
 					self.create = function() {
 

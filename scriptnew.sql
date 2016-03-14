@@ -620,6 +620,32 @@ begin
 		set @dbstate := 4;
     end if;
     
+    if @dbstate = 4 THEN
+
+        ALTER TABLE `TGv1000`.`classes`
+			ADD CONSTRAINT FK_project_classes
+            FOREIGN KEY (baseProjectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+        
+        ALTER TABLE `TGv1000`.`products`
+			ADD CONSTRAINT FK_project_products
+            FOREIGN KEY (baseProjectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+        
+        ALTER TABLE `TGv1000`.`onlineclasses`
+			ADD CONSTRAINT FK_project_onlineclasses
+            FOREIGN KEY (baseProjectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+        
+        ALTER TABLE `TGv1000`.`comiccode`
+			ADD CONSTRAINT FK_comiccode
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+
+		UPDATE control set dbstate=5 where id=1;
+        set @dbstate := 5;
+    end if;
+    
 
 end//
 
