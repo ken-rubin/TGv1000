@@ -1100,7 +1100,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                      Save processing 
+    //                      Save processing
+    //
+    // If saving project with same id as another of user's projects with same name, then save.
+    // A fallthrough case: If saving project with same id and name then save.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1148,7 +1151,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                      SaveAs processing 
+    //                      SaveAs processing
+    //
+    // New project or saving someone else's project which must have a unique name for current user.
+    // A fallthrough case: If saving project with different id or name then saveAs.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1259,6 +1265,11 @@ module.exports = function ProjectBO(app, sql, logger) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //                      SaveWithSameId processing 
+    //
+    // This method was chosen because resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought.
+    // Both are possible only with a privileged user. The first means that one of the core projects has been edited and is being saved.
+    // The second means that a Purchasable Project that has already been purchased by a user has been edited and is being saved.
+    // This special path must keep the same project.id, but can delete and re-insert everything else.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
