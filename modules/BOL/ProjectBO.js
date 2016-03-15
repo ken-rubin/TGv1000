@@ -1102,8 +1102,11 @@ module.exports = function ProjectBO(app, sql, logger) {
     //
     //                      Save processing
     //
+    // Saving consists of deleting the old project (cascaded throughout) then then inserting it
+    // using saveAs processing. It WILL change the project's id aong with ids of every part of the project.
+    //
     // If saving project with same id as another of user's projects with same name, then save.
-    // A fallthrough case: If saving project with same id and name then save.
+    // A fallthrough case: If saving own project with same id and name then save.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1152,6 +1155,8 @@ module.exports = function ProjectBO(app, sql, logger) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //                      SaveAs processing
+    //
+    // SaveAs processing INSERTs everything for the project.
     //
     // New project or saving someone else's project which must have a unique name for current user.
     // A fallthrough case: If saving project with different id or name then saveAs.
@@ -1263,7 +1268,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                      SaveWithSameId processing 
+    //                      SaveWithSameId processing
+    //
+    // SaveWithSameId retains the project id by UPDATEing but deletes from comics and types on down and
+    // INSERTs them.
     //
     // This method was chosen because resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought.
     // Both are possible only with a privileged user. The first means that one of the core projects has been edited and is being saved.
@@ -1278,13 +1286,14 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             m_log('***Continuing in m_functionSaveProjectWithSameId***');
 
-            // We'll use async.series serially to (1) insert project and 
-            // (2) use async.parallel to
-            //  (2a) write the project's tags and
-            //  (2b) call off to do all of the project's comics
+            // We'll use async.series serially to (1) update project;
+            // (2) Delete everything related to it using a combination of async.parallel and cascading deletes;
+            // (3) use async.parallel to
+            //  (3a) write the project's tags and
+            //  (3b) call off to do all of the project's comics
             async.series(
                 [
-                    // (1)
+                    // (series 1)
                     function(cb) {
 
                         if (project.specialProjectData.systemTypesEdited) {
@@ -1322,27 +1331,32 @@ module.exports = function ProjectBO(app, sql, logger) {
                             + ",isProduct=" + (project.isProduct ? 1 : 0)
                             + ",isClass=" + (project.isClass ? 1 : 0)
                             + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                            + ",comicProjectId=" + project.comicProjectId
+                            + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
+                            + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
+                            + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
                             ;
 
-                        var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
-                        m_log('Inserting project record with ' + strQuery);
+                        var strQuery = "UPDATE " + self.dbname + "projects" + guts + " where id=" + project.id + ";";
+                        m_log('Updating project record with id ' + project.id + ' with query ' + strQuery);
                         sql.queryWithCxn(connection, strQuery, 
                             function(err, rows) {
                                 if (err) { return cb(err); }
-                                if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
-
-                                project.id = rows[0].insertId;
                                 return cb(null);
                             }
                         );
                     },
-                    // (2)
+                    // ( series 2)
+                    function(cb) {
+
+                    },
+                    // (series 3)
                     function(cb) {
 
                         // Use async.parallel to save the project's tags and start doing its comics in parallel.
                         async.parallel(
                             [
-                                // (2a)
+                                // (parallel 3a)
                                 function(cb) {
                                     m_log("Going to write project tags");
                                     m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
@@ -1352,7 +1366,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     );
                                 },
-                                // (2b)
+                                // (parallel 3b)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
@@ -1362,12 +1376,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     );
                                 }
                             ],
-                            // final callback for (2)
+                            // final callback for async.parallel
                             function(err) { return cb(err); }
                         );
                     }
                 ],
-                // final callback for (1)
+                // final callback for async.series
                 function(err) {
                     return callback(err);
                 }
