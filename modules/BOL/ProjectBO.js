@@ -1288,6 +1288,8 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // We'll use async.series serially to (1) update project;
             // (2) Delete everything related to it using a combination of async.parallel and cascading deletes;
+            //     (a) We can do this by deleting comics pointing to project--this will delete comiccode, types and below.
+            //     (b) We also have to delete from classes, products and onlineclasses where they point to project.
             // (3) use async.parallel to
             //  (3a) write the project's tags and
             //  (3b) call off to do all of the project's comics
@@ -1349,6 +1351,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // ( series 2)
                     function(cb) {
 
+                        async.parallel(
+                            [
+                                function(cb) {
+                                    sql.queryWithCxn(connection, "delete from " + self.dbname + "comics where projectId=" + project.id + ";",
+                                        function(err, rows) {
+                                            return cb(err); // null or not
+                                        }
+                                    );
+                                },
+                                function(cb) {
+                                    sql.queryWithCxn(connection, "delete from " + self.dbname + "classes where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "products where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "onlineclasses where baseProjectId=" + project.id + ";",
+                                        function(err, rows) {
+                                            return cb(err); // null or not
+                                        }
+                                    );
+                                }
+                            ],
+                            function(err) { return cb(err); }
+                        );
                     },
                     // (series 3)
                     function(cb) {
