@@ -88,35 +88,15 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									projectJson: self.data
 							};
 
-							// If !data.projectJson.canEditSystemTypes, then success and error mean that the project was or wasn't saved to the database.
+							// If !data.projectJson.specialProjectData.systemTypesEdited, then success and error mean that the project was or wasn't saved to the database.
 							// If not saved, it was rolled back.
 							//
-							// If data.projectJson.canEditSystemTypes, the save code will collect and try to write a complete SQL script to the project root
-							// directory that can be run to propogate any changes or additions to System Types. This script is written to ST.sql.
+							// If data.projectJson.specialProjectData.systemTypesEdited, the save code will collect and try to write a complete SQL script to the project root
+							// directory that can be run to propagate any changes or additions to System Types. This script is written to ST.sql.
 							// We attempt to write the SQL script only if the saving of the project to the database succeeded and wasn't rolled back.
 							// This means that we could encounter two cases: the project was saved to the database and the script file was created successfully;
 							// or the project was saved to the database and the script file wasn't created.
 							// Object data is returned for both these cases with success=true.
-							/* Note:
-                                if (err) {
-                                    // Writing the file didn't work, but saving the project has already been committed to the DB.
-                                    // We'll inform the user, but do so in a way that the project is saved.
-                                    res.json({
-                                        success: true,
-                                        project: project,
-                                        scriptSuccess: false,
-                                        message: "Your project was saved the the database, but creating the System Type SQL script (ST.sql) failed."
-                                    });
-                                } else {
-
-                                    res.json({
-                                        success: true,
-                                        project: project,
-                                        scriptSuccess: true,
-                                        message: "Your project was saved to the database and the System Type SQL script (ST.sql) was created."
-                                    });
-                                }
-							*/
 							$.ajax({
 
 								type: 'POST',
@@ -128,7 +108,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 									if (objectData.success) {
 
-										if (!objectData.project.canEditSystemTypes) {
+										if (!objectData.project.specialProjectData.systemTypesEdited) {
 											errorHelper.show('Project was saved', 1000);
 										} else {
 											if (objectData.scriptSuccess) {

@@ -1173,10 +1173,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (1)
                     function(cb) {
 
-                        // CHANGE THIS TEST ONCE CLIENT SIDE IS CHANGED:
-                        if (project.canEditSystemTypes) {
+                        if (project.specialProjectData.systemTypesEdited) {
 
-                            // User (a special user) turned on project.canEditSystemTypes. We assume some were edited or added.
+                            // Entitled user edited, added or maybe deleted a System Type.
                             // Set up array of strings that will hold the System Types sql script (ST.sql) which will be written to
                             // project root when we commit the transaction.
 
@@ -1288,10 +1287,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (1)
                     function(cb) {
 
-                        // CHANGE THIS TEST ONCE CLIENT SIDE IS CHANGED:
-                        if (project.canEditSystemTypes) {
+                        if (project.specialProjectData.systemTypesEdited) {
 
-                            // User (a special user) turned on project.canEditSystemTypes. We assume some were edited or added.
+                            // Entitled user edited, added or maybe deleted System Types.
                             // Set up array of strings that will hold the System Types sql script (ST.sql) which will be written to
                             // project root when we commit the transaction.
 
@@ -1579,15 +1577,14 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         var processTypeIth = true;
 
-                        // If !project.canEditSystemTypes, there won't be any SystemTypes with id < 0, but there will be SystemTypes
+                        // If !project.specialProjectData.systemTypesEdited, there won't be any SystemTypes with id < 0, but there will be SystemTypes
                         // with id > 0 which need to be skipped but counted down.
 
                         // Don't assign an ordinal to an SystemType. It's always 10000.
                         // Don't set an SystemType's comicId either.
                         if (typeIth.ordinal === 10000) {
 
-                            // SET THIS ONCE WE KNOW WHAT CLIENT SIDE IS PASSING IN:
-                            if (!passObj.project.canEditSystemTypes || passObj.comicIth.ordinal > 0) {
+                            if (!passObj.project.specialProjectData.systemTypesEdited || passObj.comicIth.ordinal > 0) {
                                 // We process System Types only if the setting is on in the project AND we're in the first comic of the project. 
                                 processTypeIth = false; 
                             }
