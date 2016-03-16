@@ -500,6 +500,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var strNotes = $("#Notes").val().trim();
 
 										clProject.data.specialProjectData.classData = {
+											id: 0,
 											active: false,
 											classDescription: strProjectDescription,
 											instructorFirst: strInstructorFirst,
@@ -530,6 +531,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										}
 
 										clProject.data.specialProjectData.productData = {
+											id: 0,
 											active: false,
 											productDescription: strProjectDescription,
 											level: strLevel,
@@ -561,6 +563,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var strNotes = $("#Notes").val().trim();
 
 										clProject.data.specialProjectData.onlineClassData = {
+											id: 0,
 											active: false,
 											classDescription: strProjectDescription,
 											instructorFirst: strInstructorFirst,

@@ -1507,7 +1507,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     m_log('Inserting Purchasable Product into ' + dbname + ' with query ' + strQuery);
                     sql.queryWithCxn(connection, strQuery, 
                         function(err, rows) {
-                            if (err) { return cb(err); }
+                            if (err) { return callback(err); }
 
                             var id = rows[0].insertId;
                             if (dbname === 'classes') {
@@ -1525,9 +1525,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                             return callback(null);
                         }
                     );
+                } else { 
+                    return callback(null); 
                 }
+            } else { 
+                return callback(null); 
             }
-        } catch(e) { callback(e); }
+        } catch(e) { 
+            callback(e); 
+        }
     }
 
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
