@@ -1173,6 +1173,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // (2) use async.parallel to
             //  (2a) write the project's tags and
             //  (2b) call off to do all of the project's comics
+            //  (2c) if applicable, write to classes, products or onlineclasses
             async.series(
                 [
                     // (1)
@@ -1247,6 +1248,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
+                                },
+                                // (2c)
+                                function(cb) {
+                                    m_log("Calling m_maybeSavePurchProjectData");
+                                    m_maybeSavePurchProjectData(connection, req, res, project,
                                         function(err) {
                                             return cb(err);
                                         }
@@ -1410,6 +1420,116 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch(e) { callback(e); }
     }
 
+    var m_maybeSavePurchProjectData = function(connection, req, res, project, callback) {
+
+        try {
+            
+            var guts = '';
+            var dbname = '';
+
+            // There may be nothing to do here. Check these conditions carefully to understand.
+            if (project.specialProjectData.privilegedUser 
+                && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+
+                if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
+
+                    guts = " SET name='" + project.name + "'"
+                        + ",ownedByUserId=" + req.user.userId
+                        + ",public=" + project.public
+                        + ",projectTypeId=" + project.projectTypeId
+                        + ",quarantined=" + project.quarantined
+                        + ",parentPrice=" + project.parentPrice
+                        + ",parentProjectId=" + project.parentProjectId
+                        + ",priceBump=" + project.priceBump
+                        + ",imageId=" + project.imageId
+                        + ",altImagePath='" + project.altImagePath + "'"
+                        + ",description='" + project.description + "'"
+                        + ",isProduct=" + (project.isProduct ? 1 : 0)
+                        + ",isClass=" + (project.isClass ? 1 : 0)
+                        + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                        + ",comicProjectId=" + project.comicProjectId
+                        + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
+                        + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
+                        + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
+                        ;
+                    dbname = 'classes';
+
+                } else if (project.specialProjectData.productProject && project.specialProjectData.hasOwnProperty('productData')) {
+
+                    guts = " SET name='" + project.name + "'"
+                        + ",ownedByUserId=" + req.user.userId
+                        + ",public=" + project.public
+                        + ",projectTypeId=" + project.projectTypeId
+                        + ",quarantined=" + project.quarantined
+                        + ",parentPrice=" + project.parentPrice
+                        + ",parentProjectId=" + project.parentProjectId
+                        + ",priceBump=" + project.priceBump
+                        + ",imageId=" + project.imageId
+                        + ",altImagePath='" + project.altImagePath + "'"
+                        + ",description='" + project.description + "'"
+                        + ",isProduct=" + (project.isProduct ? 1 : 0)
+                        + ",isClass=" + (project.isClass ? 1 : 0)
+                        + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                        + ",comicProjectId=" + project.comicProjectId
+                        + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
+                        + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
+                        + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
+                        ;
+                    dbname = 'products';
+
+                } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
+
+                    guts = " SET name='" + project.name + "'"
+                        + ",ownedByUserId=" + req.user.userId
+                        + ",public=" + project.public
+                        + ",projectTypeId=" + project.projectTypeId
+                        + ",quarantined=" + project.quarantined
+                        + ",parentPrice=" + project.parentPrice
+                        + ",parentProjectId=" + project.parentProjectId
+                        + ",priceBump=" + project.priceBump
+                        + ",imageId=" + project.imageId
+                        + ",altImagePath='" + project.altImagePath + "'"
+                        + ",description='" + project.description + "'"
+                        + ",isProduct=" + (project.isProduct ? 1 : 0)
+                        + ",isClass=" + (project.isClass ? 1 : 0)
+                        + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                        + ",comicProjectId=" + project.comicProjectId
+                        + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
+                        + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
+                        + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
+                        ;
+                    dbname = 'onlineclasses';
+                }
+
+                if (guts.length > 0) {
+
+                    var strQuery = "INSERT " + self.dbname + dbname + guts";";
+                    m_log('Inserting Purchasable Product into ' + dbname + ' with query ' + strQuery);
+                    sql.queryWithCxn(connection, strQuery, 
+                        function(err, rows) {
+                            if (err) { return cb(err); }
+
+                            var id = rows[0].insertId;
+                            if (dbname === 'classes') {
+
+                                project.specialProjectData.classData.id = id;
+
+                            } else if (dbname === 'products') {
+
+                                project.specialProjectData.productData.id = id;
+
+                            } else {
+
+                                project.specialProjectData.onlineClassData.id = id;
+                            }
+                            return callback(null);
+                        }
+                    );
+                }
+            }
+        } catch(e) { callback(e); }
+    }
+
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
 
         // Now the project has been inserted into the DB and its id is in project.id.
@@ -1420,7 +1540,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
 
             // async.eachSeries iterates over a collection, perform a single async task at a time.
-            // Actually, we could process all comics in parallel. Maybe we'll change to that in the future.
+            // Actually, we could process all comics in parallel. Maybe we'll change to that in the future. Or maybe it really makes no diff.
             async.eachSeries(project.comics.items, 
                 function(comicIth, cb) {
 
