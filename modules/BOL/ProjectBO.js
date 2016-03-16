@@ -1301,8 +1301,8 @@ module.exports = function ProjectBO(app, sql, logger) {
             //     (a) We can do this by deleting comics pointing to project--this will delete comiccode, types and below.
             //     (b) We also have to delete from classes, products and onlineclasses where they point to project.
             // (3) use async.parallel to
-            //  (3a) write the project's tags and
-            //  (3b) call off to do all of the project's comics
+            //     (a) write the project's tags and
+            //     (b) call off to do all of the project's comics
             async.series(
                 [
                     // (series 1)
@@ -1433,70 +1433,56 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
 
-                    guts = " SET name='" + project.name + "'"
-                        + ",ownedByUserId=" + req.user.userId
-                        + ",public=" + project.public
-                        + ",projectTypeId=" + project.projectTypeId
-                        + ",quarantined=" + project.quarantined
-                        + ",parentPrice=" + project.parentPrice
-                        + ",parentProjectId=" + project.parentProjectId
-                        + ",priceBump=" + project.priceBump
-                        + ",imageId=" + project.imageId
-                        + ",altImagePath='" + project.altImagePath + "'"
-                        + ",description='" + project.description + "'"
-                        + ",isProduct=" + (project.isProduct ? 1 : 0)
-                        + ",isClass=" + (project.isClass ? 1 : 0)
-                        + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
-                        + ",comicProjectId=" + project.comicProjectId
-                        + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
-                        + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
-                        + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
+                    guts = " SET active=" + (project.specialProjectData.classData.active ? 1 : 0)
+                        + ",classDescription='" + project.specialProjectData.classData.classDescription + "'"
+                        + ",instructorFirstName='" +  project.specialProjectData.classData.instructorFirst + "'"
+                        + ",instructorLastName='" + project.specialProjectData.classData.instructorLast + "'"
+                        + ",instructorPhone='" + project.specialProjectData.classData.phone + "'"
+                        + ",facility='" + project.specialProjectData.classData.facility + "'"
+                        + ",address='" + project.specialProjectData.classData.address + "'"
+                        + ",room='" + project.specialProjectData.classData.room + "'"
+                        + ",city='" + project.specialProjectData.classData.city + "'"
+                        + ",state='" + project.specialProjectData.classData.state + "'"
+                        + ",zip='" + project.specialProjectData.classData.zip + "'"
+                        + ",schedule='" + project.specialProjectData.classData.when + "'"
+                        + ",level='" + project.specialProjectData.classData.level + "'"
+                        + ",difficulty='" + project.specialProjectData.classData.difficulty + "'"
+                        + ",price=" + project.specialProjectData.classData.price
+                        + ",imageId=" + project.specialProjectData.classData.imageId || 0           // not set on client side yet
+                        + ",classNotes='" + project.specialProjectData.classData.classNotes + "'"
+                        + ",name='" + project.name + "'"
+                        + ",baseProjectId=" + project.id
                         ;
                     dbname = 'classes';
 
                 } else if (project.specialProjectData.productProject && project.specialProjectData.hasOwnProperty('productData')) {
 
-                    guts = " SET name='" + project.name + "'"
-                        + ",ownedByUserId=" + req.user.userId
-                        + ",public=" + project.public
-                        + ",projectTypeId=" + project.projectTypeId
-                        + ",quarantined=" + project.quarantined
-                        + ",parentPrice=" + project.parentPrice
-                        + ",parentProjectId=" + project.parentProjectId
-                        + ",priceBump=" + project.priceBump
-                        + ",imageId=" + project.imageId
-                        + ",altImagePath='" + project.altImagePath + "'"
-                        + ",description='" + project.description + "'"
-                        + ",isProduct=" + (project.isProduct ? 1 : 0)
-                        + ",isClass=" + (project.isClass ? 1 : 0)
-                        + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
-                        + ",comicProjectId=" + project.comicProjectId
-                        + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
-                        + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
-                        + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
+                    guts = " SET active=" + (project.specialProjectData.productData.active ? 1 : 0)
+                        + ",productDescription='" + project.specialProjectData.productData.productDescription + "'"
+                        + ",level='" + project.specialProjectData.productData.level + "'"
+                        + ",difficulty='" + project.specialProjectData.productData.difficulty + "'"
+                        + ",price=" + project.specialProjectData.productData.price
+                        + ",imageId=" + project.specialProjectData.productData.imageId || 0           // not set on client side yet
+                        + ",name='" + project.name + "'"
+                        + ",baseProjectId=" + project.id
                         ;
                     dbname = 'products';
 
                 } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
 
-                    guts = " SET name='" + project.name + "'"
-                        + ",ownedByUserId=" + req.user.userId
-                        + ",public=" + project.public
-                        + ",projectTypeId=" + project.projectTypeId
-                        + ",quarantined=" + project.quarantined
-                        + ",parentPrice=" + project.parentPrice
-                        + ",parentProjectId=" + project.parentProjectId
-                        + ",priceBump=" + project.priceBump
-                        + ",imageId=" + project.imageId
-                        + ",altImagePath='" + project.altImagePath + "'"
-                        + ",description='" + project.description + "'"
-                        + ",isProduct=" + (project.isProduct ? 1 : 0)
-                        + ",isClass=" + (project.isClass ? 1 : 0)
-                        + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
-                        + ",comicProjectId=" + project.comicProjectId
-                        + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
-                        + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
-                        + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
+                    guts = " SET active=" + (project.specialProjectData.onlineClassData.active ? 1 : 0)
+                        + ",classDescription='" + project.specialProjectData.onlineClassData.classDescription + "'"
+                        + ",instructorFirstName='" +  project.specialProjectData.onlineClassData.instructorFirst + "'"
+                        + ",instructorLastName='" + project.specialProjectData.onlineClassData.instructorLast + "'"
+                        + ",instructorEmail='" + project.specialProjectData.onlineClassData.email + "'"
+                        + ",schedule='" + project.specialProjectData.onlineClassData.when + "'"
+                        + ",level='" + project.specialProjectData.onlineClassData.level + "'"
+                        + ",difficulty='" + project.specialProjectData.onlineClassData.difficulty + "'"
+                        + ",price=" + project.specialProjectData.onlineClassData.price
+                        + ",classNotes='" + project.specialProjectData.onlineClassData.classNotes + "'"
+                        + ",imageId=" + project.specialProjectData.onlineClassData.imageId || 0           // not set on client side yet
+                        + ",name='" + project.name + "'"
+                        + ",baseProjectId=" + project.id
                         ;
                     dbname = 'onlineclasses';
                 }

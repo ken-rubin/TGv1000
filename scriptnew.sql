@@ -646,6 +646,23 @@ begin
         set @dbstate := 5;
     end if;
     
+    if @dbstate = 5 THEN
+
+		ALTER TABLE `tgv1000`.`classes` 
+			ADD COLUMN `classNotes` TEXT NULL DEFAULT NULL AFTER `active`;
+
+		UPDATE control set dbstate=6 where id=1;
+        set @dbstate := 6;
+    end if;
+
+    if @dbstate = 6 THEN
+
+		ALTER TABLE `tgv1000`.`onlineclasses` 
+			ADD COLUMN `classNotes` TEXT NULL DEFAULT NULL AFTER `active`;
+
+		UPDATE control set dbstate=7 where id=1;
+        set @dbstate := 7;
+    end if;
 
 end//
 
