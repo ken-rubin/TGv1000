@@ -1303,9 +1303,10 @@ module.exports = function ProjectBO(app, sql, logger) {
             // (3) use async.parallel to
             //     (a) write the project's tags and
             //     (b) call off to do all of the project's comics
+            //     (c) potentially write to classes, products, onlineclasses
             async.series(
                 [
-                    // (series 1)
+                    // (1)
                     function(cb) {
 
                         if (project.specialProjectData.systemTypesEdited) {
@@ -1358,11 +1359,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         );
                     },
-                    // ( series 2)
+                    // (2)
                     function(cb) {
 
                         async.parallel(
                             [
+                                // (2a)
                                 function(cb) {
                                     sql.queryWithCxn(connection, "delete from " + self.dbname + "comics where projectId=" + project.id + ";",
                                         function(err, rows) {
@@ -1370,6 +1372,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     );
                                 },
+                                // (2b)
                                 function(cb) {
                                     sql.queryWithCxn(connection, "delete from " + self.dbname + "classes where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "products where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "onlineclasses where baseProjectId=" + project.id + ";",
                                         function(err, rows) {
@@ -1381,13 +1384,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                             function(err) { return cb(err); }
                         );
                     },
-                    // (series 3)
+                    // (3)
                     function(cb) {
 
                         // Use async.parallel to save the project's tags and start doing its comics in parallel.
                         async.parallel(
                             [
-                                // (parallel 3a)
+                                // (3a)
                                 function(cb) {
                                     m_log("Going to write project tags");
                                     m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
@@ -1397,10 +1400,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         }
                                     );
                                 },
-                                // (parallel 3b)
+                                // (3b)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
+                                },
+                                // (3c)
+                                function(cb) {
+                                    m_log("Calling m_maybeSavePurchProjectData");
+                                    m_maybeSavePurchProjectData(connection, req, res, project,
                                         function(err) {
                                             return cb(err);
                                         }
@@ -1490,7 +1502,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 if (guts.length > 0) {
 
-                    var strQuery = "INSERT " + self.dbname + dbname + guts";";
+                    var strQuery = "INSERT " + self.dbname + dbname + guts + ";";
                     m_log('Inserting Purchasable Product into ' + dbname + ' with query ' + strQuery);
                     sql.queryWithCxn(connection, strQuery, 
                         function(err, rows) {
@@ -1530,6 +1542,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         // This routine will iterate through the project's comics, saving (inserting) each and processing its types, etc.
         try {
+
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
 
             // async.eachSeries iterates over a collection, perform a single async task at a time.
@@ -1550,10 +1563,31 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
                                 
                                 comicIth.id = rows[0].insertId;
-                                m_log("Going to m_saveTypesInComicIthToDB");
-                                m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
+
+                                // Do content of comic: comiccode and types (and all their content) in parallel.
+                                async.parallel(
+                                    [
+                                        function(cb){
+
+                                            m_log("Going to m_saveTypesInComicIthToDB");
+                                            m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
+                                                function(err) {
+                                                    return cb(err); 
+                                                }
+                                            );
+                                        },
+                                        function(cb){
+
+                                            m_log("Going to m_saveComiccodeInComicIthToDB");
+                                            m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                function(err) {
+                                                    return cb(err); 
+                                                }
+                                            );
+                                        }
+                                    ],
                                     function(err) {
-                                        return cb(err); 
+                                        return cb(err);
                                     }
                                 );
                             } catch (eq) {
@@ -1568,7 +1602,43 @@ module.exports = function ProjectBO(app, sql, logger) {
                 }
             );
         } catch (e) { callback(e); }
-    } 
+    }
+
+    var m_saveComiccodeInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+
+        try {
+
+            m_log("***In m_saveComiccodeInComicIthToDB***");
+            // async.eachSeries iterates over a collection, perform a single async task at a time.
+            // Actually, we could process all types in parallel, but we'd have to pre-assign their ordinals.
+            // Maybe we'll change to that in the future.
+
+            var ord = 1;
+
+            async.eachSeries(passObj.comicIth.comiccode.items, 
+                function(ccIth, cb) {
+
+                    ccIth.comicId = comicIth.id;
+                    ccIth.ordinal = ord++;
+
+                    var strQuery = "INSERT " + self.dbname + "comiccode set comicId=" + ccIth.comicId + ", ordinal=" + ccIth.ordinal + ",description='" + ccIth.description + "',JSONsteps='" + ccIth.JSONsteps + "';";
+                    sql.queryWithCxn(connection,
+                        strQuery,
+                        function(err, rows) {
+
+                            if (err) {return cb(err); }
+                            if (rows.length === 0) { return cb(new Error("Error adding comiccode to DB")); }
+                            ccIth.id = rows[0].insertId;
+                            return cb(null);
+                        }
+                    );
+                }, 
+                // final callback
+                function(err) { return callback(err); }
+            );
+
+        } catch(e) { callback(e); }
+    }
 
     var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
