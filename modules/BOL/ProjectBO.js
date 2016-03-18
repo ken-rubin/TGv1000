@@ -140,16 +140,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     }
 
                                                     // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
-                                                    project.specialProjectData = {};
+                                                    sPD = {};
+                                                    project[specialProjectData] = {};
                                                     for (var p in rows[0]) {
-                                                        project.specialProjectData[p] = rows[0][p];
+                                                        sPD[p] = rows[0][p];
                                                     }
                                                     if (project.isProduct) {
-                                                        project.specialProjectData.productData = specialProjectData;
+                                                        project.specialProjectData[productData] = sPD;
                                                     } else if (project.isClass) {
-                                                        project.specialProjectData.classData = specialProjectData;
+                                                        project.specialProjectData[classData] = sPD;
                                                     } else {
-                                                        project.specialProjectData.onlineClassData = specialProjectData;
+                                                        project.specialProjectData[onlineClassData] = sPD;
                                                     }
 
                                                     // Note: the remainder of project.specialProjectData will be added in OpenProjectDialog.js.

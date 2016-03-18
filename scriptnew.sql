@@ -1,17 +1,17 @@
 delimiter //
 
 -- If necessary to start TGv1000 from scratch, uncomment the following:
-/* 
+/* */
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-*/
+/**/
  
 
 USE TGv1000//
 SELECT database()//
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/* 
+/**/ 
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -46,7 +46,7 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
- */
+/* */
 
 create procedure maintainDB()
 begin
