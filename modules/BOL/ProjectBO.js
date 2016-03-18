@@ -1723,7 +1723,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 typeIth.comicId = passObj.comicIth.id;
                                 typeIth.ordinal = 0;
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.user.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + ");";
+                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId,projectId,isToolStrip) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.user.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + "," + passObj.project.id + "," + typeIth.isToolStrip + ");";
                                 m_log('Inserting App type with ' + strQuery);
                                 sql.queryWithCxn(passObj.connection, strQuery,
                                     function(err, rows) {
@@ -1840,6 +1840,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             + ",public=" + typeIth.public
                                             + ",quarantined=" + typeIth.quarantined
                                             + ",baseTypeId=" + typeIth.baseTypeId
+                                            + ",projectId=" + passObj.project.id
+                                            + ",isToolStrip=" + typeIth.isToolStrip
                                             ;
 
                                         var strQuery;
