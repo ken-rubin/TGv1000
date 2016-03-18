@@ -1463,6 +1463,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         + ",difficulty='" + project.specialProjectData.productData.difficulty + "'"
                         + ",price=" + project.specialProjectData.productData.price
                         + ",imageId=" + project.specialProjectData.productData.imageId || 0           // not set on client side yet
+                        + ",videoURL=" + project.specialProjectData.productData.videoURL || ''           // not set on client side yet
                         + ",name='" + project.name + "'"
                         + ",baseProjectId=" + project.id
                         ;

@@ -663,6 +663,16 @@ begin
 		UPDATE control set dbstate=7 where id=1;
         set @dbstate := 7;
     end if;
+   
+    
+    if @dbstate = 7 THEN
+
+		ALTER TABLE `tgv1000`.`products` 
+			ADD COLUMN `videoURL` VARCHAR(255) NOT NULL DEFAULT '' AFTER `active`;
+    
+		UPDATE control set dbstate=8 where id=1;
+        set @dbstate := 8;
+    end if;
 
 end//
 
