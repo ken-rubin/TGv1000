@@ -471,6 +471,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									if (m_bClassProject) {
 
+										clProject.data.isClass = true;
+
 										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
 										var strInstructorLast = $("#InstructorLast").val().trim();
@@ -521,6 +523,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									} else if (m_bProductProject) {
 
+										clProject.data.isProduct = true;
+
 										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
 										var strLevel = $("#Level option:selected").text();
 										var strDifficulty = $("#Difficulty option:selected").text();
@@ -539,6 +543,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											price: dPrice
 										};
 									} else if (m_bOnlineClassProject) {
+
+										clProject.data.isOnlineClass = true;
 
 										// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
