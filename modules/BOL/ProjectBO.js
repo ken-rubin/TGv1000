@@ -140,9 +140,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                     }
 
                                                     // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
-                                                    var specialProjectData = {};
+                                                    project.specialProjectData = {};
                                                     for (var p in rows[0]) {
-                                                        specialProjectData[p] = rows[0][p];
+                                                        project.specialProjectData[p] = rows[0][p];
                                                     }
                                                     if (project.isProduct) {
                                                         project.specialProjectData.productData = specialProjectData;
@@ -974,14 +974,15 @@ module.exports = function ProjectBO(app, sql, logger) {
             // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
             // its project.specialProjectData.openMode will have been changed to 'bought'.
 
-            var project = req.body.projectJson;
             async.waterfall(
                 [
                     // Simple settings to get started
                     function(cb) {
 
+                        var project = req.body.projectJson;
                         return cb(null, 
                             {
+                                project: project,
                                 newProj: (project.specialProjectData.openMode === "new" || project.specialProjectData.openMode === "bought"), 
                                 notMine: project.specialProjectData.othersProjects,
                                 editingCoreProject: (project.specialProjectData.privilegedUser && project.specialProjectData.coreProject)
@@ -991,7 +992,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Getting id of any of user's projects with same name as in project.
                     function(resultArray, cb) {
 
-                        var strQuery = "select id from " + self.dbname + "projects where name='" + project.name + "' and ownedByUserId=" + req.user.userId + ";";
+                        var strQuery = "select id from " + self.dbname + "projects where name='" + resultArray.project.name + "' and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
                                 if (err) { return cb(err, null); }
@@ -1007,7 +1008,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Getting name of any of user's projects with this project's id.
                     function(resultArray, cb) {
 
-                        var strQuery = "select name from " + self.dbname + "projects where id=" + project.id + " and ownedByUserId=" + req.user.userId + ";";
+                        var strQuery = "select name from " + self.dbname + "projects where id=" + resultArray.project.id + " and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
                                 if (err) { return cb(err, null); }
@@ -1023,9 +1024,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
                     function(resultArray, cb) {
 
-                        if (project.specialProjectData.privilegedUser && project.specialProjectData.openMode === 'searched') {
+                        if (resultArray.project.specialProjectData.privilegedUser && resultArray.project.specialProjectData.openMode === 'searched') {
 
-                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + project.id + ";";
+                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + resultArray.project.id + ";";
                             sql.queryWithCxn(connection, strQuery,
                                 function(err, rows) {
                                     if (err) { return cb(err, null); }
@@ -1049,7 +1050,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     var typeOfSave = null;
 
-                    if (resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought) {
+                    if ((resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought) && resultArray.project.id > 0) {
 
                         typeOfSave = "saveWithSameId";
                     
@@ -1200,6 +1201,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                             project.idnum = 0;
                         }
 
+                        if (project.id === project.comicProjectId) {
+
+                            // project.id is going to change. Since project.comicProjectId points to this project, we
+                            // will zero it out so we can set it after we know this project's new id.
+                            project.comicProjectId = 0;
+                        }
+
                         var guts = " SET name='" + project.name + "'"
                             + ",ownedByUserId=" + req.user.userId
                             + ",public=" + project.public
@@ -1211,9 +1219,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                             + ",imageId=" + project.imageId
                             + ",altImagePath='" + project.altImagePath + "'"
                             + ",description='" + project.description + "'"
-                            + ",isProduct=" + (project.isProduct ? 1 : 0)
-                            + ",isClass=" + (project.isClass ? 1 : 0)
+                            + ",isProduct=" + (project.isProduct || project.specialProjectData.productProject ? 1 : 0)
+                            + ",isClass=" + (project.isClass || project.specialProjectData.classProject ? 1 : 0)
+                            + ",isOnlineClass=" + (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0)
                             + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                            + ",comicProjectId=" + project.comicProjectId
                             ;
 
                         var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
@@ -1224,7 +1234,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
 
                                 project.id = rows[0].insertId;
-                                return cb(null);
+
+                                // Check if necessary to and then, if so, update project.comicProjectId
+                                if (project.comicProjectId === 0) {
+
+                                    project.comicProjectId = project.id;
+                                    sql.queryWithCxn(connection, "UPDATE " + self.dbname + "projects SET comicProjectId=" + project.id + " WHERE id=" + project.id + ";",
+                                        function(err, rows) {
+                                            return cb(err);
+                                        }
+                                    );
+                                } else {
+                                    return cb(null);
+                                }
                             }
                         );
                     },
@@ -1330,6 +1352,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                             project.idnum = 0;
                         }
 
+                        if (project.comicProjectId === 0) {
+
+                            project.comicProjectId = project.id;
+                        }
+
                         var guts = " SET name='" + project.name + "'"
                             + ",ownedByUserId=" + req.user.userId
                             + ",public=" + project.public
@@ -1341,13 +1368,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                             + ",imageId=" + project.imageId
                             + ",altImagePath='" + project.altImagePath + "'"
                             + ",description='" + project.description + "'"
-                            + ",isProduct=" + (project.isProduct ? 1 : 0)
-                            + ",isClass=" + (project.isClass ? 1 : 0)
+                            + ",isProduct=" + (project.isProduct || project.specialProjectData.productProject ? 1 : 0)
+                            + ",isClass=" + (project.isClass || project.specialProjectData.classProject ? 1 : 0)
+                            + ",isOnlineClass=" + (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0)
                             + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
                             + ",comicProjectId=" + project.comicProjectId
-                            + ",isProduct=" + (project.specialProjectData.productProject ? 1 : 0)
-                            + ",isClass=" + (project.specialProjectData.classProject ? 1 : 0)
-                            + ",isOnlineClass=" + (project.specialProjectData.onlineClassProject ? 1 : 0)
                             ;
 
                         var strQuery = "UPDATE " + self.dbname + "projects" + guts + " where id=" + project.id + ";";
@@ -1550,7 +1575,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             async.eachSeries(project.comics.items, 
                 function(comicIth, cb) {
 
-                    comicIth.projectId = project.id;
+                    comicIth.projectId = project.comicProjectId;
                     var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "');";
 
                     m_log("Writing comicIth with " + strQuery);

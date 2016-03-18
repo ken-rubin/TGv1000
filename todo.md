@@ -193,6 +193,8 @@
 
 ## Jerry's Issues
 
+- Not filling in project name in SaveProjectAsDialog after creating a new Purchasable Project with a name. It's there, but it's blanked out when the snippet is displayed.
+    + Also, in cases where snippet is displayed in one of the dialogs, need to set focus to first field or to first empty field.
 - **When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.**
 - Use this code to display a Purchasable Product's video:
 ```
