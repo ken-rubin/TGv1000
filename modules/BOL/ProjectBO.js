@@ -890,7 +890,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                     }
                                                                 }
                                                             );
-                                                        } else if (typeOfSave = 'saveWithSameId') {
+                                                        } else if (typeOfSave === 'saveWithSameId') {
 
                                                             m_log('Going into m_functionSaveProjectWithSameId');
                                                             m_functionSaveProjectWithSameId(connection, req, res, project, 
@@ -1460,7 +1460,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         + ",level='" + project.specialProjectData.classData.level + "'"
                         + ",difficulty='" + project.specialProjectData.classData.difficulty + "'"
                         + ",price=" + project.specialProjectData.classData.price
-                        + ",imageId=" + project.specialProjectData.classData.imageId || 0           // not set on client side yet
+                        + ",imageId=" + (project.specialProjectData.classData.imageId || 0)           // not set on client side yet
                         + ",classNotes='" + project.specialProjectData.classData.classNotes + "'"
                         + ",name='" + project.name + "'"
                         + ",baseProjectId=" + project.id
@@ -1474,8 +1474,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                         + ",level='" + project.specialProjectData.productData.level + "'"
                         + ",difficulty='" + project.specialProjectData.productData.difficulty + "'"
                         + ",price=" + project.specialProjectData.productData.price
-                        + ",imageId=" + project.specialProjectData.productData.imageId || 0           // not set on client side yet
-                        + ",videoURL=" + project.specialProjectData.productData.videoURL || ''           // not set on client side yet
+                        + ",imageId=" + (project.specialProjectData.productData.imageId || 0)           // not set on client side yet
+                        + ",videoURL=" + (project.specialProjectData.productData.videoURL || '')           // not set on client side yet
                         + ",name='" + project.name + "'"
                         + ",baseProjectId=" + project.id
                         ;
@@ -1493,7 +1493,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         + ",difficulty='" + project.specialProjectData.onlineClassData.difficulty + "'"
                         + ",price=" + project.specialProjectData.onlineClassData.price
                         + ",classNotes='" + project.specialProjectData.onlineClassData.classNotes + "'"
-                        + ",imageId=" + project.specialProjectData.onlineClassData.imageId || 0           // not set on client side yet
+                        + ",imageId=" + (project.specialProjectData.onlineClassData.imageId || 0)           // not set on client side yet
                         + ",name='" + project.name + "'"
                         + ",baseProjectId=" + project.id
                         ;
@@ -1551,7 +1551,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(comicIth, cb) {
 
                     comicIth.projectId = project.id;
-                    var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name, url) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "','" + comicIth.url + "');";
+                    var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "');";
 
                     m_log("Writing comicIth with " + strQuery);
                     // Turn these into a series?
@@ -1615,7 +1615,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             var ord = 1;
 
-            async.eachSeries(passObj.comicIth.comiccode.items, 
+            async.eachSeries(comicIth.comiccode.items, 
                 function(ccIth, cb) {
 
                     ccIth.comicId = comicIth.id;
@@ -1705,12 +1705,14 @@ module.exports = function ProjectBO(app, sql, logger) {
 
             // We don't use async for this loop because we're looking for only one type. The loop is to find it amongst the comic's types.
             // (Of course, we know it will be the first.)
+            var bFoundAppType = false;
             for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
 
                 var typeIth = passObj.comicIth.types.items[i];
 
                 if (typeIth.isApp) {
 
+                    bFoundAppType = true;
                     // But we can use nested async calls here to do (1) and (2) serially:
                     // (1) insert the App type
                     // (2) and then do (2a) and (2b) in parallel:
@@ -1774,8 +1776,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                 // }
             }
             // If we fall through this loop, it means we didn't find an App type in the comic. This is, hopefully, quite impossible. But . . . 
-            throw new Error("No App type found in comic");
-            
+            if (!bFoundAppType) {
+                throw new Error("No App type found in comic");
+            }
         } catch (e) { callback(e); }
     }
 
