@@ -350,9 +350,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
 							// with same name due to user typing it in and closing the dialog once; then coming back.
 							m_clProject.data.name = m_clProject_data_name;
+							var strProjectDescription = $("#ProjectDescription").val().trim();
 
 							// If there was a class or product or online class snippet in the dialog, capture that info into the project.
-							if (m_clProject.data.classProject) {
+							if (m_clProject.data.isClass) {
 
 								// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
 								var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -400,7 +401,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									price: dPrice,
 									classNotes: strNotes
 								};
-							} else if (m_clProject.data.productProject) {
+							} else if (m_clProject.data.isProduct) {
 
 								// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
 								var strLevel = $("#Level option:selected").text();
@@ -418,7 +419,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									difficulty: strDifficulty,
 									price: dPrice
 								};
-							} else if (m_clProject.data.onlineClassProject) {
+							} else if (m_clProject.data.isOnlineClass) {
 
 								// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
 								var strInstructorFirst = $("#InstructorFirst").val().trim();

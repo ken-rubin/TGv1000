@@ -1,3 +1,70 @@
+
+## Ken's Issues
+
+- Replace Blockly.
+
+
+## Jerry's Issues
+##### Do first because they're annoying
+- Get "Error: specialProjectData is not defined" when trying to open searched for class project.
+- Not filling in project name in SaveProjectAsDialog after creating a new Purchasable Project with a name. It's there, but it's blanked out when the snippet is displayed.
+    + Also, in cases where snippet is displayed in one of the dialogs, need to set focus to first field or to first empty field.
+- When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.
+- Reset browser tab (remove name of previous project) when abandoning.
+- Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
+##### Do later
+- Use this code to display a Purchasable Product's video:
+```
+<div align="center" class="embed-responsive embed-responsive-16by9">
+    <video autoplay loop class="embed-responsive-item">
+        <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
+    </video>
+</div>
+```
+- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. We need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
+    + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
+- Test image (multer) stuff now that I've put JWT in the middle.
+- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
+    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
+- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
+- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
+- Administrative stuff
+    + AdminZone functionality
+        + User maintenance
+        + Usergroup maintenance
+        + Purchasable Project active flag
+        + Ability to make projects public
+- Save place (like for student working in a project) and jump right back to it if the user signs in again.
+- Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
+- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
+- Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
+    - go to AdminZone; 
+    - click "TGv1000" to return to sign-in page; **should this be taken as a singout and invalidate the JWT?**
+    - close window or browser (possible?)
+- Deleting
+    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
+- Need rest of the dialogs to submit on Enter key.
+    - These are already done:
+        + EnrollDialog
+        + NewEventDialog
+        + NewMethodDialog
+        + NewProjectDialog
+        + NewPropertyDialog
+        + NewTypeDialog
+        + SaveProjectAsDialog
+        + ImageDiskDialog
+    - Still may want to do these (where it makes sense): 
+        - DeleteConfirmDialog
+        - GenericRenameDialog
+        - ImageSearchDialog
+        - ImageURLDialog
+        - MethodSearchDialog
+        - OpenProjectDialog
+        - PropertyGrid
+        - TypeSearchDialog
+- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
+- If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
+
 ## A Discussion of Projects and Purchasable Projects
 
 - A Class, a Product or an Online Class is a project that a user has to buy in order to use it. When we don't need to differentiate between the three types, we'll call them by the collective name *Purchasable Projects*.
@@ -184,71 +251,6 @@
     + Also have to record if comics or System types had been changed. This will tell ProjectBO whether or not to update them.
 - Need to update routeSaveProject wrt permission, classes, etc.
 
-
-
-## Ken's Issues
-
-- Replace Blockly.
-
-
-## Jerry's Issues
-
-- Not filling in project name in SaveProjectAsDialog after creating a new Purchasable Project with a name. It's there, but it's blanked out when the snippet is displayed.
-    + Also, in cases where snippet is displayed in one of the dialogs, need to set focus to first field or to first empty field.
-- **When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.**
-- Use this code to display a Purchasable Product's video:
-```
-<div align="center" class="embed-responsive embed-responsive-16by9">
-    <video autoplay loop class="embed-responsive-item">
-        <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
-    </video>
-</div>
-```
-- Reset browser tab (remove name of previous project) when abandoning.
-- Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
-- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. We need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
-    + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
-- Test image (multer) stuff now that I've put JWT in the middle.
-- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
-    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
-- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
-- Administrative stuff
-    + AdminZone functionality
-        + User maintenance
-        + Usergroup maintenance
-        + Purchasable Project active flag
-        + Ability to make projects public
-- Save place (like for student working in a project) and jump right back to it if the user signs in again.
-- Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
-- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - go to AdminZone; 
-    - click "TGv1000" to return to sign-in page; **should this be taken as a singout and invalidate the JWT?**
-    - close window or browser (possible?)
-- Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
-- Need rest of the dialogs to submit on Enter key.
-    - These are already done:
-        + EnrollDialog
-        + NewEventDialog
-        + NewMethodDialog
-        + NewProjectDialog
-        + NewPropertyDialog
-        + NewTypeDialog
-        + SaveProjectAsDialog
-        + ImageDiskDialog
-    - Still may want to do these (where it makes sense): 
-        - DeleteConfirmDialog
-        - GenericRenameDialog
-        - ImageSearchDialog
-        - ImageURLDialog
-        - MethodSearchDialog
-        - OpenProjectDialog
-        - PropertyGrid
-        - TypeSearchDialog
-- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
-- If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
 
 

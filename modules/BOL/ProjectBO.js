@@ -1202,9 +1202,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             project.idnum = 0;
                         }
 
-                        if (project.id === project.comicProjectId) {
+                        if (project.specialProjectData.openMode === 'new' && (project.isProduct || project.isClass || project.isOnlineClass)) {
 
-                            // project.id is going to change. Since project.comicProjectId points to this project, we
+                            // project.id is going to be set below after INSERT. Since we want project.comicProjectId to point to this project, we
                             // will zero it out so we can set it after we know this project's new id.
                             project.comicProjectId = 0;
                         }
