@@ -57,13 +57,13 @@
         br
         .row
           .col-xs-2
+            label
               input#TrueRadio(type='radio' name='bools' value="1" style="width:25px;")
-              span
-                | true
+              | &nbsp;true
           .col-xs-2
+            label
               input#FalseRadio(type='radio' name='bools' value="0" style="width:25px;")
-              span
-                | false
+              | &nbsp;false
       div#PicklistValue(style='display:none;margin-top:8px;')              
         //- for Picklist we give user a textarea
         | Enter values to choose from, separated by a space--just like with search tags.

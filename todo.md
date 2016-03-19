@@ -6,12 +6,12 @@
 
 ## Jerry's Issues
 ##### Do first because they're annoying
+- Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog, openProjectDialog, newProjectDialog.
 - Get "Error: specialProjectData is not defined" when trying to open searched for class project.
 - Not filling in project name in SaveProjectAsDialog after creating a new Purchasable Project with a name. It's there, but it's blanked out when the snippet is displayed.
     + Also, in cases where snippet is displayed in one of the dialogs, need to set focus to first field or to first empty field.
 - When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.
 - Reset browser tab (remove name of previous project) when abandoning.
-- Add a click handler to the span next to all radio button and checkboxes in dialogs and click them if the text is clicked to have a more expected user experience.
 ##### Do later
 - Use this code to display a Purchasable Product's video:
 ```
