@@ -952,6 +952,8 @@ define(["Core/errorHelper",
 
 										m_clProject = null;
 
+										self.setBrowserTabAndBtns();
+
 										// Disable the TypeWell icons that are enabled if a project is loaded.
 										$(".disabledifnoproj").prop("disabled", true);
 

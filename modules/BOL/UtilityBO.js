@@ -155,7 +155,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                             function(err){
                                 res.json({
                                     success:false,
-                                    message: err
+                                    message: err.message
                                 });
                             }
                         );
@@ -589,7 +589,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                             function(err){
                                 res.json({
                                     success:false,
-                                    message: err
+                                    message: err.message
                                 });
                             }
                         );
@@ -715,7 +715,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                             function(err){
                                 res.json({
                                     success:false,
-                                    message: err
+                                    message: err.message
                                 });
                             }
                         );
