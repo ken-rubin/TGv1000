@@ -288,6 +288,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionRenderJadeSnippetResponse2b = function(htmlData) {
 
 						$("#DescriptionDiv").html(htmlData);
+						$("#ProjectName").focus();
 
 						if (m_bClassProject) {
 							jQuery(function($){

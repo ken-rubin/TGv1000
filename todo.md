@@ -6,10 +6,11 @@
 
 ## Jerry's Issues
 ##### Do first because they're annoying
+- Masks for whens are not set in (at least) Class snippet for SaveAs.
 - Get "Error: specialProjectData is not defined" when trying to open searched for class project.
-- Not filling in project name in SaveProjectAsDialog after creating a new Purchasable Project with a name. It's there, but it's blanked out when the snippet is displayed.
-    + Also, in cases where snippet is displayed in one of the dialogs, need to set focus to first field or to first empty field.
-- When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.
+- In SaveProjectAs need to set focus to first field or to first empty field. Done, but insertion cursor shows at end of name, not start.
+- And need to add the couple of new fields to 2 of the snippets--see comments in ProjectBO.
+* When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.
 ##### Do later
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog, openProjectDialog, newProjectDialog.
 - Use this code to display a Purchasable Product's video:

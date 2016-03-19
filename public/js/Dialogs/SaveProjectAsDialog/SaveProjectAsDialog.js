@@ -172,6 +172,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 
 						$("#DescriptionDiv").html(htmlData);
+						$("#ProjectName").focus();
+						$("#ProjectName").keyup(m_functionNameBlur);
+						$("#ProjectName").val(m_clProject.data.name);
+						$("#ProjectName").setSelectionRange(0, 0);
+
+						$("#ProjectDescription").val(m_clProject.data.description);
+						$("#ProjectTags").val(m_clProject.data.tags);
+
+						$("#ProjectDescription").blur(m_functionDescriptionBlur);
+						$("#ProjectTags").blur(m_functionTagsBlur);
 
 						if (m_clProject.data.specialProjectData.classProject) {
 							jQuery(function($){
@@ -230,6 +240,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
+						
 						} else if (m_clProject.data.specialProjectData.productProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
@@ -255,6 +266,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
+						
 						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
