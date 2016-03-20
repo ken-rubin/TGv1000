@@ -6,9 +6,8 @@
 
 ## Jerry's Issues
 ##### Do first because they're annoying
-- When priv. user retrieves a Purchasable Project and then Saves, SaveProjectAsDialog is not recognizing it as a PP.
 - And need to add the couple of new fields to 2 of the snippets--see comments in ProjectBO.
-- Finish buying in OpenProjectDialog.
+- Finish buying in OpenProjectDialog. Kill BuyDialog.
 
 ##### Do later
 - When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.

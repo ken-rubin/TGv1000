@@ -52,11 +52,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, specialProjectData) {
+					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 						try {
 
-							m_functionOK(iProjectId, specialProjectData);
+							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -113,21 +113,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 						    		var jq = this;
 						    		var j = parseInt(jq.context.id.substring(8), 10);
 						    		var projectId = m_searchResultRawArray[j].id;
-									specialProjectData = {
-										privilegedUser: m_bPrivilegedUser,
-										ownedByUser: m_onlyOwnedByUser === 1,
-										othersProjects: m_onlyOthersProjects === 1,
-										normalProject: m_onlyCoreProjects + m_onlyProducts + m_onlyClasses + m_onlyOnlineClasses === 0,
-										coreProject: m_onlyCoreProjects === 1,
-										classProject: m_onlyClasses === 1,
-										productProject: m_onlyProducts === 1,
-										onlineClassProject: m_onlyOnlineClasses === 1,
-										comicsEdited: false,
-										systemTypesEdited: false,
-										openMode: 'searched'
-									};
-
-						    		self.callFunctionOK(projectId, specialProjectData);
+						    		self.callFunctionOK(projectId, m_bPrivilegedUser, (m_onlyOwnedByUser === 1), (m_onlyOthersProjects === 1));
 						    	});
 							if (exceptionRet) { throw exceptionRet; }
 

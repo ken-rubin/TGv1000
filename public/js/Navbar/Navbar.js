@@ -58,10 +58,8 @@ define(["Core/errorHelper"],
 													var exceptionRet = client.showOpenProjectDialog(
 														// This callback is executed if the user searches for and chooses a project to open.
 														// It is called m_functionOK in OpenProjectDialog.
-														// iProjectId is the project to fetch. specialProjectData is a JS object
-														// that contains info that will affect the user's interaction with the UI and how the
-														// project is later saved to the DB. And, most importantly, if the user needs to PAY FOR THE PROJECT.
-														function (iProjectId, specialProjectData) {
+														// iProjectId is the project to fetch.
+														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 															try {
 
@@ -75,7 +73,24 @@ define(["Core/errorHelper"],
 
 																			try {
 
-																				$.extend(true, clProject.data, specialProjectData);
+																				// clProject.data.specialProjectData exists, but it's empty unless its a Purchasable Project in
+																				// which case is contains a property holding class, product or onlineClass data.
+																				// Create and merge rest of specialProjectData in.
+																				specialProjectData = {
+																					privilegedUser: bPrivilegedUser,
+																					ownedByUser: bOnlyOwnedByUser,
+																					othersProjects: bOnlyOthersProjects,
+																					normalProject: (clProject.data.isCoreProject+clProject.data.isClass+clProject.data.isProduct+clProject.data.isOnlineClass === 0),
+																					coreProject: clProject.data.isCoreProject,
+																					classProject: clProject.data.isClass,
+																					productProject: clProject.data.isProduct,
+																					onlineClassProject: clProject.data.isOnlineClass,
+																					comicsEdited: false,
+																					systemTypesEdited: false,
+																					openMode: 'searched'
+																				};
+
+																				$.extend(true, clProject.data.specialProjectData, specialProjectData);
 
 																				if (clProject.data.specialProjectData.productProject || clProject.data.specialProjectData.classProject || clProject.data.specialProjectData.onlineClassProject) {
 

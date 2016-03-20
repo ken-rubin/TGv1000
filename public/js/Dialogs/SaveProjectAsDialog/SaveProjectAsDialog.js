@@ -128,15 +128,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
 							var templateToGet = null;
-							if (m_clProject.data.specialProjectData.classProject) {
+							if (m_clProject.data.isClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
 
-							} else if (m_clProject.data.specialProjectData.productProject) {
+							} else if (m_clProject.data.isProduct) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
 
-							} else if (m_clProject.data.specialProjectData.onlineClassProject) {
+							} else if (m_clProject.data.isOnlineClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
 							}
