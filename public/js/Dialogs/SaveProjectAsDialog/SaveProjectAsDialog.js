@@ -193,9 +193,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								}
 							});
 							$("#ProjectDescription").val(m_clProject.data.specialProjectData.classData.classDescription);
-							$("#InstructorFirst").val(m_clProject.data.specialProjectData.classData.instructorFirst);
-							$("#InstructorLast").val(m_clProject.data.specialProjectData.classData.instructorLast);
-							$("#Phone").val(m_clProject.data.specialProjectData.classData.phone);
+							$("#InstructorFirst").val(m_clProject.data.specialProjectData.classData.instructorFirstName);
+							$("#InstructorLast").val(m_clProject.data.specialProjectData.classData.instructorLastName);
+							$("#Phone").val(m_clProject.data.specialProjectData.classData.instructorPhone);
 							$("#Facility").val(m_clProject.data.specialProjectData.classData.facility);
 							$("#Address").val(m_clProject.data.specialProjectData.classData.address);
 							$("#Room").val(m_clProject.data.specialProjectData.classData.room);
@@ -275,9 +275,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								}
 							});
 							$("#ProjectDescription").val(m_clProject.data.specialProjectData.onlineClassData.classDescription);
-							$("#InstructorFirst").val(m_clProject.data.specialProjectData.onlineClassData.instructorFirst);
-							$("#InstructorLast").val(m_clProject.data.specialProjectData.onlineClassData.instructorLast);
-							$("#Email").val(m_clProject.data.specialProjectData.onlineClassData.email);
+							$("#InstructorFirst").val(m_clProject.data.specialProjectData.onlineClassData.instructorFirstName);
+							$("#InstructorLast").val(m_clProject.data.specialProjectData.onlineClassData.instructorLastName);
+							$("#Email").val(m_clProject.data.specialProjectData.onlineClassData.instructorEmail);
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');

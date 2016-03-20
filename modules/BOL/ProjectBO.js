@@ -1337,6 +1337,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // (2) Delete everything related to it using a combination of async.parallel and cascading deletes;
             //     (a) We can do this by deleting comics pointing to project--this will delete comiccode, types and below.
             //     (b) We also have to delete from classes, products and onlineclasses where they point to project.
+            //         And, since we're UPDATEing the project and therefore we're not cascading delete from project_tags, we'll manually delete them, too.
             // (3) use async.parallel to
             //     (a) write the project's tags and
             //     (b) call off to do all of the project's comics
@@ -1414,7 +1415,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 },
                                 // (2b)
                                 function(cb) {
-                                    sql.queryWithCxn(connection, "delete from " + self.dbname + "classes where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "products where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "onlineclasses where baseProjectId=" + project.id + ";",
+                                    sql.queryWithCxn(connection, "delete from " + self.dbname + "classes where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "products where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "onlineclasses where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "project_tags where projectId=" + project.id + ";",
                                         function(err, rows) {
                                             return cb(err); // null or not
                                         }

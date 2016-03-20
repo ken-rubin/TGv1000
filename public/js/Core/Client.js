@@ -248,7 +248,7 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new BuyDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create(m_clProject);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;

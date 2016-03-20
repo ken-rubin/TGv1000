@@ -37,9 +37,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					// When Buy3 is closed the workspace is shown with the newly purchased project. User cannot back up out of Buy3 since the CC has been charged and
 					// the user's new project has been created and written to the DB.
 
-					self.create = function() {
+					self.create = function(clProject) {
 
 						try {
+
+							m_clProject = clProject;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -118,9 +120,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
-							m_clProject = client.getProject();
-
 							// Get the appropriate snippet and display the second form of the buy dialog.
+
+
+
+
+
+
+
 
 						} catch (e) {
 
@@ -152,7 +159,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_clProject;
+				var m_clProject = null;
 			};
 
 			// Return the constructor function as the module object.

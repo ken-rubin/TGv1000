@@ -5,9 +5,10 @@
 
 
 ## Jerry's Issues
-##### Do first because they're annoying
-- And need to add the couple of new fields to 2 of the snippets--see comments in ProjectBO.
+##### Do first because they're annoying or they just need doing
+- And need to add the couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData.
 - Finish buying in OpenProjectDialog. Kill BuyDialog. Maybe.
+- Test everything I just did with a non-privileged user.
 
 ##### Do later
 - When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done.**

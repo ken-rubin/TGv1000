@@ -94,7 +94,10 @@ define(["Core/errorHelper"],
 
 																				if (!bPrivilegedUser && (clProject.data.specialProjectData.productProject || clProject.data.specialProjectData.classProject || clProject.data.specialProjectData.onlineClassProject)) {
 
+																					// A non-privileged user will not have been able to search for a non-active or incomplete project.
+																					// So we're good to proceed to the buying process.
 																					var exceptionRet = client.showBuyDialog();
+																					if (exceptionRet) { throw exceptionRet; }
 																				}
 																			} catch (e) { errorHelper.show(e); }
 																		}
