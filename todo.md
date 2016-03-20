@@ -7,10 +7,10 @@
 ## Jerry's Issues
 ##### Do first because they're annoying
 - And need to add the couple of new fields to 2 of the snippets--see comments in ProjectBO.
-- Finish buying in OpenProjectDialog. Kill BuyDialog.
+- Finish buying in OpenProjectDialog. Kill BuyDialog. Maybe.
 
 ##### Do later
-- When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do.
+- When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done.**
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog, openProjectDialog, newProjectDialog.
 - Use this code to display a Purchasable Product's video:
 ```

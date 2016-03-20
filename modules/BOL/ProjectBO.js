@@ -146,7 +146,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                         sPD = {};
 
                                                         for (var p in rows[0]) {
-                                                            sPD[p] = rows[0][p];
+
+                                                            if (p === 'schedule') {
+
+                                                                sPD[p] = JSON.parse(rows[0][p]);
+                                                            } else {
+
+                                                                sPD[p] = rows[0][p];
+                                                            }
                                                         }
                                                         if (project.isProduct) {
                                                             project.specialProjectData['productData'] = sPD;

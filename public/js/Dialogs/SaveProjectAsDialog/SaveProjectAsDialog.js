@@ -213,7 +213,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.classData.when[i-1];
+								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];
 								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
 									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
 									$("#When" + i).val(when);
@@ -281,7 +281,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.onlineClassData.when[i-1];
+								var whenIth = m_clProject.data.specialProjectData.onlineClassData.schedule[i-1];
 								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
 									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
 									$("#When" + i).val(when);
