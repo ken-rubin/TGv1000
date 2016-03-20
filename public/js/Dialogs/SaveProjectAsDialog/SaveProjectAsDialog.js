@@ -175,7 +175,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$("#ProjectName").focus();
 						$("#ProjectName").keyup(m_functionNameBlur);
 						$("#ProjectName").val(m_clProject.data.name);
-						$("#ProjectName").setSelectionRange(0, 0);
+						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
 
 						$("#ProjectDescription").val(m_clProject.data.description);
 						$("#ProjectTags").val(m_clProject.data.tags);

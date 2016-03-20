@@ -101,7 +101,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             comics:
                             {
                                 items: []
-                            }
+                            },
+                            specialProjectData: {}
                         };
 
                         m_functionFetchTags(
@@ -123,88 +124,94 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         // 1.
                                         function(cb) {
 
-                                            // If none of these three project fields is true, then there is no purchasable project and we may proceed on to 2.
-                                            if (!project.isProduct && !project.isClass && !project.isOnlineClass) {
-                                                // A normal project.
-                                                return cb(null);
-                                            }
+                                            try {
 
-                                            // Privleged user is editing a project or a non-privileged user is considering buying a purchaseable prject.
-                                            // Need to read and insert special Product, Class or OnlineClass data into project.
-                                            var tableName = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
-                                            strQuery = "select * from " + self.dbname + tableName + " where baseProjectId=" + project.id + ";";
-                                            var exceptionRet = sql.execute(strQuery,
-                                                function(rows) {
-                                                    if (rows.length !== 1) {
-                                                        return cb(new Error('Error retrieving your project.'));
-                                                    }
-
-                                                    // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
-                                                    sPD = {};
-                                                    project[specialProjectData] = {};
-                                                    for (var p in rows[0]) {
-                                                        sPD[p] = rows[0][p];
-                                                    }
-                                                    if (project.isProduct) {
-                                                        project.specialProjectData[productData] = sPD;
-                                                    } else if (project.isClass) {
-                                                        project.specialProjectData[classData] = sPD;
-                                                    } else {
-                                                        project.specialProjectData[onlineClassData] = sPD;
-                                                    }
-
-                                                    // Note: the remainder of project.specialProjectData will be added in OpenProjectDialog.js.
-                                                    // Also, project fields such as id will be adjusted there. They used to be handled here.
-
+                                                // If none of these three project fields is true, then there is no purchasable project and we may proceed on to 2.
+                                                if (!project.isProduct && !project.isClass && !project.isOnlineClass) {
+                                                    // A normal project.
                                                     return cb(null);
-                                                },
-                                                function(strError) {
-                                                    return cb(new Error(strError));
                                                 }
-                                            );
-                                            if (exceptionRet) {
-                                                return cb(exceptionRet);
-                                            }
+
+                                                // Privleged user is editing a project or a non-privileged user is considering buying a purchaseable prject.
+                                                // Need to read and insert special Product, Class or OnlineClass data into project.
+                                                var tableName = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
+                                                strQuery = "select * from " + self.dbname + tableName + " where baseProjectId=" + project.id + ";";
+                                                var exceptionRet = sql.execute(strQuery,
+                                                    function(rows) {
+                                                        if (rows.length !== 1) {
+                                                            return cb(new Error('Error retrieving your project.'));
+                                                        }
+
+                                                        // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
+                                                        sPD = {};
+
+                                                        for (var p in rows[0]) {
+                                                            sPD[p] = rows[0][p];
+                                                        }
+                                                        if (project.isProduct) {
+                                                            project.specialProjectData['productData'] = sPD;
+                                                        } else if (project.isClass) {
+                                                            project.specialProjectData['classData'] = sPD;
+                                                        } else {
+                                                            project.specialProjectData['onlineClassData'] = sPD;
+                                                        }
+
+                                                        // Note: the remainder of project.specialProjectData will be added in OpenProjectDialog.js.
+                                                        // Also, project fields such as id will be adjusted there. They used to be handled here.
+
+                                                        return cb(null);
+                                                    },
+                                                    function(strError) {
+                                                        return cb(new Error(strError));
+                                                    }
+                                                );
+                                                if (exceptionRet) {
+                                                    return cb(exceptionRet);
+                                                }
+                                            } catch(e) { return cb(e); }
                                         },
                                         // 2.
                                         function(cb) {
 
-                                            m_functionRetProjDoComics(  
-                                                req, 
-                                                res, 
-                                                project,
-                                                function(err) {
-                                                    if (err) { return cb(err); }
+                                            try {
 
-                                                    // Sucess. The project is filled.
+                                                m_functionRetProjDoComics(  
+                                                    req, 
+                                                    res, 
+                                                    project,
+                                                    function(err) {
+                                                        if (err) { return cb(err); }
 
-                                                    // Sort comics by ordinal.
-                                                    project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                        // Sucess. The project is filled.
 
-                                                    // Sort lists inside comics by their own ordinals.
-                                                    project.comics.items.forEach(
-                                                        function(comic) {
+                                                        // Sort comics by ordinal.
+                                                        project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                            // Types. 
-                                                            // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
-                                                            comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                            comic.types.items.forEach(
-                                                                function(type) {
-                                                                    // Methods.
-                                                                    type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                    // Properties.
-                                                                    type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                    // Events.
-                                                                    type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                }
-                                                            );
-                                                            comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                        }
-                                                    );
+                                                        // Sort lists inside comics by their own ordinals.
+                                                        project.comics.items.forEach(
+                                                            function(comic) {
 
-                                                    return cb(null);
-                                                }
-                                            );
+                                                                // Types. 
+                                                                // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
+                                                                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                comic.types.items.forEach(
+                                                                    function(type) {
+                                                                        // Methods.
+                                                                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                        // Properties.
+                                                                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                        // Events.
+                                                                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                    }
+                                                                );
+                                                                comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                            }
+                                                        );
+
+                                                        return cb(null);
+                                                    }
+                                                );
+                                            } catch(e) { return cb(e); }
                                         }
                                     ],
                                     function(err) {
