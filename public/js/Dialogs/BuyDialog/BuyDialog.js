@@ -91,7 +91,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionBuy1();
+					            			m_functionBuy();
 					            		}
 					            	},
 					            	{
@@ -317,10 +317,25 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						}
 					}
 
-					var m_functionBuy1 = function() {
+					var m_functionBuy = function() {
 
-						$("#ChargeSection").css("display", "block");
-						$("#BuyBtn").text("Complete the purchase");
+						switch (m_buyMode) {
+
+							case 1: 	// uncover the charge form
+								$("#ChargeSection").css("display", "block");
+								$("#BuyBtn").text("Complete the purchase");
+								m_buyMode = 2;
+								break;
+							case 2: 	// Validate the charge form. Stay if any errors (and display).
+										// Else send to BOL for charge processing.
+
+								m_buyMode = 3;
+								break;
+							case 3: 	// Charge was processed.
+										// Notify user.
+										// Close dialog.
+								break;
+						}
 					}
 
 				} catch (e) {
@@ -334,6 +349,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_clProject = null;
+				var m_buyMode = 1;
 			};
 
 			// Return the constructor function as the module object.
