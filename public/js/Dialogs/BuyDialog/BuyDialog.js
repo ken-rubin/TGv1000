@@ -20,7 +20,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					//////////////////////////////////
 					// Public methods.
 
-					// Buying shows a series of dialogs,each closing the prior, but being able to back up to the prior, including OpenProjectDialog in its state when closed:
+					// Buying shows a series of dialogs, each closing the prior, but being able to back up to the prior, including OpenProjectDialog in its state when closed:
 					//
 					// User has already selected a candidate from the ScrollRegion in OpenProjectDialog.
 					//

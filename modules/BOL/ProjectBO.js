@@ -1488,16 +1488,16 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     guts = " SET active=" + (project.specialProjectData.classData.active ? 1 : 0)
                         + ",classDescription='" + project.specialProjectData.classData.classDescription + "'"
-                        + ",instructorFirstName='" +  project.specialProjectData.classData.instructorFirst + "'"
-                        + ",instructorLastName='" + project.specialProjectData.classData.instructorLast + "'"
-                        + ",instructorPhone='" + project.specialProjectData.classData.phone + "'"
+                        + ",instructorFirstName='" +  project.specialProjectData.classData.instructorFirstName + "'"
+                        + ",instructorLastName='" + project.specialProjectData.classData.instructorLastName + "'"
+                        + ",instructorPhone='" + project.specialProjectData.classData.instructorPhone + "'"
                         + ",facility='" + project.specialProjectData.classData.facility + "'"
                         + ",address='" + project.specialProjectData.classData.address + "'"
                         + ",room='" + project.specialProjectData.classData.room + "'"
                         + ",city='" + project.specialProjectData.classData.city + "'"
                         + ",state='" + project.specialProjectData.classData.state + "'"
                         + ",zip='" + project.specialProjectData.classData.zip + "'"
-                        + ",schedule='" + JSON.stringify(project.specialProjectData.classData.when) + "'"
+                        + ",schedule='" + JSON.stringify(project.specialProjectData.classData.schedule) + "'"
                         + ",level='" + project.specialProjectData.classData.level + "'"
                         + ",difficulty='" + project.specialProjectData.classData.difficulty + "'"
                         + ",price=" + project.specialProjectData.classData.price
@@ -1526,10 +1526,10 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     guts = " SET active=" + (project.specialProjectData.onlineClassData.active ? 1 : 0)
                         + ",classDescription='" + project.specialProjectData.onlineClassData.classDescription + "'"
-                        + ",instructorFirstName='" +  project.specialProjectData.onlineClassData.instructorFirst + "'"
-                        + ",instructorLastName='" + project.specialProjectData.onlineClassData.instructorLast + "'"
-                        + ",instructorEmail='" + project.specialProjectData.onlineClassData.email + "'"
-                        + ",schedule='" + JSON.stringify(project.specialProjectData.onlineClassData.when) + "'"
+                        + ",instructorFirstName='" +  project.specialProjectData.onlineClassData.instructorFirstName + "'"
+                        + ",instructorLastName='" + project.specialProjectData.onlineClassData.instructorLastName + "'"
+                        + ",instructorEmail='" + project.specialProjectData.onlineClassData.instructorEmail + "'"
+                        + ",schedule='" + JSON.stringify(project.specialProjectData.onlineClassData.schedule) + "'"
                         + ",level='" + project.specialProjectData.onlineClassData.level + "'"
                         + ",difficulty='" + project.specialProjectData.onlineClassData.difficulty + "'"
                         + ",price=" + project.specialProjectData.onlineClassData.price

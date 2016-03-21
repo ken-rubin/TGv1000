@@ -6,8 +6,8 @@
 
 ## Jerry's Issues
 ##### Do first because they're annoying or they just need doing
-- And need to add the couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData.
-- Finish buying in OpenProjectDialog. Kill BuyDialog. Maybe.
+- Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a search-based system.
+- Finish buying.
 - Test everything I just did with a non-privileged user.
 
 ##### Do later
@@ -106,16 +106,16 @@
                 clProject.data.specialProjectData.classData = {
                     active: [bool],
                     classDescription: [str],
-                    instructorFirst: [str],
-                    instructorLast: [str],
-                    phone: [str],
+                    instructorFirstName: [str],
+                    instructorLastName: [str],
+                    instructorPhone: [str],
                     facility: [str],
                     address: [str],
                     room: [str],
                     city: [str],
                     state: [str],
                     zip: [numstr,
-                    when: {[]},
+                    schedule: {[]},
                     level: [str],
                     difficulty: [str],
                     price: [num],
@@ -137,10 +137,10 @@
                 clProject.data.specialProjectData.onlineClassData = {
                     active: [bool],
                     classDescription: [str],
-                    instructorFirst: [str],
-                    instructorLast: [str],
-                    email: [str],
-                    when: {[]},
+                    instructorFirstName: [str],
+                    instructorLastName: [str],
+                    instructorEmail: [str],
+                    schedule: {[]},
                     level: [str],
                     difficulty: [str],
                     price: [num],

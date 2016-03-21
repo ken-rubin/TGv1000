@@ -173,8 +173,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 					                	g_profile = JSON.parse(profileJSON);
 					                }
 
-                					m_wellMessage("You have been enrolled. Please check for the email with log-in instructions we just sent to you.", 
-                									{waittime: 2000, callback: function(){	m_dialog.close(); location.href = '/';}});
+                					m_wellMessage(m_first + " " + m_last + " has been enrolled. Please check for the email with log-in instructions we just sent to " + m_email + ".", 
+                									{waittime: 4000, callback: function(){	m_dialog.close(); location.href = '/';}});
             					} else {
 
                 					// !data.success
