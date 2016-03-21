@@ -6,6 +6,54 @@
         #DescriptionDiv
 .well#ChargeSection(style="display:none; margin-top:13px;")
   .row
-      .col-xs-12
+      .col-xs-1
+      .col-xs-10(style="font-size:small;")
         span.glyphicon.glyphicon-lock
         | &nbsp;This is a secure 128-bit SSL-encrypted payment. Also, we DO NOT save your charge information. You're safe.
+      .col-xs-1
+  .row
+    br
+    .col-xs-4
+    .col-xs-4
+        label.control-label(for="ChargeName" style="margin-top:4px;") &nbsp;Name (as it appears on your card)
+    .col-xs-4
+  .row
+    .col-xs-4
+    .col-xs-4
+          input.form-control#ChargeName(type="text")
+    .col-xs-4
+  .row
+    .col-xs-4
+    .col-xs-5
+        label.control-label(for="ChargeNumber" style="margin-top:8px;") &nbsp;Card number (# digits dep. on card type)
+    .col-xs-3
+  .row
+    .col-xs-4
+    .col-xs-4
+          input.form-control#ChargeNumber(type="text")
+    .col-xs-4
+  .row
+    .col-xs-4
+    .col-xs-4
+        label.control-label(for="ExpDateMo" style="margin-top:8px;") &nbsp;Expiration date
+    .col-xs-4
+  .row
+    .col-xs-4
+    .col-xs-4
+        select.form-control#ExpDateMo(style="width:48%; float:left;")
+            each val,index in ['January','February','March','April','May','June','July','August','September','October','November','December']
+                option(value=index)= val
+        select.form-control#ExpDateYr(style="width:48%; float:right;")
+            each val,index in ['2016','2017','2018','2019','2020','2021','2022','2023','2024']
+                option(value=index)= val
+    .col-xs-4
+  .row
+    .col-xs-4
+    .col-xs-5
+        label.control-label(for="CVV" style="margin-top:8px;") &nbsp;Security code (3 on back; AmEx: 4 on front)
+    .col-xs-4
+  .row
+    .col-xs-4
+    .col-xs-4
+          input.form-control#CVV(type="text" style="width:30%")
+    .col-xs-4
