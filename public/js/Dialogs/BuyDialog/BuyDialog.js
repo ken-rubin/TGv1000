@@ -20,9 +20,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					//////////////////////////////////
 					// Public methods.
 
-					// Buying shows a series of dialogs, each closing the prior, but being able to back up to the prior, including OpenProjectDialog in its state when closed:
+					// Buying shows a series of dialogs, each closing the prior, but being able to back up to the prior, including OpenProjectDialog in its state when closed.
 					//
-					// User has already selected a candidate from the ScrollRegion in OpenProjectDialog.
+					// User has already selected a candidate from the ScrollRegion in OpenProjectDialog. That project has been loaded and has been found to be a Purchasable Project.
 					//
 					// In Buy1 we will display the contents of m_clProject.specialProjectData.classData or .onlineClassData or .productData.
 					//
@@ -80,26 +80,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// the PropertysDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
-								title: "Decide Whether or Not to Buy",
+								closable: false,
+								title: "Decide Whether or Not to Purchase",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Buy",
+					            		label: "Enter secure charge information",
 					            		id: 'BuyBtn',
 					            		cssClass: "btn-primary",
 					            		action: function(){
 
-					            			m_functionBuy();
+					            			m_functionBuy1();
 					            		}
 					            	},
 					            	{
-						                label: "Nope. Don't buy.",
+						                label: "Don't buy.",
 						                icon: "glyphicon glyphicon-remove-circle",
 						                cssClass: "btn-warning",
 						                action: function(dialogItself){
 
 						                    dialogItself.close();
+						                    client.unloadProject(null, false);	// No callback; no abandon dialog.
 						                }
 					            	}
 					            ],
@@ -121,32 +123,204 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							m_dialog = dialogItself;
 
 							// Get the appropriate snippet and display the second form of the buy dialog.
+							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
+							var templateToGet = null;
+							if (m_clProject.data.isClass) {
 
+								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
 
+							} else if (m_clProject.data.isProduct) {
 
+								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
 
+							} else if (m_clProject.data.isOnlineClass) {
 
+								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
+							}
+							if (templateToGet) {
 
+								// Get the dialog DOM.
+								$.ajax({
 
+									cache: false,
+									data: { 
 
+										templateFile: templateToGet
+									}, 
+									dataType: "HTML",
+									method: "POST",
+									url: "/renderJadeSnippet"
+								}).done(m_functionRenderJadeSnippetResponse2).error(errorHelper.show);
+							}
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
-					};
+					}
 
-					var m_functionBuyStep1 = function () {
+					var m_functionRenderJadeSnippetResponse2 = function(htmlData) {
 
-						try {
-
-
-
-							self.closeYourself();
-
-						} catch (e) {
-
-							errorHelper.show(e);
+						if (!Number.prototype.dollarFormat) {
+							Number.prototype.dollarFormat = function() {
+								if (!isNaN(this)) {
+									var n = this < 0 ? true : false,
+										a = (n ? this * -1 : this).toFixed(2).toString().split("."),
+										b = a[0].split("").reverse().join("").replace(/.{3,3}/g, "$&,").replace(/\,$/, "").split("").reverse().join("");
+									return((n ? "(" : "") + "$" + b + "." + a[1] + (n ? ")" : ""));
+								}
+							};
 						}
+
+						$("#DescriptionDiv").html(htmlData);
+						$("#ProjectName").focus();
+						// $("#ProjectName").keyup(m_functionNameBlur);
+						$("#ProjectName").val(m_clProject.data.name);
+						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
+
+						$("#ProjectDescription").val(m_clProject.data.description);
+						$("#ProjectTags").val(m_clProject.data.tags);
+
+						// $("#ProjectDescription").blur(m_functionDescriptionBlur);
+						// $("#ProjectTags").blur(m_functionTagsBlur);
+
+						if (m_clProject.data.specialProjectData.classProject) {
+
+							jQuery(function($){
+								$("#Phone").mask("(999) 999-9999? x99999");
+								$("#Zip").mask("99999");
+								$("#Price").mask("$999.99");
+								for (var i=1; i<=8; i++) {
+									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+								}
+							});
+							$("#ProjectDescription").val(m_clProject.data.specialProjectData.classData.classDescription);
+							$("#InstructorFirst").val(m_clProject.data.specialProjectData.classData.instructorFirstName);
+							$("#InstructorLast").val(m_clProject.data.specialProjectData.classData.instructorLastName);
+							$("#Phone").val(m_clProject.data.specialProjectData.classData.instructorPhone);
+							$("#Facility").val(m_clProject.data.specialProjectData.classData.facility);
+							$("#Address").val(m_clProject.data.specialProjectData.classData.address);
+							$("#Room").val(m_clProject.data.specialProjectData.classData.room);
+							$("#City").val(m_clProject.data.specialProjectData.classData.city);
+							// state combo
+							if(m_clProject.data.specialProjectData.classData.state.length > 0) {
+								$('#State > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.classData.state)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							$("#Zip").val(m_clProject.data.specialProjectData.classData.zip);
+							// when array
+							for (var i = 1; i <= 8; i++) {
+								$("#When" + i).val('');
+								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];
+								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
+									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
+									$("#When" + i).val(when);
+								}
+							}
+							// level combo
+							if(m_clProject.data.specialProjectData.classData.level.length > 0) {
+								$('#Level > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.classData.level)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							// difficulty combo
+							if(m_clProject.data.specialProjectData.classData.difficulty.length > 0) {
+								$('#Difficulty > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.classData.difficulty)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							// formatted price
+							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
+							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
+						
+						} else if (m_clProject.data.specialProjectData.productProject) {
+
+							jQuery(function($){
+								$("#Price").mask("$999.99");
+							});
+							$("#ProjectDescription").val(m_clProject.data.specialProjectData.productData.productDescription);
+							
+							// level combo
+							if(m_clProject.data.specialProjectData.productData.level.length > 0) {
+								$('#Level > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.productData.level)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							
+							// difficulty combo
+							if(m_clProject.data.specialProjectData.productData.difficulty.length > 0) {
+								$('#Difficulty > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.productData.difficulty)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							
+							// formatted price
+							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
+						
+						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
+
+							jQuery(function($){
+								$("#Price").mask("$999.99");
+								for (var i=1; i<=8; i++) {
+									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+								}
+							});
+							$("#ProjectDescription").val(m_clProject.data.specialProjectData.onlineClassData.classDescription);
+							$("#InstructorFirst").val(m_clProject.data.specialProjectData.onlineClassData.instructorFirstName);
+							$("#InstructorLast").val(m_clProject.data.specialProjectData.onlineClassData.instructorLastName);
+							$("#Email").val(m_clProject.data.specialProjectData.onlineClassData.instructorEmail);
+							// when array
+							for (var i = 1; i <= 8; i++) {
+								$("#When" + i).val('');
+								var whenIth = m_clProject.data.specialProjectData.onlineClassData.schedule[i-1];
+								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
+									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
+									$("#When" + i).val(when);
+								}
+							}
+							// level combo
+							if(m_clProject.data.specialProjectData.onlineClassData.level.length > 0) {
+								$('#Level > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.level)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							// difficulty combo
+							if(m_clProject.data.specialProjectData.onlineClassData.difficulty.length > 0) {
+								$('#Difficulty > option').each(
+									function() {
+ 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.difficulty)
+ 											$(this).parent('select').val($(this).val());
+									}
+								);
+							}
+							// formatted price
+							$("#Price").val(m_clProject.data.specialProjectData.onlineClassData.price.dollarFormat());
+							$("#Notes").val(m_clProject.data.specialProjectData.onlineClassData.classNotes);
+						}
+					}
+
+					var m_functionBuy1 = function() {
+
+						$("#ChargeSection").css("display", "block");
+						$("#BuyBtn").text("Complete the purchase");
 					}
 
 				} catch (e) {
