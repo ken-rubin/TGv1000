@@ -243,11 +243,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						if (nameStatus && ((m_iDataType === 5 && initialValueStatus) || (m_iDataType !== 5 && m_iDataType > 0))) {
 
-							$("#SavePropertyBtn").removeClass("disabled");
+							$("#SavePropertyBtn").prop("disabled", false);
 						
 						} else {
 
-							$("#SavePropertyBtn").addClass("disabled");
+							$("#SavePropertyBtn").prop("disabled", true);
 						}
 					}
 

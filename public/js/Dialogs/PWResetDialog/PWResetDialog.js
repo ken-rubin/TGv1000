@@ -124,9 +124,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						var password = $("#password").val().trim();
 						var bValid = (password.length > 0) && !(password.includes("'" || password.includes('"')));
 						if (!bValid) {
-							$("#ResetButton").addClass("disabled");
+							$("#ResetButton").prop("disabled", true);
 						} else {
-							$("#ResetButton").removeClass("disabled");
+							$("#ResetButton").prop("disabled", false);
 						}
 					}
 
@@ -135,7 +135,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							$("#ResetButton").addClass("disabled");
+							$("#ResetButton").prop("disabled", true);
 							var posting = $.post("/BOL/ValidateBO/ResetPassword", 
 												{
 													userName: m_userName,
@@ -156,13 +156,13 @@ define(["Core/snippetHelper", "Core/errorHelper"],
             					} else {
 
                 					// !data.success
-                					$("#ResetButton").removeClass("disabled");
+                					$("#ResetButton").prop("disabled", false);
                 					m_wellMessage(data.message, null);
             					}
         					});
 						} catch (e) {
 
-							$("#ResetButton").removeClass("disabled");
+							$("#ResetButton").prop("disabled", false);
 							m_wellMessage(e.message, null);
 						}
 					};

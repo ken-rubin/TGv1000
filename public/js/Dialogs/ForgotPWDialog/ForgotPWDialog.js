@@ -116,14 +116,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						var email = $("#email").val().trim();
 						var bValid = (email.length > 0);
 						if (!bValid) {
-							$("#SendButton").addClass("disabled");
+							$("#SendButton").prop("disabled", true);
 						} else {
 							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
 							bValid = email.match(eReg);
 							if (!bValid) {
-								$("#SendButton").addClass("disabled");
+								$("#SendButton").prop("disabled", true);
 							} else {
-								$("#SendButton").removeClass("disabled");
+								$("#SendButton").prop("disabled", false);
 							}
 						}
 					}
@@ -133,7 +133,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							$("#SendButton").addClass("disabled");
+							$("#SendButton").prop("disabled", true);
 							var posting = $.post("/BOL/ValidateBO/SendPasswordResetEmail", 
 												{
 													userName: $("#email").val().trim().toLowerCase()
@@ -152,13 +152,13 @@ define(["Core/snippetHelper", "Core/errorHelper"],
             					} else {
 
                 					// !data.success
-                					$("#SendButton").removeClass("disabled");
+                					$("#SendButton").prop("disabled", false);
                 					m_wellMessage(data.message, null);
             					}
         					});
 						} catch (e) {
 
-							$("#SendButton").removeClass("disabled");
+							$("#SendButton").prop("disabled", false);
 							m_wellMessage(e.message, null);
 						}
 					};

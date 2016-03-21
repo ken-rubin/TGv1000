@@ -124,9 +124,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var nameStatus = $("#EventName").val().trim().length > 0;
 
 						if (!nameStatus) {
-							$("#CreateEventBtn").addClass("disabled");
+							$("#CreateEventBtn").prop("disabled", true);
 						} else {
-							$("#CreateEventBtn").removeClass("disabled");
+							$("#CreateEventBtn").prop("disabled", false);
 						}
 					}
 

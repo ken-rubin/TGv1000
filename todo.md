@@ -6,22 +6,23 @@
 
 ## Jerry's Issues
 ##### Do first because they're annoying or they just need doing
-- Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a search-based system.
+- Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.)
+    + Use this code to display a Purchasable Product's video:
+    ```
+    <div align="center" class="embed-responsive embed-responsive-16by9">
+        <video autoplay loop class="embed-responsive-item">
+            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
+        </video>
+    </div>
+    ```
 - Finish buying.
+- Happened 1 time: created new class project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Error: cannot do trim of undefined" (or something like that).
 - Test everything I just did with a non-privileged user.
+- When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done.**
 
 ##### Do later
-- When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done.**
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog, openProjectDialog, newProjectDialog.
-- Use this code to display a Purchasable Product's video:
-```
-<div align="center" class="embed-responsive embed-responsive-16by9">
-    <video autoplay loop class="embed-responsive-item">
-        <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
-    </video>
-</div>
-```
-- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. We need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
+- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - Test image (multer) stuff now that I've put JWT in the middle.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.

@@ -259,9 +259,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					var m_setStateCreateBtn = function() {
 
 						if (!($("#TypeName").val().trim().length)) {
-							$("#CreateTypeBtn").addClass("disabled");
+							$("#CreateTypeBtn").prop("disabled", true);
 						} else {
-							$("#CreateTypeBtn").removeClass("disabled");
+							$("#CreateTypeBtn").prop("disabled", false);
 						}
 					}
 

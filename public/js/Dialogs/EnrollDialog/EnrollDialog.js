@@ -117,14 +117,14 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						m_last = $("#last").val().trim();
 						var bValid = (m_email.length > 0 && m_first.length > 0 && m_last.length > 0);
 						if (!bValid) {
-							$("#EnrollButton").addClass("disabled");
+							$("#EnrollButton").prop("disabled", true);
 						} else {
 							var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;	/* ' */
 							bValid = m_email.match(eReg);
 							if (!bValid) {
-								$("#EnrollButton").addClass("disabled");
+								$("#EnrollButton").prop("disabled", true);
 							} else {
-								$("#EnrollButton").removeClass("disabled");
+								$("#EnrollButton").prop("disabled", false);
 							}
 						}
 					}
@@ -134,7 +134,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						try {
 
-							$("#EnrollButton").addClass("disabled");
+							$("#EnrollButton").prop("disabled", true);
 							var posting = $.post("/BOL/ValidateBO/NewEnrollment", 
 												{
 													userName: m_email,
@@ -178,13 +178,13 @@ define(["Core/snippetHelper", "Core/errorHelper"],
             					} else {
 
                 					// !data.success
-                					$("#EnrollButton").removeClass("disabled");
+                					$("#EnrollButton").prop("disabled", false);
                 					m_wellMessage(data.message, null);
             					}
         					});
 						} catch (e) {
 
-							$("#EnrollButton").removeClass("disabled");
+							$("#EnrollButton").prop("disabled", false);
 							m_wellMessage(e.message, null);
 						}
 					};

@@ -134,7 +134,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (m_bPrivilegedUser) {
 								$("#PrivilegedUsersDiv").css("display", "block");
-								$("#ContinueBtn").addClass('disabled');
+								$("#ContinueBtn").prop('disabled', true);
 							}
 
 							if (g_profile["can_create_classes"]) {
@@ -181,6 +181,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
+					            		id: 'CreateProjBtn',
 					            		label: "Create Project",
 					            		cssClass: "btn-primary",
 					            		hotkey: 13,
@@ -289,6 +290,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						$("#DescriptionDiv").html(htmlData);
 						$("#ProjectName").focus();
+						$("#ProjectName").keyup(m_functionEnableDisableCreateProjBtn);
 
 						if (m_bClassProject) {
 							jQuery(function($){
@@ -310,6 +312,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
 								}
 							});
+						}
+
+						m_functionEnableDisableCreateProjBtn();
+					}
+
+					var m_functionEnableDisableCreateProjBtn = function() {
+
+						if ($("#ProjectName").val().trim().length > 0) {
+							$("#CreateProjBtn").prop('disabled', false);
+						} else {
+							$("#CreateProjBtn").prop('disabled', true);
 						}
 					}
 
@@ -377,7 +390,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 								m_projectType = strProjectType;
 
-								$("#ContinueBtn").removeClass('disabled');
+								$("#ContinueBtn").prop('disabled', false);
 
 								// Draw a big red border around the selected Core Project Image.
 								var jq;

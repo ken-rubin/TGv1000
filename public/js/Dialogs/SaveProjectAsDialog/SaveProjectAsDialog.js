@@ -315,11 +315,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setStateSaveAsBtn = function () {
 
-						var status = m_clProject.getStatus();
+						var status = m_clProject.getStatus(m_clProject_data_name);
 						if (!status.allRequiredFieldsFilled) {
-							$("#SaveProjectBtn").addClass("disabled");
+							$("#SaveProjectBtn").prop("disabled", true);
 						} else {
-							$("#SaveProjectBtn").removeClass("disabled");
+							$("#SaveProjectBtn").prop("disabled", false);
 						}
 					}
 

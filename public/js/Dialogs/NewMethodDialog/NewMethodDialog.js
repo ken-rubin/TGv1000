@@ -161,9 +161,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_setStateCreateBtn = function() {
 
 						if (!($("#MethodName").val().trim().length)) {
-							$("#CreateMethodBtn").addClass("disabled");
+							$("#CreateMethodBtn").prop("disabled", true);
 						} else {
-							$("#CreateMethodBtn").removeClass("disabled");
+							$("#CreateMethodBtn").prop("disabled", false);
 						}
 					}
 

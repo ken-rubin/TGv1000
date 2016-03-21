@@ -153,15 +153,16 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
-					self.getStatus = function () {
+					self.getStatus = function (nameInHolding) {
 
 
 						var test = parseInt(g_profile['userId'], 10);
+						var nih = nameInHolding || '';
 						return {
 
 							inDBAlready: (self.data.id > 0),
 							userOwnsProject: (self.data.ownedByUserId === test),
-							allRequiredFieldsFilled: (	self.data.name.trim().length > 0 
+							allRequiredFieldsFilled: (	nih.trim().length > 0
 											&& (self.data.imageId > 0 || self.data.altImagePath.length > 0)
 										),
 							projectNameIsFilled: (self.data.name.trim().length > 0)
