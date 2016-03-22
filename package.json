@@ -21,7 +21,8 @@
     "mysql": "^2.10.2",
     "nodemailer": "0.7.1",
     "request": "^2.69.0",
-    "serve-favicon": "^2.3.0"
+    "serve-favicon": "^2.3.0",
+    "stripe": "*"
   },
   "scripts": {
     "start": "node-dev --debug app.js development"

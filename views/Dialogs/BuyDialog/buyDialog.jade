@@ -7,7 +7,7 @@
 .well#ChargeSection(style="display:none; margin-top:13px;")
   .row
       .col-xs-1
-      .col-xs-10(style="font-size:small;")
+      .col-xs-10(style="font-size:small; color:black;")
         span.glyphicon.glyphicon-lock
         | &nbsp;This is a secure 128-bit SSL-encrypted payment. Also, we DO NOT save your charge information. You're safe.
       .col-xs-1
@@ -15,7 +15,7 @@
     br
     .col-xs-3
     .col-xs-6
-        div(style="border:2px solid gray; border-radius:8px; padding:10px;")
+        div(style="border:2px solid gray; border-radius:8px; padding:10px; background-color:lightblue;")
             label.control-label(for="ChargeName" style="margin-top:4px;") &nbsp;Name (as it appears on your card)
             input.form-control#ChargeName(type="text")
             br
@@ -31,6 +31,6 @@
                 each val,index in ['2016','2017','2018','2019','2020','2021','2022','2023','2024']
                     option(value=index)= val
             br
-            label.control-label(for="CVV" style="margin-top:20px;") &nbsp;Security code (3 on back; AmEx: 4 on front)
-            input.form-control#CVV(type="text" style="width:30%")
+            label.control-label(for="CVC" style="margin-top:20px;") &nbsp;Security code (3 digits on back; AmEx: 4 on front)
+            input.form-control#CVC(type="text" style="width:30%")
     .col-xs-3

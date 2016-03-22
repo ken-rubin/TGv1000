@@ -663,7 +663,6 @@ begin
 		UPDATE control set dbstate=7 where id=1;
         set @dbstate := 7;
     end if;
-   
     
     if @dbstate = 7 THEN
 
@@ -672,6 +671,14 @@ begin
     
 		UPDATE control set dbstate=8 where id=1;
         set @dbstate := 8;
+    end if;
+    
+    if @dbstate = 8 THEN
+
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/ProcessCharge','post','routeProcessCharge',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+    
+		UPDATE control set dbstate=9 where id=1;
+        set @dbstate := 9;
     end if;
 
 end//

@@ -5,6 +5,7 @@
 var fs = require("fs");
 var jade = require("jade");
 var async = require("async");
+var stripe = null;
 
 module.exports = function UtilityBO(app, sql, logger) {
 
@@ -12,8 +13,20 @@ module.exports = function UtilityBO(app, sql, logger) {
 
     // Private fields
     var m_resourceTypes = ['0-unused'];
-
     self.dbname = app.get("dbname");
+
+    // Decide, based on app.get("development") whether we're using test credit or real.
+    var bLocalCredit = app.get("development");
+    if (bLocalCredit) {
+
+        console.log("Using local (test) credit.");
+        stripe = require("stripe")("sk_test_ATd0E5b9XCV8G88pXqw3CcbM");
+
+    } else {
+
+        console.log("Using remote (real) credit.");
+        stripe = require("stripe")("sk_live_FNvxhlz9j5L82jwlyA4vIMK1");
+    }
     
     // Fill m_resourceTypes from database.
     try {
@@ -54,6 +67,26 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+    self.routeProcessCharge = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeProcessCharge with req.body = " + JSON.stringify(req.body));
+
+            res.json({
+                success: true
+            });
+
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeSearchResources = function (req, res) {
 
         // This is a search for Images or Sounds (resourceTypeIds 1 and 2, respectively).
