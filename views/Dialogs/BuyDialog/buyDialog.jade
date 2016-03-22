@@ -13,47 +13,24 @@
       .col-xs-1
   .row
     br
-    .col-xs-4
-    .col-xs-4
-        label.control-label(for="ChargeName" style="margin-top:4px;") &nbsp;Name (as it appears on your card)
-    .col-xs-4
-  .row
-    .col-xs-4
-    .col-xs-4
-          input.form-control#ChargeName(type="text")
-    .col-xs-4
-  .row
-    .col-xs-4
-    .col-xs-5
-        label.control-label(for="ChargeNumber" style="margin-top:8px;") &nbsp;Card number (# digits dep. on card type)
     .col-xs-3
-  .row
-    .col-xs-4
-    .col-xs-4
-          input.form-control#ChargeNumber(type="text")
-    .col-xs-4
-  .row
-    .col-xs-4
-    .col-xs-4
-        label.control-label(for="ExpDateMo" style="margin-top:8px;") &nbsp;Expiration date
-    .col-xs-4
-  .row
-    .col-xs-4
-    .col-xs-4
-        select.form-control#ExpDateMo(style="width:48%; float:left;")
-            each val,index in ['January','February','March','April','May','June','July','August','September','October','November','December']
-                option(value=index)= val
-        select.form-control#ExpDateYr(style="width:48%; float:right;")
-            each val,index in ['2016','2017','2018','2019','2020','2021','2022','2023','2024']
-                option(value=index)= val
-    .col-xs-4
-  .row
-    .col-xs-4
-    .col-xs-5
-        label.control-label(for="CVV" style="margin-top:8px;") &nbsp;Security code (3 on back; AmEx: 4 on front)
-    .col-xs-4
-  .row
-    .col-xs-4
-    .col-xs-4
-          input.form-control#CVV(type="text" style="width:30%")
-    .col-xs-4
+    .col-xs-6
+        div(style="border:2px solid gray; border-radius:8px; padding:10px;")
+            label.control-label(for="ChargeName" style="margin-top:4px;") &nbsp;Name (as it appears on your card)
+            input.form-control#ChargeName(type="text")
+            br
+            label.control-label(for="ChargeNumber") &nbsp;Card number (# digits dep. on card type)
+            input.form-control#ChargeNumber(type="text")
+            br
+            label.control-label(for="ExpDateMo") &nbsp;Expiration date
+            br
+            select.form-control#ExpDateMo(style="width:48%; float:left;")
+                each val,index in ['January','February','March','April','May','June','July','August','September','October','November','December']
+                    option(value=index)= val
+            select.form-control#ExpDateYr(style="width:48%; float:right;")
+                each val,index in ['2016','2017','2018','2019','2020','2021','2022','2023','2024']
+                    option(value=index)= val
+            br
+            label.control-label(for="CVV" style="margin-top:20px;") &nbsp;Security code (3 on back; AmEx: 4 on front)
+            input.form-control#CVV(type="text" style="width:30%")
+    .col-xs-3
