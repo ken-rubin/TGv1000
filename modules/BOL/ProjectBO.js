@@ -28,7 +28,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                 } else {
 
                     // Make sure rows are sorted by id.
-                    rows.sort(function(a,b){return a.id - b.id;})
+                    rows.sort(function(a,b){return a.id - b.id;});
                     for (var i = 0; i < rows.length; i++) {
 
                         m_resourceTypes.push(rows[i].description);
@@ -94,10 +94,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                             tags: '',
                             projectTypeId: row.projectTypeId,
                             comicProjectId: row.comicProjectId,
-                            isCoreProject: row.isCoreProject === 1 ? true : false,
-                            isProduct: row.isProduct === 1 ? true : false,
-                            isClass: row.isClass === 1 ? true : false,
-                            isOnlineClass: row.isOnlineClass === 1 ? true : false,
+                            isCoreProject: (row.isCoreProject === 1 ? true : false),
+                            isProduct: (row.isProduct === 1 ? true : false),
+                            isClass: (row.isClass === 1 ? true : false),
+                            isOnlineClass: (row.isOnlineClass === 1 ? true : false),
                             comics:
                             {
                                 items: []
@@ -327,7 +327,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     function(typeIth, cbe1) {
 
                                         typeIth.originalTypeId = typeIth.id;
-                                        typeIth.isApp = typeIth.isApp === 1 ? true : false;
+                                        typeIth.isApp = (typeIth.isApp === 1 ? true : false);
                                         typeIth.methods = [];
                                         typeIth.properties = [];
                                         typeIth.events = [];
@@ -380,7 +380,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     function(typeIth, cbe2) {
 
                                         typeIth.originalTypeId = typeIth.id;
-                                        typeIth.isApp = typeIth.isApp === 1 ? true : false;
+                                        typeIth.isApp = (typeIth.isApp === 1 ? true : false);
                                         typeIth.methods = [];
                                         typeIth.properties = [];
                                         typeIth.events = [];
@@ -804,7 +804,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
         try {
 
-            // m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
+            m_log("Entered ProjectBO/routeSaveProject with req.body=" + JSON.stringify(req.body));
             // req.user.userId
             // req.user.userName
             // req.body.projectJson
@@ -1108,10 +1108,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     return callback(null, typeOfSave);
                 }
             );
-        } catch (e) {
-
-            callback(e);
-        }
+        } catch (e) { callback(e); }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1973,11 +1970,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 +",description='" + typeIth.description + "'"
                                                 +",parentTypeId=" + typeIth.parentTypeId
                                                 +",parentPrice=" + typeIth.parentPrice
-                                                +",priceBump=" +: typeIth.priceBump
+                                                +",priceBump=" + typeIth.priceBump
                                                 +",ownedByUserId=" + typeIth.ownedByUserId
-                                                +",public=" typeIth.public
+                                                +",public=" + typeIth.public
                                                 +",quarantined=" + typeIth.quarantined
-                                                +",baseTypeId+" + typeIth.baseTypeId
+                                                +",baseTypeId=" + typeIth.baseTypeId
                                                 +",projectId=" + passObj.project.id
                                                 +",isToolStrip=" + typeIth.isToolStrip
                                                 ;
@@ -2057,7 +2054,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         } else {
                             // Even though we didn't write it out, we'll have it for lookups.
                             passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-                            // // m_log("2. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
+                            // m_log("2. xlateArray=" + JSON.stringify(passObj.typeIdTranslationArray));
                             return cb(null);
                         }
                     } else {
@@ -2246,14 +2243,14 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 // If this is a System Type property, push onto passObj.project.script.
                                                 if (typeIth.ordinal === 10000) {
-                                                    var guts = " SET typeId=" + atid
+                                                    var scriptGuts = " SET typeId=" + atid
                                                                 + ",propertyTypeId=" + property.propertyTypeId
                                                                 + ",name='" + connection.escape(property.name) + "'"
                                                                 + ",initialValue='" + connection.escape(property.initialValue) + "'"
                                                                 + ",ordinal=" + property.ordinal
                                                                 + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                 ;
-                                                    project.script.push("insert " + self.dbname + "propertys" + guts + ";");
+                                                    project.script.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
                                                 }
                                                 return cb(null);
 

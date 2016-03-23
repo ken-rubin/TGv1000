@@ -273,6 +273,7 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
                 console.log('*************** ERROR ****************');
                 console.log('Error setting up route for ' + rowi.route + '; skipping it.');
                 console.log(e.message);
+                console.log(e);
                 console.log(' ');
             }
         }
