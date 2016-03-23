@@ -90,6 +90,44 @@ module.exports = function SQL(app) {
         }
     }
 
+    self.queryWithCxnWithPlaceholders = function (connection, strQuery, objValues,  callback) {
+
+        try {
+            
+            connection.query(strQuery, objValues,
+                function(err, rows) {
+
+                    try {
+                        if (err) { throw err; }
+
+                        // Notes:   SELECT returns rows[] with each array row a JS object containing all selected fields.
+                        //          INSERT returns rows.insertId (primary key of inserted row)
+                        //          UPDATE returns rows.changedRows (# of changed rows)
+                        //          DELETE returns rows.affectedRows (# of deleted rows)
+                        // If strSql is of the form "SELECT * FROM x; SELECT * FROM y;", rows[0] and rows[1] will respectively contain results of each SELECT.
+                        if (rows.constructor === Array) {
+
+                            callback(null, rows);
+                        
+                        } else {
+
+                            // rows is a non-array js object. Turn it into an array.
+                            var newRows = [];
+                            newRows.push(rows);
+                            callback(null, newRows);
+                        }
+                    } catch (e) {
+
+                        connection.rollback(function() { callback(e, null);});
+                    }
+                }
+            );
+        } catch (e) {
+
+            connection.rollback(function() { callback(e, null);});
+        }
+    }
+
     self.commitCxn = function (connection, callback) {
 
         try {

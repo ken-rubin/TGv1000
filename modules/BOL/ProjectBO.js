@@ -1223,27 +1223,47 @@ module.exports = function ProjectBO(app, sql, logger) {
                             project.comicProjectId = 0;
                         }
 
-                        var guts = " SET name='" + project.name + "'"
-                            + ",ownedByUserId=" + req.user.userId
-                            + ",public=" + project.public
-                            + ",projectTypeId=" + project.projectTypeId
-                            + ",quarantined=" + project.quarantined
-                            + ",parentPrice=" + project.parentPrice
-                            + ",parentProjectId=" + project.parentProjectId
-                            + ",priceBump=" + project.priceBump
-                            + ",imageId=" + project.imageId
-                            + ",altImagePath='" + project.altImagePath + "'"
-                            + ",description='" + project.description + "'"
-                            + ",isProduct=" + (project.isProduct || project.specialProjectData.productProject ? 1 : 0)
-                            + ",isClass=" + (project.isClass || project.specialProjectData.classProject ? 1 : 0)
-                            + ",isOnlineClass=" + (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0)
-                            + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
-                            + ",comicProjectId=" + project.comicProjectId
-                            ;
+                        var guts = {
+                            name: project.name,
+                            ownedByUserId: req.user.userId,
+                            public: project.public,
+                            projectTypeId: project.projectTypeId,
+                            quarantined: project.quarantined,
+                            parentPrice: project.parentPrice,
+                            parentProjectId: project.parentProjectId,
+                            priceBump: project.priceBump,
+                            imageId: project.imageId,
+                            altImagePath: project.altImagePath,
+                            description: project.description,
+                            isProduct: (project.isProduct || project.specialProjectData.productProject ? 1 : 0),
+                            isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
+                            isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
+                            isCoreProject: (project.isCoreProject ? 1 : 0),
+                            comicProjectId: project.comicProjectId
+                            };
+                        // var guts = " SET name='" + project.name + "'"
+                        //     + ",ownedByUserId=" + req.user.userId
+                        //     + ",public=" + project.public
+                        //     + ",projectTypeId=" + project.projectTypeId
+                        //     + ",quarantined=" + project.quarantined
+                        //     + ",parentPrice=" + project.parentPrice
+                        //     + ",parentProjectId=" + project.parentProjectId
+                        //     + ",priceBump=" + project.priceBump
+                        //     + ",imageId=" + project.imageId
+                        //     + ",altImagePath='" + project.altImagePath + "'"
+                        //     + ",description='" + project.description + "'"
+                        //     + ",isProduct=" + (project.isProduct || project.specialProjectData.productProject ? 1 : 0)
+                        //     + ",isClass=" + (project.isClass || project.specialProjectData.classProject ? 1 : 0)
+                        //     + ",isOnlineClass=" + (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0)
+                        //     + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
+                        //     + ",comicProjectId=" + project.comicProjectId
+                        //     ;
 
-                        var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
-                        m_log('Inserting project record with ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery, 
+                        // var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
+                        var strQuery = "INSERT " + self.dbname + "projects SET ?";
+                        m_log('Inserting project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                        // sql.queryWithCxn(connection, strQuery, 
+                        sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                             function(err, rows) {
                                 if (err) { return cb(err); }
                                 if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
@@ -1524,28 +1544,29 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
 
-                    guts = " SET active=" + (project.specialProjectData.onlineClassData.active ? 1 : 0)
-                        + ",classDescription='" + project.specialProjectData.onlineClassData.classDescription + "'"
-                        + ",instructorFirstName='" +  project.specialProjectData.onlineClassData.instructorFirstName + "'"
-                        + ",instructorLastName='" + project.specialProjectData.onlineClassData.instructorLastName + "'"
-                        + ",instructorEmail='" + project.specialProjectData.onlineClassData.instructorEmail + "'"
-                        + ",schedule='" + JSON.stringify(project.specialProjectData.onlineClassData.schedule) + "'"
-                        + ",level='" + project.specialProjectData.onlineClassData.level + "'"
-                        + ",difficulty='" + project.specialProjectData.onlineClassData.difficulty + "'"
-                        + ",price=" + project.specialProjectData.onlineClassData.price
-                        + ",classNotes='" + project.specialProjectData.onlineClassData.classNotes + "'"
-                        + ",imageId=" + (project.specialProjectData.onlineClassData.imageId || 0)           // not set on client side yet
-                        + ",name='" + project.name + "'"
-                        + ",baseProjectId=" + project.id
-                        ;
+                    guts = {
+                        active: (project.specialProjectData.onlineClassData.active ? 1 : 0),
+                        classDescription: project.specialProjectData.onlineClassData.classDescription,
+                        instructorFirstName: project.specialProjectData.onlineClassData.instructorFirstName,
+                        instructorLastName: project.specialProjectData.onlineClassData.instructorLastName,
+                        instructorEmail: project.specialProjectData.onlineClassData.instructorEmail,
+                        schedule: JSON.stringify(project.specialProjectData.onlineClassData.schedule),
+                        level: project.specialProjectData.onlineClassData.level,
+                        difficulty: project.specialProjectData.onlineClassData.difficulty,
+                        price: project.specialProjectData.onlineClassData.price,
+                        classNotes: project.specialProjectData.onlineClassData.classNotes,
+                        imageId: (project.specialProjectData.onlineClassData.imageId || 0),           // not set on client side yet
+                        name: project.name,
+                        baseProjectId: project.id
+                        };
                     dbname = 'onlineclasses';
                 }
 
-                if (guts.length > 0) {
+                if (dbname.length > 0) {
 
-                    var strQuery = "INSERT " + self.dbname + dbname + guts + ";";
-                    m_log('Inserting Purchasable Product into ' + dbname + ' with query ' + strQuery);
-                    sql.queryWithCxn(connection, strQuery, 
+                    var strQuery = "INSERT " + self.dbname + dbname + " SET ?";
+                    m_log('Inserting purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                         function(err, rows) {
                             if (err) { return callback(err); }
 

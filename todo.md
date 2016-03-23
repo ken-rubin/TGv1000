@@ -6,6 +6,7 @@
 
 ## Jerry's Issues
 ##### Do first because they're annoying or they just need doing
+- In SaveProjectAsDialog I updated an online course Notes field from what I had typed into NewProjectDialog, but the SQL didn't change. It appears the project has changed in memory, but the sent information didn't change.
 - Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.)
     + Use this code to display a Purchasable Product's video:
     ```
@@ -21,6 +22,7 @@
 - When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done.**
 
 ##### Do later
+- Apostrophe-proof all data built into SQL queries. How?
 - Make all input fields SQL-good. By this I mean we have to encode internal single quotes or other things that would screw up the sql queries I build.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog, openProjectDialog, newProjectDialog.
 - After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
