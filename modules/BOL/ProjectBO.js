@@ -1374,27 +1374,28 @@ module.exports = function ProjectBO(app, sql, logger) {
                             project.comicProjectId = project.id;
                         }
 
-                        var guts = " SET name='" + project.name + "'"
-                            + ",ownedByUserId=" + req.user.userId
-                            + ",public=" + project.public
-                            + ",projectTypeId=" + project.projectTypeId
-                            + ",quarantined=" + project.quarantined
-                            + ",parentPrice=" + project.parentPrice
-                            + ",parentProjectId=" + project.parentProjectId
-                            + ",priceBump=" + project.priceBump
-                            + ",imageId=" + project.imageId
-                            + ",altImagePath='" + project.altImagePath + "'"
-                            + ",description='" + project.description + "'"
-                            + ",isProduct=" + (project.isProduct || project.specialProjectData.productProject ? 1 : 0)
-                            + ",isClass=" + (project.isClass || project.specialProjectData.classProject ? 1 : 0)
-                            + ",isOnlineClass=" + (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0)
-                            + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
-                            + ",comicProjectId=" + project.comicProjectId
-                            ;
+                        var guts = {
+                            name: project.name,
+                            ownedByUserId: req.user.userId,
+                            public: project.public,
+                            projectTypeId: project.projectTypeId,
+                            quarantined: project.quarantined,
+                            parentPrice: project.parentPrice,
+                            parentProjectId: project.parentProjectId,
+                            priceBump: project.priceBump,
+                            imageId: project.imageId,
+                            altImagePath: project.altImagePath,
+                            description: project.description,
+                            isProduct: (project.isProduct || project.specialProjectData.productProject ? 1 : 0),
+                            isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
+                            isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
+                            isCoreProject: (project.isCoreProject ? 1 : 0),
+                            comicProjectId: project.comicProjectId
+                            };
 
-                        var strQuery = "UPDATE " + self.dbname + "projects" + guts + " where id=" + project.id + ";";
-                        m_log('Updating project record with id ' + project.id + ' with query ' + strQuery);
-                        sql.queryWithCxn(connection, strQuery, 
+                        var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;
+                        m_log('Updating project record with id ' + project.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                        sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                             function(err, rows) {
                                 if (err) { return cb(err); }
                                 return cb(null);
@@ -1784,9 +1785,27 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                 typeIth.comicId = passObj.comicIth.id;
                                 typeIth.ordinal = 0;
-                                var strQuery = "insert " + self.dbname + "types (name,isApp,imageId,altImagePath,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,ownedByUserId,public,quarantined,baseTypeId,projectId,isToolStrip) values ('" + typeIth.name + "',1," + typeIth.imageId + ",'" + typeIth.altImagePath + "'," + typeIth.ordinal + "," + typeIth.comicId + ",'" + typeIth.description + "'," + typeIth.parentTypeId + "," + typeIth.parentPrice + "," + typeIth.priceBump + "," + passObj.req.user.userId + "," + typeIth.public + "," + typeIth.quarantined+ "," + typeIth.baseTypeId + "," + passObj.project.id + "," + typeIth.isToolStrip + ");";
-                                m_log('Inserting App type with ' + strQuery);
-                                sql.queryWithCxn(passObj.connection, strQuery,
+                                var guts = {
+                                    name: typeIth.name,
+                                    isApp: 1,
+                                    imageId: typeIth.imageId,
+                                    altImagePath: typeIth.altImagePath,
+                                    ordinal: typeIth.ordinal,
+                                    comicId: typeIth.comicId,
+                                    description: typeIth.description,
+                                    parentTypeId: typeIth.parentTypeId,
+                                    parentPrice: typeIth.parentPrice,
+                                    priceBump: typeIth.priceBump,
+                                    ownedByUserId: passObj.req.user.userId,
+                                    public: typeIth.public,
+                                    quarantined: typeIth.quarantined,
+                                    baseTypeId: typeIth.baseTypeId,
+                                    projectId: passObj.project.id,
+                                    isToolStrip: typeIth.isToolStrip
+                                };
+                                var strQuery = "insert " + self.dbname + "types SET ?";
+                                m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                sql.queryWithCxn(passObj.connection, strQuery, guts,
                                     function(err, rows) {
 
                                         try {
@@ -1888,23 +1907,24 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     function(cb) {
 
                                         // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
-                                        var guts = " SET name='" + typeIth.name + "'"
-                                            + ",isApp=0"
-                                            + ",imageId=" + typeIth.imageId
-                                            + ",altImagePath='" + typeIth.altImagePath + "'"
-                                            + ",ordinal=" + typeIth.ordinal
-                                            + ",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
-                                            + ",description='" + typeIth.description + "'"
-                                            + ",parentTypeId=" + typeIth.parentTypeId
-                                            + ",parentPrice=" + typeIth.parentPrice
-                                            + ",priceBump=" + typeIth.priceBump
-                                            + ",ownedByUserId=" + typeIth.ownedByUserId
-                                            + ",public=" + typeIth.public
-                                            + ",quarantined=" + typeIth.quarantined
-                                            + ",baseTypeId=" + typeIth.baseTypeId
-                                            + ",projectId=" + passObj.project.id
-                                            + ",isToolStrip=" + typeIth.isToolStrip
-                                            ;
+                                        var guts = {
+                                            name: typeIth.name,
+                                            isApp: 0,
+                                            imageId: typeIth.imageId,
+                                            altImagePath: typeIth.altImagePath,
+                                            ordinal: typeIth.ordinal,
+                                            comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId),
+                                            description: typeIth.description,
+                                            parentTypeId: typeIth.parentTypeId,
+                                            parentPrice: typeIth.parentPrice,
+                                            priceBump: typeIth.priceBump,
+                                            ownedByUserId: typeIth.ownedByUserId,
+                                            public: typeIth.public,
+                                            quarantined: typeIth.quarantined,
+                                            baseTypeId: typeIth.baseTypeId,
+                                            projectId: passObj.project.id,
+                                            isToolStrip: typeIth.isToolStrip
+                                            };
 
                                         var strQuery;
                                         var weInserted;
@@ -1913,7 +1933,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
 
                                             // First the update statement.
-                                            strQuery = "update " + self.dbname + "types" + guts + " where id=" + typeIth.id + ";";
+                                            strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id;
                                             
                                             // Then delete methods, properties and events which will be re-inserted.
                                             strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
@@ -1927,11 +1947,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         } else {
 
                                             // It's either a new System Type or a non-System Type that was deleted or never existed.
-                                            strQuery = "insert " + self.dbname + "types" + guts + ";";
+                                            strQuery = "insert " + self.dbname + "types SET ?";
                                             weInserted = true;
                                         }
 
-                                        m_log('Inserting or updating type with ' + strQuery);
+                                        m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
 
                                         // If this is a System Type, push SQL statements onto passObj.project.script.
 
@@ -1943,7 +1963,27 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             passObj.project.idnum += 1;
                                             typeIth.atid = "@id" + passObj.project.idnum;
 
-                                            passObj.project.script.push('set @guts := "' + guts + '";');
+                                            var scriptGuts = 
+                                                "SET name='" + typeIth.name + "'"
+                                                +",isApp=0"
+                                                +",imageId=" + typeIth.imageId
+                                                +",altImagePath=" + typeIth.altImagePath
+                                                +",ordinal=" + typeIth.ordinal
+                                                +",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
+                                                +",description='" + typeIth.description + "'"
+                                                +",parentTypeId=" + typeIth.parentTypeId
+                                                +",parentPrice=" + typeIth.parentPrice
+                                                +",priceBump=" +: typeIth.priceBump
+                                                +",ownedByUserId=" + typeIth.ownedByUserId
+                                                +",public=" typeIth.public
+                                                +",quarantined=" + typeIth.quarantined
+                                                +",baseTypeId+" + typeIth.baseTypeId
+                                                +",projectId=" + passObj.project.id
+                                                +",isToolStrip=" + typeIth.isToolStrip
+                                                ;
+
+
+                                            passObj.project.script.push('set @guts := "' + scriptGuts + '";');
                                             passObj.project.script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
                                             passObj.project.script.push('if ' + typeIth.atid + ' is not null then');
                                             passObj.project.script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
@@ -1961,7 +2001,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             passObj.project.script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
                                         }
 
-                                        sql.queryWithCxn(passObj.connection, strQuery,
+                                        sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
                                             function(err, rows) {
 
                                                 try {
@@ -2097,25 +2137,26 @@ module.exports = function ProjectBO(app, sql, logger) {
                                             method.typeId = typeIth.id;
                                             method.ordinal = ordinal++;
 
-                                            var guts = " SET typeId=" + typeIth.id
-                                                        + ",name='" + method.name + "'"
-                                                        + ",ordinal=" + method.ordinal
-                                                        + ",workspace='" + method.workspace + "'"
-                                                        + ",imageId=" + method.imageId
-                                                        + ",description='" + method.description + "'"
-                                                        + ",parentMethodId=" + method.parentMethodId
-                                                        + ",parentPrice=" + method.parentPrice
-                                                        + ",priceBump=" + method.priceBump
-                                                        + ",ownedByUserId=" + method.ownedByUserId
-                                                        + ",public=" + method.public
-                                                        + ",quarantined=" + method.quarantined
-                                                        + ",methodTypeId=" + method.methodTypeId
-                                                        + ",parameters='" + method.parameters + "'"
-                                                        ;
+                                            var guts = {
+                                                        typeId: typeIth.id,
+                                                        name: method.name,
+                                                        ordinal: method.ordinal,
+                                                        workspace: method.workspace,
+                                                        imageId: method.imageId,
+                                                        description: method.description,
+                                                        parentMethodId: method.parentMethodId,
+                                                        parentPrice: method.parentPrice,
+                                                        priceBump: method.priceBump,
+                                                        ownedByUserId: method.ownedByUserId,
+                                                        public: method.public,
+                                                        quarantined: method.quarantined,
+                                                        methodTypeId: method.methodTypeId,
+                                                        parameters: method.parameters
+                                                        };
 
-                                            var strQuery = "insert " + self.dbname + "methods" + guts + ";";
-                                            // m_log('Inserting method with ' + strQuery);
-                                            sql.queryWithCxn(connection, strQuery,
+                                            var strQuery = "insert " + self.dbname + "methods SET ?";
+                                            m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                            sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                                 function(err, rows) {
 
                                                     try {
@@ -2129,12 +2170,12 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                             // Re-do guts for use in ST.sql.
                                                             // We could just patch the original guts, but....
-                                                            var guts = " SET typeId=" + atid
-                                                                        + ",name='" + method.name + "'"
+                                                            var scriptGuts = " SET typeId=" + atid
+                                                                        + ",name='" + connection.escape(method.name) + "'"
                                                                         + ",ordinal=" + method.ordinal
-                                                                        + ",workspace='" + method.workspace + "'"
+                                                                        + ",workspace='" + connection.escape(method.workspace) + "'"
                                                                         + ",imageId=" + method.imageId
-                                                                        + ",description='" + method.description + "'"
+                                                                        + ",description='" + connection.escape(method.description) + "'"
                                                                         + ",parentMethodId=" + method.parentMethodId
                                                                         + ",parentPrice=" + method.parentPrice
                                                                         + ",priceBump=" + method.priceBump
@@ -2142,9 +2183,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                         + ",public=" + method.public
                                                                         + ",quarantined=" + method.quarantined
                                                                         + ",methodTypeId=" + method.methodTypeId
-                                                                        + ",parameters='" + method.parameters + "'"
+                                                                        + ",parameters='" + connection.escape(method.parameters) + "'"
                                                                         ;
-                                                            project.script.push("insert " + self.dbname + "methods" + guts + ";");
+                                                            project.script.push("insert " + self.dbname + "methods" + scriptGuts + ";");
                                                             project.script.push('set @idm := (select LAST_INSERT_ID());')
                                                         }
                                                         return cb(null);
@@ -2184,16 +2225,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     property.typeId = typeIth.id;
                                     property.ordinal = ordinal++;
 
-                                    var guts = " SET typeId=" + typeIth.id
-                                                + ",propertyTypeId=" + property.propertyTypeId
-                                                + ",name='" + property.name + "'"
-                                                + ",initialValue='" + property.initialValue + "'"
-                                                + ",ordinal=" + property.ordinal
-                                                + ",isHidden=" + (property.isHidden ? 1 : 0)
-                                                ;
-                                    strQuery = "insert " + self.dbname + "propertys" + guts + ";";
-                                    // m_log('Inserting property with ' + strQuery);
-                                    sql.queryWithCxn(connection, strQuery,
+                                    var guts = {
+                                                typeId: typeIth.id,
+                                                propertyTypeId: property.propertyTypeId,
+                                                name: property.name,
+                                                initialValue: property.initialValue,
+                                                ordinal: property.ordinal,
+                                                isHidden: (property.isHidden ? 1 : 0)
+                                                };
+                                    strQuery = "insert " + self.dbname + "propertys SET ?";
+                                    m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                         function(err, rows) {
 
                                             try {
@@ -2206,8 +2248,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 if (typeIth.ordinal === 10000) {
                                                     var guts = " SET typeId=" + atid
                                                                 + ",propertyTypeId=" + property.propertyTypeId
-                                                                + ",name='" + property.name + "'"
-                                                                + ",initialValue='" + property.initialValue + "'"
+                                                                + ",name='" + connection.escape(property.name) + "'"
+                                                                + ",initialValue='" + connection.escape(property.initialValue) + "'"
                                                                 + ",ordinal=" + property.ordinal
                                                                 + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                 ;
@@ -2240,13 +2282,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     event.typeId = typeIth.id;
                                     event.ordinal = ordinal++;
 
-                                    var guts = " SET typeId=" + typeIth.id
-                                                + ",name='" + event.name + "'"
-                                                + ",ordinal=" + event.ordinal
-                                                ;
-                                    strQuery = "insert " + self.dbname + "events" + guts + ";";
-                                    // m_log('Inserting event with ' + strQuery);
-                                    sql.queryWithCxn(connection, strQuery,
+                                    var guts = {
+                                                typeId: typeIth.id,
+                                                name: event.name,
+                                                ordinal: event.ordinal
+                                                };
+                                    strQuery = "insert " + self.dbname + "events SET ?";
+                                    m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                         function(err, rows) {
 
                                             try {
@@ -2257,11 +2300,11 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                                                 // If this is a System Type event, push onto passObj.project.script.
                                                 if (typeIth.ordinal === 10000) {
-                                                    var guts = " SET typeId=" + atid
-                                                                + ",name='" + event.name + "'"
+                                                    var scriptGuts = " SET typeId=" + atid
+                                                                + ",name='" + connection.escape(event.name) + "'"
                                                                 + ",ordinal=" + event.ordinal
                                                                 ;
-                                                    project.script.push("insert " + self.dbname + "events" + guts + ";");
+                                                    project.script.push("insert " + self.dbname + "events" + scriptGuts + ";");
                                                 }
                                                 return cb(null);
 
