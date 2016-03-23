@@ -1241,28 +1241,9 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isCoreProject: (project.isCoreProject ? 1 : 0),
                             comicProjectId: project.comicProjectId
                             };
-                        // var guts = " SET name='" + project.name + "'"
-                        //     + ",ownedByUserId=" + req.user.userId
-                        //     + ",public=" + project.public
-                        //     + ",projectTypeId=" + project.projectTypeId
-                        //     + ",quarantined=" + project.quarantined
-                        //     + ",parentPrice=" + project.parentPrice
-                        //     + ",parentProjectId=" + project.parentProjectId
-                        //     + ",priceBump=" + project.priceBump
-                        //     + ",imageId=" + project.imageId
-                        //     + ",altImagePath='" + project.altImagePath + "'"
-                        //     + ",description='" + project.description + "'"
-                        //     + ",isProduct=" + (project.isProduct || project.specialProjectData.productProject ? 1 : 0)
-                        //     + ",isClass=" + (project.isClass || project.specialProjectData.classProject ? 1 : 0)
-                        //     + ",isOnlineClass=" + (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0)
-                        //     + ",isCoreProject=" + (project.isCoreProject ? 1 : 0)
-                        //     + ",comicProjectId=" + project.comicProjectId
-                        //     ;
 
-                        // var strQuery = "INSERT " + self.dbname + "projects" + guts + ";";
                         var strQuery = "INSERT " + self.dbname + "projects SET ?";
                         m_log('Inserting project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                        // sql.queryWithCxn(connection, strQuery, 
                         sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                             function(err, rows) {
                                 if (err) { return cb(err); }
@@ -1506,40 +1487,42 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
 
-                    guts = " SET active=" + (project.specialProjectData.classData.active ? 1 : 0)
-                        + ",classDescription='" + project.specialProjectData.classData.classDescription + "'"
-                        + ",instructorFirstName='" +  project.specialProjectData.classData.instructorFirstName + "'"
-                        + ",instructorLastName='" + project.specialProjectData.classData.instructorLastName + "'"
-                        + ",instructorPhone='" + project.specialProjectData.classData.instructorPhone + "'"
-                        + ",facility='" + project.specialProjectData.classData.facility + "'"
-                        + ",address='" + project.specialProjectData.classData.address + "'"
-                        + ",room='" + project.specialProjectData.classData.room + "'"
-                        + ",city='" + project.specialProjectData.classData.city + "'"
-                        + ",state='" + project.specialProjectData.classData.state + "'"
-                        + ",zip='" + project.specialProjectData.classData.zip + "'"
-                        + ",schedule='" + JSON.stringify(project.specialProjectData.classData.schedule) + "'"
-                        + ",level='" + project.specialProjectData.classData.level + "'"
-                        + ",difficulty='" + project.specialProjectData.classData.difficulty + "'"
-                        + ",price=" + project.specialProjectData.classData.price
-                        + ",imageId=" + (project.specialProjectData.classData.imageId || 0)           // not set on client side yet
-                        + ",classNotes='" + project.specialProjectData.classData.classNotes + "'"
-                        + ",name='" + project.name + "'"
-                        + ",baseProjectId=" + project.id
-                        ;
+                    guts = {
+                        active: (project.specialProjectData.classData.active ? 1 : 0),
+                        classDescription: project.specialProjectData.classData.classDescription,
+                        instructorFirstName: project.specialProjectData.classData.instructorFirstName,
+                        instructorLastName: project.specialProjectData.classData.instructorLastName,
+                        instructorPhone: project.specialProjectData.classData.instructorPhone,
+                        facility: project.specialProjectData.classData.facility,
+                        address: project.specialProjectData.classData.address,
+                        room: project.specialProjectData.classData.room,
+                        city: project.specialProjectData.classData.city,
+                        state: project.specialProjectData.classData.state,
+                        zip: project.specialProjectData.classData.zip,
+                        schedule: JSON.stringify(project.specialProjectData.classData.schedule),
+                        level: project.specialProjectData.classData.level,
+                        difficulty: project.specialProjectData.classData.difficulty,
+                        price: project.specialProjectData.classData.price,
+                        imageId: (project.specialProjectData.classData.imageId || 0),           // not set on client side yet
+                        classNotes: project.specialProjectData.classData.classNotes,
+                        name: project.name,
+                        baseProjectId: project.id
+                        };
                     dbname = 'classes';
 
                 } else if (project.specialProjectData.productProject && project.specialProjectData.hasOwnProperty('productData')) {
 
-                    guts = " SET active=" + (project.specialProjectData.productData.active ? 1 : 0)
-                        + ",productDescription='" + project.specialProjectData.productData.productDescription + "'"
-                        + ",level='" + project.specialProjectData.productData.level + "'"
-                        + ",difficulty='" + project.specialProjectData.productData.difficulty + "'"
-                        + ",price=" + project.specialProjectData.productData.price
-                        + ",imageId=" + (project.specialProjectData.productData.imageId || 0)           // not set on client side yet
-                        + ",videoURL='" + (project.specialProjectData.productData.videoURL || '') + "'"           // not set on client side yet
-                        + ",name='" + project.name + "'"
-                        + ",baseProjectId=" + project.id
-                        ;
+                    guts = {
+                        active: (project.specialProjectData.productData.active ? 1 : 0),
+                        productDescription: project.specialProjectData.productData.productDescription,
+                        level: project.specialProjectData.productData.level,
+                        difficulty: project.specialProjectData.productData.difficulty,
+                        price: project.specialProjectData.productData.price,
+                        imageId: (project.specialProjectData.productData.imageId || 0),           // not set on client side yet
+                        videoURL: (project.specialProjectData.productData.videoURL || ''),           // not set on client side yet
+                        name: project.name,
+                        baseProjectId: project.id
+                        };
                     dbname = 'products';
 
                 } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
@@ -1613,12 +1596,19 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(comicIth, cb) {
 
                     comicIth.projectId = project.comicProjectId;
-                    var strQuery = "insert " + self.dbname + "comics (projectId, ordinal, thumbnail, name) values (" + comicIth.projectId + "," + comicIth.ordinal + ",'" + comicIth.thumbnail + "','" + comicIth.name + "');";
+                    var guts = {
+                        projectId: comi.projectId,
+                        ordinal: comicIth.ordinal,
+                        thumbnail: comicIth.thumbnail,
+                        name: comicIth.name
+                    };
+                    var strQuery = "insert " + self.dbname + "comics SET ?";
 
-                    m_log("Writing comicIth with " + strQuery);
+                    m_log("Writing comicIth with " + strQuery + '; fields: ' + JSON.stringify(guts));
                     // Turn these into a series?
-                    sql.queryWithCxn(connection,
+                    sql.queryWithCxnWithPlaceholders(connection,
                         strQuery,
+                        guts,
                         function(err, rows) {
                             try {
                                 if (err) { return cb(err); }
@@ -1682,10 +1672,17 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     ccIth.comicId = comicIth.id;
                     ccIth.ordinal = ord++;
+                    var guts = {
+                        comicId: ccIth.comicId,
+                        ordinal: ccIth.ordinal,
+                        description: ccIth.description,
+                        JSONsteps: JSON.stringify(ccIth.JSONsteps)
+                    };
 
-                    var strQuery = "INSERT " + self.dbname + "comiccode set comicId=" + ccIth.comicId + ", ordinal=" + ccIth.ordinal + ",description='" + ccIth.description + "',JSONsteps='" + ccIth.JSONsteps + "';";
-                    sql.queryWithCxn(connection,
+                    var strQuery = "INSERT " + self.dbname + "comiccode set ?";
+                    sql.queryWithCxnWithPlaceholders(connection,
                         strQuery,
+                        guts,
                         function(err, rows) {
 
                             if (err) {return cb(err); }
