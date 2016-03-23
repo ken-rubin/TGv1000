@@ -2168,11 +2168,11 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                             // Re-do guts for use in ST.sql.
                                                             // We could just patch the original guts, but....
                                                             var scriptGuts = " SET typeId=" + atid
-                                                                        + ",name='" + connection.escape(method.name) + "'"
+                                                                        + ",name=" + connection.escape(method.name)
                                                                         + ",ordinal=" + method.ordinal
-                                                                        + ",workspace='" + connection.escape(method.workspace) + "'"
+                                                                        + ",workspace=" + connection.escape(method.workspace)
                                                                         + ",imageId=" + method.imageId
-                                                                        + ",description='" + connection.escape(method.description) + "'"
+                                                                        + ",description=" + connection.escape(method.description)
                                                                         + ",parentMethodId=" + method.parentMethodId
                                                                         + ",parentPrice=" + method.parentPrice
                                                                         + ",priceBump=" + method.priceBump
@@ -2180,7 +2180,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                                         + ",public=" + method.public
                                                                         + ",quarantined=" + method.quarantined
                                                                         + ",methodTypeId=" + method.methodTypeId
-                                                                        + ",parameters='" + connection.escape(method.parameters) + "'"
+                                                                        + ",parameters=" + connection.escape(method.parameters)
                                                                         ;
                                                             project.script.push("insert " + self.dbname + "methods" + scriptGuts + ";");
                                                             project.script.push('set @idm := (select LAST_INSERT_ID());')
@@ -2245,8 +2245,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 if (typeIth.ordinal === 10000) {
                                                     var scriptGuts = " SET typeId=" + atid
                                                                 + ",propertyTypeId=" + property.propertyTypeId
-                                                                + ",name='" + connection.escape(property.name) + "'"
-                                                                + ",initialValue='" + connection.escape(property.initialValue) + "'"
+                                                                + ",name=" + connection.escape(property.name)
+                                                                + ",initialValue=" + connection.escape(property.initialValue)
                                                                 + ",ordinal=" + property.ordinal
                                                                 + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                 ;
@@ -2298,7 +2298,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 // If this is a System Type event, push onto passObj.project.script.
                                                 if (typeIth.ordinal === 10000) {
                                                     var scriptGuts = " SET typeId=" + atid
-                                                                + ",name='" + connection.escape(event.name) + "'"
+                                                                + ",name=" + connection.escape(event.name)
                                                                 + ",ordinal=" + event.ordinal
                                                                 ;
                                                     project.script.push("insert " + self.dbname + "events" + scriptGuts + ";");

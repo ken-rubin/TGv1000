@@ -162,7 +162,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                             } else {
 
-                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,pwHash,usergroupId) values ('" + mysql.escape(profile.userName) + "','" + mysql.escape(profile.firstName) + "','" + mysql.escape(profile.lastName) + "','" + mysql.escape(hash) + "'," + usergroupId + ");",
+                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,pwHash,usergroupId) values (" + mysql.escape(profile.userName) + "," + mysql.escape(profile.firstName) + "," + mysql.escape(profile.lastName) + "," + mysql.escape(hash) + "," + usergroupId + ");",
                                     function(rows){
 
                                         if (rows.length === 0) {
@@ -425,7 +425,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                     });
                 } else {
 
-                    var exceptionRet = sql.execute("update " + self.dbname + "user set pwHash='" + mysql.escape(hash) + "' where userName='" + mysql.escape(req.body.userName) + "';",
+                    var exceptionRet = sql.execute("update " + self.dbname + "user set pwHash=" + mysql.escape(hash) + " where userName=" + mysql.escape(req.body.userName) + ";",
                         function(rows){
 
                             res.json({ success: true });

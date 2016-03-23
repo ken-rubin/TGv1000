@@ -128,7 +128,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                     // body is a buffer containing the resource.
 
-                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0,'" + mysql.escape(req.body.resourceName) + "');";
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + ");";
                     sql.execute(sqlString,
                         function(rows){
 
@@ -214,7 +214,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
             var ext = (req.body.resourceTypeId === "1") ? 'png' : "mp3";
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0,'" + mysql.escape(req.body.resourceName) + "');";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + ");";
             sql.execute(sqlString,
                 function(rows){
 
@@ -1319,7 +1319,7 @@ module.exports = function ResourceBO(app, sql, logger) {
 
                     } else {
 
-                        strSql = "insert into " + self.dbname + "tags (description) values ('" + mysql.escape(tag) + "');";
+                        strSql = "insert into " + self.dbname + "tags (description) values (" + mysql.escape(tag) + ");";
                         sql.execute(strSql,
                             function(rows){
 
