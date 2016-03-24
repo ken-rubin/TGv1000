@@ -680,6 +680,14 @@ begin
         set @dbstate := 9;
     end if;
 
+    if @dbstate = 9 THEN
+
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetStripePK','post','routeGetStripePK',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+    
+		UPDATE control set dbstate=10 where id=1;
+        set @dbstate := 10;
+    end if;
+
 end//
 
 
