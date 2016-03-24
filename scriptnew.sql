@@ -1,17 +1,17 @@
 delimiter //
 
 -- If necessary to start TGv1000 from scratch, uncomment the following:
-/* */
+/* 
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-/**/
+*/
  
 
 USE TGv1000//
 SELECT database()//
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/**/ 
+/*
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -46,7 +46,7 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
-/* */
+*/
 
 create procedure maintainDB()
 begin
@@ -615,7 +615,6 @@ begin
    		INSERT TGv1000.permissions (`id`, `description`) VALUES (9, 'can_create_onlineClasses');
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,9);
         
-        
         UPDATE `TGv1000`.`control` set dbstate=4 where id=1;
 		set @dbstate := 4;
     end if;
@@ -691,3 +690,4 @@ call maintainDB()//
 drop procedure maintainDB;//
 
 delimiter ;
+select * from control;

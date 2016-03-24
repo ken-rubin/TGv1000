@@ -141,8 +141,8 @@ module.exports = function ValidateBO(app, sql, logger) {
                     // (2) Generate password, set usergroupId and insert user into DB.
                     try {
 
-                        // Generate and encrypt a password.
-                        var password = (Math.random() * 10000).toFixed(0);
+                        // Generate and encrypt a 4-digit password.
+                        var password = (Math.random() * 9000).toFixed(0) + 1000;
                         if (profile.userName === 'a@a.com' || profile.userName === 'z@z.com') {
                             console.log('Generated password: ' + password.toString());
                         }

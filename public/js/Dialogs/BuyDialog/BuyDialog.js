@@ -321,13 +321,131 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						switch (m_buyMode) {
 
-							case 1: 	// uncover the charge form
+							case 1: 	
+								// Reveal the charge form. Change BuyBtn text. Set mode to 2.
 								$("#ChargeSection").css("display", "block");
 								$("#BuyBtn").text("Complete the purchase");
 								m_buyMode = 2;
 								break;
-							case 2: 	// Validate the charge form. Stay if any errors (and display).
-										// Else send to BOL for charge processing.
+							case 2: 	
+								// Due to keyup event handlers, we couldn't get here if all CC fields weren't filled and somewhat good.
+								// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod).
+								// 2b. Ajax to Stripe (via included Stripe.js code) to request a token.
+								// 2c. Using the token, Ajax to TG server again to complete CC charging.
+								// 2d. Report to user. Set m_buyMode = 3;
+		                        $.ajax({
+
+		                            url: "/BOL/UtilityBO/GetStripePK",
+		                            dataType: "jsonp",
+		                            success: function (response,
+		                                strTextStatus,
+		                                jqxhr) {
+
+		                                try {
+
+		                                    // Check for processing error.
+		                                    if (response.success === false) {
+
+		                                        // On error, throw error.
+		                                        throw {
+		                                            
+		                                            message: response.reason
+		                                        };
+		                                    }
+
+		                                    // Set the publish key here, now that it is known.
+		                                    Stripe.setPublishableKey(response.key);
+
+		                                    // Create the token to send to the server.
+		                                    Stripe.card.createToken({
+		                                    
+		                                        name: m_strChargeName,
+		                                        number: m_strChargeNumber,
+		                                        cvc: m_strCVC,
+		                                        exp_month: m_iExpMonth,
+		                                        exp_year: m_iExpYear
+		                                    }, function (status,
+		                                        response) {
+		                                    
+		                                        try {
+		                                        
+		                                            // If error.
+		                                            if (response.error) {
+		                                            
+		                                                // Invoke error handler.
+		                                                throw response.error;
+		                                            } else {
+		                                            
+		                                                // Extract the safe-token.
+		                                                var strToken = response.id;
+		                                                
+		                                                $.ajax({
+
+		                                                    url: '/BOL/UtilityBO/ProcessCharge',
+		                                                    data: { token:response.id },
+		                                                    dataType: "jsonp",
+		                                                    success: function (response,
+		                                                        strTextStatus,
+		                                                        jqxhr) {
+
+		                                                        try {
+
+		                                                            // Check for processing error.
+		                                                            if (response.success === false) {
+
+		                                                                // If response.reason starts with "suggest:",
+		                                                                // then alert user as to duplicate child name and suggest what follows.
+		                                                                if (response.reason === "Name") {
+
+		                                                                    throw {
+
+		                                                                        message: strChildName + " is already a user name in TechGroms.  Please enter a different user name for your child."
+		                                                                    };
+		                                                                }
+
+		                                                                // On error, throw error.
+		                                                                throw {
+		                                                                        
+		                                                                    message: response.reason
+		                                                                };
+		                                                            }
+
+		                                                            // Extract the payload result and pass on to the callback.
+		                                                            functionSuccess(response.chargeId);
+		                                                        } catch (e) {
+
+		                                                            // Call error handler.
+		                                                            functionError(e.message);
+		                                                        }
+		                                                    },
+		                                                    error: function (jqxhr,
+		                                                        strTextStatus,
+		                                                        strError) {
+
+		                                                        // Call error handler.
+		                                                        functionError("Communication error: " + strError);
+		                                                    }
+		                                                });
+		                                            }
+		                                        } catch (e) {
+		                                        
+		                                            functionError("Request error: " + e.message);
+		                                        }
+		                                    });
+		                                } catch (e) {
+
+		                                    errorHelper("Processing error: " + e.message);
+		                                }
+		                            },
+		                            error: function (jqxhr,
+		                                strTextStatus,
+		                                strError) {
+
+		                                errorHelper("Communication error: " + strError);
+		                            }
+		                        });
+
+
 
 								m_buyMode = 3;
 								break;
@@ -350,6 +468,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 				var m_dialog = null;
 				var m_clProject = null;
 				var m_buyMode = 1;
+				var m_strChargeName;
+				var m_strChargeNumber;
+				var m_iExpMonth;
+				var m_iExpYear;
+				var m_strCVC;
 			};
 
 			// Return the constructor function as the module object.

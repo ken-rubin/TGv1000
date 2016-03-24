@@ -6,6 +6,7 @@ var fs = require("fs");
 var jade = require("jade");
 var async = require("async");
 var stripe = null;
+var bLocalCredit = true;
 
 module.exports = function UtilityBO(app, sql, logger) {
 
@@ -16,7 +17,7 @@ module.exports = function UtilityBO(app, sql, logger) {
     self.dbname = app.get("dbname");
 
     // Decide, based on app.get("development") whether we're using test credit or real.
-    var bLocalCredit = app.get("development");
+    bLocalCredit = app.get("development");
     if (bLocalCredit) {
 
         console.log("Using local (test) credit.");
@@ -67,6 +68,28 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
+        // Simple handler returns public key to client.
+    self.routeGetStripePK = function (req, res) {
+
+        try {
+
+            console.log("Request for " + (bLocalCredit ? "local" : "remote") + " public key: " + req.ip);
+
+            // Send key back to caller.
+            res.jsonp({
+                success: true,
+                key: (bLocalCredit ? "pk_test_eiDr85dbo39T4J1O8fzNi00a" : "pk_live_XfqMDtVuoHHxfWCJOh6Dlp89")
+            });
+        } catch (e) {
+        
+            // Send error back to caller.
+            res.jsonp({
+                success: false,
+                reason: e.message
+            });
+        }
+    };
+    
     self.routeProcessCharge = function (req, res) {
 
         try {
