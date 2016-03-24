@@ -1595,7 +1595,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     comicIth.projectId = project.comicProjectId;
                     var guts = {
-                        projectId: comi.projectId,
+                        projectId: comicIth.projectId,
                         ordinal: comicIth.ordinal,
                         thumbnail: comicIth.thumbnail,
                         name: comicIth.name
@@ -1677,7 +1677,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         JSONsteps: JSON.stringify(ccIth.JSONsteps)
                     };
 
-                    var strQuery = "INSERT " + self.dbname + "comiccode set ?";
+                    var strQuery = "INSERT " + self.dbname + "comiccode SET ?";
                     sql.queryWithCxnWithPlaceholders(connection,
                         strQuery,
                         guts,
@@ -1802,7 +1802,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 };
                                 var strQuery = "insert " + self.dbname + "types SET ?";
                                 m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                sql.queryWithCxn(passObj.connection, strQuery, guts,
+                                sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
                                     function(err, rows) {
 
                                         try {
