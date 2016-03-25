@@ -71,23 +71,13 @@ module.exports = function UtilityBO(app, sql, logger) {
         // Simple handler returns public key to client.
     self.routeGetStripePK = function (req, res) {
 
-        try {
+        console.log("Request for " + (bLocalCredit ? "local" : "remote") + " public key: " + req.ip);
 
-            console.log("Request for " + (bLocalCredit ? "local" : "remote") + " public key: " + req.ip);
-
-            // Send key back to caller.
-            res.json({
-                success: true,
-                key: (bLocalCredit ? "pk_test_eiDr85dbo39T4J1O8fzNi00a" : "pk_live_XfqMDtVuoHHxfWCJOh6Dlp89")
-            });
-        } catch (e) {
-        
-            // Send error back to caller.
-            res.json({
-                success: false,
-                reason: e.message
-            });
-        }
+        // Send key back to caller.
+        res.json({
+            success: true,
+            pk: (bLocalCredit ? "pk_test_eiDr85dbo39T4J1O8fzNi00a" : "pk_live_XfqMDtVuoHHxfWCJOh6Dlp89")
+        });
     };
     
     self.routeProcessCharge = function (req, res) {

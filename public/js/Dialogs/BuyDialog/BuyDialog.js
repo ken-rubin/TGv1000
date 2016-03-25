@@ -353,6 +353,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							case 1: 	
 								// Reveal the charge form. Change BuyBtn text. Set mode to 2.
 								$("#ChargeSection").css("display", "block");
+								$("#ChargeNumber").focus();
 								$("#BuyBtn").text("Complete the purchase");
 								m_buyMode = 2;
 								break;
@@ -369,45 +370,50 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								$("#BuyBtn").prop("disabled", true);
 
 								// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod). Set the PK in Stripe.
-								var pk = m_functionBuyStep2a();	// Returns public key or null if an error getting it.
-								if (!pk) {
+								m_functionBuyStep2a(
+									function(pk) {
 
-									errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
-									$("#BuyBtn").prop("disabled", false);
-									return;
-								}
+										if (!pk) {
 
-								// 2b. Ajax to Stripe (via included Stripe.js script) to request a token representing CC info.
-								m_token = null;
-								exceptionRet = m_functionBuyStep2b(pk);	// Sets token in m_token. Returns exceptionRet if Stripe validation error. Sets m_token = null if non-validation error.
-								if (exceptionRet) {
+											errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
+											$("#BuyBtn").prop("disabled", false);
+											return;
+										}
 
-									errorHelper.show(exceptionRet);
-									$("#BuyBtn").prop("disabled", false);
-									return;
-								}
+										// 2b. Ajax to Stripe (via included Stripe.js script) to request a token representing CC info.
+										exceptionRet = m_functionBuyStep2b(pk, 
+											function(token) {
 
-								if (!m_token) {
+												if (!token) {
 
-									errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
-									$("#BuyBtn").prop("disabled", false);
-									return;
-								}
+													errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
+													$("#BuyBtn").prop("disabled", false);
+													return;
+												}
 
-								// 2c. Ajax to TG server again to complete CC charging using the m_token. Send email to user if charge succeeds.
-								exceptionRet = m_functionBuyStep2c();
-								if (exceptionRet) {
+												// 2c. Ajax to TG server again to complete CC charging using the m_token. Send email to user if charge succeeds.
+												exceptionRet = m_functionBuyStep2c();
+												if (exceptionRet) {
 
+													$("#BuyBtn").prop("disabled", false);
+													return;
+												}
 
-									$("#BuyBtn").prop("disabled", false);
-									return;
-								}
+												// 2d. Set m_buyMode = 3;
+												$("#BuyBtn").text("");
+												// Re-enable #BuyBtn.
+												$("#BuyBtn").prop("disabled", false);
+												m_buyMode = 3;
+											}
+										);
+										if (exceptionRet) {
 
-								// 2d. Set m_buyMode = 3;
-								$("#BuyBtn").text("");
-								// Re-enable #BuyBtn.
-								$("#BuyBtn").prop("disabled", false);
-								m_buyMode = 3;
+											errorHelper.show(exceptionRet);
+											$("#BuyBtn").prop("disabled", false);
+											return;
+										}
+									}
+								);	// Returns public key or null if an error getting it.
 								break;
 
 							case 3: 	// Charge was processed.
@@ -419,38 +425,29 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod).
 					//     Set the PK in Stripe.
-					var m_functionBuyStep2a = function() {
+					var m_functionBuyStep2a = function(callback) {
 
 						try {
 
-	                        $.ajax(
-	                        	{
-		                            url: "/BOL/UtilityBO/GetStripePK",
-		                            dataType: "json",
-		                            success: function (response,
-		                                strTextStatus,
-		                                jqxhr) {
+		                    var posting = $.post("/BOL/UtilityBO/GetStripePK",
+		                    		{},
+		                            'json');
+		                    posting.done(function(data) {
 
-			                                try {
+		                    	if (data.success) {
 
-			                                    // Check for error.
-			                                    if (response.success === false) { return null; }
+                                    // Set the publish key here, now that it is known. Why 'publish' key? Why not 'public' key? Note Stripe's method name.
+                                    Stripe.setPublishableKey(data.pk);
+                                    return callback(data.pk);
+		                    	}
 
-			                                    // Set the publish key here, now that it is known. Why 'publish' key? Why not 'public' key? Note Stripe's method name.
-			                                    Stripe.setPublishableKey(response.key);
-
-			                                } catch (e) { return null; }
-		                            },
-		                            error: function (jqxhr,
-		                                strTextStatus,
-		                                strError) { return null; }
-	                        	}
-	                        );
-						} catch(e) { return null; }
-					}
+		                    	return callback(null);
+		                    });
+		                } catch(e) { return callback(null); }
+		            }
 
 					// 2b. Ajax to Stripe (via included Stripe.js script) to request a token representing CC info.
-					var m_functionBuyStep2b = function() {
+					var m_functionBuyStep2b = function(callback) {
 
 						try {
 
@@ -463,12 +460,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 	                                exp_year: m_iExpYear
 	                            }, function (status, response) {
                             
-                                    // If error.
                                     if (response.error) { return response.error; }	// response.error has its own message property.
                                     
                                     // Set the safe-token.
-                                    m_token = response.id;
-                                    return null;
+                                    return callback(response.id);
                             	}
                             );
 						} catch(e) { return e; }
@@ -478,9 +473,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					var m_functionBuyStep2c = function() {
 
 						try {
-
+							return null;
 						} catch(e) {
-							
+							return null;
 						}
 					}
 				} catch (e) {
@@ -499,7 +494,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 				var m_iExpMonth;
 				var m_iExpYear;
 				var m_strCVC;
-				var m_token = null;
 			};
 
 			// Return the constructor function as the module object.
