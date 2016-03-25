@@ -317,6 +317,37 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						}
 					}
 
+					var m_functionValCCFields = function() {
+
+						m_strChargeNumber = $("#ChargeNumber").val().trim().replace(/\D+/g, '');	// Remove everything but digits.
+						m_strCVC = $("#CVC").val().trim();
+						m_iExpMo = $("#ExpMo option:selected").val() + 1;
+						m_iExpYr = $("#ExpYr option:selected").val() + 1;
+
+						var errMsg = "";
+						if (!Stripe.card.validateCardNumber(m_strChargeNumber)) {
+							errMsg += ";The card number appears to be invalid.";
+						}
+						if (!Stripe.card.validateCVC(m_strCVC)) {
+							errMsg += ";The CVC number appears to be invalid."
+						}
+						if (!Stripe.card.validateExpiry(m_iExpMo, m_iExpYr)) {
+							errMsg += ";(This should be impossible.) The expiration data appears to be invalid."
+						}
+
+						if (errMsg.length === 0) {
+
+							$("#BuyBtn").prop("disabled", false);
+
+						} else {
+
+							// Remove the start ';'.
+							errMsg = errMsg.substr(1);
+							errorHelper.show(errMsg);
+							$("#BuyBtn").prop("disabled", true);
+						}
+					}
+
 					var m_functionBuy = function() {
 
 						var exceptionRet = null;
@@ -325,8 +356,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							case 1: 	
 								// Reveal the charge form. Change BuyBtn text. Set mode to 2.
 								$("#ChargeSection").css("display", "block");
+								$("#ChargeNumber").keyup(m_functionValCCFields);
+								$("#CVC").keyup(m_functionValCCFields);
 								$("#BuyBtn").text("Complete the purchase");
 								m_buyMode = 2;
+								m_functionValCCFields();	// This first time will simply disable #BuyBtn since there can't be any CC data yet.
 								break;
 
 							case 2: 	
@@ -336,7 +370,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								$("#BuyBtn").prop("disabled", true);
 
 								// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod). Set the PK in Stripe.
-								var pk = m_functionBuyStep2a();
+								var pk = m_functionBuyStep2a();	// Returns public key or null if an error getting it.
 								if (!pk) {
 
 									errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
@@ -344,25 +378,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								}
 
 								// 2b. Ajax to Stripe (via included Stripe.js script) to request a token representing CC info.
-								try {
-									exceptionRet = m_functionBuyStep2b(pk);
-									if (exceptionRet) {
-										
-									}
-								} catch(e) {
+								m_token = null;
+								exceptionRet = m_functionBuyStep2b(pk);	// Sets token in m_token. Returns exceptionRet if Stripe validation error. Sets m_token = null if non-validation error.
+								if (exceptionRet) {
 
-									errorHelper.show('Validation error: ' + e.message);
+									errorHelper.show(exceptionRet);
 									return;
 								}
 
-								if (!token) {
+								if (!m_token) {
 
 									errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
 									return;
 								}
 
-								// 2c. Ajax to TG server again to complete CC charging using the token. Send email to user if charge succeeds.
-								exceptionRet = m_functionBuyStep2c(token);
+								// 2c. Ajax to TG server again to complete CC charging using the m_token. Send email to user if charge succeeds.
+								exceptionRet = m_functionBuyStep2c();
 								if (exceptionRet) {
 
 
@@ -393,7 +424,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 	                        $.ajax(
 	                        	{
 		                            url: "/BOL/UtilityBO/GetStripePK",
-		                            dataType: "jsonp",
+		                            dataType: "json",
 		                            success: function (response,
 		                                strTextStatus,
 		                                jqxhr) {
@@ -403,7 +434,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 			                                    // Check for error.
 			                                    if (response.success === false) { return null; }
 
-			                                    // Set the publish key here, now that it is known.
+			                                    // Set the publish key here, now that it is known. Why 'publish' key? Why not 'public' key? Note Stripe's method name.
 			                                    Stripe.setPublishableKey(response.key);
 
 			                                } catch (e) { return null; }
@@ -424,27 +455,21 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
                             // Create the token to send to the server.
                             Stripe.card.createToken(
 	                            {
-	                                name: m_strChargeName,
 	                                number: m_strChargeNumber,
 	                                cvc: m_strCVC,
 	                                exp_month: m_iExpMonth,
 	                                exp_year: m_iExpYear
-	                            }, function (status,
-                                response) {
+	                            }, function (status, response) {
                             
                                     // If error.
-                                    if (response.error) {
+                                    if (response.error) { return response.error; }	// response.error has its own message property.
                                     
-                                        throw response.error;
-                                    
-                                    } else {
-                                    
-                                        // Set the safe-token.
-                                        m_token = response.id;
-                                        return null;
-                                    }
-                            });
-						} catch(e) { return null; }
+                                    // Set the safe-token.
+                                    m_token = response.id;
+                                    return null;
+                            	}
+                            );
+						} catch(e) { return e; }
 					}
 
 					// 2c. Ajax to TG server again to complete CC charging using m_token. Send email to user if charge succeeds.
@@ -468,7 +493,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 				var m_dialog = null;
 				var m_clProject = null;
 				var m_buyMode = 1;
-				var m_strChargeName;
 				var m_strChargeNumber;
 				var m_iExpMonth;
 				var m_iExpYear;

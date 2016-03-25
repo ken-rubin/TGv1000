@@ -76,14 +76,14 @@ module.exports = function UtilityBO(app, sql, logger) {
             console.log("Request for " + (bLocalCredit ? "local" : "remote") + " public key: " + req.ip);
 
             // Send key back to caller.
-            res.jsonp({
+            res.json({
                 success: true,
                 key: (bLocalCredit ? "pk_test_eiDr85dbo39T4J1O8fzNi00a" : "pk_live_XfqMDtVuoHHxfWCJOh6Dlp89")
             });
         } catch (e) {
         
             // Send error back to caller.
-            res.jsonp({
+            res.json({
                 success: false,
                 reason: e.message
             });

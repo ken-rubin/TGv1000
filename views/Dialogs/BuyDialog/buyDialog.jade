@@ -16,18 +16,15 @@
     .col-xs-3
     .col-xs-6
         div(style="border:2px solid gray; border-radius:8px; padding:10px; background-color:lightblue;")
-            label.control-label(for="ChargeName" style="margin-top:4px;") &nbsp;Name (as it appears on your card)
-            input.form-control#ChargeName(type="text")
-            br
-            label.control-label(for="ChargeNumber") &nbsp;Card number (# digits dep. on card type)
+            label.control-label(for="ChargeNumber" style="margin-top:4px;") &nbsp;Card number (# digits dep. on card type)
             input.form-control#ChargeNumber(type="text")
             br
-            label.control-label(for="ExpDateMo") &nbsp;Expiration date
+            label.control-label(for="ExpMo") &nbsp;Expiration date
             br
-            select.form-control#ExpDateMo(style="width:48%; float:left;")
+            select.form-control#ExpMo(style="width:48%; float:left;")
                 each val,index in ['January','February','March','April','May','June','July','August','September','October','November','December']
                     option(value=index)= val
-            select.form-control#ExpDateYr(style="width:48%; float:right;")
+            select.form-control#ExpYr(style="width:48%; float:right;")
                 each val,index in ['2016','2017','2018','2019','2020','2021','2022','2023','2024']
                     option(value=index)= val
             br
