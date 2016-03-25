@@ -143,13 +143,10 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         // Generate and encrypt a 4-digit password.
                         var password = (Math.random() * 9000).toFixed(0) + 1000;
-                        if (profile.userName === 'a@a.com' || profile.userName === 'z@z.com') {
-                            console.log('Generated password: ' + password.toString());
-                        }
                         var usergroupId = 3;
 
                         // Change john, ken and jerry password to 'a' and assign to "developer" usergroup.
-                        if (profile.userName === 'jerry@rubintech.com' || profile.userName === 'ken.rubin@live.com' || profile.userName === 'techgroms@gmail.com') {
+                        if (profile.userName === 'jerry@rubintech.com' || profile.userName === 'ken.rubin@live.com' || profile.userName === 'techgroms@gmail.com' || profile.userName === 'jdsurf@gmail.com') {
                             password = 'a';
                             usergroupId = 1;
                         }
@@ -198,59 +195,51 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         console.log(JSON.stringify(profile));
 
-                        // A special bypass. We don't send an email to a@a.com or z@z.com. Instead, we write his p/w to console.log.
-                        if (profile.userName !== 'a@a.com' && profile.userName !== 'z@z.com') {
-
-                            var smtpTransport = nodemailer.createTransport("SMTP", {
+                        var smtpTransport = nodemailer.createTransport("SMTP", {
+                        
+                            service: "Gmail",
+                            auth: {
                             
-                                service: "Gmail",
-                                auth: {
-                                
-                                    user: "techgroms@gmail.com",
-                                    pass: "Albatross!1"
-                                }
-                            });
+                                user: "techgroms@gmail.com",
+                                pass: "Albatross!1"
+                            }
+                        });
 
-                            // setup email data with unicode symbols
-                            var mailOptions = null;
+                        // setup email data with unicode symbols
+                        var mailOptions = null;
 
-                            var fullUrl = req.protocol + '://' + req.get('host'); // + req.originalUrl;
+                        var fullUrl = req.protocol + '://' + req.get('host'); // + req.originalUrl;
+                        var aORz = (profile.userName === 'a@a.com' || profile.userName === 'z@z.com');
+                        mailOptions = {
+                 
+                            from: "TechGroms <techgroms@gmail.com>", // sender address
+                            to: (!aORz) ? profile.userName : 'jerry@rubintech.com', // list of receivers -- eventually add ken and john
+                            subject: "TechGroms Registration ✔", // Subject line
+                            text: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                            "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +
+                            " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
+                            "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
+                            html: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
+                            "<br><br>We have created a login user for you. You will use the email address you entered along with" +
+                            " this password: <b>" + profile.password + "</b>. Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
+                            "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
+                        };
 
-                            mailOptions = {
-                     
-                                from: "TechGroms <techgroms@gmail.com>", // sender address
-                                to: profile.userName, // list of receivers
-                                subject: "TechGroms Registration ✔", // Subject line
-                                text: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
-                                "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +
-                                " this password: " + profile.password + ". Go to " + fullUrl + " to sign in." +
-                                "\r\n\r\nThank you for signing up with TechGroms!\r\n\r\nWarm regards, The Grom Team",
-                                html: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
-                                "<br><br>We have created a login user for you. You will use the email address you entered along with" +
-                                " this password: <b>" + profile.password + "</b>. Go to <a href='" + fullUrl + "'>" + fullUrl + "</a> to sign in." +
-                                "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
-                            };
-
-                            // send mail with defined transport object
-                            smtpTransport.sendMail(mailOptions, function(error, response){
+                        // send mail with defined transport object
+                        smtpTransport.sendMail(mailOptions, function(error, response){
+                        
+                            if (error) {
                             
-                                if (error) {
-                                
-                                    return cb(new Error("Error sending enrollment email: " + error.toString()), null);
-                                }
+                                return cb(new Error("Error sending enrollment email: " + error.toString()), null);
+                            }
 
-                                // If you don't want to use this transport object anymore, uncomment following line
-                                //smtpTransport.close(); // shut down the connection pool, no more messages
-
-                                delete profile.password;
-                                return cb(null, profile);
-
-                            });
-                        } else {
+                            // If you don't want to use this transport object anymore, uncomment following line
+                            //smtpTransport.close(); // shut down the connection pool, no more messages
 
                             delete profile.password;
                             return cb(null, profile);
-                        }
+
+                        });
                     } catch (e) {
 
                         return cb(new Error("Error sending enrollment email: " + e.message), null);
