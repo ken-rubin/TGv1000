@@ -319,33 +319,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					var m_functionValCCFields = function() {
 
-						m_strChargeNumber = $("#ChargeNumber").val().trim().replace(/\D+/g, '');	// Remove everything but digits.
+						m_strChargeNumber = $("#ChargeNumber").val().trim();	//.replace(/\D+/g, '');	// Remove everything but digits.
 						m_strCVC = $("#CVC").val().trim();
-						m_iExpMo = $("#ExpMo option:selected").val() + 1;
-						m_iExpYr = $("#ExpYr option:selected").val() + 1;
+						var t = $("#ExpMo option:selected").val();
+						m_iExpMo = parseInt(t, 10) + 1;
+						t = $("#ExpYr option:selected").val();
+						m_iExpYr = parseInt(t, 10) + 2016;
 
-						var errMsg = "";
+						var errFields = [];
 						if (!Stripe.card.validateCardNumber(m_strChargeNumber)) {
-							errMsg += ";The card number appears to be invalid.";
+							errFields.push('Card number');
 						}
 						if (!Stripe.card.validateCVC(m_strCVC)) {
-							errMsg += ";The CVC number appears to be invalid."
-						}
-						if (!Stripe.card.validateExpiry(m_iExpMo, m_iExpYr)) {
-							errMsg += ";(This should be impossible.) The expiration data appears to be invalid."
+							errFields.push('Security code');
 						}
 
-						if (errMsg.length === 0) {
-
-							$("#BuyBtn").prop("disabled", false);
-
-						} else {
-
-							// Remove the start ';'.
-							errMsg = errMsg.substr(1);
-							errorHelper.show(errMsg);
-							$("#BuyBtn").prop("disabled", true);
+						if (errFields.length === 0) {
+							return '';
 						}
+
+						if (errFields.length === 1) {
+							return 'The ' + errFields[0] + ' appears to be invalid.';
+ 						} else {
+							return 'Both the ' + errFields[0] + ' and the ' + errFields[1] + ' appear to be invalid.';
+ 						}
 					}
 
 					var m_functionBuy = function() {
@@ -356,17 +353,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							case 1: 	
 								// Reveal the charge form. Change BuyBtn text. Set mode to 2.
 								$("#ChargeSection").css("display", "block");
-								$("#ChargeNumber").keyup(m_functionValCCFields);
-								$("#CVC").keyup(m_functionValCCFields);
 								$("#BuyBtn").text("Complete the purchase");
 								m_buyMode = 2;
-								m_functionValCCFields();	// This first time will simply disable #BuyBtn since there can't be any CC data yet.
 								break;
 
 							case 2: 	
-								// Thanks to keyup event handlers, we couldn't get here unless all CC fields were filled and somewhat good.
+								var errMsg = m_functionValCCFields();
+								if (errMsg.length > 0) {
 
-								// Disable #BuyBtn to prevent double-clicking.
+									errorHelper.show(errMsg);
+									return;
+								}
+
+								// We're proceeding. Disable #BuyBtn to prevent double-clicking.
 								$("#BuyBtn").prop("disabled", true);
 
 								// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod). Set the PK in Stripe.
@@ -374,6 +373,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								if (!pk) {
 
 									errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
+									$("#BuyBtn").prop("disabled", false);
 									return;
 								}
 
@@ -383,12 +383,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								if (exceptionRet) {
 
 									errorHelper.show(exceptionRet);
+									$("#BuyBtn").prop("disabled", false);
 									return;
 								}
 
 								if (!m_token) {
 
 									errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
+									$("#BuyBtn").prop("disabled", false);
 									return;
 								}
 
@@ -397,6 +399,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								if (exceptionRet) {
 
 
+									$("#BuyBtn").prop("disabled", false);
 									return;
 								}
 
@@ -404,7 +407,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								$("#BuyBtn").text("");
 								// Re-enable #BuyBtn.
 								$("#BuyBtn").prop("disabled", false);
-
 								m_buyMode = 3;
 								break;
 
