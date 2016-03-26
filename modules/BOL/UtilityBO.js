@@ -96,7 +96,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                 {
                     source: req.body.token,
                     currency: "usd",
-                    amount: req.body.dAmount*100,    // amount in cents!
+                    amount: parseFloat(req.body.dAmount) * 100,    // amount in cents!
                     description: req.body.descriptionForReceipt,
                     receipt_email: req.user.userName,
                     statement_descriptor: req.body.statementDescriptor

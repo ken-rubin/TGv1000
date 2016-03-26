@@ -19,11 +19,12 @@ define(function () {
 				// Expose method which displays an error to the user.
 				// Parameters:
 				// Error to display. Can be an exception, {responseText: 'xxx'}, 'xxx'
-				self.show = function (error, autoCloseMS) {
+				self.show = function (error, autoCloseMS, callback) {
 
 					try {
 
 						m_autoCloseMS = autoCloseMS || 0;
+						m_callback = callback;
 
 						var dispError;
 						if (error.responseText) { dispError = error.responseText; 
@@ -43,10 +44,15 @@ define(function () {
 				                cssClass: "btn-warning",
 				                action: function(dialogItself){
 
+				                	// Cancel possible autoClose.
+				                	if (m_timerId) {
+				                		clearTimeout(m_timerId);
+				                	}
 				                    dialogItself.close();
 				                }
 				            }],
-				            onshown: m_functionOnShownDialog
+				            onshown: m_functionOnShownDialog,
+				            onhidden: m_functionOnHiddenDialog
 				        });
 					} catch (e) {
 
@@ -64,7 +70,7 @@ define(function () {
 
 				if (m_autoCloseMS > 0) {
 
-					setTimeout(
+					m_timerId = setTimeout(
 						function(){ 
 									m_dialog.close(); 
 								}, 
@@ -73,8 +79,17 @@ define(function () {
 				}
 			}
 
+			var m_functionOnHiddenDialog = function() {
+
+				if($.isFunction(m_callback)) {
+					m_callback();
+				}
+			}
+
 			var m_autoCloseMS = 0;
 			var m_dialog = null;
+			var m_callback = null;
+			var m_timerId = null;
 		}
 
 		// Allocate and return singleton.

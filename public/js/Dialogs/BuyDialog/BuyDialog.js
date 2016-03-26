@@ -417,27 +417,44 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 														}
 
 														// At this point the card has been charged. But the project in memory is still the original product.
-														// In case 3 user will perhaps change the project's name and then save the product as his own.
+														self.closeYourself();
+														// Tell user in callback errorHelper. Use callback to open SaveProjectAsDialog.
+														errorHelper.show('Your purchase is almost complete. When you close this Note, we will open the Save Project window. Use it to choose a new name, maybe some tags, the description, perhaps a new Project Image. Then click the Save button, and the project will be all yours!', 250000,	// I don't expect to auto-close errorHelper in 250 seconds.
+																														// The purpose of this very large number is to get errorHelper to use the title 'Note' instead of 'Error'.
+															function(){
 
-														// 2d. Set m_buyMode = 3; hide the CC.
-														$("#BuyBtn").text("Save your purchased project");
-														$("#ChargeSection").css("display", "none");
-														// Re-enable the buttons.
-														$("#BuyBtn").prop("disabled", false);
-														// Actually we may not re-enable the cancel button. The product is bought and paid for. User must proceed.
-														// $("#CancelBtn").prop("disabled", false);
-														m_buyMode = 3;
+																// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
+																m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
+
+																if (m_clProject.data.specialProjectData.hasOwnProperty('classData')) {
+																	delete m_clProject.data.specialProjectData.classData;
+																	m_clProject.data.isClass = false;
+																	m_clProject.data.specialProjectData.classProject = false;
+																} else if (m_clProject.data.specialProjectData.hasOwnProperty('onlineClassData')) {
+																	delete m_clProject.data.specialProjectData.onlineClassData;
+																	m_clProject.data.isOnlineClass = false;
+																	m_clProject.data.specialProjectData.onlineClassProject = false;
+																} else if (m_clProject.data.specialProjectData.hasOwnProperty('productData')) {
+																	delete m_clProject.data.specialProjectData.productData;
+																	m_clProject.data.isProduct = false;
+																	m_clProject.data.specialProjectData.productProject = false;
+																}
+
+																m_clProject.data.specialProjectData.privilegedUser = false;
+																m_clProject.data.specialProjectData.ownedByUser = true;
+																m_clProject.data.specialProjectData.normalProject = true;
+																m_clProject.data.specialProjectData.openMode = 'bought';
+
+																// Open the Save dialog.
+																client.showSaveProjectDialog();
+															}
+														);
 													}
 												);
 											}
 										);
 									}
 								);
-								break;
-
-							case 3: 	// Charge was processed.
-										// Notify user.
-										// Close dialog.
 								break;
 						}
 					}
@@ -498,8 +515,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 		                    		{
 		                    			token: token,
 		                    			dAmount: m_dPriceToCharge,
-		                    			descriptionForReceipt: '',	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
-		                    			statementDescriptor: ''		// An arbitrary string to be displayed (most of the time) on user's credit card statement.
+		                    			descriptionForReceipt: 'receipt info',	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
+		                    			statementDescriptor: 'statement info'		// An arbitrary string to be displayed (most of the time) on user's credit card statement.
 		                    		},
 		                            'json');
 		                    posting.done(function(data) {
@@ -509,7 +526,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
                                     return callback(null);
 		                    	}
 
-		                    	return callback(new Error(data.message));
+		                    	return callback(data.message);
 		                    });
 		                } catch(e) { return callback(e); }
 					}
