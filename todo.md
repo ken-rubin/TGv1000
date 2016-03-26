@@ -16,7 +16,7 @@
         </video>
     </div>
     ```
-- Finish buying.
+- Finish buying. Mostly this means adding class registration information after a student enrolls (purchases).
 - Happened 1 time: created new class project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". Happened again with a Product project. Hint: just built a new DB, enrolled and came in for the first time. Didn't recur when I tried again.
 - Test everything I just did with a non-privileged user.
 - When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done.**

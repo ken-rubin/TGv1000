@@ -96,6 +96,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					            	},
 					            	{
 						                label: "Don't buy.",
+						                id: 'CancelBtn',
 						                icon: "glyphicon glyphicon-remove-circle",
 						                cssClass: "btn-warning",
 						                action: function(dialogItself){
@@ -238,6 +239,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									}
 								);
 							}
+
+							m_dPriceToCharge = m_clProject.data.specialProjectData.classData.price;
+
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
@@ -269,6 +273,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								);
 							}
 							
+							m_dPriceToCharge = m_clProject.data.specialProjectData.productData.price;
+
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
 						
@@ -311,6 +317,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									}
 								);
 							}
+							m_dPriceToCharge = m_clProject.data.specialProjectData.onlineClassData.price;
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.onlineClassData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.onlineClassData.classNotes);
@@ -367,6 +374,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 								// We're proceeding. Disable #BuyBtn to prevent double-clicking.
 								$("#BuyBtn").prop("disabled", true);
+								// We're also disabling #CancelBtn giving the user no way to screw things up during Ajax processing.
+								$("#CancelBtn").prop("disabled", true);
 
 								// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod). Set the PK in Stripe.
 								m_functionBuyStep2a(
@@ -376,6 +385,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 											errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
 											$("#BuyBtn").prop("disabled", false);
+											$("#CancelBtn").prop("disabled", false);
 											return;
 										}
 
@@ -387,6 +397,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 													errorHelper.show(err);	// This will usually display an error in full sentence form from Stripe.
 													$("#BuyBtn").prop("disabled", false);
+													$("#CancelBtn").prop("disabled", false);
 													return;
 												}
 
@@ -399,13 +410,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 															errorHelper.show(err);
 															$("#BuyBtn").prop("disabled", false);
+															$("#CancelBtn").prop("disabled", false);
 															return;
 														}
 
-														// 2d. Set m_buyMode = 3;
-														$("#BuyBtn").text("");
-														// Re-enable #BuyBtn.
+														// At this point the card has been charged. But the project in memory is still the original product.
+														// In case 3 user will perhaps change the project's name and then save the product as his own.
+
+														// 2d. Set m_buyMode = 3; hide the CC.
+														$("#BuyBtn").text("Save your purchased project");
+														$("#ChargeSection").css("display", "none");
+														// Re-enable the buttons.
 														$("#BuyBtn").prop("disabled", false);
+														// Actually we may not re-enable the cancel button. The product is bought and paid for. User must proceed.
+														// $("#CancelBtn").prop("disabled", false);
 														m_buyMode = 3;
 													}
 												);
@@ -473,10 +491,25 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					var m_functionBuyStep2c = function(token, callback) {
 
 						try {
-							return callback(new Error("Not implemented yet!"));
-						} catch(e) {
-							return callback(e);
-						}
+
+		                    var posting = $.post("/BOL/UtilityBO/ProcessCharge",
+		                    		{
+		                    			token: token,
+		                    			dAmount: m_dPriceToCharge,
+		                    			descriptionForReceipt: '',
+		                    			statementDescriptor: ''
+		                    		},
+		                            'json');
+		                    posting.done(function(data) {
+
+		                    	if (data.success) {
+
+                                    return callback(null);
+		                    	}
+
+		                    	return callback(new Error(data.message));
+		                    });
+		                } catch(e) { return callback(e); }
 					}
 				} catch (e) {
 
@@ -494,6 +527,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 				var m_iExpMonth;
 				var m_iExpYear;
 				var m_strCVC;
+				var m_dPriceToCharge;
 			};
 
 			// Return the constructor function as the module object.

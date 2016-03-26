@@ -85,12 +85,37 @@ module.exports = function UtilityBO(app, sql, logger) {
         try {
 
             console.log("Entered UtilityBO/routeProcessCharge with req.body = " + JSON.stringify(req.body));
+            // req.user.userId*
+            // req.user.userName*
+            // req.body.token
+            // req.body.dAmount
+            // req.body.descriptionForReceipt
+            // req.body.statementDescriptor
 
-            res.json({
-                success: true
-            });
+            var charge = stripe.charges.create(
+                {
+                    source: req.body.token,
+                    currency: "usd",
+                    amount: req.body.dAmount*100,    // amount in cents!
+                    description: req.body.descriptionForReceipt,
+                    receipt_email: req.user.userName,
+                    statement_descriptor: req.body.statementDescriptor
+                },
+                function(strError, charge) {
+                    if (strError) {
+                        res.json({
+                            success: false,
+                            message: strError
+                        });
+                    } else {
 
-
+                        // Return success
+                        res.json({
+                            success: true
+                        });
+                    }
+                }
+            );
         } catch (e) {
 
             res.json({
