@@ -322,6 +322,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							$("#Price").val(m_clProject.data.specialProjectData.onlineClassData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.onlineClassData.classNotes);
 						}
+
+						$("#TheFieldset").prop("disabled", true);
 					}
 
 					var m_functionValCCFields = function() {
@@ -496,8 +498,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 		                    		{
 		                    			token: token,
 		                    			dAmount: m_dPriceToCharge,
-		                    			descriptionForReceipt: '',
-		                    			statementDescriptor: ''
+		                    			descriptionForReceipt: '',	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
+		                    			statementDescriptor: ''		// An arbitrary string to be displayed (most of the time) on user's credit card statement.
 		                    		},
 		                            'json');
 		                    posting.done(function(data) {
