@@ -347,7 +347,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 					var m_functionBuy = function() {
 
-						var exceptionRet = null;
 						switch (m_buyMode) {
 
 							case 1: 	
@@ -371,9 +370,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 								// 2a. Ajax to TG server to get stripe's PK (based on whether we're running in dev or prod). Set the PK in Stripe.
 								m_functionBuyStep2a(
-									function(pk) {
+									function(err) {
 
-										if (!pk) {
+										if (err) {
 
 											errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
 											$("#BuyBtn").prop("disabled", false);
@@ -381,39 +380,39 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 										}
 
 										// 2b. Ajax to Stripe (via included Stripe.js script) to request a token representing CC info.
-										exceptionRet = m_functionBuyStep2b(pk, 
-											function(token) {
+										m_functionBuyStep2b(
+											function(err, token) {
 
-												if (!token) {
+												if (err) {
 
-													errorHelper.show('We had a problem before submitting your charge information. Tech support has been notified and you will receive an email when you can try again. Sorry.');
+													errorHelper.show(err);	// This will usually display an error in full sentence form from Stripe.
 													$("#BuyBtn").prop("disabled", false);
 													return;
 												}
 
 												// 2c. Ajax to TG server again to complete CC charging using the m_token. Send email to user if charge succeeds.
-												exceptionRet = m_functionBuyStep2c();
-												if (exceptionRet) {
+												m_functionBuyStep2c(
+													token, 
+													function(err) {
+														
+														if (err) {
 
-													$("#BuyBtn").prop("disabled", false);
-													return;
-												}
+															errorHelper.show(err);
+															$("#BuyBtn").prop("disabled", false);
+															return;
+														}
 
-												// 2d. Set m_buyMode = 3;
-												$("#BuyBtn").text("");
-												// Re-enable #BuyBtn.
-												$("#BuyBtn").prop("disabled", false);
-												m_buyMode = 3;
+														// 2d. Set m_buyMode = 3;
+														$("#BuyBtn").text("");
+														// Re-enable #BuyBtn.
+														$("#BuyBtn").prop("disabled", false);
+														m_buyMode = 3;
+													}
+												);
 											}
 										);
-										if (exceptionRet) {
-
-											errorHelper.show(exceptionRet);
-											$("#BuyBtn").prop("disabled", false);
-											return;
-										}
 									}
-								);	// Returns public key or null if an error getting it.
+								);
 								break;
 
 							case 3: 	// Charge was processed.
@@ -438,12 +437,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
                                     // Set the publish key here, now that it is known. Why 'publish' key? Why not 'public' key? Note Stripe's method name.
                                     Stripe.setPublishableKey(data.pk);
-                                    return callback(data.pk);
+                                    return callback(null);
 		                    	}
 
-		                    	return callback(null);
+		                    	return callback(new Error("Could not retrieve public key."));
 		                    });
-		                } catch(e) { return callback(null); }
+		                } catch(e) { return callback(e); }
 		            }
 
 					// 2b. Ajax to Stripe (via included Stripe.js script) to request a token representing CC info.
@@ -456,26 +455,27 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 	                            {
 	                                number: m_strChargeNumber,
 	                                cvc: m_strCVC,
-	                                exp_month: m_iExpMonth,
-	                                exp_year: m_iExpYear
-	                            }, function (status, response) {
+	                                exp_month: m_iExpMo,
+	                                exp_year: m_iExpYr
+	                            }, 
+	                            function (status, response) {
                             
-                                    if (response.error) { return response.error; }	// response.error has its own message property.
-                                    
-                                    // Set the safe-token.
-                                    return callback(response.id);
+                                    if (response.error) { return callback(response.error, null); }	// response.error has its own message property.
+
+									// response.id is the safe-token.                                    
+                                    return callback(null, response.id);
                             	}
                             );
-						} catch(e) { return e; }
+						} catch(e) { return callback(new Error("We couldn't contact our charge processor. TechGroms support has been notified. We will send an email to you when the problem is resolved. Sorry."), null); }
 					}
 
 					// 2c. Ajax to TG server again to complete CC charging using m_token. Send email to user if charge succeeds.
-					var m_functionBuyStep2c = function() {
+					var m_functionBuyStep2c = function(token, callback) {
 
 						try {
-							return null;
+							return callback(new Error("Not implemented yet!"));
 						} catch(e) {
-							return null;
+							return callback(e);
 						}
 					}
 				} catch (e) {
