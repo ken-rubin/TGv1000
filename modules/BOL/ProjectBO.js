@@ -1281,14 +1281,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 },
                                 // (2b)
                                 function(cb) {
-                                    // if (project.specialProjectData.privilegedUser && (project.specialProjectData.isCoreProject || project.specialProjectData.isProduct || project.specialProjectData.isClass || project.specialProjectData.isOnlineClass)) {
-                                        m_log("Calling m_saveComicsToDB");
-                                        m_saveComicsToDB(connection, req, res, project,
-                                            function(err) {
-                                                return cb(err);
-                                            }
-                                        );
-                                    // } else { return cb(null); }
+                                    m_log("Calling m_saveComicsToDB");
+                                    m_saveComicsToDB(connection, req, res, project,
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
                                 },
                                 // (2c)
                                 function(cb) {
@@ -1446,14 +1444,12 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 },
                                 // (3b)
                                 function(cb) {
-                                    // if (project.specialProjectData.privilegedUser && (project.specialProjectData.isCoreProject || project.specialProjectData.isProduct || project.specialProjectData.isClass || project.specialProjectData.isOnlineClass)) {
-                                        m_log("Calling m_saveComicsToDB");
-                                        m_saveComicsToDB(connection, req, res, project,
-                                            function(err) {
-                                                return cb(err);
-                                            }
-                                        );
-                                    // } else { return cb(null); }
+                                    m_log("Calling m_saveComicsToDB");
+                                    m_saveComicsToDB(connection, req, res, project,
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
                                 },
                                 // (3c)
                                 function(cb) {
@@ -1606,7 +1602,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                     comicIth.projectId = project.comicProjectId;
 
-                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.isCoreProject || project.specialProjectData.isProduct || project.specialProjectData.isClass || project.specialProjectData.isOnlineClass)) {
+                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
                         
                         var guts = {
                             projectId: comicIth.projectId,
