@@ -1007,7 +1007,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Getting id of any of user's projects with same name as in project.
                     function(resultArray, cb) {
 
-                        var strQuery = "select id from " + self.dbname + "projects where name='" + resultArray.project.name + "' and ownedByUserId=" + req.user.userId + ";";
+                        var strQuery = "select id from " + self.dbname + "projects where name=" + connection.escape(resultArray.project.name) + " and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
                                 if (err) { return cb(err, null); }
@@ -1281,21 +1281,25 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 },
                                 // (2b)
                                 function(cb) {
-                                    m_log("Calling m_saveComicsToDB");
-                                    m_saveComicsToDB(connection, req, res, project,
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
+                                    // if (project.specialProjectData.privilegedUser && (project.specialProjectData.isCoreProject || project.specialProjectData.isProduct || project.specialProjectData.isClass || project.specialProjectData.isOnlineClass)) {
+                                        m_log("Calling m_saveComicsToDB");
+                                        m_saveComicsToDB(connection, req, res, project,
+                                            function(err) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    // } else { return cb(null); }
                                 },
                                 // (2c)
                                 function(cb) {
-                                    m_log("Calling m_maybeSavePurchProjectData");
-                                    m_maybeSavePurchProjectData(connection, req, res, project,
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
+                                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                        m_log("Calling m_savePurchProductData");
+                                        m_savePurchProductData(connection, req, res, project,
+                                            function(err) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    } else { return cb(null); }
                                 }
                             ],
                             // final callback for (2)
@@ -1442,21 +1446,26 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 },
                                 // (3b)
                                 function(cb) {
-                                    m_log("Calling m_saveComicsToDB");
-                                    m_saveComicsToDB(connection, req, res, project,
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
+                                    // if (project.specialProjectData.privilegedUser && (project.specialProjectData.isCoreProject || project.specialProjectData.isProduct || project.specialProjectData.isClass || project.specialProjectData.isOnlineClass)) {
+                                        m_log("Calling m_saveComicsToDB");
+                                        m_saveComicsToDB(connection, req, res, project,
+                                            function(err) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    // } else { return cb(null); }
                                 },
                                 // (3c)
                                 function(cb) {
-                                    m_log("Calling m_maybeSavePurchProjectData");
-                                    m_maybeSavePurchProjectData(connection, req, res, project,
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
+                                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+
+                                        m_log("Calling m_savePurchProductData");
+                                        m_savePurchProductData(connection, req, res, project,
+                                            function(err) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    } else { return cb(null); }
                                 }
                             ],
                             // final callback for async.parallel
@@ -1472,7 +1481,7 @@ module.exports = function ProjectBO(app, sql, logger) {
         } catch(e) { callback(e); }
     }
 
-    var m_maybeSavePurchProjectData = function(connection, req, res, project, callback) {
+    var m_savePurchProductData = function(connection, req, res, project, callback) {
 
         try {
             
@@ -1583,7 +1592,9 @@ module.exports = function ProjectBO(app, sql, logger) {
         // Now the project has been inserted into the DB and its id is in project.id.
         // A row has been added to resource and tags have been handled for the project, too.
 
-        // This routine will iterate through the project's comics, saving (inserting) each and processing its types, etc.
+        // This routine will iterate through the project's comics, possibly saving (inserting) each and processing its types, etc.
+        // We use the word 'possibly', because comics themselves are saved only when a privileged user is working on a purchasable product or a core project.
+        // Otherwise, only the comics' types and lower are saved.
         try {
 
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
@@ -1594,57 +1605,69 @@ module.exports = function ProjectBO(app, sql, logger) {
                 function(comicIth, cb) {
 
                     comicIth.projectId = project.comicProjectId;
-                    var guts = {
-                        projectId: comicIth.projectId,
-                        ordinal: comicIth.ordinal,
-                        thumbnail: comicIth.thumbnail,
-                        name: comicIth.name
-                    };
-                    var strQuery = "insert " + self.dbname + "comics SET ?";
 
-                    m_log("Writing comicIth with " + strQuery + '; fields: ' + JSON.stringify(guts));
-                    // Turn these into a series?
-                    sql.queryWithCxnWithPlaceholders(connection,
-                        strQuery,
-                        guts,
-                        function(err, rows) {
-                            try {
-                                if (err) { return cb(err); }
-                                if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
-                                
-                                comicIth.id = rows[0].insertId;
+                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.isCoreProject || project.specialProjectData.isProduct || project.specialProjectData.isClass || project.specialProjectData.isOnlineClass)) {
+                        
+                        var guts = {
+                            projectId: comicIth.projectId,
+                            ordinal: comicIth.ordinal,
+                            thumbnail: comicIth.thumbnail,
+                            name: comicIth.name
+                        };
+                        var strQuery = "insert " + self.dbname + "comics SET ?";
 
-                                // Do content of comic: comiccode and types (and all their content) in parallel.
-                                async.parallel(
-                                    [
-                                        function(cb){
+                        m_log("Writing comicIth with " + strQuery + '; fields: ' + JSON.stringify(guts));
+                        // Turn these into a series?
+                        sql.queryWithCxnWithPlaceholders(connection,
+                            strQuery,
+                            guts,
+                            function(err, rows) {
+                                try {
+                                    if (err) { return cb(err); }
+                                    if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
+                                    
+                                    comicIth.id = rows[0].insertId;
 
-                                            m_log("Going to m_saveTypesInComicIthToDB");
-                                            m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
-                                                function(err) {
-                                                    return cb(err); 
-                                                }
-                                            );
-                                        },
-                                        function(cb){
+                                    // Do content of comic: comiccode and types (and all their content) in parallel.
+                                    async.parallel(
+                                        [
+                                            function(cb){
 
-                                            m_log("Going to m_saveComiccodeInComicIthToDB");
-                                            m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
-                                                function(err) {
-                                                    return cb(err); 
-                                                }
-                                            );
+                                                m_log("Going to m_saveTypesInComicIthToDB");
+                                                m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComiccodeInComicIthToDB");
+                                                m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            }
+                                        ],
+                                        function(err) {
+                                            return cb(err);
                                         }
-                                    ],
-                                    function(err) {
-                                        return cb(err);
-                                    }
-                                );
-                            } catch (eq) {
-                                return cb(eq);
+                                    );
+                                } catch (eq) {
+                                    return cb(eq);
+                                }
                             }
-                        }
-                    );
+                        );
+                    } else {
+
+                        m_log("Going to m_saveTypesInComicIthToDB");
+                        m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
+                            function(err) {
+                                return cb(err); 
+                            }
+                        );
+                    }
                 },
                 // final callback for series
                 function(err) {
@@ -2376,7 +2399,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             }
 
             var tagsString = uniqueArray.join('~') + '~';
-            var strSql = "call " + self.dbname + "doTags('" + tagsString + "'," + itemId + ",'" + strItemType + "');";
+            var strSql = "call " + self.dbname + "doTags(" + connection.escape(tagsString) + "," + itemId + ",'" + strItemType + "');";
                 
             m_log("Sending this sql: " + strSql);
             sql.queryWithCxn(connection, strSql, 
@@ -2388,7 +2411,7 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         // projectScript is passed in if it is meant for us to push the procedure call. So we will.
                         if (projectScript) {
-                            projectScript.push("call " + self.dbname + "doTags('" + tagsString + "'," + atid + ",'" + strItemType + "');");
+                            projectScript.push("call " + self.dbname + "doTags(" + connection.escape(tagsString) + "," + atid + ",'" + strItemType + "');");
                         }
                         return callback(null);
                     } catch(et) { return callback(et); }
