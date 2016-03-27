@@ -419,7 +419,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 														// At this point the card has been charged. But the project in memory is still the original product.
 														self.closeYourself();
 														// Tell user in callback errorHelper. Use callback to open SaveProjectAsDialog.
-														errorHelper.show('Your purchase is almost complete. When you close this Note, we will open the Save Project window. Use it to choose a new name, maybe some tags, the description, perhaps a new Project Image. Then click the Save button, and the project will be all yours!', 250000,	// I don't expect to auto-close errorHelper in 250 seconds.
+														errorHelper.show('Your purchase is almost complete.<br><br>When you close this Note, we will open the Save Project window. Use it to choose a new name, maybe some tags, the description, perhaps a new Project Image.<br><br>Then click the Save button, and the project will be all yours!', 250000,	// I don't expect to auto-close errorHelper in 250 seconds.
 																														// The purpose of this very large number is to get errorHelper to use the title 'Note' instead of 'Error'.
 															function(){
 
