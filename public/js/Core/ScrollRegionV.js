@@ -105,7 +105,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         " data-ibase='" + 
                         iBase + 
                         "' title='" + 
-                        strName + 
+                        quoteattr(strName) + 
                         "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>"); // The 9999 z-index is so that a red div can be put behind an activated one, if desired.

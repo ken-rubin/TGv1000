@@ -97,7 +97,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_bInLoadLoop = bInLoadLoop;
 
                     // Build the item.
-                    var jItem = $("<img data-ibase='" + iBase + "' title='" + strName + "' style='position:absolute;z-index:9999;' id='" + 
+                    var jItem = $("<img data-ibase='" + iBase + "' title='" + quoteattr(strName) + "' style='position:absolute;z-index:9999;' id='" + 
                         strId + 
                         "' class='" + strImageClass + "'></img>");
 
