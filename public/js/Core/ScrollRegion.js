@@ -40,8 +40,20 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_dHeight = dHeight;
                     self.click = functionClick;
 
+                    return self.finishCreating();
+                    
+                } catch (e) {
+
+                    return e;
+                }
+            };
+
+            self.finishCreating = function() {
+
+                try {
+                    
                     // Get j-reference to root element.
-                    m_jRoot = $(strRootElementSelector);
+                    m_jRoot = $(m_strRootElementSelector);
                     var strRowHeight = (m_dHeight + 10).toString() + "px";  // Typically 100 + 10 for images.
                     m_jRoot.css("height", strRowHeight);
 
@@ -154,9 +166,9 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_arrayItems = [];
 
                     // Remove from DOM.
-                    m_jSlider.empty();
+                    m_jRoot.empty();
 
-                    return null;
+                    return self.finishCreating();
 
                 } catch (e) {
 
