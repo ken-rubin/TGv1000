@@ -5,8 +5,9 @@
 
 
 ## Jerry's Issues
+- If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible.
 - In SaveProjectAsDialog I updated an online course Notes field from what I had typed into NewProjectDialog, but the SQL didn't change. It appears the project has changed in memory, but the sent information didn't change.
-- Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.)
+- Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) Normal class will also require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
     + Use this code to display a Purchasable Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -17,10 +18,11 @@
     ```
 - Finish buying. 
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products.
+    + Send out email with class or product info reminder, login info (for online classes), etc.
+    + When displaying an online class in BuyDialog, convert times to local.
     + Add class size and validate against it. This would not apply to online classes, only classroom classes.
-    + Change <h*> lines at top of the 3 snippets depending on New, Open/Search/Edit and Buy.
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO#routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in egregious cases like deleting a comic.
-- **Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. Might have to add a source to errorHelper or have it display whatever full stack trace is in an exception if that's what's been passed in. Do this only for a privileged user.**
+- **Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user.**
 - When a privileged user opens a core project for editing, specialProjectData must be added. But it won't have a sub-property like Purchasable Projects do. **This is probably done. Needs testing.**
 - Ken thinks that OpenProjectDialog shouldn't have all those radio buttons (non-privileged user), but should return all matches, somehow visually identifying the groups.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog, openProjectDialog, newProjectDialog.

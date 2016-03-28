@@ -187,8 +187,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						$("#BuyHeader").empty();
 						if (m_clProject.data.specialProjectData.classProject) {
 
-							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Enter details for your new Product.</b></h4>';
-							strNewBuyHeader += '<h5>All but Name are optional until the Product is made <i>active</i>, and it\'s ready for sale.</h5>';
+							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Class you selected.</b></h4>';
+							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
+							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and a reminder with dates, times and location.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
 							jQuery(function($){
 								$("#Phone").mask("(999) 999-9999? x99999");
@@ -252,8 +253,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						
 						} else if (m_clProject.data.specialProjectData.productProject) {
 
-							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Enter details for your new Product.</b></h4>';
-							strNewBuyHeader += '<h5>All but Name are optional until the Product is made <i>active</i>, and it\'s ready for sale.</h5>';
+							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Product you selected.</b></h4>';
+							strNewBuyHeader += '<h5>If you want to buy it, click the <b><i>Enter secure charge information</i></b> button.</h5>';
+							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and one with information on getting started.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
 							jQuery(function($){
 								$("#Price").mask("$999.99");
@@ -287,8 +289,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						
 						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
 
-							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Enter details for your new Product.</b></h4>';
-							strNewBuyHeader += '<h5>All but Name are optional until the Product is made <i>active</i>, and it\'s ready for sale.</h5>';
+							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Online Class you selected.</b></h4>';
+							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
+							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and one with login information.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
 							jQuery(function($){
 								$("#Price").mask("$999.99");
