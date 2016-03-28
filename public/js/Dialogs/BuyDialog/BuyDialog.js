@@ -184,8 +184,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						// $("#ProjectDescription").blur(m_functionDescriptionBlur);
 						// $("#ProjectTags").blur(m_functionTagsBlur);
 
+						$("#BuyHeader").empty();
 						if (m_clProject.data.specialProjectData.classProject) {
 
+							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Enter details for your new Product.</b></h4>';
+							strNewBuyHeader += '<h5>All but Name are optional until the Product is made <i>active</i>, and it\'s ready for sale.</h5>';
+							$("#BuyHeader").append(strNewBuyHeader);
 							jQuery(function($){
 								$("#Phone").mask("(999) 999-9999? x99999");
 								$("#Zip").mask("99999");
@@ -248,6 +252,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						
 						} else if (m_clProject.data.specialProjectData.productProject) {
 
+							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Enter details for your new Product.</b></h4>';
+							strNewBuyHeader += '<h5>All but Name are optional until the Product is made <i>active</i>, and it\'s ready for sale.</h5>';
+							$("#BuyHeader").append(strNewBuyHeader);
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
@@ -280,6 +287,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						
 						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
 
+							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Enter details for your new Product.</b></h4>';
+							strNewBuyHeader += '<h5>All but Name are optional until the Product is made <i>active</i>, and it\'s ready for sale.</h5>';
+							$("#BuyHeader").append(strNewBuyHeader);
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {

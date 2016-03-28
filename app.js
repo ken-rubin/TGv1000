@@ -230,6 +230,7 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
 
                 } else {
 
+                    console.log('requiring ' + rowi.path + rowi.moduleName);
                     var mod = require(rowi.path + rowi.moduleName);
                     moduleInstance = new mod(app, sql, logger);
                     moduleInstances[rowi.moduleName] = moduleInstance;
