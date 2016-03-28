@@ -32,6 +32,10 @@ define(function () {
 						} else { dispError = error;
 						}
 
+						if (error.hasOwnProperty('message') && error.hasOwnProperty('stack') && (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"])) {
+							dispError += '<br><br>' + e.stack;
+						}
+
 						// Show the dialog.
 						BootstrapDialog.show({
 
