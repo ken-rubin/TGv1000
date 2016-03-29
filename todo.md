@@ -18,13 +18,13 @@
     ```
 - Finish buying. 
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products.
-    + Save class date/times with timezone and convert to user's timezone in BuyDialog.
-    + Send out email with class or product info reminder, login info (for online classes), etc.
-    + When displaying an online class in BuyDialog, convert times to local.
+    + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would always enter times in his local timezone.
+    + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
+    + Send out an email if some buys a product and doesn't touch it for 2 weeks.
     + Add class size and validate against it. This would not apply to online classes, only classroom classes.
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO#routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in egregious cases like deleting a comic.
-- **Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user.**
-- Ken thinks that OpenProjectDialog shouldn't have all those radio buttons (non-privileged user), but should return all matches, somehow visually identifying the groups.
+- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user.
+- Ken thinks that OpenProjectDialog shouldn't have all those radio buttons (non-privileged user), but should return all matches, somehow visually identifying the groups. I'm thinking 5 horizontal ScrollRegions for non-privileged users. Not sure what to, if anything, for privileged users.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
@@ -42,7 +42,7 @@
 - Save place (like for student working in a project) and jump right back to it if the user signs in again.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Add more occurences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
+- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; **should this be taken as a singout and invalidate the JWT?**
     - close window or browser (possible?)
@@ -67,7 +67,7 @@
         - OpenProjectDialog
         - PropertyGrid
         - TypeSearchDialog
-- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply if TW is going away.**
+- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
 ## A Discussion of Projects and Purchasable Projects
