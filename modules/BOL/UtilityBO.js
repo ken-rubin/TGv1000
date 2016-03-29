@@ -399,6 +399,13 @@ module.exports = function UtilityBO(app, sql, logger) {
                         sql.execute(strQuery,
                             function(rows){
 
+                                if (rows.length === 0) {
+                                    return res.json({
+                                        success: true,
+                                        arrayRows: []
+                                    });
+                                }
+
                                 // Sort rows on name, since async retrieval doesn't let us sort in the query.
                                 rows.sort(function(a,b){
 
@@ -418,7 +425,8 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        if ((req.body.onlyClasses === "1" || req.body.onlyOnlineClasses === "1") && passOn.projects.length > 0) {
+                        // passOn.projects.length m.b. > 0
+                        if (req.body.onlyClasses === "1" || req.body.onlyOnlineClasses === "1") {
 
                             if (req.body.privilegedUser === "0") {
                                 // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
@@ -426,10 +434,10 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 // Any non-qualified are removed from passOn.projects.
 
                                 var today = new Date();
-                                async.each(passOn.projects,
+                                async.eachSeries(passOn.projects,
                                     function(projectIth, cb) {
 
-                                        var bRemove = false;
+                                        projectIth.remove = false;
                                         var class1Date = projectIth.schedule[0].date;
                                         // This date must exist or the class could not have been made active.
                                         // As must the zipcode used below.
@@ -437,118 +445,128 @@ module.exports = function UtilityBO(app, sql, logger) {
                                         var class1DateDate = new Date(class1Date);
                                         var diffSeconds = (class1DateDate - today) / 1000;
                                         if (diffSeconds < 0) {
-                                            // Class was in the past
-                                            bRemove = true;
+                                            // Class was in the past.
+                                            projectIth.remove = true;
                                         } else {
                                             var diffDays = diffSeconds / (24*60*60);
                                             if (diffDays > 92) {
-
-                                                bRemove = true;
+                                                // Class is too far out.
+                                                projectIth.remove = true;
                                             }
                                         }
 
-                                        if (!bRemove && req.body.onlyClasses === "1") {
+                                        if (!projectIth.remove && (req.body.onlyClasses === "1")) {
                                             // Class is not disqualified due to start date. We'll do the zipcode distance check.
                                             // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                            var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + ".json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                            var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
                                             var xhr = new XMLHttpRequest();
-                                            xhr.open("GET", url, true);
+                                            xhr.open("GET", url, true);     // true means async (which is default)
                                             xhr.onload = function (e) {
 
-                                                if (xhr.readyState === 4) {
-
-                                                    if (xhr.status === 200) {
-
-                                                        var distanceJSON = JSON.parse(xhr.responseText);
-                                                        if (distanceJSON.hasOwnProperty("distance")) {
-
-                                                            if (distanceJSON.distance > 35) {
-
-                                                                bRemove = true;
-                                                            }
-                                                        } else {
-
-                                                            bRemove = true;
+                                                if (xhr.status === 200) {
+                                                    // A good result to test.
+                                                    console.log("Got xhr.responseText: " + xhr.responseText);
+                                                    var distanceJSON = JSON.parse(xhr.responseText);
+                                                    if (distanceJSON.hasOwnProperty("distance")) {
+                                                        // Has distance prop.
+                                                        if (distanceJSON.distance > 35) {
+                                                            // But too far.
+                                                            projectIth.remove = true;
                                                         }
                                                     } else {
-                                                        bRemove = true;
+                                                        // No distance prop. Some sort of error. Disqualify this project.
+                                                        projectIth.remove = true;
                                                     }
+                                                } else {
+                                                    // Error. Disqualify this project.
+                                                    projectIth.remove = true;
                                                 }
+                                                // Never an error, since we just remove a project in case of error.
+                                                return cb(null);
                                             };
                                             xhr.onerror = function (e) {
-                                                bRemove = true;
+                                                projectIth.remove = true;
+                                                return cb(null);
                                             };
                                             xhr.send(null);
                                         }
+                                    },
+                                    function(err) {
 
-                                        projectIth.remove = bRemove;
-                                        cb(null);
+                                        for (var i = passOn.projects.length - 1; i >= 0; i--) {
+                                            if (passOn.projects[i].remove) {
+                                                passOn.projects.splice(i, 1);
+                                                console.log("Removing project; " + passOn.projects.length + " are left.");
+                                            }
+                                        }
+                                        return cb(null, passOn);
                                     }
                                 );
-                            } else {
+                            } else if (req.body.nearZip.length > 0 && req.body.onlyClasses === "1") {
                                 // A privileged user, retrieving classes or online classes, gets both active and inactive ones. And date doesn't matter.
-                                // For classes (not online) they must be within 35 miles of req.body.nearZip--if that optional parameter is entered.
+                                // For classes (but not online classes) they must be within 35 miles of req.body.nearZip--if that optional parameter is entered.
                                 // Any non-qualified are removed from passOn.projects.
-                                async.each(passOn.projects,
+                                async.eachSeries(passOn.projects,
                                     function(projectIth, cb) {
 
-                                        var bRemove = false;
-                                        if (req.body.nearZip.length > 0 && req.body.onlyClasses === "1") {
-                                            // Do the zipcode distance check.
-                                            // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                            var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + ".json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
-                                            var xhr = new XMLHttpRequest();
-                                            xhr.open("GET", url, true);
-                                            xhr.onload = function (e) {
+                                        projectIth.remove = false;
+                                        // Do the zipcode distance check.
+                                        // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
+                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open("GET", url, true);
+                                        xhr.onload = function (e) {
 
-                                                if (xhr.readyState === 4) {
+                                            if (xhr.status === 200) {
 
-                                                    if (xhr.status === 200) {
+                                                var distanceJSON = JSON.parse(xhr.responseText);
+                                                if (distanceJSON.hasOwnProperty("distance")) {
 
-                                                        var distanceJSON = JSON.parse(xhr.responseText);
-                                                        if (distanceJSON.hasOwnProperty("distance")) {
+                                                    if (distanceJSON.distance > 35) {
 
-                                                            if (distanceJSON.distance > 35) {
-
-                                                                bRemove = true;
-                                                            }
-                                                        } else {
-
-                                                            bRemove = true;
-                                                        }
-                                                    } else {
-                                                        bRemove = true;
+                                                        projectIth.remove = true;
                                                     }
-                                                }
-                                            };
-                                            xhr.onerror = function (e) {
-                                                bRemove = true;
-                                            };
-                                            xhr.send(null);
-                                        }
+                                                } else {
 
-                                        projectIth.remove = bRemove;
-                                        cb(null);
+                                                    projectIth.remove = true;
+                                                }
+                                            } else {
+                                                projectIth.remove = true;
+                                            }
+
+                                            return cb(null);
+                                        };
+                                        xhr.onerror = function (e) {
+                                            projectIth.remove = true;
+                                            return cb(null);
+                                        };
+                                        xhr.send(null);
+                                    },
+                                    function(err) {
+
+                                        for (var i = passOn.projects.length - 1; i >= 0; i--) {
+                                            if (passOn.projects[i].remove) {
+                                                passOn.projects.splice(i, 1);
+                                            }
+                                        }
+                                        return cb(null, passOn);
                                     }
                                 );
                             }
-                            
-                            for (var i = passOn.projects.length - 1; i >= 0; i--) {
-                                if (passOn.projects[i].remove) {
-                                    passOn.projects.splice(i, 1);
-                                }
-                            }
+                        } else {
+                            // Didn't do anything. Just pass on....
+                            return cb(null, passOn);
                         }
-
-                        return cb(null, passOn);
                     }
                 ],
                 function(err, passOn) {
-
+                    console.log("Got into the waterfall's final function");
                     if (err) {
+                        console.log("In final func. Returning success:false");
                         return res.json({success:false, message:err.message});
                     }
 
+                    console.log("In final func. Returning success:true with this many projects: " + passOn.projects.length);
                     return res.json({
                         success: true,
                         arrayRows: passOn.projects
