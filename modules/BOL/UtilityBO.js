@@ -5,6 +5,7 @@
 var fs = require("fs");
 var jade = require("jade");
 var async = require("async");
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var stripe = null;
 var bLocalCredit = true;
 

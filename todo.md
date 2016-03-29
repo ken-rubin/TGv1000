@@ -6,6 +6,7 @@
 
 ## Jerry's Issues
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible.
+- Zipcode distance seems to accept anything. Fix.
 - In SaveProjectAsDialog I updated an online course Notes field from what I had typed into NewProjectDialog, but the SQL didn't change. It appears the project has changed in memory, but the sent information didn't change.
 - Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) Normal class will also require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
     + Use this code to display a Purchasable Product's video:

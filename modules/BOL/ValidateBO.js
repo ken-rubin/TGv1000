@@ -142,7 +142,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                     try {
 
                         // Generate and encrypt a 4-digit password.
-                        var password = (Math.random() * 9000).toFixed(0) + 1000;
+                        var password = (Math.floor((Math.random() * 9000)) + 1000).toString();
                         var usergroupId = 3;
 
                         // Change john, ken and jerry password to 'a' and assign to "developer" usergroup.
