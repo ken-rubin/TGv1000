@@ -441,16 +441,16 @@ module.exports = function UtilityBO(app, sql, logger) {
                             function(strError) { return cb(new Error(strError), null); }
                         );
                     },
-                    // (3)
+                    // (3a)
+                    // passOn.projects will have no rows in any of its 6 dimensions only if tags don't match and we're called by a non-priv. user.
+                    // passOn.projects[0] is core projects.
+                    // passOn.projects[1] is the user's own projects.
+                    // passOn.projects[2] is others' projects.
+                    // passOn.projects[3] is Product projects.
+                    // passOn.projects[4] is Class projects.
+                    // passOn.projects[5] is Online class projects.
+                    // We need to process [4] and [5] separately in (3a) and (3b), respectively.
                     function(passOn, cb) {
-
-                        // passOn.projects will have no rows in any of its 6 dimensions only if tags don't match and we're called by a non-priv. user.
-                        // passOn.projects[0] is core projects.
-                        // passOn.projects[1] is the user's own projects.
-                        // passOn.projects[2] is others' projects.
-                        // passOn.projects[3] is Product projects.
-                        // passOn.projects[4] is Class projects.
-                        // passOn.projects[5] is Online class projects.
 
                         if (req.body.privilegedUser === "0") {
                             // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
@@ -458,7 +458,8 @@ module.exports = function UtilityBO(app, sql, logger) {
                             // Any non-qualified are removed from passOn.projects.
 
                             var today = new Date();
-                            async.eachSeries(passOn.projects,
+
+                            async.eachSeries(passOn.projects[4],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
@@ -479,10 +480,10 @@ module.exports = function UtilityBO(app, sql, logger) {
                                         }
                                     }
 
-                                    if (!projectIth.remove && (req.body.onlyClasses === "1")) {
+                                    if (!projectIth.remove) {
                                         // Class is not disqualified due to start date. We'll do the zipcode distance check.
                                         // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + passOn.zipcode + "/mile";
                                         var xhr = new XMLHttpRequest();
                                         xhr.open("GET", url, true);     // true means async (which is default)
                                         xhr.onload = function (e) {
@@ -517,60 +518,52 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 },
                                 function(err) {
 
-                                    for (var i = passOn.projects.length - 1; i >= 0; i--) {
-                                        if (passOn.projects[i].remove) {
-                                            passOn.projects.splice(i, 1);
-                                            console.log("Removing project; " + passOn.projects.length + " are left.");
+                                    for (var i = passOn.projects[4].length - 1; i >= 0; i--) {
+                                        if (passOn.projects[4][i].remove) {
+                                            passOn.projects[4].splice(i, 1);
                                         }
                                     }
                                     return cb(null, passOn);
                                 }
                             );
-                        } else if (req.body.nearZip.length > 0 && req.body.onlyClasses === "1") {
-                            // A privileged user, retrieving classes or online classes, gets both active and inactive ones. And date doesn't matter.
-                            // For classes (but not online classes) they must be within 35 miles of req.body.nearZip--if that optional parameter is entered.
+                        }
+                    },
+                    // (3b)
+                    function(passOn, cb) {
+
+                        if (req.body.privilegedUser === "0") {
+                            // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
+                            // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
                             // Any non-qualified are removed from passOn.projects.
-                            async.eachSeries(passOn.projects,
+
+                            var today = new Date();
+
+                            async.eachSeries(passOn.projects[5],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    // Do the zipcode distance check.
-                                    // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                    var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
-                                    var xhr = new XMLHttpRequest();
-                                    xhr.open("GET", url, true);
-                                    xhr.onload = function (e) {
+                                    var class1Date = projectIth.schedule[0].date;
+                                    // This date must exist or the class could not have been made active.
+                                    // As must the zipcode used below.
 
-                                        if (xhr.status === 200) {
-
-                                            var distanceJSON = JSON.parse(xhr.responseText);
-                                            if (distanceJSON.hasOwnProperty("distance")) {
-
-                                                if (distanceJSON.distance > 35) {
-
-                                                    projectIth.remove = true;
-                                                }
-                                            } else {
-
-                                                projectIth.remove = true;
-                                            }
-                                        } else {
+                                    var class1DateDate = new Date(class1Date);
+                                    var diffSeconds = (class1DateDate - today) / 1000;
+                                    if (diffSeconds < 0) {
+                                        // Class was in the past.
+                                        projectIth.remove = true;
+                                    } else {
+                                        var diffDays = diffSeconds / (24*60*60);
+                                        if (diffDays > 92) {
+                                            // Class is too far out.
                                             projectIth.remove = true;
                                         }
-
-                                        return cb(null);
-                                    };
-                                    xhr.onerror = function (e) {
-                                        projectIth.remove = true;
-                                        return cb(null);
-                                    };
-                                    xhr.send(null);
+                                    }
                                 },
                                 function(err) {
 
-                                    for (var i = passOn.projects.length - 1; i >= 0; i--) {
-                                        if (passOn.projects[i].remove) {
-                                            passOn.projects.splice(i, 1);
+                                    for (var i = passOn.projects[5].length - 1; i >= 0; i--) {
+                                        if (passOn.projects[5][i].remove) {
+                                            passOn.projects[5].splice(i, 1);
                                         }
                                     }
                                     return cb(null, passOn);
@@ -580,13 +573,13 @@ module.exports = function UtilityBO(app, sql, logger) {
                     }
                 ],
                 function(err, passOn) {
+
                     console.log("Got into the waterfall's final function");
                     if (err) {
                         console.log("In final func. Returning success:false");
                         return res.json({success:false, message:err.message});
                     }
 
-                    console.log("In final func. Returning success:true with this many projects: " + passOn.projects.length);
                     return res.json({
                         success: true,
                         arrayRows: passOn.projects
