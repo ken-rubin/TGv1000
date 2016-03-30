@@ -102,39 +102,27 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
 							$("#ISSearchInput").focus();
 
-							// Attach the region to the DOM.
-							m_scISImageStrip = new ScrollRegion();
-							var exceptionRet = m_scISImageStrip.create(
-								"#IStoolstrip",
-								100,
-								100,
-								function(){
+							// Attach 5 or 6 scroll regions to the DOM.
+							var minIndex = m_bPrivilegedUser ? 0 : 1;
+							for (var i = minIndex; i <= 5; i++) {
 
-						    		var jq = this;
-						    		var j = parseInt(jq.context.id.substring(8), 10);
-						    		var projectId = m_searchResultRawArray[j].id;
-						    		self.callFunctionOK(projectId, m_bPrivilegedUser, (m_onlyOwnedByUser === 1), (m_onlyOthersProjects === 1));
-						    	});
-							if (exceptionRet) { throw exceptionRet; }
+								m_scISImageStrip[i] = new ScrollRegion();
+								var exceptionRet = m_scISImageStrip[i].create(
+									"#IStoolstrip" + i.toString(),
+									100,
+									100,
+									function(){
 
-							if (m_bPrivilegedUser) {
-
-								jQuery(function($){
-									$("#ZipP").mask("99999");
-								});
-								$(".nonprivileged").css("display", "none");
-								$(".privileged").css("display", "block");
-
-							} else {
-
-								jQuery(function($){
-									$("#Zip").mask("99999");
-								});
-								$(".privileged").css("display", "none");
-								$(".nonprivileged").css("display", "block");
+							    		var jq = this;
+							    		var j = parseInt(jq.context.id.substring(8), 10);
+							    		var projectId = m_searchResultRawArray[i][j].id;
+							    		self.callFunctionOK(projectId, m_bPrivilegedUser, (i === 1), (i === 2));	// wrong maybe.
+							    	});
+								if (exceptionRet) { throw exceptionRet; }
 							}
 
-							// Click the search button on the way in to fetch user's own projects.
+							// Click the search button on the way in to fetch everything with no tags. User may repeat with some tags.
+							// Or we'll remove this auto-click if it takes too long.
 							m_functionSearchBtnClicked();
 
 						} catch (e) { errorHelper.show(e.message); }
@@ -146,48 +134,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 					    try {
 
 						    m_tags = $("#ISSearchInput").val().toLowerCase().trim();
-						    if (m_bPrivilegedUser) {
-
-				        		m_onlyCoreProjects = $("#rad0P").prop("checked") ? 1 : 0;
-				        		m_onlyOwnedByUser = $("#rad1P").prop("checked") ? 1 : 0;
-				        		m_onlyOthersProjects = $("#rad2P").prop("checked") ? 1 : 0;
-				        		m_onlyProducts = $("#rad3P").prop("checked") ? 1 : 0;
-				        		m_onlyClasses = $("#rad4P").prop("checked") ? 1 : 0;
-				        		m_onlyOnlineClasses = $("#rad5P").prop("checked") ? 1 : 0;
-							    m_strZip = $("#ZipP").val().trim();
-
-							    if (m_onlyClasses && m_strZip.length > 0 && m_strZip.length < 5) {
-							    	m_wellMessage("If you are searching near a zipcode, you must enter 5 digits.", null);
-							    	return;
-							    }
-						    } else {
-
-						    	m_onlyCoreProjects = 0;
-				        		m_onlyOwnedByUser = $("#rad1").prop("checked") ? 1 : 0;
-				        		m_onlyOthersProjects = $("#rad2").prop("checked") ? 1 : 0;
-				        		m_onlyProducts = $("#rad3").prop("checked") ? 1 : 0;
-				        		m_onlyClasses = $("#rad4").prop("checked") ? 1 : 0;
-				        		m_onlyOnlineClasses = $("#rad5").prop("checked") ? 1 : 0;
-							    m_strZip = $("#Zip").val().trim();
-							    
-							    if (m_onlyClasses && m_strZip.length < 5) {
-							    	m_wellMessage("When searching for upcoming classes, you must enter your 5-digit zipcode.", null);
-							    	return;
-							    }
-							}
-
 					        var posting = $.post("/BOL/UtilityBO/SearchProjects", 
 					        	{
 					        		tags: m_tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
-					        		onlyCoreProjects: m_onlyCoreProjects,
-					        		onlyOwnedByUser: m_onlyOwnedByUser,
-					        		onlyOthersProjects: m_onlyOthersProjects,
-					        		onlyProducts: m_onlyProducts,
-					        		onlyClasses: m_onlyClasses,
-					        		nearZip: m_strZip,
-					        		onlyOnlineClasses: m_onlyOnlineClasses,
 					        		privilegedUser: m_bPrivilegedUser ? 1 : 0
 					        	}, 
 					        	'json');
@@ -195,27 +146,31 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 
 					            if (data.success) {
 
-					                m_searchResultProcessedArray = new Array();
-					                m_searchResultRawArray = data.arrayRows;
-					                for (var i = 0; i < m_searchResultRawArray.length; i++) {
+					                m_searchResultProcessedArray = new Array(6);
+					                m_searchResultRawArray = data.arrayRows;	// [][]
+					                for (var j = 0; j < 6; j++) {
 
-					                    var rowIth = m_searchResultRawArray[i];
-					                    m_searchResultProcessedArray.push({
+					                	m_searchResultProcessedArray[j] = new Array();
+						                for (var i = 0; i < m_searchResultRawArray[j].length; i++) {
 
-					                    	index: i,
-					                    	id: rowIth.id,
-					                    	name: rowIth.name,
-					                    	description: rowIth.description,
-					                    	url: resourceHelper.toURL('resources', 
-					                    		rowIth.imageId, 
-					                    		'image', 
-					                    		'')
-					                    	}
-					                    );
+						                    var rowIth = m_searchResultRawArray[j][i];
+						                    m_searchResultProcessedArray[j].push({
+
+						                    	index: i,
+						                    	id: rowIth.id,
+						                    	name: rowIth.name,
+						                    	description: rowIth.description,
+						                    	url: resourceHelper.toURL('resources', 
+						                    		rowIth.imageId, 
+						                    		'image', 
+						                    		'')
+						                    	}
+						                    );
+						                }
+
+					                	var exceptionRet = m_rebuildCarousel(j);
+					                	if (exceptionRet) { throw exceptionRet; }
 					                }
-
-					                var exceptionRet = m_rebuildCarousel();
-					                if (exceptionRet) { throw exceptionRet; }
 					            } else {
 
 					                // !data.success
@@ -229,89 +184,87 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 					}
 
 					// Turns the well into an image strip
-					var m_rebuildCarousel = function () {
+					var m_rebuildCarousel = function (stripNum) {
 
 						try {
 
-						    if (m_searchResultProcessedArray.length === 0) {
+						    if (m_searchResultProcessedArray[stripNum].length === 0) {
 
 						    	if (m_bPrivilegedUser) {
 
 							    	if (m_tags.length) {
 
 							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("None of your projects match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("1", "None of your projects match all of the tags: " + m_tags + ".", null);
 									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("None of others' projects match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("2", "None of others' projects match all of the tags: " + m_tags + ".", null);
 									    else if (m_onlyProducts)
-									    	m_wellMessage("No Products match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("3", "No Products match all of the tags: " + m_tags + ".", null);
 									    else if (m_onlyClasses)
-									    	m_wellMessage("No Classes match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("4", "No Classes match all of the tags: " + m_tags + ".", null);
 									    else	// online classes
-									    	m_wellMessage("No Online Classes match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("5", "No Online Classes match all of the tags: " + m_tags + ".", null);
 
 								    } else {
 
 							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("We could not find any projects that you created and saved.", null);
+									    	m_wellMessage("1", "We could not find any projects that you created and saved.", null);
 									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("We could not find any projects that others created and saved.", null);
+									    	m_wellMessage("2", "We could not find any projects that others created and saved.", null);
 									    else if (m_onlyProducts)
-									    	m_wellMessage("We found no Products.", null);
+									    	m_wellMessage("3", "We found no Products.", null);
 									    else if (m_onlyClasses)
-									    	m_wellMessage("We found no Classes.", null);
+									    	m_wellMessage("4", "We found no Classes.", null);
 									    else   // online classes
-									    	m_wellMessage("We found no Online Classes.", null);
+									    	m_wellMessage("5", "We found no Online Classes.", null);
 								    }
 								} else {	// normal user
 
 							    	if (m_tags.length) {
 
 							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("None of your projects match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("1", "None of your projects match all of the tags: " + m_tags + ".", null);
 									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("None of others' projects match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("2", "None of others' projects match all of the tags: " + m_tags + ".", null);
 									    else if (m_onlyProducts)
-									    	m_wellMessage("No active Products match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("3", "No active Products match all of the tags: " + m_tags + ".", null);
 									    else if (m_onlyClasses)
-									    	m_wellMessage("No Classes starting in the next 3 months and within 35 miles of your zipcode match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("4", "No Classes starting in the next 3 months and within 35 miles of your zipcode match all of the tags: " + m_tags + ".", null);
 									    else    // online classes
-									    	m_wellMessage("No Online Classes starting in the next 3 months match all of the tags: " + m_tags + ".", null);
+									    	m_wellMessage("5", "No Online Classes starting in the next 3 months match all of the tags: " + m_tags + ".", null);
 
 								    } else {
 
 							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("We could not find any projects that you created and saved.", null);
+									    	m_wellMessage("1", "We could not find any projects that you created and saved.", null);
 									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("We could not find any public projects that others created and saved.", null);
+									    	m_wellMessage("1", "We could not find any public projects that others created and saved.", null);
 									    else if (m_onlyProducts)
-									    	m_wellMessage("We found no active Products.", null);
+									    	m_wellMessage("3", "We found no active Products.", null);
 									    else if (m_onlyClasses)
-									    	m_wellMessage("We found no active Classes starting in the next 3 months and within 35 miles of your zipcode.", null);
+									    	m_wellMessage("4", "We found no active Classes starting in the next 3 months and within 35 miles of your zipcode.", null);
 									    else     // online classes
-									    	m_wellMessage("We found no active Online Classes starting in the next 3 months.", null);
+									    	m_wellMessage("5", "We found no active Online Classes starting in the next 3 months.", null);
 								    }
 								}
 								return;
 						    } else {
 
-							    $("#ISWellMsg").css("display", "none");
-							    $("#IStoolstriprow").css("display", "block");
+					    		var strJ = stripNum.toString();
+							    $("#ISWellMsg" + strJ).css("display", "none");
+							    $("#IStoolstriprow" + strJ).css("display", "block");
 
 								// Attach the region to the DOM.
-								var exceptionRet = m_scISImageStrip.empty();
-								if (exceptionRet) {
-
-									throw exceptionRet;
-								}
+								var exceptionRet = m_scISImageStrip[stripNum].empty();
+								if (exceptionRet) { throw exceptionRet; }
 
 								// Add returned images to the scrollregion.
-								for (var i = 0; i < m_searchResultProcessedArray.length; i++) {
+								for (var i = 0; i < m_searchResultProcessedArray[stripNum].length; i++) {
 
-							        var rowIth = m_searchResultProcessedArray[i];
+							        var rowIth = m_searchResultProcessedArray[stripNum][i];
 
 							        // Add each processed image to the region.
-							        exceptionRet = m_scISImageStrip.addImage(
+							        exceptionRet = m_scISImageStrip[stripNum].addImage(
 							        	i,
 							        	"carousel" + i.toString(),
 							        	rowIth.name,
@@ -320,26 +273,20 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							        	'ScrollRegionImage',
 							        	null,
 							        	true);
-							        if (exceptionRet) {
-
-							        	throw exceptionRet;
-							        }
+							        if (exceptionRet) { throw exceptionRet; }
 							    }
 							}
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					}
 
-					var m_wellMessage = function(msg, timeoutAction) {
+					var m_wellMessage = function(strWhichWell, msg, timeoutAction) {
 
 						try {
 
-							$("#ISWellMsg").empty();
-							$("#ISWellMsg").append("<p class='text-danger' style='text-align:center;'>" + msg + "</p>");
-						    $("#ISWellMsg").css("display", "block");
-						    $("#IStoolstriprow").css("display", "none");
+							$("#ISWellMsg" + strWhichWell).empty();
+							$("#ISWellMsg" + strWhichWell).append("<p class='text-danger' style='text-align:center;'>" + msg + "</p>");
+						    $("#ISWellMsg" + strWhichWell).css("display", "block");
+						    $("#IStoolstriprow" + strWhichWell).css("display", "none");
 
 							if (timeoutAction !== null) {
 
@@ -347,10 +294,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							}
 						} catch (e) { errorHelper.show(msg); }
 					}
-				} catch (e) {
-
-					errorHelper.show(e.message);
-				}
+				} catch (e) { errorHelper.show(e.message); }
 
 				/////////////////////////////////
 				// Private fields.
@@ -358,9 +302,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_functionOK = null;
-				var m_searchResultProcessedArray = [];
+				var m_searchResultProcessedArray;
 				var m_searchResultRawArray;
-				var m_scISImageStrip;
+				var m_scISImageStrip = new Array(6);
 				var m_tags;
 				var m_onlyCoreProjects;
         		var m_onlyOwnedByUser;

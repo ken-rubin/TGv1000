@@ -322,8 +322,8 @@ module.exports = function UtilityBO(app, sql, logger) {
                             ccString = ccString + "'" + ccArray[i] + "'";
                         }
 
-                        console.log(sqlString);
                         var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+                        console.log(sqlString);
                         sql.execute(sqlString,
                             function (arrayRows) {
                             
@@ -368,7 +368,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         } else {
                             strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
                         }
-
+/*
                         // Owned by user. Same for both priv and non-priv.
                         strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
@@ -408,10 +408,14 @@ module.exports = function UtilityBO(app, sql, logger) {
                             // A non-privileged user just sees active classes.
                             strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                         }
-
+*/
                         sql.execute(strQuery,
                             function(rows){
-
+rows.push([]);
+rows.push([]);
+rows.push([]);
+rows.push([]);
+rows.push([]);
                                 // rows is a jagged array with first dimension = 6.
                                 var totRows = 0;
                                 for (var i = 0; i < 6; i++) { totRows += rows[i].length; }
@@ -526,7 +530,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     return cb(null, passOn);
                                 }
                             );
-                        }
+                        } else { return cb(null, passOn); }
                     },
                     // (3b)
                     function(passOn, cb) {
@@ -569,7 +573,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     return cb(null, passOn);
                                 }
                             );
-                        }
+                        } else { return cb(null, passOn); }
                     }
                 ],
                 function(err, passOn) {
