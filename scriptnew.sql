@@ -688,6 +688,15 @@ begin
         set @dbstate := 10;
     end if;
 
+    if @dbstate = 10 THEN
+
+		ALTER TABLE `tgv1000`.`user` 
+		ADD COLUMN `zipcode` CHAR(5) NOT NULL AFTER `usergroupId`;
+    
+		UPDATE control set dbstate=11 where id=1;
+        set @dbstate := 11;
+    end if;
+
 end//
 
 

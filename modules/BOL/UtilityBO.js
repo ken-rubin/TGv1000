@@ -266,34 +266,48 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.tags
             // req.user.userId
             // req.user.userName
-            // req.body.onlyCoreProjects
-            // req.body.onlyOwnedByUser   
-            // req.body.onlyOthersProjects
-            // req.body.onlyProducts
-            // req.body.onlyClasses If === 1: if req.body.privilegedUser === 0, limit to classes about to start in next 3 months and then loop thru them, saving 
-            //                          only those within 30 miles of req.body.nearZip.
-            //                      If req.body.privilegedUser === 1, ignore the 3 month limitation and, since it's optional, use nearZip only if entered.
-            // req.body.nearZip     This is the user's home zipcode. It is optional for a privileged user.
-            //                      GET from https://www.zipcodeapi.com/rest/<zipcodekey>/distance.json/<zip_code1>/<zip_code2>/mile where
-            //                          <zipcodekey> is replaced by app.get("zipcodekey")
-            //                          <zip_code1> is replaced by req.body.nearZip
-            //                      result is of form { distance: 34.5 }
-            // req.body.onlyOnlineClasses If === 1: if req.body.privilegedUser === 0, limit to classes about to start in next 3 months.
-            //                      If req.body.privilegedUser === 1, ignore the 3 month limitation.
             // req.body.privilegedUser
 
-            // Will use async.series to (1) get string of tag id's; (2) perform one of many select statements to get matching projects; 
-            // (3) if req.body.onlyClasses, then possibly winnow class projects down by date and distance.
+            // Will return arrayRows: [][] where first dimension is 
+            //  [0] core projects (empty if !req.body.privilegedUser)
+            //  [1] user's own projects
+            //  [2] other's projects (if req.body.privilegedUser, then ignore public/private; else just public)
+            //  [3] products (if req.body.privilegedUser, then all, active or not; else just active)
+            //  [4] classes (if req.body.privilegedUser, then all, active or not, no matter when or where; else just active, near user and soon)
+            //  [5] online classes (if req.body.privilegedUser, then all, active or not, no matter when; else just active and soon)
+
+            // Will use async.waterfall to build up passOn javascript object:
+            // (1) if !req.body.privilegedUser, retrieve user's home zipcode.
+            // (2) get string of tag id's; 
+            // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.privilegedUser; 
+            // (4) if !req.body.privilegedUser, then winnow classes down by date and distance.
 
             async.waterfall(
                 [
                     // (1)
                     function(cb) {
 
-                        if (req.body.onlyCoreProjects === "1") {
+                        if (!req.body.privilegedUser) {
 
-                            return cb(null, {});
+                            sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
+                                function(rows) {
+                                    if (rows.length !== 1) {
+                                        return cb(new Error("Unable to read user table to determine zip code."), null);
+                                    }
+
+                                    return cb(null, {zipcode:rows[0]["zipcode"]});
+                                },
+                                function(strError) {
+                                    return cb(new Error(strError), null);
+                                }
+                            );
+                        } else {
+                            // priv user doesn't need zipcode
+                            return cb(null, {zipcode: ''});
                         }
+                    },
+                    // (2)
+                    function(passOn, cb) {
 
                         // Add resource type description to the tags the user (may have) entered.
                         var tags = req.body.tags + " project";
@@ -308,21 +322,20 @@ module.exports = function UtilityBO(app, sql, logger) {
                             ccString = ccString + "'" + ccArray[i] + "'";
                         }
 
-                        var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
-                        console.log("");
                         console.log(sqlString);
-                        console.log("");
+                        var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
                         sql.execute(sqlString,
                             function (arrayRows) {
                             
                                 // We have to get the same number of rows back from the query as ccArray.length.
+                                // Otherwise we didn't have a complete match and nothing qualifies--except core projects for privileged users which don't user tags for retrieval.
                                 if (arrayRows.length !== ccArray.length) {
 
                                     // Success as far as the POST is concerned but an empty array of projects will be returned.
-                                    return res.json({
-                                        success: true,
-                                        arrayRows: []
-                                    });
+                                    // So on to the next function in the waterfall.
+                                    passOn["idstring"] = '';
+                                    passOn["idcount"] = '0';
+                                    return cb(null, passOn);
                                 }
 
                                 // We can proceed since all tags exist and their id's are in arrayRows.
@@ -334,7 +347,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     idString = idString + arrayRows[i].id.toString();
                                 }
 
-                                var passOn = {idString: idString, arrayRows: arrayRows};
+                                var passOn = {idString: idString, idcount: arrayRows.length.toString()};
                                 return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
@@ -343,78 +356,84 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (2)
                     function(passOn, cb) {
 
-                        var strQuery;
+                        var strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
                         // We're just selecting enough to create the image (with project.id) in the carousel and to decide (in the case of classes and products)
                         // if the project should be retrieved in the first place. 
-                        if (req.body.onlyCoreProjects === "1") {
-
-                            // Only for privileged users.
+                        
+                        // Core projects for privileged users. Empty array for non.
+                        if (req.body.privilegedUser === "1") {
                             strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=1;";
+                        } else {
+                            strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
+                        }
 
-                        } else if (req.body.onlyOwnedByUser === "1") {
+                        // Owned by user. Same for both priv and non-priv.
+                        strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
-                            strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        // Others' accounts
+                        if (req.body.privilegedUser === "1") {
+                            // A privileged user doesn't care about public/private.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
-                        } else if (req.body.onlyOthersProjects === "1") {
+                        } else {
+                            // A non-privileged user can retrieve only public projects and only "normal" projects.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        }
 
-                            if (req.body.privilegedUser === "1") {
-                                // A privileged user doesn't care about public/private.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        // Products
+                        if (req.body.privilegedUser === "1") {
+                            // A privileged user doesn't care about active.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        } else {
+                            // A non-privileged user just sees active projects.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        }
 
-                            } else {
-                                // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            }
-                        } else if (req.body.onlyProducts === "1") {
+                        // Classes
+                        if (req.body.privilegedUser === "1") {
+                            // A privileged user doesn't care about active.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        } else {
+                            // A non-privileged user just sees active classes.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        }
 
-                            if (req.body.privilegedUser === "1") {
-                                // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            } else {
-                                // A non-privileged user just sees active projects.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            }
-                        } else if (req.body.onlyClasses === "1") {
-
-                            if (req.body.privilegedUser === "1") {
-                                // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            } else {
-                                // A non-privileged user just sees active classes.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            }
-                        } else { // req.body.onlyOnlineClasses === "1"
-
-                            if (req.body.privilegedUser === "1") {
-                                // A privileged user doesn't care about active.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            } else {
-                                // A non-privileged user just sees active classes.
-                                strQuery = "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.arrayRows.length.toString() + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                            }
+                        // Online classes
+                        if (req.body.privilegedUser === "1") {
+                            // A privileged user doesn't care about active.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        } else {
+                            // A non-privileged user just sees active classes.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                         }
 
                         sql.execute(strQuery,
                             function(rows){
 
-                                if (rows.length === 0) {
-                                    return res.json({
-                                        success: true,
-                                        arrayRows: []
-                                    });
+                                // rows is a jagged array with first dimension = 6.
+                                var totRows = 0;
+                                for (var i = 0; i < 6; i++) { totRows += rows[i].length; }
+                                if (totRows === 0) {
+                                    passOn.projects = rows;
+                                    return cb(null, passOn);
                                 }
 
                                 // Sort rows on name, since async retrieval doesn't let us sort in the query.
-                                rows.sort(function(a,b){
+                                for (var i = 0; i < 6; i++) {
+                                    if (rows[i].length) {
 
-                                    if (a.name > b.name)
-                                        return 1;
-                                    if (a.name < b.name)
-                                        return -1;
-                                    return 0;
-                                });
+                                        rows[i].sort(function(a,b){
+
+                                            if (a.name > b.name)
+                                                return 1;
+                                            if (a.name < b.name)
+                                                return -1;
+                                            return 0;
+                                        });
+                                    }
+                                }
 
                                 passOn.projects = rows;
                                 return cb(null, passOn);
@@ -425,115 +444,68 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        // passOn.projects.length m.b. > 0
-                        if (req.body.onlyClasses === "1" || req.body.onlyOnlineClasses === "1") {
+                        // passOn.projects will have no rows in any of its 6 dimensions only if tags don't match and we're called by a non-priv. user.
+                        // passOn.projects[0] is core projects.
+                        // passOn.projects[1] is the user's own projects.
+                        // passOn.projects[2] is others' projects.
+                        // passOn.projects[3] is Product projects.
+                        // passOn.projects[4] is Class projects.
+                        // passOn.projects[5] is Online class projects.
 
-                            if (req.body.privilegedUser === "0") {
-                                // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
-                                // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
-                                // Any non-qualified are removed from passOn.projects.
+                        if (req.body.privilegedUser === "0") {
+                            // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
+                            // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
+                            // Any non-qualified are removed from passOn.projects.
 
-                                var today = new Date();
-                                async.eachSeries(passOn.projects,
-                                    function(projectIth, cb) {
+                            var today = new Date();
+                            async.eachSeries(passOn.projects,
+                                function(projectIth, cb) {
 
-                                        projectIth.remove = false;
-                                        var class1Date = projectIth.schedule[0].date;
-                                        // This date must exist or the class could not have been made active.
-                                        // As must the zipcode used below.
+                                    projectIth.remove = false;
+                                    var class1Date = projectIth.schedule[0].date;
+                                    // This date must exist or the class could not have been made active.
+                                    // As must the zipcode used below.
 
-                                        var class1DateDate = new Date(class1Date);
-                                        var diffSeconds = (class1DateDate - today) / 1000;
-                                        if (diffSeconds < 0) {
-                                            // Class was in the past.
+                                    var class1DateDate = new Date(class1Date);
+                                    var diffSeconds = (class1DateDate - today) / 1000;
+                                    if (diffSeconds < 0) {
+                                        // Class was in the past.
+                                        projectIth.remove = true;
+                                    } else {
+                                        var diffDays = diffSeconds / (24*60*60);
+                                        if (diffDays > 92) {
+                                            // Class is too far out.
                                             projectIth.remove = true;
-                                        } else {
-                                            var diffDays = diffSeconds / (24*60*60);
-                                            if (diffDays > 92) {
-                                                // Class is too far out.
-                                                projectIth.remove = true;
-                                            }
                                         }
-
-                                        if (!projectIth.remove && (req.body.onlyClasses === "1")) {
-                                            // Class is not disqualified due to start date. We'll do the zipcode distance check.
-                                            // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                            var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
-                                            var xhr = new XMLHttpRequest();
-                                            xhr.open("GET", url, true);     // true means async (which is default)
-                                            xhr.onload = function (e) {
-
-                                                if (xhr.status === 200) {
-                                                    // A good result to test.
-                                                    console.log("Got xhr.responseText: " + xhr.responseText);
-                                                    var distanceJSON = JSON.parse(xhr.responseText);
-                                                    if (distanceJSON.hasOwnProperty("distance")) {
-                                                        // Has distance prop.
-                                                        if (distanceJSON.distance > 35) {
-                                                            // But too far.
-                                                            projectIth.remove = true;
-                                                        }
-                                                    } else {
-                                                        // No distance prop. Some sort of error. Disqualify this project.
-                                                        projectIth.remove = true;
-                                                    }
-                                                } else {
-                                                    // Error. Disqualify this project.
-                                                    projectIth.remove = true;
-                                                }
-                                                // Never an error, since we just remove a project in case of error.
-                                                return cb(null);
-                                            };
-                                            xhr.onerror = function (e) {
-                                                projectIth.remove = true;
-                                                return cb(null);
-                                            };
-                                            xhr.send(null);
-                                        }
-                                    },
-                                    function(err) {
-
-                                        for (var i = passOn.projects.length - 1; i >= 0; i--) {
-                                            if (passOn.projects[i].remove) {
-                                                passOn.projects.splice(i, 1);
-                                                console.log("Removing project; " + passOn.projects.length + " are left.");
-                                            }
-                                        }
-                                        return cb(null, passOn);
                                     }
-                                );
-                            } else if (req.body.nearZip.length > 0 && req.body.onlyClasses === "1") {
-                                // A privileged user, retrieving classes or online classes, gets both active and inactive ones. And date doesn't matter.
-                                // For classes (but not online classes) they must be within 35 miles of req.body.nearZip--if that optional parameter is entered.
-                                // Any non-qualified are removed from passOn.projects.
-                                async.eachSeries(passOn.projects,
-                                    function(projectIth, cb) {
 
-                                        projectIth.remove = false;
-                                        // Do the zipcode distance check.
+                                    if (!projectIth.remove && (req.body.onlyClasses === "1")) {
+                                        // Class is not disqualified due to start date. We'll do the zipcode distance check.
                                         // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
                                         var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
                                         var xhr = new XMLHttpRequest();
-                                        xhr.open("GET", url, true);
+                                        xhr.open("GET", url, true);     // true means async (which is default)
                                         xhr.onload = function (e) {
 
                                             if (xhr.status === 200) {
-
+                                                // A good result to test.
+                                                console.log("Got xhr.responseText: " + xhr.responseText);
                                                 var distanceJSON = JSON.parse(xhr.responseText);
                                                 if (distanceJSON.hasOwnProperty("distance")) {
-
+                                                    // Has distance prop.
                                                     if (distanceJSON.distance > 35) {
-
+                                                        // But too far.
                                                         projectIth.remove = true;
                                                     }
                                                 } else {
-
+                                                    // No distance prop. Some sort of error. Disqualify this project.
                                                     projectIth.remove = true;
                                                 }
                                             } else {
+                                                // Error. Disqualify this project.
                                                 projectIth.remove = true;
                                             }
-
+                                            // Never an error, since we just remove a project in case of error.
                                             return cb(null);
                                         };
                                         xhr.onerror = function (e) {
@@ -541,21 +513,69 @@ module.exports = function UtilityBO(app, sql, logger) {
                                             return cb(null);
                                         };
                                         xhr.send(null);
-                                    },
-                                    function(err) {
-
-                                        for (var i = passOn.projects.length - 1; i >= 0; i--) {
-                                            if (passOn.projects[i].remove) {
-                                                passOn.projects.splice(i, 1);
-                                            }
-                                        }
-                                        return cb(null, passOn);
                                     }
-                                );
-                            }
-                        } else {
-                            // Didn't do anything. Just pass on....
-                            return cb(null, passOn);
+                                },
+                                function(err) {
+
+                                    for (var i = passOn.projects.length - 1; i >= 0; i--) {
+                                        if (passOn.projects[i].remove) {
+                                            passOn.projects.splice(i, 1);
+                                            console.log("Removing project; " + passOn.projects.length + " are left.");
+                                        }
+                                    }
+                                    return cb(null, passOn);
+                                }
+                            );
+                        } else if (req.body.nearZip.length > 0 && req.body.onlyClasses === "1") {
+                            // A privileged user, retrieving classes or online classes, gets both active and inactive ones. And date doesn't matter.
+                            // For classes (but not online classes) they must be within 35 miles of req.body.nearZip--if that optional parameter is entered.
+                            // Any non-qualified are removed from passOn.projects.
+                            async.eachSeries(passOn.projects,
+                                function(projectIth, cb) {
+
+                                    projectIth.remove = false;
+                                    // Do the zipcode distance check.
+                                    // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
+                                    var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + req.body.nearZip + "/mile";
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open("GET", url, true);
+                                    xhr.onload = function (e) {
+
+                                        if (xhr.status === 200) {
+
+                                            var distanceJSON = JSON.parse(xhr.responseText);
+                                            if (distanceJSON.hasOwnProperty("distance")) {
+
+                                                if (distanceJSON.distance > 35) {
+
+                                                    projectIth.remove = true;
+                                                }
+                                            } else {
+
+                                                projectIth.remove = true;
+                                            }
+                                        } else {
+                                            projectIth.remove = true;
+                                        }
+
+                                        return cb(null);
+                                    };
+                                    xhr.onerror = function (e) {
+                                        projectIth.remove = true;
+                                        return cb(null);
+                                    };
+                                    xhr.send(null);
+                                },
+                                function(err) {
+
+                                    for (var i = passOn.projects.length - 1; i >= 0; i--) {
+                                        if (passOn.projects[i].remove) {
+                                            passOn.projects.splice(i, 1);
+                                        }
+                                    }
+                                    return cb(null, passOn);
+                                }
+                            );
                         }
                     }
                 ],

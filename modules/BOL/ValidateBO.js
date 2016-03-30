@@ -110,7 +110,8 @@ module.exports = function ValidateBO(app, sql, logger) {
                     var profile = {
                         userName: req.body.userName,
                         firstName: req.body.firstName,
-                        lastName: req.body.lastName
+                        lastName: req.body.lastName,
+                        zipcode: req.body.zipcode
                     };
                     
                     var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + profile.userName + "';",
@@ -159,7 +160,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                             } else {
 
-                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,pwHash,usergroupId) values (" + mysql.escape(profile.userName) + "," + mysql.escape(profile.firstName) + "," + mysql.escape(profile.lastName) + "," + mysql.escape(hash) + "," + usergroupId + ");",
+                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,zipcode,pwHash,usergroupId) values (" + mysql.escape(profile.userName) + "," + mysql.escape(profile.firstName) + "," + mysql.escape(profile.lastName) + ",'" + profile.zipcode + "'," + mysql.escape(hash) + "," + usergroupId + ");",
                                     function(rows){
 
                                         if (rows.length === 0) {

@@ -102,6 +102,10 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							$("#email").keyup(m_setStatePrimaryBtn);
 							$("#first").keyup(m_setStatePrimaryBtn);
 							$("#last").keyup(m_setStatePrimaryBtn);
+							$("#zipcode").keyup(m_setStatePrimaryBtn);
+							jQuery(function($){
+								$("#zipcode").mask("99999");
+							});
 							m_setStatePrimaryBtn();
 
 						} catch (e) {
@@ -115,7 +119,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 						m_email = $("#email").val().trim().toLowerCase();
 						m_first = $("#first").val().trim();
 						m_last = $("#last").val().trim();
-						var bValid = (m_email.length > 0 && m_first.length > 0 && m_last.length > 0);
+						m_zipcode = $("#zipcode").val();
+						var bValid = (m_email.length > 0 && m_first.length > 0 && m_last.length > 0 && m_zipcode.replace('_', '').length === 5);
 						if (!bValid) {
 							$("#EnrollButton").prop("disabled", true);
 						} else {
@@ -139,7 +144,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 												{
 													userName: m_email,
 													firstName: m_first,
-													lastName: m_last
+													lastName: m_last,
+													zipcode: m_zipcode
 												}, 
 												'json');
         					posting.done(function(data){
@@ -220,6 +226,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				var m_email;
 				var m_first;
 				var m_last;
+				var m_zipcode;
 			};
 
 			// Return the constructor function as the module object.

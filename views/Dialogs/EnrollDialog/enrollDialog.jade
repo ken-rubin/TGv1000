@@ -7,7 +7,7 @@
   .row
     .col-xs-12
       h4 
-        | To use TechGroms you need to register by providing an email address as your user ID and your first and last names.
+        | To use TechGroms you need to register by providing an email address as your user ID, your first and last names and your zip code<sup>*</sup>.
         | You will be able to log in momentarily after receiving an enrollment email containing your password.
       h5
         | If you are enrolling a child without an email address, please use yours, but the child's name. TechGroms will
@@ -17,9 +17,9 @@
     .col-xs-12
           br
           .col-xs-2
-            label.control-label(for="email", style="margin-top:6px;") Your user ID:
+            label.control-label(for="email", style="margin-top:6px;") Your email:
           .col-xs-4
-            input.form-control#email(type="text" placeholder="Email address")
+            input.form-control#email(type="text")
           .col-xs-6
           br
           br
@@ -27,11 +27,19 @@
           .col-xs-2
             label.control-label(for="first", style="margin-top:6px;") Name:
           .col-xs-3
-            input.form-control#first(type="text" placeholder="First name" style="width:100%;")
+            input.form-control#first(type="text" placeholder="first" style="width:100%;")
           .col-xs-3
-            input.form-control#last(type="text" placeholder="Last name" style="width:100%;")
+            input.form-control#last(type="text" placeholder="last" style="width:100%;")
           .col-xs-4
+          br
+          br
+          .col-xs-2
+            label.control-label(for="zipcode", style="margin-top:6px;") Zip code:
+          .col-xs-3
+            input.form-control#zipcode(type="text" style="width:38%;")
+          .col-xs-7
   .row
     .col-xs-12
           br
           .well#EnrollWell
+            | <sup>*</sup>Zip code will be used to locate classes near you when you're searching for them.
