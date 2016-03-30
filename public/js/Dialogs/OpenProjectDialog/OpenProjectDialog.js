@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"], 
-	function (errorHelper, resourceHelper, ScrollRegion) {
+define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"], 
+	function (errorHelper, resourceHelper, ScrollRegionMulti) {
 
 		try {
 
@@ -106,7 +106,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							var minIndex = m_bPrivilegedUser ? 0 : 1;
 							for (var i = minIndex; i <= 5; i++) {
 
-								m_scISImageStrip[i] = new ScrollRegion();
+								m_scISImageStrip[i] = new ScrollRegionMulti();
 								var exceptionRet = m_scISImageStrip[i].create(
 									"#IStoolstrip" + i.toString(),
 									100,
@@ -114,7 +114,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 									function(){
 
 							    		var jq = this;
-							    		var j = parseInt(jq.context.id.substring(8), 10);
+							    		var j = parseInt(jq.context.id.substring(9), 10);
 							    		var projectId = m_searchResultRawArray[i][j].id;
 							    		self.callFunctionOK(projectId, m_bPrivilegedUser, (i === 1), (i === 2));	// wrong maybe.
 							    	});
@@ -247,7 +247,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 									    	m_wellMessage("5", "We found no active Online Classes starting in the next 3 months.", null);
 								    }
 								}
-								return;
 						    } else {
 
 					    		var strJ = stripNum.toString();
@@ -264,9 +263,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							        var rowIth = m_searchResultProcessedArray[stripNum][i];
 
 							        // Add each processed image to the region.
+							        var combo = (stripNum + 1) * 10 + i;
 							        exceptionRet = m_scISImageStrip[stripNum].addImage(
-							        	i,
-							        	"carousel" + i.toString(),
+							        	combo,
+							        	"carousel" + combo.toString(),
 							        	rowIth.name,
 							        	rowIth.description,
 							        	rowIth.url,
@@ -275,6 +275,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegion"],
 							        	true);
 							        if (exceptionRet) { throw exceptionRet; }
 							    }
+							    return null;
 							}
 						} catch (e) { return e; }
 					}
