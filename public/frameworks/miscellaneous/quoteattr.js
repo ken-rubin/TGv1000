@@ -1,6 +1,6 @@
 function quoteattr(s, preserveCR) {
     preserveCR = preserveCR ? '&#13;' : '\n';
-    return ('' + s) /* Forces the conversion to string. */
+    var qs = ('' + s) /* Forces the conversion to string. */
         .replace(/&/g, '&amp;') /* This MUST be the 1st replacement. */
         .replace(/'/g, '&apos;') /* The 4 other predefined entities, required. */
         .replace(/"/g, '&quot;')
@@ -14,4 +14,5 @@ function quoteattr(s, preserveCR) {
         .replace(/\r\n/g, preserveCR) /* Must be before the next replacement. */
         .replace(/[\r\n]/g, preserveCR);
         ;
+    return qs;
 }

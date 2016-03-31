@@ -154,13 +154,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 					                m_searchResultProcessedArray = new Array(6);
 					                m_searchResultRawArray = data.arrayRows;	// [][]
-					                for (var j = 0; j < 6; j++) {
+					                for (var stripNum = 0; stripNum < 6; stripNum++) {
 
-					                	m_searchResultProcessedArray[j] = new Array();
-						                for (var i = 0; i < m_searchResultRawArray[j].length; i++) {
+					                	m_searchResultProcessedArray[stripNum] = new Array();
+						                for (var i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
 
-						                    var rowIth = m_searchResultRawArray[j][i];
-						                    m_searchResultProcessedArray[j].push({
+						                    var rowIth = m_searchResultRawArray[stripNum][i];
+						                    m_searchResultProcessedArray[stripNum].push({
 
 						                    	index: i,
 						                    	id: rowIth.id,
@@ -174,7 +174,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						                    );
 						                }
 
-					                	var exceptionRet = m_rebuildCarousel(j);
+					                	var exceptionRet = m_rebuildCarousel(stripNum);
 					                	if (exceptionRet) { throw exceptionRet; }
 					                }
 					            } else {
@@ -255,7 +255,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 								}
 						    } else {
 
-						    	// if (stripNum === 0) {
+						    	//if (stripNum === 0) {
 						    		var strJ = stripNum.toString();
 								    $("#ISWellMsg" + strJ).css("display", "none");
 								    $("#IStoolstriprow" + strJ).css("display", "block");
@@ -282,7 +282,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 								        	true);
 								        if (exceptionRet) { throw exceptionRet; }
 								    }
-								// }
+								//}
 							    return null;
 							}
 						} catch (e) { return e; }

@@ -128,7 +128,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 								resourceHelper.toURL('panels', null, null, clComic.data.thumbnail),		// url
 								'comicstripitem',	// image class
 								null,
-								true
+								true,
+								"data-type='xxx'"	// Don't think this is needed, but it's better than seeing undefined in the DOM.
 							);
 							if (exceptionRet) { throw exceptionRet; }
 
