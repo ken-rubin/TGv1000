@@ -104,19 +104,25 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 							// Attach 5 or 6 scroll regions to the DOM.
 							var minIndex = m_bPrivilegedUser ? 0 : 1;
-							for (var i = minIndex; i <= 5; i++) {
+							for (var stripNum = minIndex; stripNum <= 5; stripNum++) {
 
-								m_scISImageStrip[i] = new ScrollRegionMulti();
-								var exceptionRet = m_scISImageStrip[i].create(
-									"#IStoolstrip" + i.toString(),
-									100,
-									100,
+								m_scISImageStrip[stripNum] = new ScrollRegionMulti();
+								var exceptionRet = m_scISImageStrip[stripNum].create(
+									"#IStoolstrip" + stripNum.toString(),
+									50,
+									50,
 									function(){
 
+										// id was created like this:
+										// var combo = (stripNum + 1) * 10 + i;
+							   			// "carousel" + combo.toString(),
+							   			// We want to parse the id to get back stripNum and i.
 							    		var jq = this;
-							    		var j = parseInt(jq.context.id.substring(9), 10);
-							    		var projectId = m_searchResultRawArray[i][j].id;
-							    		self.callFunctionOK(projectId, m_bPrivilegedUser, (i === 1), (i === 2));	// wrong maybe.
+							    		var num = parseInt(jq.context.id.substring(8), 10);
+							    		var stripNum = Math.floor(num / 10) - 1;
+							    		var i = num % 10;
+							    		var projectId = m_searchResultRawArray[stripNum][i].id;
+							    		self.callFunctionOK(projectId, m_bPrivilegedUser, (stripNum === 1), (stripNum === 2));	// wrong maybe.
 							    	});
 								if (exceptionRet) { throw exceptionRet; }
 							}
@@ -191,7 +197,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						    if (m_searchResultProcessedArray[stripNum].length === 0) {
 
 						    	if (m_bPrivilegedUser) {
-
+						    		// Core projects will always be present so no wellmessage is required for [0].
 							    	if (m_tags.length) {
 
 							    		if (m_onlyOwnedByUser)
@@ -249,32 +255,34 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 								}
 						    } else {
 
-					    		var strJ = stripNum.toString();
-							    $("#ISWellMsg" + strJ).css("display", "none");
-							    $("#IStoolstriprow" + strJ).css("display", "block");
+						    	// if (stripNum === 0) {
+						    		var strJ = stripNum.toString();
+								    $("#ISWellMsg" + strJ).css("display", "none");
+								    $("#IStoolstriprow" + strJ).css("display", "block");
 
-								// Attach the region to the DOM.
-								var exceptionRet = m_scISImageStrip[stripNum].empty();
-								if (exceptionRet) { throw exceptionRet; }
+									// Attach the region to the DOM.
+									var exceptionRet = m_scISImageStrip[stripNum].empty();
+									if (exceptionRet) { throw exceptionRet; }
 
-								// Add returned images to the scrollregion.
-								for (var i = 0; i < m_searchResultProcessedArray[stripNum].length; i++) {
+									// Add returned images to the scrollregion.
+									for (var i = 0; i < m_searchResultProcessedArray[stripNum].length; i++) {
 
-							        var rowIth = m_searchResultProcessedArray[stripNum][i];
+								        var rowIth = m_searchResultProcessedArray[stripNum][i];
 
-							        // Add each processed image to the region.
-							        var combo = (stripNum + 1) * 10 + i;
-							        exceptionRet = m_scISImageStrip[stripNum].addImage(
-							        	combo,
-							        	"carousel" + combo.toString(),
-							        	rowIth.name,
-							        	rowIth.description,
-							        	rowIth.url,
-							        	'ScrollRegionImage',
-							        	null,
-							        	true);
-							        if (exceptionRet) { throw exceptionRet; }
-							    }
+								        // Add each processed image to the region.
+								        var combo = (stripNum + 1) * 10 + i;
+								        exceptionRet = m_scISImageStrip[stripNum].addImage(
+								        	combo,
+								        	"carousel" + combo.toString(),
+								        	rowIth.name,
+								        	rowIth.description,
+								        	rowIth.url,
+								        	'ScrollRegionImage',
+								        	null,
+								        	true);
+								        if (exceptionRet) { throw exceptionRet; }
+								    }
+								// }
 							    return null;
 							}
 						} catch (e) { return e; }
