@@ -56,6 +56,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jRoot = $(m_strRootElementSelector);
                     var strRowHeight = (m_dHeight + 10).toString() + "px";  // Typically 100 + 10 for images.
                     m_jRoot.css("height", strRowHeight);
+                    m_jRoot.css("width", "100%");
 
                     // Allocate and inject DOM.
                     m_jSliderContainer = $("<div class='ScrollRegionSliderContainer' />");
