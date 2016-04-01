@@ -19,6 +19,7 @@
     ```
 - Finish buying. 
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products.
+    + When someone buys a PP, make sure to add the buyer's user name as a tag and to remove the original creator's.
     + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would always enter times in his local timezone.
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
     + Send out an email if some buys a product and doesn't touch it for 2 weeks.

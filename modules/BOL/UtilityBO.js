@@ -361,7 +361,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        console.log("In (3)");
+                        console.log("In (3) with passOn: " + JSON.stringify(passOn));
                         var strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
@@ -455,8 +455,13 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                                     passOn.projects = Array(6);
                                     if (req.body.privilegedUser === '1') {
-
                                         passOn.projects[0] = rows;
+                                    } else {
+                                        passOn.projects[0] = new Array();
+                                    }
+
+                                    for (var i = 1; i < 6; i++) {
+                                        passOn.projects[i] = new Array();
                                     }
 
                                     return cb(null, passOn);
@@ -476,7 +481,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // We need to process [4] and [5] separately in (3a) and (3b), respectively.
                     function(passOn, cb) {
 
-                        console.log("In (4a)");
+                        console.log("In (4a) with passOn: " + JSON.stringify(passOn));
                         if (req.body.privilegedUser === "0") {
                             // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
