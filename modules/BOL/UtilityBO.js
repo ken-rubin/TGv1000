@@ -291,6 +291,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                             sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
                                 function(rows) {
+
                                     if (rows.length !== 1) {
                                         return cb(new Error("Unable to read user table to determine zip code."), null);
                                     }
@@ -333,8 +334,8 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                                     // Success as far as the POST is concerned but an empty array of projects will be returned.
                                     // So on to the next function in the waterfall.
-                                    passOn["idstring"] = '';
-                                    passOn["idcount"] = '0';
+                                    passOn.idString = '';
+                                    passOn.idCount = '0';
                                     return cb(null, passOn);
                                 }
 
@@ -347,7 +348,10 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     idString = idString + arrayRows[i].id.toString();
                                 }
 
-                                var passOn = {idString: idString, idcount: arrayRows.length.toString()};
+                                var passOn = {
+                                    idString: idString, 
+                                    idCount: arrayRows.length.toString()
+                                };
                                 return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
@@ -369,74 +373,92 @@ module.exports = function UtilityBO(app, sql, logger) {
                             strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
                         }
 
-                        // Owned by user. Same for both priv and non-priv.
-                        strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                        if (passOn.idString.length) {
+                            // Owned by user. Same for both priv and non-priv.
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
-                        // Others' accounts
-                        if (req.body.privilegedUser === "1") {
-                            // A privileged user doesn't care about public/private.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            // Others' accounts
+                            if (req.body.privilegedUser === "1") {
+                                // A privileged user doesn't care about public/private.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            } else {
+                                // A non-privileged user can retrieve only public projects and only "normal" projects.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            }
 
-                        } else {
-                            // A non-privileged user can retrieve only public projects and only "normal" projects.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                        }
+                            // Products
+                            if (req.body.privilegedUser === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            } else {
+                                // A non-privileged user just sees active projects.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            }
 
-                        // Products
-                        if (req.body.privilegedUser === "1") {
-                            // A privileged user doesn't care about active.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                        } else {
-                            // A non-privileged user just sees active projects.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                        }
+                            // Classes
+                            if (req.body.privilegedUser === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            }
 
-                        // Classes
-                        if (req.body.privilegedUser === "1") {
-                            // A privileged user doesn't care about active.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                        } else {
-                            // A non-privileged user just sees active classes.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                        }
-
-                        // Online classes
-                        if (req.body.privilegedUser === "1") {
-                            // A privileged user doesn't care about active.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
-                        } else {
-                            // A non-privileged user just sees active classes.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idcount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            // Online classes
+                            if (req.body.privilegedUser === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.schedule from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            }
                         }
 
                         sql.execute(strQuery,
                             function(rows){
 
-                                // rows is a jagged array with first dimension size = 6.
-                                var totRows = 0;
-                                for (var i = 0; i < 6; i++) { totRows += rows[i].length; }
-                                if (totRows === 0) {
+                                if (passOn.idString.length) {
+
+                                    // rows is a jagged array with first dimension size = 6.
+                                    var totRows = 0;
+                                    for (var i = 0; i < 6; i++) { totRows += rows[i].length; }
+                                    if (totRows === 0) {
+                                        passOn.projects = rows;
+                                        return cb(null, passOn);
+                                    }
+
+                                    // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                    for (var i = 0; i < 6; i++) {
+                                        if (rows[i].length) {
+
+                                            rows[i].sort(function(a,b){
+
+                                                if (a.name > b.name)
+                                                    return 1;
+                                                if (a.name < b.name)
+                                                    return -1;
+                                                return 0;
+                                            });
+                                        }
+                                    }
+
                                     passOn.projects = rows;
                                     return cb(null, passOn);
-                                }
 
-                                // Sort rows on name, since async retrieval doesn't let us sort in the query.
-                                for (var i = 0; i < 6; i++) {
-                                    if (rows[i].length) {
+                                } else {
 
-                                        rows[i].sort(function(a,b){
+                                    // Tags didn't match. rows has core projects for priv. user and is empty for non-priv. users.
+                                    // But we have to fill out passOn.projects so we can return success, not failure.
+                                    // And not crap out on the client side.
 
-                                            if (a.name > b.name)
-                                                return 1;
-                                            if (a.name < b.name)
-                                                return -1;
-                                            return 0;
-                                        });
+                                    passOn.projects = Array(6);
+                                    if (req.body.privilegedUser === '1') {
+
+                                        passOn.projects[0] = rows;
                                     }
-                                }
 
-                                passOn.projects = rows;
-                                return cb(null, passOn);
+                                    return cb(null, passOn);
+                                }
                             },
                             function(strError) { return cb(new Error(strError), null); }
                         );

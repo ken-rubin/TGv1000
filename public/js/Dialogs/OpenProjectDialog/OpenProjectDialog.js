@@ -145,7 +145,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					        		tags: m_tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
-					        		privilegedUser: m_bPrivilegedUser ? 1 : 0
+					        		privilegedUser: (m_bPrivilegedUser ? 1 : 0)
 					        	}, 
 					        	'json');
 					        posting.done(function(data){
@@ -180,12 +180,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					            } else {
 
 					                // !data.success
-					                m_wellMessage("An error has occurred: " + data.message);
+					                m_wellMessage("x", "An error has occurred: " + data.message);
 					            }
 					        });
 					    } catch(e) {
 
-					        m_wellMessage("An error has occurred: " + e.message, null);
+					        m_wellMessage("x", "An error has occurred: " + e.message, null);
 					    }
 					}
 
@@ -244,7 +244,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		if (m_onlyOwnedByUser)
 									    	m_wellMessage("1", "We could not find any projects that you created and saved.", null);
 									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("1", "We could not find any public projects that others created and saved.", null);
+									    	m_wellMessage("2", "We could not find any public projects that others created and saved.", null);
 									    else if (m_onlyProducts)
 									    	m_wellMessage("3", "We found no active Products.", null);
 									    else if (m_onlyClasses)
@@ -292,10 +292,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 						try {
 
-							$("#ISWellMsg" + strWhichWell).empty();
-							$("#ISWellMsg" + strWhichWell).append("<p class='text-danger' style='text-align:center;'>" + msg + "</p>");
-						    $("#ISWellMsg" + strWhichWell).css("display", "block");
-						    $("#IStoolstriprow" + strWhichWell).css("display", "none");
+							if (strWhichWell === "x") {
+								errorHelper.show(msg);
+							} else {
+								$("#ISWellMsg" + strWhichWell).empty();
+								$("#ISWellMsg" + strWhichWell).append("<p class='text-danger' style='text-align:center;'>" + msg + "</p>");
+							    $("#ISWellMsg" + strWhichWell).css("display", "block");
+							    $("#IStoolstriprow" + strWhichWell).css("display", "none");
+							}
 
 							if (timeoutAction !== null) {
 

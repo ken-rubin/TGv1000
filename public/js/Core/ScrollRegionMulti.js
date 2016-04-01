@@ -234,9 +234,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     m_jSlider.append(jItem);
                     // ...and make room in the slider if necessary. This is conditional, because we do things async so possibly out of order.
                     // So it would otherwise be possible to shrink the slider width after it got big.
-                    var dSliderWidth = m_jSlider.width();
                     var dSliderNewWidth = (iBase + 1) * m_dWidth;
-                    if (dSliderNewWidth > dSliderWidth) {
+                    if (dSliderNewWidth > m_jSlider.width()) {
 
                         m_jSlider.width(dSliderNewWidth);
                     }
@@ -245,9 +244,8 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                         smartPlacement: true
                     });
 
-                    // Make sure strip scrolls to show new image.
                     if (!m_bInLoadLoop) {
-
+                        // Make sure strip scrolls to show new image.
                         exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
                         if (exceptionRet) { throw exceptionRet; }
                     }
