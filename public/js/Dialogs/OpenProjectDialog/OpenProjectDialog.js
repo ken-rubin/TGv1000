@@ -204,89 +204,113 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						    		// Core projects will always be present so no wellmessage is required for [0].
 							    	if (m_tags.length) {
 
-							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("1", "None of your projects match all of the tags: " + m_tags + ".", null);
-									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("2", "None of others' projects match all of the tags: " + m_tags + ".", null);
-									    else if (m_onlyProducts)
-									    	m_wellMessage("3", "No Products match all of the tags: " + m_tags + ".", null);
-									    else if (m_onlyClasses)
-									    	m_wellMessage("4", "No Classes match all of the tags: " + m_tags + ".", null);
-									    else	// online classes
-									    	m_wellMessage("5", "No Online Classes match all of the tags: " + m_tags + ".", null);
-
+							    		switch(stripNum) {
+							    			case 1:
+									    		m_wellMessage("1", "None of your projects match all of the tags: " + m_tags + ".", null);
+									    		break;
+									    	case 2:
+									    		m_wellMessage("2", "None of others' projects match all of the tags: " + m_tags + ".", null);
+									    		break;
+									    	case 3:
+									    		m_wellMessage("3", "No Products match all of the tags: " + m_tags + ".", null);
+									    		break;
+									    	case 4:
+									    		m_wellMessage("4", "No Classes match all of the tags: " + m_tags + ".", null);
+									    		break;
+									    	case 5:
+									    		m_wellMessage("5", "No Online Classes match all of the tags: " + m_tags + ".", null);
+									    		break;
+										}
 								    } else {
 
-							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("1", "We could not find any projects that you created and saved.", null);
-									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("2", "We could not find any projects that others created and saved.", null);
-									    else if (m_onlyProducts)
-									    	m_wellMessage("3", "We found no Products.", null);
-									    else if (m_onlyClasses)
-									    	m_wellMessage("4", "We found no Classes.", null);
-									    else   // online classes
-									    	m_wellMessage("5", "We found no Online Classes.", null);
+								    	switch(stripNum) {
+									    	case 1:
+									    		m_wellMessage("1", "We could not find any projects that you created and saved.", null);
+									    		break;
+									    	case 2:
+									    		m_wellMessage("2", "We could not find any projects that others created and saved.", null);
+									    		break;
+									    	case 3:
+									    		m_wellMessage("3", "We found no Products.", null);
+									    		break;
+									    	case 4:
+									    		m_wellMessage("4", "We found no Classes.", null);
+									    		break;
+									    	case 5:
+									    		m_wellMessage("5", "We found no Online Classes.", null);
+									    		break;
+									    }
 								    }
 								} else {	// normal user
 
 							    	if (m_tags.length) {
 
-							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("1", "None of your projects match all of the tags: " + m_tags + ".", null);
-									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("2", "None of others' projects match all of the tags: " + m_tags + ".", null);
-									    else if (m_onlyProducts)
-									    	m_wellMessage("3", "No active Products match all of the tags: " + m_tags + ".", null);
-									    else if (m_onlyClasses)
-									    	m_wellMessage("4", "No Classes starting in the next 3 months and within 35 miles of your zipcode match all of the tags: " + m_tags + ".", null);
-									    else    // online classes
-									    	m_wellMessage("5", "No Online Classes starting in the next 3 months match all of the tags: " + m_tags + ".", null);
-
+							    		switch(stripNum) {
+							    			case 1:
+										    	m_wellMessage("1", "None of your projects match all of the tags: " + m_tags + ".", null);
+										    	break;
+										    case 2:
+										    	m_wellMessage("2", "None of others' projects match all of the tags: " + m_tags + ".", null);
+										    	break;
+										    case 3:
+										    	m_wellMessage("3", "No active Products match all of the tags: " + m_tags + ".", null);
+										    	break;
+										    case 4:
+										    	m_wellMessage("4", "No Classes starting in the next 3 months and within 35 miles of your zipcode match all of the tags: " + m_tags + ".", null);
+										    	break;
+										    case 5:
+										    	m_wellMessage("5", "No Online Classes starting in the next 3 months match all of the tags: " + m_tags + ".", null);
+										    	break;
+										}
 								    } else {
 
-							    		if (m_onlyOwnedByUser)
-									    	m_wellMessage("1", "We could not find any projects that you created and saved.", null);
-									    else if (m_onlyOthersProjects)
-									    	m_wellMessage("2", "We could not find any public projects that others created and saved.", null);
-									    else if (m_onlyProducts)
-									    	m_wellMessage("3", "We found no active Products.", null);
-									    else if (m_onlyClasses)
-									    	m_wellMessage("4", "We found no active Classes starting in the next 3 months and within 35 miles of your zipcode.", null);
-									    else     // online classes
-									    	m_wellMessage("5", "We found no active Online Classes starting in the next 3 months.", null);
+							    		switch(stripNum) {
+							    			case 1:
+										    	m_wellMessage("1", "We could not find any projects that you created and saved.", null);
+										    	break;
+										    case 2:
+										    	m_wellMessage("2", "We could not find any public projects that others created and saved.", null);
+										    	break;
+										    case 3:
+										    	m_wellMessage("3", "We found no active Products.", null);
+										    	break;
+										    case 4:
+										    	m_wellMessage("4", "We found no active Classes starting in the next 3 months and within 35 miles of your zipcode.", null);
+										    	break;
+										    case 5:
+										    	m_wellMessage("5", "We found no active Online Classes starting in the next 3 months.", null);
+										    	break;
+										}
 								    }
 								}
 						    } else {
 
-						    	//if (stripNum === 0) {
-						    		var strJ = stripNum.toString();
-								    $("#ISWellMsg" + strJ).css("display", "none");
-								    $("#IStoolstriprow" + strJ).css("display", "block");
+					    		var strJ = stripNum.toString();
+							    $("#ISWellMsg" + strJ).css("display", "none");
+							    $("#IStoolstriprow" + strJ).css("display", "block");
 
-									// Attach the region to the DOM.
-									var exceptionRet = m_scISImageStrip[stripNum].empty();
-									if (exceptionRet) { throw exceptionRet; }
+								// Attach the region to the DOM.
+								var exceptionRet = m_scISImageStrip[stripNum].empty();
+								if (exceptionRet) { throw exceptionRet; }
 
-									// Add returned images to the scrollregion.
-									for (var i = 0; i < m_searchResultProcessedArray[stripNum].length; i++) {
+								// Add returned images to the scrollregion.
+								for (var i = 0; i < m_searchResultProcessedArray[stripNum].length; i++) {
 
-								        var rowIth = m_searchResultProcessedArray[stripNum][i];
+							        var rowIth = m_searchResultProcessedArray[stripNum][i];
 
-								        // Add each processed image to the region.
-								        var combo = (stripNum + 1) * 10 + i;
-								        exceptionRet = m_scISImageStrip[stripNum].addImage(
-								        	combo,
-								        	"carousel" + combo.toString(),
-								        	rowIth.name,
-								        	rowIth.description,
-								        	rowIth.url,
-								        	'ScrollRegionImage',
-								        	null,
-								        	true);
-								        if (exceptionRet) { throw exceptionRet; }
-								    }
-								//}
+							        // Add each processed image to the region.
+							        var combo = (stripNum + 1) * 10 + i;
+							        exceptionRet = m_scISImageStrip[stripNum].addImage(
+							        	combo,
+							        	"carousel" + combo.toString(),
+							        	rowIth.name,
+							        	rowIth.description,
+							        	rowIth.url,
+							        	'ScrollRegionImage',
+							        	null,
+							        	true);
+							        if (exceptionRet) { throw exceptionRet; }
+							    }
 							    return null;
 							}
 						} catch (e) { return e; }
@@ -323,13 +347,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 				var m_searchResultRawArray;
 				var m_scISImageStrip = new Array(6);
 				var m_tags;
-				var m_onlyCoreProjects;
-        		var m_onlyOwnedByUser;
-        		var m_onlyOthersProjects;
-        		var m_onlyProducts;
-        		var m_onlyClasses;
-				var m_onlyOnlineClasses;
-			    var m_strZip;
 			    var m_bPrivilegedUser;
 			};
 
