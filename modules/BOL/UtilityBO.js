@@ -269,7 +269,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.privilegedUser
 
             // Will return arrayRows: [][] where first dimension is 
-            //  [0] core projects (empty if !req.body.privilegedUser)
+            //  [0] core projects (empty if req.body.privilegedUser === "0")
             //  [1] user's own projects
             //  [2] other's projects (if req.body.privilegedUser, then ignore public/private; else just public)
             //  [3] products (if req.body.privilegedUser, then all, active or not; else just active)
@@ -277,17 +277,18 @@ module.exports = function UtilityBO(app, sql, logger) {
             //  [5] online classes (if req.body.privilegedUser, then all, active or not, no matter when; else just active and soon)
 
             // Will use async.waterfall to build up passOn javascript object:
-            // (1) if !req.body.privilegedUser, retrieve user's home zipcode.
+            // (1) if req.body.privilegedUser === "0", retrieve user's home zipcode.
             // (2) get string of tag id's; 
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.privilegedUser; 
-            // (4) if !req.body.privilegedUser, then winnow classes down by date and distance.
+            // (4) if req.body.privilegedUser === "0", then winnow classes down by date and distance.
 
             async.waterfall(
                 [
                     // (1)
                     function(cb) {
 
-                        if (!req.body.privilegedUser) {
+                        console.log("In (1)");
+                        if (req.body.privilegedUser === "0") {
 
                             sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
                                 function(rows) {
@@ -310,6 +311,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (2)
                     function(passOn, cb) {
 
+                        console.log("In (2)");
                         // Add resource type description to the tags the user (may have) entered.
                         var tags = req.body.tags + " project";
 
@@ -348,18 +350,18 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     idString = idString + arrayRows[i].id.toString();
                                 }
 
-                                var passOn = {
-                                    idString: idString, 
-                                    idCount: arrayRows.length.toString()
-                                };
+                                passOn.idString = idString;
+                                passOn.idCount = arrayRows.length.toString();
+
                                 return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
                         );
                     },
-                    // (2)
+                    // (3)
                     function(passOn, cb) {
 
+                        console.log("In (3)");
                         var strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
@@ -463,7 +465,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                             function(strError) { return cb(new Error(strError), null); }
                         );
                     },
-                    // (3a)
+                    // (4a)
                     // passOn.projects will have no rows in any of its 6 dimensions only if tags don't match and we're called by a non-priv. user.
                     // passOn.projects[0] is core projects.
                     // passOn.projects[1] is the user's own projects.
@@ -474,6 +476,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // We need to process [4] and [5] separately in (3a) and (3b), respectively.
                     function(passOn, cb) {
 
+                        console.log("In (4a)");
                         if (req.body.privilegedUser === "0") {
                             // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
@@ -550,9 +553,10 @@ module.exports = function UtilityBO(app, sql, logger) {
                             );
                         } else { return cb(null, passOn); }
                     },
-                    // (3b)
+                    // (4b)
                     function(passOn, cb) {
 
+                        console.log("In (4b)");
                         if (req.body.privilegedUser === "0") {
                             // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
@@ -580,6 +584,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                                             projectIth.remove = true;
                                         }
                                     }
+                                    return cb(null);
                                 },
                                 function(err) {
 

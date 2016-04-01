@@ -27,7 +27,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 							// Save callback in private field.
 							m_functionOK = functionOK;
-							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"];
+							m_bPrivilegedUser = g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"] || false;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -97,6 +97,10 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					var m_functionOnShownDialog = function () {
 
 						try {
+
+							if (!m_bPrivilegedUser) {
+								$(".HideIfNonPriv").css("display", "none");
+							}
 
 							// Wire buttons.
 							$("#ISInnerSearchButton").click(m_functionSearchBtnClicked);
