@@ -128,6 +128,8 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										client.closeCurrentDialog();
 
 										// Set up the modified project.
+										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
+										objectData.project.specialProjectData.openMode = "searched";
 										client.load_m_clProject(objectData.project);
 
 										client.setBrowserTabAndBtns();

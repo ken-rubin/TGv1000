@@ -5,10 +5,11 @@
 
 
 ## Jerry's Issues
-- In OpenProjectDialog.js, if no projects are returned for one or more of the dimensions, the well message displays but spacing needs work.
-- If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible.
-- In SaveProjectAsDialog I updated an online course Notes field from what I had typed into NewProjectDialog, but the SQL didn't change. It appears the project has changed in memory, but the sent information didn't change.
-- Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) Normal class will also require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
+### Do not depend on Ken's rework
+- If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
+- Finish buying. 
+    + Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) 
+    + Normal class will also require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
     + Use this code to display a Purchasable Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -17,39 +18,37 @@
         </video>
     </div>
     ```
-- Finish buying. 
-    + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products.
-    + When someone buys a PP, make sure to add the buyer's user name as a tag and to remove the original creator's.
-    + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would always enter times in his local timezone.
+    + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
+    + When someone buys a PP, make sure to add the buyer's user name as a tag and to remove the original creator's. Is this really the case? I think so, since I didn't see a@a.com as a tag, but he had bought some PPs. **Important**
+    + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would enter times in his local timezone. **Important.**
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
     + Send out an email if some buys a product and doesn't touch it for 2 weeks.
     + Add class size and validate against it. This would not apply to online classes, only classroom classes.
-    + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO#routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in egregious cases like deleting a comic.
-- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user.
-- Ken thinks that OpenProjectDialog shouldn't have all those radio buttons (non-privileged user), but should return all matches, somehow visually identifying the groups. I'm thinking 5 horizontal ScrollRegions for non-privileged users. Not sure what to, if anything, for privileged users.
-- Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
-- After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
+    + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
+    + If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
+- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user. **Bug.**
+- Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - Test image (multer) stuff now that I've put JWT in the middle.
-- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
-    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
-- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Administrative stuff
     + AdminZone functionality
         + User maintenance
         + Usergroup maintenance
         + Purchasable Project active flag
         + Ability to make projects public
-- Save place (like for student working in a project) and jump right back to it if the user signs in again.
-- Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
-- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
-    - click "TGv1000" to return to sign-in page; **should this be taken as a singout and invalidate the JWT?**
+    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
-- Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
+
+### Can wait till Ken integrates
+- Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
+- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
+    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
+- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
+- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
+- Save place (like for student working in a project) and jump right back to it if the user signs in again.
+- Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Need rest of the dialogs to submit on Enter key.
     - These are already done:
         + EnrollDialog
@@ -71,6 +70,11 @@
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
+
+### To consider way later
+- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
+- Deleting
+    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 
 ## A Discussion of Projects and Purchasable Projects
 
