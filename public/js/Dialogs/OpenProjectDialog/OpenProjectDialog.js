@@ -166,7 +166,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						                    var rowIth = m_searchResultRawArray[stripNum][i];
 						                    m_searchResultProcessedArray[stripNum].push({
 
-						                    	index: i,
+						                    	index: i,	// 2nd dimension index of m_searchResultRawArray
 						                    	id: rowIth.id,
 						                    	name: rowIth.name,
 						                    	description: rowIth.description,
@@ -300,21 +300,26 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 							        // Add each processed image to the region.
 							        var combo = (stripNum + 1) * 10 + i;
-							        // For the tooltip:
+							        // For the tooltip get name from rowIth.name; get more fields from m_searchResultRawArray[stripnum][rowIth.index].*
 							        var tooltip = rowIth.name;
 							        switch(stripNum) {
 							        	case 0:
-							        		// tooltip += ;
+							        		// Core project. Just the name is fine.
 							        		break;
 							        	case 1:
+							        		// My projects. Just the name is fine.
 							        		break;
 							        	case 2:
+							        		// Others' projects.
 							        		break;
 							        	case 3:
+							        		// Products.
 							        		break;
 							        	case 4:
+							        		// Classes.
 							        		break;
 							        	case 5:
+							        		// Online classes.
 							        		break;
 							        }
 							        exceptionRet = m_scISImageStrip[stripNum].addImage(

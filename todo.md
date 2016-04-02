@@ -9,6 +9,7 @@
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
 - Finish buying. 
     + Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) 
+    + Finish tooltip enhancements in OpenProjectDialog.js.
     + Normal class (not online) will require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
     + Use this code to display a Product's video:
     ```
