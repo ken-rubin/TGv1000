@@ -9,8 +9,8 @@
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
 - Finish buying. 
     + Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) 
-    + Normal class will also require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
-    + Use this code to display a Purchasable Product's video:
+    + Normal class (not online) will require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
+    + Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
         <video autoplay loop class="embed-responsive-item">
@@ -21,8 +21,7 @@
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
     + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would enter times in his local timezone. **Important.**
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
-    + Send out an email if some buys a product and doesn't touch it for 2 weeks.
-    + Add class size and validate against it. This would not apply to online classes, only classroom classes.
+    + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     + If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user. **Bug.**

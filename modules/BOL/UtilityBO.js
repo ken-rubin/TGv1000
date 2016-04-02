@@ -478,14 +478,14 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // passOn.projects[3] is Product projects.
                     // passOn.projects[4] is Class projects.
                     // passOn.projects[5] is Online class projects.
-                    // We need to process [4] and [5] separately in (3a) and (3b), respectively.
+                    // We need to process [4] and [5] separately in (4a) and (4b), respectively.
                     function(passOn, cb) {
 
                         console.log("In (4a) with passOn: " + JSON.stringify(passOn));
                         if (req.body.privilegedUser === "0") {
-                            // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
-                            // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
-                            // Any non-qualified are removed from passOn.projects.
+                            // A normal user, retrieving classes, gets only active ones (already handled in the query) and
+                            // only only those starting within 3 months. They also must be within 35 miles of req.body.nearZip.
+                            // Any non-qualified are removed from passOn.projects[4].
 
                             var today = new Date();
 
@@ -563,9 +563,9 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         console.log("In (4b)");
                         if (req.body.privilegedUser === "0") {
-                            // A normal user, retrieving classes or online classes, gets only active ones (already handled in the query) and
-                            // only only those starting within 3 months. For classes (not online) they must be within 35 miles of req.body.nearZip.
-                            // Any non-qualified are removed from passOn.projects.
+                            // A normal user, retrieving online classes, gets only active ones (already handled in the query) and
+                            // only only those starting within 3 months.
+                            // Any non-qualified are removed from passOn.projects[5].
 
                             var today = new Date();
 

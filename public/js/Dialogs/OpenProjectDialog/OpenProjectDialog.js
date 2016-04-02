@@ -300,10 +300,27 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 							        // Add each processed image to the region.
 							        var combo = (stripNum + 1) * 10 + i;
+							        // For the tooltip:
+							        var tooltip = rowIth.name;
+							        switch(stripNum) {
+							        	case 0:
+							        		// tooltip += ;
+							        		break;
+							        	case 1:
+							        		break;
+							        	case 2:
+							        		break;
+							        	case 3:
+							        		break;
+							        	case 4:
+							        		break;
+							        	case 5:
+							        		break;
+							        }
 							        exceptionRet = m_scISImageStrip[stripNum].addImage(
 							        	combo,
 							        	"carousel" + combo.toString(),
-							        	rowIth.name,
+							        	tooltip,
 							        	rowIth.description,
 							        	rowIth.url,
 							        	'ScrollRegionImage',
