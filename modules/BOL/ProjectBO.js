@@ -1272,7 +1272,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // (2a)
                                 function(cb) {
                                     m_log("Going to write project tags");
-                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
+                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.user.userName, project.tags, project.name, 
                                         null,   // this says not to push to project.script
                                         function(err) {
                                             return cb(err);
@@ -1435,7 +1435,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // (3a)
                                 function(cb) {
                                     m_log("Going to write project tags");
-                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.body.userName, project.tags, project.name, 
+                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.user.userName, project.tags, project.name, 
                                         null,   // this says not to push to project.script
                                         function(err) {
                                             return cb(err);
@@ -1843,7 +1843,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     [
                                         // (2a)
                                         function(cb) {
-                                            m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
+                                            m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.user.userName, typeIth.tags, typeIth.name, 
                                                 null,   // This says not to push to project.script
                                                 function(err) { return cb(err); }
                                             );
@@ -2047,7 +2047,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 // (2a)
                                                 function(cb) {
 
-                                                    m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.body.userName, typeIth.tags, typeIth.name, 
+                                                    m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.user.userName, typeIth.tags, typeIth.name, 
                                                         (typeIth.ordinal === 10000 ? passObj.project.script : null),
                                                         function(err) { return cb(err); },
                                                         typeIth.atid
@@ -2213,7 +2213,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         // (1b)
                                         function(cb) {
 
-                                            m_setUpAndWriteTags(connection, res, method.id, 'method', req.body.userName, method.tags, method.name, 
+                                            m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
                                                 (typeIth.ordinal === 10000 ? project.script : null),
                                                 function(err) { return cb(err); },
                                                 '@idm'
