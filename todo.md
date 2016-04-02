@@ -19,7 +19,6 @@
     </div>
     ```
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
-    + When someone buys a PP, make sure to add the buyer's user name as a tag and to remove the original creator's. Is this really the case? I think so, since I didn't see a@a.com as a tag, but he had bought some PPs. **Important**
     + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would enter times in his local timezone. **Important.**
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
     + Send out an email if some buys a product and doesn't touch it for 2 weeks.
