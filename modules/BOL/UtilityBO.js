@@ -6,6 +6,7 @@ var fs = require("fs");
 var jade = require("jade");
 var async = require("async");
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var moment = require("moment");
 var stripe = null;
 var bLocalCredit = true;
 
@@ -487,30 +488,25 @@ module.exports = function UtilityBO(app, sql, logger) {
                             // only only those starting within 3 months. They also must be within 35 miles of req.body.nearZip.
                             // Any non-qualified are removed from passOn.projects[4].
 
-                            var today = new Date();
+                            var mntNow = moment();
 
                             async.eachSeries(passOn.projects[4],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    var class1Date = projectIth.schedule[0].date;
+                                    var strClass1Date = JSON.parse(projectIth.schedule)[0].date;
                                     // This date must exist or the class could not have been made active.
                                     // As must the zipcode used below.
 
-                                    var class1DateDate = new Date(class1Date);
-                                    var diffSeconds = (class1DateDate - today) / 1000;
-                                    if (diffSeconds < 0) {
-                                        // Class was in the past.
+                                    var mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
+                                    if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
+                                        
+                                        // Class started in the past or starts more than 3 months from now.
                                         projectIth.remove = true;
-                                    } else {
-                                        var diffDays = diffSeconds / (24*60*60);
-                                        if (diffDays > 92) {
-                                            // Class is too far out.
-                                            projectIth.remove = true;
-                                        }
-                                    }
+                                        return cb(null);
 
-                                    if (!projectIth.remove) {
+                                    } else {
+
                                         // Class is not disqualified due to start date. We'll do the zipcode distance check.
                                         // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
                                         var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + passOn.zipcode + "/mile";
@@ -548,6 +544,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 },
                                 function(err) {
 
+                                    // err is always null, since in all error cases, we just remove the project.
                                     for (var i = passOn.projects[4].length - 1; i >= 0; i--) {
                                         if (passOn.projects[4][i].remove) {
                                             passOn.projects[4].splice(i, 1);
@@ -567,32 +564,27 @@ module.exports = function UtilityBO(app, sql, logger) {
                             // only only those starting within 3 months.
                             // Any non-qualified are removed from passOn.projects[5].
 
-                            var today = new Date();
+                            var mntNow = moment();
 
                             async.eachSeries(passOn.projects[5],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    var class1Date = projectIth.schedule[0].date;
+                                    var strClass1Date = JSON.parse(projectIth.schedule)[0].date;
                                     // This date must exist or the class could not have been made active.
                                     // As must the zipcode used below.
 
-                                    var class1DateDate = new Date(class1Date);
-                                    var diffSeconds = (class1DateDate - today) / 1000;
-                                    if (diffSeconds < 0) {
-                                        // Class was in the past.
+                                    var mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
+                                    if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
+                                        
+                                        // Class started in the past or starts more than 3 months from now.
                                         projectIth.remove = true;
-                                    } else {
-                                        var diffDays = diffSeconds / (24*60*60);
-                                        if (diffDays > 92) {
-                                            // Class is too far out.
-                                            projectIth.remove = true;
-                                        }
                                     }
                                     return cb(null);
                                 },
                                 function(err) {
 
+                                    // err is always null.
                                     for (var i = passOn.projects[5].length - 1; i >= 0; i--) {
                                         if (passOn.projects[5][i].remove) {
                                             passOn.projects[5].splice(i, 1);
