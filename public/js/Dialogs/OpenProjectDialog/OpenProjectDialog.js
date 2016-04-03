@@ -285,6 +285,17 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 								}
 						    } else {
 
+								if (!Number.prototype.dollarFormat) {
+									Number.prototype.dollarFormat = function() {
+										if (!isNaN(this)) {
+											var n = this < 0 ? true : false,
+												a = (n ? this * -1 : this).toFixed(2).toString().split("."),
+												b = a[0].split("").reverse().join("").replace(/.{3,3}/g, "$&,").replace(/\,$/, "").split("").reverse().join("");
+											return((n ? "(" : "") + "$" + b + "." + a[1] + (n ? ")" : ""));
+										}
+									};
+								}
+
 					    		var strJ = stripNum.toString();
 							    $("#ISWellMsg" + strJ).css("display", "none");
 							    $("#IStoolstriprow" + strJ).css("display", "block");
@@ -300,7 +311,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 							        // Add each processed image to the region.
 							        var combo = (stripNum + 1) * 10 + i;
-							        // For the tooltip get name from rowIth.name; get more fields from m_searchResultRawArray[stripnum][rowIth.index].*
+							        // For the tooltip get name from rowIth.name; get more fields from m_searchResultRawArray[stripNum][rowIth.index].*
 							        var tooltip = rowIth.name;
 							        switch(stripNum) {
 							        	case 0:
@@ -314,12 +325,31 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		break;
 							        	case 3:
 							        		// Products.
+							        		tooltip = "<b>" + tooltip + "</b>"
+							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
+							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
 							        		break;
 							        	case 4:
 							        		// Classes.
+							        		tooltip = "<b>" + tooltip + "</b>"
+							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
+							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
+							        				+ "<br>First class: " + "Sunday, April 16"
+							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
 							        		break;
 							        	case 5:
 							        		// Online classes.
+							        		tooltip = "<b>" + tooltip + "</b>"
+							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
+							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
+							        				+ "<br>First class: " + "Sunday, April 16"
+							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
 							        		break;
 							        }
 							        exceptionRet = m_scISImageStrip[stripNum].addImage(
