@@ -333,22 +333,38 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		break;
 							        	case 4:
 							        		// Classes.
+							        		var strFirstClass;
+							        		var mntFirstClass = moment(JSON.parse(m_searchResultRawArray[stripNum][rowIth.index].schedule)[0].date, 'YYYY-MM-DD');
+							        		// mntFirstClass has to be good for a non-priv user, but it may be invalid if the class is still being set up. So handle that.
+							        		if (mntFirstClass.isValid()) {
+							        			strFirstClass = mntFirstClass.format('dddd, MMMM Do YYYY');
+							        		} else {
+							        			strFirstClass = 'n/a';
+							        		}
 							        		tooltip = "<b>" + tooltip + "</b>"
 							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
 							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
-							        				+ "<br>First class: " + "Sunday, April 16"
+							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
 							        		break;
 							        	case 5:
 							        		// Online classes.
+							        		var strFirstClass;
+							        		var mntFirstClass = moment(JSON.parse(m_searchResultRawArray[stripNum][rowIth.index].schedule)[0].date, 'YYYY-MM-DD');
+							        		// mntFirstClass has to be good for a non-priv user, but it may be invalid if the class is still being set up. So handle that.
+							        		if (mntFirstClass.isValid()) {
+							        			strFirstClass = mntFirstClass.format('dddd, MMMM Do YYYY');
+							        		} else {
+							        			strFirstClass = 'n/a';
+							        		}
 							        		tooltip = "<b>" + tooltip + "</b>"
 							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
 							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
-							        				+ "<br>First class: " + "Sunday, April 16"
+							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
 							        		break;
 							        }
