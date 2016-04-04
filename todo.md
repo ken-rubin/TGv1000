@@ -7,9 +7,11 @@
 ## Jerry's Issues
 ### Do not depend on Ken's rework
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
+- Update nodemailer npm module. We're at 0.7.1. It's up to 2.3.0. There may be breaking changes.
+- Update multer npm module. We're at 0.1.8. It's up to 1.1.0. There may be breaking changes.
+- Install and use node-schedule to create a nightly node-based chron job to send auto-emails regarding upcoming classes, etc. See below for some details.
 - Finish buying. 
     + Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) 
-    + Finish tooltip enhancements in OpenProjectDialog.js.
     + Normal class (not online) will require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user if it is already full and ask if he wants to get on a waiting list.
     + Use this code to display a Product's video:
     ```
@@ -20,7 +22,6 @@
     </div>
     ```
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
-    + Save class date/times with timezone (or in UTC) and convert to user's timezone in BuyDialog. Privileged user would enter times in his local timezone. **Important.**
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
     + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
@@ -33,14 +34,15 @@
     + AdminZone functionality
         + User maintenance
         + Usergroup maintenance
-        + Purchasable Project active flag
-        + Ability to make projects public
+        + Purchasable Project active setting--will need class date/time validation.
+        + Ability to make projects public, unquarantined, etc.
 - Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
 
 ### Can wait till Ken integrates
+- Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
