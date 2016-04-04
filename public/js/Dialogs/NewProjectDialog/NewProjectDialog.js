@@ -298,7 +298,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
 						} else if (m_bProductProject) {
@@ -309,7 +309,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
 						}
@@ -503,7 +503,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											if (str.length) { 
 												arrWhen.push(m_funcWhenProcess(str)); 
 											} else {
-												arrWhen.push({ date: '', from: '', thru: ''});
+												arrWhen.push({ date: '', duration: 0});
 											}
 										}
 										var strLevel = $("#Level option:selected").text();
@@ -570,7 +570,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											if (str.length) { 
 												arrWhen.push(m_funcWhenProcess(str)); 
 											} else {
-												arrWhen.push({ date: '', from: '', thru: ''});
+												arrWhen.push({ date: '', duration: 0});
 											}
 										}
 										var strLevel = $("#Level option:selected").text();
@@ -610,23 +610,32 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					// Takes a when string of form 2016/02/01.........19:00.-.19:55 and
-					// returns { date: '2016/02/01', from: '19:00', thru: '19:55'}.
-					// Incompletes and incorrects are set to ''.
+					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55 
+					// Below assumes user is in EST: UTC-5:00.
+					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
+					// 		date is start time in UTC.
+					// 		duration is in ms, inclusive (i.e., this example is 56 minutes long).
+					// If any parts (date, from, thru) are missing or invalid, returns { date: '', duration: 0}.
+					// Due to masking, we can have only numbers, but we can have numbers out of range, etc. (Like 34:00 - 51:00.)
 					var m_funcWhenProcess = function(strWhen) {
 
-						var strDate = '';
-						var strFrom = '';
-						var strThru = '';
-						var l = strWhen.length;
-						if (l >= 10)
-							strDate = strWhen.substring(0, 10);
-						if (l >= 24)
-							strFrom = strWhen.substring(19, 24);
-						if (l >= 32)
-							strThru = strWhen.substring(27, 32);
+						var strDate = strWhen.substring(0, 10);		// Let substring return junky results if strWhen is of insufficient length.
+						var strFrom = strWhen.substring(19, 24);
+						var strThru = strWhen.substring(27, 32);
 
-						return { date: strDate, from: strFrom, thru: strThru};
+						var mntHypo1 = moment('2016-01-01T' + strFrom);	// to check validity of strFrom
+						var mntHypo2 = moment('2016-01-01T' + strThru);	// to check validity of strThru
+						var mntDate = moment(strDate, "YYYY-MM-DD");	// to check validty of strDate
+						var bValidMntDate = mntDate.isValid();
+						var bValidMntHypo1 = mntHypo1.isValid();
+						var bValidMntHypo2 = mntHypo2.isValid();
+
+						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2 && mntHypo2.isAfter(mntHypo1)) {
+							var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
+							return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
+						}
+
+						return { date: '', duration: 0};
 					}
 
 					// 3 functions to handle the Image changing link clicks.

@@ -196,7 +196,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
 							$("#ProjectDescription").val(m_clProject.data.specialProjectData.classData.classDescription);
@@ -220,11 +220,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];
-								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
-									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
-									$("#When" + i).val(when);
-								}
+								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
 							if(m_clProject.data.specialProjectData.classData.level.length > 0) {
@@ -296,7 +293,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("9999/99/99         99:99 - 99:99")
+									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
 							$("#ProjectDescription").val(m_clProject.data.specialProjectData.onlineClassData.classDescription);
@@ -306,11 +303,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.onlineClassData.schedule[i-1];
-								if (whenIth.date.length > 0 || whenIth.from.length > 0 || whenIth.thru.length > 0) {
-									var when = (whenIth.date + '          ').substr(0,10) + '         ' + (whenIth.from + '     ').substr(0,5) + '   ' + (whenIth.thru + '     ').substr(0,5);
-									$("#When" + i).val(when);
-								}
+								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
 							if(m_clProject.data.specialProjectData.onlineClassData.level.length > 0) {
@@ -337,6 +331,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						}
 
 						$("#TheFieldset").prop("disabled", true);
+					}
+
+					var m_getWhenString = function(whenIth) {
+
+						// whenIth is JS object of form { date: 'utc datetime of class start', duraction: in ms}.
+						// date could be ''. Duration could be 0. If one of them is, so is the other.
+						// If non-empty, return string like '2016/02/01.........20:00.-.20:55' in user's timezone.
+						// If empty, return ''.
+						if (date.length === 0) { return ''; }
+
+						var mntDate = moment(whenIth.date).local();
+						var strDate = mntDate.format('YYYY-MM-DD');
+						var strFrom = mntDate.format('HH:mm');
+						var mntEndDate = mntDate.add(whenIth.duration - 60000, 'ms');
+						var strThru = mntEndDate.format('HH:mm');
+						return strDate + '         ' + strFrom + ' - ' + strThru;
 					}
 
 					var m_functionValCCFields = function() {
