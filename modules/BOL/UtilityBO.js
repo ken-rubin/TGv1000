@@ -98,7 +98,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                 {
                     source: req.body.token,
                     currency: "usd",
-                    amount: parseFloat(req.body.dAmount) * 100,    // amount in cents!
+                    amount: Math.round(parseFloat(req.body.dAmount) * 100),    // amount in cents!
                     description: req.body.descriptionForReceipt,
                     receipt_email: req.user.userName,
                     statement_descriptor: req.body.statementDescriptor
@@ -401,10 +401,10 @@ module.exports = function UtilityBO(app, sql, logger) {
                             // Classes
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                             // Online classes

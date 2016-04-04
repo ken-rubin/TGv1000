@@ -313,7 +313,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						// date could be ''. Duration could be 0. If one of them is, so is the other.
 						// If non-empty, return string like '2016/02/01.........20:00.-.20:55' in user's timezone.
 						// If empty, return ''.
-						if (date.length === 0) { return ''; }
+						if (whenIth.date.length === 0) { return ''; }
 
 						var mntDate = moment(whenIth.date).local();
 						var strDate = mntDate.format('YYYY-MM-DD');
