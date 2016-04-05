@@ -7,15 +7,23 @@
 ## Jerry's Issues
 ### Do not depend on Ken's rework
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
-- npm major updates (possible breaking changes):
-    + Update multer npm module. We're at 0.1.8. It's up to 1.1.0.
-        + Test image (multer) stuff now that I've put JWT in the middle.
-- Finish programming the use of node-schedule to create a 1am cron job to send emails regarding upcoming classes, etc. See below for some details.
-    + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
++ Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
+    + Test image (multer) upload now that I've put JWT in the middle of its route handler.
+- Finish programming the use of node-schedule to create a 1AM cron job to send emails regarding upcoming classes, etc. See below for some details. **Needs testing**
+    + Send out email with class info, login info (for online classes), etc. 7 days before a class or online class starts. Class might be done. Online class needs work.
     + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
 - Finish buying. 
-    + Need to add a couple of new fields to the PPs snippets: imageId to all 3; videoURL to productData. Both will require a searching system. (Not sure about the need for imageId.) 
-    + Normal class (not online) will require a max class size to be checked against purchases. It would be best also to check this when the project is opened in BuyDialog and to tell the user (both in tooltip and on BuyDialog) if it is already full and ask if he wants to get on a waiting list. A waiting list adds another wrinkle: user shouldn't have to pay until accepted.
+    + Need to add a couple of new fields to the specialProjectData class snippets and db tables.
+        + Products: 
+            + imageId (maybe)
+            + videoId (maybe)
+        + Classes: 
+            + max class size
+            + imageId (maybe)
+            + some computers available for student use
+        + Online classes:
+            + imageId (maybe)
+    + Normal class (not online) will require its max class size to be checked against purchased spots. It would be best to retrieve this in Search and display in the tooltip (highly highlighted). Then take user to waitlist dialog, not Buy Dialog if they want to get on the wait list.
     + Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -25,19 +33,23 @@
     </div>
     ```
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
-    + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we do know now in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
+    + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     + If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
     + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user. **Bug.**
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
-- Administrative stuff
-    + AdminZone functionality
-        + User maintenance
-        + Usergroup maintenance
-        + Purchasable Project active setting--will need class date/time validation.
-        + Ability to make projects public, unquarantined, etc.
-- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
+- AdminZone functionality
+    - User maintenance
+    - Kill the comics dialog that's there now.
+    - Usergroup maintenance
+    - Purchasable Project active setting--will need class date/time validation:
+        - Any date that's entered must be a valid date.
+        - Any date must have from/to times.
+        - No gaps allowed.
+        - Dates must be in ascending order--be careful about two classes happening on the same day.
+    - Ability to make projects public, unquarantined, etc.
+* Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
