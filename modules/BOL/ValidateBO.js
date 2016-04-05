@@ -196,13 +196,11 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         console.log(JSON.stringify(profile));
 
-                        var smtpTransport = nodemailer.createTransport("SMTP", {
-                        
-                            service: "Gmail",
-                            auth: {
-                            
-                                user: "techgroms@gmail.com",
-                                pass: "Albatross!1"
+                        var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
+
+                        smtpTransport.verify(function(err, success) {
+                            if (err) {
+                                return cb(new Error("Error setting up transport for enrollment email: " + err), null);
                             }
                         });
 
@@ -230,7 +228,6 @@ module.exports = function ValidateBO(app, sql, logger) {
                         smtpTransport.sendMail(mailOptions, function(error, response){
                         
                             if (error) {
-                            
                                 return cb(new Error("Error sending enrollment email: " + error.toString()), null);
                             }
 
@@ -316,13 +313,11 @@ module.exports = function ValidateBO(app, sql, logger) {
                         // Compose and send the email.
                         try {
 
-                            var smtpTransport = nodemailer.createTransport("SMTP", {
-                            
-                                service: "Gmail",
-                                auth: {
-                                
-                                    user: "techgroms@gmail.com",
-                                    pass: "Albatross!1"
+                            var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
+
+                            smtpTransport.verify(function(err, success) {
+                                if (err) {
+                                    return cb(new Error("Error setting up transport for password reset email: " + err), null);
                                 }
                             });
 

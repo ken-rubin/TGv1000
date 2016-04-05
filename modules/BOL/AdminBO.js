@@ -10,6 +10,9 @@ module.exports = function AdminBO(app, sql, logger) {
     self.dbname = app.get("dbname");
 
     // Create reusable transport method (opens pool of SMTP connections).
+    //
+    // THE FOLLOWING HAS CHANGED WITH nodemailer@2.3.0. SEE OTHER USERS FOR INFO.
+    //
     // self.smtpTransport = nodemailer.createTransport("SMTP", {
     
     //     service: "Gmail",

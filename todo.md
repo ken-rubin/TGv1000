@@ -8,10 +8,9 @@
 ### Do not depend on Ken's rework
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
 - npm major updates (possible breaking changes):
-    + Update nodemailer npm module. We're at 0.7.1. It's up to 2.3.0.
     + Update multer npm module. We're at 0.1.8. It's up to 1.1.0.
         + Test image (multer) stuff now that I've put JWT in the middle.
-- Install and use node-schedule to create a nightly node-based chron job to send auto-emails regarding upcoming classes, etc. See below for some details.
+- Finish programming the use of node-schedule to create a 1am cron job to send emails regarding upcoming classes, etc. See below for some details.
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
     + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
 - Finish buying. 
