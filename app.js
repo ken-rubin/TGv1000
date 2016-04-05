@@ -190,6 +190,11 @@ var Logger = require("./modules/Logger");
 var logger = new Logger(app, sql);
 
 /////////////////////////////////////
+console.log("Set up cron job.");
+var Cron = require("./modules/Cron");
+var cron = new Cron(app, sql, logger);
+
+/////////////////////////////////////
 console.log("Set up multer.");
 var multer = require("multer");
 var done = false;

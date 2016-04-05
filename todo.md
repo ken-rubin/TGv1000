@@ -7,8 +7,10 @@
 ## Jerry's Issues
 ### Do not depend on Ken's rework
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
-- Update nodemailer npm module. We're at 0.7.1. It's up to 2.3.0. There may be breaking changes.
-- Update multer npm module. We're at 0.1.8. It's up to 1.1.0. There may be breaking changes.
+- npm major updates (possible breaking changes):
+    + Update nodemailer npm module. We're at 0.7.1. It's up to 2.3.0.
+    + Update multer npm module. We're at 0.1.8. It's up to 1.1.0.
+        + Test image (multer) stuff now that I've put JWT in the middle.
 - Install and use node-schedule to create a nightly node-based chron job to send auto-emails regarding upcoming classes, etc. See below for some details.
     + Send out email with class or product info reminder, login info (for online classes), etc. Send out another email 5 days before a class or online class starts. 
     + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
@@ -30,7 +32,6 @@
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user. **Bug.**
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
-- Test image (multer) stuff now that I've put JWT in the middle.
 - Administrative stuff
     + AdminZone functionality
         + User maintenance
