@@ -96,7 +96,9 @@ module.exports = function ValidateBO(app, sql, logger) {
     self.routeNewEnrollment = function (req, res) {
         // req.body.userName -- user email address
         // req.body.firstName
-        // req.body.lastName
+        // req.body.lastName,
+        // req.body.zipcode
+        // req.body.timezone
 
         try {
         
@@ -111,7 +113,8 @@ module.exports = function ValidateBO(app, sql, logger) {
                         userName: req.body.userName,
                         firstName: req.body.firstName,
                         lastName: req.body.lastName,
-                        zipcode: req.body.zipcode
+                        zipcode: req.body.zipcode,
+                        timezone: req.body.timezone
                     };
                     
                     var exceptionRet = sql.execute("select count(*) as cnt from " + self.dbname + "user where userName='" + profile.userName + "';",
@@ -160,7 +163,7 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                             } else {
 
-                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,zipcode,pwHash,usergroupId) values (" + mysql.escape(profile.userName) + "," + mysql.escape(profile.firstName) + "," + mysql.escape(profile.lastName) + ",'" + profile.zipcode + "'," + mysql.escape(hash) + "," + usergroupId + ");",
+                                var exceptionRet = sql.execute("insert " + self.dbname + "user (userName,firstName,lastName,zipcode,pwHash,usergroupId,timezone) values (" + mysql.escape(profile.userName) + "," + mysql.escape(profile.firstName) + "," + mysql.escape(profile.lastName) + ",'" + profile.zipcode + "'," + mysql.escape(hash) + "," + usergroupId + "," + mysql.escape(profile.timezone) + ");",
                                     function(rows){
 
                                         if (rows.length === 0) {

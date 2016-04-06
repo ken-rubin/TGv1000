@@ -6,7 +6,7 @@
 var schedule = require("node-schedule");
 var async = require("async");
 var nodemailer = require("nodemailer");
-var moment = require("moment");
+var moment = require("moment-timezone");
 
 module.exports = function Cron(app, sql, logger) {
 

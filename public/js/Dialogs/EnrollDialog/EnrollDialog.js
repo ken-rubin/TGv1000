@@ -97,6 +97,9 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
+
+							m_strTimeZone = tzdetect.matches()[0];	// An approximation of user's timezone to be stored in user table and used in cron email job.
+
 							// focus
 							$("#email").focus();
 							$("#email").keyup(m_setStatePrimaryBtn);
@@ -145,7 +148,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 													userName: m_email,
 													firstName: m_first,
 													lastName: m_last,
-													zipcode: m_zipcode
+													zipcode: m_zipcode,
+													timezone: m_strTimeZone
 												}, 
 												'json');
         					posting.done(function(data){
@@ -227,6 +231,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 				var m_first;
 				var m_last;
 				var m_zipcode;
+				var m_strTimeZone;
 			};
 
 			// Return the constructor function as the module object.

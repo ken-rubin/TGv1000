@@ -12,6 +12,8 @@
 - Finish programming the use of node-schedule to create a 1AM cron job to send emails regarding upcoming classes, etc. See below for some details. **Needs testing**
     + Send out email with class info, login info (for online classes), etc. 7 days before a class or online class starts. Class might be done. Online class needs work.
     + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
+    + Add 2 datetime fields to projects table: firstSaved and lastSaved. (Done) Write to them in ProjectBO. Use them (at least for now) for the untouched product email.
+- Capture user's timezone at enrollment. Save in user table, of course.
 - Finish buying. 
     + Need to add a couple of new fields to the specialProjectData class snippets and db tables.
         + Products: 
@@ -59,7 +61,7 @@
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down.
+- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down. **TypeWell is probably a thing of the past.**
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Save place (like for student working in a project) and jump right back to it if the user signs in again.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**

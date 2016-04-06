@@ -4,14 +4,13 @@ delimiter //
 /* */
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-/**/
- 
+/* */
 
 USE TGv1000//
 SELECT database()//
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/**/
+/* */
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -46,7 +45,7 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
-/**/
+/* */
 
 create procedure maintainDB()
 begin
@@ -92,6 +91,8 @@ begin
           `isCoreProject` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isProduct` TINYINT(1) NOT NULL DEFAULT FALSE,
           `isClass` TINYINT(1) NOT NULL DEFAULT FALSE,
+		  `firstSaved` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		  `lastSaved` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  PRIMARY KEY (`id`),
           INDEX idx_ownedByUserId (ownedByUserId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -122,6 +123,7 @@ begin
           `zip` VARCHAR(10),
           `schedule` JSON,
 		  `active` tinyint(1) DEFAULT FALSE,
+		  `classNotes` TEXT NULL DEFAULT NULL,
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
@@ -135,6 +137,7 @@ begin
           `imageId` int(11) NOT NULL DEFAULT '0',
           `price` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
           `active` TINYINT(1) NOT NULL DEFAULT FALSE,
+		  `videoURL` VARCHAR(255) NOT NULL DEFAULT '',
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
@@ -350,10 +353,12 @@ begin
 		  `lastName` VARCHAR(45) NOT NULL,
 		  `pwHash` VARCHAR(16000) NOT NULL,
           `usergroupId` INT(11) NOT NULL,
+          `zipcode` CHAR(5) NOT NULL,
+          `timezone` MEDIUMTEXT NOT NULL,
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-        INSERT INTO `TGv1000`.`user` (`id`,`userName`,`firstName`,`lastName`,`pwHash`,`usergroupId`) VALUES (1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1);
+        INSERT INTO `TGv1000`.`user` (`id`,`userName`,`firstName`,`lastName`,`pwHash`,`usergroupId`,`zipcode`,`timezone`) VALUES (1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1,'10601','America/New_York');
             
 		insert TGv1000.propertyTypes (id,description) values (1,'Number');
 		insert TGv1000.propertyTypes (id,description) values (2,'Number range (e.g., 3-27)');
@@ -564,34 +569,6 @@ begin
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,6);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (4,5);
 
-        UPDATE `TGv1000`.`control` set dbstate=1 where id=1;
-		set @dbstate := 1;
-    end if;
-
-    if @dbstate = 1 THEN
-
-    	-- In which we prepare for the new form of comics that are actual an array of steps to be carried 
-    	-- out by our AI.
-
-        UPDATE `TGv1000`.`control` set dbstate=2 where id=1;
-		set @dbstate := 2;
-    end if;
-
-    if @dbstate = 2 THEN
-
-    	-- In which we switch to the state where comics are not saved with each project.
-    	-- There is only one set of comics for all projects derived from a single project type.
-    	-- Types will now point to project.
-    	-- We will have a junction table to link projects with comics.
-
-
-
-        UPDATE `TGv1000`.`control` set dbstate=3 where id=1;
-		set @dbstate := 3;
-    end if;
-    
-    if @dbstate = 3 THEN
-    
 		ALTER TABLE `tgv1000`.`projects` 
 		ADD COLUMN `isOnlineClass` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isClass`;
         
@@ -609,18 +586,13 @@ begin
           `price` DECIMAL(9,2) DEFAULT 0.00,
           `schedule` JSON,
 		  `active` tinyint(1) DEFAULT FALSE,
+		  `classNotes` TEXT NULL DEFAULT NULL,
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
    		INSERT TGv1000.permissions (`id`, `description`) VALUES (9, 'can_create_onlineClasses');
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,9);
         
-        UPDATE `TGv1000`.`control` set dbstate=4 where id=1;
-		set @dbstate := 4;
-    end if;
-    
-    if @dbstate = 4 THEN
-
         ALTER TABLE `TGv1000`.`classes`
 			ADD CONSTRAINT FK_project_classes
             FOREIGN KEY (baseProjectId) REFERENCES projects(id)
@@ -641,61 +613,15 @@ begin
             FOREIGN KEY (comicId) REFERENCES comics(id)
             ON DELETE CASCADE;
 
-		UPDATE control set dbstate=5 where id=1;
-        set @dbstate := 5;
-    end if;
-    
-    if @dbstate = 5 THEN
-
-		ALTER TABLE `tgv1000`.`classes` 
-			ADD COLUMN `classNotes` TEXT NULL DEFAULT NULL AFTER `active`;
-
-		UPDATE control set dbstate=6 where id=1;
-        set @dbstate := 6;
-    end if;
-
-    if @dbstate = 6 THEN
-
-		ALTER TABLE `tgv1000`.`onlineclasses` 
-			ADD COLUMN `classNotes` TEXT NULL DEFAULT NULL AFTER `active`;
-
-		UPDATE control set dbstate=7 where id=1;
-        set @dbstate := 7;
-    end if;
-    
-    if @dbstate = 7 THEN
-
-		ALTER TABLE `tgv1000`.`products` 
-			ADD COLUMN `videoURL` VARCHAR(255) NOT NULL DEFAULT '' AFTER `active`;
-    
-		UPDATE control set dbstate=8 where id=1;
-        set @dbstate := 8;
-    end if;
-    
-    if @dbstate = 8 THEN
-
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/ProcessCharge','post','routeProcessCharge',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
     
-		UPDATE control set dbstate=9 where id=1;
-        set @dbstate := 9;
-    end if;
-
-    if @dbstate = 9 THEN
-
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetStripePK','post','routeGetStripePK',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
     
-		UPDATE control set dbstate=10 where id=1;
-        set @dbstate := 10;
+		UPDATE control set dbstate=1 where id=1;
+        set @dbstate := 1;
     end if;
 
-    if @dbstate = 10 THEN
 
-		ALTER TABLE `tgv1000`.`user` 
-		ADD COLUMN `zipcode` CHAR(5) NOT NULL AFTER `usergroupId`;
-    
-		UPDATE control set dbstate=11 where id=1;
-        set @dbstate := 11;
-    end if;
 
 end//
 

@@ -6,7 +6,7 @@ var fs = require("fs");
 var jade = require("jade");
 var async = require("async");
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-var moment = require("moment");
+var moment = require("moment-timezone");
 var stripe = null;
 var bLocalCredit = true;
 
