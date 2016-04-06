@@ -27,7 +27,7 @@ module.exports = function Cron(app, sql, logger) {
 					// These are the emails we need to send:
 					// (1) Class someone has registered and paid for has first class one week from today.
 					// (2) Online class someone has registered and paid for has first class one week from today.
-					// (3) Someone bought a Product two weeks ago and hasn't touched it. (How to know?) "Do you need help?"
+					// (3) Someone bought a Product two weeks ago and hasn't touched it. "Do you need help?"
 
 					async.series(
 						[
@@ -248,17 +248,13 @@ module.exports = function Cron(app, sql, logger) {
 													                            subject: "Your nextwavecoders.com class is coming up", // Subject line
 													                            text: "Hi, " + userIth.firstName + ". " +
 													                            "This is a reminder that the online coding class you signed up for will have its first session in one week, " +
-													                            "on " + when + ". The class takes place at " + classIth.facilty + ", Room " + classIth.room + ", " + classIth.address + ", " + classIth.city +
-													                            ", " + classIth.state + " " + classIth.zip + "." +
-													                            "\r\n\r\nIf you don't have a wifi-capable computer or tablet, please let us know as soon as possible by calling " + classIth.instructorPhone + "." +
-													                            "\r\n\r\nWe sincerely look forward to seeing you at " + classIth.name + "." +
+													                            "on " + when + "." +
+													                            // Add in URL, etc.
    													                            "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
 													                            html: "Hi, " + userIth.firstName + ". " +
 													                            "This is a reminder that the coding class you signed up for will have its first session in one week, " +
-													                            "on " + when + ". The class takes place at " + classIth.facilty + ", Room " + classIth.room + ", " + classIth.address + ", " + classIth.city +
-													                            ", " + classIth.state + " " + classIth.zip + "." +
-													                            "<br><br>If you don't have a wifi-capable computer or tablet, please let us know as soon as possible by calling " + classIth.instructorPhone + "." +
-													                            "<br><br>We sincerely look forward to seeing you at " + classIth.name + "." +
+													                            "on " + when + "." +
+													                            // Add URL, etc.
    													                            "<br><br><br><br>Warm regards, The nextwavecoders Team"
 													                        };
 
@@ -273,7 +269,6 @@ module.exports = function Cron(app, sql, logger) {
 													                            //smtpTransport.close(); // shut down the connection pool, no more messages
 
 													                            return cb(null);
-
 													                        });
 																		} catch(e) {
 																			return cb(e);
@@ -307,8 +302,121 @@ module.exports = function Cron(app, sql, logger) {
 							},
 							// (3) Untouched Products.
 							function(cb) {
-								// Not implemented yet.
-								return cb(null);
+
+								try {
+
+									async.waterfall(
+										[
+											// Retrieve id of all active base projects that are Products.
+											function(cb) {
+												var strQuery = "select baseProjectId from " + self.dbname + "products where active=1;";
+												sql.execute(strQuery,
+													function(rows) {
+														return cb(null, { projectIds: rows });
+													},
+													function(strError) {
+														return cb(new Error(strError), null);
+													}
+												);
+											},
+											// Construct an idString out of passOn.projectIds; retrieve all projects (where isProduct=0) in idString.
+											function(passOn, cb) {
+												var idString = '';
+						                        for (var i = 0; i < passOn.projectIds.length; i++) {
+
+						                            if (i > 0) {
+
+						                                idString = idString + ',';
+						                            }
+
+						                            idString = idString + passOn.projectIds[i].baseProjectId.toString();
+						                        }
+
+						                        var strQuery = "select * from " + self.dbname + "projects p inner join " + self.dbname + "user u on u.id = p.ownedByUserId where p.isProduct=0;";
+						                        sql.execute(strQuery,
+						                        	function(rows) {
+						                        		passOn.projectsUsers = rows;
+						                        		return cb(null, passOn);
+						                        	},
+													function(strError) {
+														return cb(new Error(strError), null);
+													}
+						                        );
+											},
+											// Check dates of passOn.projectsUsers to see if an email needs to be sent.
+											function(passOn, cb) {
+
+												async.eachSeries(passOn.projectsUsers,
+													function(projectUserIth, cb) {
+
+														try {
+															
+															// We have all the information to figure out if we need to send a Help? email to the user in projectUserIth.
+															var momFirstSaved = moment(projectUserIth.firstSaved);
+															var momLastSaved = moment(projectUserIth.lastSaved);
+
+															if (momLastSaved.diff(momFirstSaved, 'days') !== 14) {
+																// No email.
+																return cb(null);
+															}
+
+															// Send an email.
+									                        var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
+
+									                        smtpTransport.verify(function(err, success) {
+									                            if (err) {
+									                                return cb(new Error("Error setting up transport for 14-day product ignore email: " + err), null);
+									                            }
+									                        });
+
+									                        // setup email data with unicode symbols
+									                        var mailOptions = null;
+
+									                        var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
+									                        var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
+									                        mailOptions = {
+									                 
+									                            from: "TechGroms <techgroms@gmail.com>", // sender address
+									                            to: (!aORz) ? userIth.userName : 'jerry@rubintech.com', // list of receivers -- eventually add ken and john
+									                            subject: "We see you haven't gotten to your newwavecoders project in 2 weeks", // Subject line
+									                            text: "Hi, " + userIth.firstName + ". " +
+									                            // Add in stuff, etc.
+										                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+									                            html: "Hi, " + userIth.firstName + ". " +
+									                            // Add stuff, etc.
+										                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+									                        };
+
+									                        // send mail with defined transport object
+									                        smtpTransport.sendMail(mailOptions, function(error, response){
+									                        
+									                            if (error) {
+									                                return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
+									                            }
+
+									                            // If you don't want to use this transport object anymore, uncomment following line
+									                            //smtpTransport.close(); // shut down the connection pool, no more messages
+
+									                            return cb(null);
+
+									                        });
+
+														} catch(e) {
+															return cb(e);
+														}
+													}
+												);
+											}
+										],
+										// Inner async.waterfall final function.
+										function(err, passOn) {
+											return cb(err);
+										}
+									);
+
+								} catch(e) {
+									return cb(e);
+								}
 							}
 						],
 						// Outer async.series final function.

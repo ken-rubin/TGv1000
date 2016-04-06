@@ -98,7 +98,8 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
 
-							m_strTimeZone = tzdetect.matches()[0];	// An approximation of user's timezone to be stored in user table and used in cron email job.
+							moment.locale("en");
+							m_strTimeZone = moment.tz.guess();	// An approximation of user's timezone to be stored in user table and used in cron email job.
 
 							// focus
 							$("#email").focus();

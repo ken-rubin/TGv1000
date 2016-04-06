@@ -5,6 +5,7 @@
 var fs = require("fs");
 var async = require("async");
 var os = require("os");
+var moment = require("moment-timezone");
 
 module.exports = function ProjectBO(app, sql, logger) {
 
@@ -98,6 +99,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isProduct: (row.isProduct === 1 ? true : false),
                             isClass: (row.isClass === 1 ? true : false),
                             isOnlineClass: (row.isOnlineClass === 1 ? true : false),
+                            firstSaved: row.firstSaved,
+                            lastSaved: row.lastSaved,
                             comics:
                             {
                                 items: []
@@ -1118,7 +1121,7 @@ module.exports = function ProjectBO(app, sql, logger) {
     // Saving consists of deleting the old project (cascaded throughout) then then inserting it
     // using saveAs processing. It WILL change the project's id aong with ids of every part of the project.
     //
-    // If saving project with same id as another of user's projects with same name, then save.
+    // If saving project with same id as another of user's project with same name, then save.
     // A fallthrough case: If saving own project with same id and name then save.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1236,8 +1239,16 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
                             isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
                             isCoreProject: (project.isCoreProject ? 1 : 0),
-                            comicProjectId: project.comicProjectId
-                            };
+                            comicProjectId: project.comicProjectId,
+                            lastSaved: (new Date())
+                        };
+
+                        if (project.specialProjectData.openMode === "searched") {
+                            
+                            // Make sure firstSaved isn't changed for this case.
+                            // If we don't do this, then firstSaved won't be passed to MySql and firstSaved will be set = CURRENT_TIMESTAMP (now).
+                            guts.firstSaved = moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss");
+                        }
 
                         var strQuery = "INSERT " + self.dbname + "projects SET ?";
                         m_log('Inserting project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
@@ -1389,8 +1400,10 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
                             isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
                             isCoreProject: (project.isCoreProject ? 1 : 0),
-                            comicProjectId: project.comicProjectId
-                            };
+                            comicProjectId: project.comicProjectId,
+                            firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
+                            lastSaved: (new Date())
+                        };
 
                         var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;
                         m_log('Updating project record with id ' + project.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(guts));

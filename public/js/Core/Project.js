@@ -129,6 +129,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 										// Set up the modified project.
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
+										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
 										client.load_m_clProject(objectData.project);
 
