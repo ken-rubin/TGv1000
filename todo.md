@@ -7,15 +7,12 @@
 ## Jerry's Issues
 ### Do not depend on Ken's rework
 - If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
-+ Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
+- Add lots to navbar menus.
+- Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
     + Test image (multer) upload now that I've put JWT in the middle of its route handler.
-- Finish programming the use of node-schedule to create a 1AM cron job to send emails regarding upcoming classes, etc. See below for some details. **Needs testing**
-    + Send out email with class info, login info (for online classes), etc. 7 days before a class or online class starts. Class might be done. Online class needs work.
-    + Send out an email if someone buys a product and doesn't touch it for 2 weeks.
-    + Add 2 datetime fields to projects table: firstSaved and lastSaved. (Done) Write to them in ProjectBO. Use them (at least for now) for the untouched product email.
-- Capture user's timezone at enrollment. Save in user table, of course.
+- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
 - Finish buying. 
-    + Need to add a couple of new fields to the specialProjectData class snippets and db tables.
+    + Need to add a couple of new fields to the specialProjectData class snippets and db tables. These fields may not appear in BuyDialog--or they may present as buttons (like to view the movie).
         + Products: 
             + imageId (maybe)
             + videoId (maybe)

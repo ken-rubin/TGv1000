@@ -148,37 +148,37 @@ define(["Core/errorHelper"],
 								$("#AdminzoneLI").css("display", "block");
 
 								// Wire Adminzone button click.
-								$("#ComicsButton").click(function () {
+								// $("#ComicsButton").click(function () {
 
-									try {
+								// 	try {
 
-										// Switch to Adminzone.
-										var exceptionRet = client.showComicsDialog();
-										if (exceptionRet) { throw exceptionRet; }
-									} catch (e) {
+								// 		// Switch to Adminzone.
+								// 		var exceptionRet = client.showComicsDialog();
+								// 		if (exceptionRet) { throw exceptionRet; }
+								// 	} catch (e) {
 
-										errorHelper.show(e);
-									}
-								});
+								// 		errorHelper.show(e);
+								// 	}
+								// });
 
 								// Wire special tooltip functionality.
-								$("#ComicsButton").powerTip({ manual: true });
-								$("#ComicsButton").on({
-									mouseenter: function(event) {
+								// $("#ComicsButton").powerTip({ manual: true });
+								// $("#ComicsButton").on({
+								// 	mouseenter: function(event) {
 
-										if ($("#ComicsLI").hasClass("disabled")) {
-											$("#ComicsButton").data('powertip', 'You have to open a project before you can work on comics.');
-											$.powerTip.show(this, event);
-										} else {
-											$("#ComicsButton").data('powertip', '');
-											$.powerTip.hide(this);
-										}
+								// 		if ($("#ComicsLI").hasClass("disabled")) {
+								// 			$("#ComicsButton").data('powertip', 'You have to open a project before you can work on comics.');
+								// 			$.powerTip.show(this, event);
+								// 		} else {
+								// 			$("#ComicsButton").data('powertip', '');
+								// 			$.powerTip.hide(this);
+								// 		}
 
-									},
-									mouseleave: function() {
-										$.powerTip.hide(this);
-									}
-								});
+								// 	},
+								// 	mouseleave: function() {
+								// 		$.powerTip.hide(this);
+								// 	}
+								// });
 							}
 
 							// Wire Play button click.
