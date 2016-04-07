@@ -999,11 +999,11 @@ define(["Core/errorHelper",
 						}
 
 						// Something happened so refresh the navbar.
-						navbar.enableDisableProjectsMenuItems();
+						navbar.enableOrDisableProjAndTypeMenuItems();
 
 						if (g_profile.can_visit_adminzone) {
 
-							navbar.enableDisableAdminZoneMenuItems();
+							navbar.enableOrDisableAminZoneMenuItems();
 						}
 					}
 

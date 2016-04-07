@@ -137,8 +137,8 @@ define(["Core/errorHelper"],
 							$("#CloseProjectButton").click(function () {
 
 								client.unloadProject(function(){ 
-									self.enableDisableProjectsMenuItems(); 
-									self.enableDisableAdminZoneMenuItems(); 
+									self.enableOrDisableProjAndTypeMenuItems(); 
+									self.enableOrDisableAminZoneMenuItems(); 
 								}, true);
 							});
 
@@ -226,7 +226,9 @@ define(["Core/errorHelper"],
 					};
 
 					// A bunch of functions that enable/disable navbar menu items.
-					self.enableDisableProjectsMenuItems = function () {
+					// During the buying process there's a project, but the user must not be allowed to do
+					// anything with it. I believe this handles itself with modal dialogs in the right places.
+					self.enableOrDisableProjAndTypeMenuItems = function () {
 
 						var clProject = client.getProject();
 
@@ -244,15 +246,15 @@ define(["Core/errorHelper"],
 						}
 					}
 
-					self.enableDisableAdminZoneMenuItems = function () {
+					self.enableOrDisableAminZoneMenuItems = function () {
 
 						var clProject = client.getProject();
-						if (clProject !== null) {
-							m_functionEnable("Comics");
-						}
-						else {
-							m_functionDisable("Comics");
-						}
+						// if (clProject !== null) {
+						// 	m_functionEnable("Comics");
+						// }
+						// else {
+						// 	m_functionDisable("Comics");
+						// }
 					}
 
 					// Private methods
