@@ -22,7 +22,6 @@ define(["Core/errorHelper",
 		"Dialogs/NewMethodDialog/NewMethodDialog",
 		"Dialogs/NewPropertyDialog/NewPropertyDialog",
 		"Dialogs/PropertyGrid/PropertyGrid",
-		"Dialogs/ComicsDialog/ComicsDialog",
 		"Dialogs/BuyDialog/BuyDialog",
 		"Core/Project",
 		"Code/Type"],
@@ -43,7 +42,6 @@ define(["Core/errorHelper",
 				NewMethodDialog,
 				NewPropertyDialog,
 				PropertyGrid,
-				ComicsDialog,
 				BuyDialog,
 				Project,
 				Type) {
@@ -276,19 +274,6 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new SaveProjectAsDialog();
-							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showComicsDialog = function() {
-
-						try {
-
-							m_openDialog = new ComicsDialog();
 							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) { throw exceptionRet; }
 

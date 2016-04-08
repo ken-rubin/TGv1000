@@ -36,10 +36,7 @@ define(["Core/errorHelper"],
 										if (exceptionRet) { throw exceptionRet; }
 									}, 
 									true);	// true means to show the Abandon dlg if applicable.
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
+								} catch (e) { errorHelper.show(e); }
 							});
 
 							$("#OpenProjectButton").click(
@@ -122,16 +119,10 @@ define(["Core/errorHelper"],
 							);
 
 							$("#SaveProjectButton").click(function () {
-
 								try {
-
 									var exceptionRet = client.showSaveProjectDialog();
 									if (exceptionRet) { throw exceptionRet; }
-
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
+								} catch (e) { errorHelper.show(e); }
 							});
 
 							$("#CloseProjectButton").click(function () {
@@ -142,26 +133,91 @@ define(["Core/errorHelper"],
 								}, true);
 							});
 
+							$("#NewTypeButton").click(function() {
+								try {
+									var exceptionRet = client.showNewTypeDialog();
+									if (exceptionRet) { throw exceptionRet; }
+								} catch(e) { errorHelper.show(e); }
+							});
+
+							$("#SearchTypeButton").click(function() {
+								try {
+									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
+										try {
+											if (iTypeId > 0) {
+												exceptionRet = client.addTypeToProjectFromDB(iTypeId);
+												if (exceptionRet) { throw exceptionRet; }
+											} else { throw new Error("Invalid type id returned."); }
+										} catch(e) { errorHelper.show(e); }
+									});
+									if (exceptionRet) { throw exceptionRet; }
+								} catch (e) { errorHelper.show(e); }
+							});
+
+							$("#NewMethodButton").click(function() {
+								try {
+									var exceptionRet = client.showNewMethodDialog();
+									if (exceptionRet) { throw exceptionRet; }
+								} catch(e) { errorHelper.show(e); }
+							});
+
+							$("#SearchMethodButton").click(function() {
+								try {
+									var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
+										try {
+											if (iMethodId > 0) {
+												exceptionRet = client.addMethodToTypeFromDB(iMethodId);
+												if (exceptionRet) { throw exceptionRet; }
+											} else { throw new Error("Invalid method id returned."); }
+										} catch(e) { errorHelper.show(e); }
+									});
+									if (exceptionRet) { throw exceptionRet; }
+								} catch (e) { errorHelper.show(e); }
+							});
+
+							$("#NewPropertyButton").click(function() {
+								try {
+									var exceptionRet = client.showNewPropertyDialog();
+									if (exceptionRet) { throw exceptionRet; }
+								} catch(e) { errorHelper.show(e); }
+							});
+
+							$("#NewEventButton").click(function() {
+								try {
+									var exceptionRet = client.showNewEventDialog();
+									if (exceptionRet) { throw exceptionRet; }
+								} catch(e) { errorHelper.show(e); }
+							});
+
 							if (g_profile.can_visit_adminzone) {
 
 								// Show Adminzone button.
 								$("#AdminzoneLI").css("display", "block");
 
-								// Wire Adminzone button click.
-								// $("#ComicsButton").click(function () {
+								$("#UsersButton").click(function() {
 
-								// 	try {
+									// AZUsersDialog is where user maintenance takes place, including usergroup creation, modification
+									// and assignment. Other user maintenance might be forcing a password reset, etc.
 
-								// 		// Switch to Adminzone.
-								// 		var exceptionRet = client.showComicsDialog();
-								// 		if (exceptionRet) { throw exceptionRet; }
-								// 	} catch (e) {
+								});
 
-								// 		errorHelper.show(e);
-								// 	}
-								// });
+								$("#ProjectsButton").click(function() {
 
-								// Wire special tooltip functionality.
+									// AZProjectsDialog is the place for making non-public projects public. Maybe it will also
+									// do Types and Methods. It may also un-quarantine images, videos and sounds.
+
+								});
+
+								$("#ActivatePPButton").click(function() {
+
+									// AZActivatePPDialog is where Purchasable Projects are finalized, activated or de-activated.
+									// This dialog is not meant to load the project for actual maintenance, just the data from the
+									// classes, onlineclasses or products table for editing.
+
+								});
+
+								// This is how to connect enabled/disabled tooltips to menu items:
+								//
 								// $("#ComicsButton").powerTip({ manual: true });
 								// $("#ComicsButton").on({
 								// 	mouseenter: function(event) {
@@ -183,32 +239,19 @@ define(["Core/errorHelper"],
 
 							// Wire Play button click.
 							$("#PlayBtn").click(function () {
-
 								try {
-
 									// Let client handle this.
 									var exceptionRet = client.play();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
+									if (exceptionRet) { throw exceptionRet; }
+								} catch (e) { errorHelper.show(e); }
 							});
 
 							// Wire Play button click.
 							$("#StopBtn").click(function () {
-
 								try {
-
 									// Let client handle this.
 									var exceptionRet = client.stop();
-									if (exceptionRet) {
-
-										throw exceptionRet;
-									}
+									if (exceptionRet) { throw exceptionRet; }
 								} catch (e) {
 
 									errorHelper.show(e);
@@ -219,10 +262,7 @@ define(["Core/errorHelper"],
 
 							return null;
 
-						} catch (e) {
-
-							return e;
-						}
+						} catch (e) { return e; }
 					};
 
 					// A bunch of functions that enable/disable navbar menu items.
@@ -243,18 +283,20 @@ define(["Core/errorHelper"],
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 							m_functionEnable("SaveProject");
+							m_functionEnable("NewType");
+							m_functionEnable("SearchType");
+							m_functionEnable("NewMethod");
+							m_functionEnable("SearchMethod");
+							m_functionEnable("NewProperty");
+							m_functionEnable("NewEvent");
 						}
 					}
 
 					self.enableOrDisableAminZoneMenuItems = function () {
 
-						var clProject = client.getProject();
-						// if (clProject !== null) {
-						// 	m_functionEnable("Comics");
-						// }
-						// else {
-						// 	m_functionDisable("Comics");
-						// }
+						m_functionEnable("Users");
+						m_functionEnable("Projects");
+						m_functionEnable("ActivatePP");
 					}
 
 					// Private methods

@@ -1082,18 +1082,20 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
 
-								if (iTypeId > 0) {
+								try{
+									if (iTypeId > 0) {
 
-									exceptionRet = client.addTypeToProjectFromDB(iTypeId);
+										exceptionRet = client.addTypeToProjectFromDB(iTypeId);
 
-									if (exceptionRet) {
+										if (exceptionRet) {
 
-										throw exceptionRet;
+											throw exceptionRet;
+										}
+									} else {
+
+										throw new Error("Invalid type id returned.");
 									}
-								} else {
-
-									throw new Error("Invalid type id returned.")
-								}
+								} catch(e) { errorHelper.show(e); }
 							});
 							if (exceptionRet) {
 
@@ -1126,18 +1128,20 @@ define(["Core/errorHelper", "Code/Type", "Core/ScrollRegion", "Core/resourceHelp
 
 							var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
 
-								if (iMethodId > 0) {
+								try {
+									if (iMethodId > 0) {
 
-									exceptionRet = client.addMethodToTypeFromDB(iMethodId);
+										exceptionRet = client.addMethodToTypeFromDB(iMethodId);
 
-									if (exceptionRet) {
+										if (exceptionRet) {
 
-										throw exceptionRet;
+											throw exceptionRet;
+										}
+									} else {
+
+										throw new Error("Invalid method id returned.");
 									}
-								} else {
-
-									throw new Error("Invalid method id returned.")
-								}
+								} catch(e) { errorHelper.show(e); }
 							});
 							if (exceptionRet) {
 
