@@ -108,6 +108,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							errorHelper.show(e);
 						}
 					};
+				} catch (e) {
+
+					errorHelper.show(e.message);
+				}
 
 				/////////////////////////////////
 				// Private fields.

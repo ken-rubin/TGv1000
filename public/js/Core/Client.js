@@ -46,6 +46,9 @@ define(["Core/errorHelper",
 				NewPropertyDialog,
 				PropertyGrid,
 				BuyDialog,
+				AZActivatePPDialog,
+				AZUsersDialog,
+				AZProjectsDialog,
 				Project,
 				Type) {
 
