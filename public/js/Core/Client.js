@@ -23,6 +23,9 @@ define(["Core/errorHelper",
 		"Dialogs/NewPropertyDialog/NewPropertyDialog",
 		"Dialogs/PropertyGrid/PropertyGrid",
 		"Dialogs/BuyDialog/BuyDialog",
+		"Dialogs/AZActivatePPDialog/AZActivatePPDialog",
+		"Dialogs/AZUsersDialog/AZUsersDialog",
+		"Dialogs/AZProjectsDialog/AZProjectsDialog",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -512,6 +515,45 @@ define(["Core/errorHelper",
 							var exceptionRet = m_openDialog.create(toolInstance, functionManipulate);
 							if (exceptionRet) { throw exceptionRet; }
 							
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					self.showAZUsersDialog = function() {
+
+						try {
+
+							m_openDialog = new AZUsersDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					self.showAZProjectsDialog = function() {
+
+						try {
+
+							m_openDialog = new AZProjectsDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					self.showAZActivatePPDialog = function() {
+
+						try {
+
+							m_openDialog = new AZActivatePPDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
 							return null;
 
 						} catch (e) { return e; }

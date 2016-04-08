@@ -198,14 +198,20 @@ define(["Core/errorHelper"],
 
 									// AZUsersDialog is where user maintenance takes place, including usergroup creation, modification
 									// and assignment. Other user maintenance might be forcing a password reset, etc.
-
+									try {
+										var exceptionRet = client.showAZUsersDialog();
+										if (exceptionRet) { throw exceptionRet; }
+									} catch(e) { errorHelper.show(e); }
 								});
 
 								$("#ProjectsButton").click(function() {
 
 									// AZProjectsDialog is the place for making non-public projects public. Maybe it will also
 									// do Types and Methods. It may also un-quarantine images, videos and sounds.
-
+									try {
+										var exceptionRet = client.showAZProjectsDialog();
+										if (exceptionRet) { throw exceptionRet; }
+									} catch(e) { errorHelper.show(e); }
 								});
 
 								$("#ActivatePPButton").click(function() {
@@ -213,7 +219,10 @@ define(["Core/errorHelper"],
 									// AZActivatePPDialog is where Purchasable Projects are finalized, activated or de-activated.
 									// This dialog is not meant to load the project for actual maintenance, just the data from the
 									// classes, onlineclasses or products table for editing.
-
+									try {
+										var exceptionRet = client.showAZActivatePPDialog();
+										if (exceptionRet) { throw exceptionRet; }
+									} catch(e) { errorHelper.show(e); }
 								});
 
 								// This is how to connect enabled/disabled tooltips to menu items:
