@@ -65,14 +65,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
-					            		label: "Create Product",
-					            		id: 'createBtn',
-					            		cssClass: "btn-primary",
-					            		action: function(){
-
-					            		}
-					            	},
-					            	{
 						                label: "Close",
 						                icon: "glyphicon glyphicon-remove-circle",
 						                cssClass: "btn-warning",
