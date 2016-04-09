@@ -553,10 +553,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 		                    });
 		                } catch(e) { return callback(e); }
 					}
-				} catch (e) {
-
-					errorHelper.show(e);
-				}
+				} catch (e) { errorHelper.show(e); }
 
 				/////////////////////////////////
 				// Private fields.
@@ -575,8 +572,5 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 			// Return the constructor function as the module object.
 			return functionBuyDialog;
 
-		} catch (e) {
-
-			errorHelper.show(e);
-		}
+		} catch (e) { errorHelper.show(e); }
 	});

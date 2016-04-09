@@ -1030,6 +1030,7 @@ define(["Core/errorHelper",
 
 						// Something happened so refresh the navbar.
 						navbar.enableOrDisableProjAndTypeMenuItems();
+						navbar.enableOrDisablePlayAndStopButtons();
 
 						if (g_profile.can_visit_adminzone) {
 

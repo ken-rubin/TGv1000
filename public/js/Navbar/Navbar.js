@@ -130,6 +130,7 @@ define(["Core/errorHelper"],
 								client.unloadProject(function(){ 
 									self.enableOrDisableProjAndTypeMenuItems(); 
 									self.enableOrDisableAminZoneMenuItems(); 
+									self.enableOrDisablePlayAndStopButtons();
 								}, true);
 							});
 
@@ -303,9 +304,33 @@ define(["Core/errorHelper"],
 
 					self.enableOrDisableAminZoneMenuItems = function () {
 
-						m_functionEnable("Users");
-						m_functionEnable("Projects");
-						m_functionEnable("ActivatePP");
+						if (g_profile.can_edit_permissions) {
+							m_functionEnable("Users");
+						} else {
+							m_functionDisable("Users");
+						}
+
+						if (g_profile.can_unquarantine) {
+							m_functionEnable("Projects");
+						} else {
+							m_functionDisable("Projects");
+						}
+							
+						if (g_profile.can_activate_PPs) {
+							m_functionEnable("ActivatePP");
+						} else {
+							m_functionDisable("ActivatePP");
+						}
+					}
+
+					self.enableOrDisablePlayAndStopButtons = function () {
+
+						if (client.getProject()) {
+							$("#PlayBtn").removeClass("disabled");
+						} else {
+							$("#PlayBtn").addClass("disabled");
+						}
+						$("#StopBtn").addClass("disabled");
 					}
 
 					// Private methods

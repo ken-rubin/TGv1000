@@ -554,10 +554,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}
-				} catch (e) {
-
-					errorHelper.show(e.message);
-				}
+				} catch (e) { errorHelper.show(e.message); }
 
 				/////////////////////////////////
 				// Private fields.

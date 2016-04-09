@@ -420,8 +420,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 			// Return the constructor function as the module object.
 			return functionOpenProjectDialog;
-		} catch (e) {
 
-			errorHelper.show(e.message);
-		}
+		} catch (e) { errorHelper.show(e.message); }
 	});

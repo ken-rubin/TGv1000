@@ -690,10 +690,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						m_imageId = imageId;
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
 					}
-				} catch (e) {
-
-					errorHelper.show(e);
-				}
+				} catch (e) { errorHelper.show(e); }
 
 				/////////////////////////////////
 				// Private fields.
@@ -712,8 +709,5 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 			// Return the constructor function as the module object.
 			return functionNewProjectDialog;
 
-		} catch (e) {
-
-			errorHelper.show(e);
-		}
+		} catch (e) { errorHelper.show(e); }
 	});

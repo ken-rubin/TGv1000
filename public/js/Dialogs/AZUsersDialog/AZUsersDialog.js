@@ -60,7 +60,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							BootstrapDialog.show({
 
-								title: "User and Usergroup Maintenance",
+								title: "Permission, Usergroup and User Maintenance",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
