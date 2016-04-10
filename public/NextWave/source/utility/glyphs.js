@@ -1,0 +1,133 @@
+/////////////////////////
+// Glyph module.
+//
+// Wrapps access to the Bootstrap glyph icons.
+// Public fields specify an Area for a single
+//      glyph.
+//
+// Returns instance.
+//
+
+"use strict";
+
+// Require-AMD, and dependencies.
+define(["utility/prototypes",
+	"utility/settings",
+	"utility/Point",
+	"utility/Size",
+	"utility/Area"],
+    function (prototypes, settings, Point, Size, Area) {
+
+        try {
+
+            // Constructor function.
+        	var functionRet = function Glyph() {
+
+                try {
+
+            		var self = this;                        // Uber closure.
+
+                    ///////////////////////
+                    // Public fields.
+
+                    // pushpin.
+                    self.pushpin = new Area(new Point(settings.glyphs.pushpin.x,settings.glyphs.pushpin.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // arrowNorth.
+                    self.arrowNorth = new Area(new Point(settings.glyphs.arrowNorth.x,settings.glyphs.arrowNorth.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // arrowSouth.
+                    self.arrowSouth = new Area(new Point(settings.glyphs.arrowSouth.x,settings.glyphs.arrowSouth.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // arrowWest.
+                    self.arrowWest = new Area(new Point(settings.glyphs.arrowWest.x,settings.glyphs.arrowWest.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // expand.
+                    self.expand = new Area(new Point(settings.glyphs.expand.x,settings.glyphs.expand.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // contract.
+                    self.contract = new Area(new Point(settings.glyphs.contract.x,settings.glyphs.contract.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+
+                    ///////////////////////
+                    // Public methods.
+
+                    // Helper method loads up icons and 
+                    // then calls back to specified callback.
+                    self.create = function (functionComplete) {
+
+                    	try {
+
+                    		// Load bitmap of glyphs.
+                    		m_imageGlyphs = new Image();
+                    		m_imageGlyphs.onload = function () {
+
+                    			// Mark created.
+                    			m_bCreated = true;
+
+                    			// Invoke callback.
+                    			functionComplete();
+                    		};
+                            m_imageGlyphs.src = settings.glyphs.imageURL;
+
+                    		return null;
+                    	} catch (e) {
+
+                    		return e;
+                    	}
+                    }
+
+                    // Draw an icon.
+                    self.render = function (contextRender, areaRender, areaIcon, bBackground) {
+                        
+                        try {
+
+                        	if (m_bCreated) {
+
+                                if (bBackground) {
+
+                                    // Render the background in place.
+                                    contextRender.fillStyle = settings.glyphs.fillBackground;
+                                    contextRender.fillRect(areaRender.location.x, 
+                                        areaRender.location.y,
+                                        areaRender.extent.width,
+                                        areaRender.extent.height);
+                                }
+
+                        		// Render the icon in place.
+	                            contextRender.drawImage(m_imageGlyphs,
+	                                areaIcon.location.x,
+	                                areaIcon.location.y,
+	                                areaIcon.extent.width,
+	                                areaIcon.extent.height,
+	                                areaRender.location.x, 
+	                                areaRender.location.y,
+	                                areaRender.extent.width,
+	                                areaRender.extent.height);
+	                        }
+                            return null;
+                        } catch (e) {
+                            
+                            return e;
+                        }
+                    };
+
+                    ///////////////////////
+                    // Private fields.
+
+                    // Load bitmap of glyphs.
+                    var m_imageGlyphs = null;
+                    // Indicates so.
+                    var m_bCreated = false;
+                } catch (e) {
+
+                    alert(e.message);
+                }
+        	};
+
+        	return new functionRet();
+        } catch (e) {
+
+            alert(e.message);
+        }
+    });

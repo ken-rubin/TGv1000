@@ -1,0 +1,10 @@
+ToDo:
+
+Pass data object to manager.
+Adjust scrolling offset after destructive, or constructive drag.
+Adjust scrolling offset after end drag.
+Get all drag targets on start drag.
+Drop/add to drag target on consumate.
+Draw the line from the draged to the nearest drag target.
+Insert drag stubs for statement-type drags.
+Dragging is off for contents of CodeStatementExpression.
