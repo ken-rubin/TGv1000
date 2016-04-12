@@ -78,14 +78,15 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 					// The following will not be called with any gaps or errors in the Project's structure.
 					// All images are already resources with their id's in the items in the Project. Etc.
-					self.saveToDatabase = function () {
+					self.saveToDatabase = function (bChangeableName) {
 
 						try {
 
 							var data = {
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
-									projectJson: self.data
+									projectJson: self.data,
+									changeableName: bChangeableName || false
 							};
 
 							// If !data.projectJson.specialProjectData.systemTypesEdited, then success and error mean that the project was or wasn't saved to the database.

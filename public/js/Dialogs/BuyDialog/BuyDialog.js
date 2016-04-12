@@ -433,45 +433,54 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 														
 														if (err) {
 
+															// This is most likely a charge card error.
 															errorHelper.show(err);
 															$("#BuyBtn").prop("disabled", false);
 															$("#CancelBtn").prop("disabled", false);
 															return;
 														}
 
-														// At this point the card has been charged. But the project in memory is still the original product.
+														// We will convert the Purchasable Project into a "bought" project and immediately save it.
+														// First, we'll create a fairly unique name, but a name conflict will still be checked on the server, and it's possible the name will be changed.
+
+														// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
+														m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
+
+														if (m_clProject.data.specialProjectData.hasOwnProperty('classData')) {
+															delete m_clProject.data.specialProjectData.classData;
+															m_clProject.data.isClass = false;
+															m_clProject.data.specialProjectData.classProject = false;
+														} else if (m_clProject.data.specialProjectData.hasOwnProperty('onlineClassData')) {
+															delete m_clProject.data.specialProjectData.onlineClassData;
+															m_clProject.data.isOnlineClass = false;
+															m_clProject.data.specialProjectData.onlineClassProject = false;
+														} else if (m_clProject.data.specialProjectData.hasOwnProperty('productData')) {
+															delete m_clProject.data.specialProjectData.productData;
+															m_clProject.data.isProduct = false;
+															m_clProject.data.specialProjectData.productProject = false;
+														}
+														m_clProject.data.specialProjectData.privilegedUser = false;
+														m_clProject.data.specialProjectData.ownedByUser = true;
+														m_clProject.data.specialProjectData.normalProject = true;
+														m_clProject.data.specialProjectData.openMode = 'bought';
+
+														// Generate a unique-ish name.
+														var momNow = new moment();
+														m_clProject.data.name += "_" + momNow.format("MM-DD-YYYY");
+
+														// But still send through an indication to routeSaveProject to change the name in case of conflict.
+														exceptionRet = client.saveProject(true);
+														if (exceptionRet) {
+
+															errorHelper.show("A strange glitch occurred: after we processed your credit card, we could not save your purchased project under your name.<br><br>Please contact us so we can investigate and process a refund.");
+
+														} else {
+
+															errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + client.getProject().data.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
+																250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
+														}
+
 														self.closeYourself();
-														// Tell user in callback errorHelper. Use callback to open SaveProjectAsDialog.
-														errorHelper.show('Your purchase is almost complete.<br><br>When you close this Note, we will open the Save Project window. Use it to choose a new name, maybe some tags, the description, perhaps a new Project Image.<br><br>Then click the Save button, and the project will be all yours!', 250000,	// I don't expect to auto-close errorHelper in 250 seconds.
-																														// The purpose of this very large number is to get errorHelper to use the title 'Note' instead of 'Error'.
-															function(){
-
-																// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
-																m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
-
-																if (m_clProject.data.specialProjectData.hasOwnProperty('classData')) {
-																	delete m_clProject.data.specialProjectData.classData;
-																	m_clProject.data.isClass = false;
-																	m_clProject.data.specialProjectData.classProject = false;
-																} else if (m_clProject.data.specialProjectData.hasOwnProperty('onlineClassData')) {
-																	delete m_clProject.data.specialProjectData.onlineClassData;
-																	m_clProject.data.isOnlineClass = false;
-																	m_clProject.data.specialProjectData.onlineClassProject = false;
-																} else if (m_clProject.data.specialProjectData.hasOwnProperty('productData')) {
-																	delete m_clProject.data.specialProjectData.productData;
-																	m_clProject.data.isProduct = false;
-																	m_clProject.data.specialProjectData.productProject = false;
-																}
-
-																m_clProject.data.specialProjectData.privilegedUser = false;
-																m_clProject.data.specialProjectData.ownedByUser = true;
-																m_clProject.data.specialProjectData.normalProject = true;
-																m_clProject.data.specialProjectData.openMode = 'bought';
-
-																// Open the Save dialog.
-																client.showSaveProjectDialog();
-															}
-														);
 													}
 												);
 											}
@@ -538,8 +547,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 		                    		{
 		                    			token: token,
 		                    			dAmount: m_dPriceToCharge,
-		                    			descriptionForReceipt: 'receipt info',	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
-		                    			statementDescriptor: 'statement info'		// An arbitrary string to be displayed (most of the time) on user's credit card statement.
+		                    			descriptionForReceipt: 'Purchase of NextWaveCoders product: ' + m_clProject.data.name,	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
+		                    			statementDescriptor: 'Purchase of NextWaveCoders product: ' + m_clProject.data.name		// An arbitrary string to be displayed (most of the time) on user's credit card statement.
 		                    		},
 		                            'json');
 		                    posting.done(function(data) {

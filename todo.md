@@ -7,8 +7,7 @@
 ## Jerry's Issues
 ### Do not depend on Ken's rework
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
-- If user buys a PP and then doesn't (or can't) complete the Save, he'll lose his purchase after the CC has been charged. This must be avoided/prevented/fixed/made impossible. **Very important.** The way to fix this would be to do a save while still on the server after the charge is accepted.
-    + During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test after the fix above is made. And more after Ken's stuff is done.**
+- During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
     + Test image (multer) upload now that I've put JWT in the middle of its route handler.
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.

@@ -811,6 +811,7 @@ module.exports = function ProjectBO(app, sql, logger) {
             // req.user.userId
             // req.user.userName
             // req.body.projectJson
+            // req.body.changeableName - if true, in case of a name conflict within the user's projects, keep appending until a unique name is found and do a saveAs, not a save.
 
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
@@ -979,7 +980,8 @@ module.exports = function ProjectBO(app, sql, logger) {
             // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
             // One or two buts here: a save will be changed to a saveAs if it's a new project or the user is saving a project gotten from another user;
             // a saveAs will be changed to a save if the name and id are the same as one of the user's existing projects.
-
+            // And one more thing: if req.body.changeableName is true, then a name conflict will be resolved until there is no conflict
+            // within the user's projects and a SaveAs can be done. This will only happen on a project with project.specialProjectData.openMode === "bought".
 
             // A privileged user can also edit and save a core project as such. In this case project.isCoreProject And
             // project.specialProjectData.coreProject will both be true. Take your pick.
@@ -1007,21 +1009,41 @@ module.exports = function ProjectBO(app, sql, logger) {
                             }
                         );
                     },
-                    // Getting id of any of user's projects with same name as in project.
+                    // Getting id of any of user's projects with same name as in project. See note on req.body.changeableName above.
                     function(resultArray, cb) {
 
-                        var strQuery = "select id from " + self.dbname + "projects where name=" + connection.escape(resultArray.project.name) + " and ownedByUserId=" + req.user.userId + ";";
-                        sql.queryWithCxn(connection, strQuery,
-                            function(err, rows) {
-                                if (err) { return cb(err, null); }
-                                var idOfUsersProjWithThisName = -1;  // -1 if none exists
-                                if (rows.length === 1) {
-                                    idOfUsersProjWithThisName = rows[0].id;
+                        var iteration = 1;
+                        var originalName = resultArray.project.name;
+                        while(true) {
+
+                            var strQuery = "select id from " + self.dbname + "projects where name=" + connection.escape(resultArray.project.name) + " and ownedByUserId=" + req.user.userId + ";";
+                            sql.queryWithCxn(connection, strQuery,
+                                function(err, rows) {
+                                    if (err) { return cb(err, null); }
+                                    
+                                    if (rows.length === 1) {
+
+                                        // There is a name conflict. Check req.body.changeableName to see if we are going to loop or return.
+                                        if (req.body.changeableName) {
+
+                                            var newName = originalName + "(" + (++iteration).toString() + ")";
+                                            resultArray.project.name = newName;
+                                            // By not doing a return here we'll loop through again and test out this new name. And we'll continue to do so until we find a unique name
+                                            // and can return -1 in resultArray["idOfUsersProjWithThisName"] forcing a saveAs with the new name.
+
+                                        } else {
+
+                                            resultArray["idOfUsersProjWithThisName"] = rows[0].id;
+                                            return cb(null, resultArray);
+                                        }
+                                    } else {
+
+                                        resultArray["idOfUsersProjWithThisName"] = -1;
+                                        return cb(null, resultArray);
+                                    }
                                 }
-                                resultArray["idOfUsersProjWithThisName"] = idOfUsersProjWithThisName;
-                                return cb(null, resultArray);
-                            }
-                        );
+                            );
+                        }
                     },
                     // Getting name of any of user's projects with this project's id.
                     function(resultArray, cb) {
