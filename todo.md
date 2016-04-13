@@ -5,7 +5,7 @@
 
 
 ## Jerry's Issues
-### Do not depend on Ken's rework
+### These items do not depend on Ken's rework.
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
 - During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
@@ -22,7 +22,7 @@
             + some computers available for student use
         + Online classes:
             + imageId (maybe)
-    + Normal class (not online) will require its max class size to be checked against purchased spots. It would be best to retrieve this in Search and display in the tooltip (highly highlighted). Then take user to waitlist dialog, not Buy Dialog if they want to get on the wait list.
+    + Normal class (not online) will require its max class size to be checked against purchased spots. It would be best to retrieve this in Search and display in the tooltip (highly highlighted). Then take user to waitlist dialog, not Buy Dialog if they want to get on the wait list. **Do WaitListDialog.**
     + Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -45,6 +45,8 @@
         - Any date must have from/to times.
         - No gaps allowed.
         - Dates must be in ascending order--be careful about two classes happening on the same day.
+        - Finish routeRetrievePurchasableProjectData.
+        - Finish AZActivatePPDialog.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc.
 * Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 

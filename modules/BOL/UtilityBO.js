@@ -257,6 +257,40 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
+    self.routeRetrievePurchasableProjectData = function (req, res) {
+
+        // This method retrieves all items in products, classes and online classes.
+        // It's purpose is to let a privileged user activate/desctivate, edit details, etc.
+
+        try {
+
+            console.log("Entered UtilityBO/routeRetrievePurchasableProjectData");
+            // req.user.userId
+            // req.user.userName
+            // Neither of these is used, and no other input is needed, although we may want to add tags.
+
+            var sqlQuery = "select * from classes; select * from onlineclasses; select * from products;";
+            sql.execute(strQuery,
+                function(rows) {
+
+                },
+                function(strError) {
+
+                    res.json({
+                        success: false,
+                        message: strError
+                    });
+                }
+            );
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeSearchProjects = function (req, res) {
 
         // This is a search for projects based on tags.
@@ -902,92 +936,5 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
-    // self.routeGetDashboardFuncs = function (req, res) {
-
-    //     console.log("Entered UtilityBO/routeGetDashboardFuncs");
-
-    //     try {
-
-    //         // Select data.
-    //         var exceptionRet = sql.execute("select * from " + self.dbname + "adminFuncs order by wording asc;",
-    //             function (arrayRows) {
-                
-    //                 res.json({
-
-    //                     success: true,
-    //                     arrayRows: arrayRows
-    //                 });
-    //             },
-    //             function (strError) {
-                
-    //                 res.json({
-
-    //                     success: false,
-    //                     message: strError
-    //                 });
-    //         });
-    //         if (exceptionRet !== null) {
-
-    //             res.json({
-
-    //                 success: false,
-    //                 message: exceptionRet.message
-    //             });
-    //         }
-    //     } catch (e) {
-
-    //         res.json({
-
-    //             success: false,
-    //             message: e.message
-    //         });
-    //     }
-    // }
-
-    // self.routeGetClasses = function (req, res, next) {
-    
-    //     try {
-        
-    //         console.log("Entered UtilityBO/routeGetClasses.");
-
-    //         var strWhere = (req.body.which === 'active' ? ' where display=1;' : ";");
-
-    //         // Select data.
-    //         var exceptionRet = sql.execute("select * from " + self.dbname + "classes" + strWhere,
-    //             function (arrayRows) {
-                
-    //                 res.json({
-
-    //                     success: true,
-    //                     arrayRows: arrayRows
-    //                 });
-    //             },
-    //             function (strError) {
-                
-    //                 res.json({
-
-    //                     success: false,
-    //                     message: strError
-    //                 });
-    //         });
-    //         if (exceptionRet !== null) {
-
-    //             res.json({
-
-    //                 success: false,
-    //                 message: exceptionRet.message
-    //             });
-    //         }
-    //     } catch (e) {
-
-    //         res.json({
-
-    //             success: false,
-    //             message: e.message
-    //         });
-    //     }
-    // };
-    
-    // Private fields
 };
 
