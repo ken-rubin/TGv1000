@@ -109,13 +109,16 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 									if (objectData.success) {
 
-										if (!objectData.project.specialProjectData.systemTypesEdited) {
-											errorHelper.show('Project was saved', 1000);
-										} else {
-											if (objectData.scriptSuccess) {
-												errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
+										// If callback exists, then our errorHelper will be display in callback back in BuyDialog.js.
+										if (!$.isFunction(callback)) {
+											if (!objectData.project.specialProjectData.systemTypesEdited) {
+												errorHelper.show('Project was saved', 1000);
 											} else {
-												errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + saveError.message + ".");
+												if (objectData.scriptSuccess) {
+													errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
+												} else {
+													errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + saveError.message + ".");
+												}
 											}
 										}
 
@@ -136,6 +139,9 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 										client.setBrowserTabAndBtns();
 
+										if ($.isFunction(callback)) {
+											callback(null);
+										}
 									} else {
 
 										// !objectData.success -- error message in objectData.message
