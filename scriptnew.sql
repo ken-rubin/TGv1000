@@ -1,13 +1,22 @@
 delimiter //
 
--- If necessary to start TGv1000 from scratch, uncomment the following:
+-- This file should also be saved to git with the commented out sections commented out.
+-- If necessary to start TGv1000 from scratch, uncomment the 3 sections below. But don't push it that way to git.
+
+
+
+
 /* 
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
 */
 
+
+
 USE TGv1000//
 SELECT database()//
+
+
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
 /*
@@ -46,6 +55,36 @@ begin
 end //
 
 */
+
+
+-- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
+/* 
+
+DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
+
+create FUNCTION getUniqueProjNameForUser(checkName varchar(255), userId int(11))
+	RETURNS TEXT
+begin
+
+	set @uniqueName = checkName;
+    set @iter = 1;
+	
+	rpt_loop: LOOP
+
+		SET @id := (select id from projects where name=@uniqueName and ownedByUserId=userId);
+        IF @id IS NULL THEN
+			LEAVE rpt_loop;
+		END IF;
+        
+        SET @iter = @iter + 1;
+        SET @uniqueName = CONCAT(checkName, '(', @iter, ')');
+
+	END LOOP;
+    
+    RETURN @uniqueName;
+end //
+
+ */
 
 create procedure maintainDB()
 begin

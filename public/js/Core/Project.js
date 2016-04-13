@@ -78,7 +78,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 					// The following will not be called with any gaps or errors in the Project's structure.
 					// All images are already resources with their id's in the items in the Project. Etc.
-					self.saveToDatabase = function (bChangeableName) {
+					self.saveToDatabase = function (bChangeableName, callback) {
 
 						try {
 
@@ -139,13 +139,21 @@ define(["Core/errorHelper", "Navbar/Comics"],
 									} else {
 
 										// !objectData.success -- error message in objectData.message
-										errorHelper.show(objectData.message);
+										if ($.isFunction(callback)) {
+											callback(objectData.message);
+										} else {
+											errorHelper.show(objectData.message);
+										}
 									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
 
 									// Non-computational error in strError
-									errorHelper.show(strError);
+									if ($.isFunction(callback)) {
+										callback(strError);
+									} else {
+										errorHelper.show(strError);
+									}
 								}
 							});
 

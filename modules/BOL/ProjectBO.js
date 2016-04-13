@@ -1012,35 +1012,48 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // Getting id of any of user's projects with same name as in project. See note on req.body.changeableName above.
                     function(resultArray, cb) {
 
-                        var iteration = 1;
-                        var originalName = resultArray.project.name;
-                        while(true) {
+                        if (req.body.changeableName) {
+
+                            // Use UDF getUniqueProjNameForUser to make sure result.project.name or its derivative is unique for req.user.userId.
+                            var strQuery = "select " + self.dbname + "getUniqueProjNameForUser(" + connection.escape(resultArray.project.name) + "," + req.user.userId + ") as uniqueName;";
+                            sql.queryWithCxn(connection, strQuery,
+                                function(err, rows) {
+                                    if (err) {
+
+                                        return cb(err, null);
+                                    }
+
+                                    if (rows.length !== 1) {
+
+                                        return cb(new Error("Error checking/getting unique name for purchase."), null);
+                                    }
+
+                                    resultArray.project.name = rows[0].uniqueName;
+                                    resultArray["idOfUsersProjWithThisName"] = -1;
+                                    return cb(null, resultArray);
+                                }
+                            );
+                        } else {
 
                             var strQuery = "select id from " + self.dbname + "projects where name=" + connection.escape(resultArray.project.name) + " and ownedByUserId=" + req.user.userId + ";";
                             sql.queryWithCxn(connection, strQuery,
                                 function(err, rows) {
-                                    if (err) { return cb(err, null); }
+                                    if (err) { 
+
+                                        return cb(err, null); 
+                                    
+                                    } 
                                     
                                     if (rows.length === 1) {
 
-                                        // There is a name conflict. Check req.body.changeableName to see if we are going to loop or return.
-                                        if (req.body.changeableName) {
+                                        resultArray["idOfUsersProjWithThisName"] = rows[0].id;
 
-                                            var newName = originalName + "(" + (++iteration).toString() + ")";
-                                            resultArray.project.name = newName;
-                                            // By not doing a return here we'll loop through again and test out this new name. And we'll continue to do so until we find a unique name
-                                            // and can return -1 in resultArray["idOfUsersProjWithThisName"] forcing a saveAs with the new name.
-
-                                        } else {
-
-                                            resultArray["idOfUsersProjWithThisName"] = rows[0].id;
-                                            return cb(null, resultArray);
-                                        }
                                     } else {
 
                                         resultArray["idOfUsersProjWithThisName"] = -1;
-                                        return cb(null, resultArray);
                                     }
+
+                                    return cb(null, resultArray);
                                 }
                             );
                         }

@@ -1043,11 +1043,11 @@ define(["Core/errorHelper",
 						return m_clProject;
 					};
 
-					self.saveProject = function (bChangeableName) {
+					self.saveProject = function (bChangeableName, callback) {
 
 						try {
 
-							return m_clProject.saveToDatabase(bChangeableName);
+							return m_clProject.saveToDatabase(bChangeableName, callback);
 
 						} catch (e) { return e; }
 					}
