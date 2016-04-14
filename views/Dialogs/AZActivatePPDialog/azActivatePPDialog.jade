@@ -2,8 +2,43 @@
 //-
 .well
   .row
-    .col-xs-12
-      h4
-        | AZActivatePPDialog is where Purchasable Projects are finalized, activated or de-activated.
-        | This dialog is not meant to load the project for actual maintenance, just the data from the
-        | classes, onlineclasses or products table for editing.
+    h4
+        | Use this dialog to finalize, activate or deactivate purchasable projects. For example, once a class starts,
+        | deactivate it to prevent users from retrieving it and buying it.
+    h5
+        | The dialog is not meant to load the project for inspection or maintenance of types, comics, etc.
+        | You should have checked all that out already by searching for and opening the project.
+    br
+    .row
+      .col-xs-1
+      .col-xs-10
+        h5 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Classes</b>
+        #ISWellMsg0
+        .col-xs-12#IStoolstriprow0
+          #IStoolstrip0.ScrollRegionRow
+          br
+          br
+          br
+      .col-xs-1
+    .row
+      .col-xs-1
+      .col-xs-10
+        h5 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Online classes</b>
+        #ISWellMsg1
+        .col-xs-12#IStoolstriprow1
+          #IStoolstrip1.ScrollRegionRow
+          br
+          br
+          br
+      .col-xs-1
+    .row
+      .col-xs-1
+      .col-xs-10
+        h5 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Kit programming products</b>
+        #ISWellMsg2
+        .col-xs-12#IStoolstriprow2
+          #IStoolstrip2.ScrollRegionRow
+          br
+          br
+          br
+      .col-xs-1
