@@ -275,7 +275,7 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.putUserOnWaitlist(iProjectId) {
+					self.putUserOnWaitlist = function (iProjectId) {
 
 						try {
 
@@ -293,9 +293,13 @@ define(["Core/errorHelper",
 									BootstrapDialog.show({
 
 										title: "Waitlist",
-										message: "You have been added to the waitlist for the selected class. We will you updated via email.",
+										message: "You have been added to the waitlist for the selected class. We will update you by email.",
 										closable: true, // <-- Default value is false
-										draggable: true // <-- Default value is false
+										draggable: true, // <-- Default value is false
+										buttons: [{
+											label: "OK",
+											action: function(d) { d.close(); }
+										}]
 									});
 								} else {
 

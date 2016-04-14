@@ -267,7 +267,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             console.log("Entered UtilityBO/routeRetrievePurchasableProjectData");
             // req.user.userId
             // req.user.userName
-            // Neither of these is used, and no other input is needed, although we may want to add tags.
+            // Neither of these is used, and no other input is needed, although we may want to add tags later.
 
             var sqlQuery = "select * from classes; select * from onlineclasses; select * from products;";
             sql.execute(strQuery,
@@ -701,7 +701,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         userName: req.user.userName
                     };
                     var strQuery = "INSERT " + self.dbname + "waitlist SET ?";
-                    m_log('Inserting waitlist record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    console.log('Inserting waitlist record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                         function(err, rows) {
 
