@@ -1557,7 +1557,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                         imageId: (project.specialProjectData.classData.imageId || 0),           // not set on client side yet
                         classNotes: project.specialProjectData.classData.classNotes,
                         name: project.name,
-                        baseProjectId: project.id
+                        baseProjectId: project.id,
+                        maxClassSize: (project.specialProjectData.classData.maxClassSize || 0)  // not set on client side yet
                         };
                     dbname = 'classes';
 

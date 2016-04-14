@@ -7,6 +7,7 @@
 ## Jerry's Issues
 ### These items do not depend on Ken's rework.
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
+- Why in the OpenProject scrollregions do all the images look like they do? Will they work if I choose an image? Having a real image should be a requirement of activation.
 - During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
     + Test image (multer) upload now that I've put JWT in the middle of its route handler.
@@ -14,15 +15,15 @@
 - Finish buying. 
     + Need to add a couple of new fields to the specialProjectData class snippets and db tables. These fields may not appear in BuyDialog--or they may present as buttons (like to view the movie).
         + Products: 
-            + imageId (maybe)
+            + imageId (maybe--doesn't the project already have an image?)
             + videoId (maybe)
         + Classes: 
-            + max class size
-            + imageId (maybe)
-            + some computers available for student use
+            + maxClassSize
+            + imageId (maybe--doesn't the project already have an image?)
+            + some computers available for student use (bool)
         + Online classes:
-            + imageId (maybe)
-    + Normal class (not online) will require its max class size to be checked against purchased spots. It would be best to retrieve this in Search and display in the tooltip (highly highlighted). Then take user to waitlist dialog, not Buy Dialog if they want to get on the wait list. **Do WaitListDialog.**
+            + imageId (maybe--doesn't the project already have an image?)
+    + Add waitlist table to DB. Add functionality to add a user to a class's waitlist if appropriate. Don't take user to BuyDialog. Add to waitlist and display errorHelper. Add waitlist checking to cron.
     + Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -40,15 +41,16 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - AdminZone functionality
     - User & Usergroup and Permissions maintenance
-    - Purchasable Project active setting--will need class date/time validation:
-        - Any date that's entered must be a valid date.
-        - Any date must have from/to times.
-        - No gaps allowed.
-        - Dates must be in ascending order--be careful about two classes happening on the same day.
+    - Purchasable Project active setting.
+        - Will need class date/time validation:
+            - Any date that's entered must be a valid date.
+            - Any date must have from/to times.
+            - No gaps allowed.
+            - Dates must be in ascending order--be careful about two classes happening on the same day.
         - Finish routeRetrievePurchasableProjectData.
         - Finish AZActivatePPDialog.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc.
-* Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
+- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)

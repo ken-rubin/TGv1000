@@ -681,6 +681,15 @@ begin
         set @dbstate := 3;
     end if;
 
+    if @dbstate = 3 THEN
+    
+		ALTER TABLE `tgv1000`.`classes` 
+			ADD COLUMN `maxClassSize` INT(11) NULL DEFAULT 0 AFTER `classNotes`;
+
+		UPDATE control set dbstate=4 where id=1;
+        set @dbstate := 4;
+    end if;
+
 end//
 
 

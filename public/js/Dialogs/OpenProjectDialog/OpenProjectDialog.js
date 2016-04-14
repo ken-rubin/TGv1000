@@ -348,6 +348,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
+							        		var maxClassSize = m_searchResultRawArray[stripNum][rowIth.index].maxClassSize;
+							        		var numEnrollees = m_searchResultRawArray[stripNum][rowIth.index].numEnrollees;
+							        		if (numEnrollees >= maxClassSize) {
+							        			tooltip += "<br><b>This class is full. Click to be put on its waitlist.</b>";
+							        		} else if (numEnrollees > maxClassSize - 5) {
+							        			tooltip += "<br><b>There are only " + (maxClassSize - numEnrollees).toString() + " spots left in this class. Really.</b>";
+							        		}
 							        		break;
 							        	case 5:
 							        		// Online classes.

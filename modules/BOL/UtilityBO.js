@@ -315,14 +315,14 @@ module.exports = function UtilityBO(app, sql, logger) {
             // (1) if req.body.privilegedUser === "0", retrieve user's home zipcode.
             // (2) get string of tag id's; 
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.privilegedUser; 
-            // (4) if req.body.privilegedUser === "0", then winnow classes down by date and distance.
+            // (4) if req.body.privilegedUser === "0", then winnow classes down by date and distance and then onlineclasses by date.
+            // (5) Finally, for all surviving classes determine current number of users who bought the class.
 
             async.waterfall(
                 [
                     // (1)
                     function(cb) {
 
-                        console.log("In (1)");
                         if (req.body.privilegedUser === "0") {
 
                             sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
@@ -346,7 +346,6 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (2)
                     function(passOn, cb) {
 
-                        console.log("In (2)");
                         // Add resource type description to the tags the user (may have) entered.
                         var tags = req.body.tags + " project";
 
@@ -396,7 +395,6 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        console.log("In (3) with passOn: " + JSON.stringify(passOn));
                         var strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
@@ -435,10 +433,10 @@ module.exports = function UtilityBO(app, sql, logger) {
                             // Classes
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                             // Online classes
@@ -516,7 +514,6 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // We need to process [4] and [5] separately in (4a) and (4b), respectively.
                     function(passOn, cb) {
 
-                        console.log("In (4a) with passOn: " + JSON.stringify(passOn));
                         if (req.body.privilegedUser === "0") {
                             // A normal user, retrieving classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months. They also must be within 35 miles of req.body.nearZip.
@@ -592,7 +589,6 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // (4b)
                     function(passOn, cb) {
 
-                        console.log("In (4b)");
                         if (req.body.privilegedUser === "0") {
                             // A normal user, retrieving online classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months.
@@ -628,6 +624,32 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 }
                             );
                         } else { return cb(null, passOn); }
+                    },
+                    // (5)
+                    function(passOn, cb) {
+
+                        async.eachSeries(passOn.projects[4],
+                            function(projectIth, cb) {
+
+                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.id + " and id<>" + projectIth.id + ";";
+
+                                sql.execute(strQuery,
+                                    function(rows){
+
+                                        if (rows.length === 0) {
+                                            projectIth.numEnrollees = 0;
+                                        } else {
+                                            projectIth.numEnrollees = rows[0].cnt;
+                                        }
+                                        return cb(null);
+                                    },
+                                    function(strError) { return cb(new Error(strError)); }
+                                );
+                            },
+                            function(err) {
+                                return cb(err, passOn);
+                            }
+                        );
                     }
                 ],
                 function(err, passOn) {
