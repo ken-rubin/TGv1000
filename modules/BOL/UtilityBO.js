@@ -675,6 +675,59 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
+    self.routePutUserOnWaitlist = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routePutUserOnWaitList with req.body = " + JSON.stringify(req.body));
+            // req.body.productId
+            // req.user.userId
+            // req.user.userName
+
+            sql.getCxnFromPool(
+                function(err, connection) {
+
+                    if (err) {
+
+                        return res.json({
+                            success: false,
+                            message: 'Could not get a database connection: ' + err.message
+                        });
+                    }
+
+                    var guts = {
+                        projectId: req.body.projectId,
+                        userId: req.user.userId,
+                        userName: req.user.userName
+                    };
+                    var strQuery = "INSERT " + self.dbname + "waitlist SET ?";
+                    m_log('Inserting waitlist record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                        function(err, rows) {
+
+                            if (err) {
+                                return res.json({
+                                    success: false,
+                                    message: 'Could not add user to waitlist: ' + err.message
+                                });
+                            }
+
+                            return res.json({
+                                success: true
+                            });
+                        }
+                    );
+                }
+            );
+        } catch(e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeSearchTypes = function (req, res) {
 
         // This is a search for types based on tags.

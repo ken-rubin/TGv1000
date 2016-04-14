@@ -275,6 +275,40 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					self.putUserOnWaitlist(iProjectId) {
+
+						try {
+
+							var posting = $.post("/BOL/UtilityBO/PutUserOnWaitlist", 
+								{
+									projectId: iProjectId
+									// userId: g_profile["userId"] not needed; sent in JWT
+									// userName: g_profile["userName"] not needed; sent in JWT
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									BootstrapDialog.show({
+
+										title: "Waitlist",
+										message: "You have been added to the waitlist for the selected class. We will you updated via email.",
+										closable: true, // <-- Default value is false
+										draggable: true // <-- Default value is false
+									});
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
 					self.showSaveProjectDialog = function () {
 
 						try {

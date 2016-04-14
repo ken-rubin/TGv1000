@@ -690,6 +690,22 @@ begin
         set @dbstate := 4;
     end if;
 
+    if @dbstate = 4 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/PutUserOnWaitlist','post','routePutUserOnWaitlist',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		CREATE TABLE `TGv1000`.`waitlist` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `projectId` VARCHAR(255) NOT NULL,
+          `userId` int(11) NOT NULL,
+          `userName`  VARCHAR(45),
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+		UPDATE control set dbstate=5 where id=1;
+        set @dbstate := 5;
+    end if;
+
 end//
 
 

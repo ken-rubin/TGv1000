@@ -23,7 +23,7 @@
             + some computers available for student use (bool)
         + Online classes:
             + imageId (maybe--doesn't the project already have an image?)
-    + Add waitlist table to DB. Add functionality to add a user to a class's waitlist if appropriate. Don't take user to BuyDialog. Add to waitlist and display errorHelper. Add waitlist checking to cron.
+    + Add waitlist table to DB. Add functionality to add a user to a class's waitlist if appropriate. Don't take user to BuyDialog. Add to waitlist and display errorHelper. Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
     + Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
