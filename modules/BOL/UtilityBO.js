@@ -269,7 +269,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.user.userName
             // Neither of these is used, and no other input is needed, although we may want to add tags later.
 
-            var sqlQuery = "select * from classes; select * from onlineclasses; select * from products;";
+            var strQuery = "select * from classes; select * from onlineclasses; select * from products;";
             sql.execute(strQuery,
                 function(rows) {
 
