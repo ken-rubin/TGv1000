@@ -21,9 +21,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(functionOK) {
 
 						try {
+
+							// Save callback in private field.
+							m_functionOK = functionOK;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -42,6 +45,16 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 						} catch (e) { return e; }
 					};
+
+					self.callFunctionOK = function(iProjectId) {
+
+						try {
+
+							m_functionOK(iProjectId);
+							m_dialog.close();
+
+						} catch (e) { errorHelper.show(e); }
+					}
 
 					//////////////////////////////////
 					// Private functions.
@@ -98,20 +111,13 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		var stripNum = Math.floor(num / 10) - 1;
 							    		var i = num % 10;
 							    		var projectId = m_searchResultRawArray[stripNum][i].baseProjectId;
-
-							    		errorHelper,show("You clicked strip " + stripNum + "; image " + i + "; projectId " + projectId);
-							    		// self.callFunctionOK(projectId, 
-							    		// 					m_bPrivilegedUser, 
-							    		// 					(stripNum === 1), 
-							    		// 					(stripNum === 2),
-							    		// 					(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize)
-							    		// );
+										self.callFunctionOK(projectId);
 							    	});
 								if (exceptionRet) { throw exceptionRet; }
 							}
 
 							// There's no search button at this time.
-							// We'll use the old search function to populate the dialog's scroll regions.
+							// We'll use the old search function to populate the dialog's 3 scroll regions.
 							m_functionSearchBtnClicked();
 
 						} catch (e) { errorHelper.show(e.message); }
@@ -142,7 +148,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						                    	index: i,	// 2nd dimension index of m_searchResultRawArray
 						                    	id: rowIth.baseProjectId,
 						                    	name: rowIth.name,
-						                    	description: (rowIth.description || ''),
 						                    	url: resourceHelper.toURL('resources', 
 						                    		rowIth.imageId, 
 						                    		'image', 
@@ -227,7 +232,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		tooltip = "<b>" + tooltip + "</b>"
 							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
-							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].classDescription
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
@@ -253,7 +258,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		tooltip = "<b>" + tooltip + "</b>"
 							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
-							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].classDescription
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
@@ -271,7 +276,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        	combo,
 							        	"carousel" + combo.toString(),
 							        	tooltip,
-							        	rowIth.description,
 							        	rowIth.url,
 							        	'ScrollRegionImage',
 							        	null,
@@ -312,6 +316,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 				var m_searchResultProcessedArray;
 				var m_searchResultRawArray;
 				var m_scISImageStrip = new Array(3);
+				var m_functionOK;
 			};
 
 			// Return the constructor function as the module object.

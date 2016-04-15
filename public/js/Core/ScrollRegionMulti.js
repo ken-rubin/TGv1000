@@ -99,7 +99,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
             self.addImage = function (  iBase,                  // All params are required.
                                         strId, 
                                         strName, 
-                                        strDescription, 
                                         strResourceUrl, 
                                         strImageClass, 
                                         functionJItemCallBack,
@@ -136,26 +135,6 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     return e;
                 }
             };
-
-            // Update scroll region image.
-            self.updateImage = function(selector, strName, strDescription, strUrl) {
-
-                try {
-
-                    var jItem = $(selector);
-                    jItem.off('load');  // unbind the previous event handler or they'll all fire.
-                    jItem.on('load', m_functionOnUpdatedImageLoaded);
-                    jItem.attr("title", strName);   // for the updated tooltip
-                    jItem.attr("src", strUrl);
-
-                    return null;
-
-                } catch (e) {
-
-                    return e;
-                }
-
-            }
 
             // Remove all items.
             //
@@ -257,37 +236,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                 }
             };
 
-            var m_functionOnUpdatedImageLoaded = function() {
-
-                try {
-
-                    // Get reference to the item that raised the load.
-                    var jItem = $(this);
-
-                    // Calculate/search for iBase: index of this item in m_arrayItems.
-                    for (var iBase = 0; iBase < m_arrayItems.length; iBase++) {
-
-                        if (m_arrayItems[iBase][0].id === jItem[0].id) {
-
-                            var exceptionRet = m_functionCompleteImageAddUpdate(jItem, iBase);
-                            if (exceptionRet) { throw exceptionRet; }
-
-                            // Not sure if this applies in hor. scroll region like it does in vertical, but it should do no harm.
-                            // User may have selected an image, scrolled it out of sight and then changed it.
-                            // I want it to be seen in the strip.
-                            exceptionRet = m_functionAssureImageIsVisible(jItem[0].id);
-                            if (exceptionRet) { throw exceptionRet; }
-
-                            break;
-                        }
-                    }
-                } catch(e) {
-
-                    errorHelper.show(e);
-                }
-            }
-
-            // Shared code for image add and update.
+            // Shared code for image add and update (which has been removed).
             var m_functionCompleteImageAddUpdate = function (jItem, iBase) {
 
                 try {

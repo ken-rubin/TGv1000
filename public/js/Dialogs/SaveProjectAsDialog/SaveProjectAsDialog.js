@@ -68,7 +68,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            		id: "SaveProjectBtn",
 					            		label: "Save Project",
 					            		hotkey: 13,
-					            		cssClass: "btn-primary",
+					            		cssClass: "btn-primary"
 					            	},
 					            	{
 						                label: "Close",

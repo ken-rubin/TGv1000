@@ -174,7 +174,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						                    	index: i,	// 2nd dimension index of m_searchResultRawArray
 						                    	id: rowIth.id,
 						                    	name: rowIth.name,
-						                    	description: rowIth.description,
 						                    	url: resourceHelper.toURL('resources', 
 						                    		rowIth.imageId, 
 						                    		'image', 
@@ -349,7 +348,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		tooltip = "<b>" + tooltip + "</b>"
 							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
-							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].classDescription
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
@@ -376,7 +375,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		tooltip = "<b>" + tooltip + "</b>"
 							        				+ "<br>Level: " + m_searchResultRawArray[stripNum][rowIth.index].level 
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
-							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
+							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].classDescription
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
@@ -386,7 +385,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        	combo,
 							        	"carousel" + combo.toString(),
 							        	tooltip,
-							        	rowIth.description,
 							        	rowIth.url,
 							        	'ScrollRegionImage',
 							        	null,

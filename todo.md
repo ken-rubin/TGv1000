@@ -6,6 +6,7 @@
 
 ## Jerry's Issues
 ### These items do not depend on Ken's rework.
+- Finish showAZActivatePPDialog, creating SavePPDataDialog and ProjectBO#routeSavePPData.
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
 - Why in the OpenProject scrollregions do all the images look like they do? Will they work if I choose an image? Having a real image should be a requirement of activation.
 - During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
@@ -24,7 +25,9 @@
         + Online classes:
             + imageId (maybe--doesn't the project already have an image?)
     + Add waitlist table to DB. Add functionality to add a user to a class's waitlist if appropriate. Don't take user to BuyDialog. Add to waitlist and display errorHelper. Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-    + Use this code to display a Product's video:
+        + Add waitlist reminders emails.
+        + Speaking of waitlist, don't write out dups.
+    * Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
         <video autoplay loop class="embed-responsive-item">

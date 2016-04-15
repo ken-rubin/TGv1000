@@ -364,10 +364,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (m_bPrivilegedUser) {
 
+								var jq;
 								if (m_projectType) {
 
 									// Remove the border around the previously selected image.
-									var jq;
 									switch(m_projectType) {
 										case "Game":
 											jq = $("#GameImage");
@@ -393,7 +393,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#ContinueBtn").prop('disabled', false);
 
 								// Draw a big red border around the selected Core Project Image.
-								var jq;
 								switch(m_projectType) {
 									case "Game":
 										jq = $("#GameImage");

@@ -227,7 +227,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} 
 
 								strBuild += '</div>';	// close <div class="PGChild"
-							};
+							}
 							strBuild += '</div>';
 
 							$("#PropertiesTbody").empty();
