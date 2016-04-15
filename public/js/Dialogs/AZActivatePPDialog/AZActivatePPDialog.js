@@ -50,7 +50,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 						try {
 
-							m_functionOK(iProjectId);
+							var exceptionRet = m_functionOK(iProjectId);
+							if (exceptionRet) { throw exceptionRet; }
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }

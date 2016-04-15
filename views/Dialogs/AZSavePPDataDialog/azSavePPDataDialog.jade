@@ -1,0 +1,43 @@
+//- Jade DOM for the Save Project As dialog. 
+//-
+.well
+  #DescriptionDiv.row
+      h4
+        | A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.
+      br
+
+      br
+      .col-xs-2
+          label.control-label(for="ProjectName", style="margin-top:6px;") Name
+      .col-xs-4
+          input.form-control#ProjectName(type='text' placeholder='Enter project name.')
+      br
+      br
+      .col-xs-2
+          label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
+      .col-xs-10
+          textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
+      br
+      br
+      br
+      .col-xs-2
+          label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
+      .col-xs-10
+          textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this project later.")
+  .row.tt-selector
+    br
+    .col-xs-12
+      .col-xs-2
+        label.control-label(for="ProjectImage", style="margin-top:6px;")  Project image
+      .col-xs-2
+        img#ProjectImage.img-responsive
+      .col-xs-1
+        button#ImageSearchLink.btn.btn-default.disabledifnoproj(type="button" title="Search for a Project Image")
+          span.glyphicon.glyphicon-search(aria-hidden="true")
+      .col-xs-1
+        button#NewImageURLLink.btn.btn-default.disabledifnoproj(type="button" title="Load a new Project Image using a URL")
+          span.glyphicon.glyphicon-cloud-download(aria-hidden="true")
+      .col-xs-1
+        button#NewImageDiskLink.btn.btn-default.disabledifnoproj(type="button" title="Load a new Project Image that's already on your computer")
+          span.glyphicon.glyphicon-open-file(aria-hidden="true")
+      .col-xs-5

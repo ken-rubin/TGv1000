@@ -26,6 +26,7 @@ define(["Core/errorHelper",
 		"Dialogs/AZActivatePPDialog/AZActivatePPDialog",
 		"Dialogs/AZUsersDialog/AZUsersDialog",
 		"Dialogs/AZProjectsDialog/AZProjectsDialog",
+		"Dialogs/AZSavePPDataDialog/AZSavePPDataDialog",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -49,6 +50,7 @@ define(["Core/errorHelper",
 				AZActivatePPDialog,
 				AZUsersDialog,
 				AZProjectsDialog,
+				AZSavePPDataDialog,
 				Project,
 				Type) {
 
@@ -594,10 +596,16 @@ define(["Core/errorHelper",
 							m_openDialog = new AZActivatePPDialog();
 							var exceptionRet = m_openDialog.create(function(jsPPData) {
 
-								errorHelper.show(JSON.stringify(jsPPData));
+								try {
+
+									m_openDialog = new AZSavePPDataDialog();
+									var exceptionRet = m_openDialog.create(jsPPData);
+									if (exceptionRet) { throw exceptionRet; }
+									return null;
+
+								} catch(e) { return e; }
 							});
 							if (exceptionRet) { throw exceptionRet; }
-
 							return null;
 
 						} catch (e) { return e; }
