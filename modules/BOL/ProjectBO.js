@@ -2542,6 +2542,90 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
+    self.routeSavePPData = function (req, res) {
+
+        try {
+
+            m_log("Entered ProjectBO/routeSavePPData with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
+            // Only one of the next 3 will be non-null.
+            // req.body.classData
+            // req.body.onlineClassData
+            // req.body.productData
+            // req.user.userId
+
+            // classData, onlineClassData, productData can be used as guts.
+
+            m_log("Getting a connection to MySql");
+            sql.getCxnFromPool(
+                function(err, connection) {
+                    try {
+                        if (err) { 
+
+                            return res.json({
+                                success: false,
+                                message: 'Could not get a database connection: ' + err.message
+                            });
+                        } else {
+
+                            if (req.body.classData) {
+
+                                var strQuery = "UPDATE " + self.dbname + "classes SET ? where id=" + req.body.classData.id;
+                                m_log('Updating classes record with id ' + req.body.classData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.classData));
+                                delete req.body.classData.id;
+                                sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.classData,
+                                    function(err, rows) {
+                                        if (err) { return res.json({ success: false, message: err.message}); }
+                                        return res.json({ success: true });
+                                    }
+                                );
+                            } else if (req.body.onlineClassData) {
+
+                                var strQuery = "UPDATE " + self.dbname + "onlineclasses SET ? where id=" + req.body.onlineClassData.id;
+                                m_log('Updating onlineclasses record with id ' + req.body.onlineClassData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.onlineClassData));
+                                delete req.body.onlineClassData.id;
+                                sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.onlineClassData,
+                                    function(err, rows) {
+                                        if (err) { return res.json({ success: false, message: err.message}); }
+                                        return res.json({ success: true });
+                                    }
+                                );
+                            } else if (req.body.productData) {
+
+                                var strQuery = "UPDATE " + self.dbname + "products SET ? where id=" + req.body.productData.id;
+                                m_log('Updating products record with id ' + req.body.productData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.productData));
+                                delete req.body.productData.id;
+                                sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.productData,
+                                    function(err, rows) {
+                                        if (err) { return res.json({ success: false, message: err.message}); }
+                                        return res.json({ success: true });
+                                    }
+                                );
+                            }
+                            
+                            // We fell through. One of them should have been non-null.
+                            return res.json({
+                                success: false,
+                                message: "routeSavePPData was called with invalid data."
+                            });
+                        }
+                    } catch(e) {
+
+                        return res.json({
+                            success: false,
+                            message: e.message
+                        });
+                    }
+                }
+            );
+        } catch (e) {
+
+            return res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     var m_log = function(msg) {
         // console.log(' ');
         console.log(msg);
