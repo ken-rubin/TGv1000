@@ -110,8 +110,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		var num = parseInt(jq.context.id.substring(8), 10);
 							    		var stripNum = Math.floor(num / 10) - 1;
 							    		var i = num % 10;
-							    		var projectId = m_searchResultRawArray[stripNum][i].baseProjectId;
-										self.callFunctionOK(projectId);
+										self.callFunctionOK(m_searchResultRawArray[stripNum][i]);
 							    	});
 								if (exceptionRet) { throw exceptionRet; }
 							}

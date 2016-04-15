@@ -592,11 +592,9 @@ define(["Core/errorHelper",
 						try {
 
 							m_openDialog = new AZActivatePPDialog();
-							var exceptionRet = m_openDialog.create(function(iProjectId) {
+							var exceptionRet = m_openDialog.create(function(jsPPData) {
 
-								// want to pass in product data row, iProjectId.
-								// new dlg will load it into snippet.
-								// new BO route will save to same id.
+								errorHelper.show(JSON.stringify(jsPPData));
 							});
 							if (exceptionRet) { throw exceptionRet; }
 

@@ -6,7 +6,7 @@
 
 ## Jerry's Issues
 ### These items do not depend on Ken's rework.
-- Finish showAZActivatePPDialog, creating SavePPDataDialog and ProjectBO#routeSavePPData.
+- Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData.
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
 - Why in the OpenProject scrollregions do all the images look like they do? Will they work if I choose an image? Having a real image should be a requirement of activation.
 - During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
