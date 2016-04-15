@@ -273,10 +273,30 @@ module.exports = function UtilityBO(app, sql, logger) {
             sql.execute(strQuery,
                 function(rows) {
 
+                    // rows is a ragged array [3][x].
+                    
+                    // Sort results by name.
+
+                    for(var i=0; i<3; i++) {
+
+                        rows[i].sort(function(a,b){
+
+                            if (a.name > b.name)
+                                return 1;
+                            if (a.name < b.name)
+                                return -1;
+                            return 0;
+                        });
+                    }
+
+                    return res.json({
+                        success: true,
+                        arrayRows: rows                        
+                    });
                 },
                 function(strError) {
 
-                    res.json({
+                    return res.json({
                         success: false,
                         message: strError
                     });
@@ -284,7 +304,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             );
         } catch (e) {
 
-            res.json({
+            return res.json({
                 success: false,
                 message: e.message
             });
