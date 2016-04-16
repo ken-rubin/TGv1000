@@ -105,11 +105,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							$("#SaveProjectBtn").click(m_functionSaveProject);
 
-							$("#ProjectName").val(m_jsPPData.name);
-
-							// $("#ProjectDescription").val(m_clProject.data.description);
-							// $("#ProjectTags").val(m_clProject.data.tags);
-
 							if (m_jsPPData.hasOwnProperty("facility")) {
 
 								m_templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';

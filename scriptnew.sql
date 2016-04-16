@@ -706,6 +706,14 @@ begin
         set @dbstate := 6;
     end if;
 
+    if @dbstate = 6 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SavePPData','post','routeSavePPData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		UPDATE control set dbstate=7 where id=1;
+        set @dbstate := 7;
+    end if;
+
 end//
 
 

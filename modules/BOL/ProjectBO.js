@@ -2560,36 +2560,183 @@ module.exports = function ProjectBO(app, sql, logger) {
             // req.user.userName
             // Neither of these is used, and no other input is needed, although we may want to add tags later.
 
-            var strQuery = "select c.*, p.description from " + self.dbname + "classes c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "onlineclasses c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "products c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
-            sql.execute(strQuery,
-                function(rows) {
+            async.waterfall(
+                [
+                    // (1)
+                    function(cb) {
 
-                    // rows is a ragged array [3][x].
-                    
-                    // Sort results by name.
+                        var strQuery = "select c.*, p.description from " + self.dbname + "classes c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "onlineclasses c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "products c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
+                        sql.execute(strQuery,
+                            function(rows) {
 
-                    for(var i=0; i<3; i++) {
+                                if (rows.length !== 3) {
+                                    return cb(new Error("Unable to fetch from PP data tables."), null);
+                                }
+                                // rows is a ragged array [3][x].
+                                
+                                // Sort results by name.
+                                for(var i=0; i<3; i++) {
 
-                        rows[i].sort(function(a,b){
+                                    rows[i].sort(function(a,b){
 
-                            if (a.name > b.name)
-                                return 1;
-                            if (a.name < b.name)
-                                return -1;
-                            return 0;
+                                        if (a.name > b.name)
+                                            return 1;
+                                        if (a.name < b.name)
+                                            return -1;
+                                        return 0;
+                                    });
+                                }
+                                return cb(null, { arrayRows: rows} );
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Unable to fetch from PP data tables: " + strError), null);
+                            }
+                        );
+                    },
+                    // (2)
+                    function(passOn, cb) {
+
+                        // In parallel we'll do [1], [2] and [3] to get project tags.
+                        // Inside each we'll use async.eachSeries to loop through the retrieved data for getting tags.
+                        async.parallel(
+                            [
+                                function(cb) {  // classes
+                                    async.eachSeries(passOn.arrayRows[0],
+                                        function(dataIth, cb) {
+                                            m_functionFetchTags(
+                                                dataIth.baseProjectId,
+                                                'project',
+                                                function(err, tags) {
+
+                                                    if (err) { return cb(err); }
+                                                }
+
+                                                dataIth.tags = tags;
+                                                return cb(null);
+                                            );
+                                        }
+                                    );
+                                },
+                                function(cb) {  // onlineclasses
+                                    async.eachSeries(passOn.arrayRows[1],
+                                        function(dataIth, cb) {
+                                            m_functionFetchTags(
+                                                dataIth.baseProjectId,
+                                                'project',
+                                                function(err, tags) {
+
+                                                    if (err) { return cb(err); }
+                                                }
+
+                                                dataIth.tags = tags;
+                                                return cb(null);
+                                            );
+                                        }
+                                    );
+                                },
+                                function(cb) {  // products
+                                    async.eachSeries(passOn.arrayRows[2],
+                                        function(dataIth, cb) {
+                                            m_functionFetchTags(
+                                                dataIth.baseProjectId,
+                                                'project',
+                                                function(err, tags) {
+
+                                                    if (err) { return cb(err); }
+                                                }
+
+                                                dataIth.tags = tags;
+                                                return cb(null);
+                                            );
+                                        }
+                                    );
+                                },
+                            ],
+                            function(err) {
+                                return cb(err, passOn);
+                            }
+                        );
+                    },
+                    // (3)
+                    function(passOn, cb) {
+
+                        // In parallel we'll do [1], [2] and [3] to get PP burchase numbers.
+                        // Inside each we'll use async.eachSeries to loop through the retrieved data.
+                        async.parallel(
+                            [
+                                function(cb) {  // classes
+                                    async.eachSeries(passOn.arrayRows[0],
+                                        function(dataIth, cb) {
+                                            m_functionFetchTags(
+                                                dataIth.baseProjectId,
+                                                'project',
+                                                function(err, tags) {
+
+                                                    if (err) { return cb(err); }
+
+                                                    dataIth.tags = tags;
+                                                    return cb(null);
+                                                }
+                                            );
+                                        },
+                                        function(err) { return cb(err); }
+                                    );
+                                },
+                                function(cb) {  // onlineclasses
+                                    async.eachSeries(passOn.arrayRows[1],
+                                        function(dataIth, cb) {
+                                            m_functionFetchTags(
+                                                dataIth.baseProjectId,
+                                                'project',
+                                                function(err, tags) {
+
+                                                    if (err) { return cb(err); }
+
+                                                    dataIth.tags = tags;
+                                                    return cb(null);
+                                                }
+                                            );
+                                        },
+                                        function(err) { return cb(err); }
+                                    );
+                                },
+                                function(cb) {  // products
+                                    async.eachSeries(passOn.arrayRows[2],
+                                        function(dataIth, cb) {
+                                            m_functionFetchTags(
+                                                dataIth.baseProjectId,
+                                                'project',
+                                                function(err, tags) {
+
+                                                    if (err) { return cb(err); }
+
+                                                    dataIth.tags = tags;
+                                                    return cb(null);
+                                                }
+                                            );
+                                        },
+                                        function(err) { return cb(err); }
+                                    );
+                                },
+                            ],
+                            function(err) {
+                                return cb(err, passOn);
+                            }
+                        );
+                    }
+                ],
+                function(err, passOn) {
+
+                    if (err) {
+                        return res.json({
+                            success: false,
+                            message: err.message
                         });
                     }
-
                     return res.json({
                         success: true,
-                        arrayRows: rows                        
-                    });
-                },
-                function(strError) {
-
-                    return res.json({
-                        success: false,
-                        message: strError
+                        arrayRows: passOn.arrayRows
                     });
                 }
             );
