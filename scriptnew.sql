@@ -669,14 +669,6 @@ begin
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,11);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (1,12);
 
-		UPDATE control set dbstate=2 where id=1;
-        set @dbstate := 2;
-    end if;
-
-    if @dbstate = 2 THEN
-    
-		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/RetrievePurchasableProjectData','post','routeRetrievePurchasableProjectData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
-
 		UPDATE control set dbstate=3 where id=1;
         set @dbstate := 3;
     end if;
@@ -708,7 +700,7 @@ begin
 
     if @dbstate = 5 THEN
     
-		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/RetrievePurchasableProjectData','post','routeRetrievePurchasableProjectData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrievePurchasableProjectData','post','routeRetrievePurchasableProjectData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 
 		UPDATE control set dbstate=6 where id=1;
         set @dbstate := 6;

@@ -157,8 +157,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$("#ProjectName").val(m_jsPPData.name);
 						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
 
-						// $("#ProjectDescription").val(m_clProject.data.description);
-						// $("#ProjectTags").val(m_clProject.data.tags);
+						$("#ProjectDescription").val(m_jsPPData.description);
+						$("#ProjectTags").val(m_jsPPData.tags);
 
 						if (m_templateToGet.includes("class")) {
 

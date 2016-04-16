@@ -128,7 +128,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 					    try {
 
-					        var posting = $.post("/BOL/UtilityBO/RetrievePurchasableProjectData", 
+					        var posting = $.post("/BOL/ProjectBO/RetrievePurchasableProjectData", 
 					        	{}, 
 					        	'json');
 					        posting.done(function(data){

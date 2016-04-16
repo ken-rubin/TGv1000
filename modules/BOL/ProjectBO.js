@@ -2542,6 +2542,66 @@ module.exports = function ProjectBO(app, sql, logger) {
         }
     }
 
+    self.routeRetrievePurchasableProjectData = function (req, res) {
+
+        // This method retrieves all items in products, classes and online classes.
+        // It's purpose is to let a privileged user activate/desctivate, edit details, etc.
+
+        // We're going to use async.waterfall for these stages:
+        // (1) Retrieve 3 by x jagged array of classes, onlineclasses and products plus joined project.description.
+        // (2) Add related tags to each record in all 3 arrays.
+        // (3) Add enrollment/purchase data to all 3 arrays.
+        // Finally, return the single 2-dim jagged array.
+
+        try {
+
+            console.log("Entered ProjectBO/routeRetrievePurchasableProjectData");
+            // req.user.userId
+            // req.user.userName
+            // Neither of these is used, and no other input is needed, although we may want to add tags later.
+
+            var strQuery = "select c.*, p.description from " + self.dbname + "classes c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "onlineclasses c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "products c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
+            sql.execute(strQuery,
+                function(rows) {
+
+                    // rows is a ragged array [3][x].
+                    
+                    // Sort results by name.
+
+                    for(var i=0; i<3; i++) {
+
+                        rows[i].sort(function(a,b){
+
+                            if (a.name > b.name)
+                                return 1;
+                            if (a.name < b.name)
+                                return -1;
+                            return 0;
+                        });
+                    }
+
+                    return res.json({
+                        success: true,
+                        arrayRows: rows                        
+                    });
+                },
+                function(strError) {
+
+                    return res.json({
+                        success: false,
+                        message: strError
+                    });
+                }
+            );
+        } catch (e) {
+
+            return res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeSavePPData = function (req, res) {
 
         try {

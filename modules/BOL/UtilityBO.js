@@ -257,60 +257,6 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
-    self.routeRetrievePurchasableProjectData = function (req, res) {
-
-        // This method retrieves all items in products, classes and online classes.
-        // It's purpose is to let a privileged user activate/desctivate, edit details, etc.
-
-        try {
-
-            console.log("Entered UtilityBO/routeRetrievePurchasableProjectData");
-            // req.user.userId
-            // req.user.userName
-            // Neither of these is used, and no other input is needed, although we may want to add tags later.
-
-            var strQuery = "select * from classes; select * from onlineclasses; select * from products;";
-            sql.execute(strQuery,
-                function(rows) {
-
-                    // rows is a ragged array [3][x].
-                    
-                    // Sort results by name.
-
-                    for(var i=0; i<3; i++) {
-
-                        rows[i].sort(function(a,b){
-
-                            if (a.name > b.name)
-                                return 1;
-                            if (a.name < b.name)
-                                return -1;
-                            return 0;
-                        });
-                    }
-
-                    return res.json({
-                        success: true,
-                        arrayRows: rows                        
-                    });
-                },
-                function(strError) {
-
-                    return res.json({
-                        success: false,
-                        message: strError
-                    });
-                }
-            );
-        } catch (e) {
-
-            return res.json({
-                success: false,
-                message: e.message
-            });
-        }
-    }
-
     self.routeSearchProjects = function (req, res) {
 
         // This is a search for projects based on tags.
