@@ -2610,12 +2610,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function(err, tags) {
 
                                                     if (err) { return cb(err); }
-                                                }
 
-                                                dataIth.tags = tags;
-                                                return cb(null);
+                                                    dataIth.tags = tags;
+                                                    return cb(null);
+                                                }
                                             );
-                                        }
+                                        },
+                                        function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
                                     );
                                 },
                                 function(cb) {  // onlineclasses
@@ -2627,12 +2628,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function(err, tags) {
 
                                                     if (err) { return cb(err); }
-                                                }
 
-                                                dataIth.tags = tags;
-                                                return cb(null);
+                                                    dataIth.tags = tags;
+                                                    return cb(null);
+                                                }
                                             );
-                                        }
+                                        },
+                                        function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
                                     );
                                 },
                                 function(cb) {  // products
@@ -2644,14 +2646,15 @@ module.exports = function ProjectBO(app, sql, logger) {
                                                 function(err, tags) {
 
                                                     if (err) { return cb(err); }
-                                                }
 
-                                                dataIth.tags = tags;
-                                                return cb(null);
+                                                    dataIth.tags = tags;
+                                                    return cb(null);
+                                                }
                                             );
-                                        }
+                                        },
+                                        function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
                                     );
-                                },
+                                }
                             ],
                             function(err) {
                                 return cb(err, passOn);
@@ -2661,24 +2664,13 @@ module.exports = function ProjectBO(app, sql, logger) {
                     // (3)
                     function(passOn, cb) {
 
-                        // In parallel we'll do [1], [2] and [3] to get PP burchase numbers.
+                        // In parallel we'll do [1], [2] and [3] to get PP purchase numbers.
                         // Inside each we'll use async.eachSeries to loop through the retrieved data.
                         async.parallel(
                             [
                                 function(cb) {  // classes
                                     async.eachSeries(passOn.arrayRows[0],
                                         function(dataIth, cb) {
-                                            m_functionFetchTags(
-                                                dataIth.baseProjectId,
-                                                'project',
-                                                function(err, tags) {
-
-                                                    if (err) { return cb(err); }
-
-                                                    dataIth.tags = tags;
-                                                    return cb(null);
-                                                }
-                                            );
                                         },
                                         function(err) { return cb(err); }
                                     );
@@ -2686,17 +2678,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 function(cb) {  // onlineclasses
                                     async.eachSeries(passOn.arrayRows[1],
                                         function(dataIth, cb) {
-                                            m_functionFetchTags(
-                                                dataIth.baseProjectId,
-                                                'project',
-                                                function(err, tags) {
-
-                                                    if (err) { return cb(err); }
-
-                                                    dataIth.tags = tags;
-                                                    return cb(null);
-                                                }
-                                            );
                                         },
                                         function(err) { return cb(err); }
                                     );
@@ -2704,17 +2685,6 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 function(cb) {  // products
                                     async.eachSeries(passOn.arrayRows[2],
                                         function(dataIth, cb) {
-                                            m_functionFetchTags(
-                                                dataIth.baseProjectId,
-                                                'project',
-                                                function(err, tags) {
-
-                                                    if (err) { return cb(err); }
-
-                                                    dataIth.tags = tags;
-                                                    return cb(null);
-                                                }
-                                            );
                                         },
                                         function(err) { return cb(err); }
                                     );
@@ -2734,6 +2704,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             message: err.message
                         });
                     }
+
                     return res.json({
                         success: true,
                         arrayRows: passOn.arrayRows
