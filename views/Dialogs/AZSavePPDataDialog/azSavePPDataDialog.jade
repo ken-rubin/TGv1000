@@ -1,29 +1,7 @@
-//- Jade DOM for the Save Project As dialog. 
+//- Jade DOM for the Save Purchasable Project Data dialog. 
 //-
 .well
   #DescriptionDiv.row
-      h4
-        | A TechGroms project has a <em>name</em>, an id <em>image</em> and a number of <em>tags</em> that will help you and others (if it's shared) search for it later.
-      br
-
-      br
-      .col-xs-2
-          label.control-label(for="ProjectName", style="margin-top:6px;") Name
-      .col-xs-4
-          input.form-control#ProjectName(type='text' placeholder='Enter project name.')
-      br
-      br
-      .col-xs-2
-          label.control-label(for="ProjectDescription", style="margin-top:6px;") Description
-      .col-xs-10
-          textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Optional project description.")
-      br
-      br
-      br
-      .col-xs-2
-          label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
-      .col-xs-10
-          textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help you search for this project later.")
   .row.tt-selector
     br
     .col-xs-12
