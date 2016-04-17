@@ -63,6 +63,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
+					            		id: "ValidateBtn",
+					            		label: "Pre-Validate",
+					            		cssClass: "btn-primary"
+					            	},
+					            	{
 					            		id: "SaveProjectBtn",
 					            		label: "Save",
 					            		hotkey: 13,
@@ -103,6 +108,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageURLLink").click(m_functionURLClick);
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 
+							$("#ValidateBtn").click(m_functionValidate);
 							$("#SaveProjectBtn").click(m_functionSaveProject);
 
 							if (m_jsPPData.hasOwnProperty("facility")) {
@@ -298,9 +304,37 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						return strDate + '         ' + strFrom + ' - ' + strThru;
 					}
 
+					var m_functionValidate = function () {
+
+				        // The following fields are required:
+				        //   general:
+				        //
+				        //   class:
+				        // 		Will need class schedule validation:
+				        //    		Any date that's entered must be a valid datetime.
+				        //    		Any date must have valid duration.
+				        //    		No gaps allowed in the array.
+				        //    		Dates must be in ascending order--think about two classes happening on the same day.
+				        //
+				        //   online class:
+				        //		Same schedule validation as for class.
+				        //
+				        //   product:
+				        //
+				        // There must be an image with imageId !== 0.
+
+						try {
+
+
+
+						} catch (e) { errorHelper.show(e); }
+					}
+
 					var m_functionSaveProject = function () {
 
 						try {
+
+							if (!m_functionValidate()) { return; }
 
 							var strProjectDescription = $("#ProjectDescription").val().trim();
 
