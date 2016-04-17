@@ -334,7 +334,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							if (!m_functionValidate()) { return; }
+							if (!m_functionValidate()) { return; }	// m_functionValidate displays its own success or failure popup.
 
 							var strProjectDescription = $("#ProjectDescription").val().trim();
 

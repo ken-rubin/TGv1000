@@ -6,7 +6,7 @@
 
 ## Jerry's Issues
 ### These items do not depend on Ken's rework.
-- Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData.
+- Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData. **Close open project if one exists beforehand.**
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
 - Why in the OpenProject scrollregions do all the images look like they do? Will they work if I choose an image? Having a real image should be a requirement of activation.
 - During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
@@ -21,12 +21,12 @@
         + Classes: 
             + maxClassSize
             + imageId (maybe--doesn't the project already have an image?)
-            + some computers available for student use (bool)
+            + some computers available for student use (bool/checkbox)
         + Online classes:
             + imageId (maybe--doesn't the project already have an image?)
-    + Add waitlist table to DB. Add functionality to add a user to a class's waitlist if appropriate. Don't take user to BuyDialog. Add to waitlist and display errorHelper. Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
         + Add waitlist reminders emails.
-        + Speaking of waitlist, don't write out dups.
+        + Speaking of waitlist, check for and don't write out dups.
     * Use this code to display a Product's video:
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -44,14 +44,6 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - AdminZone functionality
     - User & Usergroup and Permissions maintenance
-    - Purchasable Project active setting.
-        - Will need class date/time validation:
-            - Any date that's entered must be a valid date.
-            - Any date must have from/to times.
-            - No gaps allowed.
-            - Dates must be in ascending order--be careful about two classes happening on the same day.
-        - Finish routeRetrievePurchasableProjectData.
-        - Finish AZActivatePPDialog.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc.
 - Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - go to AdminZone; 
@@ -89,7 +81,7 @@
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
-### To consider way later
+### To consider later
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.

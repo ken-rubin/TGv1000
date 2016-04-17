@@ -989,18 +989,6 @@ define(["Core/errorHelper",
 					}
 
 					//////////////////////////////
-					// Non-dialog menu handlers
-
-					self.navToAdminzone = function() {
-
-						try {
-
-							location.href = "/adminzone"
-
-						} catch (e) { return e; }
-					}
-
-					//////////////////////////////
 					// Miscellaneous helpers.
 					self.getNumberOfTypesInActiveComic = function () {
 
