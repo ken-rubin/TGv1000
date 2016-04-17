@@ -2577,14 +2577,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 // Sort results by name.
                                 for(var i=0; i<3; i++) {
 
-                                    rows[i].sort(function(a,b){
+                                    if (rows[i].length) {
 
-                                        if (a.name > b.name)
-                                            return 1;
-                                        if (a.name < b.name)
-                                            return -1;
-                                        return 0;
-                                    });
+                                        rows[i].sort(function(a,b){
+
+                                            if (a.name > b.name)
+                                                return 1;
+                                            if (a.name < b.name)
+                                                return -1;
+                                            return 0;
+                                        });
+                                    }
                                 }
                                 return cb(null, { arrayRows: rows} );
                             },
@@ -2599,100 +2602,97 @@ module.exports = function ProjectBO(app, sql, logger) {
 
                         // In parallel we'll do [1], [2] and [3] to get project tags.
                         // Inside each we'll use async.eachSeries to loop through the retrieved data for getting tags.
-                        async.parallel(
-                            [
-                                function(cb) {  // classes
-                                    async.eachSeries(passOn.arrayRows[0],
-                                        function(dataIth, cb) {
-                                            m_functionFetchTags(
-                                                dataIth.baseProjectId,
-                                                'project',
-                                                function(err, tags) {
+                        // async.parallel(
+                        //     [
+                        //         function(cb) {  // classes
+                        //             async.eachSeries(passOn.arrayRows[0],
+                        //                 function(dataIth, cb) {
+                        //                     m_functionFetchTags(
+                        //                         dataIth.baseProjectId,
+                        //                         'project',
+                        //                         function(err, tags) {
 
-                                                    if (err) { return cb(err); }
+                        //                             if (err) { return cb(err); }
 
-                                                    dataIth.tags = tags;
-                                                    return cb(null);
-                                                }
-                                            );
-                                        },
-                                        function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
-                                    );
-                                },
-                                function(cb) {  // onlineclasses
-                                    async.eachSeries(passOn.arrayRows[1],
-                                        function(dataIth, cb) {
-                                            m_functionFetchTags(
-                                                dataIth.baseProjectId,
-                                                'project',
-                                                function(err, tags) {
+                        //                             dataIth.tags = tags;
+                        //                             return cb(null);
+                        //                         }
+                        //                     );
+                        //                 },
+                        //                 function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
+                        //             );
+                        //         },
+                        //         function(cb) {  // onlineclasses
+                        //             async.eachSeries(passOn.arrayRows[1],
+                        //                 function(dataIth, cb) {
+                        //                     m_functionFetchTags(
+                        //                         dataIth.baseProjectId,
+                        //                         'project',
+                        //                         function(err, tags) {
 
-                                                    if (err) { return cb(err); }
+                        //                             if (err) { return cb(err); }
 
-                                                    dataIth.tags = tags;
-                                                    return cb(null);
-                                                }
-                                            );
-                                        },
-                                        function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
-                                    );
-                                },
-                                function(cb) {  // products
-                                    async.eachSeries(passOn.arrayRows[2],
-                                        function(dataIth, cb) {
-                                            m_functionFetchTags(
-                                                dataIth.baseProjectId,
-                                                'project',
-                                                function(err, tags) {
+                        //                             dataIth.tags = tags;
+                        //                             return cb(null);
+                        //                         }
+                        //                     );
+                        //                 },
+                        //                 function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
+                        //             );
+                        //         },
+                        //         function(cb) {  // products
+                        //             async.eachSeries(passOn.arrayRows[2],
+                        //                 function(dataIth, cb) {
+                        //                     m_functionFetchTags(
+                        //                         dataIth.baseProjectId,
+                        //                         'project',
+                        //                         function(err, tags) {
 
-                                                    if (err) { return cb(err); }
+                        //                             if (err) { return cb(err); }
 
-                                                    dataIth.tags = tags;
-                                                    return cb(null);
-                                                }
-                                            );
-                                        },
-                                        function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
-                                    );
-                                }
-                            ],
-                            function(err) {
-                                return cb(err, passOn);
-                            }
-                        );
+                        //                             dataIth.tags = tags;
+                        //                             return cb(null);
+                        //                         }
+                        //                     );
+                        //                 },
+                        //                 function(err) { return cb(new Error("Error rec'd retrieving tags: " + err.message), null); }
+                        //             );
+                        //         }
+                        //     ],
+                        //     function(err) {
+                        //         return cb(err, passOn);
+                        //     }
+                        // );
+                        return cb(null, passOn);
                     },
                     // (3)
                     function(passOn, cb) {
 
-                        // In parallel we'll do [1], [2] and [3] to get PP purchase numbers.
-                        // Inside each we'll use async.eachSeries to loop through the retrieved data.
-                        async.parallel(
-                            [
-                                function(cb) {  // classes
-                                    async.eachSeries(passOn.arrayRows[0],
-                                        function(dataIth, cb) {
-                                        },
-                                        function(err) { return cb(err); }
-                                    );
-                                },
-                                function(cb) {  // onlineclasses
-                                    async.eachSeries(passOn.arrayRows[1],
-                                        function(dataIth, cb) {
-                                        },
-                                        function(err) { return cb(err); }
-                                    );
-                                },
-                                function(cb) {  // products
-                                    async.eachSeries(passOn.arrayRows[2],
-                                        function(dataIth, cb) {
-                                        },
-                                        function(err) { return cb(err); }
-                                    );
-                                },
-                            ],
-                            function(err) {
-                                return cb(err, passOn);
-                            }
+                        // We're going to try to use nested async.eachSeries to get PP purchase numbers from the 2 dimensions of passOn.arrayRows.
+                        async.eachSeries(passOn.arrayRows,
+                            function(arIth, cb) {
+
+                                async.eachSeries(arIth,
+                                    function(arIthJth, cb) {
+
+                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.id + " and id<>" + arIthJth.id + ";";
+                                        sql.execute(strQuery,
+                                            function(rows){
+
+                                                if (rows.length === 0) {
+                                                    arIthJth.numBuyers = 0;
+                                                } else {
+                                                    arIthJth.numBuyers = rows[0].cnt;
+                                                }
+                                                return cb(null);
+                                            },
+                                            function(strError) { return cb(new Error(strError)); }
+                                        );
+                                    },
+                                    function(err) { return cb(err); }
+                                );
+                            },
+                            function(err) { return cb(err, passOn); }
                         );
                     }
                 ],

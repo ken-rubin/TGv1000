@@ -184,9 +184,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 							$("#Zip").val(m_jsPPData.zip);
 							// when array
+							var jsWhen = JSON.parse(m_jsPPData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_jsPPData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = jsWhen[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
@@ -251,9 +252,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#InstructorLast").val(m_jsPPData.instructorLastName);
 							$("#Email").val(m_jsPPData.instructorEmail);
 							// when array
+							var jsWhen = JSON.parse(m_jsPPData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_jsPPData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = jsWhen[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo

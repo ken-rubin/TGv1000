@@ -46,11 +46,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						} catch (e) { return e; }
 					};
 
-					self.callFunctionOK = function(iProjectId) {
+					self.callFunctionOK = function(jsPPData) {
 
 						try {
 
-							var exceptionRet = m_functionOK(iProjectId);
+							var exceptionRet = m_functionOK(jsPPData);
 							if (exceptionRet) { throw exceptionRet; }
 							m_dialog.close();
 

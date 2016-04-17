@@ -278,7 +278,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_clProject.data.specialProjectData.onlineClassData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
