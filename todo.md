@@ -5,14 +5,19 @@
 
 
 ## Jerry's Issues
-### These items do not depend on Ken's rework.
+### Immediate importance
+- Loading the Len image didn't work. But I also didn't have the public\resources folder in place.
 - Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData. **Close open project if one exists beforehand.**
+- Test image (multer) upload now that I've put JWT in the middle of its route handler.
+- Show abandon dlg if user opens AZActivatePPDialog.
+
+### These items do not depend on Ken's rework.
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?
-- Why in the OpenProject scrollregions do all the images look like they do? Will they work if I choose an image? Having a real image should be a requirement of activation.
-- During the buying process there's a project, but the user must not be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
+- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
-    + Test image (multer) upload now that I've put JWT in the middle of its route handler.
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.
+    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+    + Add waitlist reminders emails.
 - Finish buying. 
     + Need to add a couple of new fields to the specialProjectData class snippets and db tables. These fields may not appear in BuyDialog--or they may present as buttons (like to view the movie).
         + Products: 
@@ -24,8 +29,6 @@
             + some computers available for student use (bool/checkbox)
         + Online classes:
             + imageId (maybe--doesn't the project already have an image?)
-    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-        + Add waitlist reminders emails.
         + Speaking of waitlist, check for and don't write out dups.
     * Use this code to display a Product's video:
     ```
