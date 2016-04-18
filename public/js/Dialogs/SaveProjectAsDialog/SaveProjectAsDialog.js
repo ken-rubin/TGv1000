@@ -421,7 +421,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									level: strLevel,
 									difficulty: strDifficulty,
 									price: dPrice,
-									classNotes: strNotes
+									classNotes: strNotes,
+									imageId: m_clProject.data.imageId
 								};
 							} else if (m_clProject.data.isProduct) {
 
@@ -439,7 +440,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									productDescription: strProjectDescription,
 									level: strLevel,
 									difficulty: strDifficulty,
-									price: dPrice
+									price: dPrice,
+									imageId: m_clProject.data.imageId
 								};
 							} else if (m_clProject.data.isOnlineClass) {
 
@@ -475,7 +477,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									level: strLevel,
 									difficulty: strDifficulty,
 									price: dPrice,
-									classNotes: strNotes
+									classNotes: strNotes,
+									imageId: m_clProject.data.imageId
 								};
 							}
 
@@ -549,8 +552,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						m_clProject.imageId = imageId;
-						m_clProject.altImagePath = '';
+						m_clProject.data.imageId = imageId;
+						m_clProject.data.altImagePath = '';
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}

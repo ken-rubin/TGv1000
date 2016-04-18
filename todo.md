@@ -6,9 +6,7 @@
 
 ## Jerry's Issues
 ### Immediate importance
-- Loading the Len image didn't work. But I also didn't have the public\resources folder in place.
-- Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData. **Close open project if one exists beforehand.**
-- Test image (multer) upload now that I've put JWT in the middle of its route handler.
+- Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData.
 - Show abandon dlg if user opens AZActivatePPDialog.
 
 ### These items do not depend on Ken's rework.
