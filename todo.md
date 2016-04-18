@@ -6,7 +6,7 @@
 
 ## Jerry's Issues
 ### Immediate importance
-- Finish showAZActivatePPDialog, creating AZSavePPDataDialog and ProjectBO#routeSavePPData.
+- Finish AZSavePPDataDialog.
 
 ### These items do not depend on Ken's rework.
 - On a new installation John got e is not defined when trying to save first Product. This is caused when there's a missing catch in a dialog. Can't find that. What else could it be?

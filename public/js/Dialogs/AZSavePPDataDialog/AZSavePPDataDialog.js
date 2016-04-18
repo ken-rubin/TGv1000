@@ -110,7 +110,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
-							$("#NewImageDiskLink").click(m_functionDiskClick);
 
 							$("#ValidateBtn").click(m_functionValidate);
 							$("#SaveProjectBtn").click(m_functionSaveProject);
@@ -377,10 +376,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						return strDate + '         ' + strFrom + ' - ' + strThru;
 					}
 
-					var m_functionValidate = function () {
+					var m_functionValidate = function (event, bSaving) {
 
-				        // The following fields are required:
 				        //   general:
+				        //      imageId mb > 0
 				        //
 				        //   class:
 				        // 		Will need class schedule validation:
@@ -388,18 +387,50 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				        //    		Any date must have valid duration.
 				        //    		No gaps allowed in the array.
 				        //    		Dates must be in ascending order--think about two classes happening on the same day.
+				        //      All fields except room and dates beyond final class are required.
 				        //
 				        //   online class:
 				        //		Same schedule validation as for class.
+				        //      All fields except room and dates beyond final class are required.
 				        //
 				        //   product:
+				        //      All fields are required.
 				        //
-				        // There must be an image with imageId !== 0.
+
+				        bSaving = bSaving || false;
 
 						try {
 
+							var bValid = true;
+							m_strProductType = m_templateToGet.includes("class") ? "class" : m_templateToGet.includes("product") ? "product" : "onlineClass";
+							var htmlError = "";
 
+							if (m_jsPPData.imageId === 0) {
+								htmlError += "<br><span>You must choose a real image.</span>";
+								bValid = false;
+							}
 
+							switch(strProductType) {
+								case "class":
+
+									break;
+								case "onlineClass":
+
+									break;
+								case "product":
+
+									break;
+							}
+
+							if (!bValid) {
+								errorHelper.show(htmlError);
+							}
+
+							if (bSaving) {
+								return bValid;
+							} else if (bValid) {
+								errorHelper.show("Everything checks out fine!", 250000);	// Changes header from Error to Note.
+							}
 						} catch (e) { errorHelper.show(e); }
 					}
 
@@ -419,7 +450,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							if (!m_functionValidate()) { return; }	// m_functionValidate displays its own success or failure popup.
+							if (!m_functionValidate(null, true)) { return; }	// m_functionValidate displays its own success or failure popup.
 
 							bToggleActive = bToggleActive || false;
 
@@ -532,9 +563,33 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// };
 							}
 
-							// exceptionRet = client.saveProject();
-							// if (exceptionRet) { throw exceptionRet; }
+							var data = {};
+							switch (m_strProductType) {
+								case "class":
+									data.classData = m_jsPPData;
+									break;
+								case "onlineClass":
+									data.onlineClassData = m_jsPPData;
+									break;
+								case "product":
+									data.productData = m_jsPPData;
+									break;
+							}
+		                    var posting = $.post("/BOL/ProjectBO/SavePPData",
+		                    		data,
+		                            'json');
+		                    posting.done(function(data) {
 
+		                    	if (data.success) {
+
+                                    errorHelper.show("The save was successful.", 250000);
+                                    m_dialog.close();
+		                    	
+		                    	} else {
+
+		                    		errorHelper.show("The save failed: " + data.message);
+		                    	}
+		                    });
 						} catch(e) { errorHelper.show(e); }
 					}
 
@@ -612,6 +667,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_jsPPData;
 				var m_templateToGet;
+				var m_strProductType;
 			};
 
 			// Return the constructor function as the module object.
