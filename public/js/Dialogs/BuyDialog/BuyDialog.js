@@ -191,6 +191,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
 							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and a reminder with dates, times and location.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
+
 							jQuery(function($){
 								$("#Phone").mask("(999) 999-9999? x99999");
 								$("#Zip").mask("99999");

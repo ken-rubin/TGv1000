@@ -64,17 +64,21 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            buttons: [
 					            	{
 					            		id: "ValidateBtn",
-					            		label: "Pre-Validate",
+					            		label: "Pre-Validate Fields",
 					            		cssClass: "btn-primary"
 					            	},
 					            	{
 					            		id: "SaveProjectBtn",
-					            		label: "Save",
-					            		hotkey: 13,
+					            		label: "Save w/o Changing Active Status",
 					            		cssClass: "btn-primary"
 					            	},
 					            	{
-						                label: "Close",
+					            		id: "SaveChangeProjectBtn",
+					            		label: "xxx",
+					            		cssClass: "btn-primary"
+					            	},
+					            	{
+						                label: "Close w/o Changing Anything",
 						                icon: "glyphicon glyphicon-remove-circle",
 						                cssClass: "btn-warning",
 						                action: function(dialogItself){
@@ -110,6 +114,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							$("#ValidateBtn").click(m_functionValidate);
 							$("#SaveProjectBtn").click(m_functionSaveProject);
+							$("#SaveChangeProjectBtn").click(m_functionSaveToggleProject);
 
 							if (m_jsPPData.hasOwnProperty("facility")) {
 
@@ -161,7 +166,31 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$("#ProjectDescription").val(m_jsPPData.description);
 						$("#ProjectTags").val(m_jsPPData.tags);
 
+						$("#BuyHeader").empty();
+						var strNewBuyHeader = '';
 						if (m_templateToGet.includes("class")) {
+
+							if (m_jsPPData.active === 1) {
+
+								$("#SaveChangeProjectBtn").text("Deactivate and Save");
+								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>ACTIVE</b> Class you selected.</h4>';
+								strNewBuyHeader += '<h5>You may <i>deactivate</i> the class or just change its details and save it. ';
+								strNewBuyHeader += "Pre-validating to check your changes is a good idea, but we'll still validate before saving--even if you deactivate the class. ";
+								if (m_jsPPData.numBuyers === 1) {
+									strNewBuyHeader += "<b>FYI</b>: there is 1 person enrolled in the class.</h5>";
+								} else {
+									strNewBuyHeader += "<b>FYI</b>: there are " + m_jsPPData.numBuyers + " people enrolled in the class.</h5>";
+								}
+
+							} else {
+
+								$("#SaveChangeProjectBtn").text("Activate and Save");
+								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>INACTIVE</b> Class you selected.</h4>';
+								strNewBuyHeader += '<h5>You may <i>activate</i> the class or just change its details and save it. ';
+								strNewBuyHeader += "Pre-validating to check your changes is a good idea, but we'll always validate before saving--even if you don't.</h5>";
+							}
+
+							$("#BuyHeader").append(strNewBuyHeader);
 
 							jQuery(function($){
 								$("#Phone").mask("(999) 999-9999? x99999");
@@ -220,6 +249,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						
 						} else if (m_templateToGet.includes("product")) {
 
+							if (m_jsPPData.active === 1) {
+
+								$("#SaveChangeProjectBtn").text("Deactivate and Save");
+								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>ACTIVE</b> Product you selected.</h4>';
+								strNewBuyHeader += '<h5>You may <i>deactivate</i> the product or just change its details and save it. ';
+								strNewBuyHeader += "Pre-validating to check your changes is a good idea, but we'll still validate before saving--even if you deactivate. ";
+								if (m_jsPPData.numBuyers === 1) {
+									strNewBuyHeader += "<b>FYI</b>: there is 1 person who has already bought this product.</h5>";
+								} else {
+									strNewBuyHeader += "<b>FYI</b>: there are " + m_jsPPData.numBuyers + " people who have already bought this product.</h5>";
+								}
+
+							} else {
+
+								$("#SaveChangeProjectBtn").text("Activate and Save");
+								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>INACTIVE</b> Product you selected.</h4>';
+								strNewBuyHeader += '<h5>You may <i>activate</i> the product or just change its details and save it. ';
+								strNewBuyHeader += "Pre-validating to check your changes is a good idea, but we'll always validate before saving--even if you don't.</h5>";
+							}
+
+							$("#BuyHeader").append(strNewBuyHeader);
+
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
@@ -246,6 +297,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#Price").val(m_jsPPData.price.dollarFormat());
 						
 						} else {
+
+							if (m_jsPPData.active === 1) {
+
+								$("#SaveChangeProjectBtn").text("Deactivate and Save");
+								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>ACTIVE</b> Online Class you selected.</h4>';
+								strNewBuyHeader += '<h5>You may <i>deactivate</i> the class or just change its details and save it. ';
+								strNewBuyHeader += "Pre-validating to check your changes is a good idea, but we'll still validate before saving--even if you deactivate.";
+								if (m_jsPPData.numBuyers === 1) {
+									strNewBuyHeader += "<b>FYI</b>: there is 1 person enrolled in the class.</h5>";
+								} else {
+									strNewBuyHeader += "<b>FYI</b>: there are " + m_jsPPData.numBuyers + " people enrolled in the class.</h5>";
+								}
+
+							} else {
+
+								$("#SaveChangeProjectBtn").text("Activate and Save");
+								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>INACTIVE</b> Online Class you selected.</h4>';
+								strNewBuyHeader += '<h5>You may <i>activate</i> the class or just change its details and save it. ';
+								strNewBuyHeader += "Pre-validating to check your changes is a good idea, but we'll always validate before saving--even if you don't.</h5>";
+							}
+
+							$("#BuyHeader").append(strNewBuyHeader);
 
 							jQuery(function($){
 								$("#Price").mask("$999.99");
@@ -330,11 +403,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						} catch (e) { errorHelper.show(e); }
 					}
 
-					var m_functionSaveProject = function () {
+					var m_functionSaveToggleProject = function () {
+
+						try {
+
+							m_functionSaveProject(true);	// Means to toggle active before saving, but after validating.
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
+					var m_functionSaveProject = function (bToggleActive) {
 
 						try {
 
 							if (!m_functionValidate()) { return; }	// m_functionValidate displays its own success or failure popup.
+
+							bToggleActive = bToggleActive || false;
+
+							if (bToggleActive) {
+
+								m_jsPPData.active = 1 - m_jsPPData.active;
+							}
 
 							var strProjectDescription = $("#ProjectDescription").val().trim();
 
