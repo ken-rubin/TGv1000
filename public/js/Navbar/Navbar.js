@@ -209,8 +209,12 @@ define(["Core/errorHelper"],
 									// AZUsersDialog is where user maintenance takes place, including usergroup creation, modification
 									// and assignment. Other user maintenance might be forcing a password reset, etc.
 									try {
-										var exceptionRet = client.showAZUsersDialog();
-										if (exceptionRet) { throw exceptionRet; }
+										client.unloadProject(
+											function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+												var exceptionRet = client.showAZUsersDialog();
+												if (exceptionRet) { throw exceptionRet; }
+										},
+										true);
 									} catch(e) { errorHelper.show(e); }
 								});
 
@@ -219,8 +223,12 @@ define(["Core/errorHelper"],
 									// AZProjectsDialog is the place for making non-public projects public. Maybe it will also
 									// do Types and Methods. It may also un-quarantine images, videos and sounds.
 									try {
-										var exceptionRet = client.showAZProjectsDialog();
-										if (exceptionRet) { throw exceptionRet; }
+										client.unloadProject(
+											function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+												var exceptionRet = client.showAZProjectsDialog();
+												if (exceptionRet) { throw exceptionRet; }
+										},
+										true);
 									} catch(e) { errorHelper.show(e); }
 								});
 
@@ -230,8 +238,12 @@ define(["Core/errorHelper"],
 									// This dialog is not meant to load the project for actual maintenance, just the data from the
 									// classes, onlineclasses or products table for editing.
 									try {
-										var exceptionRet = client.showAZActivatePPDialog();
-										if (exceptionRet) { throw exceptionRet; }
+										client.unloadProject(
+											function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+												var exceptionRet = client.showAZActivatePPDialog();
+												if (exceptionRet) { throw exceptionRet; }
+										},
+										true);
 									} catch(e) { errorHelper.show(e); }
 								});
 
