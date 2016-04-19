@@ -410,7 +410,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								bValid = false;
 							}
 
-							switch(strProductType) {
+							switch(m_strProductType) {
 								case "class":
 
 									break;
