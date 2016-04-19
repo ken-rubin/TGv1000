@@ -452,9 +452,51 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var jsWhen = JSON.parse(m_jsPPData.schedule);
 						for (var i = 0; i < 8; i++) {
 
-							var whenIth = jsWhen[i];
+							var whenIth = jsWhen[i];	// whenIth.date is a string (either '' or '2016-04-18T00:00:00+00:00'); duration is number ms the class lasts (0 if date is '')
+							var momFrom = null;
+							var momThru = null;
+							var validDate = false;
+							if (whenIth.date.length) {
 
+								var momFrom = moment(whenIth.date);
+								var dur = whenIth.duration - 60000;
+								var momThru;
+								if (dur > 0) {
+									momThru = momFrom.clone().add(dur, 'ms');
+								} else {
+									momThru = momFrom.clone().subtract(0 - dur, 'ms');
+								}
+								validDate = true;
+							}
+							compArray.push(
+								{
+									from: momFrom,
+									thru: momThru,
+									valid: validDate
+								}
+							);
 						}
+	
+						if (!compArray[0].valid) {
+							htmlError += "<br><span>The first date must be entered.</span>";
+						}
+						var bAnyEmptiesFoundYet = false;
+						for (var i = 0; i < 8; i++) {
+
+							var compIth = compArray[i];
+							if (!compIth.valid) {
+								bAnyEmptiesFoundYet = true;
+							} else {
+								if (bAnyEmptiesFoundYet) {
+									htmlError += "<br><span>You may not have gaps in the dates. See #" + (i + 1) +".</span>";
+								} else {
+									if(compIth.thru.isBefore(compIth.from)) {
+										htmlError += "<br><span>Date #" + (i + 1) +" appears to end before it starts.</span>";
+									}
+								}
+							}
+						}
+
 
 
 						// htmlError += "<br><span>Your 3rd date is wrong.</span>";

@@ -510,8 +510,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var bValidMntHypo1 = mntHypo1.isValid();
 						var bValidMntHypo2 = mntHypo2.isValid();
 
-						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2 && mntHypo2.isAfter(mntHypo1)) {
-							var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
+						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2/* && mntHypo2.isAfter(mntHypo1)*/) {
+							var mntDateFromUTC = moment.utc(moment(strDate + 'T' + strFrom));	// Actual class start datetime with utc flag set.
 							return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
 						}
 
