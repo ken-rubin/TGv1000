@@ -393,7 +393,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (str.length) { 
 										arrWhen.push(m_funcWhenProcess(str)); 
 									} else {
-										arrWhen.push({ date: '', from: '', thru: ''});
+										arrWhen.push({ date: '', duration: 0});
 									}
 								}
 								var strLevel = $("#Level option:selected").text();
@@ -455,7 +455,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (str.length) { 
 										arrWhen.push(m_funcWhenProcess(str)); 
 									} else {
-										arrWhen.push({ date: '', from: '', thru: ''});
+										arrWhen.push({ date: '', duration: 0});
 									}
 								}
 								var strLevel = $("#Level option:selected").text();
@@ -495,7 +495,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
 					// 		date is start time in UTC.
 					// 		duration is in ms, inclusive (i.e., this example is 56 minutes long).
-					// If any parts (date, from, thru) are missing or invalid, returns { date: '', duration: 0}.
+					// If any parts (date, duration) are missing or invalid, returns { date: '', duration: 0}.
 					// Due to masking, we can have only numbers, but we can have numbers out of range, etc. (Like 34:00 - 51:00.)
 					var m_funcWhenProcess = function(strWhen) {
 

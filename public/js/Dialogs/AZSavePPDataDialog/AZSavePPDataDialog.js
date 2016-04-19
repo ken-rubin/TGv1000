@@ -383,10 +383,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				        //
 				        //   class:
 				        // 		Will need class schedule validation:
-				        //    		Any date that's entered must be a valid datetime.
-				        //    		Any date must have valid duration.
-				        //    		No gaps allowed in the array.
-				        //    		Dates must be in ascending order--think about two classes happening on the same day.
 				        //      All fields except room and dates beyond final class are required.
 				        //
 				        //   online class:
@@ -412,9 +408,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							switch(m_strProductType) {
 								case "class":
+									var strSchedule = m_valSchedule();
+									bValid = bValid && strSchedule;
+									htmlError += strSchedule;
 
 									break;
 								case "onlineClass":
+									var strSchedule = m_valSchedule();
+									bValid = bValid && strSchedule;
+									htmlError += strSchedule;
 
 									break;
 								case "product":
@@ -432,6 +434,33 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								errorHelper.show("Everything checks out fine!", 250000);	// Changes header from Error to Note.
 							}
 						} catch (e) { errorHelper.show(e); }
+					}
+
+					var m_valSchedule = function() {
+
+						// First date must be valid.
+				        // Any date that's entered must be a valid datetime.
+				        // Any date must have valid duration.
+				        // No gaps allowed in the array.
+				        // Dates must be in ascending order.
+				        // If two classes happen on the same day, they must not overlap and first must precede second.
+
+						var htmlError = "";
+						var compArray = new Array();
+
+						// Prepare schedule for checks.
+						var jsWhen = JSON.parse(m_jsPPData.schedule);
+						for (var i = 0; i < 8; i++) {
+
+							var whenIth = jsWhen[i];
+
+						}
+
+
+						// htmlError += "<br><span>Your 3rd date is wrong.</span>";
+						// htmlError += "<br><span>There's a gap between your 3rd and 5th dates.</span>";
+						// htmlError += "<br><span>Your 6th date comes before your 3rd..</span>";
+						return htmlError;
 					}
 
 					var m_functionSaveToggleProject = function () {
@@ -479,7 +508,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (str.length) { 
 										arrWhen.push(m_funcWhenProcess(str)); 
 									} else {
-										arrWhen.push({ date: '', from: '', thru: ''});
+										arrWhen.push({ date: '', duration: 0});
 									}
 								}
 								var strLevel = $("#Level option:selected").text();
@@ -537,7 +566,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (str.length) { 
 										arrWhen.push(m_funcWhenProcess(str)); 
 									} else {
-										arrWhen.push({ date: '', from: '', thru: ''});
+										arrWhen.push({ date: '', duration: 0});
 									}
 								}
 								var strLevel = $("#Level option:selected").text();
@@ -598,7 +627,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
 					// 		date is start time in UTC.
 					// 		duration is in ms, inclusive (i.e., this example is 56 minutes long).
-					// If any parts (date, from, thru) are missing or invalid, returns { date: '', duration: 0}.
+					// If any parts (date, duration) are missing or invalid, returns { date: '', duration: 0}.
 					// Due to masking, we can have only numbers, but we can have numbers out of range, etc. (Like 34:00 - 51:00.)
 					var m_funcWhenProcess = function(strWhen) {
 
