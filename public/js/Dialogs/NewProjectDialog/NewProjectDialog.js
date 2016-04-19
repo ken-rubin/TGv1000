@@ -494,7 +494,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var strAddress = $("#Address").val().trim();
 										var strRoom = $("#Room").val().trim();
 										var strCity = $("#City").val().trim();
-										var strState = $("#State option:selected").text();
+										var strState = $("#USState option:selected").text();
 										var strZip = $("#Zip").val().trim();
 										var arrWhen = [];
 										for (var i = 1; i <=8; i++) {

@@ -202,7 +202,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#City").val(m_clProject.data.specialProjectData.classData.city);
 							// state combo
 							if(m_clProject.data.specialProjectData.classData.state.length > 0) {
-								$('#State > option').each(
+								$('#USState > option').each(
 									function() {
  										if ($(this).text() === m_clProject.data.specialProjectData.classData.state)
  											$(this).parent('select').val($(this).val());
@@ -385,7 +385,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var strAddress = $("#Address").val().trim();
 								var strRoom = $("#Room").val().trim();
 								var strCity = $("#City").val().trim();
-								var strState = $("#State option:selected").text();
+								var strState = $("#USState option:selected").text();
 								var strZip = $("#Zip").val().trim();
 								var arrWhen = [];
 								for (var i = 1; i <=8; i++) {

@@ -209,7 +209,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#City").val(m_jsPPData.city);
 							// state combo
 							if(m_jsPPData.state.length > 0) {
-								$('#State > option').each(
+								$('#USState > option').each(
 									function() {
  										if ($(this).text() === m_jsPPData.state)
  											$(this).parent('select').val($(this).val());
@@ -393,6 +393,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				        //      All fields are required.
 				        //
 
+				        m_functionGetAllFieldsFromBrowser();
+
 				        bSaving = bSaving || false;
 
 						try {
@@ -402,7 +404,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var htmlError = "";
 
 							if (m_jsPPData.imageId === 0) {
-								htmlError += "<br><span>You must choose a real image.</span>";
+								htmlError += "<br><span>You must choose a real image, not our stock picture.</span>";
 								bValid = false;
 							}
 
@@ -459,11 +461,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (whenIth.date.length) {
 
 								var momFrom = moment(whenIth.date);
+								// dur is probably unnecessary. It's probably fine to add a negative number of ms to a moment.
 								var dur = whenIth.duration - 60000;
 								var momThru;
 								if (dur > 0) {
+
 									momThru = momFrom.clone().add(dur, 'ms');
+
 								} else {
+
 									momThru = momFrom.clone().subtract(0 - dur, 'ms');
 								}
 								validDate = true;
@@ -485,14 +491,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var compIth = compArray[i];
 							if (!compIth.valid) {
+
 								bAnyEmptiesFoundYet = true;
+
 							} else {
-								if (bAnyEmptiesFoundYet) {
-									htmlError += "<br><span>You may not have gaps in the dates. See #" + (i + 1) +".</span>";
-								} else {
-									if(compIth.thru.isBefore(compIth.from)) {
-										htmlError += "<br><span>Date #" + (i + 1) +" appears to end before it starts.</span>";
-									}
+
+								if (bAnyEmptiesFoundYet && !htmlError.includes("gaps")) {
+
+									htmlError += "<br><span>You may not have gaps in the dates. Look above Class " + (i + 1) +".</span>";
+
+								} else if(compIth.thru.isBefore(compIth.from)) {
+
+									htmlError += "<br><span>Class " + (i + 1) +" ends before it starts.</span>";
 								}
 							}
 						}
@@ -503,6 +513,113 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						// htmlError += "<br><span>There's a gap between your 3rd and 5th dates.</span>";
 						// htmlError += "<br><span>Your 6th date comes before your 3rd..</span>";
 						return htmlError;
+					}
+
+					var m_functionGetAllFieldsFromBrowser = function () {
+
+						m_strProjectDescription = $("#ProjectDescription").val().trim();
+
+						// If there was a class or product or online class snippet in the dialog, capture that info into the project.
+						if (m_templateToGet.includes("class")) {
+
+							m_strInstructorFirst = $("#InstructorFirst").val().trim();
+							m_strInstructorLast = $("#InstructorLast").val().trim();
+							m_strPhone = $("#Phone").val().trim();
+							m_strFacility = $("#Facility").val().trim();
+							m_strAddress = $("#Address").val().trim();
+							m_strRoom = $("#Room").val().trim();
+							m_strCity = $("#City").val().trim();
+							m_strState = $("#USState option:selected").text();
+							m_strZip = $("#Zip").val().trim();
+							m_arrWhen = [];
+							for (var i = 1; i <=8; i++) {
+								var str = $("#When" + i).val().trim();
+								if (str.length) { 
+									m_arrWhen.push(m_funcWhenProcess(str)); 
+								} else {
+									m_arrWhen.push({ date: '', duration: 0});
+								}
+							}
+							m_strLevel = $("#Level option:selected").text();
+							m_strDifficulty = $("#Difficulty option:selected").text();
+							m_dPrice = 0.00;
+							strPrice = $("#Price").val().trim();
+							if (strPrice.length) {
+								m_dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+							}
+							m_strNotes = $("#Notes").val().trim();
+
+							m_jsPPData = {
+								// active: false,
+								classDescription: m_strProjectDescription,
+								instructorFirstName: m_strInstructorFirst,
+								instructorLastName: m_strInstructorLast,
+								instructorPhone: m_strPhone,
+								facility: m_strFacility,
+								address: m_strAddress,
+								room: m_strRoom,
+								city: m_strCity,
+								state: m_strState,
+								zip: m_strZip,
+								schedule: m_arrWhen,
+								level: m_strLevel,
+								difficulty: m_strDifficulty,
+								price: m_dPrice,
+								classNotes: m_strNotes
+							};
+						} else if (m_templateToGet.includes("product")) {
+
+							m_strLevel = $("#Level option:selected").text();
+							m_strDifficulty = $("#Difficulty option:selected").text();
+							m_dPrice = 0.00;
+							strPrice = $("#Price").val().trim();
+							if (strPrice.length) {
+								m_dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+							}
+
+							m_jsPPData = {
+								// active: false,
+								productDescription: m_strProjectDescription,
+								level: m_strLevel,
+								difficulty: m_strDifficulty,
+								price: m_dPrice
+							};
+						} else {
+
+							m_strInstructorFirst = $("#InstructorFirst").val().trim();
+							m_strInstructorLast = $("#InstructorLast").val().trim();
+							m_strEmail = $("#Email").val().trim();
+							m_arrWhen = [];
+							for (var i = 1; i <=8; i++) {
+								var str = $("#When" + i).val().trim();
+								if (str.length) { 
+									m_arrWhen.push(m_funcWhenProcess(str)); 
+								} else {
+									m_arrWhen.push({ date: '', duration: 0});
+								}
+							}
+							m_strLevel = $("#Level option:selected").text();
+							m_strDifficulty = $("#Difficulty option:selected").text();
+							m_dPrice = 0.00;
+							strPrice = $("#Price").val().trim();
+							if (strPrice.length) {
+								m_dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+							}
+							m_strNotes = $("#Notes").val().trim();
+
+							m_jsPPData = {
+							// 	active: false,
+								classDescription: m_strProjectDescription,
+								instructorFirstName: m_strInstructorFirst,
+								instructorLastName: m_strInstructorLast,
+								instructorEmail: m_strEmail,
+								schedule: m_arrWhen,
+								level: m_strLevel,
+								difficulty: m_strDifficulty,
+								price: m_dPrice,
+								classNotes: m_strNotes
+							};
+						}
 					}
 
 					var m_functionSaveToggleProject = function () {
@@ -528,110 +645,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (bToggleActive) {
 
 								m_jsPPData.active = 1 - m_jsPPData.active;
-							}
-
-							var strProjectDescription = $("#ProjectDescription").val().trim();
-
-							// If there was a class or product or online class snippet in the dialog, capture that info into the project.
-							if (m_templateToGet.includes("class")) {
-
-								var strInstructorFirst = $("#InstructorFirst").val().trim();
-								var strInstructorLast = $("#InstructorLast").val().trim();
-								var strPhone = $("#Phone").val().trim();
-								var strFacility = $("#Facility").val().trim();
-								var strAddress = $("#Address").val().trim();
-								var strRoom = $("#Room").val().trim();
-								var strCity = $("#City").val().trim();
-								var strState = $("#State option:selected").text();
-								var strZip = $("#Zip").val().trim();
-								var arrWhen = [];
-								for (var i = 1; i <=8; i++) {
-									var str = $("#When" + i).val().trim();
-									if (str.length) { 
-										arrWhen.push(m_funcWhenProcess(str)); 
-									} else {
-										arrWhen.push({ date: '', duration: 0});
-									}
-								}
-								var strLevel = $("#Level option:selected").text();
-								var strDifficulty = $("#Difficulty option:selected").text();
-								var dPrice = 0.00;
-								var strPrice = $("#Price").val().trim();
-								if (strPrice.length) {
-									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-								}
-								var strNotes = $("#Notes").val().trim();
-
-								// m_jsPPData = {
-								// 	active: false,
-								// 	classDescription: strProjectDescription,
-								// 	instructorFirstName: strInstructorFirst,
-								// 	instructorLastName: strInstructorLast,
-								// 	instructorPhone: strPhone,
-								// 	facility: strFacility,
-								// 	address: strAddress,
-								// 	room: strRoom,
-								// 	city: strCity,
-								// 	state: strState,
-								// 	zip: strZip,
-								// 	schedule: arrWhen,
-								// 	level: strLevel,
-								// 	difficulty: strDifficulty,
-								// 	price: dPrice,
-								// 	classNotes: strNotes
-								// };
-							} else if (m_templateToGet.includes("product")) {
-
-								var strLevel = $("#Level option:selected").text();
-								var strDifficulty = $("#Difficulty option:selected").text();
-								var dPrice = 0.00;
-								var strPrice = $("#Price").val().trim();
-								if (strPrice.length) {
-									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-								}
-
-								// m_jsPPData = {
-								// 	active: false,
-								// 	productDescription: strProjectDescription,
-								// 	level: strLevel,
-								// 	difficulty: strDifficulty,
-								// 	price: dPrice
-								// };
-							} else {
-
-								var strInstructorFirst = $("#InstructorFirst").val().trim();
-								var strInstructorLast = $("#InstructorLast").val().trim();
-								var strEmail = $("#Email").val().trim();
-								var arrWhen = [];
-								for (var i = 1; i <=8; i++) {
-									var str = $("#When" + i).val().trim();
-									if (str.length) { 
-										arrWhen.push(m_funcWhenProcess(str)); 
-									} else {
-										arrWhen.push({ date: '', duration: 0});
-									}
-								}
-								var strLevel = $("#Level option:selected").text();
-								var strDifficulty = $("#Difficulty option:selected").text();
-								var dPrice = 0.00;
-								var strPrice = $("#Price").val().trim();
-								if (strPrice.length) {
-									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-								}
-								var strNotes = $("#Notes").val().trim();
-
-								// m_jsPPData = {
-								// 	active: false,
-								// 	classDescription: strProjectDescription,
-								// 	instructorFirstName: strInstructorFirst,
-								// 	instructorLastName: strInstructorLast,
-								// 	instructorEmail: strEmail,
-								// 	schedule: arrWhen,
-								// 	level: strLevel,
-								// 	difficulty: strDifficulty,
-								// 	price: dPrice,
-								// 	classNotes: strNotes
-								// };
 							}
 
 							var data = {};
@@ -739,6 +752,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_jsPPData;
 				var m_templateToGet;
 				var m_strProductType;
+
+				// PP data fields
+				var m_strProjectDescription;
+				var m_strInstructorFirst;
+				var m_strInstructorLast;
+				var m_strPhone;
+				var m_strFacility;
+				var m_strAddress;
+				var m_strRoom;
+				var m_strCity;
+				var m_strState;
+				var m_strZip;
+				var m_arrWhen;
+				var m_strLevel;
+				var m_strDifficulty;
+				var m_dPrice;
+				var m_strNotes;
+				var m_strEmail;
 			};
 
 			// Return the constructor function as the module object.
