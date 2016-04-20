@@ -106,7 +106,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_dialog = dialogItself;
 
 							// Set project image.
-							m_functionSetImageSrc(m_jsPPData.imageId);
+							m_iImageId = m_jsPPData.imageId;
+							m_functionSetImageSrc(m_iImageId);
 
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
@@ -576,7 +577,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								level: m_strLevel,
 								difficulty: m_strDifficulty,
 								price: m_dPrice,
-								classNotes: m_strNotes
+								classNotes: m_strNotes,
+								imageId: m_iImageId
 							};
 						} else if (m_templateToGet.includes("product")) {
 
@@ -599,7 +601,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								productDescription: m_strProjectDescription,
 								level: m_strLevel,
 								difficulty: m_strDifficulty,
-								price: m_dPrice
+								price: m_dPrice,
+								imageId: m_iImageId
 							};
 						} else {
 
@@ -640,7 +643,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								level: m_strLevel,
 								difficulty: m_strDifficulty,
 								price: m_dPrice,
-								classNotes: m_strNotes
+								classNotes: m_strNotes,
+								imageId: m_iImageId
 							};
 						}
 					}
@@ -762,7 +766,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						m_jsPPData.imageId = imageId;
+						m_imageId = imageId;
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 					}
 				} catch (e) { errorHelper.show(e.message); }
@@ -793,6 +797,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dPrice;
 				var m_strNotes;
 				var m_strEmail;
+				var m_iImageId;
 			};
 
 			// Return the constructor function as the module object.
