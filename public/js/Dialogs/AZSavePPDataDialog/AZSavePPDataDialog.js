@@ -418,10 +418,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									bValid = bValid && !strSchedule;
 									htmlError += strSchedule;
 									if (!m_strInstructorFirst || !m_strInstructorLast || !m_strPhone) { htmlError += "<br><span>Instructor's Name and Phone are required.</span>"; bValid = false; }
-									if (!m_strFacility || !m_strAddress || !m_strCity || !m_strZip) { htmlError += "<br><span>All 'Where' are required (except room number).</span>"; bValid = false; }
+									if (!m_strFacility || !m_strAddress || !m_strCity || !m_strZip) { htmlError += "<br><span>All 'Where' fields are required (except room number).</span>"; bValid = false; }
 									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
 									if (!m_strNotes) { htmlError += "<br><span>Classs Notes are required.</span>"; bValid = false; }
 									break;
+
 								case "onlineClass":
 									var strSchedule = m_valSchedule();	// Returns empty string if schedule is good; else html as below.
 									bValid = bValid && !strSchedule;
@@ -430,18 +431,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
 									if (!m_strNotes) { htmlError += "<br><span>Classs Notes are required.</span>"; bValid = false; }
 									break;
+
 								case "product":
 									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
 									break;
 							}
 
 							if (!bValid) {
+
 								errorHelper.show(htmlError);
 							}
 
 							if (bSaving) {
+
 								return bValid;
+
 							} else if (bValid) {
+
 								errorHelper.show("Everything checks out fine!", 250000);	// Changes header from Error to Note.
 							}
 						} catch (e) { errorHelper.show(e); }
@@ -449,12 +455,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_valSchedule = function() {
 
-						// First date must be valid.
-				        // Any date that's entered must be a valid datetime.
-				        // Any date must have valid duration.
-				        // No gaps allowed in the array.
-				        // Dates must be in ascending order.
-				        // If two classes happen on the same day, they must not overlap and first must precede second.
+						// done First date must be valid.
+				        // ____ Any date that's entered must be a valid datetime.
+				        // done Any date must have valid duration (from < thru).
+				        // done No gaps allowed in the array.
+				        // ____ Dates must be in ascending order.
+				        // ____ If two classes happen on the same day, they must not overlap and first must precede second.
 
 						var htmlError = "";
 						var compArray = new Array();
@@ -492,7 +498,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 	
 						if (!compArray[0].valid) {
-							htmlError += "<br><span>The first date must be entered.</span>";
+							htmlError += "<br><span>The date and times of at least the first class must be entered.</span>";
 						}
 						var bAnyEmptiesFoundYet = false;
 						for (var i = 0; i < 8; i++) {
