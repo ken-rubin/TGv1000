@@ -9,7 +9,7 @@
 - Finish AZSavePPDataDialog.
 
 ### These items do not depend on Ken's rework.
-- On a new installation John got e is not defined when trying to save first Product. Does it still happen?
+- I got e is not defined when trying to save an Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Tried it again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
 - During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.

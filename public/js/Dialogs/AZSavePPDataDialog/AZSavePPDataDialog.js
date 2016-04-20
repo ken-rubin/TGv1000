@@ -27,6 +27,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save off the data to be edited.
 							m_jsPPData = jsPPData;
+							m_iActive = m_jsPPData.active;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -111,6 +112,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
+							$("#NewImageDiskLink").click(m_functionDiskClick);
 
 							$("#ValidateBtn").click(m_functionValidate);
 							$("#SaveProjectBtn").click(m_functionSaveProject);
@@ -170,7 +172,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var strNewBuyHeader = '';
 						if (m_templateToGet.includes("class")) {
 
-							if (m_jsPPData.active === 1) {
+							if (m_iActive === 1) {
 
 								$("#SaveChangeProjectBtn").text("Deactivate and Save");
 								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>ACTIVE</b> Class you selected.</h4>';
@@ -219,10 +221,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 							$("#Zip").val(m_jsPPData.zip);
 							// when array
-							var jsWhen = JSON.parse(m_jsPPData.schedule);
+							m_jsPPData.schedule = JSON.parse(m_jsPPData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = jsWhen[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_jsPPData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
@@ -249,7 +251,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						
 						} else if (m_templateToGet.includes("product")) {
 
-							if (m_jsPPData.active === 1) {
+							if (m_iActive === 1) {
 
 								$("#SaveChangeProjectBtn").text("Deactivate and Save");
 								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>ACTIVE</b> Product you selected.</h4>';
@@ -298,7 +300,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						
 						} else {
 
-							if (m_jsPPData.active === 1) {
+							if (m_iActive === 1) {
 
 								$("#SaveChangeProjectBtn").text("Deactivate and Save");
 								strNewBuyHeader = '<h4 style="margin-top:-5px;">Here are the details for the <b>ACTIVE</b> Online Class you selected.</h4>';
@@ -331,10 +333,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#InstructorLast").val(m_jsPPData.instructorLastName);
 							$("#Email").val(m_jsPPData.instructorEmail);
 							// when array
-							var jsWhen = JSON.parse(m_jsPPData.schedule);
+							m_jsPPData.schedule = JSON.parse(m_jsPPData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = jsWhen[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_jsPPData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
@@ -404,26 +406,31 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strProductType = m_templateToGet.includes("class") ? "class" : m_templateToGet.includes("product") ? "product" : "onlineClass";
 							var htmlError = "";
 
-							if (m_jsPPData.imageId === 0) {
-								htmlError += "<br><span>You must choose a real image, not our stock picture.</span>";
-								bValid = false;
-							}
+							if (!m_iImageId) { htmlError += "<br><span>You must choose a real image, not our stock picture.</span>"; bValid = false; }
+							if (!m_strProjectName) { htmlError += "<br><span>Project Name is required.</span>"; bValid = false; }
+							if (!m_strProjectDescription) { htmlError += "<br><span>Project Description is required.</span>"; bValid = false; }
+							if (!m_strProjectTags) { htmlError += "<br><span>At least one Search tag is required.</span>"; bValid = false; }
 
 							switch(m_strProductType) {
 								case "class":
-									var strSchedule = m_valSchedule();
-									bValid = bValid && strSchedule;
+									var strSchedule = m_valSchedule();	// Returns empty string if schedule is good; else html as below.
+									bValid = bValid && !strSchedule;
 									htmlError += strSchedule;
-
+									if (!m_strInstructorFirst || !m_strInstructorLast || !m_strPhone) { htmlError += "<br><span>Instructor's Name and Phone are required.</span>"; bValid = false; }
+									if (!m_strFacility || !m_strAddress || !m_strCity || !m_strZip) { htmlError += "<br><span>All 'Where' are required (except room number).</span>"; bValid = false; }
+									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
+									if (!m_strNotes) { htmlError += "<br><span>Classs Notes are required.</span>"; bValid = false; }
 									break;
 								case "onlineClass":
-									var strSchedule = m_valSchedule();
-									bValid = bValid && strSchedule;
+									var strSchedule = m_valSchedule();	// Returns empty string if schedule is good; else html as below.
+									bValid = bValid && !strSchedule;
 									htmlError += strSchedule;
-
+									if (!m_strInstructorFirst || !m_strInstructorLast || !m_strEmail) { htmlError += "<br><span>Instructor's Name and Email address are required.</span>"; bValid = false; }
+									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
+									if (!m_strNotes) { htmlError += "<br><span>Classs Notes are required.</span>"; bValid = false; }
 									break;
 								case "product":
-
+									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
 									break;
 							}
 
@@ -518,6 +525,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionGetAllFieldsFromBrowser = function () {
 
 						m_strProjectDescription = $("#ProjectDescription").val().trim();
+						m_strProjectName = $("#ProjectName").val().trim();
+						m_strProjectTags = $("#ProjectTags").val().trim();
 						var e;
 
 						// If there was a class or product or online class snippet in the dialog, capture that info into the project.
@@ -562,8 +571,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strNotes = $("#Notes").val().trim();
 
 							m_jsPPData = {
-								// active: false,
+								active: m_iActive,
+								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
+								tags: m_strProjectTags,
 								instructorFirstName: m_strInstructorFirst,
 								instructorLastName: m_strInstructorLast,
 								instructorPhone: m_strPhone,
@@ -597,8 +608,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							m_jsPPData = {
-								// active: false,
+								active: m_iActive,
+								name: m_strProjectName,
 								productDescription: m_strProjectDescription,
+								tags: m_strProjectTags,
 								level: m_strLevel,
 								difficulty: m_strDifficulty,
 								price: m_dPrice,
@@ -634,8 +647,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strNotes = $("#Notes").val().trim();
 
 							m_jsPPData = {
-							// 	active: false,
+							 	active: m_iActive,
+								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
+								tags: m_strProjectTags,
 								instructorFirstName: m_strInstructorFirst,
 								instructorLastName: m_strInstructorLast,
 								instructorEmail: m_strEmail,
@@ -671,7 +686,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							if (bToggleActive) {
 
-								m_jsPPData.active = 1 - m_jsPPData.active;
+								m_iActive = 1 - m_iActive;
+								m_jsPPData.active = m_iActive;
 							}
 
 							var data = {};
@@ -724,7 +740,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var bValidMntHypo1 = mntHypo1.isValid();
 						var bValidMntHypo2 = mntHypo2.isValid();
 
-						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2 && mntHypo2.isAfter(mntHypo1)) {
+						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2 /*&& mntHypo2.isAfter(mntHypo1)*/) {
 							var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
 							return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
 						}
@@ -766,7 +782,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						m_imageId = imageId;
+						m_iImageId = imageId;
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 					}
 				} catch (e) { errorHelper.show(e.message); }
@@ -781,7 +797,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_strProductType;
 
 				// PP data fields
+				var m_iActive;	// Actually, bool, but values are 1 or 0 and not true or false.
 				var m_strProjectDescription;
+				var m_strProjectName;
+				var m_strProjectTags;
 				var m_strInstructorFirst;
 				var m_strInstructorLast;
 				var m_strPhone;
