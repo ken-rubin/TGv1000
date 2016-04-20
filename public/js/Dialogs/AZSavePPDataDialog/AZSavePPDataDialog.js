@@ -451,10 +451,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var compArray = new Array();
 
 						// Prepare schedule for checks.
-						var jsWhen = JSON.parse(m_jsPPData.schedule);
 						for (var i = 0; i < 8; i++) {
 
-							var whenIth = jsWhen[i];	// whenIth.date is a string (either '' or '2016-04-18T00:00:00+00:00'); duration is number ms the class lasts (0 if date is '')
+							var whenIth = m_jsPPData.schedule[i];	// whenIth.date is a string (either '' or '2016-04-18T00:00:00+00:00'); duration is number ms the class lasts (0 if date is '')
 							var momFrom = null;
 							var momThru = null;
 							var validDate = false;
@@ -518,6 +517,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionGetAllFieldsFromBrowser = function () {
 
 						m_strProjectDescription = $("#ProjectDescription").val().trim();
+						var e;
 
 						// If there was a class or product or online class snippet in the dialog, capture that info into the project.
 						if (m_templateToGet.includes("class")) {
@@ -529,7 +529,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strAddress = $("#Address").val().trim();
 							m_strRoom = $("#Room").val().trim();
 							m_strCity = $("#City").val().trim();
-							m_strState = $("#USState option:selected").text();
+
+							// jQuery not working here and several places below.
+							// m_strState = $("#USState option:selected").text();
+							e = document.getElementById("USState");
+							m_strState = e.options[e.selectedIndex].text;
+
 							m_strZip = $("#Zip").val().trim();
 							m_arrWhen = [];
 							for (var i = 1; i <=8; i++) {
@@ -540,8 +545,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									m_arrWhen.push({ date: '', duration: 0});
 								}
 							}
-							m_strLevel = $("#Level option:selected").text();
-							m_strDifficulty = $("#Difficulty option:selected").text();
+ 							// m_strLevel = $("#Level option:selected").text();
+							e = document.getElementById("Level");
+							m_strLevel = e.options[e.selectedIndex].text;
+
+							// m_strDifficulty = $("#Difficulty option:selected").text();
+							e = document.getElementById("Difficulty");
+							m_strDifficulty = e.options[e.selectedIndex].text;
+
 							m_dPrice = 0.00;
 							strPrice = $("#Price").val().trim();
 							if (strPrice.length) {
@@ -569,8 +580,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							};
 						} else if (m_templateToGet.includes("product")) {
 
-							m_strLevel = $("#Level option:selected").text();
-							m_strDifficulty = $("#Difficulty option:selected").text();
+ 							// m_strLevel = $("#Level option:selected").text();
+							e = document.getElementById("Level");
+							m_strLevel = e.options[e.selectedIndex].text;
+
+							// m_strDifficulty = $("#Difficulty option:selected").text();
+							e = document.getElementById("Difficulty");
+							m_strDifficulty = e.options[e.selectedIndex].text;
+
 							m_dPrice = 0.00;
 							strPrice = $("#Price").val().trim();
 							if (strPrice.length) {
@@ -598,8 +615,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									m_arrWhen.push({ date: '', duration: 0});
 								}
 							}
-							m_strLevel = $("#Level option:selected").text();
-							m_strDifficulty = $("#Difficulty option:selected").text();
+ 							// m_strLevel = $("#Level option:selected").text();
+							e = document.getElementById("Level");
+							m_strLevel = e.options[e.selectedIndex].text;
+
+							// m_strDifficulty = $("#Difficulty option:selected").text();
+							e = document.getElementById("Difficulty");
+							m_strDifficulty = e.options[e.selectedIndex].text;
+
 							m_dPrice = 0.00;
 							strPrice = $("#Price").val().trim();
 							if (strPrice.length) {
