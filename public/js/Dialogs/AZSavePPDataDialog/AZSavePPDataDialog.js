@@ -28,6 +28,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save off the data to be edited.
 							m_jsPPData = jsPPData;
 							m_iActive = m_jsPPData.active;
+							m_iId = m_jsPPData.id;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -571,6 +572,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strNotes = $("#Notes").val().trim();
 
 							m_jsPPData = {
+								id: m_iId,
 								active: m_iActive,
 								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
@@ -608,6 +610,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							m_jsPPData = {
+								id: m_iId,
 								active: m_iActive,
 								name: m_strProjectName,
 								productDescription: m_strProjectDescription,
@@ -647,6 +650,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strNotes = $("#Notes").val().trim();
 
 							m_jsPPData = {
+								id: m_iId,
 							 	active: m_iActive,
 								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
@@ -798,6 +802,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 				// PP data fields
 				var m_iActive;	// Actually, bool, but values are 1 or 0 and not true or false.
+				var m_iId;
 				var m_strProjectDescription;
 				var m_strProjectName;
 				var m_strProjectTags;
