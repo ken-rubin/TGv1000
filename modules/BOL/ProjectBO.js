@@ -1558,7 +1558,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                         classNotes: project.specialProjectData.classData.classNotes,
                         name: project.name,
                         baseProjectId: project.id,
-                        maxClassSize: (project.specialProjectData.classData.maxClassSize || 0)  // not set on client side yet
+                        maxClassSize: (project.specialProjectData.classData.maxClassSize || 0),  // not set on client side yet
+                        loadComputersAvailable: (project.specialProjectData.classData.loadComputersAvailable || 0)  // not set on client side yet
                         };
                     dbname = 'classes';
 

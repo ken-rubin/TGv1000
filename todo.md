@@ -4,17 +4,9 @@
 - Replace Blockly.
 
 
-## Jerry's Issues
-### Immediate importance
-- Finish AZSavePPDataDialog.
-
-### These items do not depend on Ken's rework.
-- I got e is not defined when trying to save an Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Tried it again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
-- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
-- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
-    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-    + Add waitlist reminders emails.
+## Jerry's High Priority Issues
+- Finish AZSavePPDataDialog along with routeSavePPData.
+- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
 - Finish buying. 
     + Need to add a couple of new fields to the specialProjectData class snippets and db tables. These fields may not appear in BuyDialog--or they may present as buttons (like to view the movie).
         + Products: 
@@ -22,8 +14,7 @@
             + videoId (maybe)
         + Classes: 
             + maxClassSize
-            + imageId (maybe--doesn't the project already have an image?)
-            + some computers available for student use (bool/checkbox)
+            + loanComputersAvailable
         + Online classes:
             + imageId (maybe--doesn't the project already have an image?)
         + Speaking of waitlist, check for and don't write out dups.
@@ -37,7 +28,6 @@
     ```
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
-    + If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
     + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user. **Bug.**
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
@@ -81,10 +71,16 @@
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
-### To consider later
+### To consider or do later
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
+- Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
+- If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
+- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
+- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
+    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+    + Add waitlist reminders emails.
 
 ## A Discussion of Projects and Purchasable Projects
 

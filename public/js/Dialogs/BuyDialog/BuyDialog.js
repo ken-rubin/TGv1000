@@ -192,14 +192,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and a reminder with dates, times and location.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
 
-							jQuery(function($){
-								$("#Phone").mask("(999) 999-9999? x99999");
-								$("#Zip").mask("99999");
-								$("#Price").mask("$999.99");
-								for (var i=1; i<=8; i++) {
-									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
-								}
-							});
+							$("#OnlyForPrivileged").css("display","none");
+
+							// jQuery(function($){
+							// 	$("#Phone").mask("(999) 999-9999? x99999");
+							// 	$("#Zip").mask("99999");
+							// 	$("#Price").mask("$999.99");
+							// 	for (var i=1; i<=8; i++) {
+							// 		$("#When" + i).mask("9999-99-99         99:99 - 99:99")
+							// 	}
+							// });
 							$("#ProjectDescription").val(m_clProject.data.specialProjectData.classData.classDescription);
 							$("#InstructorFirst").val(m_clProject.data.specialProjectData.classData.instructorFirstName);
 							$("#InstructorLast").val(m_clProject.data.specialProjectData.classData.instructorLastName);

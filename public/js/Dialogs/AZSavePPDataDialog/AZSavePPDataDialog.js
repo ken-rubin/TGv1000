@@ -199,6 +199,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#Phone").mask("(999) 999-9999? x99999");
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
+								$("#MaxClassSize").mask("99");
 								for (var i=1; i<=8; i++) {
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
@@ -249,6 +250,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// formatted price
 							$("#Price").val(m_jsPPData.price.dollarFormat());
 							$("#Notes").val(m_jsPPData.classNotes);
+							$("#MaxClassSize").val(m_jsPPData.maxClassSize);
+							$("#cb1").prop("checked", m_jsPPData.loadComputersAvailable);
 						
 						} else if (m_templateToGet.includes("product")) {
 
@@ -419,6 +422,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									htmlError += strSchedule;
 									if (!m_strInstructorFirst || !m_strInstructorLast || !m_strPhone) { htmlError += "<br><span>Instructor's Name and Phone are required.</span>"; bValid = false; }
 									if (!m_strFacility || !m_strAddress || !m_strCity || !m_strZip) { htmlError += "<br><span>All 'Where' fields are required (except room number).</span>"; bValid = false; }
+									if (!m_iMaxClassSize) { htmlError += "<br><span>Max class size is required.</span>"; bValid = false; }
 									if (m_dPrice === 0.0) { htmlError += "<br><span>A Price that is greater than $0.00 is required.</span>"; bValid = false; }
 									if (!m_strNotes) { htmlError += "<br><span>Classs Notes are required.</span>"; bValid = false; }
 									break;
@@ -576,6 +580,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								m_dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 							}
 							m_strNotes = $("#Notes").val().trim();
+							m_iMaxClassSize = parseInt($("MaxClassSize").val.trim(), 10);
+							m_iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
 							m_jsPPData = {
 								id: m_iId,
@@ -597,7 +603,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								difficulty: m_strDifficulty,
 								price: m_dPrice,
 								classNotes: m_strNotes,
-								imageId: m_iImageId
+								imageId: m_iImageId,
+								maxClassSize: m_iMaxClassSize,
+								loanComputersAvailable: m_iLoanComputersAvailable
 							};
 						} else if (m_templateToGet.includes("product")) {
 
@@ -827,6 +835,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dPrice;
 				var m_strNotes;
 				var m_strEmail;
+				var m_iMaxClassSize;
+				var m_iLoanComputersAvailable;
 				var m_iImageId;
 			};
 

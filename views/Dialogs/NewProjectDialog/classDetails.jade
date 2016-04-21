@@ -8,45 +8,45 @@
     h5
       | All but Name are optional until the Class is made <i>active</i>, and it's time for students to sign up.
 .col-xs-2
-      label.control-label(for="ProjectName", style="margin-top:6px;") Name
+      label.control-label(for="ProjectName", style="margin-top:6px;display:block;text-align:right;") Name
 .col-xs-4
       input.form-control#ProjectName(type="text" placeholder="Enter Class name." tabindex=1)
 .col-xs-6
 br
 br
 .col-xs-2
-    label.control-label(for="ProjectDescription", style="margin-top:6px;") Class Description
+    label.control-label(for="ProjectDescription", style="margin-top:6px;display:block;text-align:right;") Class Description
 .col-xs-10
     textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Enter a complete description of your Class." tabindex=2)
 br
 br
 br
 .col-xs-2
-        label.control-label(for="ProjectTags", style="margin-top:6px;") Search tags
+        label.control-label(for="ProjectTags", style="margin-top:6px;display:block;text-align:right;") Search tags
 .col-xs-10
         textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help people search for this Class." tabindex=3)
 br
 br
 br
 .col-xs-2
-    label.control-label(for="InstructorFirst", style="margin-top:6px;") Instructor
+    label.control-label(for="InstructorFirst", style="margin-top:6px;display:block;text-align:right;") Instructor
 .col-xs-2
     input.form-control#InstructorFirst(placeholder="First name" style="width:100%;" tabindex=4)
 .col-xs-2
     input.form-control#InstructorLast(placeholder="Last name" style="width:100%;" tabindex=5)
 .col-xs-2
-    label.control-label(for="Phone", style="margin-top:6px;") Phone
+    label.control-label(for="Phone", style="margin-top:6px;display:block;text-align:right;") Phone
 .col-xs-3
     input.form-control#Phone(placeholder="Info call line" tabindex=15)
 .col-xs-1
 br
 br
 .col-xs-2
-    label.control-label(for="Facility", style="margin-top:6px;") Where
+    label.control-label(for="Facility", style="margin-top:6px;display:block;text-align:right;") Class Location
 .col-xs-4
     input.form-control#Facility(placeholder="Facility name" tabindex=6)
 .col-xs-2
-    label.control-label(for="When1", style="margin-top:6px;") When
+    label.control-label(for="When1", style="margin-top:6px;display:block;text-align:right;") Class Schedule
 .col-xs-4
     input.form-control#When1(placeholder="Class 1 date / start-end times (24-hr)" tabindex=16)
 br
@@ -88,7 +88,7 @@ br
 br
 br
 .col-xs-2
-    label.control-label(for="Level", style="margin-top:6px;") Level
+    label.control-label(for="Level", style="margin-top:6px;display:block;text-align:right;") Level
 .col-xs-4
     select.form-control#Level(tabindex=12)
         each val,index in ['Elementary school','Middle School','High school and beyond']
@@ -99,7 +99,7 @@ br
 br
 br
 .col-xs-2
-    label.control-label(for="Difficulty", style="margin-top:6px;") Difficulty
+    label.control-label(for="Difficulty", style="margin-top:6px;display:block;text-align:right;") Difficulty
 .col-xs-4
     select.form-control#Difficulty(tabindex=13)
         each val,index in ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
@@ -110,15 +110,27 @@ br
 br
 br
 .col-xs-2
-    label.control-label(for="Price", style="margin-top:6px;") Price
+    label.control-label(for="Price", style="margin-top:6px;display:block;text-align:right;") Price
 .col-xs-4
     input.form-control#Price(placeholder="$xxx.xx" tabindex=14)
 .col-xs-2
 .col-xs-4
     input.form-control#When8(placeholder="Class 8 date / start-end times (24-hr)" tabindex=23)
+#OnlyForPrivileged(style="display:block;")
+    br
+    br
+    .col-xs-2
+        label.control-label(for="MaxClassSize", style="margin-top:6px;display:block;text-align:right;") Max Class Size
+    .col-xs-4
+        input.form-control#MaxClassSize(placeholder="xx" tabindex=24)
+    .col-xs-2
+    .col-xs-4
+        label.checkbox(style="margin-left:21px;")
+          input#cb1(type='checkbox' tabindex=25)
+          | Some loaner computers available
 br
 br
 .col-xs-2
-    label.control-label(for="Notes", style="margin-top:6px;") Notes
+    label.control-label(for="Notes", style="margin-top:6px;display:block;text-align:right;") Notes
 .col-xs-10
-    textarea.form-control#Notes(spellcheck=true cols=40 rows=2 placeholder="Enter special details about your Class." tabindex=24)
+    textarea.form-control#Notes(spellcheck=true cols=40 rows=2 placeholder="Enter special details about your Class." tabindex=26)

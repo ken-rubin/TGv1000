@@ -297,6 +297,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#Phone").mask("(999) 999-9999? x99999");
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
+								$("#MaxClassSize").mask("99");
 								for (var i=1; i<=8; i++) {
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}

@@ -188,6 +188,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#Phone").mask("(999) 999-9999? x99999");
 								$("#Zip").mask("99999");
 								$("#Price").mask("$999.99");
+								$("#MaxClassSize").mask("99");
 								for (var i=1; i<=8; i++) {
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
@@ -237,6 +238,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
+							$("#MaxClassSize").val(substr((m_clProject.data.specialProjectData.classData.classNotes + 100).toString()), 1);
+							$("#cb1").prop("checked", m_clProject.data.specialProjectData.classData.loanComputersAvailable);
 						
 						} else if (m_clProject.data.specialProjectData.productProject) {
 							jQuery(function($){
@@ -404,6 +407,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 								}
 								var strNotes = $("#Notes").val().trim();
+								var iMaxClassSize = parseInt($("MaxClassSize").val.trim(), 10);
+								var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
 								m_clProject.data.specialProjectData.classData = {
 									active: false,
@@ -422,7 +427,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									difficulty: strDifficulty,
 									price: dPrice,
 									classNotes: strNotes,
-									imageId: m_clProject.data.imageId
+									imageId: m_clProject.data.imageId,
+									maxClassSize: iMaxClassSize,
+									loanComputersAvailable: iLoanComputersAvailable
 								};
 							} else if (m_clProject.data.isProduct) {
 
