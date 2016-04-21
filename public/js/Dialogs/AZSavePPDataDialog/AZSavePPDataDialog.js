@@ -580,7 +580,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								m_dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 							}
 							m_strNotes = $("#Notes").val().trim();
-							m_iMaxClassSize = parseInt($("MaxClassSize").val.trim(), 10);
+							m_iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
 							m_iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
 							m_jsPPData = {

@@ -238,7 +238,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// formatted price
 							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
 							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
-							$("#MaxClassSize").val(substr((m_clProject.data.specialProjectData.classData.classNotes + 100).toString()), 1);
+							var iMax = m_clProject.data.specialProjectData.classData.maxClassSize;
+							if (iMax) {
+
+								var strMax100 = (iMax + 100).toString();
+								$("#MaxClassSize").val(strMax100.substr(1));
+							}
 							$("#cb1").prop("checked", m_clProject.data.specialProjectData.classData.loanComputersAvailable);
 						
 						} else if (m_clProject.data.specialProjectData.productProject) {
@@ -407,7 +412,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 								}
 								var strNotes = $("#Notes").val().trim();
-								var iMaxClassSize = parseInt($("MaxClassSize").val.trim(), 10);
+								var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
 								var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
 								m_clProject.data.specialProjectData.classData = {

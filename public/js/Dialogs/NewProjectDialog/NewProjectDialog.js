@@ -514,6 +514,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 										}
 										var strNotes = $("#Notes").val().trim();
+										var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
+										var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
 										clProject.data.specialProjectData.classData = {
 											id: 0,
@@ -532,7 +534,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											level: strLevel,
 											difficulty: strDifficulty,
 											price: dPrice,
-											classNotes: strNotes
+											classNotes: strNotes,
+											maxClassSize: iMaxClassSize,
+											loanComputersAvailable: iLoanComputersAvailable
 										};
 
 									} else if (m_bProductProject) {
