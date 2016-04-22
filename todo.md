@@ -5,20 +5,11 @@
 
 
 ## Jerry's High Priority Issues
-- Finish AZSavePPDataDialog along with routeSavePPData.
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
 - Finish buying. 
-    + Need to add a couple of new fields to the specialProjectData class snippets and db tables. These fields may not appear in BuyDialog--or they may present as buttons (like to view the movie).
-        + Products: 
-            + imageId (maybe--doesn't the project already have an image?)
-            + videoId (maybe)
-        + Classes: 
-            + maxClassSize
-            + loanComputersAvailable
-        + Online classes:
-            + imageId (maybe--doesn't the project already have an image?)
-        + Speaking of waitlist, check for and don't write out dups.
-    * Use this code to display a Product's video:
+    + 3 more cases in schedule verification.
+    + Speaking of waitlist, check for and don't write out dups.
+    * Use this code to display a Product's video (if I add that):
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
         <video autoplay loop class="embed-responsive-item">
@@ -35,10 +26,6 @@
 - AdminZone functionality
     - User & Usergroup and Permissions maintenance
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc.
-- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - go to AdminZone; 
-    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
-    - close window or browser (possible?)
 
 ### Can wait till Ken integrates
 - Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
@@ -71,7 +58,7 @@
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
-### To consider or do later
+### To consider or do even later
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
@@ -81,6 +68,10 @@
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.
     + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
     + Add waitlist reminders emails.
+- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
+    - go to AdminZone; 
+    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
+    - close window or browser (possible?)
 
 ## A Discussion of Projects and Purchasable Projects
 

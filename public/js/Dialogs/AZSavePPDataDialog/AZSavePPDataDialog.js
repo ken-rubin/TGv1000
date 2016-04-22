@@ -29,6 +29,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_jsPPData = jsPPData;
 							m_iActive = m_jsPPData.active;
 							m_iId = m_jsPPData.id;
+							m_iBaseProjectId = m_jsPPData.baseProjectId;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -251,7 +252,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#Price").val(m_jsPPData.price.dollarFormat());
 							$("#Notes").val(m_jsPPData.classNotes);
 							$("#MaxClassSize").val(m_jsPPData.maxClassSize);
-							$("#cb1").prop("checked", m_jsPPData.loadComputersAvailable);
+							$("#cb1").prop("checked", m_jsPPData.loanComputersAvailable);
 						
 						} else if (m_templateToGet.includes("product")) {
 
@@ -585,6 +586,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_jsPPData = {
 								id: m_iId,
+								baseProjectId: m_iBaseProjectId,
 								active: m_iActive,
 								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
@@ -625,6 +627,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_jsPPData = {
 								id: m_iId,
+								baseProjectId: m_iBaseProjectId,
 								active: m_iActive,
 								name: m_strProjectName,
 								productDescription: m_strProjectDescription,
@@ -665,6 +668,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_jsPPData = {
 								id: m_iId,
+								baseProjectId: m_iBaseProjectId,
 							 	active: m_iActive,
 								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
@@ -732,7 +736,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 		                    	
 		                    	} else {
 
-		                    		errorHelper.show("The save failed: " + data.message);
+		                    		errorHelper.show("The save failed with error: " + data.message);
 		                    	}
 		                    });
 						} catch(e) { errorHelper.show(e); }
@@ -817,6 +821,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				// PP data fields
 				var m_iActive;	// Actually, bool, but values are 1 or 0 and not true or false.
 				var m_iId;
+				var m_iBaseProjectId;
 				var m_strProjectDescription;
 				var m_strProjectName;
 				var m_strProjectTags;

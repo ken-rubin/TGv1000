@@ -1559,7 +1559,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                         name: project.name,
                         baseProjectId: project.id,
                         maxClassSize: (project.specialProjectData.classData.maxClassSize || 0),  // not set on client side yet
-                        loadComputersAvailable: (project.specialProjectData.classData.loadComputersAvailable || 0)  // not set on client side yet
+                        loanComputersAvailable: (project.specialProjectData.classData.loadComputersAvailable || 0)  // not set on client side yet
                         };
                     dbname = 'classes';
 
@@ -2706,46 +2706,109 @@ module.exports = function ProjectBO(app, sql, logger) {
                             });
                         } else {
 
-                            if (req.body.classData) {
-
-                                var strQuery = "UPDATE " + self.dbname + "classes SET ? where id=" + req.body.classData.id;
-                                m_log('Updating classes record with id ' + req.body.classData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.classData));
-                                delete req.body.classData.id;
-                                sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.classData,
-                                    function(err, rows) {
-                                        if (err) { return res.json({ success: false, message: err.message}); }
-                                        return res.json({ success: true });
-                                    }
-                                );
-                            } else if (req.body.onlineClassData) {
-
-                                var strQuery = "UPDATE " + self.dbname + "onlineclasses SET ? where id=" + req.body.onlineClassData.id;
-                                m_log('Updating onlineclasses record with id ' + req.body.onlineClassData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.onlineClassData));
-                                delete req.body.onlineClassData.id;
-                                sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.onlineClassData,
-                                    function(err, rows) {
-                                        if (err) { return res.json({ success: false, message: err.message}); }
-                                        return res.json({ success: true });
-                                    }
-                                );
-                            } else if (req.body.productData) {
-
-                                var strQuery = "UPDATE " + self.dbname + "products SET ? where id=" + req.body.productData.id;
-                                m_log('Updating products record with id ' + req.body.productData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.productData));
-                                delete req.body.productData.id;
-                                sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.productData,
-                                    function(err, rows) {
-                                        if (err) { return res.json({ success: false, message: err.message}); }
-                                        return res.json({ success: true });
-                                    }
-                                );
+                            // Extract values needed for parallel steps 2 and 3 below.
+                            var imageId;
+                            var tags;
+                            var name;
+                            var id;
+                            if (req.body.hasOwnProperty("classData")) {
+                                req.body.classData.schedule = JSON.stringify(req.body.classData.schedule);
+                                imageId = req.body.classData.imageId;
+                                tags = req.body.classData.tags;
+                                req.body.classData.delete("tags");
+                                name = req.body.classData.name;
+                                id = req.body.classData.baseProjectId;
+                            } else if (req.body.hasOwnProperty("onlineClassData")) {
+                                req.body.onlineClassData.schedule = JSON.stringify(req.body.onlineClassData.schedule);
+                                imageId = req.body.onlineClassData.imageId;
+                                tags = req.body.onlineClassData.tags;
+                                req.body.onlineClassData.delete("tags");
+                                name = req.body.onlineClassData.name;
+                                id = req.body.onlineClassData.baseProjectId;
+                            } else if (req.body.hasOwnProperty("productData")) {
+                                imageId = req.body.productData.imageId;
+                                tags = req.body.productData.tags;
+                                req.body.productData.delete("tags");
+                                name = req.body.productData.name;
+                                id = req.body.productData.baseProjectId;
                             }
-                            
-                            // We fell through. One of them should have been non-null.
-                            return res.json({
-                                success: false,
-                                message: "routeSavePPData was called with invalid data."
-                            });
+
+                            // In parallel (1) save to classes, onlineclasses or products; (2) update some fields in the project; and (3) update the project's tags.
+                            async.parallel(
+                                [
+                                    // (1)
+                                    function(cb) {
+
+                                        if (req.body.hasOwnProperty("classData")) {
+
+                                            var strQuery = "UPDATE " + self.dbname + "classes SET ? where id=" + req.body.classData.id;
+                                            m_log('Updating classes record with id ' + req.body.classData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.classData));
+                                            sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.classData,
+                                                function(err, rows) {
+                                                    return cb(err);
+                                                }
+                                            );
+                                        } else if (req.body.hasOwnProperty("onlineClassData")) {
+
+                                            var strQuery = "UPDATE " + self.dbname + "onlineclasses SET ? where id=" + req.body.onlineClassData.id;
+                                            m_log('Updating onlineclasses record with id ' + req.body.onlineClassData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.onlineClassData));
+                                            sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.onlineClassData,
+                                                function(err, rows) {
+                                                    return cb(err);
+                                                }
+                                            );
+                                        } else if (req.body.hasOwnProperty("productData")) {
+
+                                            var strQuery = "UPDATE " + self.dbname + "products SET ? where id=" + req.body.productData.id;
+                                            m_log('Updating products record with id ' + req.body.productData.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(req.body.productData));
+                                            sql.queryWithCxnWithPlaceholders(connection, strQuery, req.body.productData,
+                                                function(err, rows) {
+                                                    return cb(err);
+                                                }
+                                            );
+                                        }
+                                    },
+                                    // (2)
+                                    function(cb) {
+
+                                        guts = {
+                                            imageId: imageId,
+                                            name: name,
+                                            altImagePath: ''
+                                        };
+                                        var strQuery = "update " + self.dbname + "projects SET ? where id=" + id.toString();
+                                        m_log('Updating projects record with id ' + id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                        sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                            function(err, rows) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    },
+                                    // (3)
+                                    function(cb) {
+
+                                        m_setUpAndWriteTags(connection, res, id, 'project', req.user.userName, tags, name, 
+                                            null,   // this says not to push to project.script
+                                            function(err) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    },
+                                ],
+                                function(err) {
+                                    
+                                    if (err) {
+                                        return res.json({
+                                            success: false,
+                                            message: err.message
+                                        });
+                                    }
+
+                                    return res.json({
+                                        success: true
+                                    });
+                                }
+                            );
                         }
                     } catch(e) {
 
