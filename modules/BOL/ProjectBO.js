@@ -2715,20 +2715,20 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 req.body.classData.schedule = JSON.stringify(req.body.classData.schedule);
                                 imageId = req.body.classData.imageId;
                                 tags = req.body.classData.tags;
-                                req.body.classData.delete("tags");
+                                delete req.body.classData.tags;
                                 name = req.body.classData.name;
                                 id = req.body.classData.baseProjectId;
                             } else if (req.body.hasOwnProperty("onlineClassData")) {
                                 req.body.onlineClassData.schedule = JSON.stringify(req.body.onlineClassData.schedule);
                                 imageId = req.body.onlineClassData.imageId;
                                 tags = req.body.onlineClassData.tags;
-                                req.body.onlineClassData.delete("tags");
+                                delete req.body.onlineClassData.tags;
                                 name = req.body.onlineClassData.name;
                                 id = req.body.onlineClassData.baseProjectId;
                             } else if (req.body.hasOwnProperty("productData")) {
                                 imageId = req.body.productData.imageId;
                                 tags = req.body.productData.tags;
-                                req.body.productData.delete("tags");
+                                delete req.body.productData.tags;
                                 name = req.body.productData.name;
                                 id = req.body.productData.baseProjectId;
                             }
@@ -2787,11 +2787,17 @@ module.exports = function ProjectBO(app, sql, logger) {
                                     // (3)
                                     function(cb) {
 
-                                        m_setUpAndWriteTags(connection, res, id, 'project', req.user.userName, tags, name, 
-                                            null,   // this says not to push to project.script
-                                            function(err) {
-                                                return cb(err);
-                                            }
+                                        sql.queryWithCxn(connection, "delete from " + self.dbname + "project_tags where projectId=" + id + ";",
+                                            function(err, rows) {
+                                                if (err) { return cb(err); }
+
+                                                m_setUpAndWriteTags(connection, res, id, 'project', req.user.userName, tags, name, 
+                                                    null,   // this says not to push to project.script
+                                                    function(err) {
+                                                        return cb(err);
+                                                    }
+                                                );
+                                            }    
                                         );
                                     },
                                 ],

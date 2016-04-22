@@ -587,7 +587,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_jsPPData = {
 								id: m_iId,
 								baseProjectId: m_iBaseProjectId,
-								active: m_iActive,
+								active: m_iActive,		// may be toggled below
 								name: m_strProjectName,
 								classDescription: m_strProjectDescription,
 								tags: m_strProjectTags,
@@ -686,31 +686,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
+					// This saves the data with toggled active status.
 					var m_functionSaveToggleProject = function () {
 
-						try {
+						if (!m_functionValidate(null, true)) { return; }	// m_functionValidate displays its own success or failure popup.
 
-							m_functionSaveProject(true);	// Means to toggle active before saving, but after validating.
+						m_jsPPData.active = 1 - m_iActive;
 
-						} catch (e) {
-
-							errorHelper.show(e);
-						}
+						m_functionSaveProject2();
 					}
 
-					var m_functionSaveProject = function (bToggleActive) {
+					// This saves the data without touching active status.
+					var m_functionSaveProject = function () {
+
+						if (!m_functionValidate(null, true)) { return; }	// m_functionValidate displays its own success or failure popup.
+
+						m_functionSaveProject2();
+					}
+
+					// This saves the data without touching active status.
+					var m_functionSaveProject2 = function () {
 
 						try {
-
-							if (!m_functionValidate(null, true)) { return; }	// m_functionValidate displays its own success or failure popup.
-
-							bToggleActive = bToggleActive || false;
-
-							if (bToggleActive) {
-
-								m_iActive = 1 - m_iActive;
-								m_jsPPData.active = m_iActive;
-							}
 
 							var data = {};
 							switch (m_strProductType) {
