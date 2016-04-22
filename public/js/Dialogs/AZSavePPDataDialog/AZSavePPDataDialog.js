@@ -461,7 +461,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_valSchedule = function() {
 
 						// done First date must be valid.
-				        // ____ Any date that's entered must be a valid datetime.
+				        // ____ Any date that's entered must be a valid datetime. This is difficult, because getAllFieldsFromTheBrowser has already
+				        //		set an invalid date in m_arrWhen to { date: '', duration: 0}, so we can't report it as an error, just as a gap.
 				        // done Any date must have valid duration (from < thru).
 				        // done No gaps allowed in the array.
 				        // ____ Dates must be in ascending order.
@@ -559,12 +560,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_strZip = $("#Zip").val().trim();
 							m_arrWhen = [];
+							m_arrWhenQuality = [];
 							for (var i = 1; i <=8; i++) {
 								var str = $("#When" + i).val().trim();
 								if (str.length) { 
-									m_arrWhen.push(m_funcWhenProcess(str)); 
+									var when = m_funcWhenProcess(str);
+									m_arrWhen.push(when);
+									if (when.date) {
+										m_arrWhenQuality.push('good');
+									} else {
+										m_arrWhenQuality.push('bad');
+									}
 								} else {
 									m_arrWhen.push({ date: '', duration: 0});
+									m_arrWhenQuality.push('empty');
 								}
 							}
  							// m_strLevel = $("#Level option:selected").text();
@@ -832,6 +841,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_strState;
 				var m_strZip;
 				var m_arrWhen;
+				var m_arrWhenQuality;
 				var m_strLevel;
 				var m_strDifficulty;
 				var m_dPrice;
