@@ -461,8 +461,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_valSchedule = function() {
 
 						// done First date must be valid.
-				        // ____ Any date that's entered must be a valid datetime. This is difficult, because getAllFieldsFromTheBrowser has already
-				        //		set an invalid date in m_arrWhen to { date: '', duration: 0}, so we can't report it as an error, just as a gap.
+				        // done Any date that's entered must be a valid datetime. I've created an array of strings m_arrWhenQuality in
+				        //		m_functionGetAllFieldsFromBrowser where 8 entries correspond to the 8 when fields and hold: 'good', 'bad' or 'empty'.
+				        //		m_arrWhenQuality reflects the quality of what's on the screen, not what's in m_jsPPData.schedule. So I
+				        //		can base error messages off it.
 				        // done Any date must have valid duration (from < thru).
 				        // done No gaps allowed in the array.
 				        // ____ Dates must be in ascending order.
@@ -477,8 +479,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var whenIth = m_jsPPData.schedule[i];	// whenIth.date is a string (either '' or '2016-04-18T00:00:00+00:00'); duration is number ms the class lasts (0 if date is '')
 							var momFrom = null;
 							var momThru = null;
-							var validDate = false;
-							if (whenIth.date.length) {
+							if (m_arrWhenQuality[i] === 'good') {
 
 								var momFrom = moment(whenIth.date);
 								// dur is probably unnecessary. It's probably fine to add a negative number of ms to a moment.
@@ -492,25 +493,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									momThru = momFrom.clone().subtract(0 - dur, 'ms');
 								}
-								validDate = true;
 							}
 							compArray.push(
 								{
 									from: momFrom,
-									thru: momThru,
-									valid: validDate
+									thru: momThru
 								}
 							);
 						}
 	
-						if (!compArray[0].valid) {
+						if (m_arrWhenQuality[0] === 'empty') {
 							htmlError += "<br><span>The date and times of at least the first class must be entered.</span>";
 						}
+
 						var bAnyEmptiesFoundYet = false;
 						for (var i = 0; i < 8; i++) {
 
 							var compIth = compArray[i];
-							if (!compIth.valid) {
+							if (m_arrWhenQuality[i] === 'empty') {
 
 								bAnyEmptiesFoundYet = true;
 
@@ -519,6 +519,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								if (bAnyEmptiesFoundYet && !htmlError.includes("gaps")) {
 
 									htmlError += "<br><span>You may not have gaps in the dates. Look above Class " + (i + 1) +".</span>";
+
+								} else if (m_arrWhenQuality[i] === 'bad') {
+
+									htmlError += "<br><span>Class " + (i + 1) +"'s date isn't formatted properly.</span>";
 
 								} else if(compIth.thru.isBefore(compIth.from)) {
 
@@ -652,12 +656,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_strInstructorLast = $("#InstructorLast").val().trim();
 							m_strEmail = $("#Email").val().trim();
 							m_arrWhen = [];
+							m_arrWhenQuality = [];
 							for (var i = 1; i <=8; i++) {
 								var str = $("#When" + i).val().trim();
 								if (str.length) { 
-									m_arrWhen.push(m_funcWhenProcess(str)); 
+									var when = m_funcWhenProcess(str);
+									m_arrWhen.push(when);
+									if (when.date) {
+										m_arrWhenQuality.push('good');
+									} else {
+										m_arrWhenQuality.push('bad');
+									}
 								} else {
 									m_arrWhen.push({ date: '', duration: 0});
+									m_arrWhenQuality.push('empty');
 								}
 							}
  							// m_strLevel = $("#Level option:selected").text();
