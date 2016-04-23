@@ -386,7 +386,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_functionValidate = function (event, bSaving) {
 
-				        //   general:
+				        //   all:
 				        //      imageId mb > 0
 				        //
 				        //   class:
@@ -460,15 +460,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_valSchedule = function() {
 
-						// done First date must be valid.
-				        // done Any date that's entered must be a valid datetime. I've created an array of strings m_arrWhenQuality in
+						// First date must be valid.
+				        // Any date that's entered must be a valid datetime. I've created an array of strings m_arrWhenQuality in
 				        //		m_functionGetAllFieldsFromBrowser where 8 entries correspond to the 8 when fields and hold: 'good', 'bad' or 'empty'.
 				        //		m_arrWhenQuality reflects the quality of what's on the screen, not what's in m_jsPPData.schedule. So I
-				        //		can base error messages off it.
-				        // done Any date must have valid duration (from < thru).
-				        // done No gaps allowed in the array.
-				        // ____ Dates must be in ascending order.
-				        // ____ If two classes happen on the same day, they must not overlap and first must precede second.
+				        // 		can base error messages off it.
+				        // Any date must have valid duration (from < thru).
+				        // No gaps allowed in the array.
+				        // (Don't check until there are no other schedule errors.) Dates must be in ascending order.
 
 						var htmlError = "";
 						var compArray = new Array();
@@ -528,6 +527,33 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								} else if(compIth.thru.isBefore(compIth.from)) {
 
 									htmlError += "<br><span>Class " + (i + 1) +" ends before it starts.</span>";
+								}
+							}
+						}
+
+						if (htmlError) {
+
+							htmlError += "<br><span>(After you fix all other Schedule errors, we'll check that your Classes are ordered correctly.)</span>";
+						
+						} else {
+
+							for (var i = 1; i < 8; i++) {
+
+								// We know date[0] is present and good.
+								var compPrior = compArray[i - 1];
+								var compIth = compArray[i];
+								var whenQualityIth = m_arrWhenQuality[i];
+
+								if (whenQualityIth === 'empty') {
+									break;
+								}
+
+								// End of compPrior mb before start of compIth.
+								var durCompPrior = moment.duration(m_jsPPData.schedule[i].duration);	// May have to add or subtract 60000.
+								var endOfCompPrior = compPrior.from.clone().add(durCompPrior);
+								if (compIth.from.isBefore(endOfCompPrior)) {
+
+									htmlError += "<br><span>Class # " + (i + 1).toString() + " starts BEFORE the previous class ends.</span>";
 								}
 							}
 						}

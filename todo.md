@@ -7,7 +7,7 @@
 ## Jerry's High Priority Issues
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
 - Finish buying. 
-    + 3 more cases in schedule verification.
+    + 2 more cases in schedule verification.
     + Speaking of waitlist, check for and don't write out dups.
     * Use this code to display a Product's video (if I add that):
     ```
