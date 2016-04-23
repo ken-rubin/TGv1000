@@ -661,26 +661,57 @@ module.exports = function UtilityBO(app, sql, logger) {
                         });
                     }
 
-                    var guts = {
-                        projectId: req.body.projectId,
-                        userId: req.user.userId,
-                        userName: req.user.userName
-                    };
-                    var strQuery = "INSERT " + self.dbname + "waitlist SET ?";
-                    console.log('Inserting waitlist record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                        function(err, rows) {
+                    sql.queryWithCxn(connection,
+                        "select count(*) as cnt from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and userId=" + req.user.userId + " and userName=" + connection.escape(req.user.userName) + ";",
+                        function (err, rows) {
 
                             if (err) {
+
                                 return res.json({
                                     success: false,
-                                    message: 'Could not add user to waitlist: ' + err.message
+                                    message: 'Could not check for prior existance on the waitlist: ' + err.message
                                 });
                             }
 
-                            return res.json({
-                                success: true
-                            });
+                            if (rows.length === 0) {
+
+                                return res.json({
+                                    success: false,
+                                    message: 'Could not check for prior existance on the waitlist.'
+                                });
+                            }
+
+                            if (rows[0].cnt) {
+
+                                // Already on waitlist. Make like it worked fine.
+                                return res.json({
+                                    success: true
+                                });
+                            }
+
+                            // We're good to insert.
+                            var guts = {
+                                projectId: req.body.projectId,
+                                userId: req.user.userId,
+                                userName: req.user.userName
+                            };
+                            var strQuery = "INSERT " + self.dbname + "waitlist SET ?";
+                            console.log('Inserting waitlist record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                            sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                function(err, rows) {
+
+                                    if (err) {
+                                        return res.json({
+                                            success: false,
+                                            message: 'Could not add user to waitlist: ' + err.message
+                                        });
+                                    }
+
+                                    return res.json({
+                                        success: true
+                                    });
+                                }
+                            );
                         }
                     );
                 }

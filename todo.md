@@ -7,16 +7,7 @@
 ## Jerry's High Priority Issues
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
 - Finish buying. 
-    + 2 more cases in schedule verification.
-    + Speaking of waitlist, check for and don't write out dups.
-    * Use this code to display a Product's video (if I add that):
-    ```
-    <div align="center" class="embed-responsive embed-responsive-16by9">
-        <video autoplay loop class="embed-responsive-item">
-            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
-        </video>
-    </div>
-    ```
+    + Speaking of waitlist, check for and don't write out dups. I.e., don't put same user on waitlist for same class twice. **Implemented. Test it.**
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
@@ -59,6 +50,14 @@
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
 ### To consider or do even later
+* Use this code to display a Product's video (if I add that):
+    ```
+    <div align="center" class="embed-responsive embed-responsive-16by9">
+        <video autoplay loop class="embed-responsive-item">
+            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
+        </video>
+    </div>
+    ```
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
 - Deleting
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
