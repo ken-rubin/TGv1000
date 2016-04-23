@@ -518,11 +518,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 								if (bAnyEmptiesFoundYet && !htmlError.includes("gaps")) {
 
-									htmlError += "<br><span>You may not have gaps in the dates. Look above Class " + (i + 1) +".</span>";
+									htmlError += "<br><span>You may not have gaps in the Schedule.</span>";
+								}
+								
+								if (m_arrWhenQuality[i] === 'bad') {
 
-								} else if (m_arrWhenQuality[i] === 'bad') {
-
-									htmlError += "<br><span>Class " + (i + 1) +"'s date isn't formatted properly.</span>";
+									htmlError += "<br><span>The date for class " + (i + 1) +" isn't formatted properly.</span>";
 
 								} else if(compIth.thru.isBefore(compIth.from)) {
 
@@ -531,11 +532,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 						}
 
-
-
-						// htmlError += "<br><span>Your 3rd date is wrong.</span>";
-						// htmlError += "<br><span>There's a gap between your 3rd and 5th dates.</span>";
-						// htmlError += "<br><span>Your 6th date comes before your 3rd..</span>";
 						return htmlError;
 					}
 
