@@ -771,7 +771,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 		                    	if (data.success) {
 
-                                    errorHelper.show("The save was successful.", 250000);
+                                    errorHelper.show("The save was successful.", 2000);
                                     m_dialog.close();
 		                    	
 		                    	} else {

@@ -112,7 +112,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 										// If callback exists, then our errorHelper will be display in callback back in BuyDialog.js.
 										if (!$.isFunction(callback)) {
 											if (!objectData.project.specialProjectData.systemTypesEdited) {
-												errorHelper.show('Project was saved', 1000);
+												errorHelper.show('Project was saved', 2000);
 											} else {
 												if (objectData.scriptSuccess) {
 													errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);

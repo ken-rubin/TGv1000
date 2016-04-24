@@ -5,7 +5,7 @@
 
 
 ## Jerry's Bugs
-- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was kind-of created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
+- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined.
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. I've enhanced errorHelper to have it show the excption stack for a privileged user.
 
 ## Jerry's High Priority Issues
