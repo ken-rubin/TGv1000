@@ -2711,12 +2711,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                             var tags;
                             var name;
                             var id;
+                            var description;
                             if (req.body.hasOwnProperty("classData")) {
                                 req.body.classData.schedule = JSON.stringify(req.body.classData.schedule);
                                 imageId = req.body.classData.imageId;
                                 tags = req.body.classData.tags;
                                 delete req.body.classData.tags;
                                 name = req.body.classData.name;
+                                description = req.body.classData.classDescription;
                                 id = req.body.classData.baseProjectId;
                             } else if (req.body.hasOwnProperty("onlineClassData")) {
                                 req.body.onlineClassData.schedule = JSON.stringify(req.body.onlineClassData.schedule);
@@ -2724,12 +2726,14 @@ module.exports = function ProjectBO(app, sql, logger) {
                                 tags = req.body.onlineClassData.tags;
                                 delete req.body.onlineClassData.tags;
                                 name = req.body.onlineClassData.name;
+                                description = req.body.onlineClassData.classDescription;
                                 id = req.body.onlineClassData.baseProjectId;
                             } else if (req.body.hasOwnProperty("productData")) {
                                 imageId = req.body.productData.imageId;
                                 tags = req.body.productData.tags;
                                 delete req.body.productData.tags;
                                 name = req.body.productData.name;
+                                description = req.body.productData.productDescription;
                                 id = req.body.productData.baseProjectId;
                             }
 
@@ -2774,6 +2778,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                                         guts = {
                                             imageId: imageId,
                                             name: name,
+                                            description: description,
                                             altImagePath: ''
                                         };
                                         var strQuery = "update " + self.dbname + "projects SET ? where id=" + id.toString();

@@ -88,6 +88,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							$("#tabs").tabs();
 							$(".tt-selector .btn-default").powerTip({
 								smartPlacement: true
 							});

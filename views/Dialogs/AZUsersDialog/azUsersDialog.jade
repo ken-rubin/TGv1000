@@ -1,26 +1,31 @@
 //- Jade DOM for the AZUsersDialog. 
 //-
-.well
-  .row
-    .col-xs-12
-      h4(style="margin-top:-8px;")
-        | Permissions
-      h5
-        | This section will have a vertically scrollable list of premissions: id, permission. Editing and deletion are disallowed, since a permission might
-        | be in use in the app. All that will be allowed is adding a new permission.
-.well
-  .row
-    .col-xs-12
-      h4(style="margin-top:-8px;")
-        | Usergroups
-      h5
-        | This will be a vertically scrollable list of all usergroups showing id, name and horizontally scrolling columns for each permission with a checkbox which is checked if the usergroup contains that permission.
-        | All of the checkboxes are available for change. Usergroups cannot be deleted, but their names can be changed. A new usergroup can be added, named and filled with permissions.
-.well
-  .row
-    .col-xs-12
-      h4(style="margin-top:-8px;")
-        | Users
-      h5
-        | This is a verticallay scrolling list of users showing id, userName (email), first and last names, zipcode and usergroupId or name.
-        | userId and userName are not editable. Everything else is. No adding users here or anything to do with passwords. Yet.
+#tabs
+  ul
+    li
+      a(href='#Permissions') Permissions
+    li
+      a(href='#Usergroups') Usergroups
+    li
+      a(href='#Users') Users
+  #Permissions
+    .well
+      .row
+        .col-xs-12
+          h5
+            | This section will have a vertically scrollable list of premissions: id, permission. Editing and deletion are disallowed, since a permission might
+            | be in use in the app. All that will be allowed is adding a new permission.
+  #Usergroups
+    .well
+      .row
+        .col-xs-12
+          h5
+            | This will be a vertically scrollable list of all usergroups showing id, name and horizontally scrolling columns for each permission with a checkbox which is checked if the usergroup contains that permission.
+            | All of the checkboxes are available for change. Usergroups cannot be deleted, but their names can be changed. A new usergroup can be added, named and filled with permissions.
+  #Users
+    .well
+      .row
+        .col-xs-12
+          h5
+            | This is a verticallay scrolling list of users showing id, userName (email), first and last names, zipcode and usergroupId or name.
+            | userId and userName are not editable. Everything else is. No adding users here or anything to do with passwords. Yet.
