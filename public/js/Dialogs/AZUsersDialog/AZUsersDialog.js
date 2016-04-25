@@ -130,7 +130,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							errorHelper.show("Got the data back successfully", 4000);
+							// Disable search for all datatables unless overridden.
+							// Add more defaults here.
+							$.extend( $.fn.dataTable.defaults, {
+							    searching: false
+							} );
+
+
+
 
 							return null;
 						
