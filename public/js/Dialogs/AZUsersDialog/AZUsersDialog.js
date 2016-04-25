@@ -60,7 +60,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							BootstrapDialog.show({
 
-								title: "Permission, Usergroup and User Maintenance",
+								title: "User, etc. Maintenance",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
 					            buttons: [
@@ -96,21 +96,59 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
-						} catch (e) {
+							var posting = $.post("/BOL/UtilityBO/GetAllUserMaintData", 
+								{},
+								'json');
+							posting.done(function(data){
 
-							errorHelper.show(e);
-						}
+								try {
+									if (data.success) {
+
+										m_rows = data.rows;
+										m_user = data.rows[0];
+										m_usergroups = data.rows[1];
+										m_permissions = data.rows[2];
+										m_ug_permissions = data.rows[3];
+
+										var exceptionRet = m_functionSetUp3Tabs();
+										if (exceptionRet) { throw exceptionRet; }
+
+									} else {
+
+										// !data.success
+										 throw new Error(data.message);
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+  							});
+						} catch (e) { errorHelper.show(e); }
 					};
-				} catch (e) {
 
-					errorHelper.show(e.message);
-				}
+					var m_functionSetUp3Tabs = function () {
+
+						try {
+
+							errorHelper.show("Got the data back successfully", 4000);
+
+							return null;
+						
+						} catch (e) { return e; }
+					}
+
+				} catch (e) { errorHelper.show(e.message); }
 
 				/////////////////////////////////
 				// Private fields.
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
+				var m_rows;
+				var m_user;
+				var m_usergroups;
+				var m_permissions;
+				var m_ug_permissions;
 			};
 
 			// Return the constructor function as the module object.

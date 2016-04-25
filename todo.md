@@ -10,7 +10,7 @@
 
 ## Jerry's High Priority Issues
 - Finish buying. 
-    + Check for and don't write out dups to waitlist. I.e., don't put same user on waitlist for same class twice. **Implemented. Test it.**
+    + **Test no dups to waitlist.**
     + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
     + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.

@@ -70,7 +70,8 @@ module.exports = function UtilityBO(app, sql, logger) {
     // Public methods
     
     // Router handler functions.
-        // Simple handler returns public key to client.
+        
+    // Simple handler returns public key to client.
     self.routeGetStripePK = function (req, res) {
 
         console.log("Request for " + (bLocalCredit ? "local" : "remote") + " public key: " + req.ip);
@@ -123,6 +124,53 @@ module.exports = function UtilityBO(app, sql, logger) {
             res.json({
                 success: false,
                 message: e.message
+            });
+        }
+    }
+
+    self.routeGetAllUserMaintData = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeGetAllUserMaintData");
+            // no req props are used.
+
+            // Returns all users, usergroups, permissions and ug_permissions.
+            var strSql = "select * from " + self.dbname + "user; ";
+            strSql += "select * from " + self.dbname + "usergroups; ";
+            strSql += "select * from " + self.dbname + "permissions; ";
+            strSql += "select * from " + self.dbname + "ug_permissions; ";
+            sql.execute(
+                strSql,
+                function (rows) {
+
+                    if (rows.length !== 4) {
+
+                        return res.json({
+                            success:false,
+                            message: "Something went wrong fetching required info from the DB."
+                        });
+                    }
+
+                    return res.json({
+                        success:true,
+                        rows: rows
+                    });
+                },
+                function (strError) {
+
+                    return res.json({
+                        success: false,
+                        message: "This error received fetching required info from the DB: " + strError
+                     });
+                }
+            );
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received fetching required info from the DB: " + e.message
             });
         }
     }
