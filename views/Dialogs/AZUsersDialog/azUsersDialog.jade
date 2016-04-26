@@ -15,6 +15,8 @@
           h5
             | This section will have a vertically scrollable list of premissions: id, permission. Editing and deletion are disallowed, since a permission might
             | be in use in the app. All that will be allowed is adding a new permission.
+          br
+          table#PermissionsTable.display(style="width:100%;")
   #Usergroups
     .well
       .row
@@ -22,6 +24,8 @@
           h5
             | This will be a vertically scrollable list of all usergroups showing id, name and horizontally scrolling columns for each permission with a checkbox which is checked if the usergroup contains that permission.
             | All of the checkboxes are available for change. Usergroups cannot be deleted, but their names can be changed. A new usergroup can be added, named and filled with permissions.
+          br
+          table#UsergroupsTable.display(style="width:100%;")
   #Users
     .well
       .row
@@ -29,3 +33,5 @@
           h5
             | This is a verticallay scrolling list of users showing id, userName (email), first and last names, zipcode and usergroupId or name.
             | userId and userName are not editable. Everything else is. No adding users here or anything to do with passwords. Yet.
+          br
+          table#UsersTable.display(style="width:100%;")

@@ -136,8 +136,43 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							    searching: false
 							} );
 
+							$("#PermissionsTable").DataTable(
+								{
+									data: m_permissions,
+									columns:
+										[
+											{data: "id"},
+											{data: "description"}
+										]
+								}
+							);
 
+							$("#UsergroupsTable").DataTable(
+								{
+									data: m_usergroups,
+									columns:
+										[
+											{data: "id"},
+											{data: "name"}
+										]
+								}
+							);
 
+							$("#UsersTable").DataTable(
+								{
+									data: m_user,
+									columns:
+										[
+											{data: "id"},
+											{data: "userName"},
+											{data: "firstName"},
+											{data: "lastName"},
+											{data: "usergroupId"},
+											{data: "zipcode"},
+											{data: "timezone"},
+										]
+								}
+							);
 
 							return null;
 						
