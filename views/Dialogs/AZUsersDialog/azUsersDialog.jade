@@ -13,10 +13,20 @@
       .row
         .col-xs-12
           h5
-            | This section will have a vertically scrollable list of premissions: id, permission. Editing and deletion are disallowed, since a permission might
-            | be in use in the app. All that will be allowed is adding a new permission.
+            | This tab has a datatable of premissions: id, permission. Editing and deletion are disallowed, since a permission might
+            | be in use in the app. All that is allowed is adding a new permission. After one is added, it is available for use in the app.
           br
           table#PermissionsTable.display(style="width:100%;")
+          br
+      .row
+        .col-xs-12
+            label(for="AddPermissionBtn") Add a New Permission
+        .col-xs-4
+            input.form-control#Permission(type="text" placeholder="Permission name")
+        .col-xs-1
+            button#AddPermissionBtn.btn.btn-default(type="button" title="Add a Permission" style="margin-left: -20px;")
+                span.glyphicon.glyphicon-plus(aria-hidden="true")
+        .col-xs-7
   #Usergroups
     .well
       .row
