@@ -141,8 +141,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									data: m_permissions,
 									columns:
 										[
-											{data: "id"},
-											{data: "description"}
+											{data: "id", title: "id"},
+											{data: "description", title: "description"}
 										]
 								}
 							);
@@ -152,8 +152,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									data: m_usergroups,
 									columns:
 										[
-											{data: "id"},
-											{data: "name"}
+											{data: "id", title: "id"},
+											{data: "name", title: "name"}
 										]
 								}
 							);
@@ -163,13 +163,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									data: m_user,
 									columns:
 										[
-											{data: "id"},
-											{data: "userName"},
-											{data: "firstName"},
-											{data: "lastName"},
-											{data: "usergroupId"},
-											{data: "zipcode"},
-											{data: "timezone"},
+											{data: "id", title: "id"},
+											{data: "userName", title: "userName"},
+											{data: "firstName", title: "firstName"},
+											{data: "lastName", title: "lastName"},
+											{data: "usergroupId", title: "usergroupId"},
+											{data: "zipcode", title: "zipcode"},
+											{data: "timezone", title: "timezone"},
 										]
 								}
 							);
