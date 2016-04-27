@@ -242,10 +242,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									$("#Permission").val('');
 
 									m_permissions = data.rows;
+									m_permissionsTable.clear().rows.add(m_permissions).draw();
 
-									var exceptionRet = m_doPermissions();
-									if (exceptionRet) { throw exceptionRet; }
-									m_permissionsTable.draw(true);
+									errorHelper.show('New permission was saved to database.', 2500);
 
 								} else {
 
