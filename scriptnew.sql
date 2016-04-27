@@ -731,6 +731,24 @@ begin
         set @dbstate := 9;
     end if;
 
+    if @dbstate = 9 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddPermission','post','routeAddPermission',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		UPDATE control set dbstate=10 where id=1;
+        set @dbstate := 10;
+    end if;
+    
+    if @dbstate = 10 THEN
+    
+		ALTER TABLE `tgv1000`.`permissions` 
+		CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ,
+		DROP INDEX `id_UNIQUE` ;
+
+		UPDATE control set dbstate=11 where id=1;
+        set @dbstate := 11;
+    end if;
+    
 end//
 
 

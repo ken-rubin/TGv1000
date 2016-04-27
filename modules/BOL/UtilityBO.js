@@ -165,12 +165,84 @@ module.exports = function UtilityBO(app, sql, logger) {
                      });
                 }
             );
-
         } catch (e) {
 
             res.json({
                 success: false,
                 message: "This error received fetching required info from the DB: " + e.message
+            });
+        }
+    }
+
+    self.routeAddPermission = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeAddPermission w/req.body = " + JSON.stringify(req.body));
+            // req.body.permission
+
+            sql.getCxnFromPool(
+                function(err, connection) {
+
+                    if (err) {
+
+                        return res.json({
+                            success: false,
+                            message: 'Could not get a database connection: ' + err.message
+                        });
+                    }
+
+                    var guts = {
+                        description: req.body.permission
+                    };
+
+                    var strQuery = "INSERT " + self.dbname + "permissions SET ?";
+                    console.log('Inserting permissions record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                        function(err, rows) {
+
+                            if (err) {
+                                return res.json({
+                                    success: false,
+                                    message: 'Could not add permission: ' + err.message
+                                });
+                            }
+
+                            strQuery = "select * from " + self.dbname + "permissions;";
+                            sql.execute(
+                                strQuery,
+                                function (rows) {
+
+                                    if (rows.length === 0) {
+
+                                        return res.json({
+                                            success:false,
+                                            message: "Something went wrong fetching permissions from the DB."
+                                        });
+                                    }
+
+                                    return res.json({
+                                        success:true,
+                                        rows: rows
+                                    });
+                                },
+                                function (strError) {
+
+                                    return res.json({
+                                        success: false,
+                                        message: "This error received fetching permissions from the DB: " + strError
+                                     });
+                                }
+                            );
+                        }
+                    );
+                }            
+            );
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received adding permission: " + e.message
             });
         }
     }

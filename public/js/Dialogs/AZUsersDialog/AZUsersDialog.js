@@ -90,25 +90,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							$("#tabs").tabs();
 
-							$("#tabs").on(
-								"tabsbeforeactivate", function( event, ui) {
-									alert('tabsbeforeActivate: ' + ui.newPanel[0].id);
-								}
-							);
-							$("#tabs").on(
-								"tabsactivate", function( event, ui) {
-									alert('tabsactivate: ' + ui.newPanel[0].id);
-								}
-							);
-							$("#tabs").on(
-								"tabscreate", function( event, ui) {
-									alert('tabscreate: ' + ui.tab[0].id);
-								}
-							);
-
 							$(".tt-selector .btn-default").powerTip({
 								smartPlacement: true
 							});
+
+							$("#AddPermissionBtn").click(m_functionAddPermission);
 							
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
@@ -171,14 +157,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$("#PermissionsTable").DataTable(
+							m_permissionsTable = $("#PermissionsTable").DataTable(
 								{
 									data: m_permissions,
 									columns:
 										[
 											{data: "id", title: "id"},
 											{data: "description", title: "description"}
-										]
+										],
+									scrollY: 200,
 								}
 							);
 						} catch (e) { return e; }
@@ -188,7 +175,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$("#UsergroupsTable").DataTable(
+							m_usergroupsTable = $("#UsergroupsTable").DataTable(
 								{
 									data: m_usergroups,
 									columns:
@@ -205,7 +192,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$("#UsersTable").DataTable(
+							m_usersTable = $("#UsersTable").DataTable(
 								{
 									data: m_user,
 									columns:
@@ -227,6 +214,51 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						} catch (e) { return e; }
 					}
 
+					var m_functionAddPermission = function () {
+
+						var strPerm = $("#Permission").val().trim().toLowerCase();
+						if (!strPerm) {
+							errorHelper.show("You must enter a permission description.");
+							return;
+						}
+
+						for (var i = 0; i < m_permissions.length; i++) {
+							if (strPerm === m_permissions[i].description) {
+								errorHelper.show("'" + strPerm + "' already exists.");
+								return;
+							}
+						}
+
+						var posting = $.post("/BOL/UtilityBO/AddPermission", 
+							{
+								permission: strPerm
+							},
+							'json');
+						posting.done(function(data){
+
+							try {
+								if (data.success) {
+
+									$("#Permission").val('');
+
+									m_permissions = data.rows;
+
+									var exceptionRet = m_doPermissions();
+									if (exceptionRet) { throw exceptionRet; }
+									m_permissionsTable.draw(true);
+
+								} else {
+
+									// !data.success
+									 throw new Error(data.message);
+								}
+							} catch (e) {
+
+								errorHelper.show(e);
+							}
+							});
+					}
+
 				// catch for outer try
 				} catch (e) { errorHelper.show(e.message); }
 
@@ -240,6 +272,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_usergroups;
 				var m_permissions;
 				var m_ug_permissions;
+				var m_permissionsTable;
+				var m_usergroupsTable;
+				var m_usersTable;
 			};
 
 			// Return the constructor function as the module object.
