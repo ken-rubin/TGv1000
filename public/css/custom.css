@@ -279,3 +279,8 @@ a.list-group-item {
 {
   position:absolute;
 }
+
+div.dataTables_wrapper {
+  width:100%;
+  margin: 0 auto;
+}

@@ -3,11 +3,11 @@
 #tabs
   ul
     li
+      a(href='#Users') Users
+    li
       a(href='#Permissions') Permissions
     li
       a(href='#Usergroups') Usergroups
-    li
-      a(href='#Users') Users
   #Permissions
     .well
       .row
@@ -44,4 +44,4 @@
             | This is a verticallay scrolling list of users showing id, userName (email), first and last names, zipcode and usergroupId or name.
             | userId and userName are not editable. Everything else is. No adding users here or anything to do with passwords. Yet.
           br
-          table#UsersTable.display(style="width:100%;")
+          table#UsersTable.display.nowrap(style="cellspacing:0;width:100%;")

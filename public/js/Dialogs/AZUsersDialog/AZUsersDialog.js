@@ -89,6 +89,23 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						try {
 
 							$("#tabs").tabs();
+
+							$("#tabs").on(
+								"tabsbeforeactivate", function( event, ui) {
+									alert('tabsbeforeActivate: ' + ui.newPanel[0].id);
+								}
+							);
+							$("#tabs").on(
+								"tabsactivate", function( event, ui) {
+									alert('tabsactivate: ' + ui.newPanel[0].id);
+								}
+							);
+							$("#tabs").on(
+								"tabscreate", function( event, ui) {
+									alert('tabscreate: ' + ui.tab[0].id);
+								}
+							);
+
 							$(".tt-selector .btn-default").powerTip({
 								smartPlacement: true
 							});
@@ -136,6 +153,24 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							    searching: false
 							} );
 
+							var exceptionRet = m_doPermissions();
+							if (exceptionRet) { return exceptionRet; }
+
+							var exceptionRet = m_doUsergroups();
+							if (exceptionRet) { return exceptionRet; }
+
+							var exceptionRet = m_doUsers();
+							if (exceptionRet) { return exceptionRet; }
+
+							return null;
+						
+						} catch (e) { return e; }
+					}
+
+					var m_doPermissions = function () {
+
+						try {
+
 							$("#PermissionsTable").DataTable(
 								{
 									data: m_permissions,
@@ -146,6 +181,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										]
 								}
 							);
+						} catch (e) { return e; }
+					}
+
+					var m_doUsergroups = function () {
+
+						try {
 
 							$("#UsergroupsTable").DataTable(
 								{
@@ -157,28 +198,36 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										]
 								}
 							);
+						} catch (e) { return e; }
+					}
+
+					var m_doUsers = function () {
+
+						try {
 
 							$("#UsersTable").DataTable(
 								{
 									data: m_user,
 									columns:
-										[
-											{data: "id", title: "id"},
-											{data: "userName", title: "userName"},
-											{data: "firstName", title: "firstName"},
-											{data: "lastName", title: "lastName"},
-											{data: "usergroupId", title: "usergroupId"},
-											{data: "zipcode", title: "zipcode"},
-											{data: "timezone", title: "timezone"},
-										]
+									[
+										{data: "id", title: "id"},
+										{data: "userName", title: "userName"},
+										{data: "firstName", title: "firstName"},
+										{data: "lastName", title: "lastName"},
+										{data: "usergroupId", title: "usergroupId"},
+										{data: "zipcode", title: "zipcode"},
+										{data: "timezone", title: "timezone"},
+										{data: "pwHash", "title": "pwHash"}
+									],
+									scrollY: 200,
+									scrollX: true,
+									autoWidth: false
 								}
 							);
-
-							return null;
-						
 						} catch (e) { return e; }
 					}
 
+				// catch for outer try
 				} catch (e) { errorHelper.show(e.message); }
 
 				/////////////////////////////////
