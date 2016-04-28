@@ -5,8 +5,8 @@
 
 
 ## Jerry's Bugs
-- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.
-- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. See note above.
+- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
+- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
 
 ## Jerry's High Priority Issues
 - Finish buying. 
@@ -18,11 +18,9 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - AdminZone functionality
     - User & Usergroup and Permissions maintenance (AZUsersDialog).
-        - Users: Would like combobox column for usergroup, not usergroupId. On any change confirm w/dialog (maybe). Write single change to DB on confirmation. Maybe add in-place editing of other permitted fields later.
-        - Usergroups: Need Add Usergroup (like Add Permission). When a usergroup is added, update combobox options for all users. Usergroup also has to have 1 column for each permission with a checkbox showing which are on/off for the usergroup. On click, immediately save the change to the DB.
-        - Permissions: When a permission is added, need to update m_usergroups to add a column to every usergroup. It will be false for every usergroup, but can be turned on by the user on that tab.
-        - Initial data has to be massaged before the datatables are loaded.
-        - Still having disconnected table header problem in backgroup tabs. Need to get notification of tab change event working so I can rebuild the databable.
+        - Users: Write combobox selection change to DB immediately. **Maybe** Add in-place editing of a few other fields.
+        - Usergroups: On click on any permission checkbox, immediately save the change to the DB (add or remove a record from table ug_permissions).
+        - **Maybe** Still having disconnected table header problem in background tabs. Need to get notification of tab change event working so I can rebuild the databable that user just switched to.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
 
 ### Can wait till Ken integrates

@@ -201,7 +201,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										$("#Permission").val('');
 
 										m_permissions = data.rows;
+
+										// Clear and redraw permissions table to add new row.
 										m_permissionsTable.clear().rows.add(m_permissions).draw();
+
+										// Also rebuild usergroups table to add a checkbox column.
+										m_usergroupsTable.destroy();
+										m_setResetUsergroupsTable();
+										m_usergroupsTable = $("#UsergroupsTable").DataTable(
+											{
+												scrollY: 200,
+												scrollX: true,
+												autoWidth: false
+											}
+										);
 
 										errorHelper.show('New permission was saved to database.', 2500);
 
@@ -253,8 +266,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strBuildUsersHTML += '<td>' + u.id + '</td>';
 								// name
 								strBuildUsersHTML += '<td>' + u.name + '</td>';
-
-
 
 								// permissions checkbox columns
 								for (var i = 0; i < m_permissions.length; i++) {
@@ -315,7 +326,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										$("#Usergroup").val('');
 
 										m_usergroups = data.rows;
-										m_usergroupsTable.clear().rows.add(m_usergroups).draw();
+
+										// Rebuild usergroups table to add new row with all checkboxes off.
+										m_usergroupsTable.destroy();
+										m_doUsergroups();
+
+										// Also rebuild users table to add new usergroup to all combos therein.
+										m_usersTable.destroy();
+										m_doUsers();
 
 										errorHelper.show('New usergroup was saved to database.', 2500);
 
