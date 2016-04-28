@@ -247,6 +247,79 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
+    self.routeAddUsergroup = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeAddUsergroup w/req.body = " + JSON.stringify(req.body));
+            // req.body.usergroup
+
+            sql.getCxnFromPool(
+                function(err, connection) {
+
+                    if (err) {
+
+                        return res.json({
+                            success: false,
+                            message: 'Could not get a database connection: ' + err.message
+                        });
+                    }
+
+                    var guts = {
+                        name: req.body.usergroup
+                    };
+
+                    var strQuery = "INSERT " + self.dbname + "usergroups SET ?";
+                    console.log('Inserting usergroups record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                        function(err, rows) {
+
+                            if (err) {
+                                return res.json({
+                                    success: false,
+                                    message: 'Could not add usergroup: ' + err.message
+                                });
+                            }
+
+                            strQuery = "select * from " + self.dbname + "usergroups;";
+                            sql.execute(
+                                strQuery,
+                                function (rows) {
+
+                                    if (rows.length === 0) {
+
+                                        return res.json({
+                                            success:false,
+                                            message: "Something went wrong fetching usergroups from the DB."
+                                        });
+                                    }
+
+                                    return res.json({
+                                        success:true,
+                                        rows: rows
+                                    });
+                                },
+                                function (strError) {
+
+                                    return res.json({
+                                        success: false,
+                                        message: "This error received fetching usergroups from the DB: " + strError
+                                     });
+                                }
+                            );
+                        }
+                    );
+                }            
+            );
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received adding usergroup: " + e.message
+            });
+        }
+    }
+
     self.routeSearchResources = function (req, res) {
 
         // This is a search for Images or Sounds (resourceTypeIds 1 and 2, respectively).

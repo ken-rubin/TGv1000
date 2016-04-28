@@ -95,6 +95,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							});
 
 							$("#AddPermissionBtn").click(m_functionAddPermission);
+							$("#AddUsergroupBtn").click(m_functionAddUsergroup);
 							
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
@@ -234,28 +235,76 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								permission: strPerm
 							},
 							'json');
-						posting.done(function(data){
+						posting.done(function(data) {
 
-							try {
-								if (data.success) {
+								try {
 
-									$("#Permission").val('');
+									if (data.success) {
 
-									m_permissions = data.rows;
-									m_permissionsTable.clear().rows.add(m_permissions).draw();
+										$("#Permission").val('');
 
-									errorHelper.show('New permission was saved to database.', 2500);
+										m_permissions = data.rows;
+										m_permissionsTable.clear().rows.add(m_permissions).draw();
 
-								} else {
+										errorHelper.show('New permission was saved to database.', 2500);
 
-									// !data.success
-									 throw new Error(data.message);
+									} else {
+
+										// !data.success
+										 throw new Error(data.message);
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
 								}
-							} catch (e) {
-
-								errorHelper.show(e);
 							}
-							});
+						);
+					}
+
+					var m_functionAddUsergroup = function () {
+
+						var strUg = $("#Usergroup").val().trim().toLowerCase();
+						if (!strUg) {
+							errorHelper.show("You must enter a usergroup name.");
+							return;
+						}
+
+						for (var i = 0; i < m_usergroups.length; i++) {
+							if (strUg === m_usergroups[i].name) {
+								errorHelper.show("'" + strUg + "' already exists.");
+								return;
+							}
+						}
+
+						var posting = $.post("/BOL/UtilityBO/AddUsergroup", 
+							{
+								usergroup: strUg
+							},
+							'json');
+						posting.done(function(data) {
+
+								try {
+
+									if (data.success) {
+
+										$("#Usergroup").val('');
+
+										m_usergroups = data.rows;
+										m_usergroupsTable.clear().rows.add(m_usergroups).draw();
+
+										errorHelper.show('New usergroup was saved to database.', 2500);
+
+									} else {
+
+										// !data.success
+										 throw new Error(data.message);
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							}
+						);
 					}
 
 				// catch for outer try

@@ -749,6 +749,16 @@ begin
         set @dbstate := 11;
     end if;
     
+    if @dbstate = 11 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddUsergroup','post','routeAddUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		ALTER TABLE `tgv1000`.`usergroups` 
+		CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ;
+
+		UPDATE control set dbstate=12 where id=1;
+        set @dbstate := 12;
+    end if;
+    
 end//
 
 
