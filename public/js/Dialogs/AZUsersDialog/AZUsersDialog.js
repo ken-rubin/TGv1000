@@ -366,6 +366,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setResetUsersTable = function () {
 
+						var processSelectChange = function (select) {
+
+							var selectedUsergroup = select.options[select.selectedIndex];
+							alert("You switched to " + selectedUsergroup.value);
+						}
+
 						var strBuildUsersHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead><tbody>';
 
 						m_user.forEach(
@@ -382,7 +388,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// lastName
 								strBuildUsersHTML += '<td>' + u.lastName + '</td>';
 								// usergroup combo
-								strBuildUsersHTML += '<td><select size="1" id="user-' + u.id + '-usergroup" name="user-' + u.id + '-usergroup">'
+								strBuildUsersHTML += '<td><select size="1" id="user-' + u.id + '-usergroup" name="user-' + u.id + '-usergroup" onchange="processSelectChange(this);">'
 								for (var i = 0; i < m_usergroups.length; i++) {
 									var ugIth = m_usergroups[i];
 									strBuildUsersHTML += '<option value="' + ugIth.name + '"';
@@ -431,4 +437,5 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 			errorHelper.show(e);
 		}
+		
 	});
