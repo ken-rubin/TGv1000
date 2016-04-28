@@ -172,49 +172,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						} catch (e) { return e; }
 					}
 
-					var m_doUsergroups = function () {
-
-						try {
-
-							m_usergroupsTable = $("#UsergroupsTable").DataTable(
-								{
-									data: m_usergroups,
-									columns:
-										[
-											{data: "id", title: "id"},
-											{data: "name", title: "name"}
-										]
-								}
-							);
-						} catch (e) { return e; }
-					}
-
-					var m_doUsers = function () {
-
-						try {
-
-							m_usersTable = $("#UsersTable").DataTable(
-								{
-									data: m_user,
-									columns:
-									[
-										{data: "id", title: "id"},
-										{data: "userName", title: "userName"},
-										{data: "firstName", title: "firstName"},
-										{data: "lastName", title: "lastName"},
-										{data: "usergroupId", title: "usergroupId"},
-										{data: "zipcode", title: "zipcode"},
-										{data: "timezone", title: "timezone"},
-										{data: "pwHash", "title": "pwHash"}
-									],
-									scrollY: 200,
-									scrollX: true,
-									autoWidth: false
-								}
-							);
-						} catch (e) { return e; }
-					}
-
 					var m_functionAddPermission = function () {
 
 						var strPerm = $("#Permission").val().trim().toLowerCase();
@@ -261,6 +218,74 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						);
 					}
 
+					var m_doUsergroups = function () {
+
+						try {
+
+							m_setResetUsergroupsTable();
+							m_usergroupsTable = $("#UsergroupsTable").DataTable(
+								{
+									scrollY: 200,
+									scrollX: true,
+									autoWidth: false
+								}
+							);
+
+						} catch (e) { return e; }
+					}
+
+					var m_setResetUsergroupsTable = function () {
+
+						var strBuildUsersHTML = '<thead><tr><th>id</th><th>name</th>';
+						m_permissions.forEach(
+							function(perm) {
+								strBuildUsersHTML += '<th>' + perm.description + '</th>';
+							}
+						);
+						strBuildUsersHTML += '</tr></thead><tbody>';
+
+						m_usergroups.forEach(
+							function(u) {
+								var usergroupId = u.usergroupId;
+								strBuildUsersHTML += '<tr>';
+
+								// id
+								strBuildUsersHTML += '<td>' + u.id + '</td>';
+								// name
+								strBuildUsersHTML += '<td>' + u.name + '</td>';
+
+
+
+								// permissions checkbox columns
+								for (var i = 0; i < m_permissions.length; i++) {
+									var pIth = m_permissions[i];
+									strBuildUsersHTML += '<td><input type="checkbox" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
+									// See if it should be checked. We're working with usergroupId=u.id and permissionId=pIth.id
+									var checked = false;
+									for (var j = 0; j < m_ug_permissions.length; j++) {
+										var ugpIth = m_ug_permissions[j];
+										if (ugpIth.usergroupId === u.id) {
+											if (ugpIth.permissionId === pIth.id) {
+												checked = true;
+												break;
+											}
+										}
+									}
+									if (checked) {
+										strBuildUsersHTML += ' checked';
+									}
+									strBuildUsersHTML += '></td>';
+								}
+								strBuildUsersHTML += '</tr>';
+							}
+						);
+
+						strBuildUsersHTML += '</tbody>';
+
+						$("#UsergroupsTable").empty();
+						$("#UsergroupsTable").append(strBuildUsersHTML);
+					}
+
 					var m_functionAddUsergroup = function () {
 
 						var strUg = $("#Usergroup").val().trim().toLowerCase();
@@ -305,6 +330,62 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								}
 							}
 						);
+					}
+					var m_doUsers = function () {
+
+						try {
+
+							m_setResetUsersTable();
+							m_usersTable = $("#UsersTable").DataTable(
+								{
+									scrollY: 200,
+									scrollX: true,
+									autoWidth: false
+								}
+							);
+						} catch (e) { return e; }
+					}
+
+					var m_setResetUsersTable = function () {
+
+						var strBuildUsersHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead><tbody>';
+
+						m_user.forEach(
+							function(u) {
+								var usergroupId = u.usergroupId;
+								strBuildUsersHTML += '<tr>';
+
+								// id
+								strBuildUsersHTML += '<td>' + u.id + '</td>';
+								// userName
+								strBuildUsersHTML += '<td>' + u.userName + '</td>';
+								// firstName
+								strBuildUsersHTML += '<td>' + u.firstName + '</td>';
+								// lastName
+								strBuildUsersHTML += '<td>' + u.lastName + '</td>';
+								// usergroup combo
+								strBuildUsersHTML += '<td><select size="1" id="user-' + u.id + '-usergroup" name="user-' + u.id + '-usergroup">'
+								for (var i = 0; i < m_usergroups.length; i++) {
+									var ugIth = m_usergroups[i];
+									strBuildUsersHTML += '<option value="' + ugIth.name + '"';
+									if (usergroupId === ugIth.id) {
+										strBuildUsersHTML += 'selected="selected"';
+									}
+									strBuildUsersHTML += '>' + ugIth.name + '</option>';
+								}
+								strBuildUsersHTML += '</select></td>';
+								// zipcode
+								strBuildUsersHTML += '<td>' + u.zipcode + '</td>';
+								// timezone
+								strBuildUsersHTML += '<td>' + u.timezone + '</td>';
+								strBuildUsersHTML += '</tr>';
+							}
+						);
+
+						strBuildUsersHTML += '</tbody>';
+
+						$("#UsersTable").empty();
+						$("#UsersTable").append(strBuildUsersHTML);
 					}
 
 				// catch for outer try

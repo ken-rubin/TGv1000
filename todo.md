@@ -18,8 +18,8 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - AdminZone functionality
     - User & Usergroup and Permissions maintenance (AZUsersDialog).
-        - Users: Would like <select> column for usergroup, not usergroupId. On any change confirm w/dialog. Write single change to DB on confirmation. Maybe add in-place editing of other permitted fields later.
-        - Usergroups: Need Add Usergroup (like Add Permission). When a usergroup is added, update <select> <option>s for all users. Usergroup also has to have 1 column for each permission with a checkbox showing which are on/off for the usergroup. On click, immediately save the change to the DB.
+        - Users: Would like combobox column for usergroup, not usergroupId. On any change confirm w/dialog (maybe). Write single change to DB on confirmation. Maybe add in-place editing of other permitted fields later.
+        - Usergroups: Need Add Usergroup (like Add Permission). When a usergroup is added, update combobox options for all users. Usergroup also has to have 1 column for each permission with a checkbox showing which are on/off for the usergroup. On click, immediately save the change to the DB.
         - Permissions: When a permission is added, need to update m_usergroups to add a column to every usergroup. It will be false for every usergroup, but can be turned on by the user on that tab.
         - Initial data has to be massaged before the datatables are loaded.
         - Still having disconnected table header problem in backgroup tabs. Need to get notification of tab change event working so I can rebuild the databable.
