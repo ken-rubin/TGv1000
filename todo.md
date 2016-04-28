@@ -21,6 +21,8 @@
         - Users: Write combobox selection change to DB immediately. **Maybe** Add in-place editing of a few other fields.
         - Usergroups: On click on any permission checkbox, immediately save the change to the DB (add or remove a record from table ug_permissions).
         - **Maybe** Still having disconnected table header problem in background tabs. Need to get notification of tab change event working so I can rebuild the databable that user just switched to.
+        - Turn on search.
+        - Fetching from DB just stopped working. Restarted server, and it worked again.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
 
 ### Can wait till Ken integrates
