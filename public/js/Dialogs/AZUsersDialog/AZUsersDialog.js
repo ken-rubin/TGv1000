@@ -366,12 +366,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setResetUsersTable = function () {
 
-						var processSelectChange = function (select) {
-
-							var selectedUsergroup = select.options[select.selectedIndex];
-							alert("You switched to " + selectedUsergroup.value);
-						}
-
 						var strBuildUsersHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead><tbody>';
 
 						m_user.forEach(
@@ -391,7 +385,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strBuildUsersHTML += '<td><select size="1" id="user-' + u.id + '-usergroup" name="user-' + u.id + '-usergroup" onchange="processSelectChange(this);">'
 								for (var i = 0; i < m_usergroups.length; i++) {
 									var ugIth = m_usergroups[i];
-									strBuildUsersHTML += '<option value="' + ugIth.name + '"';
+									strBuildUsersHTML += '<option value="' + ugIth.id + '"';
 									if (usergroupId === ugIth.id) {
 										strBuildUsersHTML += 'selected="selected"';
 									}
@@ -421,7 +415,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_rows;
-				var m_user;
 				var m_usergroups;
 				var m_permissions;
 				var m_ug_permissions;
@@ -438,4 +431,48 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 			errorHelper.show(e);
 		}
 		
-	});
+	}
+);
+var m_user;
+function processSelectChange (select) {
+
+	var selectedUsergroup = select.options[select.selectedIndex];
+	var arrParts = select.id.split('-');
+	var strUserId = arrParts[1];
+	var strUsergroupId = selectedUsergroup.value;
+
+	var posting = $.post("/BOL/UtilityBO/UpdateUserUsergroup", 
+		{
+			userId: strUserId,
+			usergroupId: strUsergroupId
+		},
+		'json');
+	posting.done(function(data) {
+
+			try {
+
+				if (data.success) {
+
+					// Update in saved array of users m_user.
+					var userId = parseInt(strUserId, 10);
+					for (var i = 0; i < m_user.length; i++) {
+
+						if (m_user[i].id === userId) {
+
+							m_user[i].usergroupId = parseInt(strUsergroupId, 10);
+							break;
+						}
+					}
+				} else {
+
+					// !data.success
+					throw new Error(data.message);
+				}
+			} catch (e) {
+
+				alert(e.message);
+			}
+		}
+	);
+}
+

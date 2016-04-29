@@ -320,6 +320,33 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
+    self.routeUpdateUserUsergroup = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeUpdateUserUsergroup with req.body = " + JSON.stringify(req.body));
+            // req.body.userId
+            // req.body.usergroupId
+
+            var strQuery = "update " + self.dbname + "user set usergroupId=" + req.body.usergroupId + " where id=" + req.body.userId + ";";
+            var exceptionRet = sql.execute(
+                strQuery,
+                function (rows) {
+
+                    return res.json({ success: true });
+                },
+                function (strError) { throw new Error(strError); }
+            );
+            if (exceptionRet) { throw exceptionRet; }
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received updating usergroup: " + e.message
+            });
+        }
+    }
+
     self.routeSearchResources = function (req, res) {
 
         // This is a search for Images or Sounds (resourceTypeIds 1 and 2, respectively).

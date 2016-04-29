@@ -759,6 +759,14 @@ begin
         set @dbstate := 12;
     end if;
     
+    if @dbstate = 12 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/UpdateUserUsergroup','post','routeUpdateUserUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		UPDATE control set dbstate=13 where id=1;
+        set @dbstate := 13;
+    end if;
+    
 end//
 
 

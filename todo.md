@@ -18,7 +18,7 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 - AdminZone functionality
     - User & Usergroup and Permissions maintenance (AZUsersDialog).
-        - Users: Write combobox selection change to DB immediately. **Maybe** Add in-place editing of a few other fields.
+        - Users: **Maybe** Add in-place editing of a few other fields.
         - Usergroups: On click on any permission checkbox, immediately save the change to the DB (add or remove a record from table ug_permissions).
         - **Maybe** Still having disconnected table header problem in background tabs. Need to get notification of tab change event working so I can rebuild the databable that user just switched to.
         - Turn on search.
