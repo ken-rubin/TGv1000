@@ -134,11 +134,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							// Disable search for all datatables unless overridden.
-							// Add more defaults here.
-							$.extend( $.fn.dataTable.defaults, {
-							    searching: false
-							} );
+							// Add datatable default overrides here.
+							// $.extend( $.fn.dataTable.defaults, {
+							    // searching: false
+							// } );
 
 							var exceptionRet = m_doPermissions();
 							if (exceptionRet) { return exceptionRet; }
@@ -270,7 +269,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// permissions checkbox columns
 								for (var i = 0; i < m_permissions.length; i++) {
 									var pIth = m_permissions[i];
-									strBuildUsersHTML += '<td><input type="checkbox" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
+									strBuildUsersHTML += '<td><input type="checkbox" onchange="processCheckboxChange(this);" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
 									// See if it should be checked. We're working with usergroupId=u.id and permissionId=pIth.id
 									var checked = false;
 									for (var j = 0; j < m_ug_permissions.length; j++) {
@@ -361,12 +360,32 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									autoWidth: false
 								}
 							);
+
+							// Attach search handlers.
+							m_usersTable.columns().every(
+								function () {
+
+									var that = this;
+									var thisFooter = this.footer();
+									if (thisFooter.childElementCount) {
+								        $( 'input', thisFooter ).on( 'keyup change', function () {
+								            if ( that.search() !== this.value ) {
+								                that
+								                    .search( this.value )
+								                    .draw();
+								            }
+								        } );
+								    }
+								}
+							);
 						} catch (e) { return e; }
 					}
 
 					var m_setResetUsersTable = function () {
 
-						var strBuildUsersHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead><tbody>';
+						var strBuildUsersHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strBuildUsersHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th></th><th>zipcode</th><th>timezone</th></tr></tfoot>';
+						strBuildUsersHTML += '<tbody>';
 
 						m_user.forEach(
 							function(u) {
@@ -404,6 +423,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						$("#UsersTable").empty();
 						$("#UsersTable").append(strBuildUsersHTML);
+
+					    // Set up for searching
+					    $('#UsersTable tfoot th').each( function () {
+					        var title = $(this).text();
+					        if (title) {
+					        	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+					        }
+					    } );
 					}
 
 				// catch for outer try
@@ -417,7 +444,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_rows;
 				var m_usergroups;
 				var m_permissions;
-				var m_ug_permissions;
 				var m_permissionsTable;
 				var m_usergroupsTable;
 				var m_usersTable;
@@ -433,7 +459,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 		
 	}
 );
+
 var m_user;
+var m_ug_permissions;
 function processSelectChange (select) {
 
 	var selectedUsergroup = select.options[select.selectedIndex];
@@ -476,3 +504,58 @@ function processSelectChange (select) {
 	);
 }
 
+function processCheckboxChange (box) {
+
+	var arrParts = box.name.split('-');
+	var strUsergroupId = arrParts[1];
+	var strPermissionId = arrParts[3];
+
+	var posting = $.post("/BOL/UtilityBO/UpdateUgPermissions", 
+		{
+			permissionId: strPermissionId,
+			usergroupId: strUsergroupId,
+			state: (box.checked ? 'on' : 'off')
+		},
+		'json');
+	posting.done(function(data) {
+
+			try {
+
+				if (data.success) {
+
+					// Update in saved array m_ug_permissions.
+					var usergroupId = parseInt(strUsergroupId, 10);
+					var permissionId = parseInt(strPermissionId, 10);
+
+					if (box.checked) {
+
+						// Add to array.
+						m_ug_permissions.push({
+							usergroupId: usergroupId,
+							permissionId: permissionId
+						});
+					} else {
+
+						// Remove from array.
+						for (var i = 0; i < m_ug_permissions.length; i++) {
+
+							var ugpIth = m_ug_permissions[i];
+							if (usergroupId === ugpIth.usergroupId && permissionId === ugpIth.permissionId) {
+
+								m_ug_permissions.splice(i);
+								break;
+							}
+						}
+					}
+				} else {
+
+					// !data.success
+					throw new Error(data.message);
+				}
+			} catch (e) {
+
+				alert(e.message);
+			}
+		}
+	);
+}

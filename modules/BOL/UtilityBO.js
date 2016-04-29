@@ -347,6 +347,45 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
+    self.routeUpdateUgPermissions = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeUpdateUgPermissions with req.body = " + JSON.stringify(req.body));
+            // req.body.permissionId
+            // req.body.usergroupId
+            // req.body.state ('on' or 'off')
+
+            var strQuery;
+            if (req.body.state === 'on') {
+
+                // Add to ug_permissions.
+                var strQuery = "insert " + self.dbname + "ug_permissions set usergroupId=" + req.body.usergroupId + ", permissionId=" + req.body.permissionId + ";";
+
+            } else {
+
+                // Delete from ug_permissions.
+                var strQuery = "delete from " + self.dbname + "ug_permissions where usergroupId=" + req.body.usergroupId + " and permissionId=" + req.body.permissionId + ";";
+            }
+
+            var exceptionRet = sql.execute(
+                strQuery,
+                function(rows) {
+
+                    return res.json({ success: true });
+                },
+                function (strError) { throw new Error(strError); }
+            );
+            if (exceptionRet) { throw exceptionRet; }
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received updating usergroup permission-set: " + e.message
+            });
+        }
+    }
+
     self.routeSearchResources = function (req, res) {
 
         // This is a search for Images or Sounds (resourceTypeIds 1 and 2, respectively).
