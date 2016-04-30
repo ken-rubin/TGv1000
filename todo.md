@@ -7,7 +7,7 @@
 ## Jerry's Bugs--even those that happened only once
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
-- Fetching from DB for AZUsersDialog just stopped working after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
+- Fetching from DB for AZUsersDialog just stopped working once after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ## Jerry's High Priority Issues
 - Finish buying. 
@@ -17,15 +17,14 @@
     + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
+- Save place (like for student working in a project) and jump right back to it when the user signs in again.
 
 ### Can wait till Ken integrates
 - Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- A tall picture for a Type needs to scale both width and height. Now it just scales width and it pulls the TW down. **TypeWell is probably a thing of the past.**
 - No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
-- Save place (like for student working in a project) and jump right back to it if the user signs in again.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Need rest of the dialogs to submit on Enter key.
     - These are already done:
@@ -47,10 +46,9 @@
         - PropertyGrid
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
-- If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
 
 ### To consider or do even later
-- AZUsersDialog Users tab: Open some fields for in-place editing.
+- AZUsersDialog Users tab: Open some fields for in-place editing. Like firstName, lastName, zipcode. timezone would have to be a huge select list, repeated on every row. This won't work.
 - AZProjectsDialog:
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.
