@@ -157,18 +157,41 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							m_setResetPermissionsTable();
 							m_permissionsTable = $("#PermissionsTable").DataTable(
 								{
-									data: m_permissions,
-									columns:
-										[
-											{data: "id", title: "id"},
-											{data: "description", title: "description"}
-										],
-									scrollY: 200,
+								//	scrollY: 200,	// scrolling is disabled to work around a header sizing problem. Y isn't needed. X woule be nice.
+								//	scrollX: true,
+									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
 								}
 							);
+							// m_permissionsTable.table().header().draw();
+
 						} catch (e) { return e; }
+					}
+
+					var m_setResetPermissionsTable = function () {
+
+						var strBuildPermissionsHTML = '<thead><tr><th>id</th><th>description</th></tr></thead>';
+						strBuildPermissionsHTML += '<tbody>';
+
+						m_permissions.forEach(
+							function(p) {
+								var permissionId = p.id;
+								strBuildPermissionsHTML += '<tr>';
+
+								// id
+								strBuildPermissionsHTML += '<td>' + p.id + '</td>';
+								// description
+								strBuildPermissionsHTML += '<td>' + p.description + '</td>';
+								strBuildPermissionsHTML += '</tr>';
+							}
+						);
+
+						strBuildPermissionsHTML += '</tbody>';
+
+						$("#PermissionsTable").empty();
+						$("#PermissionsTable").append(strBuildPermissionsHTML);
 					}
 
 					var m_functionAddPermission = function () {
@@ -201,19 +224,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 										m_permissions = data.rows;
 
-										// Clear and redraw permissions table to add new row.
-										m_permissionsTable.clear().rows.add(m_permissions).draw();
+										// Rebuild permissions table to add new row.
+										m_permissionsTable.destroy();
+										m_doPermissions();
 
 										// Also rebuild usergroups table to add a checkbox column.
 										m_usergroupsTable.destroy();
-										m_setResetUsergroupsTable();
-										m_usergroupsTable = $("#UsergroupsTable").DataTable(
-											{
-												scrollY: 200,
-												scrollX: true,
-												autoWidth: false
-											}
-										);
+										m_doUsergroups();
 
 										errorHelper.show('New permission was saved to database.', 2500);
 
@@ -239,7 +256,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								{
 									scrollY: 200,
 									scrollX: true,
-									autoWidth: false
+									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
+									// ,
+									// autoWidth: false
 								}
 							);
 
@@ -357,7 +376,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								{
 									scrollY: 200,
 									scrollX: true,
-									autoWidth: false
+									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
+									// ,
+									// autoWidth: false
 								}
 							);
 

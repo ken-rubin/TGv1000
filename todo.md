@@ -4,11 +4,10 @@
 - Replace Blockly.
 
 
-## Jerry's Bugs
+## Jerry's Bugs--even those that happened only once
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
-- Added an image when creating a new Product. When I tried to save it, the image had reverted to the original core project selected. The image *was* saved when the project was saved to the DB and it came up when I opened the product to activate it.
-- AZUsersDialog: headings on the Permissions tab are squished to the left.
+- Fetching from DB for AZUsersDialog just stopped working after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ## Jerry's High Priority Issues
 - Finish buying. 
@@ -18,10 +17,6 @@
     + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
-- AdminZone functionality
-    - User, Usergroup and Permissions maintenance (AZUsersDialog).
-        - **Maybe** Still having disconnected table header problem in background tabs. Need to get notification of tab change event working so I can rebuild the databable that user just switched to.
-        - Fetching from DB for AZUsersDialog just stopped working after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### Can wait till Ken integrates
 - Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.

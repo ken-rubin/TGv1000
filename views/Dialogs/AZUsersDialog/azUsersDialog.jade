@@ -8,6 +8,15 @@
       a(href='#Permissions') Permissions
     li
       a(href='#Usergroups') Usergroups
+  #Users
+    .well
+      .row
+        .col-xs-12
+          h5
+            | This is a verticallay scrolling list of users showing id, userName (email), first and last names, zipcode and usergroupId or name.
+            | userId and userName are not editable. Everything else is. No adding users here or anything to do with passwords. Yet.
+          br
+          table#UsersTable.display(style="width:100%;")
   #Permissions
     .well
       .row
@@ -46,12 +55,3 @@
             button#AddUsergroupBtn.btn.btn-default(type="button" title="Add a Usergroup" style="margin-left: -20px;")
                 span.glyphicon.glyphicon-plus(aria-hidden="true")
         .col-xs-7
-  #Users
-    .well
-      .row
-        .col-xs-12
-          h5
-            | This is a verticallay scrolling list of users showing id, userName (email), first and last names, zipcode and usergroupId or name.
-            | userId and userName are not editable. Everything else is. No adding users here or anything to do with passwords. Yet.
-          br
-          table#UsersTable.display(style="width:100%;")

@@ -466,6 +466,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									clProject.data.tags = strProjectTags;
 									clProject.data.description = strProjectDescription;
 									clProject.data.imageId = m_imageId;
+									if (m_imageId) {
+										clProject.data.altImagePath = '';
+									}
 									clProject.data.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
@@ -536,7 +539,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											price: dPrice,
 											classNotes: strNotes,
 											maxClassSize: iMaxClassSize,
-											loanComputersAvailable: iLoanComputersAvailable
+											loanComputersAvailable: iLoanComputersAvailable,
+											imageId: m_imageId
 										};
 
 									} else if (m_bProductProject) {
@@ -558,7 +562,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											productDescription: strProjectDescription,
 											level: strLevel,
 											difficulty: strDifficulty,
-											price: dPrice
+											price: dPrice,
+											imageId: m_imageId
 										};
 									} else if (m_bOnlineClassProject) {
 
@@ -597,7 +602,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											level: strLevel,
 											difficulty: strDifficulty,
 											price: dPrice,
-											classNotes: strNotes
+											classNotes: strNotes,
+											imageId: m_imageId
 										};
 									}
 
