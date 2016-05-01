@@ -7,18 +7,47 @@
 ## Jerry's Bugs--even those that happened only once
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
-- Fetching from DB for AZUsersDialog just stopped working after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
+- Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ## Jerry's High Priority Issues
-- Finish buying. 
-    + Test no dups to waitlist.
-    + Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
-    + If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
-    + Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
-- Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
+- Test no dups to waitlist.
+- Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
+- If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
+- Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
+* Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
 
-### Can wait till Ken integrates
+### To consider for later
+- AZUsersDialog 
+    - Users tab: Open some fields for in-place editing.
+    - Tab changes. If I can manage to get an event to fire on tab change (maybe the event handler has to be in global space) implement [this](https://datatables.net/examples/api/tabs_and_scrolling.html).
+- AZProjectsDialog:
+    - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
+        - *Public* means other non-privileged users can find it.
+            - What starts off as public?
+            - What starts off as private?
+        - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
+- Use this code to display a Product's video (if I add that):
+    ```
+    <div align="center" class="embed-responsive embed-responsive-16by9">
+        <video autoplay loop class="embed-responsive-item">
+            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
+        </video>
+    </div>
+    ```
+- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
+- Deleting
+    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
+- Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
+- If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
+- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
+- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
+    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+    + Add waitlist reminders emails.
+- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
+    - go to AdminZone; 
+    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
+    - close window or browser (possible?)
 - Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
@@ -48,36 +77,6 @@
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 - If user is not entitled to edit System Types (generally or in this particular project), when active type is an SystemType, disable just about everything in TypeWell.
-
-### To consider or do even later
-- AZUsersDialog Users tab: Open some fields for in-place editing.
-- AZProjectsDialog:
-    - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
-        - *Public* means other non-privileged users can find it.
-            - What starts off as public?
-            - What starts off as private?
-        - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
-- Use this code to display a Product's video (if I add that):
-    ```
-    <div align="center" class="embed-responsive embed-responsive-16by9">
-        <video autoplay loop class="embed-responsive-item">
-            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
-        </video>
-    </div>
-    ```
-- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
-- Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
-- If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
-- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
-    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-    + Add waitlist reminders emails.
-- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - go to AdminZone; 
-    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
-    - close window or browser (possible?)
 
 ## A Discussion of Projects and Purchasable Projects
 
