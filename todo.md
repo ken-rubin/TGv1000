@@ -10,7 +10,7 @@
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ## Jerry's High Priority Issues
-- Test no dups to waitlist.
+- Test no dups to waitlist. **Was trying to test. On first purchase wrote this to console.log: Came into end of waterfall with err non-null. Then (correctly) displayed in errorHelper the "strange glitch" message. After I dismissed errorHelper, I couldn't close the purchase dialog. Must fix immediately.**
 - Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
 - Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
