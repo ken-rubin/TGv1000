@@ -7,11 +7,7 @@
 ## Jerry's Bugs--even those that happened only once
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
-<<<<<<< HEAD
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
-=======
-- Fetching from DB for AZUsersDialog just stopped working once after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
->>>>>>> c3aad77a868d44877a66ef8b8b87db26ca61fdcc
 
 ## Jerry's High Priority Issues
 - Test no dups to waitlist.
@@ -80,39 +76,6 @@
         - TypeSearchDialog
 - In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 
-<<<<<<< HEAD
-=======
-### To consider or do even later
-- AZUsersDialog Users tab: Open some fields for in-place editing. Like firstName, lastName, zipcode. timezone would have to be a huge select list, repeated on every row. This won't work.
-- AZProjectsDialog:
-    - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
-        - *Public* means other non-privileged users can find it.
-            - What starts off as public?
-            - What starts off as private?
-        - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
-- Use this code to display a Product's video (if I add that):
-    ```
-    <div align="center" class="embed-responsive embed-responsive-16by9">
-        <video autoplay loop class="embed-responsive-item">
-            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
-        </video>
-    </div>
-    ```
-- Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
-- Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
-- If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
-- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
-    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-    + Add waitlist reminders emails.
-- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - go to AdminZone; 
-    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
-    - close window or browser (possible?)
-
->>>>>>> c3aad77a868d44877a66ef8b8b87db26ca61fdcc
 ## A Discussion of Projects and Purchasable Projects
 
 - A Class, a Product or an Online Class is a project that a user has to buy in order to use it. When we don't need to differentiate between the three types, we'll call them by the collective name *Purchasable Projects*.
