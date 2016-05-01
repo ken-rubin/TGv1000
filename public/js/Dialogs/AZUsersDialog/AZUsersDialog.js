@@ -165,8 +165,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
 								}
 							);
-							// m_permissionsTable.table().header().draw();
-
+							$("#PermissionsTable_wrapper .dataTables_scrollHeadInner").css("width", "100%");
 						} catch (e) { return e; }
 					}
 
