@@ -473,11 +473,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 														// But still send through an indication to routeSaveProject to change the name in case of conflict.
 														client.saveProject(true,
-															function(err) {
+															function(errMsg) {
 
-																if (err) {
+																if (errMsg) {
 
-																	errorHelper.show("A strange glitch occurred: after we processed your credit card, we could not save your purchased project under your name.<br><br>Please contact us so we can investigate and process a refund.");
+																	errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + errMsg);
 
 																} else {
 
