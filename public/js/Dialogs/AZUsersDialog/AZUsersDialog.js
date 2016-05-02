@@ -88,7 +88,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$("#tabs").tabs();
+							jqTabs = $("#tabs");
+							jqTabs.on('tabscreate', fnTabscreate);
+							jqTabs.tabs();
+							jqTabs.on('tabsbeforeactivate', fnTabsbeforeactivate);
 
 							$(".tt-selector .btn-default").powerTip({
 								smartPlacement: true
@@ -578,4 +581,16 @@ function processCheckboxChange (box) {
 			}
 		}
 	);
+}
+function fnTabscreate (event, ui) {
+
+	// ui.tab and ui.panel are jQuery object.
+	alert('In fnTabscreate so "Users" is about to be activated (without firing tabsbeforeactivate)');
+
+}
+function fnTabsbeforeactivate (event, ui) {
+
+	// ui.newPanel[0].id is like "Usergroups".
+	alert('In fnTabsbeforeactivate for ' + ui.newPanel[0].id);
+
 }
