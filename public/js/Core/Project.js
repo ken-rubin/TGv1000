@@ -146,6 +146,7 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 										// !objectData.success -- error message in objectData.message
 										client.closeCurrentDialog();
+										client.unloadProject(null, false);
 
 										if ($.isFunction(callback)) {
 											callback(objectData.message);
