@@ -91,7 +91,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							jqTabs = $("#tabs");
 							jqTabs.on('tabscreate', fnTabscreate);
 							jqTabs.tabs();
-							jqTabs.on('tabsbeforeactivate', fnTabsbeforeactivate);
+							// jqTabs.on('tabsbeforeactivate', fnTabsbeforeactivate);
+							jqTabs.on('tabsactivate', fnTabsactivate);
 
 							$(".tt-selector .btn-default").powerTip({
 								smartPlacement: true
@@ -139,7 +140,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Add datatable default overrides here.
 							// $.extend( $.fn.dataTable.defaults, {
-							    // searching: false
+							// 	searching: false
 							// } );
 
 							var exceptionRet = m_doPermissions();
@@ -163,12 +164,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_setResetPermissionsTable();
 							m_permissionsTable = $("#PermissionsTable").DataTable(
 								{
-								//	scrollY: 200,	// scrolling is disabled to work around a header sizing problem. Y isn't needed. X woule be nice.
-								//	scrollX: true,
+									scrollY: 200,
+									scrollX: true,
 									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
 								}
 							);
-							$("#PermissionsTable_wrapper .dataTables_scrollHeadInner").css("width", "100%");
 						} catch (e) { return e; }
 					}
 
@@ -258,9 +258,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								{
 									scrollY: 200,
 									scrollX: true,
-									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
-									// ,
-									// autoWidth: false
+									scrollCollapse: true,
+									dom: 'lrtip'	// Remove top right search input. 'f' is left out to do this 'f' is for 'filter'.
 								}
 							);
 
@@ -290,7 +289,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// permissions checkbox columns
 								for (var i = 0; i < m_permissions.length; i++) {
 									var pIth = m_permissions[i];
-									strBuildUsersHTML += '<td><input type="checkbox" onchange="processCheckboxChange(this);" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
+									strBuildUsersHTML += '<td class="dt-body-center"><input type="checkbox" onchange="processCheckboxChange(this);" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
 									// See if it should be checked. We're working with usergroupId=u.id and permissionId=pIth.id
 									var checked = false;
 									for (var j = 0; j < m_ug_permissions.length; j++) {
@@ -378,9 +377,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								{
 									scrollY: 200,
 									scrollX: true,
+									scrollCollapse: true,
 									dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
-									// ,
-									// autoWidth: false
 								}
 							);
 
@@ -584,13 +582,12 @@ function processCheckboxChange (box) {
 }
 function fnTabscreate (event, ui) {
 
-	// ui.tab and ui.panel are jQuery object.
-	alert('In fnTabscreate so "Users" is about to be activated (without firing tabsbeforeactivate)');
-
+	// This handler is probably unnecessary, but the one below in fnTabsactivate is needed.
+	$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 }
-function fnTabsbeforeactivate (event, ui) {
+function fnTabsactivate (event, ui) {
 
-	// ui.newPanel[0].id is like "Usergroups".
-	alert('In fnTabsbeforeactivate for ' + ui.newPanel[0].id);
-
+	// A tab has been activated ( display:none has been changed to display: block ).
+	// This will set column widths wereas before the hidden tables had no width and the columns could have been screwed up.
+	$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 }
