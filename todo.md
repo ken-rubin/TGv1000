@@ -4,12 +4,15 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
-- Add class registration information after a student enrolls (purchases). This would apply to all 3 types of purchasable products. **What did I mean by this?**
+- Disable 2nd menu list if no project.
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
+    - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
 - Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
 - Save place (like for student working in a project) and jump right back to it when the user signs in again.
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
+    + Lengthen to like 2 weeks.
+    + Save project to DB with every change.
 
 ## Jerry's seldom- or non-reproducable Bugs
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
@@ -17,12 +20,16 @@
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
+- Should we have a PP to handle teachers' setting up curriculum for their classes?
+    - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
+    - The class is free. Site license to the school.
 - AZUsersDialog 
     - Users tab
-        - Open some fields for in-place editing.
-        - Add reset email button? Is it necessary, since user has a link to click on the login page?
+        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
+        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
     - Waitlist or Classes tab
         - Need a place to view enrollments, manage waitlist communication, etc.
+        - Drop someone from a class and optionally give a refund thru Stripe.
     - I've put functions into global. I believe there are ways to have event handlers attached to dynamic JS code. Implement them.
 - AZProjectsDialog:
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
@@ -30,6 +37,7 @@
             - What starts off as public?
             - What starts off as private?
         - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
+        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public --  with observation of quarantined material.
 - Use this code to display a Product's video (if I add that):
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -44,6 +52,7 @@
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
 - During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
+- Prohibit buying a Product a second time.
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.
     + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
     + Add waitlist reminders emails.
