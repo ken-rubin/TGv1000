@@ -97,7 +97,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
-							var posting = $.post("/BOL/UtilityBO/GetBuyersOfProject", 
+							var posting = $.post("/BOL/UtilityBO/GetPPBuyers", 
 								{
 									projectId: m_iProjectId
 								},

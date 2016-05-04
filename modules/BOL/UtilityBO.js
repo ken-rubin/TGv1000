@@ -174,6 +174,27 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
+    self.routeGetPPBuyers = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeGetPPBuyers w/req.body = " + JSON.stringify(req.body));
+            // req.body.projectId
+
+            // Return 2 dim array: [0]: all users who have purchased; [1]: all users on waitlist (if applicable)
+            var strSql = "select u.* from " + self.dbname + "user u where u.id in (); ";
+
+
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received fetching PP Buyers from the DB: " + e.message
+            });
+        }
+    }
+
     self.routeAddPermission = function (req, res) {
 
         try {
