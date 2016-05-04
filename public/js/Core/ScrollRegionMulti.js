@@ -118,7 +118,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     jItem.load(m_functionOnNewImageLoaded);
 
                     // Wire the click.
-                    jItem.click(m_functionImageClick);
+                    jItem.click(function(e){ m_functionImageClick(e, jItem); });
 
                     jItem.attr("src",
                         strResourceUrl);
@@ -288,14 +288,16 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 
             // Invoked when an image is clicked.
             // Implemented to raise the event.
-            var m_functionImageClick = function () {
+            var m_functionImageClick = function (e, jItem) {
 
                 try {
 
-                    var jItem = $(this);
+                    var bShiftKey = e.shiftKey;
+
+                    // var jItem = $(this);
                     if ($.isFunction(self.click)) {
 
-                        self.click.call(jItem);
+                        self.click.call(jItem, bShiftKey);
                     }
                 } catch (e) {
 

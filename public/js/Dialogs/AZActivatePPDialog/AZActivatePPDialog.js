@@ -101,18 +101,26 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 									"#IStoolstrip" + stripNum.toString(),
 									50,
 									50,
-									function(){
+									function(bShiftKey) {
 
 										// id was created like this:
 										// var combo = (stripNum + 1) * 10 + i;
 							   			// "carousel" + combo.toString(),
 							   			// We want to parse the id to get back stripNum and i.
 							    		var jq = this;
-							    		var num = parseInt(jq.context.id.substring(8), 10);
+							    		var num = parseInt(jq[0].id.substring(8), 10);
 							    		var stripNum = Math.floor(num / 10) - 1;
 							    		var i = num % 10;
-										self.callFunctionOK(m_searchResultRawArray[stripNum][i]);
-							    	});
+										if (bShiftKey) {
+											var exceptionRet = client.showAZPPBuyersDialog(m_searchResultRawArray[stripNum][i].baseProjectId);
+											if (exceptionRet) {
+												errorHelper.show(exceptionRet);
+											}
+										} else {
+											self.callFunctionOK(m_searchResultRawArray[stripNum][i]);
+										}
+							    	}
+							    );
 								if (exceptionRet) { throw exceptionRet; }
 							}
 

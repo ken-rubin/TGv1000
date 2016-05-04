@@ -4,7 +4,6 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
-- Disable 2nd menu list if no project.
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
 - Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
@@ -13,16 +12,9 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
     + Lengthen to like 2 weeks.
     + Save project to DB with every change.
-
-## Jerry's seldom- or non-reproducable Bugs
-- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
-- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
-- Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
-
-### To consider
-- Should we have a PP to handle teachers' setting up curriculum for their classes?
+- We need a way to handle teachers' setting up curriculum for their classes when the school has purchased what amounts to a site license.
     - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
-    - The class is free. Site license to the school.
+    - The class is free to the students.
 - AZUsersDialog 
     - Users tab
         - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
@@ -38,6 +30,14 @@
             - What starts off as private?
         - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
         - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public --  with observation of quarantined material.
+
+## Jerry's seldom- or non-reproducable Bugs
+- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
+- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above.**
+- Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
+
+### To consider
+- Disable 2nd menu list if no project. Wait for merge with Ken.
 - Use this code to display a Product's video (if I add that):
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -52,7 +52,6 @@
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
 - During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Prohibit buying a Product or enrolling in an Online Class a second time. **Done. Needs testing. Do I need to do this for regular classes, too??? I think so.** 
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.
     + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
     + Add waitlist reminders emails.

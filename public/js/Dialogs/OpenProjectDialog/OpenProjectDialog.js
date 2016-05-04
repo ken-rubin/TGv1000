@@ -122,7 +122,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							   			// "carousel" + combo.toString(),
 							   			// We want to parse the id to get back stripNum and i.
 							    		var jq = this;
-							    		var num = parseInt(jq.context.id.substring(8), 10);
+							    		var num = parseInt(jq[0].id.substring(8), 10);
 							    		var stripNum = Math.floor(num / 10) - 1;
 							    		var i = num % 10;
 							    		var projectId = m_searchResultRawArray[stripNum][i].id;

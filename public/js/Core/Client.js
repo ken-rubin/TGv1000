@@ -27,6 +27,7 @@ define(["Core/errorHelper",
 		"Dialogs/AZUsersDialog/AZUsersDialog",
 		"Dialogs/AZProjectsDialog/AZProjectsDialog",
 		"Dialogs/AZSavePPDataDialog/AZSavePPDataDialog",
+		"Dialogs/AZSavePPDataDialog/AZPPBuyersDialog",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
@@ -51,6 +52,7 @@ define(["Core/errorHelper",
 				AZUsersDialog,
 				AZProjectsDialog,
 				AZSavePPDataDialog,
+				AZPPBuyersDialog,
 				Project,
 				Type) {
 
@@ -236,6 +238,20 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Dialog creators/openers
+					
+					self.showAZPPBuyersDialog = function (iProjectId) {
+
+						try {
+
+							m_openDialog = new AZPPBuyersDialog();
+							var exceptionRet = m_openDialog.create(iProjectId);
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
 					self.showNewProjectDialog = function () {
 
 						try {
