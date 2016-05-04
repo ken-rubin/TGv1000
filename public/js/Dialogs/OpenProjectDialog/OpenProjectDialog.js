@@ -52,11 +52,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
+					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
 
 						try {
 
-							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass);
+							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -130,6 +130,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    							m_bPrivilegedUser, 
 							    							(stripNum === 1), 
 							    							(stripNum === 2),
+							    							(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].alreadyEnrolled),
 							    							(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize),
 							    							(stripNum === 3 && !m_bPrivilegedUser && m_searchResultRawArray[3][i].alreadyBought),
 							    							(stripNum === 6 && !m_bPrivilegedUser && m_searchResultRawArray[6][i].alreadyEnrolled)
@@ -360,12 +361,14 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        		var maxClassSize = m_searchResultRawArray[stripNum][rowIth.index].maxClassSize;
 							        		var numEnrollees = m_searchResultRawArray[stripNum][rowIth.index].numEnrollees;
 							        		if (!m_bPrivilegedUser) {
-								        		if (numEnrollees >= maxClassSize) {
-								        			tooltip += "<br><b>This class is full. Click to be put on its waitlist.</b>";
-								        		} else if (numEnrollees > maxClassSize - 5) {
-								        			tooltip += "<br><b>There are only " + (maxClassSize - numEnrollees).toString() + " spots left in this class. Really.</b>";
-								        		}
-								        	}
+								        		if ( m_searchResultRawArray[stripNum][rowIth.index].alreadyEnrolled) {
+								        			tooltip += "<br><b>You've already enrolled in this class.</b>";
+								        		} else if (numEnrollees >= maxClassSize) {
+									        		tooltip += "<br><b>This class is full. Click to be put on its waitlist.</b>";
+									        	} else if (numEnrollees > maxClassSize - 5) {
+									        		tooltip += "<br><b>There are only " + (maxClassSize - numEnrollees).toString() + " spots left in this class. Really.</b>";
+									        	}
+									        }
 							        		break;
 							        	case 5:
 							        		// Online classes.

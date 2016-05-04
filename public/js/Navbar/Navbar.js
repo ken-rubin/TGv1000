@@ -56,7 +56,7 @@ define(["Core/errorHelper"],
 														// This callback is executed if the user searches for and chooses a project to open.
 														// It is called m_functionOK in OpenProjectDialog.
 														// iProjectId is the project to fetch.
-														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
+														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
 
 															try {
 
@@ -64,7 +64,11 @@ define(["Core/errorHelper"],
 
 																if (iProjectId > 0) {
 
-																	if(bPutOnWaitList) {
+																	if (bAlreadyBoughtClass) {
+
+																		errorHelper.show("You've already enrolled in this class.");
+
+																	} else if (bPutOnWaitList) {
 
 																		exceptionRet = client.putUserOnWaitlist(iProjectId);
 																		if (exceptionRet) { throw exceptionRet; }

@@ -737,7 +737,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // passOn.projects[4] is Class projects.
                     // passOn.projects[5] is Online class projects.
                     // We need to process [4] and [5] separately in (4a) and (4b), respectively.
-                    // In (4c) and (4d) we check if Products or Online Classes are amongst the user's own projects in [1]. (This is synchronous.)
+                    // In (4c), (4d) and (4e) we check if Products, Online Classes or Classes are amongst the user's own projects in [1]. (This is synchronous.)
                     function(passOn, cb) {
 
                         if (req.body.privilegedUser === "0") {
@@ -877,7 +877,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         } else { return cb(null, passOn); }
                     },
-                    // (4b)
+                    // (4d)
                     function(passOn, cb) {
 
                         if (req.body.privilegedUser === "0") {
@@ -886,6 +886,32 @@ module.exports = function UtilityBO(app, sql, logger) {
                             for (var i = 0; i < passOn.projects[5].length; i++) {
 
                                 var pIth = passOn.projects[5][i];
+                                pIth.alreadyEnrolled = false;
+
+                                for (var j = 0; j < passOn.projects[1].length; j++) {
+
+                                    var pJth = passOn.projects[1][j];
+                                    if (pJth.comicProjectId === pIth.id) {
+
+                                        pIth.alreadyEnrolled = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            return cb(null, passOn);
+
+                        } else { return cb(null, passOn); }
+                    },
+                    // (4e)
+                    function(passOn, cb) {
+
+                        if (req.body.privilegedUser === "0") {
+                            // Loop through classes left in passOn.projects[2] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
+
+                            for (var i = 0; i < passOn.projects[4].length; i++) {
+
+                                var pIth = passOn.projects[4][i];
                                 pIth.alreadyEnrolled = false;
 
                                 for (var j = 0; j < passOn.projects[1].length; j++) {

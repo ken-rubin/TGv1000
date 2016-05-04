@@ -52,7 +52,7 @@
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
 - During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Prohibit buying a Product or enrolling in an Online Class a second time. **Done. Needs testing.**
+- Prohibit buying a Product or enrolling in an Online Class a second time. **Done. Needs testing. Do I need to do this for regular classes, too??? I think so.** 
 - Test the 1AM cron job that sends emails regarding upcoming classes, etc.
     + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
     + Add waitlist reminders emails.
