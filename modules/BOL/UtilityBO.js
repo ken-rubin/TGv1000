@@ -540,7 +540,7 @@ module.exports = function UtilityBO(app, sql, logger) {
             // (1) if req.body.privilegedUser === "0", retrieve user's home zipcode.
             // (2) get string of tag id's; 
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.privilegedUser; 
-            // (4) if req.body.privilegedUser === "0", then winnow classes down by date and distance and then onlineclasses by date.
+            // (4) if req.body.privilegedUser === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
             // (5) Finally, for all surviving classes determine current number of users who bought the class.
 
             async.waterfall(
@@ -635,7 +635,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
                         if (passOn.idString.length) {
                             // Owned by user. Same for both priv and non-priv.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
                             if (req.body.privilegedUser === "1") {
@@ -737,6 +737,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     // passOn.projects[4] is Class projects.
                     // passOn.projects[5] is Online class projects.
                     // We need to process [4] and [5] separately in (4a) and (4b), respectively.
+                    // In (4c) and (4d) we check if Products or Online Classes are amongst the user's own projects in [1]. (This is synchronous.)
                     function(passOn, cb) {
 
                         if (req.body.privilegedUser === "0") {
@@ -848,6 +849,58 @@ module.exports = function UtilityBO(app, sql, logger) {
                                     return cb(null, passOn);
                                 }
                             );
+                        } else { return cb(null, passOn); }
+                    },
+                    // (4c)
+                    function(passOn, cb) {
+
+                        if (req.body.privilegedUser === "0") {
+                            // Loop through products left in passOn.projects[3] and add property alreadyBought by comparing to all projects in passOn.projects[1].
+
+                            for (var i = 0; i < passOn.projects[3].length; i++) {
+
+                                var pIth = passOn.projects[3][i];
+                                pIth.alreadyBought = false;
+
+                                for (var j = 0; j < passOn.projects[1].length; j++) {
+
+                                    var pJth = passOn.projects[1][j];
+                                    if (pJth.comicProjectId === pIth.id) {
+
+                                        pIth.alreadyBought = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            return cb(null, passOn);
+
+                        } else { return cb(null, passOn); }
+                    },
+                    // (4b)
+                    function(passOn, cb) {
+
+                        if (req.body.privilegedUser === "0") {
+                            // Loop through online classes left in passOn.projects[5] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
+
+                            for (var i = 0; i < passOn.projects[5].length; i++) {
+
+                                var pIth = passOn.projects[5][i];
+                                pIth.alreadyEnrolled = false;
+
+                                for (var j = 0; j < passOn.projects[1].length; j++) {
+
+                                    var pJth = passOn.projects[1][j];
+                                    if (pJth.comicProjectId === pIth.id) {
+
+                                        pIth.alreadyEnrolled = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            return cb(null, passOn);
+
                         } else { return cb(null, passOn); }
                     },
                     // (5)

@@ -52,11 +52,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList) {
+					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
 
 						try {
 
-							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList);
+							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -130,7 +130,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    							m_bPrivilegedUser, 
 							    							(stripNum === 1), 
 							    							(stripNum === 2),
-							    							(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize)
+							    							(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize),
+							    							(stripNum === 3 && !m_bPrivilegedUser && m_searchResultRawArray[3][i].alreadyBought),
+							    							(stripNum === 6 && !m_bPrivilegedUser && m_searchResultRawArray[6][i].alreadyEnrolled)
 							    		);
 							    	});
 								if (exceptionRet) { throw exceptionRet; }
@@ -334,6 +336,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
 							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
+							        		if (!m_bPrivilegedUser && m_searchResultRawArray[stripNum][rowIth.index].alreadyBought) {
+							        			tooltip += "<br><b>You've already purchased this product.</b>";
+							        		}
 							        		break;
 							        	case 4:
 							        		// Classes.
@@ -379,6 +384,9 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
+							        		if (!m_bPrivilegedUser && m_searchResultRawArray[stripNum][rowIth.index].alreadyEnrolled) {
+							        			tooltip += "<br><b>You've already enrolled in this online class.</b>";
+							        		}
 							        		break;
 							        }
 							        exceptionRet = m_scISImageStrip[stripNum].addImage(
