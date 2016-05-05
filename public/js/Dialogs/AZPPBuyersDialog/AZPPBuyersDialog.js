@@ -145,8 +145,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setBuyersTable = function () {
 
-						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
-						strHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th>';
+						if (!m_holdData.hasOwnProperty("productsdata")) {
+							strHTML += '<th></th><th></th>';
+						}
+						strHTML += '</tr></thead>';
+						strHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th>';
+						if (!m_holdData.hasOwnProperty("productsdata")) {
+							strHTML += '<th></th><th></th>';
+						}
+						strHTML += '</tr></tfoot>';
 						strHTML += '<tbody>';
 
 						m_holdData.buyers.forEach(
@@ -170,6 +178,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.zipcode + '</td>';
 								// timezone
 								strHTML += '<td>' + u.timezone + '</td>';
+								if (!m_holdData.hasOwnProperty("productsdata")) {
+									strHTML += '<td><button type="button">Remove from class w/refund</button></td>'
+									strHTML += '<td><button type="button">Remove from class no refund</button></td>'
+								}
 								strHTML += '</tr>';
 							}
 						);
