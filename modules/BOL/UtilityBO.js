@@ -235,7 +235,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata.
 
                         // Add array of all purchasers.
-                        var strQuery = "select * from " + self.dbname + "user where id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
+                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -254,7 +254,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
 
                         // Add array of all waitlistees.
-                        var strQuery = "select * from " + self.dbname + "user where id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " order by id asc);";
+                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " order by id asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {

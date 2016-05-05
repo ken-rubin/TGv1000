@@ -553,11 +553,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 						);
 					}
+
 					function fnTabscreate (event, ui) {
 
 						// This handler is probably unnecessary, but the one below in fnTabsactivate is needed.
 						$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 					}
+					
 					function fnTabsactivate (event, ui) {
 
 						// A tab has been activated ( display:none has been changed to display: block ).

@@ -243,8 +243,8 @@ define(["Core/errorHelper",
 
 						try {
 
-							m_openDialog = new AZPPBuyersDialog();
-							var exceptionRet = m_openDialog.create(iProjectId);
+							m_openDialog2 = new AZPPBuyersDialog();
+							var exceptionRet = m_openDialog2.create(iProjectId);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;

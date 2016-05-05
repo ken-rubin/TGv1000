@@ -90,6 +90,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
+							jqTabs = $("#tabs");
+							jqTabs.on('tabscreate', fnTabscreate);
+							jqTabs.tabs();
+							// jqTabs.on('tabsbeforeactivate', fnTabsbeforeactivate);
+							jqTabs.on('tabsactivate', fnTabsactivate);
+
+
 							// $(".tt-selector .btn-default").powerTip({
 							// 	smartPlacement: true
 							// });
@@ -127,6 +134,170 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_setDataDisplay = function () {
 						// properties of m_holdData: project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; success [bool]
 
+						m_setProjectData();
+						m_setBuyersTable();
+						m_setWaitlistedTable();
+					}
+
+					var m_setProjectData = function () {
+
+					}
+
+					var m_setBuyersTable = function () {
+
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
+						strHTML += '<tbody>';
+
+						m_holdData.buyers.forEach(
+							function(u) {
+
+								var usergroupId = u.usergroupId;
+								strHTML += '<tr>';
+
+								// id
+								strHTML += '<td>' + u.id + '</td>';
+								// userName
+								strHTML += '<td>' + u.userName + '</td>';
+								// firstName
+								strHTML += '<td>' + u.firstName + '</td>';
+								// lastName
+								strHTML += '<td>' + u.lastName + '</td>';
+								// usergroup
+								var strUsergroup;
+								strHTML += '<td>' + u.usergroupName + '</td>';
+								// zipcode
+								strHTML += '<td>' + u.zipcode + '</td>';
+								// timezone
+								strHTML += '<td>' + u.timezone + '</td>';
+								strHTML += '</tr>';
+							}
+						);
+
+						strHTML += '</tbody>';
+
+						$("#BuyersTable").empty();
+						$("#BuyersTable").append(strHTML);
+
+					    // Set up for searching
+					    $('#BuyersTable tfoot th').each( function () {
+					        var title = $(this).text();
+					        if (title) {
+					        	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+					        }
+					    } );
+
+						m_buyersTable = $("#BuyersTable").DataTable(
+							{
+								scrollY: 200,
+								scrollX: true,
+								scrollCollapse: true,
+								dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
+							}
+						);
+
+						// Attach search handlers.
+						m_buyersTable.columns().every(
+							function () {
+
+								var that = this;
+								var thisFooter = this.footer();
+								if (thisFooter.childElementCount) {
+							        $( 'input', thisFooter ).on( 'keyup change', function () {
+							            if ( that.search() !== this.value ) {
+							                that
+							                    .search( this.value )
+							                    .draw();
+							            }
+							        } );
+							    }
+							}
+						);
+					}
+					
+					var m_setWaitlistedTable = function () {
+
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
+						strHTML += '<tbody>';
+
+						m_holdData.waitlisted.forEach(
+							function(u) {
+
+								var usergroupId = u.usergroupId;
+								strHTML += '<tr>';
+
+								// id
+								strHTML += '<td>' + u.id + '</td>';
+								// userName
+								strHTML += '<td>' + u.userName + '</td>';
+								// firstName
+								strHTML += '<td>' + u.firstName + '</td>';
+								// lastName
+								strHTML += '<td>' + u.lastName + '</td>';
+								// usergroup
+								var strUsergroup;
+								strHTML += '<td>' + u.usergroupName + '</td>';
+								// zipcode
+								strHTML += '<td>' + u.zipcode + '</td>';
+								// timezone
+								strHTML += '<td>' + u.timezone + '</td>';
+								strHTML += '</tr>';
+							}
+						);
+
+						strHTML += '</tbody>';
+
+						$("#WaitlistedTable").empty();
+						$("#WaitlistedTable").append(strHTML);
+
+					    // Set up for searching
+					    $('#WaitlistedTable tfoot th').each( function () {
+					        var title = $(this).text();
+					        if (title) {
+					        	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+					        }
+					    } );
+
+						m_waitlistedTable = $("#WaitlistedTable").DataTable(
+							{
+								scrollY: 200,
+								scrollX: true,
+								scrollCollapse: true,
+								dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
+							}
+						);
+
+						// Attach search handlers.
+						m_waitlistedTable.columns().every(
+							function () {
+
+								var that = this;
+								var thisFooter = this.footer();
+								if (thisFooter.childElementCount) {
+							        $( 'input', thisFooter ).on( 'keyup change', function () {
+							            if ( that.search() !== this.value ) {
+							                that
+							                    .search( this.value )
+							                    .draw();
+							            }
+							        } );
+							    }
+							}
+						);
+					}
+
+					function fnTabscreate (event, ui) {
+
+						// This handler is probably unnecessary, but the one below in fnTabsactivate is needed.
+						$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+					}
+
+					function fnTabsactivate (event, ui) {
+
+						// A tab has been activated ( display:none has been changed to display: block ).
+						// This will set column widths wereas before the hidden tables had no width and the columns could have been screwed up.
+						$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 					}
 
 				// catch for outer try
@@ -139,6 +310,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_dialog = null;
 				var m_iProjectId;
 				var m_holdData;
+				var m_buyersTable;
+				var m_waitlistedTable;
 			};
 
 			// Return the constructor function as the module object.
@@ -250,15 +423,4 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 // 			}
 // 		}
 // 	);
-// }
-// function fnTabscreate (event, ui) {
-
-// 	// This handler is probably unnecessary, but the one below in fnTabsactivate is needed.
-// 	$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-// }
-// function fnTabsactivate (event, ui) {
-
-// 	// A tab has been activated ( display:none has been changed to display: block ).
-// 	// This will set column widths wereas before the hidden tables had no width and the columns could have been screwed up.
-// 	$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 // }
