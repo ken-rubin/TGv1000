@@ -22,7 +22,6 @@
     - Waitlist or Classes tab
         - Need a place to view enrollments, manage waitlist communication, etc.
         - Drop someone from a class and optionally give a refund thru Stripe.
-    - I've put functions into global. I believe there are ways to have event handlers attached to dynamic JS code. Implement them.
 - AZProjectsDialog:
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.

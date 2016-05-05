@@ -289,7 +289,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// permissions checkbox columns
 								for (var i = 0; i < m_permissions.length; i++) {
 									var pIth = m_permissions[i];
-									strBuildUsersHTML += '<td class="dt-body-center"><input type="checkbox" onchange="processCheckboxChange(this);" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
+									strBuildUsersHTML += '<td class="dt-body-center t4checkbox"><input type="checkbox" name="usergroup-' + u.id + '-permission-' + pIth.id + '"';
 									// See if it should be checked. We're working with usergroupId=u.id and permissionId=pIth.id
 									var checked = false;
 									for (var j = 0; j < m_ug_permissions.length; j++) {
@@ -314,6 +314,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						$("#UsergroupsTable").empty();
 						$("#UsergroupsTable").append(strBuildUsersHTML);
+						$(".t4checkbox").change(processCheckboxChange);
 					}
 
 					var m_functionAddUsergroup = function () {
@@ -422,7 +423,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// lastName
 								strBuildUsersHTML += '<td>' + u.lastName + '</td>';
 								// usergroup combo
-								strBuildUsersHTML += '<td><select size="1" id="user-' + u.id + '-usergroup" name="user-' + u.id + '-usergroup" onchange="processSelectChange(this);">'
+								strBuildUsersHTML += '<td><select class="t4select" size="1" id="user-' + u.id + '-usergroup" name="user-' + u.id + '-usergroup">'
 								for (var i = 0; i < m_usergroups.length; i++) {
 									var ugIth = m_usergroups[i];
 									strBuildUsersHTML += '<option value="' + ugIth.id + '"';
@@ -444,6 +445,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						$("#UsersTable").empty();
 						$("#UsersTable").append(strBuildUsersHTML);
+						$(".t4select").change(processSelectChange);
 
 					    // Set up for searching
 					    $('#UsersTable tfoot th').each( function () {
@@ -452,6 +454,115 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					        	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
 					        }
 					    } );
+					}
+
+					function processSelectChange (select) {
+
+						var selectedUsergroup = select.originalEvent.target.options[select.originalEvent.target.selectedIndex];
+						var arrParts = select.originalEvent.target.id.split('-');
+						var strUserId = arrParts[1];
+						var strUsergroupId = selectedUsergroup.value;
+
+						var posting = $.post("/BOL/UtilityBO/UpdateUserUsergroup", 
+							{
+								userId: strUserId,
+								usergroupId: strUsergroupId
+							},
+							'json');
+						posting.done(function(data) {
+
+								try {
+
+									if (data.success) {
+
+										// Update in saved array of users m_user.
+										var userId = parseInt(strUserId, 10);
+										for (var i = 0; i < m_user.length; i++) {
+
+											if (m_user[i].id === userId) {
+
+												m_user[i].usergroupId = parseInt(strUsergroupId, 10);
+												break;
+											}
+										}
+									} else {
+
+										// !data.success
+										throw new Error(data.message);
+									}
+								} catch (e) {
+
+									alert(e.message);
+								}
+							}
+						);
+					}
+
+					function processCheckboxChange (box) {
+
+						var arrParts = box.originalEvent.target.name.split('-');
+						var strUsergroupId = arrParts[1];
+						var strPermissionId = arrParts[3];
+
+						var posting = $.post("/BOL/UtilityBO/UpdateUgPermissions", 
+							{
+								permissionId: strPermissionId,
+								usergroupId: strUsergroupId,
+								state: (box.originalEvent.target.checked ? 'on' : 'off')
+							},
+							'json');
+						posting.done(function(data) {
+
+								try {
+
+									if (data.success) {
+
+										// Update in saved array m_ug_permissions.
+										var usergroupId = parseInt(strUsergroupId, 10);
+										var permissionId = parseInt(strPermissionId, 10);
+
+										if (box.originalEvent.target.checked) {
+
+											// Add to array.
+											m_ug_permissions.push({
+												usergroupId: usergroupId,
+												permissionId: permissionId
+											});
+										} else {
+
+											// Remove from array.
+											for (var i = 0; i < m_ug_permissions.length; i++) {
+
+												var ugpIth = m_ug_permissions[i];
+												if (usergroupId === ugpIth.usergroupId && permissionId === ugpIth.permissionId) {
+
+													m_ug_permissions.splice(i);
+													break;
+												}
+											}
+										}
+									} else {
+
+										// !data.success
+										throw new Error(data.message);
+									}
+								} catch (e) {
+
+									alert(e.message);
+								}
+							}
+						);
+					}
+					function fnTabscreate (event, ui) {
+
+						// This handler is probably unnecessary, but the one below in fnTabsactivate is needed.
+						$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+					}
+					function fnTabsactivate (event, ui) {
+
+						// A tab has been activated ( display:none has been changed to display: block ).
+						// This will set column widths wereas before the hidden tables had no width and the columns could have been screwed up.
+						$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 					}
 
 				// catch for outer try
@@ -468,6 +579,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_permissionsTable;
 				var m_usergroupsTable;
 				var m_usersTable;
+				var m_user;
+				var m_ug_permissions;
 			};
 
 			// Return the constructor function as the module object.
@@ -481,113 +594,3 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 	}
 );
 
-var m_user;
-var m_ug_permissions;
-function processSelectChange (select) {
-
-	var selectedUsergroup = select.options[select.selectedIndex];
-	var arrParts = select.id.split('-');
-	var strUserId = arrParts[1];
-	var strUsergroupId = selectedUsergroup.value;
-
-	var posting = $.post("/BOL/UtilityBO/UpdateUserUsergroup", 
-		{
-			userId: strUserId,
-			usergroupId: strUsergroupId
-		},
-		'json');
-	posting.done(function(data) {
-
-			try {
-
-				if (data.success) {
-
-					// Update in saved array of users m_user.
-					var userId = parseInt(strUserId, 10);
-					for (var i = 0; i < m_user.length; i++) {
-
-						if (m_user[i].id === userId) {
-
-							m_user[i].usergroupId = parseInt(strUsergroupId, 10);
-							break;
-						}
-					}
-				} else {
-
-					// !data.success
-					throw new Error(data.message);
-				}
-			} catch (e) {
-
-				alert(e.message);
-			}
-		}
-	);
-}
-
-function processCheckboxChange (box) {
-
-	var arrParts = box.name.split('-');
-	var strUsergroupId = arrParts[1];
-	var strPermissionId = arrParts[3];
-
-	var posting = $.post("/BOL/UtilityBO/UpdateUgPermissions", 
-		{
-			permissionId: strPermissionId,
-			usergroupId: strUsergroupId,
-			state: (box.checked ? 'on' : 'off')
-		},
-		'json');
-	posting.done(function(data) {
-
-			try {
-
-				if (data.success) {
-
-					// Update in saved array m_ug_permissions.
-					var usergroupId = parseInt(strUsergroupId, 10);
-					var permissionId = parseInt(strPermissionId, 10);
-
-					if (box.checked) {
-
-						// Add to array.
-						m_ug_permissions.push({
-							usergroupId: usergroupId,
-							permissionId: permissionId
-						});
-					} else {
-
-						// Remove from array.
-						for (var i = 0; i < m_ug_permissions.length; i++) {
-
-							var ugpIth = m_ug_permissions[i];
-							if (usergroupId === ugpIth.usergroupId && permissionId === ugpIth.permissionId) {
-
-								m_ug_permissions.splice(i);
-								break;
-							}
-						}
-					}
-				} else {
-
-					// !data.success
-					throw new Error(data.message);
-				}
-			} catch (e) {
-
-				alert(e.message);
-			}
-		}
-	);
-}
-function fnTabscreate (event, ui) {
-
-	// This handler is probably unnecessary, but the one below in fnTabsactivate is needed.
-	$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-}
-function fnTabsactivate (event, ui) {
-
-	// A tab has been activated ( display:none has been changed to display: block ).
-	// This will set column widths wereas before the hidden tables had no width and the columns could have been screwed up.
-	$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-}
