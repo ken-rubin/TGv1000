@@ -182,10 +182,106 @@ module.exports = function UtilityBO(app, sql, logger) {
             // req.body.projectId
 
             // Return 2 dim array: [0]: all users who have purchased; [1]: all users on waitlist (if applicable)
-            var strSql = "select u.* from " + self.dbname + "user u where u.id in (); ";
+            // Retrieve and build a response containing: (1) the project; (2) special PP data; (3) array of purchasers (users); (4) array of waitlisted users, if any (in order).
 
 
+            async.waterfall(
+                [
+                    // (1)
+                    function(cb) {
 
+                        var strQuery = "select * from " + self.dbname + "projects where id=" + req.body.projectId;
+                        sql.execute(strQuery,
+                            function(rows) {
+
+                                if (rows.length !== 1) {
+                                    return cb(new Error("Unable to fetch project from DB."), null);
+                                }
+
+                                return cb(null, { project: rows[0] } );
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Rec'd error fetching project from DB: " + strError), null);
+                            }
+                        );
+                    },
+                    // (2)
+                    function(passOn, cb) {
+                        // So far passOn contains this property: project.
+
+                        // Add special PP data
+                        var tbl = (passOn.project.isProduct === 1) ? "products" : (passOn.project.isClass === 1) ? "classes" : "onlineclasses";
+                        var strQuery = "select * from " + self.dbname + tbl + " where baseProjectId=" + req.body.projectId + ";";
+                        sql.execute(strQuery,
+                            function(rows) {
+
+                                if (rows.length !== 1) {
+                                    return cb(new Error("Unable to fetch project data from DB."), null);
+                                }
+
+                                passOn[tbl + "data"] = rows[0];
+                                return cb(null, passOn);
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Rec'd error fetching project data from DB: " + strError), null);
+                            }
+                        );
+
+                    },
+                    // (3)
+                    function(passOn, cb) {
+                        // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata.
+
+                        // Add array of all purchasers.
+                        var strQuery = "select * from " + self.dbname + "user where id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+
+                                passOn["buyers"] = rows;
+                                return cb(null, passOn);
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Rec'd error fetching buyers from DB: " + strError), null);
+                            }
+                        );
+                    },
+                    // (4)
+                    function(passOn, cb) {
+                        // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
+
+                        // Add array of all waitlistees.
+                        var strQuery = "select * from " + self.dbname + "user where id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + ");";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+
+                                passOn["waitlisted"] = rows;
+                                return cb(null, passOn);
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Rec'd error fetching waitlisted from DB: " + strError), null);
+                            }
+                        );
+                    }
+                ],
+                function(err, passOn) {
+
+                    if (err) {
+                        return res.json({
+                            success: false,
+                            message: err.message
+                        });
+                    }
+
+                    passOn["success"] = true;
+                    return res.json(passOn);
+                }
+            );
         } catch (e) {
 
             res.json({

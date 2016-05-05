@@ -107,14 +107,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								try {
 									if (data.success) {
 
-									m_setResetUsersTable();
-									m_usersTable = $("#UsersTable").DataTable(
-										{
-											scrollY: 200,
-											scrollX: true,
-											dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
-										}
-									);
+										m_setResetUsersTable();
+										// m_usersTable = $("#UsersTable").DataTable(
+										// 	{
+										// 		scrollY: 200,
+										// 		scrollX: true,
+										// 		dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
+										// 	}
+										// );
 
 									} else {
 
@@ -132,22 +132,22 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_setResetUsersTable = function () {
 
 						var strBuildUsersHTML = '<thead><tr><th>id</th><th>description</th></tr></thead>';
-						strBuildUsersHTML += '<tbody>';
+						// strBuildUsersHTML += '<tbody>';
 
-						m_Users.forEach(
-							function(p) {
-								var permissionId = p.id;
-								strBuildUsersHTML += '<tr>';
+						// m_Users.forEach(
+						// 	function(p) {
+						// 		var permissionId = p.id;
+						// 		strBuildUsersHTML += '<tr>';
 
-								// id
-								strBuildUsersHTML += '<td>' + p.id + '</td>';
-								// description
-								strBuildUsersHTML += '<td>' + p.description + '</td>';
-								strBuildUsersHTML += '</tr>';
-							}
-						);
+						// 		// id
+						// 		strBuildUsersHTML += '<td>' + p.id + '</td>';
+						// 		// description
+						// 		strBuildUsersHTML += '<td>' + p.description + '</td>';
+						// 		strBuildUsersHTML += '</tr>';
+						// 	}
+						// );
 
-						strBuildUsersHTML += '</tbody>';
+						// strBuildUsersHTML += '</tbody>';
 
 						$("#UsersTable").empty();
 						$("#UsersTable").append(strBuildUsersHTML);
