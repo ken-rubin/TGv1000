@@ -254,7 +254,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
 
                         // Add array of all waitlistees.
-                        var strQuery = "select * from " + self.dbname + "user where id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + ");";
+                        var strQuery = "select * from " + self.dbname + "user where id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " order by id asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -279,6 +279,8 @@ module.exports = function UtilityBO(app, sql, logger) {
                     }
 
                     passOn["success"] = true;
+                    // passOn properties are:  project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; success [bool].
+
                     return res.json(passOn);
                 }
             );

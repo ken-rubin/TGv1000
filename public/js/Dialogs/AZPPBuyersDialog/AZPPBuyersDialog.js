@@ -103,18 +103,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								},
 								'json');
 							posting.done(function(data){
-
+								
 								try {
+
 									if (data.success) {
 
-										m_setResetUsersTable();
-										// m_usersTable = $("#UsersTable").DataTable(
-										// 	{
-										// 		scrollY: 200,
-										// 		scrollX: true,
-										// 		dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
-										// 	}
-										// );
+										m_holdData = data;
+										m_setDataDisplay();
 
 									} else {
 
@@ -129,30 +124,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						} catch (e) { errorHelper.show(e); }
 					};
 
-					var m_setResetUsersTable = function () {
+					var m_setDataDisplay = function () {
+						// properties of m_holdData: project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; success [bool]
 
-						var strBuildUsersHTML = '<thead><tr><th>id</th><th>description</th></tr></thead>';
-						// strBuildUsersHTML += '<tbody>';
-
-						// m_Users.forEach(
-						// 	function(p) {
-						// 		var permissionId = p.id;
-						// 		strBuildUsersHTML += '<tr>';
-
-						// 		// id
-						// 		strBuildUsersHTML += '<td>' + p.id + '</td>';
-						// 		// description
-						// 		strBuildUsersHTML += '<td>' + p.description + '</td>';
-						// 		strBuildUsersHTML += '</tr>';
-						// 	}
-						// );
-
-						// strBuildUsersHTML += '</tbody>';
-
-						$("#UsersTable").empty();
-						$("#UsersTable").append(strBuildUsersHTML);
 					}
-
 
 				// catch for outer try
 				} catch (e) { errorHelper.show(e.message); }
@@ -163,7 +138,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				// Reference to the dialog object instance.
 				var m_dialog = null;
 				var m_iProjectId;
-				var m_usersTable;
+				var m_holdData;
 			};
 
 			// Return the constructor function as the module object.
