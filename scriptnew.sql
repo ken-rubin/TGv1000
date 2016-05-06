@@ -783,6 +783,15 @@ begin
         set @dbstate := 15;
     end if;
     
+    if @dbstate = 15 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/UndoPurchase','post','routeUndoPurchase',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SendClassInvite','post','routeSendClassInvite',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		UPDATE control set dbstate=16 where id=1;
+        set @dbstate := 16;
+    end if;
+    
 end//
 
 

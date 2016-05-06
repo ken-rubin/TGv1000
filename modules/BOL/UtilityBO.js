@@ -181,9 +181,12 @@ module.exports = function UtilityBO(app, sql, logger) {
             console.log("Entered UtilityBO/routeGetPPBuyers w/req.body = " + JSON.stringify(req.body));
             // req.body.projectId
 
-            // Return 2 dim array: [0]: all users who have purchased; [1]: all users on waitlist (if applicable)
-            // Retrieve and build a response containing: (1) the project; (2) special PP data; (3) array of purchasers (users); (4) array of waitlisted users, if any (in order).
-
+            // Retrieve and build a response containing: 
+            // (1) the project; 
+            // (2) special PP data; 
+            // (3) array of purchasers (users); 
+            // (4) array of waitlisted users, if any (in order).
+            // (5) array of users in the 24-hour period after being invited to enroll.
 
             async.waterfall(
                 [
@@ -501,6 +504,38 @@ module.exports = function UtilityBO(app, sql, logger) {
             res.json({
                 success: false,
                 message: "This error received updating usergroup permission-set: " + e.message
+            });
+        }
+    }
+
+    self.routeUndoPurchase = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
+            
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received undoing purchase: " + e.message
+            });
+        }
+    }
+
+    self.routeSendClassInvite = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeSendClassInvite with req.body = " + JSON.stringify(req.body));
+            
+
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: "This error received inviting user off waitlist: " + e.message
             });
         }
     }
