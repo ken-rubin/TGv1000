@@ -167,7 +167,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					                	var exceptionRet = m_rebuildCarousel(stripNum);
 					                	if (exceptionRet) { throw exceptionRet; }
 
-					                	blink("#BlinkingSpan", -1, 2000);
+					                	blink("#BlinkingSpan", -1, 1200);
 					                }
 					            } else {
 

@@ -90,18 +90,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							jqTabs = $("#tabs");
-							jqTabs.on('tabscreate', fnTabscreate);
-							jqTabs.tabs();
-							// jqTabs.on('tabsbeforeactivate', fnTabsbeforeactivate);
-							jqTabs.on('tabsactivate', fnTabsactivate);
-
-
-							// $(".tt-selector .btn-default").powerTip({
-							// 	smartPlacement: true
-							// });
-
-							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
 							var posting = $.post("/BOL/UtilityBO/GetPPBuyers", 
@@ -115,6 +103,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									if (data.success) {
 
+										m_bClass = data.hasOwnProperty("classesdata");
+										m_bOnlineClass = data.hasOwnProperty("onlineclassesdata");
+										m_bProduct = data.hasOwnProperty("productsdata");
 										m_holdData = data;
 										m_setDataDisplay();
 
@@ -134,9 +125,25 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_setDataDisplay = function () {
 						// properties of m_holdData: project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; success [bool]
 
+						if (!m_bClass) {
+							// Completely remove the #Waitlisted tab by removing $(".remove").
+							$(".remove").remove();
+						}
+						jqTabs = $("#tabs");
+						jqTabs.on('tabscreate', fnTabscreate);
+						jqTabs.tabs();
+						// jqTabs.on('tabsbeforeactivate', fnTabsbeforeactivate);
+						jqTabs.on('tabsactivate', fnTabsactivate);
+
+						// $(".tt-selector .btn-default").powerTip({
+						// 	smartPlacement: true
+						// });
+
 						m_setProjectData();
 						m_setBuyersTable();
-						m_setWaitlistedTable();
+						if (m_bClass) {
+							m_setWaitlistedTable();
+						}
 					}
 
 					var m_setProjectData = function () {
@@ -145,16 +152,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setBuyersTable = function () {
 
-						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th>';
-						if (!m_holdData.hasOwnProperty("productsdata")) {
+						var strHTML = '<thead><tr><th>id</th><th>userName</th>';
+						if (!m_bProduct) {
 							strHTML += '<th></th><th></th>';
 						}
-						strHTML += '</tr></thead>';
-						strHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th>';
-						if (!m_holdData.hasOwnProperty("productsdata")) {
+						strHTML += '<th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strHTML += '<tfoot><tr><th></th><th>userName</th>';
+						if (!m_bProduct) {
 							strHTML += '<th></th><th></th>';
 						}
-						strHTML += '</tr></tfoot>';
+						strHTML += '<th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
 						strHTML += '<tbody>';
 
 						m_holdData.buyers.forEach(
@@ -167,6 +174,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.id + '</td>';
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
+								// buttons for classes and onlineclasses
+								if (!m_bProduct) {
+									strHTML += '<td class="dt-body-center t4btnb"><button type="button" name="RemRefund-' + u.id + '">Remove w/Refund</button></td>'
+									strHTML += '<td class="dt-body-center t4btnb"><button type="button" name="RemNoRefund-' + u.id + '">Remove w/no Refund</button></td>'
+								}
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
 								// lastName
@@ -178,10 +190,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.zipcode + '</td>';
 								// timezone
 								strHTML += '<td>' + u.timezone + '</td>';
-								if (!m_holdData.hasOwnProperty("productsdata")) {
-									strHTML += '<td><button type="button">Remove from class w/refund</button></td>'
-									strHTML += '<td><button type="button">Remove from class no refund</button></td>'
-								}
 								strHTML += '</tr>';
 							}
 						);
@@ -190,6 +198,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						$("#BuyersTable").empty();
 						$("#BuyersTable").append(strHTML);
+						$(".t4btnb").click(processBtnClick);
 
 					    // Set up for searching
 					    $('#BuyersTable tfoot th').each( function () {
@@ -229,8 +238,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					
 					var m_setWaitlistedTable = function () {
 
-						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
-						strHTML += '<tfoot><tr><th></th><th>userName</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th></th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strHTML += '<tfoot><tr><th></th><th>userName</th><th></th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
 						strHTML += '<tbody>';
 
 						m_holdData.waitlisted.forEach(
@@ -243,6 +252,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.id + '</td>';
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
+								// Send email giving opportun ity to enroll.
+								strHTML += '<td class="dt-body-center t4btnw"><button type="button" name="Invite-' + u.id + '">Invite to Enroll</button></td>'
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
 								// lastName
@@ -262,6 +273,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						$("#WaitlistedTable").empty();
 						$("#WaitlistedTable").append(strHTML);
+						$(".t4btnw").click(processBtnClick);
 
 					    // Set up for searching
 					    $('#WaitlistedTable tfoot th').each( function () {
@@ -312,6 +324,32 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 					}
 
+					function processBtnClick (event) {
+
+						var parts = event.currentTarget.childNodes[0].name.split('-');
+
+						var iUserId = parseInt(parts[1], 10);
+						switch (parts[0]) {
+							case 'RemRefund':
+								fnRemoveBuyer(iUserid, true);
+								break;
+							case 'RemNoRefund':
+								fnRemoveBuyer(iUserid, false);
+								break;
+							case 'Invite':
+								fnInvite(iUserid)
+								break;
+						}
+					}
+
+					function fnRemoveBuyer (iUserId, bRefund) {
+
+					}
+
+					function fnInvite (iUserId) {
+						
+					}
+
 				// catch for outer try
 				} catch (e) { errorHelper.show(e.message); }
 
@@ -324,6 +362,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_holdData;
 				var m_buyersTable;
 				var m_waitlistedTable;
+				var m_bClass;
+				var m_bOnlineClass;
+				var m_bProduct;
 			};
 
 			// Return the constructor function as the module object.
