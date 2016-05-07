@@ -215,7 +215,7 @@ module.exports = function ValidateBO(app, sql, logger) {
                         mailOptions = {
                  
                             from: "TechGroms <techgroms@gmail.com>", // sender address
-                            to: (!aORz) ? profile.userName : 'jerry@rubintech.com', // list of receivers -- eventually add ken and john
+                            to: (!aORz) ? profile.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
                             subject: "TechGroms Registration ✔", // Subject line
                             text: "Hi, " + profile.firstName + ". You have successfully enrolled " + profile.userName + " in TechGroms." + 
                             "\r\n\r\nWe have created a login user for you. You will use the email address you entered along with" +

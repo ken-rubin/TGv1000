@@ -344,10 +344,28 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					function fnRemoveBuyer (iUserId, bRefund) {
 
+						// Call to server to delete user's project where comicProjectId = m_iProjectId.
+						// Pass along bool as to whether to process refund or not.
+						// Means that buying has to save a payment token in the project so that the potential refund can be processed.
+
+						// On successful return, remove user from m_holdData.buyers; adjust numBuyers in m_holdData.project or in one of the datas;
+						// regen and set the project data in the top; re-do the buyers datatable.
+
 					}
 
 					function fnInvite (iUserId) {
-						
+
+						// Ignoring maxClassSize and numEnrolled, the purpose of this function is to send an email to the selected user which
+						// gives that user n (24?) hours to purchase the class. The email will contain an Accept Invitation link and a Decline Invitation link.
+						// When a user is invited, the class is marked so that other users cannot buy it unless 2 things occur: the email recipient Declines
+						// and there are no more users waitlisted for the class. 
+
+						// In case of a Declined Invititation and no additional users on the waitlist, the class is made active.
+						// In case of a Declined Invitation and one or more additional users on the waitlist, the next user is automatically sent the 24-hour invitation.
+						// The expiration of the 24-hour time period works exactly the same as a Declined Invitation.
+
+						// In the case of an Accepted Invitation, when the user clicks the Accept link in the email, he is taken to the login page; after login he is
+						// taken directly to NewProjectDialog in mode 2 with the credit card entry form visible.
 					}
 
 				// catch for outer try
