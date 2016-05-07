@@ -129,36 +129,57 @@ module.exports = function UtilityBO(app, sql, logger) {
         }
     }
 
-    self.routeProcessRefund = function (req, res) {
+    self.routeUndoPurchase = function (req, res) {
 
         try {
 
-            console.log("Entered UtilityBO/routeProcessRefund with req.body = " + JSON.stringify(req.body));
-            // req.user.userId*
-            // req.user.userName*
+            // Processes a Stripe refund and upon success delete the purchased project (cascading).
+
+            console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
             // req.body.chargeId
             // req.body.projectId
+            // req.body.issueRefund
 
-            var charge = stripe.refunds.create(
-                {
-                    charge: req.body.chargeId
-                },
-                function(err, refund) {
-                    if (err) {
-                        res.json({
-                            success: false,
-                            message: err.message
-                        });
-                    } else {
+            if (req.body.issueRefund === '1') {
 
-                        // Return success
-                        res.json({
-                            success: true,
-                            refundId: refund.id
-                        });
+                var charge = stripe.refunds.create(
+                    {
+                        charge: req.body.chargeId
+                    },
+                    function(err, refund) {
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err.message
+                            });
+                        } else {
+
+                            // Do a cascading deletion of the project.
+
+
+
+
+
+
+
+                            // Return success
+                            res.json({
+                                success: true,
+                                refundId: refund.id
+                            });
+                        }
                     }
-                }
-            );
+                );
+            } else {
+
+                // Just do cascading delete of the project.
+
+
+
+
+
+                
+            }
         } catch (e) {
 
             res.json({
@@ -544,22 +565,6 @@ module.exports = function UtilityBO(app, sql, logger) {
             res.json({
                 success: false,
                 message: "This error received updating usergroup permission-set: " + e.message
-            });
-        }
-    }
-
-    self.routeUndoPurchase = function (req, res) {
-
-        try {
-
-            console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
-            
-
-        } catch (e) {
-
-            res.json({
-                success: false,
-                message: "This error received undoing purchase: " + e.message
             });
         }
     }
