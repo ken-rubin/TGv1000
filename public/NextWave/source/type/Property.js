@@ -10,8 +10,10 @@
 
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
-    "type/SectionPart"],
-    function (prototypes, SectionPart) {
+    "type/SectionPart",
+    "methodBuilder/CodeExpressionRefinement",
+    "methodBuilder/CodeExpressionName"],
+    function (prototypes, SectionPart, CodeExpressionRefinement, CodeExpressionName) {
 
         try {
 
@@ -26,6 +28,24 @@ define(["utility/prototypes",
                     self.inherits(SectionPart,
                         strName,
                         "property");
+
+                    ////////////////////////////
+                    // Public methods.
+
+                    // Return a code instance
+                    self.allocateCodeInstance = function () {
+
+                        return new CodeExpressionRefinement(
+                                new CodeExpressionName("instance"),
+                                new CodeExpressionName(self.name)
+                            );
+                    };
+
+                    // Save.
+                    self.save = function () {
+
+                        return { name: self.name };
+                    };
                 } catch (e) {
 
                     alert(e.message);

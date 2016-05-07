@@ -31,6 +31,31 @@ define(["utility/prototypes",
                         "Methods",
                         "methods",
                         arrayMethods);
+
+                    ///////////////////////////
+                    // Public methods.
+
+                    // Save.
+                    self.save = function () {
+
+                        var arrayRet = [];
+
+                        // If there are methods, then save them.
+                        if (self.parts) {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                // Extract and save the method.
+                                var methodIth = self.parts[i];
+                                var objectMethod = methodIth.save();
+
+                                // Add it to the result object.
+                                arrayRet.push(objectMethod);
+                            }
+                        }
+
+                        return arrayRet;
+                    };
                 } catch (e) {
 
                     alert(e.message);

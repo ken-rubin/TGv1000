@@ -37,6 +37,21 @@ define(["utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Return a new instance of a Parameter.
+                    self.clone = function () {
+
+                        return new self.constructor(strName);
+                    };
+
+                    // Return a new object for this Parameter.
+                    self.save = function () {
+
+                        return {
+
+                            name: self.name
+                        };
+                    };
+
                     // Clear area.
                     self.clearArea = function () {
 

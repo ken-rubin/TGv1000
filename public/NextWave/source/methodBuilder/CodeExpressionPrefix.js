@@ -31,6 +31,30 @@ define(["utility/prototypes",
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         self.operator + " [rHS]");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a prefix expression.
+                    self.clone = function () {
+
+                        return new self.constructor(strOperator,
+                            self.rHS.clone());
+                    };
+
+                    // Inner save.  Save constructor parameters.
+                    self.innerSave = function () {
+
+                        return [ 
+
+                            {
+
+                                type: "String",
+                                value: self.operator
+                            },
+                            self.rHS.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

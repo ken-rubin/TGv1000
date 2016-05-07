@@ -30,6 +30,15 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "break",
                         "break ;");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a break statement.
+                    self.clone = function () {
+
+                        return new self.constructor();
+                    };
                 } catch (e) {
 
                     alert(e.message);

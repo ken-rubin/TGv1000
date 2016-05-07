@@ -39,11 +39,42 @@ define(["utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Return the area for dragging rendering.
+                    self.getDragArea = function () {
+
+                        return m_area.clone();
+                    };
+
                     // Returns the height of this sectionpart.
                     self.getHeight = function () {
 
                         var dHeight = self.settingsNode.lineHeight + 2 * settings.general.margin;
                         return dHeight;
+                    };
+
+                    // Virtual method to determine selection.
+                    self.getSelected = function () {
+
+                        return false;
+                    };
+
+                    // Invoked when the mouse is pressed down over the type.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            // Can't do much if no area.
+                            if (!self.area) {
+
+                                return null;
+                            }
+
+                            // Don't do much anyway....
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Render out this part.
@@ -66,11 +97,18 @@ define(["utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Call virtual to determine if this is a selected element.
+                            var bSelected = self.getSelected();
+
                             // Fill and stroke the path.
                             if (window.draggingStatement || window.draggingExpression) {
 
                                 contextRender.fillStyle = settings.general.fillDrag;
                                 contextRender.strokeStyle = settings.general.strokeDrag;
+                            } else if (bSelected) {
+
+                                contextRender.fillStyle = settings.general.fillBackgroundSelected;
+                                contextRender.strokeStyle = settings.general.strokeBackgroundSelected;
                             } else if (self.highlight) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
@@ -85,13 +123,7 @@ define(["utility/prototypes",
 
                             // Render the name.
                             contextRender.font = self.settingsNode.font;
-                            if (self.highlight) {
-
-                                contextRender.fillStyle = settings.general.fillText;
-                            } else {
-
-                                contextRender.fillStyle = settings.general.fillText;
-                            }
+                            contextRender.fillStyle = settings.general.fillText;
                             contextRender.fillText(self.name,
                                 m_area.location.x + settings.general.margin,
                                 m_area.location.y + settings.general.margin,

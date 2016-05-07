@@ -56,8 +56,10 @@ define(["utility/prototypes",
                                 // If stub, ...
                                 if (itemIth.constructor.name === "CodeExpressionStub") {
 
-                                    // ...and there is a payload...
-                                    if (itemIth.payload) {
+                                    // ...and there is a payload (which is not a literal or name...
+                                    if (itemIth.payload &&
+                                        !(itemIth.payload instanceof CodeLiteral) &&
+                                        !(itemIth.payload instanceof CodeName)) {
 
                                         // ...recurse.
                                         var exceptionRet = itemIth.payload.accumulateDragTargets(arrayAccumulator);
@@ -139,6 +141,13 @@ define(["utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Virtual method in base class.
+                    self.clone = function () {
+
+                        // Just clone the base....
+                        return new self.constructor(strDisplayTemplate);
                     };
 
                     // Return the area for dragging rendering.
@@ -228,6 +237,23 @@ define(["utility/prototypes",
                         return dWidth;
                     };
 
+                    // Save.
+                    self.save = function () {
+
+                        var objectRet = {};
+
+                        objectRet.type = self.constructor.name;
+                        objectRet.parameters = self.innerSave();
+
+                        return objectRet;
+                    };
+
+                    // Inner save.  Base class returns no parameters.
+                    self.innerSave = function () {
+
+                        return [];
+                    };
+
                     // Invoked when the mouse is pressed down over the type.
                     self.mouseDown = function (objectReference) {
 
@@ -243,7 +269,10 @@ define(["utility/prototypes",
                                 }
 
                                 // Pass down to highlight object.
-                                return m_objectHighlight.mouseDown(objectReference);
+                                if ($.isFunction(m_objectHighlight.mouseDown)) {
+
+                                    return m_objectHighlight.mouseDown(objectReference);
+                                }
                             }
                             return null;
                         } catch (e) {
@@ -281,7 +310,8 @@ define(["utility/prototypes",
                             }
 
                             // If over an object, pass mouse move to it.
-                            if (m_objectHighlight) {
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.mouseMove)) {
 
                                 exceptionRet = m_objectHighlight.mouseMove(objectReference);
                                 if (exceptionRet) {
@@ -306,11 +336,32 @@ define(["utility/prototypes",
                             if (m_objectHighlight) {
 
                                 // Don't check return...just a mouse out.
-                                m_objectHighlight.mouseOut(objectReference);
+                                if ($.isFunction(m_objectHighlight.mouseOut)) {
+
+                                    m_objectHighlight.mouseOut(objectReference);
+                                }
                                 m_objectHighlight.highlight = false;
                                 m_objectHighlight = null;
                             }
 
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is clicked over the item.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.click)) {
+
+                                // Pass down to highlight object.
+                                return m_objectHighlight.click(objectReference);
+                            }
                             return null;
                         } catch (e) {
 
@@ -356,17 +407,13 @@ define(["utility/prototypes",
                             if ((window.draggingStatement || window.draggingExpression) &&
                                 self.collection) {
 
-                                contextRender.fillStyle = settings.general.fillDrag;
+                                //contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
+                                //contextRender.stroke();
                             } else if (self.highlight) {
 
-                                contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
                                 contextRender.stroke();
-                            } else {
-
-                                contextRender.fillStyle = settings.list.expression.fillBackground;
                             }
-                            //contextRender.fill();
 
                             /////////
                             // Process display template:

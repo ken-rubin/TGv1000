@@ -32,6 +32,28 @@ define(["utility/prototypes",
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         "( [condition] ? [thenExpression] : [elseExpression] )");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a ternary expression.
+                    self.clone = function () {
+
+                        return new self.constructor(self.condition.clone(),
+                            self.thenExpression.clone(),
+                            self.elseExpression.clone());
+                    };
+
+                    // Inner save.  Save constructor parameters.
+                    self.innerSave = function () {
+
+                        return [ 
+
+                            self.condition.save(),
+                            self.thenExpression.save(),
+                            self.elseExpression.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

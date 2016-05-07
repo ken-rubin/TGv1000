@@ -35,6 +35,29 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "try",
                         "try");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a try statement.
+                    self.clone = function () {
+
+                        // Clone the parameters too.
+                        return new self.constructor(self.tryBlock.clone(),
+                            self.catchBlock.clone(),
+                            self.finallyBlock.clone());
+                    };
+
+                    // Inner save.  Return constructor parameters.
+                    self.innerSave = function () {
+
+                        return [
+
+                            self.tryBlock.save(),
+                            self.catchBlock.save(),
+                            self.finallyBlock.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

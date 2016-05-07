@@ -35,6 +35,31 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "for",
                         "for (var [initialization] ; [condition] ; [increment] )");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a for statement.
+                    self.clone = function () {
+
+                        // Clone the parameters too.
+                        return new self.constructor(self.initialization.clone(), 
+                            self.condition.clone(), 
+                            self.increment.clone(), 
+                            self.block.clone());
+                    };
+
+                    // Inner save.  Return constructor parameters.
+                    self.innerSave = function () {
+
+                        return [
+
+                            self.initialization.save(),
+                            self.condition.save(),
+                            self.increment.save(),
+                            self.block.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

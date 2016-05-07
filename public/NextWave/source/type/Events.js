@@ -31,6 +31,31 @@ define(["utility/prototypes",
                         "Events",
                         "events",
                         arrayEvents);
+
+                    ///////////////////////////
+                    // Public methods.
+
+                    // Save.
+                    self.save = function () {
+
+                        var arrayRet = [];
+
+                        // If there are events, then save them.
+                        if (self.parts) {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                // Extract and save the events.
+                                var eventIth = self.parts[i];
+                                var objectEvent = eventIth.save();
+
+                                // Add it to the result object.
+                                arrayRet.push(objectEvent);
+                            }
+                        }
+
+                        return arrayRet;
+                    };
                 } catch (e) {
 
                     alert(e.message);

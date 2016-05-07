@@ -11,8 +11,9 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "expression/Expression",
-    "methodBuilder/CodeExpressionPostfix"],
-    function (prototypes, Expression, CodeExpressionPostfix) {
+    "methodBuilder/CodeExpressionPostfix",
+    "methodBuilder/CodeExpressionName"],
+    function (prototypes, Expression, CodeExpressionPostfix, CodeExpressionName) {
 
         try {
 
@@ -33,7 +34,10 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeExpressionPostfix(undefined, "++");
+                        return new CodeExpressionPostfix(
+                                new CodeExpressionName("i"), 
+                                "++"
+                            );
                     };
                 } catch (e) {
 

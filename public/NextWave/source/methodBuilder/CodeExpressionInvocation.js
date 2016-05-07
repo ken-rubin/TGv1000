@@ -32,6 +32,26 @@ define(["utility/prototypes",
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         "[reference] ( [argumentList] )");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a invocation expression.
+                    self.clone = function () {
+
+                        return new self.constructor(self.reference.clone(),
+                            self.argumentList.clone());
+                    };
+
+                    // Inner save.  Save constructor parameters.
+                    self.innerSave = function () {
+
+                        return [ 
+
+                            self.reference.save(),
+                            self.argumentList.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

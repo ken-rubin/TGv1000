@@ -26,6 +26,22 @@ define(["utility/prototypes",
                     // Inherit from List.
                     self.inherits(List,
                         true);
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Method adds a new Type.
+                    self.addType = function (typeNew) {
+
+                        try {
+
+                            self.items.push(typeNew);
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
                 } catch (e) {
 
                     alert(e.message);

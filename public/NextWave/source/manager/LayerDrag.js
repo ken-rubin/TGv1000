@@ -16,11 +16,19 @@ define(["utility/prototypes",
     "manager/Layer",
     "manager/ListItem",
     "type/Type",
+    "type/Method",
+    "type/Property",
+    "name/Name",
     "statement/Statement",
+    "methodBuilder/Block",
     "methodBuilder/CodeStatement",
     "methodBuilder/CodeExpression",
-    "methodBuilder/CodeExpressionStub"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Statement, CodeStatement, CodeExpression, CodeExpressionStub) {
+    "methodBuilder/CodeExpressionStub",
+    "methodBuilder/CodeStatementVar",
+    "methodBuilder/CodeExpressionInfix",
+    "methodBuilder/CodeExpressionName",
+    "methodBuilder/CodeName"],
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Statement, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName) {
 
         try {
 
@@ -49,9 +57,32 @@ define(["utility/prototypes",
                     self.dragTargets = [];
                     // The drag target the mouse was let up over.
                     self.upOver = null;
+                    // Collection of placements for dragging Statements or CodeStatements.
+                    self.placements = [];
 
                     ////////////////////////
                     // Public methods.
+
+                    // Clear drag object.
+                    self.clearDragObject = function () {
+
+                        try {
+
+                            // Clear it out.
+                            self.dragObject = null;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Get drag object.
+                    self.getDragObject = function () {
+
+                        return self.dragObject;
+                    };
 
                     // Set drag object, and get drag area.
                     self.setDragObject = function (objectDrag) {
@@ -88,63 +119,29 @@ define(["utility/prototypes",
                                 self.move = new Size(pointMove.x - self.down.x,
                                     pointMove.y - self.down.y);
 
-                                // If ListItem, clone, else remove and set highlight to false.
-                                if (self.dragObject instanceof ListItem ||
-                                    self.dragObject instanceof Type) {
+                                // Handle each drag-type differently.
+                                if (self.dragObject instanceof CodeStatement) {
 
-                                    // Clone the ListItem.
-                                    self.dragObject = new self.dragObject.constructor(self.dragObject.name);
-                                    self.dragObject.highlight = false;
-                                } else {
+                                    return m_functionStartDragCodeStatement(pointDown,
+                                        pointMove);
+                                } else if (self.dragObject instanceof CodeExpression) {
 
-                                    // Get container and remove from it.
-                                    var collectionOwner = self.dragObject.collection;
+                                    return m_functionStartDragCodeExpression(pointDown,
+                                        pointMove);
+                                } else if (self.dragObject instanceof Statement) {
 
-                                    // Remove it.
-                                    if (collectionOwner) {
-
-                                        var exceptionRet = collectionOwner.removeItem(self.dragObject);
-                                        if (exceptionRet) {
-
-                                            return exceptionRet;
-                                        }
-                                    }
-
-                                    // If CodeStatement, close its blocks.
-                                    if (self.dragObject instanceof CodeStatement) {
-
-                                        var exceptionRet = self.dragObject.closeBlocks();
-                                        if (exceptionRet) {
-
-                                            return exceptionRet;
-                                        }
-                                    }
-                                }
-
-                                // Add in drag stubs if dragging a Statement or CodeStatement.
-                                if (self.dragObject instanceof CodeStatement ||
-                                    self.dragObject instanceof Statement) {
-
-                                    var exceptionRet = window.methodBuilder.addStatementDragStubs(self.dragTargets);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-
-                                    // Set global dragging variable.
-                                    window.draggingStatement = self.dragObject;
+                                    return m_functionStartDragStatement(pointDown,
+                                        pointMove);
                                 } else if (self.dragObject instanceof ListItem ||
-                                    self.dragObject instanceof CodeExpression) {
+                                    self.dragObject instanceof Method ||
+                                    self.dragObject instanceof Property)  {
 
-                                    // Get the drag targets somehow else.
-                                    var exceptionRet = window.methodBuilder.accumulateDragTargets(self.dragTargets);
-                                    if (exceptionRet) {
+                                    return m_functionStartDragNonStatementListItem(pointDown,
+                                        pointMove);
+                                } else if (self.dragObject instanceof Type)  {
 
-                                        return exceptionRet;
-                                    }
-
-                                    // Set global dragging variable.
-                                    window.draggingExpression = self.dragObject;
+                                    return m_functionStartDragType(pointDown,
+                                        pointMove);
                                 }
                             }
                             return null;
@@ -161,7 +158,8 @@ define(["utility/prototypes",
 
                             // Purge drag stubs if dragging a Statement or CodeStatement.
                             if (self.dragObject instanceof CodeStatement ||
-                                self.dragObject instanceof Statement) {
+                                self.dragObject instanceof Statement ||
+                                self.dragObject instanceof Type) {
 
                                 var exceptionRet = window.methodBuilder.purgeStatementDragStubs();
                                 if (exceptionRet) {
@@ -174,6 +172,11 @@ define(["utility/prototypes",
                             self.down = null;
                             self.move = null;
                             self.dragArea = null;
+
+                            // Remove index and collection from drag target.
+                            self.dragTargets.index = undefined;
+                            self.dragTargets.dragCollection = undefined;
+
                             self.dragTargets = [];
                             self.upOver = null;
 
@@ -195,6 +198,7 @@ define(["utility/prototypes",
                             // If mouse let up over a drag target.
                             if (self.upOver) {
 
+                                // Expressions must be integrated into their collection...
                                 if (self.upOver instanceof CodeExpressionStub) {
 
                                     // If the dragged thing is already a CodeExpression
@@ -220,29 +224,21 @@ define(["utility/prototypes",
                                     }
                                 } else {
 
-                                    // If the dragged thing is already a CodeExpression
-                                    // then just add it, else, allocate it and add it.
-                                    if (self.dragObject instanceof CodeStatement) {
+                                    // If this is a drag from the TypeList,
+                                    // or a new var statement drag, then
+                                    // add a name on this consumate call.
+                                    if (self.dragTargets.addNameInDragConsumate) {
 
-                                        var exceptionRet = self.upOver.collection.addItem(self.dragObject,
-                                            self.upOver);
-                                        if (exceptionRet) {
-
-                                            return e;
-                                        }
-                                    } else {
-
-                                        // Allocate a new CodeExpression.
-                                        var csNew = self.dragObject.allocateCodeInstance();
-
-                                        // And add that.
-                                        var exceptionRet = self.upOver.collection.addItem(csNew,
-                                            self.upOver);
+                                        self.dragTargets.addNameInDragConsumate = false;
+                                        var exceptionRet = window.manager.addName(self.dragTargets.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
                                         }
                                     }
+
+                                    // ...CodeStatements just get turned back to non-dragStub.
+                                    self.dragTargets.dragStub = false;
                                 }
                             }
 
@@ -266,6 +262,18 @@ define(["utility/prototypes",
 
                                 self.move = new Size(pointCursor.x - self.down.x,
                                     pointCursor.y - self.down.y);
+
+                                // If dragging a statement-type, then need to place the stub.
+                                if (self.dragTargets &&
+                                    (self.dragObject instanceof Statement ||
+                                        self.dragObject instanceof CodeStatement ||
+                                        self.dragObject instanceof Type)) {
+
+                                    // If drag object is a Statement or a CodeStatement, 
+                                    // then find the location of the closest possible
+                                    // drag stub location and put the drag stub there.
+                                    return m_functionPlaceStub(pointCursor);
+                                }
                             }
                             return null;
                         } catch (e) {
@@ -282,17 +290,48 @@ define(["utility/prototypes",
                             // If dragging...
                             if (self.down) {
 
-                                // Loop over all drag targets, ask each if cursor in.
-                                for (var i = 0; i < self.dragTargets.length; i++) {
+                                // If dragTargets is a collection, then loop, else...
+                                if (self.dragTargets.length) {
 
-                                    var itemIth = self.dragTargets[i];
+                                    // Loop over all drag targets, ask each if cursor in.
+                                    for (var i = 0; i < self.dragTargets.length; i++) {
 
-                                    var bIn = itemIth.pointIn(objectReference.contextRender,
+                                        var itemIth = self.dragTargets[i];
+
+                                        var bIn = itemIth.pointIn(objectReference.contextRender,
+                                            objectReference.pointCursor);
+                                        if (bIn) {
+
+                                            self.upOver = itemIth;
+                                            break;
+                                        }
+                                    }
+                                } else if (self.dragTargets &&
+                                    $.isFunction(self.dragTargets.pointIn)) {
+
+                                    // ...just ask the one.
+                                    var bIn = self.dragTargets.pointIn(objectReference.contextRender,
                                         objectReference.pointCursor);
                                     if (bIn) {
 
-                                        self.upOver = itemIth;
-                                        break;
+                                        self.upOver = self.dragTargets;
+                                    } else {
+
+                                        // Dragged to remove.
+
+                                        // If its a var with a name...
+                                        if (self.dragTargets instanceof CodeStatementVar &&
+                                            self.dragTargets.assignment.payload instanceof CodeExpressionInfix &&
+                                            self.dragTargets.assignment.payload.lHS.payload instanceof CodeExpressionName &&
+                                            self.dragTargets.assignment.payload.lHS.payload.payload instanceof CodeName) {
+
+                                            // ...remove it from names.
+                                            var exceptionRet = window.manager.removeName(self.dragTargets.assignment.payload.lHS.payload.payload.payload);
+                                            if (exceptionRet) {
+
+                                                return exceptionRet;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -320,6 +359,22 @@ define(["utility/prototypes",
                                 // Render the drag object.
                                 try {
 
+                                    if (settings.layerDrag.showInsertionLines) {
+
+                                        contextRender.lineWidth = 10;
+                                        // Render placements.
+                                        for (var i = 0; i < self.placements.length; i++) {
+
+                                            contextRender.strokeStyle = (self.placements[i].type ? "red" : "green");
+
+                                            contextRender.beginPath();
+                                            contextRender.moveTo(0, self.placements[i].y);
+                                            contextRender.lineTo(self.extent.width, self.placements[i].y);
+                                            contextRender.stroke();
+                                        }
+                                        contextRender.lineWidth = 1;
+                                    }
+
                                     // Set to partially transparency.
                                     contextRender.globalAlpha = 0.65;
 
@@ -335,6 +390,279 @@ define(["utility/prototypes",
                             return null;
                         } catch (e) {
                             
+                            return e;
+                        }
+                    };
+
+                    /////////////////////////
+                    // Private methods.
+
+                    // Helper method handles dragging Statements.
+                    var m_functionStartDragStatement = function (pointDown, pointMove) {
+
+                        try {
+
+                            // Clone the ListItem.
+                            self.dragObject = new self.dragObject.constructor(self.dragObject.name);
+                            self.dragObject.highlight = false;
+
+                            // Allocate and turn into dragstub.
+                            var csDragStub = self.dragObject.allocateCodeInstance();
+                            csDragStub.dragStub = true;
+
+                            // Store in dragTargets (normally a collection).
+                            // ToDo: replace with something just for statements.
+                            self.dragTargets = csDragStub;
+
+                            // Set global dragging variable.
+                            window.draggingStatement = self.dragObject;
+
+                            /* Move the dragstub to the nearest to the cursor.
+                            var exceptionRet = m_functionPlaceStub(pointMove);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }*/
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method handles dragging Types.
+                    var m_functionStartDragType = function (pointDown, pointMove) {
+
+                        try {
+
+                            // Clone the Type.
+                            self.dragObject = new self.dragObject.constructor(self.dragObject.name);
+                            self.dragObject.highlight = false;
+
+                            // Close the type.
+                            var exceptionRet = self.dragObject.close();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Allocate and turn into dragstub.
+                            var csDragStub = self.dragObject.allocateCodeInstance();
+                            csDragStub.dragStub = true;
+
+                            // Store in dragTargets (normally a collection).
+                            // ToDo: replace with something just for statements.
+                            self.dragTargets = csDragStub;
+
+                            // Need its new height to compare with 
+                            // the old height to adjust the grab point.
+                            var dClosedHeight = self.dragObject.getClosedHeight();
+                            self.dragArea.extent.height = dClosedHeight;
+
+                            // If the statement is now above the grab point, move it down.
+                            if (self.dragArea.location.y + self.dragArea.extent.height < pointMove.y) {
+
+                                self.dragArea.location.y = pointMove.y - self.dragArea.extent.height + settings.general.margin;
+                            }
+
+                            // Set global dragging variable.
+                            window.draggingStatement = self.dragObject;
+
+                            // Move the dragstub to the nearest to the cursor.
+                            /*exceptionRet = m_functionPlaceStub(pointMove);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = window.methodBuilder.methodStatements.insertAt(self.dragTargets,
+                                0);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }*/
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method handles dragging non-Statement 
+                    // list items: Names, literals, expressions.
+                    var m_functionStartDragNonStatementListItem = function (pointDown, pointMove) {
+
+                        try {
+
+                            // Clone the ListItem.
+                            self.dragObject = new self.dragObject.constructor(self.dragObject.name);
+                            self.dragObject.highlight = false;
+
+                            // Get the drag targets somehow else.
+                            var exceptionRet = window.methodBuilder.accumulateDragTargets(self.dragTargets);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Set global dragging variable.
+                            window.draggingExpression = self.dragObject;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method handles dragging CodeStatements.
+                    var m_functionStartDragCodeStatement = function (pointDown, pointMove) {
+
+                        try {
+
+                            // Save off the dragObject as the dragTargets object.
+                            // ToDo: make a different field for statement-types.
+                            self.dragTargets = self.dragObject;
+                            self.dragTargets.dragStub = true;
+
+                            // Clone statement and set as the drag object, 
+                            // the original Statement is now the dragStub.
+                            self.dragObject = self.dragObject.clone();
+
+                            // Close any open blocks.
+                            var exceptionRet = self.dragObject.closeBlocks();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Need its new height to compare with 
+                            // the old height to adjust the grab point.
+                            var dClosedHeight = self.dragObject.getClosedHeight();
+                            self.dragArea.extent.height = dClosedHeight;
+
+                            // If the statement is now above the grab point, move it down.
+                            if (self.dragArea.location.y + self.dragArea.extent.height < pointMove.y) {
+
+                                self.dragArea.location.y = pointMove.y - self.dragArea.extent.height + settings.general.margin;
+                            }
+
+                            // Set global dragging variable.
+                            window.draggingStatement = self.dragObject;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method handles dragging CodeExpression.
+                    var m_functionStartDragCodeExpression = function (pointDown, pointMove) {
+
+                        try {
+
+                            // Get container and remove from it.
+                            var collectionOwner = self.dragObject.collection;
+
+                            // Remove it.
+                            if (collectionOwner) {
+
+                                var exceptionRet = collectionOwner.removeItem(self.dragObject);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // Get the drag targets somehow else.
+                            var exceptionRet = window.methodBuilder.accumulateDragTargets(self.dragTargets);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Set global dragging variable.
+                            window.draggingExpression = self.dragObject;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Find the closest possible insertion point to the cursor.
+                    var m_functionPlaceStub = function (pointCursor) {
+
+                        try {
+
+                            // First, gather the collection/location/index/type array.
+                            var arrayDragStubInsertionPoints = [];
+                            var exceptionRet = window.methodBuilder.accumulateDragStubInsertionPoints(arrayDragStubInsertionPoints,
+                                self.dragTargets);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            self.placements = arrayDragStubInsertionPoints;
+
+                            // Process each, keeping nearest.
+                            var objectClosest = null;
+                            var iClosestDistance = Infinity;
+                            for (var i = 0; i < arrayDragStubInsertionPoints.length; i++) {
+
+                                var objectIth = arrayDragStubInsertionPoints[i];
+
+                                var iDistance = Math.abs(objectIth.y - pointCursor.y);
+                                if (iDistance < iClosestDistance) {
+
+                                    iClosestDistance = iDistance;
+                                    objectClosest = objectIth;
+                                }
+                            }
+
+                            // If placement has changed, remove the stub and add back in the new place.
+                            if (objectClosest) {
+
+                                // If in the same collection, make so only ever moves by 1 index.
+                                if (objectClosest.collection === self.dragTargets.dragCollection) {
+
+                                    if (objectClosest.index < self.dragTargets.index) {
+
+                                        objectClosest.index = self.dragTargets.index - 1;
+                                    } else if (objectClosest.index > self.dragTargets.index) {
+
+                                        objectClosest.index = self.dragTargets.index + 1;
+                                    }
+                                }
+
+                                // Ensure no drop on the dragStub.
+                                if (!objectClosest.type) {
+
+                                    // Remove placed stub now.
+                                    exceptionRet = window.methodBuilder.purgeStatementDragStubs();
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Insert at the specified index to the specified collection.
+                                    exceptionRet = objectClosest.collection.insertAt(self.dragTargets,
+                                        objectClosest.index);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Save index in drag target.
+                                    self.dragTargets.index = objectClosest.index;
+                                    self.dragTargets.dragCollection = objectClosest.collection;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
                             return e;
                         }
                     };

@@ -36,9 +36,9 @@ define(["utility/prototypes",
     "methodBuilder/MethodBuilder",
     "methodBuilder/ParameterList",
     "methodBuilder/Parameter",
-    "methodBuilder/CodeStatementList",
-    "methodBuilder/TypeName"],
-    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, NameList, Name, StatementList, ExpressionList, LiteralList, MethodBuilder, ParameterList, Parameter, CodeStatementList, TypeName) {
+    "methodBuilder/StatementList",
+    "methodBuilder/TypeMethodPair"],
+    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, ParameterList, Parameter, StatementList, TypeMethodPair) {
 
         try {
 
@@ -53,7 +53,212 @@ define(["utility/prototypes",
                     self.inherits(Layer);
 
                     ////////////////////////
+                    // Public fields.
+
+                    // Panel of types.
+                    self.typesPanel = null;
+                    // Panel of names.
+                    self.namesPanel = null;
+                    // Panel of statements.
+                    self.statementsPanel = null;
+                    // Panel of expressions.
+                    self.expressionsPanel = null;
+                    // Panel of literal.
+                    self.literalsPanel = null;
+
+                    ////////////////////////
                     // Public methods.
+
+                    // Method adds a new name.
+                    self.addName = function (strName) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.namesPanel.payload.addName(strName);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits an existing name.
+                    self.editName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.namesPanel.payload.editName(strOriginalName,
+                                strNewName);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method removes an existing name.
+                    self.removeName = function (strName) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.namesPanel.payload.removeName(strName);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method adds a new Type.
+                    self.addType = function (typeNew) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.typesPanel.payload.addType(typeNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear the list of types.
+                    self.clearTypes = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.typesPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear the list of Statements.
+                    self.clearStatements = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.statementsPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Load up statements from list of statement constructor names.
+                    self.loadStatements = function (arrayList) {
+
+                        try {
+
+                            // Clear the old.
+                            var exceptionRet = self.clearStatements();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the new.
+                            return self.statementsPanel.payload.load(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant statement constructors.
+                    self.saveStatements = function () {
+
+                        return self.statementsPanel.payload.save();
+                    };
+
+                    // Clear the list of Expressions.
+                    self.clearExpressions = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.expressionsPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Load up Expressions from list of Expression constructor names.
+                    self.loadExpressions = function (arrayList) {
+
+                        try {
+
+                            // Clear the old.
+                            var exceptionRet = self.clearExpressions();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the new.
+                            return self.expressionsPanel.payload.load(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant Expression constructors.
+                    self.saveExpressions = function () {
+
+                        return self.expressionsPanel.payload.save();
+                    };
+
+                    // Clear the list of Literals.
+                    self.clearLiterals = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.literalsPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Load up Literals from list of Literal constructor names.
+                    self.loadLiterals = function (arrayList) {
+
+                        try {
+
+                            // Clear the old.
+                            var exceptionRet = self.clearLiterals();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the new.
+                            return self.literalsPanel.payload.load(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant Literals constructors.
+                    self.saveLiterals = function () {
+
+                        return self.literalsPanel.payload.save();
+                    };
 
                     // Initialze instance.
                     self.create = function () {
@@ -66,23 +271,23 @@ define(["utility/prototypes",
                                 throw { message: "Instance already created!" };
                             }
 
-                            var panelNames = new Panel("Names", 
+                            self.namesPanel = new Panel("Names", 
                                 orientation.north, 
                                 new Point(settings.layerPanels.namesPanel.x, 0), 
                                 new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
-                            var panelStatements = new Panel("Statements", 
+                            self.statementsPanel = new Panel("Statements", 
                                 orientation.north, 
                                 new Point(settings.layerPanels.statementsPanel.x, 0), 
                                 new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
-                            var panelExpressions = new Panel("Expressions", 
+                            self.expressionsPanel = new Panel("Expressions", 
                                 orientation.north, 
                                 new Point(settings.layerPanels.expressionsPanel.x, 0), 
                                 new Size(settings.layerPanels.expressionsPanel.width, settings.layerPanels.expressionsPanel.height));
-                            var panelLiterals = new Panel("Literals", 
+                            self.literalsPanel = new Panel("Literals", 
                                 orientation.north, 
                                 new Point(settings.layerPanels.literalsPanel.x, 0), 
                                 new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
-                            var panelTypes = new Panel("Types", 
+                            self.typesPanel = new Panel("Types", 
                                 orientation.west, 
                                 new Point(0, settings.layerPanels.typesPanel.y), 
                                 new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
@@ -92,40 +297,41 @@ define(["utility/prototypes",
                                 new Size(settings.layerPanels.methodPanel.width, settings.layerPanels.methodPanel.height));
 
                             // Add the TypeTree to the types Panel.
-                            var exceptionRet = m_functionAddTypeTreeToTypesPanel(panelTypes);
+                            var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Add the NameList to the names Panel.
-                            exceptionRet = m_functionAddNameListToNamesPanel(panelNames);
+                            exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Add the StatmentList to the statements Panel.
-                            exceptionRet = m_functionAddStatementListToStatementsPanel(panelStatements);
+                            exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Add the ExpressionList to the expressions Panel.
-                            exceptionRet = m_functionAddExpressionListToExpressionsPanel(panelExpressions);
+                            exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Add the LiteralList to the literals Panel.
-                            exceptionRet = m_functionAddLiteralListToLiteralsPanel(panelLiterals);
+                            exceptionRet = m_functionAddLiteralListToLiteralsPanel(self.literalsPanel);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
+                            // To be replaced by: load type/method.
                             // Add the MethodBuilder to the method Panel.
                             exceptionRet = m_functionAddMethodBuilderToMethodPanel(panelMethod);
                             if (exceptionRet) {
@@ -135,11 +341,11 @@ define(["utility/prototypes",
 
                             // Compile to generic list of panels for looping operations.
                             m_arrayPanels = [
-                                panelNames, 
-                                panelStatements, 
-                                panelExpressions, 
-                                panelLiterals, 
-                                panelTypes,
+                                self.namesPanel, 
+                                self.statementsPanel, 
+                                self.expressionsPanel, 
+                                self.literalsPanel, 
+                                self.typesPanel,
                                 panelMethod
                             ];
 
@@ -290,6 +496,26 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Handle click.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // If active panel, just pass to it.
+                            if (m_panelActive) {
+
+                                // Panel handles down--even if not over a control.
+                                objectReference.handled = true;
+
+                                return m_panelActive.click(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Set the size of this layer and children.
                     // Also handle responsiveness of application.
                     self.calculateLayout = function (sizeExtent, contextRender) {
@@ -357,39 +583,6 @@ define(["utility/prototypes",
 
                             // Some dummy data for now....
                             var arrayTypes = [];
-                            var iNumberOfTypes = Math.floor(Math.random() * 100);
-                            for (var i = 0; i < iNumberOfTypes; i++) {
-
-                                // Methods.
-                                var arrayMethods = [];
-                                var iNumberOfMethods = Math.floor(Math.random() * 10);
-                                for (var j = 0; j < iNumberOfMethods; j++) {
-
-                                    arrayMethods.push(new Method("Method" + (j + 1).toString()));
-                                }
-                                var methodsNew = new Methods(arrayMethods);
-
-                                // Properties.
-                                var arrayProperties = [];
-                                var iNumberOfProperties = Math.floor(Math.random() * 10);
-                                for (var j = 0; j < iNumberOfProperties; j++) {
-
-                                    arrayProperties.push(new Property("Property" + (j + 1).toString()));
-                                }
-                                var propertiesNew = new Properties(arrayProperties);
-
-                                // Events
-                                var arrayEvents = [];
-                                var iNumberOfEvents = Math.floor(Math.random() * 10);
-                                for (var j = 0; j < iNumberOfEvents; j++) {
-
-                                    arrayEvents.push(new Event("Event" + (j + 1).toString()));
-                                }
-                                var eventsNew = new Events(arrayEvents);
-
-                                arrayTypes.push(new Type("Type" + (i + 1).toString(),
-                                    [methodsNew, propertiesNew, eventsNew]));
-                            }
 
                             // Allocate and create the object tree, passing the initialization object.
                             var tt = new TypeTree();
@@ -416,22 +609,6 @@ define(["utility/prototypes",
 
                             // Some dummy data for now....
                             var arrayNames = [];
-                            arrayNames.push(new Name("this"));
-                            var iNumberOfParams = Math.floor(Math.random() * 5);
-                            var iNumberOfGlobals = Math.floor(Math.random() * 5);
-                            var iNumberOfVars = Math.floor(Math.random() * 5);
-                            for (var i = 0; i < iNumberOfGlobals; i++) {
-
-                                arrayNames.push(new Name("Global" + (i + 1).toString()));
-                            }
-                            for (var i = 0; i < iNumberOfParams; i++) {
-
-                                arrayNames.push(new Name("Parameter" + (i + 1).toString()));
-                            }
-                            for (var i = 0; i < iNumberOfVars; i++) {
-
-                                arrayNames.push(new Name("Variable" + (i + 1).toString()));
-                            }
 
                             // Allocate and create the object list, passing the initialization object.
                             var nl = new NameList();
@@ -457,8 +634,8 @@ define(["utility/prototypes",
                         try {
 
                             // Allocate and create the object list.
-                            var sl = new StatementList();
-                            var exceptionRet = sl.create();
+                            var sl = new StatementListPayload();
+                            var exceptionRet = sl.create([]);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -481,7 +658,7 @@ define(["utility/prototypes",
 
                             // Allocate and create the object list.
                             var el = new ExpressionList();
-                            var exceptionRet = el.create();
+                            var exceptionRet = el.create([]);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -504,7 +681,7 @@ define(["utility/prototypes",
 
                             // Allocate and create the object list.
                             var ll = new LiteralList();
-                            var exceptionRet = ll.create();
+                            var exceptionRet = ll.create([]);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -526,8 +703,8 @@ define(["utility/prototypes",
                         try {
 
                             // Allocate type-name object.
-                            var tn = new TypeName();
-                            var exceptionRet = tn.create();
+                            var tmp = new TypeMethodPair();
+                            var exceptionRet = tmp.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -540,8 +717,8 @@ define(["utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            var csl = new CodeStatementList();
-                            exceptionRet = csl.create();
+                            var sl = new StatementList();
+                            exceptionRet = sl.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -550,7 +727,7 @@ define(["utility/prototypes",
                             // Allocate and create the object list.
                             // Store globally so the drag layer can access.
                             window.methodBuilder = new MethodBuilder();
-                            exceptionRet = window.methodBuilder.create(tn, pl, csl);
+                            exceptionRet = window.methodBuilder.create(tmp, pl, sl);
                             if (exceptionRet) {
 
                                 throw exceptionRet;

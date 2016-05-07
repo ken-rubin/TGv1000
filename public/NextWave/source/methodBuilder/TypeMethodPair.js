@@ -1,7 +1,7 @@
 ///////////////////////////////////////
-// TypeName module.
+// TypeMethodPair module.
 //
-// Gui component for showing a method type and name.
+// Gui component for showing a method type name and method name.
 //
 // Return constructor function.
 //
@@ -20,7 +20,7 @@ define(["utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function TypeName() {
+        	var functionRet = function TypeMethodPair() {
 
                 try {
 
@@ -32,7 +32,7 @@ define(["utility/prototypes",
                     // Name of this type object.
                     self.type = null;
                     // Name of this type object.
-                    self.name = null;
+                    self.method = null;
                     // Indicates the type is highlighted.
                     self.highlight = false;
 
@@ -40,13 +40,13 @@ define(["utility/prototypes",
                     // Public methods.
 
                     // Initialize instance.
-                    self.create = function (strType, strName) {
+                    self.create = function (strType, strMethod) {
 
                     	try {
 
                     		// Save off type and name.
                     		self.type = strType || "type";
-                    		self.name = strName || "name";
+                    		self.method = strMethod || "method";
 
                     		return null;
                     	} catch (e) {
@@ -72,8 +72,8 @@ define(["utility/prototypes",
                     // Returns the width of this type.
                     self.getWidth = function (contextRender) {
 
-                        contextRender.font = settings.typeName.font;
-                        var dTextWidth = contextRender.measureText(self.type + "." + self.name).width
+                        contextRender.font = settings.typeMethodPair.font;
+                        var dTextWidth = contextRender.measureText(self.type + "." + self.method).width
 
                         return dTextWidth + 2 * settings.general.margin;
                     };
@@ -115,16 +115,16 @@ define(["utility/prototypes",
                                 contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
                             } else {
 
-                                contextRender.fillStyle = settings.typeName.fillBackground;
+                                contextRender.fillStyle = settings.typeMethodPair.fillBackground;
                                 contextRender.strokeStyle = settings.general.strokeBackground;
                             }
                             contextRender.fill();
                             contextRender.stroke();
 
                             // Render the type-name.
-                            contextRender.font = settings.typeName.font;
+                            contextRender.font = settings.typeMethodPair.font;
                             contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.type + "." + self.name,
+                            contextRender.fillText(self.type + "." + self.method,
                                 m_area.location.x + settings.general.margin,
                                 m_area.location.y + settings.general.margin,
                                 m_area.extent.width - 2 * settings.general.margin);

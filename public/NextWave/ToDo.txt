@@ -1,10 +1,16 @@
 ToDo:
 
-Pass data object to manager.
-Adjust scrolling offset after destructive, or constructive drag.
-Adjust scrolling offset after end drag.
-Get all drag targets on start drag.
-Drop/add to drag target on consumate.
-Draw the line from the draged to the nearest drag target.
-Insert drag stubs for statement-type drags.
-Dragging is off for contents of CodeStatementExpression.
+1) Drag names.  Two different places: a) a new statement.  generates an invocation statement.  b) a parameter list.  generates a name expression.
+2) Drag type-methods. Three places: a) a new statement.  generates an invocation statement and possibly an allocate statement as well — need to drag/move as a pair. b) a parameter list.  Generates an invocation expression and possibly an allocate statement as well — can’t drag as pair…what to do? c) into an expression stub.  generates an invocation expression and possibly an allocate statement as well — also can’t drag as pair…what to do?
+3) Drag type-properties.  Two places: a) a parameter list. generates a refinement expression, b) into an expression stub.  generates a refinement expression.
+3.5) Drag expression into parameter list.  Generates the expression in place in the parameter list.
+3.7) Drag a Type into the method builder’s parameter list.  Adds a new method parameter and name object.
+3.8) When load up method builder’s parameter list, add a name object for each.
+4) Change Type/Method in the MethodBuilder to use CodeNames (so it can be edited).  Keep in sync with TypeTree.
+5) Add modules: CodeMethod and CodeProperty.  These are like CodeName, CodeType and CodeLiteral.  But they are not validated against reserved words like CodeName (using CodeName now).
+6) Load method statements into MethodBuilder on method name click in TypeTree.
+7) Store statements with method in TypeTree when saving or changing method.
+8) Always have Type/Method context defined.  Set in Manager when the first type is loaded.
+10) Load/save JSON string.  Al la integration.
+11) Build method code from statements/expression.  Add a new property to each statement and expression type: generateCode.  Render out big string.
+12) Build modules from method code.  Generate the module stub, and insert all methods and properties for type in as public members. Expose through public Manager method.

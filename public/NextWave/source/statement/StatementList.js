@@ -42,24 +42,33 @@ define(["utility/prototypes",
                     // Public methods.
 
                     // Add statements to collection.
-                    self.innerCreate = function (arrayItems) {
+                    self.load = function (objectStatements) {
 
                         try {
 
                             // Add the Expressions.
-                            arrayItems = [
+                            var arrayItems = [/*
+                                new StatementBreak(),
+                                new StatementContinue(),
                                 new StatementExpression(),
                                 new StatementFor(),
                                 new StatementForIn(),
-                                new StatementWhile(),
                                 new StatementIf(),
-                                new StatementVar(),
                                 new StatementReturn(),
-                                new StatementTry(),
                                 new StatementThrow(),
-                                new StatementBreak(),
-                                new StatementContinue(),
-                                ];
+                                new StatementTry(),
+                                new StatementVar(),
+                                new StatementWhile()
+                                */];
+
+                            // Build each included statement.
+                            for (var i = 0; i < objectStatements.length; i++) {
+
+                                var statementIth = objectStatements[i];
+
+                                // Allocate and add.
+                                arrayItems.push(eval("new " + statementIth + "();"));
+                            }
 
                             // Add the Statements.
                             for (var i = 0; i < arrayItems.length; i++) {
@@ -76,6 +85,20 @@ define(["utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Save the list of statements.
+                    self.save = function () {
+
+                        var arrayItems = [];
+
+                        // Loop over items, save the name of the constructor.
+                        for (var i = 0; i < self.items.length; i++) {
+
+                            arrayItems.push(self.items[i].constructor.name);
+                        }
+
+                        return arrayItems;
                     };
                 } catch (e) {
 

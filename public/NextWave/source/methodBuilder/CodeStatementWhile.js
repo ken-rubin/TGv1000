@@ -33,6 +33,27 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "while",
                         "while ( [condition] )");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a while statement.
+                    self.clone = function () {
+
+                        // Clone the parameters too.
+                        return new self.constructor(self.condition.clone(),
+                            self.block.clone());
+                    };
+
+                    // Inner save.  Return constructor parameters.
+                    self.innerSave = function () {
+
+                        return [
+
+                            self.condition.save(),
+                            self.block.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

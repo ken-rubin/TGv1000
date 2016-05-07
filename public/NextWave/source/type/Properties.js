@@ -31,6 +31,31 @@ define(["utility/prototypes",
                         "Properties",
                         "properties",
                         arrayProperties);
+
+                    ///////////////////////////
+                    // Public methods.
+
+                    // Save.
+                    self.save = function () {
+
+                        var arrayRet = [];
+
+                        // If there are properties, then save them.
+                        if (self.parts) {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                // Extract and save the property.
+                                var propertyIth = self.parts[i];
+                                var objectProperty = propertyIth.save();
+
+                                // Add it to the result object.
+                                arrayRet.push(objectProperty);
+                            }
+                        }
+
+                        return arrayRet;
+                    };
                 } catch (e) {
 
                     alert(e.message);

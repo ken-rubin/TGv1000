@@ -31,6 +31,26 @@ define(["utility/prototypes",
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         "[base] . [refinement]");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a refinement expression.
+                    self.clone = function () {
+
+                        return new self.constructor(self.base.clone(),
+                            self.refinement.clone());
+                    };
+
+                    // Inner save.  Save constructor parameters.
+                    self.innerSave = function () {
+
+                        return [ 
+
+                            self.base.save(),
+                            self.refinement.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

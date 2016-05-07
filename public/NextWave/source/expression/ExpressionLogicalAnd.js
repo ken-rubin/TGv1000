@@ -11,8 +11,9 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "expression/Expression",
-    "methodBuilder/CodeExpressionInfix"],
-    function (prototypes, Expression, CodeExpressionInfix) {
+    "methodBuilder/CodeExpressionInfix",
+    "methodBuilder/CodeExpressionName"],
+    function (prototypes, Expression, CodeExpressionInfix, CodeExpressionName) {
 
         try {
 
@@ -33,7 +34,11 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeExpressionInfix(undefined, "&&");
+                        return new CodeExpressionInfix(
+                                new CodeExpressionName("i"), 
+                                "&&",
+                                new CodeExpressionName("j")
+                            );
                     };
                 } catch (e) {
 

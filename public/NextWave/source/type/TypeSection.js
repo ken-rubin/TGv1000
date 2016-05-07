@@ -49,6 +49,19 @@ define(["utility/prototypes",
                     ////////////////////////
                     // Public Methods.
 
+                    // Add a part to ths TypeSection.
+                    self.addPart = function (partNew) {
+
+                        try {
+
+                            self.parts.push(partNew);
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Returns the height of this type.
                     self.getHeight = function () {
 
@@ -105,6 +118,17 @@ define(["utility/prototypes",
                                         self.open = true;
                                     }
                                 }
+                            } else if (self.highlightChild) {
+
+                                // Store the cursor item as the drag object.
+                                var exceptionRet = window.manager.setDragObject(self.highlightChild);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                                // Pass down to highlight object.
+                                return self.highlightChild.mouseDown(objectReference);
                             }
                             return null;
                         } catch (e) {
@@ -186,6 +210,26 @@ define(["utility/prototypes",
 
                                 self.highlightChild.highlight = false;
                                 self.highlightChild = null;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is clicked over the Type.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // Reset highlight.
+                            if (self.highlightChild &&
+                                $.isFunction(self.highlightChild.click)) {
+
+                                // Pass down.
+                                return self.highlightChild.click(objectReference);
                             }
 
                             return null;

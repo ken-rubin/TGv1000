@@ -11,8 +11,11 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "statement/Statement",
-    "methodBuilder/CodeStatementWhile"],
-    function (prototypes, Statement, CodeStatementWhile) {
+    "methodBuilder/CodeStatementWhile",
+    "methodBuilder/CodeExpressionInfix",
+    "methodBuilder/CodeExpressionName",
+    "methodBuilder/CodeExpressionLiteral"],
+    function (prototypes, Statement, CodeStatementWhile, CodeExpressionInfix, CodeExpressionName, CodeExpressionLiteral) {
 
         try {
 
@@ -33,7 +36,13 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeStatementWhile();
+                        return new CodeStatementWhile(
+                                new CodeExpressionInfix(
+                                        new CodeExpressionName("i"),
+                                        "<",
+                                        new CodeExpressionLiteral("10")
+                                    )
+                            );
                     };
                 } catch (e) {
 

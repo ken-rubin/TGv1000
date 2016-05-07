@@ -55,43 +55,46 @@ define(["utility/prototypes",
                     // Public methods.
 
                     // Add expressions to collection.
-                    self.innerCreate = function (arrayItems) {
+                    self.load = function (objectExpressions) {
 
                         try {
 
                             // Add the Expressions.
-                            arrayItems = [
+                            var arrayItems = [/*
                                 new ExpressionAdd(),
-                                new ExpressionSubtract(),
-                                new ExpressionMultiply(),
-                                new ExpressionDivide(),
-                                new ExpressionModulo(),
-
-                                new ExpressionNegate(),
-                                new ExpressionIncrement(),
+                                new ExpressionAssignment(),
                                 new ExpressionDecrement(),
-
+                                new ExpressionDelete(),
+                                new ExpressionDivide(),
                                 new ExpressionEqual(),
-                                new ExpressionNotEqual(),
                                 new ExpressionGreater(),
                                 new ExpressionGreaterOrEqual(),
+                                new ExpressionIncrement(),
+                                new ExpressionInvocation(),
                                 new ExpressionLess(),
                                 new ExpressionLessOrEqual(),
-
                                 new ExpressionLogicalAnd(),
-                                new ExpressionLogicalOr(),
                                 new ExpressionLogicalNot(),
-
+                                new ExpressionLogicalOr(),
+                                new ExpressionModulo(),
+                                new ExpressionMultiply(),
+                                new ExpressionNegate(),
                                 new ExpressionNew(),
-                                new ExpressionDelete(),
-
+                                new ExpressionNotEqual(),
                                 new ExpressionParentheses(),
                                 new ExpressionRefinement(),
-                                new ExpressionInvocation(),
-                                new ExpressionAssignment(),
-
+                                new ExpressionSubtract(),
                                 new ExpressionTernary()
-                                ];
+                                */];
+
+                            // Build each included expression.
+                            for (var i = 0; i < objectExpressions.length; i++) {
+
+                                var strExpressionIth = objectExpressions[i];
+
+                                // Allocate and add.
+                                arrayItems.push(eval("new " + strExpressionIth + "();"));
+                            }
 
                             // Add the Expressions.
                             for (var i = 0; i < arrayItems.length; i++) {
@@ -108,6 +111,20 @@ define(["utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Save the list of expressions.
+                    self.save = function () {
+
+                        var arrayItems = [];
+
+                        // Loop over items, save the name of the constructor.
+                        for (var i = 0; i < self.items.length; i++) {
+
+                            arrayItems.push(self.items[i].constructor.name);
+                        }
+
+                        return arrayItems;
                     };
                 } catch (e) {
 

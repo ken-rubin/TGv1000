@@ -30,6 +30,15 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "continue",
                         "continue ;");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a continue statement.
+                    self.clone = function () {
+
+                        return new self.constructor();
+                    };
                 } catch (e) {
 
                     alert(e.message);

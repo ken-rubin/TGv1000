@@ -11,8 +11,11 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "expression/Expression",
-    "methodBuilder/CodeExpressionTernary"],
-    function (prototypes, Expression, CodeExpressionTernary) {
+    "methodBuilder/CodeExpressionTernary",
+    "methodBuilder/CodeExpressionInfix",
+    "methodBuilder/CodeExpressionName",
+    "methodBuilder/CodeExpressionLiteral"],
+    function (prototypes, Expression, CodeExpressionTernary, CodeExpressionInfix, CodeExpressionName, CodeExpressionLiteral) {
 
         try {
 
@@ -33,7 +36,15 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeExpressionTernary();
+                        return new CodeExpressionTernary(
+                                new CodeExpressionInfix(
+                                        new CodeExpressionName("i"),
+                                        ">",
+                                        new CodeExpressionLiteral("1")
+                                    ),
+                                new CodeExpressionName("i"),
+                                new CodeExpressionLiteral("2")
+                            );
                     };
                 } catch (e) {
 

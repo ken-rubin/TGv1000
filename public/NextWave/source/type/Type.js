@@ -16,13 +16,25 @@ define(["utility/prototypes",
     "utility/Size",
     "utility/Area",
     "utility/glyphs",
-    "type/TypeSection"],
-    function (prototypes, settings, Point, Size, Area, glyphs, TypeSections) {
+    "type/TypeSection",
+    "type/Methods",
+    "type/Method",
+    "type/Properties",
+    "type/Property",
+    "methodBuilder/CodeStatementVar",
+    "methodBuilder/CodeExpressionInfix",
+    "methodBuilder/CodeExpressionName",
+    "methodBuilder/CodeExpressionType",
+    "methodBuilder/CodeName",
+    "methodBuilder/CodeType",
+    "methodBuilder/CodeExpressionPrefix",
+    "methodBuilder/CodeExpressionInvocation"],
+    function (prototypes, settings, Point, Size, Area, glyphs, TypeSections, Methods, Method, Properties, Property, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
 
         try {
 
             // Constructor function.
-        	var functionRet = function Type(strName, arrayTypeSections) {
+        	var functionRet = function Type() {
 
                 try {
 
@@ -32,9 +44,14 @@ define(["utility/prototypes",
                     // Public fields.
 
                     // Name of this type object.
-                    self.name = strName || "default";
+                    self.name = "default";
+                    // Colleciton of methods.
+                    self.methods = new Methods();
+                    // Colleciton of properties.
+                    self.properties = new Properties();
                     // Collection of contained method objects.
-                    self.typeSections = arrayTypeSections || [];
+                    self.typeSections = [self.methods, 
+                        self.properties];
                     // Indicates the type is open.
                     self.open = false;
                     // Indicates the type is highlighted.
@@ -42,8 +59,100 @@ define(["utility/prototypes",
                     // Get the node containing settings for this type.
                     self.settingsNode = settings.tree.type;
 
-                    ////////////////////////
+                    ///////////////////////////
                     // Public methods.
+
+                    // Create instance.
+                    self.create = function (objectType) {
+
+                        try {
+
+                            // Set the name.
+                            self.name = objectType.name;
+
+                            // Build the methods.
+                            for (var j = 0; j < objectType.methods.length; j++) {
+
+                                var objectMethodIth = objectType.methods[j];
+
+                                var methodNew = new Method(self,
+                                    objectMethodIth.name);
+                                var exceptionRet = methodNew.create(objectMethodIth);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                                exceptionRet = self.methods.addPart(methodNew);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // Build the properties.
+                            for (var j = 0; j < objectType.properties.length; j++) {
+
+                                var objectPropertyIth = objectType.properties[j];
+
+                                var propertyNew = new Property(objectPropertyIth.name);
+                                var exceptionRet = self.properties.addPart(propertyNew);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Return a code instance
+                    self.allocateCodeInstance = function () {
+
+                        var strName = self.name.substring(0, 1).toLowerCase() + self.name.substring(1);
+                        strName = window.manager.getUniqueName(strName);
+                        var csvRet = new CodeStatementVar(
+                            new CodeExpressionInfix(
+                                new CodeExpressionName(
+                                    new CodeName(
+                                        strName
+                                    )
+                                ),
+                                "=",
+                                new CodeExpressionPrefix(
+                                    "new", 
+                                    new CodeExpressionInvocation(
+                                        new CodeExpressionType(
+                                            new CodeType(
+                                                self.name
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        );
+                        csvRet.addNameInDragConsumate = true;
+                        csvRet.consumateName = strName;
+                        return csvRet;
+                    };
+
+                    // Method closes up the type.
+                    self.close = function () {
+
+                        try {
+
+                            // Loop over them all and close them.
+                            self.open = false;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Returns the height of this type.
                     self.getHeight = function () {
@@ -58,6 +167,14 @@ define(["utility/prototypes",
                             }
                             dHeight += settings.general.margin * (self.typeSections.length - 1);
                         }
+
+                        return dHeight;
+                    };
+
+                    // Returns the height of this type with all blocks closed.
+                    self.getClosedHeight = function () {
+
+                        var dHeight = self.settingsNode.lineHeight + 2 * settings.general.margin;
 
                         return dHeight;
                     };
@@ -80,6 +197,29 @@ define(["utility/prototypes",
                     self.getDragArea = function () {
 
                         return m_area.clone();
+                    };
+
+                    // Save type to JSON.
+                    self.save = function () {
+
+                        var objectRet = {};
+
+                        // Save name.
+                        objectRet.name = self.name;
+
+                        // If there are methods, then save them up.
+                        if (self.methods) {
+
+                            objectRet.methods = self.methods.save();
+                        }
+
+                        // If there are methods, then save them up.
+                        if (self.properties) {
+
+                            objectRet.properties = self.properties.save();
+                        }
+
+                        return objectRet;
                     };
 
                     // Invoked when the mouse is pressed down over the type.
@@ -133,8 +273,6 @@ define(["utility/prototypes",
 
                                 return null;
                             }
-
-// Sears claim: 4143633, 800-927-7836 option 5.
 
                             // Reset highlight.
                             var exceptionRet = self.mouseOut(objectReference);
@@ -200,6 +338,25 @@ define(["utility/prototypes",
                                 m_objectHighlight.mouseOut(objectReference);
                                 m_objectHighlight.highlight = false;
                                 m_objectHighlight = null;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is clicked over the Type.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // Reset highlight.
+                            if (m_objectHighlight) {
+
+                                // Pass down.
+                                return m_objectHighlight.click(objectReference);
                             }
 
                             return null;

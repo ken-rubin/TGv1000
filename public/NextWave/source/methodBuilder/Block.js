@@ -21,7 +21,7 @@ define(["utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Block(strName) {
+        	var functionRet = function Block(strName, arrayStatements) {
 
                 try {
 
@@ -31,11 +31,21 @@ define(["utility/prototypes",
                     // Public fields.
 
                     // Collection of statements.
-                    self.statements = [];
+                    self.statements = arrayStatements || [];
                     // Indicates the block is open.
-                    self.open = false;
+                    self.open = true;
                     // The name of this block.
                     self.name = strName || "default";
+
+                    // If there are statements, then need to parent them.
+                    if (self.statements.length) {
+
+                        // Loop over each statement.
+                        for (var i = 0; i < self.statements.length; i++) {
+
+                            self.statements[i].collection = self;
+                        }
+                    }
 
                     ////////////////////////
                     // Public methods.
@@ -95,6 +105,31 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Add item to list of items.
+                    self.insertAt = function (itemNew, iIndex) {
+
+                        try {
+
+                            // Add...
+                            if (iIndex >= self.statements.length) {
+
+                                return self.addItem(itemNew);
+                            }
+
+                            // ...or insert.
+                            self.statements.splice(iIndex,
+                                0,
+                                itemNew);
+
+                            // Identify parent.
+                            itemNew.collection = self;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Remove item from list of items.
                     self.removeItem = function (itemRemove) {
 
@@ -128,31 +163,71 @@ define(["utility/prototypes",
 
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
-                    self.addStatementDragStubs = function (arrayAccumulator) {
+                    self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {
 
                         try {
 
-                            // Add as the first element.
-                            var sdsNew = new StatementDragStub();
-                            sdsNew.collection = self;
-                            arrayAccumulator.push(sdsNew);
-                            self.statements.splice(0, 0, sdsNew);
+                            // Drop out if no area.
+                            if (!m_area) {
+
+                                return null;
+                            }
+
+                            // First, check the "before all statements" location.
+                            if (m_area.location.y > areaMethodBuilder.location.y &&
+                                m_area.location.y < areaMethodBuilder.location.y + areaMethodBuilder.extent.height) {
+
+                                // If the top is visible, then add  
+                                // the first spot as a potential.
+                                arrayAccumulator.push({
+
+                                    index: 0,
+                                    y: m_area.location.y,
+                                    collection: self,
+                                    type: (self.statements.length > 0 ? self.statements[0].dragStub : false)
+                                });
+                            }
 
                             // Loop over each statement.
-                            for (var i = 1; i < self.statements.length; i+=2) {
+                            for (var i = 0; i < self.statements.length; i++) {
 
-                                var exceptionRet = self.statements[i].addStatementDragStubs(arrayAccumulator);
+                                // Extract the ith statement.
+                                var statementIth = self.statements[i];
+                                if (!statementIth ||
+                                    !statementIth.area) {
+
+                                    continue;
+                                }
+
+                                // Check in each statement for block....
+                                var exceptionRet = statementIth.accumulateDragStubInsertionPoints(arrayAccumulator,
+                                    statementDragStub, 
+                                    areaMethodBuilder);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
                                 }
 
-                                // Also add after each statement.
-                                sdsNew = new StatementDragStub();
-                                sdsNew.collection = self;
-                                arrayAccumulator.push(sdsNew);
-                                self.statements.splice(i + 1, 0, sdsNew);
+                                // Also check after each statement.
+
+                                // If the bottom + the full drag statement is fully visible.
+                                var areaStatement = statementIth.area();
+                                if (areaStatement) {
+
+                                    if (areaStatement.location.y + areaStatement.extent.height < areaMethodBuilder.location.y + areaMethodBuilder.extent.height) {
+
+                                        arrayAccumulator.push({
+
+                                            index: i,
+                                            y: areaStatement.location.y + areaStatement.extent.height,
+                                            collection: self,
+                                            type: (statementIth.dragStub ||
+                                                ((self.statements.length > i + 1) ? self.statements[i + 1].dragStub : false))
+                                        });
+                                    }
+                                }
                             }
+
                             return null;
                         } catch (e) {
 
@@ -173,7 +248,7 @@ define(["utility/prototypes",
                                 var itemIth = self.statements[i];
 
                                 // If it is a SDS...
-                                if (itemIth instanceof StatementDragStub) {
+                                if (itemIth.dragStub) {
 
                                     // ...then remove it...
                                     self.statements.splice(i, 1);
@@ -208,6 +283,53 @@ define(["utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Return a new instance of a while statement.
+                    self.clone = function () {
+
+                        // Clone the parameter too.
+                        var blockClone = new self.constructor(strName);
+
+                        // And add in clones of all statements.
+                        for (var i = 0; i < self.statements.length; i++) {
+
+                            blockClone.statements.push(self.statements[i].clone());
+                        }
+                        return blockClone;
+                    };
+
+                    // Save block.
+                    self.save = function () {
+
+                        // Pre-allocate array of statement parameters for this block.
+                        var arrayParameters = [];
+
+                        // Add them all.
+                        for (var i = 0; i < self.statements.length; i++) {
+
+                            arrayParameters.push(self.statements[i].save());
+                        }
+
+                        // Return array of the name and the Array of parameters.
+                        return [{ 
+
+                                type: "String", 
+                                value: self.name
+                            }, {
+
+                                type: "Array",
+                                parameters: arrayParameters
+                            }
+                        ];
+                    };
+
+                    // Returns the height of this block as closed.
+                    self.getClosedHeight = function () {
+
+                        // The height is 2 margins + header.
+                        var dHeight = settings.block.lineHeight + 2 * settings.general.margin;
+                        return dHeight;
                     };
 
                     // Returns the height of this type.
@@ -355,6 +477,24 @@ define(["utility/prototypes",
                                 m_objectHighlight = null;
                             }
 
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is clicked over the item.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.click)) {
+
+                                // Pass down to highlight object.
+                                return m_objectHighlight.click(objectReference);
+                            }
                             return null;
                         } catch (e) {
 

@@ -32,6 +32,25 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "expression",
                         "[payload] ;");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a expression statement.
+                    self.clone = function () {
+
+                        // Clone the parameter too.
+                        return new self.constructor(self.payload.clone());
+                    };
+
+                    // Inner save.  Return constructor parameters.
+                    self.innerSave = function () {
+
+                        return [
+
+                            self.payload.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

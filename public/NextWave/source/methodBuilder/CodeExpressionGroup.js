@@ -30,6 +30,24 @@ define(["utility/prototypes",
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         "( [payload] )");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a group expression.
+                    self.clone = function () {
+
+                        return new self.constructor(self.payload.clone());
+                    };
+
+                    // Inner save.  Save constructor parameters.
+                    self.innerSave = function () {
+
+                        return [ 
+
+                            self.payload.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

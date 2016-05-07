@@ -45,11 +45,13 @@ define(["utility/prototypes",
                     self.expressionStubs = [];
                     // Boolean indicates statement properties have been parsed.
                     self.parsed = false;
+                    // Indicates that this object is displayed as and functions as a drag stub.
+                    self.dragStub = false;
 
                     ////////////////////////
                     // Public methods.
 
-                    // Get all the drag targets from all the statements.
+                    // Get all the drag targets from all the expressions.
                     self.accumulateDragTargets = function (arrayAccumulator) {
 
                         try {
@@ -92,17 +94,32 @@ define(["utility/prototypes",
 
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
-                    self.addStatementDragStubs = function (arrayAccumulator) {
+                    self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {
 
                         try {
+
+                            // Can't add yourself to any block in yourself!
+                            if (self.dragStub) {
+
+                                return null;
+                            }
 
                             // Loop over each block.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                var exceptionRet = self.blocks[i].addStatementDragStubs(arrayAccumulator);
-                                if (exceptionRet) {
+                                var blockIth = self.blocks[i];
 
-                                    return exceptionRet;
+                                // If it is open, then ask it for its drag stubs.
+                                if (blockIth.open) {
+
+                                    // Call down.
+                                    var exceptionRet = blockIth.accumulateDragStubInsertionPoints(arrayAccumulator,
+                                        statementDragStub, 
+                                        areaMethodBuilder);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
                             return null;
@@ -149,10 +166,34 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Return private area field.
+                    self.area = function () {
+
+                        return m_area;
+                    };
+
+                    // Virtual method in base class.
+                    self.clone = function () {
+
+                        // Just clone the base....
+                        return new self.constructor(strSettingsNode, strDisplayTemplate);
+                    };
+
                     // Method closes up all the blocks.
                     self.closeBlocks = function () {
 
                         try {
+
+                            // No better place to do this....
+                            if (!self.parsed) {
+
+                                // Parse it.
+                                var exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
 
                             // Loop over them all and close them.
                             for (var i = 0; i < self.blocks.length; i++) {
@@ -173,40 +214,34 @@ define(["utility/prototypes",
                         return m_area.clone();
                     };
 
+                    // Returns the height of this type with all blocks closed.
+                    self.getClosedHeight = function () {
+
+                        // All statements have an initial line.
+                        var dHeight = settings.codeStatement.lineHeight + 2 * settings.general.margin;
+
+                        // If blocks, then more than just a line.
+                        for (var i = 0; i < self.blocks.length; i++) {
+
+                            // Add in the height of the block, and also an extra margin.
+                            dHeight += self.blocks[i].getClosedHeight() + settings.general.margin;
+                        }
+
+                        return dHeight;
+                    };
+
                     // Returns the height of this type.
                     self.getHeight = function () {
 
                         // No better place to do this....
                         if (!self.parsed) {
 
-                            // Scan for blocks and expressionStubs.
-                            var arrayKeys = Object.keys(self);
-                            for (var i = 0; i < arrayKeys.length; i++) {
+                            // Parse it.
+                            var exceptionRet = m_functionParse();
+                            if (exceptionRet) {
 
-                                // Extract the key.
-                                var strKeyIth = arrayKeys[i];
-
-                                // Don't permit collection, causes circular reference.
-                                if (strKeyIth === "collection") {
-
-                                    continue;
-                                }
-
-                                // Extract the object.
-                                var objectIth = self[strKeyIth];
-
-                                // Test object.
-                                if (objectIth instanceof Block) {
-
-                                    self.blocks.push(objectIth);
-                                } else if (objectIth instanceof CodeExpressionStub) {
-
-                                    objectIth.collection = self;
-                                    self.expressionStubs.push(objectIth);
-                                }
+                                return exceptionRet;
                             }
-
-                            self.parsed = true;
                         }
 
                         // All statements have an initial line.
@@ -220,6 +255,23 @@ define(["utility/prototypes",
                         }
 
                         return dHeight;
+                    };
+
+                    // Save.
+                    self.save = function () {
+
+                        var objectRet = {};
+
+                        objectRet.type = self.constructor.name;
+                        objectRet.parameters = self.innerSave();
+
+                        return objectRet;
+                    };
+
+                    // Inner save.  Base class returns no parameters.
+                    self.innerSave = function () {
+
+                        return [];
                     };
 
                     // Invoked when the mouse is pressed down over the type.
@@ -331,6 +383,24 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Invoked when the mouse is clicked over the item.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.click)) {
+
+                                // Pass down to highlight object.
+                                return m_objectHighlight.click(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Test if the point is in this Type.
                     self.pointIn = function (contextRender, point) {
 
@@ -366,16 +436,36 @@ define(["utility/prototypes",
                             }
 
                             // Fill the path.
-                            if ((window.draggingStatement || window.draggingExpression) &&
-                                (self.collection)) {
+                            if (self.dragStub) {
 
-                                contextRender.fillStyle = settings.general.fillDrag;
-                            } else if (self.highlight) {
+                                // Fill and stroke the path.
+                                if (self.highlight) {
 
-                                contextRender.fillStyle = settings.general.fillBackgroundHighlight;
+                                    contextRender.fillStyle = settings.statementDragStub.fillHighlight;
+                                } else {
+
+                                    // Blinky blinky.
+                                    if (Math.floor(new Date().getTime() / settings.statementDragStub.blinkMS) % 2 === 0) {
+
+                                        contextRender.fillStyle = settings.statementDragStub.fillEven;
+                                    } else {
+
+                                        contextRender.fillStyle = settings.statementDragStub.fillOdd;
+                                    }
+                                }
                             } else {
 
-                                contextRender.fillStyle = self.settingsNode.fillBackground;
+                                if ((window.draggingStatement || window.draggingExpression) &&
+                                    (self.collection)) {
+
+                                    contextRender.fillStyle = settings.general.fillDrag;
+                                } else if (self.highlight) {
+
+                                    contextRender.fillStyle = settings.general.fillBackgroundHighlight;
+                                } else {
+
+                                    contextRender.fillStyle = self.settingsNode.fillBackground;
+                                }
                             }
                             contextRender.fill();
 
@@ -485,6 +575,52 @@ define(["utility/prototypes",
                             return e;
                         }
                     };
+
+                    //////////////////////////
+                    // Private methods.
+
+                    var m_functionParse = function () {
+
+                        try {
+
+                            // Scan for blocks and expressionStubs.
+                            var arrayKeys = Object.keys(self);
+                            for (var i = 0; i < arrayKeys.length; i++) {
+
+                                // Extract the key.
+                                var strKeyIth = arrayKeys[i];
+
+                                // Don't permit collection, causes circular reference.
+                                if (strKeyIth === "collection" ||
+                                    strKeyIth === "dragCollection") {
+
+                                    continue;
+                                }
+
+                                // Extract the object.
+                                var objectIth = self[strKeyIth];
+
+                                // Test object.
+                                if (objectIth instanceof Block) {
+
+                                    self.blocks.push(objectIth);
+                                } else if (objectIth instanceof CodeExpressionStub) {
+
+                                    objectIth.collection = self;
+                                    self.expressionStubs.push(objectIth);
+                                }
+                            }
+
+                            // Now parsed, set object state.
+                            self.parsed = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
 
                     //////////////////////////
                     // Private fields.

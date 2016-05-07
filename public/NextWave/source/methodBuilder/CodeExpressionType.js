@@ -1,7 +1,7 @@
 ///////////////////////////////////////
-// CodeExpressionName module.
+// CodeExpressionType module.
 //
-// A literal expression.
+// A type expression.
 //
 // Return constructor function.
 //
@@ -11,13 +11,13 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "methodBuilder/CodeExpression",
-    "methodBuilder/CodeName"],
-    function (prototypes, CodeExpression, CodeName) {
+    "methodBuilder/CodeType"],
+    function (prototypes, CodeExpression, CodeType) {
 
         try {
 
             // Constructor function.
-            var functionRet = function CodeExpressionName(cnPayload) {
+            var functionRet = function CodeExpressionType(ctPayload) {
 
                 try {
 
@@ -28,13 +28,13 @@ define(["utility/prototypes",
 
                     // If payload is a string, then convert
                     // it to a CodeName containing it.
-                    if (cnPayload &&
-                        typeof cnPayload === "string") {
+                    if (ctPayload &&
+                        typeof ctPayload === "string") {
 
-                        cnPayload = new CodeName(cnPayload);
+                        ctPayload = new CodeType(ctPayload);
                     }
 
-                    self.payload = cnPayload || new CodeName();
+                    self.payload = ctPayload || new CodeType();
 
                     if (self.payload) {
 
@@ -48,7 +48,7 @@ define(["utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
-                    // Return a new instance of a name expression.
+                    // Return a new instance of a literal expression.
                     self.clone = function () {
 
                         return new self.constructor(self.payload.clone());

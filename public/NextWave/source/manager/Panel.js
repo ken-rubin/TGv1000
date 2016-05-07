@@ -281,10 +281,34 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Handle click.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // Pass to payload if in its bounds.
+                            if (self.open &&
+                                m_bInPayload &&
+                                self.payload &&
+                                $.isFunction(self.payload.click)) {
+
+                                return self.payload.click(objectReference);
+                            }
+
+                            return null;
+                         } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Position and size the instance.
                     self.calculateLayout = function (sizeExtent, contextRender) {
 
                         try {
+
+                            // Save for opening/closing code.
+                            self.totalExtent = sizeExtent;
 
                             // First, calculate location and openExtent from the percentages.
                             self.location = new Point(self.locationPercent.x * sizeExtent.width + settings.panel.gap, 
@@ -628,6 +652,9 @@ define(["utility/prototypes",
                                     m_dPercentOpen = self.currentExtent.height / self.openExtent.height;
                                 } else {
 
+                                    self.currentExtent.height = self.openExtent.height;
+                                    m_areaPayload.extent.height = self.openExtent.height - settings.panel.closedExtent;
+
                                     self.open = true;
                                     self.opening = false;
                                 }
@@ -645,6 +672,11 @@ define(["utility/prototypes",
                                     m_dPercentOpen = self.currentExtent.height / self.openExtent.height;
                                 } else {
 
+                                    self.currentExtent.height = self.openExtent.height;
+                                    m_areaPayload.extent.height = self.openExtent.height - settings.panel.closedExtent;
+                                    self.location.y = self.totalExtent.height - self.openExtent.height;
+                                    m_areaPayload.location.y = self.location.y + settings.panel.closedExtent;
+
                                     self.open = true;
                                     self.opening = false;
                                 }
@@ -659,6 +691,9 @@ define(["utility/prototypes",
                                     // Calculate how much open the panel is.
                                     m_dPercentOpen = self.currentExtent.width / self.openExtent.width;
                                 } else {
+
+                                    self.currentExtent.width = self.openExtent.width;
+                                    m_areaPayload.extent.width = self.openExtent.width - settings.panel.closedExtent;
 
                                     self.open = true;
                                     self.opening = false;
@@ -699,6 +734,9 @@ define(["utility/prototypes",
                                     m_dPercentOpen = self.currentExtent.height / self.openExtent.height;
                                 } else {
 
+                                    self.currentExtent.height = self.closedExtent.height;
+                                    m_areaPayload.extent.height = 0;
+
                                     self.closed = true;
                                     self.closing = false;
                                 }
@@ -716,6 +754,11 @@ define(["utility/prototypes",
                                     m_dPercentOpen = self.currentExtent.height / self.openExtent.height;
                                 } else {
 
+                                    self.currentExtent.height = self.closedExtent.height;
+                                    self.location.y = self.totalExtent.height - self.closedExtent.height;
+                                    m_areaPayload.extent.height = 0;
+                                    m_areaPayload.location.y = self.totalExtent.height;
+
                                     self.closed = true;
                                     self.closing = false;
                                 }
@@ -730,6 +773,9 @@ define(["utility/prototypes",
                                     // Calculate how much open the panel is.
                                     m_dPercentOpen = self.currentExtent.width / self.openExtent.width;
                                 } else {
+
+                                    self.currentExtent.width = self.closedExtent.width;
+                                    m_areaPayload.extent.width = 0;
 
                                     self.closed = true;
                                     self.closing = false;

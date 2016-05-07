@@ -15,8 +15,9 @@ define(["utility/prototypes",
     "utility/Size",
     "utility/Area",
     "utility/glyphs",
+    "utility/InPlaceEditHelper",
     "methodBuilder/CodeStatement"],
-    function (prototypes, settings, Point, Size, Area, glyphs, CodeStatement) {
+    function (prototypes, settings, Point, Size, Area, glyphs, InPlaceEditHelper, CodeStatement) {
 
         try {
 
@@ -34,9 +35,30 @@ define(["utility/prototypes",
                     self.highlight = false;
                     // For now, all literals are strings.
                     self.payload = strPayload || "";
+                    // Allocate the in place editor helper.
+                    self.inPlaceEditor = new InPlaceEditHelper(self, 
+                        "payload",      // Value member.
+                        "collection");  // Focus member.
 
                     ////////////////////////
                     // Public methods.
+
+                    // Return a new instance of a CodeLiteral.
+                    self.clone = function () {
+
+                        return new self.constructor(self.payload);
+                    };
+
+                    // Save constructor parameters.
+                    self.save = function () {
+
+                        return [{
+
+                                type: "String",
+                                value: self.payload
+                            }
+                        ];
+                    };
 
                     // Clear area.
                     self.clearArea = function () {
@@ -63,7 +85,7 @@ define(["utility/prototypes",
                             2 * settings.general.margin;
                     };
 
-                    // Invoked when the mouse is pressed down over the type.
+                    /* Invoked when the mouse is pressed down over the type.
                     self.mouseDown = function (objectReference) {
 
                         try {
@@ -99,6 +121,18 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Invoked when the mouse is clicked over the item.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };*/
+
                     // Test if the point is in this Type.
                     self.pointIn = function (contextRender, point) {
 
@@ -133,37 +167,27 @@ define(["utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Determine if connected to statement.
-                            var objectCollection = self.collection;
-                            while (objectCollection &&
-                                !(objectCollection.isStatement)) {
+                            // After defining location, and generating the path,
+                            // defer to the in place editor to handle rendering.
+                            // If will call back to the function parameter to
+                            // handle non-focused rendering that is non in-place.
+                            return self.inPlaceEditor.render(contextRender,
+                                m_area,
+                                function () {
 
-                                objectCollection = objectCollection.collection;
-                            }
-                            var bConnectedToStatement = (objectCollection != null);
+                                    try {
 
-                            // Fill and stroke the path.
-                            if ((window.draggingStatement || window.draggingExpression) &&
-                                bConnectedToStatement) {
+                                        // Now render the label.
+                                        contextRender.fillStyle = settings.general.fillText;
+                                        contextRender.fillText(self.payload,
+                                            m_area.location.x + settings.general.margin,
+                                            m_area.location.y);
+                                        return null;
+                                    } catch (e) {
 
-                                contextRender.fillStyle = settings.general.fillDrag;
-                            } else if (self.highlight) {
-
-                                contextRender.fillStyle = settings.general.fillBackgroundHighlight;
-                            } else {
-
-                                contextRender.fillStyle = settings.list.literal.fillBackground;
-                            }
-                            contextRender.fill();
-
-                            // Render the payload.
-                            contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.payload,
-                                m_area.location.x + settings.general.margin,
-                                m_area.location.y,
-                                m_area.extent.width - 2 * settings.general.margin);
-
-                            return null;
+                                        return e;
+                                    }
+                                });
                         } catch (e) {
 
                             return e;

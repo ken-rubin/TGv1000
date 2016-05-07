@@ -11,8 +11,9 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "statement/Statement",
-    "methodBuilder/CodeStatementForIn"],
-    function (prototypes, Statement, CodeStatementForIn) {
+    "methodBuilder/CodeStatementForIn",
+    "methodBuilder/CodeExpressionName"],
+    function (prototypes, Statement, CodeStatementForIn, CodeExpressionName) {
 
         try {
 
@@ -33,7 +34,8 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeStatementForIn();
+                        return new CodeStatementForIn(new CodeExpressionName("strKey"),
+                            new CodeExpressionName("objectInstance"));
                     };
                 } catch (e) {
 

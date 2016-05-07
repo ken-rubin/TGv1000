@@ -51,7 +51,7 @@ define(["utility/prototypes",
                     // Returns the height of this type.
                     self.getHeight = function () {
 
-                        return settings.statementDragStub.height + 2 * settings.general.margin;
+                        return 4 * settings.general.margin;
                     };
 
                     // Invoked when the mouse is moved over the type.
@@ -100,13 +100,13 @@ define(["utility/prototypes",
                             // Define the containing area.
                             m_area = new Area(
                                 new Point(areaRender.location.x + areaRender.extent.width * settings.statementDragStub.widthMarginPercent, 
-                                    areaRender.location.y + settings.general.margin + dY),
+                                    areaRender.location.y + dY),
                                 new Size(areaRender.extent.width  * (1 - 2 * settings.statementDragStub.widthMarginPercent), 
-                                    self.getHeight() - 2 * settings.general.margin)
+                                    4 * settings.general.margin)
                             );
 
                             // Generate the path.
-                            var exceptionRet = m_area.generateRoundedRectPath(contextRender);
+                            var exceptionRet = m_area.generateRectPath(contextRender);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -118,7 +118,7 @@ define(["utility/prototypes",
                                 contextRender.fillStyle = settings.statementDragStub.fillHighlight;
                             } else {
 
-                                if (Math.floor(new Date().getTime() / 500) % 2 === 0) {
+                                if (Math.floor(new Date().getTime() / settings.statementDragStub.blinkMS) % 2 === 0) {
 
                                     contextRender.fillStyle = settings.statementDragStub.fillEven;
                                 } else {
@@ -126,10 +126,7 @@ define(["utility/prototypes",
                                     contextRender.fillStyle = settings.statementDragStub.fillOdd;
                                 }
                             }
-                            contextRender.strokeStyle = settings.general.strokeBackground;
-
                             contextRender.fill();
-                            contextRender.stroke();
 
                             return null;
                         } catch (e) {

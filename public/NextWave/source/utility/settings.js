@@ -29,19 +29,23 @@ define(["utility/prototypes"],
                         scrollStub: {
 
                             width: 40,
-                            height: 20,
-                            yOffset: -10,
+                            height: 40,
+                            yOffset: -20,
                             fillBackground: "rgba(0,0,100,0.25)",
                             amount: 4
                         },
                         margin: 4,
                         textOffset: 4,
-                        strokeDrag: "#000",
-                        fillDrag: "#666",
+                        strokeDrag: "rgba(0,0,0,0.1)",
+                        fillDrag: "rgba(100,100,100,0.1)",
+                        strokeBackgroundSelected: "#404",
+                        fillBackgroundSelected: "#f0f",
                         strokeBackgroundHighlight: "#000",
-                        strokeBackground: "#000",
                         fillBackgroundHighlight: "#fff",
-                        fillText: "#000"
+                        strokeBackground: "#000",
+                        fillText: "#000",
+                        blinkMS: 500,
+                        maximumCharacters: 32
                     };
                     self.area = {
 
@@ -68,6 +72,10 @@ define(["utility/prototypes"],
                         hostSelector: "#Palette",
                         showIconBackgrounds: false,
                         dragDistance: 5
+                    };
+                    self.layerDrag = {
+
+                        showInsertionLines: false
                     };
                     self.panel = {
 
@@ -175,18 +183,19 @@ define(["utility/prototypes"],
                         font: "22px Arial",
                         fillBackground: "#9c9"
                     };
-                    self.typeName = {
+                    self.typeMethodPair = {
 
                         font: "22px Arial",
                         fillBackground: "#4dd"
                     };
                     self.statementDragStub = {
 
-                        height: 16,
+                        height: 2,
                         widthMarginPercent: 0.1,
                         fillEven: "#ee0",
                         fillOdd: "rgba(0,0,0,0.25)",
-                        fillHighlight: "#0f0"
+                        fillHighlight: "#0f0",
+                        blinkMS: 250
                     };
                     self.codeStatement = {
 
@@ -245,10 +254,6 @@ define(["utility/prototypes"],
                         font: "16px Arial",
                         lineHeight: 24,
                         glyphExtent: 16
-                    };
-                    self.codeName = {
-
-                        emptyWidth: 20
                     };
                     self.codeLiteral = {
 

@@ -33,6 +33,25 @@ define(["utility/prototypes",
                     self.inherits(CodeStatement,
                         "throw",
                         "throw [throw] ;");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a throw statement.
+                    self.clone = function () {
+
+                        // Clone the parameter too.
+                        return new self.constructor(self.throw.clone());
+                    };
+
+                    // Inner save.  Return constructor parameters.
+                    self.innerSave = function () {
+
+                        return [
+
+                            self.throw.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

@@ -100,6 +100,18 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Clone payload.
+                    self.clone = function () {
+
+                        if (self.payload) {
+
+                            return self.payload.clone();
+                        } else {
+
+                            return null;
+                        }
+                    };
+
                     // Returns the width of this stub.
                     self.getWidth = function (contextRender) {
 
@@ -110,6 +122,19 @@ define(["utility/prototypes",
                         }
                         // ...return empty stub width.
                         return settings.codeExpressionStub.emptyWidth;
+                    };
+
+                    // Just pass through to the payload.
+                    self.save = function () {
+
+                        // If set, otherwise...
+                        if (self.payload) {
+
+                            return self.payload.save();
+                        }
+
+                        // ...null?
+                        return null;
                     };
 
                     // Invoked when the mouse is pressed down over the type.
@@ -191,6 +216,24 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Invoked when the mouse is clicked over the item.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.click)) {
+
+                                // Pass down to highlight object.
+                                return m_objectHighlight.click(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Test if the point is in this Type.
                     self.pointIn = function (contextRender, point) {
 
@@ -253,7 +296,7 @@ define(["utility/prototypes",
                                         contextRender.fillStyle = settings.statementDragStub.fillHighlight;
                                     } else {
 
-                                        if (Math.floor(new Date().getTime() / 500) % 2 === 0) {
+                                        if (Math.floor(new Date().getTime() / settings.statementDragStub.blinkMS) % 2 === 0) {
 
                                             contextRender.fillStyle = settings.statementDragStub.fillEven;
                                         } else {

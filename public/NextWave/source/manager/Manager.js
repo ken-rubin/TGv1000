@@ -22,6 +22,7 @@ define(["utility/prototypes",
     "manager/LayerPanels",
     "manager/LayerDebug",
     "manager/LayerDrag",
+    "manager/LayerAl",
     "expression/Expression",
     "literal/Literal",
     "statement/Statement",
@@ -29,8 +30,14 @@ define(["utility/prototypes",
     "methodBuilder/CodeExpression",
     "methodBuilder/CodeStatement",
     "methodBuilder/Parameter",
-    "type/Type"],
-    function (prototypes, settings, Area, Point, Size, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, Type) {
+    "methodBuilder/ParameterList",
+    "methodBuilder/StatementList",
+    "type/Type",
+    "type/Methods",
+    "type/Method",
+    "type/Properties",
+    "type/Property"],
+    function (prototypes, settings, Area, Point, Size, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
 
         try {
 
@@ -46,12 +53,237 @@ define(["utility/prototypes",
 
                     // Hold reference to the drag layer.
                     self.dragLayer = null;
+                    // Hold reference to the panel layer.
+                    self.panelLayer = null;
+                    // Object used to initialize this instance.
+                    self.initializer = null;
+                    // Collection of named object pertinent to the current context.
+                    self.names = [];
+                    // Collection of types available in the current context.
+                    self.types = [];
+                    // Current type/method.
+                    self.context = {
+
+                        type: null,
+                        method: null
+                    };
 
                     ////////////////////////
                     // Public methods.
 
+                    // Method adds a new name.
+                    self.addName = function (strName) {
+
+                        try {
+
+                            self.names.push(strName);
+
+                            return self.panelLayer.addName(strName);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits a new name.
+                    self.editName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < self.names.length; i++) {
+
+                                // Find match...
+                                if (self.names[i] === strOriginalName) {
+
+                                    // ...and splice in place.
+                                    self.names.splice(i, 1, strNewName);
+
+                                    break;
+                                }
+                            }
+
+                            // Update the panel too.
+                            return self.panelLayer.editName(strOriginalName, 
+                                strNewName);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method removes an existing name.
+                    self.removeName = function (strName) {
+
+                        try {
+
+                            // Remove in place.
+                            for (var i = 0; i < self.names.length; i++) {
+
+                                // Find match...
+                                if (self.names[i] === strName) {
+
+                                    // ...and splace in place.
+                                    self.names.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+
+                            // Update the panel too.
+                            return self.panelLayer.removeName(strName);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Determines if the method is selected.
+                    self.getSelected = function (method) {
+
+                        if (!self.context ||
+                            !self.context.method) {
+
+                            return false;
+                        }
+                        return (self.context.method === method);
+                    };
+
+                    // Build a unique name from the specified name.
+                    self.getUniqueName = function (strName) {
+
+                        // Make sure a good JS name.
+                        if (!strName) {
+
+                            strName = "_";
+                        }
+
+                        // Check against variable name rules:
+
+                        // Cannot start with a number:
+                        strName = strName.replace(/^\d/, "_");
+
+                        // No only letters and number and _:
+                        strName = strName.replace(/[^A-Za-z0-9\_]/g, "_");
+
+                        // Define a simple method which 
+                        // searches for a matching name.
+                        var functionNameExists = function (strTest) {
+
+                            for (var i = 0; i < self.names.length; i++) {
+
+                                if (self.names[i] === strTest) {
+
+                                    return true;
+                                }
+                            }
+
+                            // Also test reserved words.
+                            for (var i = 0; i < m_arrayReserved.length; i++) {
+
+                                if (m_arrayReserved[i] === strTest) {
+
+                                    return true;
+                                }
+                            }
+                            return false;
+                        };
+
+                        // Keep inc'ing the name until unique.
+                        var strBaseName = strName;
+                        var iCounter = 2;
+                        while (functionNameExists(strName)) {
+
+                            strName = strBaseName + (iCounter++).toString();
+                        }
+                        return strName;
+                    };
+
+                    // Set a new context.  A type and the index into its method collection, 
+                    // or iIndex can be mis-used as the name of the method for which to search.
+                    self.setContext = function (type, iIndex) {
+
+                        try {
+
+                            // Setting dirty causes the next render to calculate layout.
+                            m_bDirty = true;
+
+                            // If iIndex is a string, find its matching index.
+                            if (iIndex.substring) {
+
+                                for (var i = 0; i < type.methods.parts.length; i++) {
+
+                                    var methodIth = type.methods.parts[i];
+                                    if (methodIth.name === iIndex) {
+
+                                        iIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // If did not find an index, set to 0.
+                            if (iIndex.substring) {
+
+                                iIndex = 0;
+                            }
+
+                            // Set context, load method builder.
+                            self.context = {
+
+                                type: type,
+                                method: type.methods.parts[iIndex]
+                            };
+
+                            // Load up the method into the method builder.
+                            var exceptionRet = window.methodBuilder.loadTypeMethod(self.context);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method adds a new Type.
+                    self.addType = function (typeNew) {
+
+                        try {
+
+                            // If there are no types, then set context to this type,
+                            // unless this type has no methods, in which case, wait.
+                            if (self.context.type === null &&
+                                typeNew &&
+                                typeNew.methods &&
+                                typeNew.methods.parts &&
+                                typeNew.methods.parts.length > 0) {
+
+                                // Set context.
+                                var exceptionRet = self.setContext(typeNew,
+                                    0);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                            }
+
+                            // Add to list.
+                            self.types.push(typeNew);
+
+                            return self.panelLayer.addType(typeNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Initialze instance.
-                    self.create = function () {
+                    self.create = function (objectInitializer) {
 
                         try {
 
@@ -74,8 +306,10 @@ define(["utility/prototypes",
                             }
 
                             // Allocate and create the regions layer.
-                            var lp = new LayerPanels();
-                            exceptionRet = lp.create();
+                            // Pass in statements, expressions and literals.
+                            // Types will be "played" later on in create.
+                            self.panelLayer = new LayerPanels();
+                            exceptionRet = self.panelLayer.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -97,8 +331,16 @@ define(["utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Allocate and create the Al layer.
+                            var la = new LayerAl();
+                            exceptionRet = la.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Save off the layers.
-                            m_arrayLayers = [lb, lp, ld, self.dragLayer];
+                            m_arrayLayers = [lb, self.panelLayer, ld, self.dragLayer, la];
 
                             // Get the parent references.
                             m_jqParent = $(settings.manager.hostSelector);
@@ -135,6 +377,13 @@ define(["utility/prototypes",
                             m_jqCanvas.bind("mouseout",
                                 m_functionMouseOut);
 
+                            m_jqCanvas.bind("keydown",
+                                m_functionKeyDown);
+                            m_jqCanvas.bind("keypress",
+                                m_functionKeyPressed);
+                            m_jqCanvas.bind("keyup",
+                                m_functionKeyUp);
+
                             // Start the rendering.
                             m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
@@ -143,6 +392,187 @@ define(["utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Clear the list of types.
+                    self.clearTypes = function () {
+
+                        try {
+
+                            self.types = [];
+
+                            return self.panelLayer.clearTypes();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Load up a set of types.
+                    self.loadTypes = function (arrayList) {
+
+                        try {
+
+                            // Start with a clean slate.
+                            var exceptionRet = self.clearTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // "Play" the list of Types.
+                            for (var i = 0; i < arrayList.length; i++) {
+
+                                // Extract the type.
+                                var objectTypeIth = arrayList[i];
+
+                                var typeNew = new Type();
+                                exceptionRet = typeNew.create(objectTypeIth);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                                // Add it to the system.
+                                exceptionRet = self.addType(typeNew);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Load up statements from list of statement constructor names.
+                    self.loadStatements = function (arrayList) {
+
+                        try {
+
+                            return self.panelLayer.loadStatements(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant statement constructors.
+                    self.saveStatements = function () {
+
+                        return self.panelLayer.saveStatements();
+                    };
+
+                    // Load up expressions from list of expression constructor names.
+                    self.loadExpressions = function (arrayList) {
+
+                        try {
+
+                            return self.panelLayer.loadExpressions(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant expression constructors.
+                    self.saveExpressions = function () {
+
+                        return self.panelLayer.saveExpressions();
+                    };
+
+                    // Load up literals from list of literal constructor names.
+                    self.loadLiterals = function (arrayList) {
+
+                        try {
+
+                            return self.panelLayer.loadLiterals(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant literal constructors.
+                    self.saveLiterals = function () {
+
+                        return self.panelLayer.saveLiterals();
+                    };
+
+                    // Load all types and visible/existing panels 
+                    // into this manager instance from persistence.
+                    self.load = function (objectInitializer) {
+
+                        try {
+
+                            // Save the initializer.
+                            self.initializer = objectInitializer;
+
+                            // Load up panels.
+                            var exceptionRet = self.loadLiterals(objectInitializer.literals);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.loadExpressions(objectInitializer.expressions);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.loadStatements(objectInitializer.statements);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the types from the initializer into this intance.
+                            return self.loadTypes(objectInitializer.types);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Save all types and visible/existing panels 
+                    // from this manager instance for persistence.
+                    self.save = function () {
+
+                        var objectRet = {};
+
+                        // First, types.
+                        objectRet.types = [];
+
+                        // Add the list of Type objects to the types collection.
+                        for (var i = 0; i < self.types.length; i++) {
+
+                            // Extract and save the type.
+                            var typeIth = self.types[i];
+                            var objectType = typeIth.save();
+
+                            // Add it to the result object.
+                            objectRet.types.push(objectType);
+                        }
+
+                        // Now statements.
+                        objectRet.statements = self.panelLayer.saveStatements();
+
+                        // Now literals.
+                        objectRet.literals = self.panelLayer.saveLiterals();
+
+                        // Now expressions.
+                        objectRet.expressions = self.panelLayer.saveExpressions();
+
+                        // Return the fully qualified manager state object.
+                        return objectRet;
+                    }
+
+                    // Test object for input focus.
+                    self.hasFocus = function (objectTest) {
+
+                        return (objectTest === self.dragLayer.getDragObject());
                     };
 
                     // Set the drag object.
@@ -156,7 +586,10 @@ define(["utility/prototypes",
                                 objectDrag instanceof Statement ||
                                 objectDrag instanceof Name ||
                                 objectDrag instanceof CodeExpression ||
-                                objectDrag instanceof CodeStatement) {
+                                objectDrag instanceof CodeStatement ||
+                                objectDrag instanceof Type ||
+                                objectDrag instanceof Method ||
+                                objectDrag instanceof Property) {
 
                                 // Pass to layer.
                                 return self.dragLayer.setDragObject(objectDrag);
@@ -293,6 +726,14 @@ define(["utility/prototypes",
                                 return exceptionRet;
                             }
 
+                            // Clear existing drag object--it will be reset, 
+                            // if applicable lower down in this method.
+                            exceptionRet = self.dragLayer.clearDragObject();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Handle dragging.
                             m_pointDown = new Point(e.offsetX, e.offsetY);
 
@@ -377,6 +818,27 @@ define(["utility/prototypes",
                                     if (exceptionRet) {
 
                                         throw exceptionRet;
+                                    }
+                                } else {
+
+                                    // Reset handled in case it was set in mouseUp.
+                                    objectReference.handled = false;
+
+                                    // Not dragging, raise click.
+                                    for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
+
+                                        // Pass to the layers.
+                                        var exceptionRet = m_arrayLayers[i].click(objectReference);
+                                        if (exceptionRet) {
+
+                                            throw exceptionRet;
+                                        }
+
+                                        // Only one thing can intersect the mouse at a time.
+                                        if (objectReference.handled) {
+
+                                            break;
+                                        }
                                     }
                                 }
 
@@ -468,6 +930,125 @@ define(["utility/prototypes",
 
                                 // Also stop dragging.
                                 var exceptionRet = self.dragLayer.cancelDrag();
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+                            }
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
+
+                    // Invoked when a key is pressed down over the canvas.
+                    // Implemented to pass on to managed layers.
+                    var m_functionKeyDown = function (e) {
+
+                        try {
+
+                            // Pass to focused object.
+                            var objectFocus = self.dragLayer.getDragObject();
+                            if (objectFocus &&
+                                $.isFunction(objectFocus.keyDown)) {
+
+                                var objectReference = {
+
+                                    manager: self,                      // Catch-all....
+                                    canvas: m_canvasRender,
+                                    contextRender: m_contextRender,
+                                    handled: false,
+                                    which: e.which,
+                                    shiftKey: e.shiftKey,
+                                    ctrlKey: e.ctrlKey,
+                                    stopPropagation: function () {
+
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    },
+                                    event: e
+                                };
+                                var exceptionRet = objectFocus.keyDown(objectReference);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+                            }
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
+
+                    // Invoked when a key is let up over the canvas.
+                    // Implemented to pass on to managed layers.
+                    var m_functionKeyUp = function (e) {
+
+                        try {
+
+                            // Pass to focused object.
+                            var objectFocus = self.dragLayer.getDragObject();
+                            if (objectFocus &&
+                                $.isFunction(objectFocus.keyUp)) {
+
+                                // Pass to focused object.
+                                var objectReference = {
+
+                                    manager: self,                      // Catch-all....
+                                    canvas: m_canvasRender,
+                                    contextRender: m_contextRender,
+                                    handled: false,
+                                    which: e.which,
+                                    shiftKey: e.shiftKey,
+                                    ctrlKey: e.ctrlKey,
+                                    stopPropagation: function () {
+
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    },
+                                    event: e
+                                };
+                                var exceptionRet = objectFocus.keyUp(objectReference);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+                            }
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
+
+                    // Invoked when a key is pressed over the canvas.
+                    // Implemented to pass on to managed layers.
+                    var m_functionKeyPressed = function (e) {
+
+                        try {
+
+                            // Pass to focused object.
+                            var objectFocus = self.dragLayer.getDragObject();
+                            if (objectFocus &&
+                                $.isFunction(objectFocus.keyPressed)) {
+
+                                // Pass to focused object.
+                                var objectReference = {
+
+                                    manager: self,                      // Catch-all....
+                                    canvas: m_canvasRender,
+                                    contextRender: m_contextRender,
+                                    handled: false,
+                                    which: e.which,
+                                    shiftKey: e.shiftKey,
+                                    ctrlKey: e.ctrlKey,
+                                    stopPropagation: function () {
+
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    },
+                                    event: e
+                                };
+                                var exceptionRet = objectFocus.keyPressed(objectReference);
                                 if (exceptionRet) {
 
                                     throw exceptionRet;
@@ -574,12 +1155,13 @@ define(["utility/prototypes",
                                     throw exceptionRet;
                                 }
                             }
-
-                            // Continue the rendering.
-                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
                         } catch (e) {
                             
                             alert(e.message);
+                        } finally {
+
+                            // Continue the rendering.
+                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
                         }
                     };
 
@@ -612,6 +1194,31 @@ define(["utility/prototypes",
                     var m_areaMaximal = null;
                     // Point of click down.  Used to determine dragging.
                     var m_pointDown = null;
+                    // Reserved JS words--for building good, unique variable names.
+                    var m_arrayReserved = [
+
+                        "abstract", "alert", "all", "anchor", "anchors", "area", "Array", "assign",
+                        "boolean", "break", "byte", "blur", "button", 
+                        "case", "catch", "char", "class", "const", "continue", "checkbox", "clearInterval", "clearTimeout", "clientInformation", "close", "closed", "confirm", "constructor", "crypto",
+                        "debugger", "default", "delete", "do", "double", "Date", "decodeURI", "decodeURIComponent", "defaultStatus", "document", 
+                        "else", "enum", "export", "extends", "element", "elements", "embed", "encodeURI", "encodeURIComponent", "escape", "eval", "event",
+                        "false", "final", "finally", "float", "for", "function", "fileUpload", "focus", "form", "forms", "frame", "frames", "frameRate",
+                        "goto", "getClass",
+                        "hasOwnProperty", "hidden", "history", 
+                        "if", "implements", "import", "in", "instanceof", "int", "interface", "image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth", 
+                        "java", "JavaArray", "JavaClass", "JavaObject", "JavaPackage",
+                        "let", "long", "layer", "laysers", "length", "link", "location",
+                        "Math", "mimeTypes", 
+                        "native", "new", "null", "name", "NaN", "navigate", "navigator", "Number",
+                        "Object", "offscreenBuffering", "open", "opener", "option", "outerHeight", "outerWidth", "onbeforeunload", "onblur", "ondragdrop", "onclick", "oncontextmenu", "onerror", "onfocus", "onkeydown", "onkeypress", "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onsubmit", "onunload",
+                        "package", "private", "protected", "public", "packages", "pageXOffset", "pageYOffset", "parent", "pargeFloat", "parseInt", "password", "pkcs11", "plugin", "prompt", "propertyIsEnum", "prototype",
+                        "return", "radio", "reset",
+                        "short", "static", "super", "switch", "synchronized", "screenX", "screenY", "scroll", "secure", "select", "self", "setInterval", "setTimeout", "status", "String", "submit", 
+                        "this", "throw", "throws", "transient", "true", "try", "typeof", "taint", "text", "textarea", "top", "toString", 
+                        "undefined", "unescape", "untaint", 
+                        "var", "void", "volatile", "valueOf", 
+                        "while", "with" 
+                    ];
                 } catch (e) {
 
                     alert(e.message);

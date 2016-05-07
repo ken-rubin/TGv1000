@@ -32,6 +32,31 @@ define(["utility/prototypes",
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         "[lHS] " + self.operator + " [rHS]");
+
+                    ////////////////////////
+                    // Public methods.
+
+                    // Return a new instance of a infix expression.
+                    self.clone = function () {
+
+                        return new self.constructor(self.lHS.clone(),
+                            strOperator,
+                            self.rHS.clone());
+                    };
+
+                    // Inner save.  Save constructor parameters.
+                    self.innerSave = function () {
+
+                        return [ 
+
+                            self.lHS.save(),
+                            {
+                                type: "String",
+                                value: self.operator
+                            },
+                            self.rHS.save()
+                        ];
+                    };
                 } catch (e) {
 
                     alert(e.message);

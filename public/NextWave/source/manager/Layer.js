@@ -90,6 +90,12 @@ define(["utility/prototypes",
 
                         return null;
                     };
+
+                    // Handle mouse up.
+                    self.click = function (objectReference) {
+
+                        return null;
+                    };
                 } catch (e) {
 
                     alert(e.message);

@@ -39,13 +39,13 @@ define(["utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
-                    // Add expressions to collection.
-                    self.innerCreate = function (arrayItems) {
+                    // Add literals to collection.
+                    self.load = function (objectLiterals) {
 
                         try {
 
-                            // Add the Expressions.
-                            arrayItems = [
+                            // Add the Literals.
+                            var arrayItems = [/*
                                 new LiteralArray(),
                                 new LiteralBoolean(),
                                 new LiteralInfinity(),
@@ -55,7 +55,16 @@ define(["utility/prototypes",
                                 new LiteralObject(),
                                 new LiteralRegexp(),
                                 new LiteralString()
-                                ];
+                                */];
+
+                            // Build each included Literals.
+                            for (var i = 0; i < objectLiterals.length; i++) {
+
+                                var strLiteralIth = objectLiterals[i];
+
+                                // Allocate and add.
+                                arrayItems.push(eval("new " + strLiteralIth + "();"));
+                            }
 
                             // Add the items.
                             for (var i = 0; i < arrayItems.length; i++) {
@@ -72,6 +81,20 @@ define(["utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Save the list of literals.
+                    self.save = function () {
+
+                        var arrayItems = [];
+
+                        // Loop over items, save the name of the constructor.
+                        for (var i = 0; i < self.items.length; i++) {
+
+                            arrayItems.push(self.items[i].constructor.name);
+                        }
+
+                        return arrayItems;
                     };
                 } catch (e) {
 

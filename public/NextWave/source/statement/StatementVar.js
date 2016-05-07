@@ -11,8 +11,12 @@
 // Require-AMD, and dependencies.
 define(["utility/prototypes",
     "statement/Statement",
-    "methodBuilder/CodeStatementVar"],
-    function (prototypes, Statement, CodeStatementVar) {
+    "methodBuilder/CodeName",
+    "methodBuilder/CodeStatementVar",
+    "methodBuilder/CodeExpressionInfix",
+    "methodBuilder/CodeExpressionName",
+    "methodBuilder/CodeExpressionLiteral"],
+    function (prototypes, Statement, CodeName, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionLiteral) {
 
         try {
 
@@ -33,7 +37,22 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeStatementVar();
+                        var strName = "i";
+                        strName = window.manager.getUniqueName(strName);
+                        var csvRet = new CodeStatementVar(
+                            new CodeExpressionInfix(
+                                new CodeExpressionName(
+                                    new CodeName(
+                                        strName
+                                    )
+                                ),
+                                "=",
+                                new CodeExpressionLiteral("1")
+                            )
+                        );
+                        csvRet.addNameInDragConsumate = true;
+                        csvRet.consumateName = strName;
+                        return csvRet;
                     };
                 } catch (e) {
 

@@ -43,10 +43,11 @@ define(["utility/prototypes",
                     };                 
 
                     // Generate path for the pinched rounded rect.
-                    self.generateRoundedRectPath = function (contextRender) {
+                    self.generateRectPath = function (contextRender) {
                         
                         try {
-/* for faster rendering
+
+                            // Simple square rect....
                             contextRender.beginPath();
                             contextRender.moveTo(self.location.x,
                                     self.location.y);
@@ -58,7 +59,17 @@ define(["utility/prototypes",
                                     self.location.y + self.extent.height);
                             contextRender.closePath();
                             return null;
-*/
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Generate path for the pinched rounded rect.
+                    self.generateRoundedRectPath = function (contextRender) {
+                        
+                        try {
+
                             // Calculate a good, relative corner radius.
                             var dCornerRadius = settings.area.cornerRadius;
 

@@ -16,10 +16,10 @@ define(["utility/prototypes",
     "utility/Point",
     "utility/Size",
     "utility/Area",
-    "methodBuilder/TypeName",
+    "methodBuilder/TypeMethodPair",
     "methodBuilder/ParameterList",
-    "methodBuilder/CodeStatementList"],
-    function (prototypes, settings, Point, Size, Area, ParameterList, CodeStatementList) {
+    "methodBuilder/StatementList"],
+    function (prototypes, settings, Point, Size, Area, TypeMethodPair, ParameterList, StatementList) {
 
         try {
 
@@ -34,7 +34,7 @@ define(["utility/prototypes",
                     // Public fields.
 
                     // .
-                    self.mthodTypeName = null;
+                    self.methodTypeMethodPair = null;
                     // .
                     self.methodParameters = null;
                     // .
@@ -44,7 +44,7 @@ define(["utility/prototypes",
                     // Public methods.
 
                     // Attach instance to DOM and initialize state.
-                    self.create = function (tnMethod, plMethod, cslMethod) {
+                    self.create = function (tmpMethod, plMethod, slMethod) {
 
                         try {
 
@@ -53,7 +53,7 @@ define(["utility/prototypes",
 
                                 throw { message: "Instance already created!" };
                             }
-                            if (!tnMethod) {
+                            if (!tmpMethod) {
 
                                 throw { message: "Must specify a type-name object!" };
                             }
@@ -61,15 +61,15 @@ define(["utility/prototypes",
 
                                 throw { message: "Must specify a parameter list!" };
                             }
-                            if (!cslMethod) {
+                            if (!slMethod) {
 
                                 throw { message: "Must specify a code statement list!" };
                             }
 
                             // Save the parameters.
-                            self.methodTypeName = tnMethod;
+                            self.methodTypeMethodPair = tmpMethod;
                             self.methodParameters = plMethod;
-                            self.methodStatements = cslMethod;
+                            self.methodStatements = slMethod;
 
                             // Because it is!
                             m_bCreated = true;
@@ -114,14 +114,15 @@ define(["utility/prototypes",
                         }
                     };
 
-                    // Add in statements around all elements in the 
-                    // self.methodStatements list and all sub-blocks.
-                    self.addStatementDragStubs = function (arrayAccumulator) {
+                    // Look for all places where a statement drag stub could be inserted.
+                    self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub) {
 
                         try {
 
                             // Pass on down the line.
-                            return self.methodStatements.addStatementDragStubs(arrayAccumulator);
+                            return self.methodStatements.accumulateDragStubInsertionPoints(arrayAccumulator,
+                                statementDragStub,
+                                m_areaMaximal);
                         } catch (e) {
 
                             return e;
@@ -136,6 +137,28 @@ define(["utility/prototypes",
 
                             // Pass on down the line.
                             return self.methodStatements.purgeStatementDragStubs();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method loads type into method builder.
+                    self.loadTypeMethod = function (objectContext) {
+
+                        try {
+
+                            // Set the name.
+                            self.methodTypeMethodPair.type = objectContext.type.name;
+                            self.methodTypeMethodPair.method = objectContext.method.name;
+
+                            // Set parameters.
+                            self.methodParameters = objectContext.method.parameters;
+
+                            // Set statements.
+                            self.methodStatements = objectContext.method.statements;
+
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -210,6 +233,23 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Invoked when the mouse is clicked over the canvas.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            if (m_objectCursor &&
+                                $.isFunction(m_objectCursor.click)) {
+
+                                return m_objectCursor.click(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Invoked when the mouse wheel is scrolled over the canvas.
                     self.mouseWheel = function (objectReference) {
 
@@ -236,22 +276,22 @@ define(["utility/prototypes",
                             m_areaMaximal = areaMaximal;
 
                             // See how wide the type name wants to be.
-                            var dWidth = self.methodTypeName.getWidth(contextRender);
+                            var dWidth = self.methodTypeMethodPair.getWidth(contextRender);
 
                             // Make the area according to its type-name width.
-                            var areaTypeName =  new Area(new Point(m_areaMaximal.location.x + settings.general.margin, 
+                            var areaTypeMethodPair =  new Area(new Point(m_areaMaximal.location.x + settings.general.margin, 
                                     m_areaMaximal.location.y + settings.general.margin),
                                 new Size(dWidth,
                                     settings.methodBuilder.lineHeight));
-                            var exceptionRet = self.methodTypeName.calculateLayout(areaTypeName, contextRender);
+                            var exceptionRet = self.methodTypeMethodPair.calculateLayout(areaTypeMethodPair, contextRender);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            var areaParameters =  new Area(new Point(areaTypeName.location.x + areaTypeName.extent.width + settings.general.margin, 
+                            var areaParameters =  new Area(new Point(areaTypeMethodPair.location.x + areaTypeMethodPair.extent.width + settings.general.margin, 
                                     m_areaMaximal.location.y + settings.general.margin),
-                                new Size(areaMaximal.extent.width - (areaTypeName.extent.width + 3 * settings.general.margin),
+                                new Size(areaMaximal.extent.width - (areaTypeMethodPair.extent.width + 3 * settings.general.margin),
                                     settings.methodBuilder.lineHeight));
                             exceptionRet = self.methodParameters.calculateLayout(areaParameters, contextRender);
                             if (exceptionRet) {
@@ -290,7 +330,7 @@ define(["utility/prototypes",
                             contextRender.save();
                             contextRender.clip();
 
-                            exceptionRet = self.methodTypeName.render(contextRender);
+                            exceptionRet = self.methodTypeMethodPair.render(contextRender);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -362,10 +402,10 @@ define(["utility/prototypes",
 
                                     return exceptionRet;
                                 }
-                            }  else if (self.methodTypeName.pointIn(objectReference.contextRender,
+                            }  else if (self.methodTypeMethodPair.pointIn(objectReference.contextRender,
                                 objectReference.pointCursor)) {
 
-                                m_objectCursor = self.methodTypeName;
+                                m_objectCursor = self.methodTypeMethodPair;
                                 m_objectCursor.highlight = true;
                             } 
 
@@ -399,7 +439,7 @@ define(["utility/prototypes",
                     // The whole area.
                     var m_areaMaximal = null;
                     // .
-                    var m_areaTypeName = null;
+                    var m_areaTypeMethodPair = null;
                     // .
                     var m_areaStatements = null;
                     // Object under cursor.

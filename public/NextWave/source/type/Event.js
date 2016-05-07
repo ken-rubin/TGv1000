@@ -26,6 +26,21 @@ define(["utility/prototypes",
                     self.inherits(SectionPart,
                         strName,
                         "event");
+
+                    ////////////////////////////
+                    // Public methods.
+
+                    // Return a code instance
+                    self.allocateCodeInstance = function () {
+
+                        return new CodeExpressionName(self.name);
+                    };
+
+                    // Save.
+                    self.save = function () {
+
+                        return { name: self.name };
+                    };
                 } catch (e) {
 
                     alert(e.message);

@@ -1,5 +1,5 @@
 ///////////////////////////////////////
-// CodeStatementList module.
+// StatementList module.
 //
 // Gui component responsible for showing 
 //      a list of method statements.
@@ -18,7 +18,7 @@ define(["utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function CodeStatementList() {
+        	var functionRet = function StatementList() {
 
                 try {
 
@@ -65,7 +65,7 @@ define(["utility/prototypes",
                         }
                     };
 
-                    // Get all the drag targets from all the statements.
+                    // Get all the drag targets from all the expressions.
                     self.accumulateDragTargets = function (arrayAccumulator) {
 
                         try {
@@ -88,35 +88,64 @@ define(["utility/prototypes",
 
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
-                    self.addStatementDragStubs = function (arrayAccumulator) {
+                    self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {
 
                         try {
 
-                            // Add as the first element.
-                            var sdsNew = new StatementDragStub();
-                            sdsNew.collection = self;
-                            arrayAccumulator.push(sdsNew);
+                            // First, check the "before all statements" location.
+                            if (self.scrollOffset() === 0) {
 
-                            // Assuming it does not matter that addItem is not called here....
-                            self.items.splice(0, 0, sdsNew);
+                                // If the list is scrolled all the way to the top, then  
+                                // it is always OK to add the first spot as a potential.
+                                arrayAccumulator.push({
+
+                                    index: 0,
+                                    y: self.areaMaximal().location.y,
+                                    collection: self,
+                                    type: (self.items.length > 0 ? self.items[0].dragStub : false)
+                                });
+                            }
 
                             // Loop over each statement.
-                            for (var i = 1; i < self.items.length; i+=2) {
+                            for (var i = 0; i < self.items.length; i++) {
 
-                                var exceptionRet = self.items[i].addStatementDragStubs(arrayAccumulator);
+                                // Extract the ith statement.
+                                var statementIth = self.items[i];
+                                if (!statementIth ||
+                                    !statementIth.area) {
+
+                                    continue;
+                                }
+
+                                // Check in each statement for block....
+                                var exceptionRet = statementIth.accumulateDragStubInsertionPoints(arrayAccumulator,
+                                    statementDragStub, 
+                                    areaMethodBuilder);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
                                 }
 
-                                // Also add after each statement.
-                                sdsNew = new StatementDragStub();
-                                sdsNew.collection = self;
-                                arrayAccumulator.push(sdsNew);
+                                // Also check after each statement.
 
-                                // Assuming it does not matter that addItem is not called here....
-                                self.items.splice(i + 1, 0, sdsNew);
+                                // If the bottom + the full drag statement is fully visible.
+                                var areaStatement = statementIth.area();
+                                if (areaStatement) {
+
+                                    if (areaStatement.location.y + areaStatement.extent.height /* + min stub visible height? */ < areaMethodBuilder.location.y + areaMethodBuilder.extent.height) {
+
+                                        arrayAccumulator.push({
+
+                                            index: i,
+                                            y: areaStatement.location.y + areaStatement.extent.height,
+                                            collection: self,
+                                            type: (statementIth.dragStub ||
+                                                ((self.items.length > i + 1) ? self.items[i + 1].dragStub : false))
+                                        });
+                                    }
+                                }
                             }
+
                             return null;
                         } catch (e) {
 
@@ -137,7 +166,7 @@ define(["utility/prototypes",
                                 var itemIth = self.items[i];
 
                                 // If it is a SDS...
-                                if (itemIth instanceof StatementDragStub) {
+                                if (itemIth.dragStub) {
 
                                     // ...then remove it (via splice, not removeItem)...
                                     self.items.splice(i, 1);
@@ -153,11 +182,33 @@ define(["utility/prototypes",
                                     }
                                 }
                             }
+                            
+                            // Possibly adjust scroll offset.
+                            var exceptionRet = self.possiblyAdjustScrollOffset();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             return null;
                         } catch (e) {
 
                             return e;
                         }
+                    };
+
+                    // Save.
+                    self.save = function () {
+
+                        var arrayRet = [];
+
+                        // Save the statements.
+                        for (var i = 0; i < self.items.length; i++) {
+
+                            arrayRet.push(self.items[i].save());
+                        }
+
+                        return arrayRet;
                     };
                 } catch (e) {
 

@@ -45,8 +45,66 @@ define(["utility/prototypes",
                                     return exceptionRet;
                                 }
                             }
+                            return null;
+                        } catch (e) {
 
+                            return e;
+                        }
+                    };
 
+                    // Add a name.
+                    self.addName = function (strName) {
+
+                        try {
+
+                            return self.addItem(new Name(strName));
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits an existing name.
+                    self.editName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // Find match...
+                                if (self.items[i].name === strOriginalName) {
+
+                                    // ...and splace in place.
+                                    self.items[i].name = strNewName;
+
+                                    break;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method removes an existing name.
+                    self.removeName = function (strName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // Find match...
+                                if (self.items[i].name === strName) {
+
+                                    // ...and splice in place.
+                                    self.items.splice(i, 1);
+
+                                    break;
+                                }
+                            }
                             return null;
                         } catch (e) {
 

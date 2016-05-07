@@ -65,6 +65,31 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Add item to list of items.
+                    self.insertAt = function (itemNew, iIndex) {
+
+                        try {
+
+                            // Add...
+                            if (iIndex >= self.items.length) {
+
+                                return self.addItem(itemNew);
+                            }
+
+                            // ...or insert.
+                            self.items.splice(iIndex,
+                                0,
+                                itemNew);
+
+                            // Identify parent.
+                            itemNew.collection = self;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Remove iteem from list of items.
                     self.removeItem = function (itemRemove) {
 
@@ -89,6 +114,20 @@ define(["utility/prototypes",
                             // Unidentify parent.
                             itemRemove.collection = null;
                             itemRemove.highlight = false;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear out every item from the collection.
+                    self.clearItems = function () {
+
+
+                        try {
+
+                            self.items = [];
                             return null;
                         } catch (e) {
 
@@ -146,6 +185,21 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Remove all items.
+                    self.clear = function () {
+
+                        try {
+
+                            // Clean on items.
+                            self.items = [];
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Decompose instance.
                     self.destroy = function () {
 
@@ -155,6 +209,13 @@ define(["utility/prototypes",
                             if (!m_bCreated) {
 
                                 throw { message: "Instance not created!" };
+                            }
+
+                            // Clear items.
+                            var exceptionRet = self.create();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
                             }
 
                             m_bCreated = false;
@@ -222,21 +283,18 @@ define(["utility/prototypes",
                                 // Pass it down.
                                 if ($.isFunction(m_itemCursor.mouseDown)) {
 
-                                    var exceptionRet = m_itemCursor.mouseDown(objectReference);
+                                    exceptionRet = m_itemCursor.mouseDown(objectReference);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
                                     }
                                 }
 
-                                // Calculate the total extent.
-                                var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
+                                // Adjust scroll offset, if necessary.
+                                exceptionRet = self.possiblyAdjustScrollOffset();
+                                if (exceptionRet) {
 
-                                // Adjust down the scroll, if necessary.
-                                if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
-
-                                    m_dScrollOffset = Math.max(0, 
-                                        dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
+                                    return exceptionRet;
                                 }
                             }
 
@@ -264,13 +322,46 @@ define(["utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Pass mouse down to type, if cursor over type.
+                            // Pass mouse up to type, if cursor over type.
                             if (m_itemCursor) {
 
                                 // Pass it down.
                                 if ($.isFunction(m_itemCursor.mouseUp)) {
 
                                     var exceptionRet = m_itemCursor.mouseUp(objectReference);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is clicked over the canvas.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // Call helper method to test the cursor point.
+                            var exceptionRet = m_functionTestPoint(objectReference);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Pass mouse up to type, if cursor over type.
+                            if (m_itemCursor) {
+
+                                // Pass it down.
+                                if ($.isFunction(m_itemCursor.click)) {
+
+                                    var exceptionRet = m_itemCursor.click(objectReference);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -456,6 +547,32 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Adjust the scroll offset if sizes have changed on next render.
+                    self.possiblyAdjustScrollOffset = function () {
+
+                        try {
+
+                            m_bPossiblyAdjustScrollOffsets = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Expose private field.
+                    self.scrollOffset = function () {
+
+                        return m_dScrollOffset;
+                    };
+
+                    // Expose private field.
+                    self.areaMaximal = function () {
+
+                        return m_areaMaximal;
+                    };
+
                     // Calculate the section rectangles.
                     self.calculateLayout = function (areaMaximal, contextRender) {
 
@@ -486,17 +603,8 @@ define(["utility/prototypes",
                                         m_areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
                             }
 
-                            // Get the height of all the items.
-                            var dTotalExtent = self.getTotalExtent(contextRender);
-
-                            // Adjust down the scroll, if necessary.
-                            if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
-
-                                m_dScrollOffset = Math.max(0, 
-                                    dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
-                            }
-
-                            return null;
+                            // Adjust scroll offset, if necessary.
+                            return self.possiblyAdjustScrollOffset();
                         } catch (e) {
 
                             return e;
@@ -513,6 +621,20 @@ define(["utility/prototypes",
 
                                 // Just call it.
                                 m_functionScroll();
+                            }
+
+                            // If previously instructed, possibly adjust scroll offsets here.
+                            if (m_bPossiblyAdjustScrollOffsets) {
+
+                                // Calculate the total extent.
+                                var dTotalExtent = self.getTotalExtent(contextRender);
+
+                                // Adjust down the scroll, if necessary.
+                                if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
+
+                                    m_dScrollOffset = Math.max(0, 
+                                        dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
+                                }
                             }
 
                             // Draw the rounded body background.
@@ -719,6 +841,8 @@ define(["utility/prototypes",
                     var m_itemCursor = null;
                     // Scroll callback--set for up or down when cursor over stub.
                     var m_functionScroll = null;
+                    // Update the scroll offset if necessary.
+                    var m_bPossiblyAdjustScrollOffsets = false;
                 } catch (e) {
 
                     alert(e.message);
