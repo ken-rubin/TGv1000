@@ -104,17 +104,57 @@ module.exports = function UtilityBO(app, sql, logger) {
                     receipt_email: req.user.userName,
                     statement_descriptor: req.body.statementDescriptor
                 },
-                function(strError, charge) {
-                    if (strError) {
+                function(err, charge) {
+                    if (err) {
                         res.json({
                             success: false,
-                            message: strError
+                            message: err.message
                         });
                     } else {
 
                         // Return success
                         res.json({
-                            success: true
+                            success: true,
+                            chargeId: charge.id
+                        });
+                    }
+                }
+            );
+        } catch (e) {
+
+            res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
+    self.routeProcessRefund = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeProcessRefund with req.body = " + JSON.stringify(req.body));
+            // req.user.userId*
+            // req.user.userName*
+            // req.body.chargeId
+            // req.body.projectId
+
+            var charge = stripe.refunds.create(
+                {
+                    charge: req.body.chargeId
+                },
+                function(err, refund) {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err.message
+                        });
+                    } else {
+
+                        // Return success
+                        res.json({
+                            success: true,
+                            refundId: refund.id
                         });
                     }
                 }

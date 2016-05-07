@@ -101,6 +101,7 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isOnlineClass: (row.isOnlineClass === 1 ? true : false),
                             firstSaved: row.firstSaved,
                             lastSaved: row.lastSaved,
+                            chargeId: row.chargeId,
                             comics:
                             {
                                 items: []
@@ -1275,7 +1276,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
                             isCoreProject: (project.isCoreProject ? 1 : 0),
                             comicProjectId: project.comicProjectId,
-                            lastSaved: (new Date())
+                            lastSaved: (new Date()),
+                            chargeId: project.chargeId
                         };
 
                         if (project.specialProjectData.openMode === "searched") {
@@ -1437,7 +1439,8 @@ module.exports = function ProjectBO(app, sql, logger) {
                             isCoreProject: (project.isCoreProject ? 1 : 0),
                             comicProjectId: project.comicProjectId,
                             firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
-                            lastSaved: (new Date())
+                            lastSaved: (new Date()),
+                            chargeId: chargeId
                         };
 
                         var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;

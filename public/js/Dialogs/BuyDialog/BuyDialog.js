@@ -432,7 +432,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 												// 2c. Ajax to TG server again to complete CC charging using the m_token. Send email to user if charge succeeds.
 												m_functionBuyStep2c(
 													token, 
-													function(err) {
+													function(err, chargeId) {
 														
 														if (err) {
 
@@ -448,6 +448,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 														// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
 														m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
+														m_clProject.data.chargeId = chargeId;
 
 														if (m_clProject.data.specialProjectData.hasOwnProperty('classData')) {
 															delete m_clProject.data.specialProjectData.classData;
@@ -561,7 +562,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 		                    	if (data.success) {
 
-                                    return callback(null);
+                                    return callback(null, data.chargeId);
 		                    	}
 
 		                    	return callback(data.message);

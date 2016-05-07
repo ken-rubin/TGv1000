@@ -792,6 +792,19 @@ begin
         set @dbstate := 16;
     end if;
     
+    if @dbstate = 16 THEN
+    
+		ALTER TABLE `tgv1000`.`waitlist` 
+			ADD COLUMN `dtWaitlisted` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `userName`,
+			ADD COLUMN `dtInvited` DATETIME NULL AFTER `dtWaitlisted`;
+
+		ALTER TABLE `tgv1000`.`projects` 
+			ADD COLUMN `chargeId` VARCHAR(255) NULL DEFAULT '' AFTER `lastSaved`;
+    
+		UPDATE control set dbstate=17 where id=1;
+        set @dbstate := 17;
+    end if;
+    
 end//
 
 
