@@ -281,25 +281,25 @@ define(["Core/errorHelper"],
 							}
 
 							// Wire Play button click.
-							$("#PlayBtn").click(function () {
-								try {
-									// Let client handle this.
-									var exceptionRet = client.play();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch (e) { errorHelper.show(e); }
-							});
+							// $("#PlayBtn").click(function () {
+							// 	try {
+							// 		// Let client handle this.
+							// 		var exceptionRet = client.play();
+							// 		if (exceptionRet) { throw exceptionRet; }
+							// 	} catch (e) { errorHelper.show(e); }
+							// });
 
 							// Wire Play button click.
-							$("#StopBtn").click(function () {
-								try {
-									// Let client handle this.
-									var exceptionRet = client.stop();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch (e) {
+							// $("#StopBtn").click(function () {
+							// 	try {
+							// 		// Let client handle this.
+							// 		var exceptionRet = client.stop();
+							// 		if (exceptionRet) { throw exceptionRet; }
+							// 	} catch (e) {
 
-									errorHelper.show(e);
-								}
-							});
+							// 		errorHelper.show(e);
+							// 	}
+							// });
 
 							client.setBrowserTabAndBtns();
 
@@ -320,6 +320,12 @@ define(["Core/errorHelper"],
 						m_functionEnable("OpenProject");
 						m_functionDisable("SaveProject");
 						m_functionDisable("CloseProject");
+						m_functionDisable("NewType");
+						m_functionDisable("SearchType");
+						m_functionDisable("NewMethod");
+						m_functionDisable("SearchMethod");
+						m_functionDisable("NewProperty");
+						m_functionDisable("NewEvent");
 
 						if (clProject !== null) {
 
@@ -358,12 +364,12 @@ define(["Core/errorHelper"],
 
 					self.enableOrDisablePlayAndStopButtons = function () {
 
-						if (client.getProject()) {
-							$("#PlayBtn").removeClass("disabled");
-						} else {
-							$("#PlayBtn").addClass("disabled");
-						}
-						$("#StopBtn").addClass("disabled");
+						// if (client.getProject()) {
+						// 	$("#PlayBtn").removeClass("disabled");
+						// } else {
+						// 	$("#PlayBtn").addClass("disabled");
+						// }
+						// $("#StopBtn").addClass("disabled");
 					}
 
 					// Private methods

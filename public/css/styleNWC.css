@@ -1,0 +1,29 @@
+*
+{
+	margin:0px;
+	padding:0px;
+}
+html
+{
+	background:black;
+}
+#bodyPalette
+{
+	background:#111;
+	color:#eef;
+	scroll:none;
+	overflow: hidden;
+}
+:focus
+{
+    outline: 0;
+}
+#Palette
+{
+	position: absolute;
+	display: inline-block;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+}

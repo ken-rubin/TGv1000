@@ -15,27 +15,13 @@ html
   body
     include ./indexnavbar.jade
 
-    .container-fluid
+   #bodyPalette
+    
+     .container-fluid
 
       .row
 
-        .toGetMiddleCol
+        #Palette
 
-          //- Include the designer element DOM.
-          include ./indexdesigner.jade
-
-          //- Include the code element DOM.
-          include ./indexcode.jade
-
-        .toGetLeftCol
-
-          //- Define a scrolling column.
-          #toolstrip.ScrollRegionVCol
-
-        .toGetRightCol
-
-          #comicstrip.ScrollRegionVCol
-
-    //- Inlcude the list of scripts.
     include ./indexscripts.jade
 
