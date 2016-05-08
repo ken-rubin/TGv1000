@@ -12,7 +12,7 @@
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
     + Lengthen to like 2 weeks.
     + Save project to DB with every change.
-- We need a way to handle teachers' setting up curriculum for their classes when the school has purchased what amounts to a site license.
+- We need a way to let teachers setting up curriculum for their classes when the school has purchased a site license.
     - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
     - The class is free to the students.
 - AZUsersDialog 
@@ -25,7 +25,11 @@
         - Drop someone from a class and optionally give a refund thru Stripe.
     - Waitlisted tab
         - Display tab only for classes.
-        - Tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class.
+        - Invite user, tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class. Implement all of this.
+        - Allow instructor to overbook by inviting multiple waitlist people.
+    - Invited tab
+        - Fetch data. Do it.
+    - Add 5-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist.
 - AZProjectsDialog
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.
