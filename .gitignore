@@ -1,14 +1,8 @@
-# Ignore everything.
-*
-
-# Don't ignore directories, so we can resurse into them.
-!*/
-
-# Do ignore these 3 directories.
+# Ignore these 3 directories.
 node_modules
 .DS_Store
-public/resources
 uploads
 
-# But not keepme.rtf in public/resources.
+# Ignore public/resources but not in public/resources/keepme.rtf.
+public/resources
 !public/resources/keepme.rtf
