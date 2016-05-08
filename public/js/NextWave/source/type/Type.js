@@ -44,7 +44,7 @@ define(["utility/prototypes",
                     // Public fields.
 
                     // Name of this type object.
-                    self.name = "default";
+                    self.name = new CodeType();
                     // Colleciton of methods.
                     self.methods = new Methods();
                     // Colleciton of properties.
@@ -68,7 +68,45 @@ define(["utility/prototypes",
                         try {
 
                             // Set the name.
-                            self.name = objectType.name;
+                            self.name = new CodeType(objectType.name);
+                            // Since these are not draggable,
+                            // set the collection to itself.
+                            self.name.collection = self.name;
+                            self.name.beforeChange = function () {
+
+                                try {
+
+                                    m_strTypeBefore = self.name.payload;
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
+                            self.name.afterChange = function () {
+
+                                try {
+
+                                    // Ensure the value is unique.
+                                    var strPayload = self.name.payload;
+                                    self.name.payload = "Hopefully A Unique Value That Is Never Duplicated";
+                                    self.name.payload = window.manager.getUniqueName(strPayload,
+                                        window.manager.types,
+                                        "name",
+                                        "payload");
+
+                                    // Update.
+                                    if (m_strTypeBefore !== self.name.payload) {
+
+                                        return window.manager.editTypeName(m_strTypeBefore,
+                                            self.name.payload);
+                                    }
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
 
                             // Build the methods.
                             for (var j = 0; j < objectType.methods.length; j++) {
@@ -112,7 +150,7 @@ define(["utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        var strName = self.name.substring(0, 1).toLowerCase() + self.name.substring(1);
+                        var strName = self.name.payload.substring(0, 1).toLowerCase() + self.name.payload.substring(1);
                         strName = window.manager.getUniqueName(strName);
                         var csvRet = new CodeStatementVar(
                             new CodeExpressionInfix(
@@ -127,7 +165,7 @@ define(["utility/prototypes",
                                     new CodeExpressionInvocation(
                                         new CodeExpressionType(
                                             new CodeType(
-                                                self.name
+                                                self.name.payload
                                             )
                                         )
                                     )
@@ -144,7 +182,7 @@ define(["utility/prototypes",
 
                         try {
 
-                            // Loop over them all and close them.
+                            // Close up type.
                             self.open = false;
 
                             return null;
@@ -172,10 +210,10 @@ define(["utility/prototypes",
                     };
 
                     // Returns the height of this type with all blocks closed.
+                    // Used by dragging because all dragged items are closed.
                     self.getClosedHeight = function () {
 
                         var dHeight = self.settingsNode.lineHeight + 2 * settings.general.margin;
-
                         return dHeight;
                     };
 
@@ -205,7 +243,7 @@ define(["utility/prototypes",
                         var objectRet = {};
 
                         // Save name.
-                        objectRet.name = self.name;
+                        objectRet.name = self.name.payload;
 
                         // If there are methods, then save them up.
                         if (self.methods) {
@@ -220,47 +258,6 @@ define(["utility/prototypes",
                         }
 
                         return objectRet;
-                    };
-
-                    // Invoked when the mouse is pressed down over the type.
-                    self.mouseDown = function (objectReference) {
-
-                        try {
-
-                            // Can't do much if no area.
-                            if (!m_area) {
-
-                                return null;
-                            }
-
-                            // If over the title.
-                            if (m_functionOverName(objectReference.pointCursor) &&
-                                m_areaGlyph) {
-
-                                // Toggle openness.
-                                var bIn = m_areaGlyph.pointInArea(objectReference.contextRender,
-                                    objectReference.pointCursor);
-
-                                if (bIn) {
-
-                                    if (self.open) {
-
-                                        self.open = false;
-                                    } else {
-
-                                        self.open = true;
-                                    }
-                                }
-                            } else if (m_objectHighlight) {
-
-                                // Pass down to highlight object.
-                                return m_objectHighlight.mouseDown(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
                     };
 
                     // Invoked when the mouse is moved over the type.
@@ -281,42 +278,97 @@ define(["utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // If over the title.
-                            if (m_functionOverName(objectReference.pointCursor)) {
+                            // Test the two icons.
+                            var bIn = m_areaOpenCloseIcon.pointInArea(objectReference.contextRender,
+                                objectReference.pointCursor);
+                            if (bIn) {
 
-                                // Toggle openness.
-                                var bIn = m_areaGlyph.pointInArea(objectReference.contextRender,
-                                    objectReference.pointCursor);
-
-                                if (bIn) {
-
-                                    objectReference.cursor = "cell";
-                                }
+                                m_objectHighlight = m_areaOpenCloseIcon;
+                                objectReference.cursor = "cell";
                             } else {
 
-                                // Figure out which.
-                                for (var i = 0; i < self.typeSections.length; i++) {
+                                // Then test the other icon.
+                                bIn = m_areaDeleteIcon.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor);
+                                if (bIn) {
 
-                                    var typeSectionIth = self.typeSections[i];
+                                    m_objectHighlight = m_areaDeleteIcon;
+                                    objectReference.cursor = "cell";
+                                } else {
 
-                                    // Test mouse.
-                                    if (typeSectionIth.pointIn(objectReference.contextRender, 
-                                            objectReference.pointCursor)) {
+                                    // Then test the name CodeType.
+                                    bIn = self.name.pointIn(objectReference.contextRender,
+                                        objectReference.pointCursor);
+                                    if (bIn) {
 
-                                        // Highlight.
-                                        m_objectHighlight = typeSectionIth;
-                                        typeSectionIth.highlight = true;
+                                        m_objectHighlight = self.name;
+                                        self.name.highlight = true;
+                                    } else {
 
-                                        // Pass down to methods.
-                                        exceptionRet = typeSectionIth.mouseMove(objectReference);
-                                        if (exceptionRet) {
+                                        // Then test the Methods.
+                                        bIn = self.methods.pointIn(objectReference.contextRender,
+                                            objectReference.pointCursor);
+                                        if (bIn) {
 
-                                            throw exceptionRet;
+                                            m_objectHighlight = self.methods;
+                                            self.methods.highlight = true;
+
+                                            return self.methods.mouseMove(objectReference);
+                                        } else {
+
+                                            // Finally properties, to be replaced by events....
+                                            bIn = self.properties.pointIn(objectReference.contextRender,
+                                                objectReference.pointCursor);
+                                            if (bIn) {
+
+                                                m_objectHighlight = self.properties;
+                                                self.properties.highlight = true;
+
+                                                return self.properties.mouseMove(objectReference);
+                                            }
                                         }
+                                    }
+                                }
+                            }
+                            return null;
+                        } catch (e) {
 
-                                        // There can be only one!
-                                        break;
-                                    } 
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is pressed down over the type.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            // Only care about mouse down if over some regon.
+                            if (m_objectHighlight) {
+
+                                if (m_objectHighlight === m_areaOpenCloseIcon) {
+
+                                    if (self.open) {
+
+                                        self.open = false;
+                                    } else {
+
+                                        self.open = true;
+                                    }
+                                } else if (m_objectHighlight === m_areaDeleteIcon) {
+
+                                    if (self.open) {
+
+                                        self.open = false;
+                                    } else {
+
+                                        self.open = true;
+                                    }
+                                } else if (m_objectHighlight === self.name) {
+
+                                    return window.manager.setFocus(m_objectHighlight);
+                                } else if ($.isFunction(m_objectHighlight.mouseDown)) {
+
+                                    return m_objectHighlight.mouseDown(objectReference);
                                 }
                             }
                             return null;
@@ -335,8 +387,14 @@ define(["utility/prototypes",
                             if (m_objectHighlight) {
 
                                 // Don't check return...just a mouse out.
-                                m_objectHighlight.mouseOut(objectReference);
-                                m_objectHighlight.highlight = false;
+                                if ($.isFunction(m_objectHighlight.mouseOut)) {
+
+                                    m_objectHighlight.mouseOut(objectReference);
+                                }
+                                if (m_objectHighlight.hasOwnProperty("highlight")) {
+
+                                    m_objectHighlight.highlight = false;
+                                }
                                 m_objectHighlight = null;
                             }
 
@@ -353,7 +411,8 @@ define(["utility/prototypes",
                         try {
 
                             // Reset highlight.
-                            if (m_objectHighlight) {
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.click)) {
 
                                 // Pass down.
                                 return m_objectHighlight.click(objectReference);
@@ -419,11 +478,17 @@ define(["utility/prototypes",
 
                             // Render the name.
                             contextRender.font = self.settingsNode.font;
-                            contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.name,
-                                m_area.location.x + settings.general.margin,
-                                m_area.location.y,
-                                m_area.extent.width - settings.general.margin - settings.glyphs.width);
+
+                            // Render the type CodeType.
+                            var areaName = new Area(m_area.location.clone(),
+                                new Size(m_area.width, self.settingsNode.lineHeight));
+                            exceptionRet = self.name.render(contextRender, 
+                                areaName,
+                                0);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             // If open, render methods and properties.
                             var glyph = glyphs.expand;
@@ -451,16 +516,33 @@ define(["utility/prototypes",
                             }
 
                             // Draw the open/close glyphs.
-                            m_areaGlyph = new Area(
+                            m_areaOpenCloseIcon = new Area(
                                 new Point(m_area.location.x + m_area.extent.width - settings.glyphs.width,
                                     m_area.location.y + settings.general.margin),
                                 new Size(settings.glyphs.width, 
                                     settings.glyphs.height));
 
                             // Render glyph.
-                            var exceptionRet = glyphs.render(contextRender,
-                                m_areaGlyph,
+                            exceptionRet = glyphs.render(contextRender,
+                                m_areaOpenCloseIcon,
                                 glyph, 
+                                settings.manager.showIconBackgrounds);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Draw the delete glyphs.
+                            m_areaDeleteIcon = new Area(
+                                new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
+                                    m_areaOpenCloseIcon.location.y),
+                                new Size(settings.glyphs.width, 
+                                    settings.glyphs.height));
+
+                            // Render glyph.
+                            exceptionRet = glyphs.render(contextRender,
+                                m_areaDeleteIcon,
+                                glyphs.remove, 
                                 settings.manager.showIconBackgrounds);
                             if (exceptionRet) {
 
@@ -475,27 +557,18 @@ define(["utility/prototypes",
                     };
 
                     //////////////////////////
-                    // Private methods.
-
-                    // Helper method returns bool if eponymous.
-                    var m_functionOverName = function (pointCursor) {
-
-                        // Figure out where, over the type, the cursor is.
-                        var dHeightRelativeToTopOfType = pointCursor.y - m_area.location.y;
-
-                        // If over the title.
-                        return (dHeightRelativeToTopOfType < self.settingsNode.lineHeight);
-                    };
-
-                    //////////////////////////
                     // Private fields.
 
                     // The area, relative to the canvas, occupied by this instance.
                     var m_area = null;
                     // The area of the open/close glyph.
-                    var m_areaGlyph = null;
+                    var m_areaOpenCloseIcon = null;
+                    // The area of the delete glyph.
+                    var m_areaDeleteIcon = null;
                     // Remember which object has the highlight.
                     var m_objectHighlight = null;
+                    // The type name before it is edited.
+                    var m_strTypeBefore = null;
                 } catch (e) {
 
                     alert(e.message);

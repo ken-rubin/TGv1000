@@ -131,6 +131,11 @@ define(["utility/prototypes"],
 
                             x: 55,
                             y: 376
+                        },
+                        remove: {
+
+                            x: 820,
+                            y: 316
                         }
                     };
                     self.layerPanels = {
@@ -174,8 +179,8 @@ define(["utility/prototypes"],
                     };
                     self.methodBuilder = {
 
-                        font: "20px Arial",
-                        lineHeight: 30,
+                        font: "32px Arial",
+                        lineHeight: 34,
                         fillBackground: "#bbb"
                     };
                     self.parameter = {
@@ -185,7 +190,7 @@ define(["utility/prototypes"],
                     };
                     self.typeMethodPair = {
 
-                        font: "22px Arial",
+                        font: "26px Arial",
                         fillBackground: "#4dd"
                     };
                     self.statementDragStub = {

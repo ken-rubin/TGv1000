@@ -57,6 +57,8 @@ define(["utility/prototypes",
                     self.panelLayer = null;
                     // Object used to initialize this instance.
                     self.initializer = null;
+                    // Directly set focus object, overrides dragObject.
+                    self.alternateFocus = null;
                     // Collection of named object pertinent to the current context.
                     self.names = [];
                     // Collection of types available in the current context.
@@ -112,6 +114,85 @@ define(["utility/prototypes",
                         }
                     };
 
+                    // Method edits a type name.
+                    self.getTypeFromName = function (strTypeName) {
+
+                        try {
+
+                            // Find it.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                if (self.types[i].name.payload === strTypeName) {
+
+                                    // ...and return it.
+                                    return self.types[i];
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits a type name.
+                    self.editTypeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                // Find match...
+                                if (self.types[i].name.payload === strOriginalName) {
+
+                                    // ...and update.
+                                    self.types[i].name.payload = strNewName;
+
+                                    break;
+                                }
+                            }
+
+                            // TODO: Update any allocation associated with this type.
+                            // Also, update the type name in the method builder.
+                            // Not sure if this will conflict with the type-name 
+                            // editing if done directly from the type name....
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits a Method name.
+                    self.editMethodName = function (type, strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < type.methods.parts.length; i++) {
+
+                                // Find match...
+                                if (type.methods.parts[i].name === strOriginalName) {
+
+                                    // ...and update.
+                                    type.methods.parts[i].name = strNewName;
+
+                                    break;
+                                }
+                            }
+
+                            // TODO: Update any allocation associated with this type.
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Method removes an existing name.
                     self.removeName = function (strName) {
 
@@ -150,7 +231,17 @@ define(["utility/prototypes",
                     };
 
                     // Build a unique name from the specified name.
-                    self.getUniqueName = function (strName) {
+                    // strName -- the initial proposed name.
+                    // arrayCollection -- the collection to iterate over and ensure uniqueness.  Defaults to self.names.
+                    // strNameProperty -- the property-name-accessor on items in arrayCollection.
+                    // strNameReferenceProperty -- the accessor property on the strNamePropety types as objects.
+                    self.getUniqueName = function (strName, arrayCollection, strNameProperty, strNameRefinementProperty) {
+
+                        // Default collection value to names.
+                        if (!arrayCollection) {
+
+                            arrayCollection = self.names;
+                        }
 
                         // Make sure a good JS name.
                         if (!strName) {
@@ -170,9 +261,17 @@ define(["utility/prototypes",
                         // searches for a matching name.
                         var functionNameExists = function (strTest) {
 
-                            for (var i = 0; i < self.names.length; i++) {
+                            for (var i = 0; i < arrayCollection.length; i++) {
 
-                                if (self.names[i] === strTest) {
+                                var itemIth = arrayCollection[i];
+
+                                // Get the item in the collection.  It can be a string or an object.
+                                // If it is an object, then access its Name-Property to get the string.
+                                var strValue = ((strNameProperty) ? itemIth[strNameProperty] : itemIth);
+                                // However, the Name-Property of an object, itself, could be an object.
+                                // In which case, get the Name-Refinement-Property of that as a string!
+                                strValue = ((strNameRefinementProperty) ? strValue[strNameRefinementProperty] : strValue);
+                                if (strValue === strTest) {
 
                                     return true;
                                 }
@@ -572,13 +671,38 @@ define(["utility/prototypes",
                     // Test object for input focus.
                     self.hasFocus = function (objectTest) {
 
+                        // Test alternate focus first.
+                        if (self.alternateFocus) {
+
+                            return (objectTest === self.alternateFocus);
+                        }
+
+                        // Else, test drag object.
                         return (objectTest === self.dragLayer.getDragObject());
+                    };
+
+                    // Set focus to an object--this overrides drag-object focus.
+                    self.setFocus = function (objectFocus) {
+
+                        try {
+
+                            // Set the alternate focus object.
+                            self.alternateFocus = objectFocus;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Set the drag object.
                     self.setDragObject = function (objectDrag) {
 
                         try {
+
+                            // Clear out any alternate.
+                            self.alternateFocus = null;
 
                             // Only certain types can drag.
                             if (objectDrag instanceof Expression ||
@@ -733,6 +857,7 @@ define(["utility/prototypes",
 
                                 throw exceptionRet;
                             }
+                            self.alternateFocus = null;
 
                             // Handle dragging.
                             m_pointDown = new Point(e.offsetX, e.offsetY);
@@ -948,7 +1073,11 @@ define(["utility/prototypes",
                         try {
 
                             // Pass to focused object.
-                            var objectFocus = self.dragLayer.getDragObject();
+                            var objectFocus = self.alternateFocus;
+                            if (!objectFocus) {
+
+                                objectFocus = self.dragLayer.getDragObject();
+                            }
                             if (objectFocus &&
                                 $.isFunction(objectFocus.keyDown)) {
 
@@ -987,7 +1116,11 @@ define(["utility/prototypes",
                         try {
 
                             // Pass to focused object.
-                            var objectFocus = self.dragLayer.getDragObject();
+                            var objectFocus = self.alternateFocus;
+                            if (!objectFocus) {
+
+                                objectFocus = self.dragLayer.getDragObject();
+                            }
                             if (objectFocus &&
                                 $.isFunction(objectFocus.keyUp)) {
 
@@ -1027,7 +1160,11 @@ define(["utility/prototypes",
                         try {
 
                             // Pass to focused object.
-                            var objectFocus = self.dragLayer.getDragObject();
+                            var objectFocus = self.alternateFocus;
+                            if (!objectFocus) {
+
+                                objectFocus = self.dragLayer.getDragObject();
+                            }
                             if (objectFocus &&
                                 $.isFunction(objectFocus.keyPressed)) {
 

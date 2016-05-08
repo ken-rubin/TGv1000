@@ -148,17 +148,15 @@ define(["utility/prototypes",
 
                         try {
 
-                            // Set the name.
-                            self.methodTypeMethodPair.type = objectContext.type.name;
-                            self.methodTypeMethodPair.method = objectContext.method.name;
-
                             // Set parameters.
                             self.methodParameters = objectContext.method.parameters;
 
                             // Set statements.
                             self.methodStatements = objectContext.method.statements;
 
-                            return null;
+                            // Set the name.
+                            return self.methodTypeMethodPair.create(objectContext.type.name.payload,
+                                objectContext.method.name);
                         } catch (e) {
 
                             return e;
@@ -171,7 +169,17 @@ define(["utility/prototypes",
                         try {
 
                             // Determine which object is under the cursor.
-                            return m_functionTestPoint(objectReference);
+                            var exceptionRet = m_functionTestPoint(objectReference);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            if (m_objectCursor) {
+
+                                return m_objectCursor.mouseMove(objectReference);
+                            }
+                            return null;
                         } catch (e) {
 
                             return e;

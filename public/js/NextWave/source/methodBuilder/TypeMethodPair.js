@@ -14,8 +14,10 @@ define(["utility/prototypes",
     "utility/Point",
     "utility/Size",
     "utility/Area",
-    "utility/glyphs"],
-    function (prototypes, settings, Point, Size, Area, glyphs) {
+    "utility/glyphs",
+    "methodBuilder/CodeType",
+    "methodBuilder/CodeName"],
+    function (prototypes, settings, Point, Size, Area, glyphs, CodeType, CodeName) {
 
         try {
 
@@ -44,9 +46,88 @@ define(["utility/prototypes",
 
                     	try {
 
-                    		// Save off type and name.
-                    		self.type = strType || "type";
-                    		self.method = strMethod || "method";
+                    		// Save off type and method.
+                    		self.type = new CodeType(strType || "type");
+                            // Since these are not draggable,
+                            // set the collection to itself.
+                            self.type.collection = self.type;
+                            self.type.beforeChange = function () {
+
+                                try {
+
+                                    m_strTypeBefore = self.type.payload;
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
+                            self.type.afterChange = function () {
+
+                                try {
+
+                                    // Ensure the value is unique.
+                                    self.type.payload = window.manager.getUniqueName(self.type.payload,
+                                        window.manager.types,
+                                        "name",
+                                        "payload");
+
+                                    // Update.
+                                    if (m_strTypeBefore !== self.type.payload) {
+
+                                        return window.manager.editTypeName(m_strTypeBefore,
+                                            self.type.payload);
+                                    }
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
+                    		self.method = new CodeName(strMethod || "method");
+                            // Since these are not draggable,
+                            // set the collection to itself.
+                            self.method.collection = self.method;
+                            self.method.beforeChange = function () {
+
+                                try {
+
+                                    m_strMethodBefore = self.method.payload;
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
+                            self.method.afterChange = function () {
+
+                                try {
+
+                                    // Lookup the type from its name.
+                                    var typeFromName = window.manager.getTypeFromName(self.type.payload);
+                                    if (!typeFromName) {
+
+                                        throw { message: "Failed to find Type named: " + self.type.payload };
+                                    }
+
+                                    // Ensure the value is unique.
+                                    self.method.payload = window.manager.getUniqueName(self.method.payload,
+                                        typeFromName.methods.parts,
+                                        "name");
+
+                                    // Update.
+                                    if (m_strMethodBefore !== self.method.payload) {
+
+                                        return window.manager.editMethodName(typeFromName,
+                                            m_strMethodBefore,
+                                            self.method.payload);
+                                    }
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
 
                     		return null;
                     	} catch (e) {
@@ -73,9 +154,87 @@ define(["utility/prototypes",
                     self.getWidth = function (contextRender) {
 
                         contextRender.font = settings.typeMethodPair.font;
-                        var dTextWidth = contextRender.measureText(self.type + "." + self.method).width
+                        var dTextWidth = contextRender.measureText(" . ").width
+
+                        dTextWidth += self.type.getWidth(contextRender);
+                        dTextWidth += self.method.getWidth(contextRender);
 
                         return dTextWidth + 2 * settings.general.margin;
+                    };
+
+                    // Invoked when the mouse is pressed down over the type.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            // If there is a highlight object set.
+                            if (m_objectHighlight) {
+
+                                return window.manager.setFocus(m_objectHighlight);
+                            }
+                            return null;                        
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is moved over the type.
+                    self.mouseMove = function (objectReference) {
+
+                        try {
+
+                            var objectOriginalHighlight = m_objectHighlight;
+
+                            // Test the two objects.
+                            var bRet = self.type.pointIn(objectReference.contextRender, 
+                                objectReference.pointCursor);
+                            if (bRet) {
+
+                                m_objectHighlight = self.type;
+                            } else {
+
+                                bRet = self.method.pointIn(objectReference.contextRender, 
+                                    objectReference.pointCursor);
+                                if (bRet) {
+
+                                    m_objectHighlight = self.method;
+                                }
+                            }
+
+                            // Test a changed highlight object.
+                            if (m_objectHighlight !== objectOriginalHighlight) {
+
+                                if (objectOriginalHighlight) {
+
+                                    objectOriginalHighlight.highlight = false;
+                                }
+                                m_objectHighlight.highlight = true;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is moved out of this type.
+                    self.mouseOut = function (objectReference) {
+
+                        try {
+
+                            // If there is a highlight object set.
+                            if (m_objectHighlight) {
+
+                                m_objectHighlight.highlight = false;
+                                m_objectHighlight = null;
+                            }
+                            return null;                        
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Test if the point is in this Type.
@@ -104,30 +263,36 @@ define(["utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Fill and stroke the path.
-                            if (window.draggingStatement || window.draggingExpression) {
-
-                                contextRender.fillStyle = settings.general.fillDrag;
-                                contextRender.strokeStyle = settings.general.strokeDrag;
-                            } else if (self.highlight) {
-
-                                contextRender.fillStyle = settings.general.fillBackgroundHighlight;
-                                contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
-                            } else {
-
-                                contextRender.fillStyle = settings.typeMethodPair.fillBackground;
-                                contextRender.strokeStyle = settings.general.strokeBackground;
-                            }
-                            contextRender.fill();
-                            contextRender.stroke();
-
-                            // Render the type-name.
                             contextRender.font = settings.typeMethodPair.font;
+
+                            // Render the type CodeType.
+                            exceptionRet = self.type.render(contextRender, 
+                                m_area,
+                                0);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Get the width of the type and the " . "-string.
+                            var dDotWidth = contextRender.measureText(" . ").width
+                            var dTypeWidth = self.type.getWidth(contextRender);
+
+                            // Render the dot-separator.
                             contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.type + "." + self.method,
-                                m_area.location.x + settings.general.margin,
+                            contextRender.fillText(" . ",
+                                m_area.location.x + dTypeWidth,
                                 m_area.location.y + settings.general.margin,
                                 m_area.extent.width - 2 * settings.general.margin);
+
+                            // Render the type CodeName.
+                            exceptionRet = self.method.render(contextRender, 
+                                m_area,
+                                dDotWidth + dTypeWidth);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             return null;
                         } catch (e) {
@@ -141,6 +306,12 @@ define(["utility/prototypes",
 
                     // The area, relative to the canvas, occupied by this instance.
                     var m_area = null;
+                    // Remember which object has the highlight.
+                    var m_objectHighlight = null;
+                    // Value of type before type change.
+                    var m_strTypeBefore = null;
+                    // Value of method before method change.
+                    var m_strMethodBefore = null;
                 } catch (e) {
 
                     alert(e.message);

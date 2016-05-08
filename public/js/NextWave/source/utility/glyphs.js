@@ -48,6 +48,9 @@ define(["utility/prototypes",
                     // contract.
                     self.contract = new Area(new Point(settings.glyphs.contract.x,settings.glyphs.contract.y),
                         new Size(settings.glyphs.width, settings.glyphs.width));
+                    // contract.
+                    self.remove = new Area(new Point(settings.glyphs.remove.x,settings.glyphs.remove.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
 
                     ///////////////////////
                     // Public methods.

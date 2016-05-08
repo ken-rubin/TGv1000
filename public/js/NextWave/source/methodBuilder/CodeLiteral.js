@@ -85,54 +85,6 @@ define(["utility/prototypes",
                             2 * settings.general.margin;
                     };
 
-                    /* Invoked when the mouse is pressed down over the type.
-                    self.mouseDown = function (objectReference) {
-
-                        try {
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is moved over the type.
-                    self.mouseMove = function (objectReference) {
-
-                        try {
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is moved out of the type.
-                    self.mouseOut = function (objectReference) {
-
-                        try {
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is clicked over the item.
-                    self.click = function (objectReference) {
-
-                        try {
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };*/
-
                     // Test if the point is in this Type.
                     self.pointIn = function (contextRender, point) {
 
@@ -165,6 +117,13 @@ define(["utility/prototypes",
                             if (exceptionRet) {
 
                                 throw exceptionRet;
+                            }
+
+                            // Draw border on highlight.
+                            if (self.highlight) {
+
+                                contextRender.strokeStyle = "#000";
+                                contextRender.stroke();
                             }
 
                             // After defining location, and generating the path,
