@@ -1,4 +1,8 @@
+# Ignore these 3 directories.
 node_modules
 .DS_Store
-public/resources
 uploads
+
+# Ignore public/resources but not in public/resources/keepme.rtf.
+public/resources
+!public/resources/keepme.rtf

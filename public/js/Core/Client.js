@@ -6,7 +6,6 @@
 
 // Define module and require dependencies.
 define(["Core/errorHelper",
-		"Core/Simulator", 
 		"Dialogs/NewProjectDialog/NewProjectDialog", 
 		"Dialogs/OpenProjectDialog/OpenProjectDialog", 
 		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
@@ -31,7 +30,6 @@ define(["Core/errorHelper",
 		"Core/Project",
 		"Code/Type"],
 	function (errorHelper, 
-				Simulator,
 				NewProjectDialog, 
 				OpenProjectDialog,
 				SaveProjectAsDialog,
@@ -87,154 +85,6 @@ define(["Core/errorHelper",
 
 						} catch (e) { return e; }
 					};
-
-					// Run (play) the Project
-					self.play = function () {
-
-						try {
-
-							/* For now, just hard-code the environment to build.
-				            var objectProject = {
-
-				                comics: [{
-
-				                    evaluator: {
-
-				                        // Index across window.instances
-				                        target: "window.app.ship",
-				                        condition: {
-
-				                            x: 200
-				                        }
-				                    },
-				                    types: [{
-
-				                        name: "App",
-				                        methods: [{
-
-				                            name: "initialize",
-				                            workspace: "<xml>Some stuff...</xml>",
-				                            code: " self.ship = new Ship(self);  self.ship.x = 0;  self.ship.y = 0; self.ship.dx = 2; self.ship.dy = 1; window.eventCollection['keypress'].push({ target: self.ship, method: 'HandleKeyPress' }); window.eventCollection['bounce'].push({ target: self.ship, method: 'HandleBounce' }); "
-				                        }],
-				                        properties: [{
-
-				                            name: "ship"
-				                        }, {
-
-				                            name: "context"
-				                        }],
-				                        events: []
-				                    }, {
-
-				                        name: "Ship",                
-				                        methods: [{
-
-				                            name: "HandleBounce",
-				                            parameters: ["ea"],
-				                            workspace: "<xml>Other stuff...</xml>",
-				                            code: " if (self.color === 'yellow') { self.color = 'green'; } else { self.color = 'yellow'; } "
-				                        }, {
-
-				                            name: "HandleKeyPress",
-				                            parameters: ["ea"],
-				                            workspace: "<xml>Other stuff...</xml>",
-				                            code: " document.title = ea.key; "
-				                        }, {
-
-				                            name: "update",
-				                            workspace: "<xml>Other stuff...</xml>",
-				                            code: " self.x += self.dx; " + 
-				                                " if (self.x > 780 || self.x < 0) { self.dx *= -1; self.x += self.dx * 2; window.raiseEvent('bounce', {}); } " + 
-				                                "self.y += self.dy; " +
-				                                " if (self.y > 580 || self.y < 0) { self.dy *= -1; self.y += self.dy * 2; window.raiseEvent('bounce', {}); } "
-				                        }, {
-
-				                            name: "render",
-				                            workspace: "<xml>Other stuff...</xml>",
-				                            code: " self.app.context.fillStyle = self.color; " + 
-				                                "self.app.context.fillRect(self.x, self.y, 20, 20); "
-				                        }],
-				                        properties: [{
-
-				                            name: "x"
-				                        },{
-
-				                            name: "dx"
-				                        },{
-
-				                            name: "y"
-				                        }, {
-
-				                            name: "dy"
-				                        }, {
-
-				                            name: "color",
-				                            initialValue: "red",
-				                            initialValueQuoted: true
-				                        }],
-				                        events: [{
-
-				                            name: "bounce"
-				                        }]
-				                    }]
-				                }]
-				            };*/
-
-				            // Allocate simulator.
-				            m_simulator = new Simulator();
-				            var exceptionRet = m_simulator.create(m_clProject.data);
-				            if (exceptionRet) {
-
-				                throw exceptionRet;
-				            }
-
-				            // Start simulation.
-				            exceptionRet = m_simulator.start();
-				            if (exceptionRet) {
-
-				                throw exceptionRet;
-				            }
-
-				            $(".hiddenifrunning").css("display", "none");
-							$(".hiddenifnotrunning").css("display", "inherit");
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					// Method invoked when the nav-bar stop button is pressed.
-					self.stop = function () {
-
-						try {
-
-				            // Start simulation.
-				            var exceptionRet = m_simulator.stop();
-				            if (exceptionRet) {
-
-				                throw exceptionRet;
-				            }
-
-				            $(".hiddenifrunning").css("display", "inherit");
-							$(".hiddenifnotrunning").css("display", "none");
-
-						} catch (e) { errorHelper.show(e); }
-					};
-
-					// Start off the client.
-					// self.debug = function () {
-
-					// 	try {
-
-					// 		// 
-					// 		alert($("#BlocklyIFrame")[0].contentWindow.getMethodString());
-
-					// 		return null;
-					// 	} catch (e) {
-
-					// 		return e;
-					// 	}
-					// };
 
 					//////////////////////////////
 					// Dialog creators/openers
