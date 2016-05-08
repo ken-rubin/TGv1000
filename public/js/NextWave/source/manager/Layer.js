@@ -14,11 +14,11 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "utility/settings",
-    "utility/Area",
-    "utility/Point",
-    "utility/Size"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/settings",
+    "NextWave/source/utility/Area",
+    "NextWave/source/utility/Point",
+    "NextWave/source/utility/Size"],
     function (prototypes, settings, Area, Point, Size) {
 
         try {

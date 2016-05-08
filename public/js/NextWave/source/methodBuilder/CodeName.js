@@ -9,8 +9,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "methodBuilder/CodeLiteral"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/methodBuilder/CodeLiteral"],
     function (prototypes, CodeLiteral) {
 
         try {

@@ -10,19 +10,19 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "manager/List",
-    "statement/StatementFor",
-    "statement/StatementForIn",
-    "statement/StatementWhile",
-    "statement/StatementIf",
-    "statement/StatementReturn",
-    "statement/StatementTry",
-    "statement/StatementThrow",
-    "statement/StatementVar",
-    "statement/StatementExpression",
-    "statement/StatementBreak",
-    "statement/StatementContinue"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/manager/List",
+    "NextWave/source/statement/StatementFor",
+    "NextWave/source/statement/StatementForIn",
+    "NextWave/source/statement/StatementWhile",
+    "NextWave/source/statement/StatementIf",
+    "NextWave/source/statement/StatementReturn",
+    "NextWave/source/statement/StatementTry",
+    "NextWave/source/statement/StatementThrow",
+    "NextWave/source/statement/StatementVar",
+    "NextWave/source/statement/StatementExpression",
+    "NextWave/source/statement/StatementBreak",
+    "NextWave/source/statement/StatementContinue"],
     function (prototypes, List, StatementFor, StatementForIn, StatementWhile, StatementIf, StatementReturn, StatementTry, StatementThrow, StatementVar, StatementExpression, StatementBreak, StatementContinue) {
 
         try {

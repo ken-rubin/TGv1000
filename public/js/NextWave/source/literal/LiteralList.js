@@ -10,17 +10,17 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "manager/List",
-    "literal/LiteralArray",
-    "literal/LiteralBoolean",
-    "literal/LiteralInfinity",
-    "literal/LiteralNaN",
-    "literal/LiteralNull",
-    "literal/LiteralNumber",
-    "literal/LiteralObject",
-    "literal/LiteralRegexp",
-    "literal/LiteralString"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/manager/List",
+    "NextWave/source/literal/LiteralArray",
+    "NextWave/source/literal/LiteralBoolean",
+    "NextWave/source/literal/LiteralInfinity",
+    "NextWave/source/literal/LiteralNaN",
+    "NextWave/source/literal/LiteralNull",
+    "NextWave/source/literal/LiteralNumber",
+    "NextWave/source/literal/LiteralObject",
+    "NextWave/source/literal/LiteralRegexp",
+    "NextWave/source/literal/LiteralString"],
     function (prototypes, List, LiteralArray, LiteralBoolean, LiteralInfinity, LiteralNaN, LiteralNull, LiteralNumber, LiteralObject, LiteralRegexp, LiteralString) {
 
         try {

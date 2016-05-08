@@ -8,13 +8,13 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "utility/settings",
-    "utility/Point",
-    "utility/Size",
-    "utility/Area",
-    "manager/Layer",
-    "Al/Al"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/settings",
+    "NextWave/source/utility/Point",
+    "NextWave/source/utility/Size",
+    "NextWave/source/utility/Area",
+    "NextWave/source/manager/Layer",
+    "NextWave/source/Al/Al"],
     function (prototypes, settings, Point, Size, Area, Layer, Al) {
 
         try {

@@ -10,9 +10,9 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "manager/List",
-    "name/Name"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/manager/List",
+    "NextWave/source/name/Name"],
     function (prototypes, List, Name) {
 
         try {

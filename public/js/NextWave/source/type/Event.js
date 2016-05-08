@@ -9,8 +9,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "type/SectionPart"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/type/SectionPart"],
     function (prototypes, SectionPart) {
 
         try {

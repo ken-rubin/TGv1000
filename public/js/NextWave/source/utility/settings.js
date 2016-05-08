@@ -9,7 +9,7 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes"],
+define(["NextWave/source/utility/prototypes"],
     function (prototypes) {
 
         try {
@@ -55,13 +55,13 @@ define(["utility/prototypes"],
 
                         imageURLs: [
 
-                            "./media/background0.png",
-                            "./media/background1.jpg",
-                            "./media/background2.jpg",
-                            "./media/background3.jpg",
-                            "./media/background4.jpg",
-                            "./media/background5.jpg",
-                            "./media/background6.png"]
+                            "./js/NextWave/media/background0.png",
+                            "./js/NextWave/media/background1.jpg",
+                            "./js/NextWave/media/background2.jpg",
+                            "./js/NextWave/media/background3.jpg",
+                            "./js/NextWave/media/background4.jpg",
+                            "./js/NextWave/media/background5.jpg",
+                            "./js/NextWave/media/background6.png"]
                     };
                     self.manager = {
 
@@ -98,7 +98,7 @@ define(["utility/prototypes"],
                     };
                     self.glyphs = {
 
-                        imageURL: "./media/glyphicons.png",   // Icon sheet.
+                        imageURL: "./js/NextWave/media/glyphicons.png",   // Icon sheet.
                         fillBackground: "rgba(0,0,0,0.25)",
                         width: 32,
                         height: 32,

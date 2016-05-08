@@ -9,13 +9,13 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "statement/Statement",
-    "methodBuilder/CodeStatementFor",
-    "methodBuilder/CodeExpressionName",
-    "methodBuilder/CodeExpressionLiteral",
-    "methodBuilder/CodeExpressionInfix",
-    "methodBuilder/CodeExpressionPostfix"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/statement/Statement",
+    "NextWave/source/methodBuilder/CodeStatementFor",
+    "NextWave/source/methodBuilder/CodeExpressionName",
+    "NextWave/source/methodBuilder/CodeExpressionLiteral",
+    "NextWave/source/methodBuilder/CodeExpressionInfix",
+    "NextWave/source/methodBuilder/CodeExpressionPostfix"],
     function (prototypes, Statement, CodeStatementFor, CodeExpressionName, CodeExpressionLiteral, CodeExpressionInfix, CodeExpressionPostfix) {
 
         try {

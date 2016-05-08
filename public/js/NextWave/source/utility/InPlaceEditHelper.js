@@ -10,8 +10,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "utility/settings"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/settings"],
     function (prototypes, settings) {
 
         try {

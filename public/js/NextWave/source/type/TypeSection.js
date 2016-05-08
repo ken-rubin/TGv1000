@@ -10,13 +10,13 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "utility/settings",
-    "utility/Point",
-    "utility/Size",
-    "utility/Area",
-    "utility/glyphs",
-    "type/SectionPart"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/settings",
+    "NextWave/source/utility/Point",
+    "NextWave/source/utility/Size",
+    "NextWave/source/utility/Area",
+    "NextWave/source/utility/glyphs",
+    "NextWave/source/type/SectionPart"],
     function (prototypes, settings, Point, Size, Area, glyphs, SectionPart) {
 
         try {

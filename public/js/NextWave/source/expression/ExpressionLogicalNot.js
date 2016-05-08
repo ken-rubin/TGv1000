@@ -9,10 +9,10 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "expression/Expression",
-    "methodBuilder/CodeExpressionPrefix",
-    "methodBuilder/CodeExpressionLiteral"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/expression/Expression",
+    "NextWave/source/methodBuilder/CodeExpressionPrefix",
+    "NextWave/source/methodBuilder/CodeExpressionLiteral"],
     function (prototypes, Expression, CodeExpressionPrefix, CodeExpressionLiteral) {
 
         try {

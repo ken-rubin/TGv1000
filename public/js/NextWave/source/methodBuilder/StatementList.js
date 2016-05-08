@@ -10,9 +10,9 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "manager/List",
-    "methodBuilder/StatementDragStub"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/manager/List",
+    "NextWave/source/methodBuilder/StatementDragStub"],
     function (prototypes, List, StatementDragStub) {
 
         try {

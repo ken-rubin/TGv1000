@@ -9,8 +9,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["utility/prototypes",
-    "manager/ListItem"],
+define(["NextWave/source/utility/prototypes",
+    "NextWave/source/manager/ListItem"],
     function (prototypes, ListItem) {
 
         try {
