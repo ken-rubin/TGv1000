@@ -10,7 +10,7 @@ var moment = require("moment-timezone");
 var stripe = null;
 var bLocalCredit = true;
 
-module.exports = function UtilityBO(app, sql, logger) {
+module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
     var self = this;                // Über closure.
 

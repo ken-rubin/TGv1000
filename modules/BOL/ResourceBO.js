@@ -7,7 +7,7 @@ var fs = require("fs"),
     util = require("util");
 var mysql = require("mysql");
 
-module.exports = function ResourceBO(app, sql, logger) {
+module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
     var self = this;                // Über closure.
 

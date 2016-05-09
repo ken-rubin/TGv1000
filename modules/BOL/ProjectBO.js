@@ -7,7 +7,7 @@ var async = require("async");
 var os = require("os");
 var moment = require("moment-timezone");
 
-module.exports = function ProjectBO(app, sql, logger) {
+module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
     var self = this;                // Über closure.
 

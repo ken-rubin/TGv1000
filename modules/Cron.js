@@ -5,10 +5,9 @@
 
 var schedule = require("node-schedule");
 var async = require("async");
-var nodemailer = require("nodemailer");
 var moment = require("moment-timezone");
 
-module.exports = function Cron(app, sql, logger) {
+module.exports = function Cron(app, sql, logger, mailWrapper) {
 
 	var self = this;					// Über closure.
 
@@ -91,23 +90,12 @@ module.exports = function Cron(app, sql, logger) {
 																		// Send email about upcoming classIth to userIth.
 																		try {
 
-													                        var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
-
-													                        smtpTransport.verify(function(err, success) {
-													                            if (err) {
-													                                return cb(new Error("Error setting up transport for 7-day warning email: " + err), null);
-													                            }
-													                        });
-
-													                        // setup email data with unicode symbols
-													                        var mailOptions = null;
-
 													                        var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
 													                        var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
 													                        mailOptions = {
 													                 
 													                            from: "TechGroms <techgroms@gmail.com>", // sender address
-													                            to: (!aORz) ? userIth.userName : 'jerry@rubintech.com', // list of receivers -- eventually add ken and john
+													                            to: (!aORz) ? userIth.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
 													                            subject: "Your nextwavecoders.com class is coming up", // Subject line
 													                            text: "Hi, " + userIth.firstName + ". " +
 													                            "This is a reminder that the coding class you signed up for will have its first session in one week, " +
@@ -125,19 +113,16 @@ module.exports = function Cron(app, sql, logger) {
    													                            "<br><br><br><br>Warm regards, The nextwavecoders Team"
 													                        };
 
-													                        // send mail with defined transport object
-													                        smtpTransport.sendMail(mailOptions, function(error, response){
-													                        
-													                            if (error) {
-													                                return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
-													                            }
+													                        mailWrapper.mail(mailOptions, 
+													                        	function(error) {
 
-													                            // If you don't want to use this transport object anymore, uncomment following line
-													                            //smtpTransport.close(); // shut down the connection pool, no more messages
+													                            	if (error) {
+													                                	return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
+													                            	}
 
-													                            return cb(null);
-
-													                        });
+													                            	return cb(null);
+													                        	}
+													                        );
 																		} catch(e) {
 																			return cb(e);
 																		}
@@ -228,17 +213,6 @@ module.exports = function Cron(app, sql, logger) {
 																		// Send email about upcoming classIth to userIth.
 																		try {
 
-													                        var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
-
-													                        smtpTransport.verify(function(err, success) {
-													                            if (err) {
-													                                return cb(new Error("Error setting up transport for 7-day warning email: " + err), null);
-													                            }
-													                        });
-
-													                        // setup email data with unicode symbols
-													                        var mailOptions = null;
-
 													                        var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
 													                        var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
 													                        mailOptions = {
@@ -258,18 +232,16 @@ module.exports = function Cron(app, sql, logger) {
    													                            "<br><br><br><br>Warm regards, The nextwavecoders Team"
 													                        };
 
-													                        // send mail with defined transport object
-													                        smtpTransport.sendMail(mailOptions, function(error, response){
-													                        
-													                            if (error) {
-													                                return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
-													                            }
+													                        mailWrapper.mail(mailOptions,
+													                        	function(error) {
 
-													                            // If you don't want to use this transport object anymore, uncomment following line
-													                            //smtpTransport.close(); // shut down the connection pool, no more messages
+													                        		if (error) {
+													                                	return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
+													                                }
 
-													                            return cb(null);
-													                        });
+														                            return cb(null);
+													                        	}
+													                        );
 																		} catch(e) {
 																			return cb(e);
 																		}
@@ -360,24 +332,12 @@ module.exports = function Cron(app, sql, logger) {
 																return cb(null);
 															}
 
-															// Send an email.
-									                        var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
-
-									                        smtpTransport.verify(function(err, success) {
-									                            if (err) {
-									                                return cb(new Error("Error setting up transport for 14-day product ignore email: " + err), null);
-									                            }
-									                        });
-
-									                        // setup email data with unicode symbols
-									                        var mailOptions = null;
-
 									                        var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
 									                        var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
 									                        mailOptions = {
 									                 
 									                            from: "TechGroms <techgroms@gmail.com>", // sender address
-									                            to: (!aORz) ? userIth.userName : 'jerry@rubintech.com', // list of receivers -- eventually add ken and john
+									                            to: (!aORz) ? userIth.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
 									                            subject: "We see you haven't gotten to your newwavecoders project in 2 weeks", // Subject line
 									                            text: "Hi, " + userIth.firstName + ". " +
 									                            // Add in stuff, etc.
@@ -387,20 +347,17 @@ module.exports = function Cron(app, sql, logger) {
 										                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
 									                        };
 
-									                        // send mail with defined transport object
-									                        smtpTransport.sendMail(mailOptions, function(error, response){
-									                        
-									                            if (error) {
-									                                return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
-									                            }
+									                        mailWrapper.mail(mailOptions,
+									                        	function(error) {
 
-									                            // If you don't want to use this transport object anymore, uncomment following line
-									                            //smtpTransport.close(); // shut down the connection pool, no more messages
+									                        		if (error) {
 
-									                            return cb(null);
+									                                	return cb(new Error("Error sending 7-day warning email: " + error.toString()), null);
+									                                }
 
-									                        });
-
+										                            return cb(null);
+									                        	}
+									                        );
 														} catch(e) {
 															return cb(e);
 														}

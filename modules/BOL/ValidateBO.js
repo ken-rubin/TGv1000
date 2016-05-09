@@ -4,12 +4,12 @@
 //////////////////////////////////
 
 var bcrypt = require("bcrypt-nodejs");
-var nodemailer = require("nodemailer");
+
 var jwt = require('jsonwebtoken');
 var async = require("async");
 var mysql = require("mysql");
 
-module.exports = function ValidateBO(app, sql, logger) {
+module.exports = function ValidateBO(app, sql, logger, mailWrapper) {
 
     var self = this;                // Über closure.
     self.dbname = app.get("dbname");
@@ -199,17 +199,6 @@ module.exports = function ValidateBO(app, sql, logger) {
 
                         console.log(JSON.stringify(profile));
 
-                        var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
-
-                        smtpTransport.verify(function(err, success) {
-                            if (err) {
-                                return cb(new Error("Error setting up transport for enrollment email: " + err), null);
-                            }
-                        });
-
-                        // setup email data with unicode symbols
-                        var mailOptions = null;
-
                         var fullUrl = req.protocol + '://' + req.get('host'); // + req.originalUrl;
                         var aORz = (profile.userName === 'a@a.com' || profile.userName === 'z@z.com');
                         mailOptions = {
@@ -227,20 +216,18 @@ module.exports = function ValidateBO(app, sql, logger) {
                             "<br><br>Thank you for signing up with TechGroms!<br><br>Warm regards, The Grom Team"
                         };
 
-                        // send mail with defined transport object
-                        smtpTransport.sendMail(mailOptions, function(error, response){
-                        
-                            if (error) {
-                                return cb(new Error("Error sending enrollment email: " + error.toString()), null);
+                        mailWrapper.mail(mailOptions,
+                            function(error) {
+
+                                if (error) {
+
+                                    return cb(new Error("Error sending enrollment email: " + error.toString()), null);
+                                }
+
+                                delete profile.password;
+                                return cb(null, profile);
                             }
-
-                            // If you don't want to use this transport object anymore, uncomment following line
-                            //smtpTransport.close(); // shut down the connection pool, no more messages
-
-                            delete profile.password;
-                            return cb(null, profile);
-
-                        });
+                        );
                     } catch (e) {
 
                         return cb(new Error("Error sending enrollment email: " + e.message), null);
@@ -316,17 +303,6 @@ module.exports = function ValidateBO(app, sql, logger) {
                         // Compose and send the email.
                         try {
 
-                            var smtpTransport = nodemailer.createTransport('smtps://techgroms@gmail.com:Albatross!1@smtp.gmail.com');
-
-                            smtpTransport.verify(function(err, success) {
-                                if (err) {
-                                    return cb(new Error("Error setting up transport for password reset email: " + err), null);
-                                }
-                            });
-
-                            // setup email data with unicode symbols
-                            var mailOptions = null;
-
                             var profile = { userName: req.body.userName};
                             // Note: we do not sign this token with our special, server-side secret.
                             // Instead, we use one that can be employed client-side for token verification. No big deal.
@@ -353,20 +329,17 @@ module.exports = function ValidateBO(app, sql, logger) {
                                 "<br><br><br>Regards from The Grom Team"
                             };
 
-                            // send mail with defined transport object
-                            smtpTransport.sendMail(mailOptions, function(error, response){
-                            
-                                if (error) {
-                                
-                                    return cb(new Error("Error sending password reset email: " + error.toString()));
+                            mailWrapper.mail(mailOptions,
+                                function(error) {
+
+                                    if (error) {
+
+                                        return cb(new Error("Error sending password reset email: " + error.toString()));
+                                    }
+
+                                    return cb(null);
                                 }
-
-                                // If you don't want to use this transport object anymore, uncomment following line
-                                //smtpTransport.close(); // shut down the connection pool, no more messages
-
-                                return cb(null);
-
-                            });
+                            );
                         } catch (e) {
 
                             return cb(new Error("Error sending reset email: " + e.message), null);

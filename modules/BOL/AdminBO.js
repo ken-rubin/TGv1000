@@ -3,7 +3,7 @@
 //
 //////////////////////////////////
 var nodemailer = require("nodemailer");
-module.exports = function AdminBO(app, sql, logger) {
+module.exports = function AdminBO(app, sql, logger, mailWrapper) {
 
     var self = this; // Über closure.
 

@@ -190,9 +190,14 @@ var Logger = require("./modules/Logger");
 var logger = new Logger(app, sql);
 
 /////////////////////////////////////
+console.log("Set up mail wrapper.");
+var MailWrapper = require("./modules/MailWrapper");
+var mailWrapper = new MailWrapper();
+
+/////////////////////////////////////
 console.log("Set up cron job.");
 var Cron = require("./modules/Cron");
-var cron = new Cron(app, sql, logger);
+var cron = new Cron(app, sql, logger, mailWrapper);
 
 /////////////////////////////////////
 console.log("Set up multer.");
@@ -237,7 +242,7 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
 
                     console.log('requiring ' + rowi.path + rowi.moduleName);
                     var mod = require(rowi.path + rowi.moduleName);
-                    moduleInstance = new mod(app, sql, logger);
+                    moduleInstance = new mod(app, sql, logger, mailWrapper);
                     moduleInstances[rowi.moduleName] = moduleInstance;
                 }
 
