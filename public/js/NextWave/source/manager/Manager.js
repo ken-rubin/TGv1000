@@ -635,6 +635,29 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+                    // Generates JavaScript string modules for each Type.
+                    self.generateJavaScript = function () {
+
+                        var objectRet = {};
+
+                        // Allocate array which holds module strings.
+                        objectRet.modules = [];
+
+                        // Generate a module for each Type.
+                        for (var i = 0; i < self.types.length; i++) {
+
+                            // Extract and save the type.
+                            var typeIth = self.types[i];
+                            var strModule = typeIth.generateJavaScript();
+
+                            // Add it to the result object.
+                            objectRet.modules.push(strModule);
+                        }
+
+                        // Return all the modules.
+                        return objectRet;
+                    };
+
                     // Save all types and visible/existing panels 
                     // from this manager instance for persistence.
                     self.save = function () {
@@ -666,7 +689,7 @@ define(["NextWave/source/utility/prototypes",
 
                         // Return the fully qualified manager state object.
                         return objectRet;
-                    }
+                    };
 
                     // Test object for input focus.
                     self.hasFocus = function (objectTest) {

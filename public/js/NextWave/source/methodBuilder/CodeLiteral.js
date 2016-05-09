@@ -49,6 +49,17 @@ define(["NextWave/source/utility/prototypes",
                         return new self.constructor(self.payload);
                     };
 
+                    // Generate JavaScript for this literal.
+                    self.generateJavaScript = function () {
+
+                        var strBlock = " ";
+
+                        strBlock += self.payload;
+
+                        strBlock += " ";
+                        return strBlock;
+                    };
+
                     // Save constructor parameters.
                     self.save = function () {
 

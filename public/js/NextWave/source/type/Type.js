@@ -237,6 +237,34 @@ define(["NextWave/source/utility/prototypes",
                         return m_area.clone();
                     };
 
+                    // Generates JavaScript string module for this Type.
+                    self.generateJavaScript = function () {
+
+                        // Build the constructor function for the type.
+                        var strConstructorFunction = " window." + self.name.payload + 
+                            " = function (app) { " + 
+                            " /* Closure. */ var self = this; " + 
+                            " /* Register with system. */ window.instances.push(self); " + 
+                            " /* Reference to the application object. */ self.app = app; ";
+
+                        // Add properties.
+                        if (self.properties) {
+
+                            strConstructorFunction += self.properties.generateJavaScript();
+                        }
+
+                        // Add methods.
+                        if (self.methods) {
+
+                            strConstructorFunction += self.methods.generateJavaScript();
+                        }
+
+                        strConstructorFunction += " };";
+
+                        // Return the module.
+                        return strConstructorFunction;
+                    };
+
                     // Save type to JSON.
                     self.save = function () {
 

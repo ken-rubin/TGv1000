@@ -197,6 +197,21 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Generates JavaScript string for this statement list.
+                    self.generateJavaScript = function () {
+
+                        var strStatements = " ";
+
+                        for (var i = 0; i < self.items.length; i++) {
+
+                            strStatements += self.items[i].generateJavaScript();
+                        }
+
+                        strStatements += " ";
+
+                        return strStatements;
+                    };
+
                     // Save.
                     self.save = function () {
 

@@ -43,6 +43,18 @@ define(["NextWave/source/utility/prototypes",
                         return new self.constructor(strName);
                     };
 
+                    // Generates JavaScript string for this parameter.
+                    self.generateJavaScript = function () {
+
+                        var strParameter = " ";
+
+                        strParameter += self.name;
+
+                        strParameter += " ";
+
+                        return strParameter;
+                    };
+
                     // Return a new object for this Parameter.
                     self.save = function () {
 

@@ -53,6 +53,25 @@ define(["NextWave/source/utility/prototypes",
                         return plClone;
                     };
 
+                    // Generates JavaScript string for this parameterlist.
+                    self.generateJavaScript = function () {
+
+                        var strParameters = " ";
+
+                        // Clone the parameters.
+                        for (var i = 0; i < self.items.length; i++) {
+
+                            if (i > 0) {
+
+                                strParameters += " , ";
+                            }
+
+                            strParameters += self.items[i].generateJavaScript();
+                        }
+
+                        return strParameters;
+                    };
+
                     // Save.
                     self.save = function (bStraight) {
 

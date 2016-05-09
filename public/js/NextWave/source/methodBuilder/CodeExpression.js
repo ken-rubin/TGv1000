@@ -237,6 +237,35 @@ define(["NextWave/source/utility/prototypes",
                         return dWidth;
                     };
 
+                    // Generate JavaScript for this expression.
+                    self.generateJavaScript = function () {
+
+                        var strExpression = " ";
+
+                        // Process display template:
+                        var arrayDisplayTemplate = self.displayTemplate.split(/(.*?)(\[.*?\])/g).filter(function (strItem) { return (strItem.length > 0); });
+                        for (var i = 0; i < arrayDisplayTemplate.length; i++) {
+
+                            // Get the ith component.
+                            var strIth = arrayDisplayTemplate[i];
+
+                            // If the first character is a '[', then render the object.
+                            if (strIth[0] === '[') {
+
+                                // Extract the property.
+                                var strProperty = strIth.substring(1, strIth.length - 1);
+
+                                strExpression += self[strProperty].generateJavaScript();
+                            } else {
+
+                                strExpression += " " + strIth + " ";
+                            }
+                        }
+
+                        strExpression += " ";
+                        return strExpression;
+                    };
+
                     // Save.
                     self.save = function () {
 

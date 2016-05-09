@@ -257,6 +257,41 @@ define(["NextWave/source/utility/prototypes",
                         return dHeight;
                     };
 
+                    // Generate JavaScript for this statement.
+                    self.generateJavaScript = function () {
+
+                        var strStatement = " ";
+
+                        // Process display template:
+                        var arrayDisplayTemplate = self.displayTemplate.split(/(.*?)(\[.*?\])/g).filter(function (strItem) { return (strItem.length > 0); });
+
+                        for (var i = 0; i < arrayDisplayTemplate.length; i++) {
+
+                            // Get the ith component.
+                            var strIth = arrayDisplayTemplate[i];
+
+                            // If the first character is a '[', then render the object.
+                            if (strIth[0] === '[') {
+
+                                // Extract the property.
+                                var strProperty = strIth.substring(1, strIth.length - 1);
+
+                                strStatement += self[strProperty].generateJavaScript();
+                            } else {
+
+                                strStatement += " " + strIth + " ";
+                            }
+                        }
+
+                        for (var i = 0; i < self.blocks.length; i++) {
+
+                            var blockIth = self.blocks[i];
+                            strStatement += blockIth.generateJavaScript();
+                        }
+
+                        return strStatement;
+                    };
+
                     // Save.
                     self.save = function () {
 

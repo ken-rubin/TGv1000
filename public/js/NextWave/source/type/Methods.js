@@ -35,6 +35,29 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////////
                     // Public methods.
 
+                    // Generates JavaScript string for the methods.
+                    self.generateJavaScript = function () {
+
+                        var strMethods = " ";
+
+                        // If there are method, then build their JavaScript.
+                        if (self.parts) {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                // Extract and build the method.
+                                var methodIth = self.parts[i];
+                                var strMethod = methodIth.generateJavaScript();
+
+                                // Add it to the result object.
+                                strMethods += strMethod;
+                            }
+                        }
+
+                        strMethods += " ";
+                        return strMethods;
+                    };
+
                     // Save.
                     self.save = function () {
 

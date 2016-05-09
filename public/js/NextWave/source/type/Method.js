@@ -144,6 +144,26 @@ define(["NextWave/source/utility/prototypes",
                         return window.manager.getSelected(self);
                     };
 
+                    // Generates JavaScript string for this method.
+                    self.generateJavaScript = function () {
+
+                        var strMethod = " ";
+
+                        strMethod += "self." + self.name + " = function ( ";
+
+                        // Parameters.
+                        strMethod += self.parameters.generateJavaScript();
+
+                        strMethod += " ) { "
+
+                        // Statements.
+                        strMethod += self.statements.generateJavaScript();
+
+                        strMethod += " }; ";
+
+                        return strMethod;
+                    };
+
                     // Save.
                     self.save = function () {
 

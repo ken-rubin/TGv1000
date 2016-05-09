@@ -312,13 +312,20 @@ $(document).ready(function() {
 						                        null,
 						                        2);
 						                    console.log(strSave);
+
+						                    setTimeout( function () {
+
+							                    var objectJavaScript = manager.generateJavaScript();
+							                    var strJavaScript = JSON.stringify(objectJavaScript,
+							                        null,
+							                        2);
+							                    console.log(strJavaScript);
+							                }, 10000);
 						                } catch (e) {
 
 						                    alert(e.message);
 						                }
 						            });
-
-//									$(window).resize();
 
 								} catch(e) { errorHelper.show(e); }
 							});

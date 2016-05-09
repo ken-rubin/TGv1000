@@ -35,6 +35,30 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////////
                     // Public methods.
 
+                    // Generates JavaScript string for the properties.
+                    self.generateJavaScript = function () {
+
+                        var strProperties = " ";
+
+                        // If there are properties, then build their JavaScript.
+                        if (self.parts) {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                // Extract and save the property.
+                                var propertyIth = self.parts[i];
+                                var strProperty = propertyIth.generateJavaScript();
+
+                                // Add it to the result object.
+                                strProperties += strProperty;
+                            }
+                        }
+
+                        strProperties += " ";
+
+                        return strProperties;
+                    };
+
                     // Save.
                     self.save = function () {
 

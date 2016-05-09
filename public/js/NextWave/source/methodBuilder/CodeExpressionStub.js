@@ -124,6 +124,15 @@ define(["NextWave/source/utility/prototypes",
                         return settings.codeExpressionStub.emptyWidth;
                     };
 
+                    // Pass to payload.
+                    self.generateJavaScript = function () {
+
+                        if (self.payload) {
+
+                            return self.payload.generateJavaScript();
+                        }
+                    };
+
                     // Just pass through to the payload.
                     self.save = function () {
 

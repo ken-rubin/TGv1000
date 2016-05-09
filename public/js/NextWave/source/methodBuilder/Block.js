@@ -299,6 +299,20 @@ define(["NextWave/source/utility/prototypes",
                         return blockClone;
                     };
 
+                    // Generate JavaScript for this expression.
+                    self.generateJavaScript = function () {
+
+                        var strBlock = " { ";
+
+                        for (var i = 0; i < self.statements.length; i++) {
+
+                            strBlock += self.statements[i].generateJavaScript();
+                        }
+
+                        strBlock += " } ";
+                        return strBlock;
+                    };
+
                     // Save block.
                     self.save = function () {
 

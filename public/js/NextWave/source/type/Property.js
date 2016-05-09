@@ -41,6 +41,18 @@ define(["NextWave/source/utility/prototypes",
                             );
                     };
 
+                    // Generates JavaScript string for this property.
+                    self.generateJavaScript = function () {
+
+                        var strProperty = " ";
+
+                        strProperty += "self." + self.name + " = null;";
+
+                        strProperty += " ";
+
+                        return strProperty;
+                    };
+
                     // Save.
                     self.save = function () {
 
