@@ -403,15 +403,17 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 						function(rows) {
 							if (rows.length) {
 
-								rows.forEach(row, function(){
+								rows.forEach(row, 
+									function() {
 
-									// If within 4 hours of expiring, send a warning version of the invite.
-
-
-
-									// If expired, send an expired email and, if there's someone else on the waitlist, invite that user, giving a new 24-hour deadline.
+										// If within 4 hours of expiring, send a warning version of the invite.
 
 
+
+										// If expired, send an expired email and, if there's someone else on the waitlist, invite that user, giving a new 24-hour deadline.
+
+
+										// Some will be in their first 20 hours. We do nothing with them.
 									}
 								);
 							}

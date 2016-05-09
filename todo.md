@@ -22,14 +22,15 @@
 - AZPPBuyersDialog
     - Display PP info above the tabs.
     - Buyers tab
-        - Drop someone from a class and optionally give a refund thru Stripe.
+        - Finish dropping someone from a class and optionally giving a refund thru Stripe.
+        - Add an email to the user if a refund has been processed.
     - Waitlisted tab
-        - Display tab only for classes.
         - Invite user, tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class. Implement all of this.
         - Allow instructor to overbook by inviting multiple waitlist people.
     - Invited tab
-        - Fetch data. Do it.
-    - Add 5-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist.
+        - Fetch data. Do it. **Done. Test it.**
+    - Add 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
+        - Handle the Accept and Decline links in the email.
 - AZProjectsDialog
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.

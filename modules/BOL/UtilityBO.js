@@ -188,11 +188,32 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 strQuery,
                                 function(rows) {
 
-                                    // Return success
-                                    res.json({
-                                        success: true,
-                                        refundId: refund.id
-                                    });
+                                    // Success. Add a row to the refunds table.
+                                    var strQuery2 = "insert " + self.dbname + " (userId, projectId, refundId) values(" + req.body.userId + "," + req.body.projectId + ",'" + refund.id + "');";
+                                    sql.execute(
+                                        strQuery2,
+                                        function(rows) {
+
+                                            // Add a refund-processed email to the user.
+
+
+
+
+
+
+                                            // Return success
+                                            res.json({
+                                                success: true
+                                            });
+                                        },
+                                        function(strError) {
+
+                                            return res.json({
+                                                success: false,
+                                                message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + strError
+                                            });
+                                        }
+                                    );
                                 },
                                 function(strError) {
                                     return res.json({

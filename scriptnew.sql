@@ -805,6 +805,21 @@ begin
         set @dbstate := 17;
     end if;
     
+    if @dbstate = 17 THEN
+    
+		CREATE TABLE `TGv1000`.`refunds` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `usedId` int(11) NOT NULL,
+		  `projectId` int(11) NOT NULL,
+          `refundId` varchar(255) NOT NULL,
+		  `dtRefund` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		UPDATE control set dbstate=18 where id=1;
+        set @dbstate := 18;
+    end if;
+    
 end//
 
 

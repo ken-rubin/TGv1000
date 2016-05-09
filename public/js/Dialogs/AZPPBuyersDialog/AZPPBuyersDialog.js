@@ -437,21 +437,19 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									if (data.success) {
 
-										if (bRefund) {
+										// If there was a refund requested, a row has been added to the refunds table.
 
-											// Do something with data.refundId.
+										// Delete the user from m_holdData.buyers and reset #BuyersTable.
+										m_holdData.buyers.splice(iUserIndex, 1);
+										m_holdData.project.numEnrollees--;
+										m_setBuyersTable();
 
-
-
-										}
-
-
-
+										errorHelper.show('The project has been deleted.' + (bRefund ? ' And the refund has been sent through Stripe.' : ''));
 
 									} else {
 
 										// !data.success
-										 throw new Error(data.message);
+										throw new Error(data.message);
 									}
 								} catch (e) {
 
@@ -459,13 +457,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								}
 							}
 						);
-
-
-
-						// On successful return, remove user from m_holdData.buyers; adjust numEnrollees in m_holdData.project;
-						// regen and set the project data in the top; re-do the buyers datatable.
-
-
 					}
 
 					function fnInvite (iUserId) {
@@ -481,6 +472,43 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						// In the case of an Accepted Invitation, when the user clicks the Accept link in the email, he is taken to the login page; after login he is
 						// taken directly to NewProjectDialog in mode 2 with the credit card entry form visible.
+						var posting = $.post("/BOL/UtilityBO/SendClassInvite", 
+							{
+								projectId: m_holdData.project.id,
+								userid: iUserid
+							},
+							'json'
+						);
+						posting.done(
+							function(data){
+								
+								try {
+
+									if (data.success) {
+
+										// What we really want to do is to move a user from m_holdData.waitlisted to m_holdData.invited and then rebuild both datatables.
+										// We can try to do that manually or we can refresh the data from the database.
+
+
+
+
+										// Do it
+
+
+
+										errorHelper.show('The user has been sent an email about the class opening has been deleted. He/she has 24 hours to respond.');
+
+									} else {
+
+										// !data.success
+										throw new Error(data.message);
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							}
+						);
 					}
 
 				// catch for outer try
