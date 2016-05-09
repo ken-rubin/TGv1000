@@ -136,49 +136,120 @@ module.exports = function UtilityBO(app, sql, logger) {
             // Processes a Stripe refund and upon success delete the purchased project (cascading).
 
             console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
-            // req.body.chargeId
-            // req.body.projectId
-            // req.body.issueRefund
+            // req.body.projectId: product project id
+            // req.body.userid: iUserid of owner of project
+            // req.body.refund: bRefund
 
-            if (req.body.issueRefund === '1') {
+            if (req.body.refund === '1') {
+
+                var chargeId = null;
+                var id = null;
+                var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
+                sql.execute(
+                    strQuery,
+                    function(rows) {
+
+                        if (!rows.length) {
+
+                            return res.json({
+                                success: false,
+                                message: "Unable to find user's charge Id."
+                            });
+                        }
+
+                        chargeId = rows[0].chargeId;
+                        id = rows[0].id;
+                    },
+                    function(strError) {
+
+                        return res.json({
+                            success: false,
+                            message: "Received this error retrieving charge Id: " + strError
+                        });
+                    }
+                );
 
                 var charge = stripe.refunds.create(
                     {
-                        charge: req.body.chargeId
+                        charge: chargeId
                     },
                     function(err, refund) {
+
                         if (err) {
                             res.json({
                                 success: false,
-                                message: err.message
+                                message: "Received this error processing refund with Stripe: " + err.message
                             });
                         } else {
 
                             // Do a cascading deletion of the project.
+                            var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                            sql.execute(
+                                strQuery,
+                                function(rows) {
 
-
-
-
-
-
-
-                            // Return success
-                            res.json({
-                                success: true,
-                                refundId: refund.id
-                            });
+                                    // Return success
+                                    res.json({
+                                        success: true,
+                                        refundId: refund.id
+                                    });
+                                },
+                                function(strError) {
+                                    return res.json({
+                                        success: false,
+                                        message: "Received this error deleting user's project AFTER the refund was processed successfully: " + strError
+                                    });
+                                }
+                            );
                         }
                     }
                 );
             } else {
 
                 // Just do cascading delete of the project.
+                var id = null;
+                var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
+                sql.execute(
+                    strQuery,
+                    function(rows) {
 
+                        if (!rows.length) {
 
+                            return res.json({
+                                success: false,
+                                message: "Unable to find user's project Id."
+                            });
+                        }
 
+                        id = rows[0].id;
+                    },
+                    function(strError) {
 
+                        return res.json({
+                            success: false,
+                            message: "Received this error retrieving user's project Id: " + strError
+                        });
+                    }
+                );
 
-                
+                // Now do the cascading deletion of the project.
+                var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                sql.execute(
+                    strQuery,
+                    function(rows) {
+
+                        // Return success
+                        res.json({
+                            success: true
+                        });
+                    },
+                    function(strError) {
+                        return res.json({
+                            success: false,
+                            message: "Received this error deleting user's project: " + strError
+                        });
+                    }
+                );
             }
         } catch (e) {
 

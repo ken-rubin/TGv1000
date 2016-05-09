@@ -448,7 +448,11 @@ module.exports = function Cron(app, sql, logger) {
 
 								rows.forEach(row, function(){
 
-									// If 
+									// If within 4 hours of expiring, send a warning version of the invite.
+
+
+
+									// If expired, send an expired email and, if there's someone else on the waitlist, invite that user, giving a new 24-hour deadline.
 
 
 									}

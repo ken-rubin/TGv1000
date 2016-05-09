@@ -371,6 +371,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					function processBtnClick (event) {
 
+						// Initial stage of handling button click in #BuyersTable or #WaitlistedTable.
 						var parts = event.currentTarget.childNodes[0].name.split('-');
 
 						var iUserId = parseInt(parts[1], 10);
@@ -391,10 +392,79 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						// Call to server to delete user's project where comicProjectId = m_iProjectId.
 						// Pass along bool as to whether to process refund or not.
-						// Means that buying has to save a payment token in the project so that the potential refund can be processed.
+						// When we placed the charge, we saved a charge id in the project so that the potential refund could be processed.
 
-						// On successful return, remove user from m_holdData.buyers; adjust numBuyers in m_holdData.project or in one of the datas;
+						var iUserIndex = null;
+						for (var i = 0; i < m_holdData.buyers.length; i++) {
+
+							var userIth = m_holdData.buyers[i];
+							if (userIth.id === iUserId) {
+
+								iUserIndex = i;
+								break;
+							}
+
+							if (!iUserIndex) {
+
+								errorHelper.show("Strange error: we could not find the user in the table. This is rather impossible.");
+								return;
+							}
+						}
+
+						BootstrapDialog.confirm("Are you sure you want to remove " + m_holdData.buyers[iUserIndex].userName + " from this class?"
+							function (result) {
+
+								if (!result) {
+
+									BootstrapDialog.show("OK. Have it your way.");
+									return;
+								}
+							}
+						);
+
+						var posting = $.post("/BOL/UtilityBO/UndoPurchase", 
+							{
+								projectId: m_holdData.project.id,
+								userid: iUserid,
+								refund: bRefund
+							},
+							'json'
+						);
+						posting.done(
+							function(data){
+								
+								try {
+
+									if (data.success) {
+
+										if (bRefund) {
+
+											// Do something with data.refundId.
+
+
+
+										}
+
+
+
+
+									} else {
+
+										// !data.success
+										 throw new Error(data.message);
+									}
+								} catch (e) {
+
+									errorHelper.show(e);
+								}
+							}
+						);
+
+
+
+						// On successful return, remove user from m_holdData.buyers; adjust numEnrollees in m_holdData.project;
 						// regen and set the project data in the top; re-do the buyers datatable.
+
 
 					}
 
