@@ -251,7 +251,7 @@ module.exports = function UtilityBO(app, sql, logger) {
 
             async.waterfall(
                 [
-                    // (1)
+                    // (1a)
                     function(cb) {
 
                         var strQuery = "select * from " + self.dbname + "projects where id=" + req.body.projectId;
@@ -270,9 +270,31 @@ module.exports = function UtilityBO(app, sql, logger) {
                             }
                         );
                     },
-                    // (2)
+                    // (1b)
                     function(passOn, cb) {
                         // So far passOn contains this property: project.
+
+                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";";
+
+                        sql.execute(strQuery,
+                            function(rows){
+
+                                var numEnrollees = 0;
+                                if (rows.length) {
+                                    numEnrollees = rows[0].cnt;
+                                }
+                                passOn.project["numEnrollees"] = numEnrollees;
+                                return cb(null, passOn);
+                            },
+                            function(strError) { 
+
+                                return cb(new Error("Rec'd error fetching numEnrollees from DB: " + strError), null);
+                            }
+                        );
+                    },
+                    // (2)
+                    function(passOn, cb) {
+                        // So far passOn contains this property: project augmented with numEnrollees.
 
                         // Add special PP data
                         var tbl = (passOn.project.isProduct === 1) ? "products" : (passOn.project.isClass === 1) ? "classes" : "onlineclasses";
@@ -292,7 +314,6 @@ module.exports = function UtilityBO(app, sql, logger) {
                                 return cb(new Error("Rec'd error fetching project data from DB: " + strError), null);
                             }
                         );
-
                     },
                     // (3)
                     function(passOn, cb) {
@@ -318,7 +339,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
 
                         // Add array of all waitlistees.
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " order by id asc);";
+                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is null order by dtWaitlisted asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -329,6 +350,25 @@ module.exports = function UtilityBO(app, sql, logger) {
                             function(strError) {
 
                                 return cb(new Error("Rec'd error fetching waitlisted from DB: " + strError), null);
+                            }
+                        );
+                    },
+                    // (5)
+                    function(passOn, cb) {
+                        // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers, waitlisted.
+
+                        // Add array of all waitlistees.
+                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is not null order by dtInvited asc);";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+
+                                passOn["invited"] = rows;
+                                return cb(null, passOn);
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Rec'd error fetching invited from DB: " + strError), null);
                             }
                         );
                     }
@@ -343,7 +383,7 @@ module.exports = function UtilityBO(app, sql, logger) {
                     }
 
                     passOn["success"] = true;
-                    // passOn properties are:  project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; success [bool].
+                    // passOn properties are:  project [project obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of user objs]; waitlisted [array of user objs]; invited [array of user objs]; success [bool].
 
                     return res.json(passOn);
                 }

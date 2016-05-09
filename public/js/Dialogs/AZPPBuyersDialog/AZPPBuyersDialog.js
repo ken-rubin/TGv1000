@@ -143,6 +143,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						m_setBuyersTable();
 						if (m_bClass) {
 							m_setWaitlistedTable();
+							m_setInvitedTable();
 						}
 					}
 
@@ -167,7 +168,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						m_holdData.buyers.forEach(
 							function(u) {
 
-								var usergroupId = u.usergroupId;
 								strHTML += '<tr>';
 
 								// id
@@ -245,7 +245,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						m_holdData.waitlisted.forEach(
 							function(u) {
 
-								var usergroupId = u.usergroupId;
 								strHTML += '<tr>';
 
 								// id
@@ -307,6 +306,52 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							            }
 							        } );
 							    }
+							}
+						);
+					}
+
+					var m_setInvitedTable = function () {
+
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>Expires</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strHTML += '<tbody>';
+
+						m_holdData.invited.forEach(
+							function(u) {
+
+								strHTML += '<tr>';
+
+								// id
+								strHTML += '<td>' + u.id + '</td>';
+								// userName
+								strHTML += '<td>' + u.userName + '</td>';
+								// invitation expires dt.
+								strHTML += '<td>2016-0708 23:45</td>'
+								// firstName
+								strHTML += '<td>' + u.firstName + '</td>';
+								// lastName
+								strHTML += '<td>' + u.lastName + '</td>';
+								// usergroup
+								var strUsergroup;
+								strHTML += '<td>' + u.usergroupName + '</td>';
+								// zipcode
+								strHTML += '<td>' + u.zipcode + '</td>';
+								// timezone
+								strHTML += '<td>' + u.timezone + '</td>';
+								strHTML += '</tr>';
+							}
+						);
+
+						strHTML += '</tbody>';
+
+						$("#InvitedTable").empty();
+						$("#InvitedTable").append(strHTML);
+
+						m_invitedTable = $("#InvitedTable").DataTable(
+							{
+								scrollY: 200,
+								scrollX: true,
+								scrollCollapse: true,
+								dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
 							}
 						);
 					}
@@ -380,6 +425,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_holdData;
 				var m_buyersTable;
 				var m_waitlistedTable;
+				var m_invitedTable;
 				var m_bClass;
 				var m_bOnlineClass;
 				var m_bProduct;
@@ -395,103 +441,3 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 		
 	}
 );
-
-// var m_user;
-// var m_ug_Users;
-// function processSelectChange (select) {
-
-// 	var selectedUsergroup = select.options[select.selectedIndex];
-// 	var arrParts = select.id.split('-');
-// 	var strUserId = arrParts[1];
-// 	var strUsergroupId = selectedUsergroup.value;
-
-// 	var posting = $.post("/BOL/UtilityBO/UpdateUserUsergroup", 
-// 		{
-// 			userId: strUserId,
-// 			usergroupId: strUsergroupId
-// 		},
-// 		'json');
-// 	posting.done(function(data) {
-
-// 			try {
-
-// 				if (data.success) {
-
-// 					// Update in saved array of users m_user.
-// 					var userId = parseInt(strUserId, 10);
-// 					for (var i = 0; i < m_user.length; i++) {
-
-// 						if (m_user[i].id === userId) {
-
-// 							m_user[i].usergroupId = parseInt(strUsergroupId, 10);
-// 							break;
-// 						}
-// 					}
-// 				} else {
-
-// 					// !data.success
-// 					throw new Error(data.message);
-// 				}
-// 			} catch (e) {
-
-// 				alert(e.message);
-// 			}
-// 		}
-// 	);
-// }
-
-// function processCheckboxChange (box) {
-
-// 	var arrParts = box.name.split('-');
-// 	var strUsergroupId = arrParts[1];
-// 	var strPermissionId = arrParts[3];
-
-// 	var posting = $.post("/BOL/UtilityBO/UpdateUgUsers", 
-// 		{
-// 			permissionId: strPermissionId,
-// 			usergroupId: strUsergroupId,
-// 			state: (box.checked ? 'on' : 'off')
-// 		},
-// 		'json');
-// 	posting.done(function(data) {
-
-// 			try {
-
-// 				if (data.success) {
-
-// 					// Update in saved array m_ug_Users.
-// 					var usergroupId = parseInt(strUsergroupId, 10);
-// 					var permissionId = parseInt(strPermissionId, 10);
-
-// 					if (box.checked) {
-
-// 						// Add to array.
-// 						m_ug_Users.push({
-// 							usergroupId: usergroupId,
-// 							permissionId: permissionId
-// 						});
-// 					} else {
-
-// 						// Remove from array.
-// 						for (var i = 0; i < m_ug_Users.length; i++) {
-
-// 							var ugpIth = m_ug_Users[i];
-// 							if (usergroupId === ugpIth.usergroupId && permissionId === ugpIth.permissionId) {
-
-// 								m_ug_Users.splice(i);
-// 								break;
-// 							}
-// 						}
-// 					}
-// 				} else {
-
-// 					// !data.success
-// 					throw new Error(data.message);
-// 				}
-// 			} catch (e) {
-
-// 				alert(e.message);
-// 			}
-// 		}
-// 	);
-// }
