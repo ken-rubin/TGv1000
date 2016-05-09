@@ -17,10 +17,10 @@ module.exports = function Cron(app, sql, logger) {
 	try {
 
 		// Schedule a job to run every night at 1am to send emails.
-		var rule = new schedule.RecurrenceRule();
-		rule.hour = 1;
+		var rule1 = new schedule.RecurrenceRule();
+		rule1.hour = 1;
 
-		var job = schedule.scheduleJob(rule, function() {
+		var job1 = schedule.scheduleJob(rule1, function() {
 
 				try {
 
@@ -431,8 +431,43 @@ module.exports = function Cron(app, sql, logger) {
 				}
 			}
 		);
+
+		// Schedule a job to run every minute and check for expiring or expired waitlist invitees.
+		var rule2 = new schedule.RecurrenceRule();
+		rule2.minute = [new schedule.Range()]; // every minute
+
+		var job2 = schedule.scheduleJob(rule2, function() {
+
+				try {
+
+					var strQuery = "select w.*, u.*, p.name from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
+					sql.execute (
+						strQuery,
+						function(rows) {
+							if (rows.length) {
+
+								rows.forEach(row, function(){
+
+									// If 
+
+
+									}
+								);
+							}
+						},
+						function(strError) {
+							throw new Error("Received this error fetching Invitees: " + strError);
+						}
+					);
+				} catch(ex) {
+					throw ex;
+				}
+			}
+		)
 	} catch(e) {
-		throw e;	// Who's catching this error?????
+		console.log("***");
+		console.log("CRON ERROR: " + e.message);
+		console.log("***");
 	}
 }
 
