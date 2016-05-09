@@ -153,6 +153,13 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Set the cursor.
                                     objectReference.cursor = "cell";
+                                } else if (m_areaAddNew &&
+                                    m_areaAddNew.pointInArea(objectReference.contextRender,
+                                        objectReference.pointCursor,
+                                        true)) {
+
+                                    // Set the cursor.
+                                    objectReference.cursor = "cell";
                                 }
                             }
                             return null;
@@ -183,6 +190,18 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Toggle pinned-ed-ness.
                                 self.pinned = !self.pinned;
+                            } else if (m_areaAddNew &&
+                                m_areaAddNew.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor,
+                                    true) &&
+                                $.isFunction(self.addNew)) {
+
+                                // Invoke the callback.
+                                var exceptionRet = self.addNew();
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
                             }
 
                             return null;
@@ -491,7 +510,7 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.strokeStyle = settings.general.strokeBackground;
                             contextRender.stroke();
 
-                            // Render title and pushpin.
+                            // Render title, add-new (if specified) and pushpin.
                             contextRender.fillStyle = settings.panel.fillTitle;
                             contextRender.font = settings.panel.fontTitle;
                             if (self.dock === orientation.north) {
@@ -568,15 +587,39 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             } else if (self.dock === orientation.west) {
 
-                                    contextRender.save();
-                                    contextRender.rotate(Math.PI/2);
-                                    contextRender.fillText(self.title,
-                                        self.location.y + settings.panel.west.offsetHeight,
-                                        -self.location.x - self.currentExtent.width + settings.panel.gap);
-                                    contextRender.restore();
+                                contextRender.save();
+                                contextRender.rotate(Math.PI/2);
+                                contextRender.fillText(self.title,
+                                    self.location.y + settings.panel.west.offsetHeight,
+                                    -self.location.x - self.currentExtent.width + settings.panel.gap);
+                                contextRender.restore();
 
                                 // Render the pin if open.
                                 if (self.open) {
+
+                                    // If the function is set, then render.
+                                    if ($.isFunction(self.addNew)) {
+
+                                        // Need to know how big the title is.
+                                        var dTitleWidth = contextRender.measureText(self.title).width;
+
+                                        // Calculate where the add new is, also used for hittesting.
+                                        m_areaAddNew = new Area(
+                                            new Point(self.location.x + self.currentExtent.width - settings.glyphs.width, 
+                                                self.location.y + 4 * settings.panel.gap + dTitleWidth),
+                                            new Size(settings.panel.north.lineHeight, 
+                                                settings.panel.north.lineHeight));
+
+                                        // Render pushpin.
+                                        var exceptionRet = glyphs.render(contextRender,
+                                            m_areaAddNew,
+                                            glyphs.addNew, 
+                                            settings.manager.showIconBackgrounds);
+                                        if (exceptionRet) {
+
+                                            throw exceptionRet;
+                                        }
+                                    }
 
                                     var glyph = null;
                                     if (self.pinned) {
@@ -806,6 +849,8 @@ define(["NextWave/source/utility/prototypes",
                     var m_bCreated = false;
                     // Location of the pin glyph.
                     var m_areaGlyph = null;
+                    // Location of the add-new, if specified.
+                    var m_areaAddNew = null;
                     // Placement of the payload.
                     var m_areaPayload = null;
                     // Indicates the mouse is inside the payload.

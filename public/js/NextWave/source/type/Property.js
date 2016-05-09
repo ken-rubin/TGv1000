@@ -18,7 +18,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function Property(strName) {
+            var functionRet = function Property(typeOwner, strName) {
 
                 try {
 
@@ -28,6 +28,9 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(SectionPart,
                         strName,
                         "property");
+
+                    // Keep track of the owning Type.
+                    self.owner = typeOwner;
 
                     ////////////////////////////
                     // Public methods.
@@ -40,6 +43,12 @@ define(["NextWave/source/utility/prototypes",
                                 new CodeExpressionName(self.name)
                             );
                     };
+
+                    // Virtual name of the method to remove this section.  Overtride if not satisfied with method.
+                    self.removeMethod = function () {
+
+                        return "removeProperty";
+                    }
 
                     // Generates JavaScript string for this property.
                     self.generateJavaScript = function () {

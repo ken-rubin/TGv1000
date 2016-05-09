@@ -126,6 +126,20 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Method removes an existing Type.
+                    self.removeType = function (typeToRemove) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.typesPanel.payload.removeType(typeToRemove);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Clear the list of types.
                     self.clearTypes = function () {
 
@@ -291,6 +305,17 @@ define(["NextWave/source/utility/prototypes",
                                 orientation.west, 
                                 new Point(0, settings.layerPanels.typesPanel.y), 
                                 new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
+                            self.typesPanel.addNew = function () {
+
+                                try {
+
+                                    // What to do when the icon is clicked....
+                                    return window.manager.createType();
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
                             var panelMethod = new Panel("Method", 
                                 orientation.south, 
                                 new Point(settings.layerPanels.methodPanel.x, 0), 

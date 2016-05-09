@@ -114,6 +114,75 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Create a new, empty type.
+                    self.createType = function () {
+
+                        try {
+
+                            // Generate a new type-name.
+                            var strName = self.getUniqueName("MyType",
+                                self.types,
+                                "name",
+                                "payload");;
+
+                            // Create type.
+                            var typeNew = new Type();
+                            var exceptionRet = typeNew.create({
+
+                                name: strName
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return self.addType(typeNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Create a new, empty method.
+                    self.createMethod = function (typeContaining) {
+
+                        try {
+
+                            // Generate a new method-name.
+                            var strName = self.getUniqueName("MyMethod",
+                                typeContaining.methods.parts,
+                                "name");
+
+                            // Create type.
+                            var methodNew = new Method(typeContaining,
+                                strName);
+                            return typeContaining.methods.addPart(methodNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Create a new, empty property.
+                    self.createProperty = function (typeContaining) {
+
+                        try {
+
+                            // Generate a new property-name.
+                            var strName = self.getUniqueName("MyProperty",
+                                typeContaining.properties.parts,
+                                "name");
+
+                            // Create type.
+                            var propertyNew = new Property(typeContaining,
+                                strName);
+                            return typeContaining.properties.addPart(propertyNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Method edits a type name.
                     self.getTypeFromName = function (strTypeName) {
 
@@ -160,6 +229,76 @@ define(["NextWave/source/utility/prototypes",
                             // editing if done directly from the type name....
 
                             return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove type from manager/project.
+                    self.removeType = function (typeToRemove) {
+
+                        try {
+
+                            // Search for type.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                // Find match...
+                                if (self.types[i].name.payload === typeToRemove.name.payload) {
+
+                                    // ...and remove.
+                                    self.types.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+
+                            // Also remove from panel layer.
+                            return self.panelLayer.removeType(typeToRemove);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove method from specified type.
+                    self.removeMethod = function (typeOwner, methodToRemove) {
+
+                        try {
+
+                            // Search for type.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                // Find match...
+                                if (self.types[i].name.payload === typeOwner.name.payload) {
+
+                                    // ...and remove.
+                                    return self.types[i].methods.removePart(methodToRemove);
+                                }
+                            }
+                            return null
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove property from specified type.
+                    self.removeProperty = function (typeOwner, propertyToRemove) {
+
+                        try {
+
+                            // Search for type.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                // Find match...
+                                if (self.types[i].name.payload === typeOwner.name.payload) {
+
+                                    // ...and remove.
+                                    return self.types[i].properties.removePart(propertyToRemove);
+                                }
+                            }
+                            return null
                         } catch (e) {
 
                             return e;

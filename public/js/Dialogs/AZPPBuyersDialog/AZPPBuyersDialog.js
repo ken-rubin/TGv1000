@@ -411,7 +411,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 						}
 
-						BootstrapDialog.confirm("Are you sure you want to remove " + m_holdData.buyers[iUserIndex].userName + " from this class?"
+						BootstrapDialog.confirm("Are you sure you want to remove " + m_holdData.buyers[iUserIndex].userName + " from this class?",
 							function (result) {
 
 								if (!result) {

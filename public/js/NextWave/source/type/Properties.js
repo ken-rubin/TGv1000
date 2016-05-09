@@ -20,7 +20,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function Properties(arrayProperties) {
+            var functionRet = function Properties(typeOwner, arrayProperties) {
 
                 try {
 
@@ -28,12 +28,19 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from TypeSection.
                     self.inherits(TypeSection,
+                        typeOwner, 
                         "Properties",
                         "properties",
                         arrayProperties);
 
                     ///////////////////////////
                     // Public methods.
+
+                    // Virtual method, defaults to method, override if not desired.
+                    self.createMethod = function () {
+
+                        return "createProperty";
+                    };
 
                     // Generates JavaScript string for the properties.
                     self.generateJavaScript = function () {

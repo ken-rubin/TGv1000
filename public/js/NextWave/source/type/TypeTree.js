@@ -42,6 +42,28 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    // Remove type.
+                    self.removeType = function (typeRemove) {
+
+                        try {
+
+                            // Find type....
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // If found, remove it.
+                                if (self.items[i].name.payload === typeRemove.name.payload) {
+
+                                    self.items.splice(i, 1);
+                                    break;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
                 } catch (e) {
 
                     alert(e.message);

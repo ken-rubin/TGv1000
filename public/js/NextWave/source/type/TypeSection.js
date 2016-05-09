@@ -22,7 +22,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function TypeSection(strName, strSettingsNode, arrayParts) {
+        	var functionRet = function TypeSection(typeOwner, strName, strSettingsNode, arrayParts) {
 
                 try {
 
@@ -31,6 +31,8 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public fields.
 
+                    // The type that owns this Section.
+                    self.owningType = typeOwner || null;
                     // Name of this type object.
                     self.name = strName || "Default";
                     // Collection of contained method objects.
@@ -62,6 +64,26 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Remove a part from ths TypeSection.
+                    self.removePart = function (partToRemove) {
+
+                        try {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                if (self.parts[i].name === partToRemove.name) {
+
+                                    self.parts.splice(i, 1);
+                                    break;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Returns the height of this type.
                     self.getHeight = function () {
 
@@ -73,6 +95,12 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         return dHeight;
+                    };
+
+                    // Virtual method, defaults to method, override if not desired.
+                    self.createMethod = function () {
+
+                        return "createMethod";
                     };
 
                     // Virtual method overridden for meta.
@@ -100,8 +128,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // If over the title.
-                            if (self.overName(objectReference.pointCursor) &&
-                                m_areaGlyph) {
+                            if (self.overName(objectReference.pointCursor)) {
 
                                 // Toggle openness.
                                 var bIn = m_areaGlyph.pointInArea(objectReference.contextRender,
@@ -117,6 +144,11 @@ define(["NextWave/source/utility/prototypes",
 
                                         self.open = true;
                                     }
+                                } else if (m_areaAddNew.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor)) {
+
+                                    // Add new, empty Method or property to the owning Type.
+                                    return window.manager[self.createMethod()](self.owningType);
                                 }
                             } else if (self.highlightChild) {
 
@@ -165,6 +197,10 @@ define(["NextWave/source/utility/prototypes",
                                 if (bIn) {
 
                                     objectReference.cursor = "cell";
+                                } else if (m_areaAddNew.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor)) {
+
+                                    objectReference.cursor = "cell";
                                 }
                             } else {
 
@@ -192,6 +228,11 @@ define(["NextWave/source/utility/prototypes",
                             if (self.highlightChild) {
 
                                 self.highlightChild.highlight = true;
+
+                                if ($.isFunction(self.highlightChild.mouseMove)) {
+
+                                    return self.highlightChild.mouseMove(objectReference);
+                                }
                             }
                             return null;
                         } catch (e) {
@@ -334,6 +375,23 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Draw the add new glyph.
+                            m_areaAddNew = new Area(
+                                new Point(self.area.location.x + self.area.extent.width - 2 * settings.glyphs.width + settings.general.margin,
+                                    self.area.location.y),
+                                new Size(settings.glyphs.width - settings.general.margin, 
+                                    settings.glyphs.height - settings.general.margin));
+
+                            // Render glyph.
+                            exceptionRet = glyphs.render(contextRender,
+                                m_areaAddNew,
+                                glyphs.addNew, 
+                                settings.manager.showIconBackgrounds);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             return null;
                         } catch (e) {
 
@@ -415,6 +473,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Area of glyph.
                     var m_areaGlyph = null;
+                    // Area of add new icon.
+                    var m_areaAddNew = null;
                 } catch (e) {
 
                     alert(e.message);

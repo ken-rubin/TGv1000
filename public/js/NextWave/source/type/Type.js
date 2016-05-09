@@ -46,9 +46,9 @@ define(["NextWave/source/utility/prototypes",
                     // Name of this type object.
                     self.name = new CodeType();
                     // Colleciton of methods.
-                    self.methods = new Methods();
+                    self.methods = new Methods(self);
                     // Colleciton of properties.
-                    self.properties = new Properties();
+                    self.properties = new Properties(self);
                     // Collection of contained method objects.
                     self.typeSections = [self.methods, 
                         self.properties];
@@ -109,34 +109,41 @@ define(["NextWave/source/utility/prototypes",
                             };
 
                             // Build the methods.
-                            for (var j = 0; j < objectType.methods.length; j++) {
+                            if (objectType.methods) {
 
-                                var objectMethodIth = objectType.methods[j];
+                                for (var j = 0; j < objectType.methods.length; j++) {
 
-                                var methodNew = new Method(self,
-                                    objectMethodIth.name);
-                                var exceptionRet = methodNew.create(objectMethodIth);
-                                if (exceptionRet) {
+                                    var objectMethodIth = objectType.methods[j];
 
-                                    return exceptionRet;
-                                }
-                                exceptionRet = self.methods.addPart(methodNew);
-                                if (exceptionRet) {
+                                    var methodNew = new Method(self,
+                                        objectMethodIth.name);
+                                    var exceptionRet = methodNew.create(objectMethodIth);
+                                    if (exceptionRet) {
 
-                                    return exceptionRet;
+                                        return exceptionRet;
+                                    }
+                                    exceptionRet = self.methods.addPart(methodNew);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
 
                             // Build the properties.
-                            for (var j = 0; j < objectType.properties.length; j++) {
+                            if (objectType.properties) {
 
-                                var objectPropertyIth = objectType.properties[j];
+                                for (var j = 0; j < objectType.properties.length; j++) {
 
-                                var propertyNew = new Property(objectPropertyIth.name);
-                                var exceptionRet = self.properties.addPart(propertyNew);
-                                if (exceptionRet) {
+                                    var objectPropertyIth = objectType.properties[j];
 
-                                    return exceptionRet;
+                                    var propertyNew = new Property(self,
+                                        objectPropertyIth.name);
+                                    var exceptionRet = self.properties.addPart(propertyNew);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
 
@@ -384,13 +391,7 @@ define(["NextWave/source/utility/prototypes",
                                     }
                                 } else if (m_objectHighlight === m_areaDeleteIcon) {
 
-                                    if (self.open) {
-
-                                        self.open = false;
-                                    } else {
-
-                                        self.open = true;
-                                    }
+                                    return window.manager.removeType(self);
                                 } else if (m_objectHighlight === self.name) {
 
                                     return window.manager.setFocus(m_objectHighlight);

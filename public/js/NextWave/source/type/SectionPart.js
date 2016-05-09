@@ -12,10 +12,11 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
+    "NextWave/source/utility/glyphs",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area"],
-    function (prototypes, settings, Point, Size, Area) {
+    function (prototypes, settings, glyphs, Point, Size, Area) {
 
         try {
 
@@ -58,18 +59,55 @@ define(["NextWave/source/utility/prototypes",
                         return false;
                     };
 
+                    // Virtual name of the method to remove this section.  Overtride if not satisfied with method.
+                    self.removeMethod = function () {
+
+                        return "removeMethod";
+                    }
+
                     // Invoked when the mouse is pressed down over the type.
                     self.mouseDown = function (objectReference) {
 
                         try {
 
                             // Can't do much if no area.
-                            if (!self.area) {
+                            if (!m_area ||
+                                !m_areaRemove) {
 
                                 return null;
                             }
 
-                            // Don't do much anyway....
+                            // Remove if clicked.
+                            if (m_areaRemove.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor)) {
+
+                                return window.manager[self.removeMethod()](self.owner, self);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is moved over the type.
+                    self.mouseMove = function (objectReference) {
+
+                        try {
+
+                            // Can't do much if no area.
+                            if (!m_area ||
+                                !m_areaRemove) {
+
+                                return null;
+                            }
+
+                            // Remove if clicked.
+                            if (m_areaRemove.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor)) {
+
+                                objectReference.cursor = "cell";
+                            }
                             return null;
                         } catch (e) {
 
@@ -129,6 +167,23 @@ define(["NextWave/source/utility/prototypes",
                                 m_area.location.y + settings.general.margin,
                                 m_area.extent.width - 2 * settings.general.margin);
 
+                            // Render the delete icon.
+                            m_areaRemove = new Area(
+                                new Point(m_area.location.x + m_area.extent.width - (self.getHeight() - settings.general.margin),
+                                    m_area.location.y),
+                                new Size(self.getHeight() - 2 * settings.general.margin, 
+                                    self.getHeight() - 2 * settings.general.margin));
+
+                            // Render glyph.
+                            exceptionRet = glyphs.render(contextRender,
+                                m_areaRemove,
+                                glyphs.remove, 
+                                settings.manager.showIconBackgrounds);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             return null;
                         } catch (e) {
 
@@ -141,6 +196,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // The area, relative to the canvas, occupied by this instance.
                     var m_area = null;
+                    // The delete icon location.
+                    var m_areaRemove = null;
                 } catch (e) {
 
                     alert(e.message);

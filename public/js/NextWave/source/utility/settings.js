@@ -136,6 +136,11 @@ define(["NextWave/source/utility/prototypes"],
 
                             x: 820,
                             y: 316
+                        },
+                        addNew: {
+
+                            x: 707,
+                            y: 316
                         }
                     };
                     self.layerPanels = {

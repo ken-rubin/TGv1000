@@ -51,6 +51,9 @@ define(["NextWave/source/utility/prototypes",
                     // contract.
                     self.remove = new Area(new Point(settings.glyphs.remove.x,settings.glyphs.remove.y),
                         new Size(settings.glyphs.width, settings.glyphs.width));
+                    // addNew.
+                    self.addNew = new Area(new Point(settings.glyphs.addNew.x,settings.glyphs.addNew.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
 
                     ///////////////////////
                     // Public methods.
