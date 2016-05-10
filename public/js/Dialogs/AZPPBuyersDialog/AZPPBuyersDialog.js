@@ -123,7 +123,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					var m_setDataDisplay = function () {
-						// properties of m_holdData: project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; success [bool]
+						// properties of m_holdData: project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; recentRefunds [array of objs] success [bool]
 
 						if (!m_bClass) {
 							// Completely remove the #Waitlisted tab by removing $(".remove").
@@ -145,6 +145,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							m_setWaitlistedTable();
 							m_setInvitedTable();
 						}
+						m_setRecentRefundsTable();
 					}
 
 					var m_setProjectData = function () {
@@ -354,6 +355,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
 							}
 						);
+					}
+
+					var m_setRecentRefundsTable = function () {
+						
 					}
 
 					function fnTabscreate (event, ui) {

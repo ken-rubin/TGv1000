@@ -819,6 +819,15 @@ begin
 		UPDATE control set dbstate=18 where id=1;
         set @dbstate := 18;
     end if;
+
+    if @dbstate = 18 THEN
+    
+		ALTER TABLE `tgv1000`.`refunds` 
+			CHANGE COLUMN `usedId` `userId` INT(11) NOT NULL ;
+
+		UPDATE control set dbstate=19 where id=1;
+        set @dbstate := 19;
+    end if;
     
 end//
 
