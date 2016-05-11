@@ -163,8 +163,8 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 								}
 							}
 
-							if (index > -1)
-								m_srComicStrip.repositionRedDivBehind(index);
+							// if (index > -1)
+							// 	m_srComicStrip.repositionRedDivBehind(index);
 
 							return null;
 							

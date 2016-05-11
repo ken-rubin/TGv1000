@@ -634,7 +634,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Destroy instance.
                     self.destroy = function () {
-                        
+
                     }
 
                     // Clear the list of types.
@@ -747,32 +747,85 @@ define(["NextWave/source/utility/prototypes",
 
                     // Load all types and visible/existing panels 
                     // into this manager instance from persistence.
+                    // objectInitializer is comics[i].data as loaded from database.
+                    // It needs to be massaged a bit.
                     self.load = function (objectInitializer) {
 
                         try {
 
-                            // Save the initializer.
-                            self.initializer = objectInitializer;
+                            // Massage objectInitializer into the format manager requires.
+                            // Clone it into self.initializer.
+                            self.initializer = JSON.parse(JSON.stringify(objectInitializer));
+
+                            // Now empty the arrays. We have to do this because their structure is like:
+                            // { types: items: [{type0},...{typeN}]}
+                            self.initializer.types = [];
+                            self.initializer.expressions = [];
+                            self.initializer.statements = [];
+                            self.initializer.literals = [];
+
+                            objectInitializer.types.items.forEach(
+                                function(typeIth) {
+                                    typeIth.methods.forEach(
+                                        function(methodIth) {
+                                            methodIth.statements = JSON.parse(methodIth.workspace).statements;
+                                            methodIth.arguments = [];
+                                            if (methodIth.parameters.length) {
+
+                                                // Separate, de-dupe, recombine
+                                                var pArray = methodIth.parameters.match(/([\w\-]+)/g);
+                                                if (pArray.length) {
+
+                                                    // Remove possible dups from pArray.
+                                                    for (var i = 0; i < pArray.length; i++)
+                                                    {
+                                                        if (($.inArray(pArray[i], uniqueArray)) == -1)
+                                                        {
+                                                            methodIth.arguments.push(pArray[i]);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    );
+                                    self.initializer.types.push(typeIth);
+                                }
+                            )
+                            objectInitializer.expressions.items.forEach(
+                                function(expressionIth) {
+                                    self.initializer.expressions.push(expressionIth);
+                                }
+                            )
+                            objectInitializer.statements.items.forEach(
+                                function(statementIth) {
+                                    self.initializer.statements.push(statementIth);
+                                }
+                            )
+                            objectInitializer.literals.items.forEach(
+                                function(literalIth) {
+                                    self.initializer.literals.push(literalIth);
+                                }
+                            )
 
                             // Load up panels.
-                            var exceptionRet = self.loadLiterals(objectInitializer.literals);
+                            var exceptionRet = self.loadLiterals(self.initializer.literals);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.loadExpressions(objectInitializer.expressions);
+                            exceptionRet = self.loadExpressions(self.initializer.expressions);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.loadStatements(objectInitializer.statements);
+                            exceptionRet = self.loadStatements(self.initializer.statements);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
                             // Add the types from the initializer into this intance.
-                            return self.loadTypes(objectInitializer.types);
+                            return self.loadTypes(self.initializer.types);
                         } catch (e) {
 
                             return e;

@@ -1158,7 +1158,7 @@ begin
                 (5,9)
 			;
             
-		UPDATE `tgv1000`.`methods` set workspace = '{}';
+		UPDATE `tgv1000`.`methods` set workspace = '{"statements": []}';
             
 		ALTER TABLE `tgv1000`.`methods` 
 			CHANGE COLUMN `workspace` `workspace` JSON NOT NULL ;

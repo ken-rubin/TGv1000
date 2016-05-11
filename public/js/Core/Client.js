@@ -519,21 +519,24 @@ define(["Core/errorHelper",
 
 							// Enable the TypeWell icons that are disabled if no project is loaded.
 							// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
-							$(".disabledifnoproj").prop("disabled", false);
+							// $(".disabledifnoproj").prop("disabled", false);
 
 				    		// Allocate project.
 				    		m_clProject = new Project();
 				    		var exceptionRet = m_clProject.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
 
-				    		// Play App Type's initialize Method to set the initial state of the designer frame
-		    				designer.initializeWithWorkspace();
+				    		exceptionRet = manager.load(comics.getActiveComic().data);
+				    		if (exceptionRet) { return exceptionRet; }
 
-							// Fire bootstrap tooltip opt-in.
-							$(".disabledifnoproj").powerTip({
-								smartPlacement: true,
-								manual: false
-							});
+				    		// Play App Type's initialize Method to set the initial state of the designer frame
+		    				// designer.initializeWithWorkspace();
+
+							// // Fire bootstrap tooltip opt-in.
+							// $(".disabledifnoproj").powerTip({
+							// 	smartPlacement: true,
+							// 	manual: false
+							// });
 
 							if ($.isFunction(callback)) {
 

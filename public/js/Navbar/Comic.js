@@ -45,11 +45,13 @@ define(["Core/errorHelper", "Core/resourceHelper"],
 							}
 
 							// Clear prior data out of Blockly and code.
-							exceptionRet = code.reset(true);	// Force complete reset.
-							if (exceptionRet) { throw exceptionRet; }
+							// exceptionRet = code.reset(true);	// Force complete reset.
+							// if (exceptionRet) { throw exceptionRet; }
 
 							// Create or re-create the strips with this comic's data.
-							return types.load(self.data.types);
+							// return types.load(self.data.types);
+
+							return null;
 							
 						} catch (e) {
 
