@@ -1166,7 +1166,28 @@ begin
 		UPDATE control set dbstate=20 where id=1;
         set @dbstate := 20;
     end if;
+
+    if @dbstate = 20 THEN
+
+        ALTER TABLE `TGv1000`.`comics_expressions`
+			ADD CONSTRAINT FK_comicsexp
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
     
+        ALTER TABLE `TGv1000`.`comics_statements`
+			ADD CONSTRAINT FK_comicsstmt
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+    
+        ALTER TABLE `TGv1000`.`comics_literals`
+			ADD CONSTRAINT FK_comicslit
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+    
+		UPDATE control set dbstate=21 where id=1;
+        set @dbstate := 21;
+    end if;
+
 end//
 
 

@@ -1735,6 +1735,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     comicIth.id = rows[0].insertId;
 
                                     // Do content of comic: comiccode and types (and all their content) in parallel.
+                                    // Also do the juntion tables comics_statements, comics_Expressions and comics_literals.
                                     async.parallel(
                                         [
                                             function(cb){
@@ -1750,6 +1751,33 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                 m_log("Going to m_saveComiccodeInComicIthToDB");
                                                 m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComics_StatementsInComicIthToDB");
+                                                m_saveComics_StatementsInComicIthToDB(connection, req, res, project, comicIth,
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComics_ExpressionsInComicIthToDB");
+                                                m_saveComics_ExpressionsInComicIthToDB(connection, req, res, project, comicIth,
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComics_LiteralsInComicIthToDB");
+                                                m_saveComics_LiteralsInComicIthToDB(connection, req, res, project, comicIth,
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -1783,6 +1811,198 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch (e) { callback(e); }
     }
 
+    var m_saveComics_StatementsInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+
+        try {
+
+            m_log("***In m_saveComics_StatementsInComicIthToDB***");
+
+            var statements = [];
+
+            async.series(
+                [
+                    // Fill statements array.
+                    function(cb) {
+
+                        var strQuery = "select * from " + self.dbname + "statements;";
+                        sql.queryWithCxn(connection,
+                            strQuery,
+                            function(err, rows) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                statements = rows;
+                            }
+                        );
+                    },
+                    // Save to comics_statements, using statements array to look up statementId.
+                    function(cb) {
+
+                        async.eachSeries(comicIth.statements.items,
+                            function(lIth, cb) {
+
+                                for (var i = 0; i < statements.length; i++) {
+                                    if (lIth === statements[i].name) {
+                                        lIth.statementId = statements[i].id;
+                                        break;
+                                    }
+                                }
+
+                                lIth.comicId = comicIth.id;
+                                var guts = {
+                                    comicId: lIth.comicId,
+                                    statementId: lIth.statementId
+                                };
+                                var strQuery = "INSERT " + self.dbname + "comics_statements SET ?";
+                                sql.queryWithCxnWithPlaceholders(connection,
+                                    strQuery,
+                                    guts,
+                                    function(err, rows) {
+                                        return cb(err);
+                                    }
+                                );
+                            },
+                            // final callback
+                            function(err) { return cb(err); }
+                        );
+                    }
+                ],
+                //final callback of async.series
+                function(err) {
+                    return callback(err);
+                }
+            );
+        } catch(e) { callback(e); }
+    }
+            
+    var m_saveComics_ExpressionsInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+
+        try {
+
+            m_log("***In m_saveComics_ExpressionsInComicIthToDB***");
+
+            var expressions = [];
+
+            async.series(
+                [
+                    // Fill expressions array.
+                    function(cb) {
+
+                        var strQuery = "select * from " + self.dbname + "expressions;";
+                        sql.queryWithCxn(connection,
+                            strQuery,
+                            function(err, rows) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                expressions = rows;
+                            }
+                        );
+                    },
+                    // Save to comics_expressions, using expressions array to look up expressionId.
+                    function(cb) {
+
+                        async.eachSeries(comicIth.expressions.items,
+                            function(lIth, cb) {
+
+                                for (var i = 0; i < expressions.length; i++) {
+                                    if (lIth === expressions[i].name) {
+                                        lIth.expressionId = expressions[i].id;
+                                        break;
+                                    }
+                                }
+
+                                lIth.comicId = comicIth.id;
+                                var guts = {
+                                    comicId: lIth.comicId,
+                                    expressionId: lIth.expressionId
+                                };
+                                var strQuery = "INSERT " + self.dbname + "comics_expressions SET ?";
+                                sql.queryWithCxnWithPlaceholders(connection,
+                                    strQuery,
+                                    guts,
+                                    function(err, rows) {
+                                        return cb(err);
+                                    }
+                                );
+                            },
+                            // final callback
+                            function(err) { return cb(err); }
+                        );
+                    }
+                ],
+                //final callback of async.series
+                function(err) {
+                    return callback(err);
+                }
+            );
+        } catch(e) { callback(e); }
+    }
+            
+    var m_saveComics_LiteralsInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+
+        try {
+
+            m_log("***In m_saveComics_LiteralsInComicIthToDB***");
+
+            var literals = [];
+
+            async.series(
+                [
+                    // Fill literals array.
+                    function(cb) {
+
+                        var strQuery = "select * from " + self.dbname + "literals;";
+                        sql.queryWithCxn(connection,
+                            strQuery,
+                            function(err, rows) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                literals = rows;
+                            }
+                        );
+                    },
+                    // Save to comics_literals, using literals array to look up statementId.
+                    function(cb) {
+
+                        async.eachSeries(comicIth.literals.items,
+                            function(lIth, cb) {
+
+                                for (var i = 0; i < literals.length; i++) {
+                                    if (lIth === literals[i].name) {
+                                        lIth.literalId = literals[i].id;
+                                        break;
+                                    }
+                                }
+
+                                lIth.comicId = comicIth.id;
+                                var guts = {
+                                    comicId: lIth.comicId,
+                                    literalId: lIth.literalId
+                                };
+                                var strQuery = "INSERT " + self.dbname + "comics_literals SET ?";
+                                sql.queryWithCxnWithPlaceholders(connection,
+                                    strQuery,
+                                    guts,
+                                    function(err, rows) {
+                                        return cb(err);
+                                    }
+                                );
+                            },
+                            // final callback
+                            function(err) { return cb(err); }
+                        );
+                    }
+                ],
+                //final callback of async.series
+                function(err) {
+                    return callback(err);
+                }
+            );
+        } catch(e) { callback(e); }
+    }
+            
     var m_saveComiccodeInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
         try {
@@ -1822,7 +2042,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 // final callback
                 function(err) { return callback(err); }
             );
-
         } catch(e) { callback(e); }
     }
 
