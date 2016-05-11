@@ -632,6 +632,11 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Destroy instance.
+                    self.destroy = function () {
+                        
+                    }
+
                     // Clear the list of types.
                     self.clearTypes = function () {
 

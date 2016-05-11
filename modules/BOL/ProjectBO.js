@@ -277,6 +277,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comicIth.originalComicId = comicIth.id;
                             comicIth.comiccode = { items: [] };
                             comicIth.types = { items: [] };
+                            comicIth.expressions = { items: [] };
+                            comicIth.statements = { items: [] };
+                            comicIth.literals = { items: [] };
 
                             // Fill comicIth's comiccode and types (including System Types).
                             m_functionRetProjDoComicInternals(  req, 
@@ -443,6 +446,60 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             function(strError) { return cbp3(new Error(strError)); }
                         );
                         if (exceptionRet) { return cbp3(exceptionRet); }
+                    },
+                    function(cb) {  // expressions
+
+                        var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ");";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+                                rows.forEach(
+                                    function(rowIth) {
+                                        comicIth.expressions.items.push(rowIth.name);
+                                    }
+                                );
+                                return cb(null);
+                            },
+                            function(strError) {
+                                return cb(new Error(strError));
+                            }
+                        );
+                    },
+                    function(cb) {  // statements
+
+                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ");";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+                                rows.forEach(
+                                    function(rowIth) {
+                                        comicIth.statements.items.push(rowIth.name);
+                                    }
+                                );
+                                return cb(null);
+                            },
+                            function(strError) {
+                                return cb(new Error(strError));
+                            }
+                        );
+                    },
+                    function(cb) {  // literals
+
+                        var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ");";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+                                rows.forEach(
+                                    function(rowIth) {
+                                        comicIth.literals.items.push(rowIth.name);
+                                    }
+                                );
+                                return cb(null);
+                            },
+                            function(strError) {
+                                return cb(new Error(strError));
+                            }
+                        );
                     }
                 ],
                 function(err) {
