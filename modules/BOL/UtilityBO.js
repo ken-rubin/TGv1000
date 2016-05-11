@@ -335,11 +335,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // req.body.projectId
 
             // Retrieve and build a response containing: 
-            // (1) the project; 
+            // (1) the project with numEnrollees property added; 
             // (2) special PP data; 
             // (3) array of purchasers (users); 
             // (4) array of waitlisted users, if any (in order).
-            // (5) array of users in the 24-hour period after being invited to enroll.
+            // (5) array of users in the 24-hour period after being invited to enroll. Will be displayed with active countdown.
+            // (6) array of up to 10 latest refunds.
 
             async.waterfall(
                 [
@@ -365,6 +366,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (1b)
                     function(passOn, cb) {
                         // So far passOn contains this property: project.
+                        // This function adds passOn.project.numEnrollees
 
                         var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";";
 
@@ -387,8 +389,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (2)
                     function(passOn, cb) {
                         // So far passOn contains this property: project augmented with numEnrollees.
+                        // This function adds passOn.classesdata or onlineclassesdata or productsdata for the project.
 
-                        // Add special PP data
                         var tbl = (passOn.project.isProduct === 1) ? "products" : (passOn.project.isClass === 1) ? "classes" : "onlineclasses";
                         var strQuery = "select * from " + self.dbname + tbl + " where baseProjectId=" + req.body.projectId + ";";
                         sql.execute(strQuery,
@@ -410,8 +412,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (3)
                     function(passOn, cb) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata.
+                        // This function adds passOn.buyers.
 
-                        // Add array of all purchasers.
                         var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
                         sql.execute(
                             strQuery,
@@ -429,8 +431,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (4)
                     function(passOn, cb) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
+                        // This function adds passOn.waitlisted.
 
-                        // Add array of all waitlistees.
                         var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is null order by dtWaitlisted asc);";
                         sql.execute(
                             strQuery,
@@ -448,8 +450,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (5)
                     function(passOn, cb) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers, waitlisted.
+                        // This function adds passOn.invited.
 
-                        // Add array of all waitlistees.
                         var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is not null order by dtInvited asc);";
                         sql.execute(
                             strQuery,
@@ -461,6 +463,25 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             function(strError) {
 
                                 return cb(new Error("Rec'd error fetching invited from DB: " + strError), null);
+                            }
+                        );
+                    },
+                    // (6)
+                    function(passOn, cb) {
+                        // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers, waitlisted, invited.
+                        // This function adds passOn.recentRefunds. These refunds apply across all purchasable products, unlike all the other passOn properties.
+
+                        var strQuery = "select r.*, u.userName, p.name from " + self.dbname + "refunds r inner join " + self.dbname + "user u on u.id=r.userId inner join " + self.dbname + "projects p on p.id=r.projectId order by dtRefund desc LIMIT 100;";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+
+                                passOn["recentRefunds"] = rows;
+                                return cb(null, passOn);
+                            },
+                            function(strError) {
+
+                                return cb(new Error("Rec'd error fetching refunds from DB: " + strError), null);
                             }
                         );
                     }
@@ -475,8 +496,6 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     }
 
                     passOn["success"] = true;
-                    // passOn properties are:  project [project obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of user objs]; waitlisted [array of user objs]; invited [array of user objs]; success [bool].
-
                     return res.json(passOn);
                 }
             );
