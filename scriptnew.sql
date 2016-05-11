@@ -6,10 +6,10 @@ delimiter //
 
 
 
-/* 
+/* */
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
- */
+/* */
 
 
 
@@ -19,7 +19,7 @@ SELECT database()//
 
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/* 
+/* */ 
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -54,11 +54,11 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
- */
+/* */
 
 
 -- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/* 
+/* */
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 
@@ -84,7 +84,7 @@ begin
     RETURN @uniqueName;
 end //
 
- */
+/* */
 
 create procedure maintainDB()
 begin
@@ -860,12 +860,11 @@ begin
 				(4,'StatementFor'),
 				(5,'StatementForIn'),
 				(6,'StatementIf'),
-				(7,'StatementList'),
-				(8,'StatementReturn'),
-				(9,'StatementThrow'),
-				(10,'StatementTry'),
-				(11,'StatementVar'),
-                (12,'StatementWhile')
+				(7,'StatementReturn'),
+				(8,'StatementThrow'),
+				(9,'StatementTry'),
+				(10,'StatementVar'),
+                (11,'StatementWhile')
                 ;
                 
         insert TGv1000.expressions (id, `name`)
@@ -882,19 +881,18 @@ begin
 				(10,'ExpressionInvocation'),
 				(11,'ExpressionLess'),
                 (12,'ExpressionLessOrEqual'),
-                (13,'ExpressionList'),
-                (14,'ExpressionLogicalAnd'),
-                (15,'ExpressionLogicalNot'),
-                (16,'ExpressionLogicalOr'),
-                (17,'ExpressionModulo'),
-                (18,'ExpressionMultiply'),
-                (19,'ExpressionNegate'),
-                (20,'ExpressionNew'),
-                (21,'ExpressionNotEqual'),
-                (22,'ExpressionParentheses'),
-                (23,'ExpressionRefinement'),
-                (24,'ExpressionSubtract'),
-                (25,'ExpressionTernary')
+                (13,'ExpressionLogicalAnd'),
+                (14,'ExpressionLogicalNot'),
+                (15,'ExpressionLogicalOr'),
+                (16,'ExpressionModulo'),
+                (17,'ExpressionMultiply'),
+                (18,'ExpressionNegate'),
+                (19,'ExpressionNew'),
+                (20,'ExpressionNotEqual'),
+                (21,'ExpressionParentheses'),
+                (22,'ExpressionRefinement'),
+                (23,'ExpressionSubtract'),
+                (24,'ExpressionTernary')
                 ;
                 
 		insert TGv1000.literals (id, `name`)
@@ -902,33 +900,266 @@ begin
 				(1,'LiteralArray'),
 				(2,'LiteralBoolean'),
 				(3,'LiteralInfinity'),
-				(4,'LiteralList'),
-				(5,'LiteralNaN'),
-				(6,'LiteralNull'),
-				(7,'LiteralNumber'),
-				(8,'LiteralObject'),
-				(9,'LiteralRegexp'),
-				(10,'LiteralString')
+				(4,'LiteralNaN'),
+				(5,'LiteralNull'),
+				(6,'LiteralNumber'),
+				(7,'LiteralObject'),
+				(8,'LiteralRegexp'),
+				(9,'LiteralString')
                 ;
         
-		CREATE TABLE `TGv1000`.`comic_statement` (
+		CREATE TABLE `TGv1000`.`comics_statements` (
 		  `comicId` int(11) NOT NULL,
 		  `statementId` int(11) NOT NULL,
 		  PRIMARY KEY (`comicId`,`statementId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
-		CREATE TABLE `TGv1000`.`comic_expression` (
+        insert comics_statements
+			VALUES
+				(1,1),
+				(1,2),
+				(1,3),
+				(1,4),
+                (1,5),
+                (1,6),
+                (1,7),
+                (1,8),
+                (1,9),
+                (1,10),
+                (1,11),
+                (1,12),
+                (1,13),
+                (1,14),
+                (1,15),
+                (1,16),
+                (1,17),
+                (1,18),
+                (1,19),
+                (1,20),
+                (1,21),
+                (1,22),
+                (1,23),
+                (1,24),
+				(2,1),
+				(2,2),
+				(2,3),
+				(2,4),
+                (2,5),
+                (2,6),
+                (2,7),
+                (2,8),
+                (2,9),
+                (2,10),
+                (2,11),
+                (2,12),
+                (2,13),
+                (2,14),
+                (2,15),
+                (2,16),
+                (2,17),
+                (2,18),
+                (2,19),
+                (2,20),
+                (2,21),
+                (2,22),
+                (2,23),
+                (2,24),
+				(3,1),
+				(3,2),
+				(3,3),
+				(3,4),
+                (3,5),
+                (3,6),
+                (3,7),
+                (3,8),
+                (3,9),
+                (3,10),
+                (3,11),
+                (3,12),
+                (3,13),
+                (3,14),
+                (3,15),
+                (3,16),
+                (3,17),
+                (3,18),
+                (3,19),
+                (3,20),
+                (3,21),
+                (3,22),
+                (3,23),
+                (3,24),
+				(4,1),
+				(4,2),
+				(4,3),
+				(4,4),
+                (4,5),
+                (4,6),
+                (4,7),
+                (4,8),
+                (4,9),
+                (4,10),
+                (4,11),
+                (4,12),
+                (4,13),
+                (4,14),
+                (4,15),
+                (4,16),
+                (4,17),
+                (4,18),
+                (4,19),
+                (4,20),
+                (4,21),
+                (4,22),
+                (4,23),
+                (4,24),
+				(5,1),
+				(5,2),
+				(5,3),
+				(5,4),
+                (5,5),
+                (5,6),
+                (5,7),
+                (5,8),
+                (5,9),
+                (5,10),
+                (5,11),
+                (5,12),
+                (5,13),
+                (5,14),
+                (5,15),
+                (5,16),
+                (5,17),
+                (5,18),
+                (5,19),
+                (5,20),
+                (5,21),
+                (5,22),
+                (5,23),
+                (5,24)
+			;
+            
+		CREATE TABLE `TGv1000`.`comics_expressions` (
 		  `comicId` int(11) NOT NULL,
 		  `expressionId` int(11) NOT NULL,
 		  PRIMARY KEY (`comicId`,`expressionId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
-		CREATE TABLE `TGv1000`.`comic_literal` (
+        insert comics_expressions
+			VALUES
+				(1,1),
+				(1,2),
+				(1,3),
+				(1,4),
+                (1,5),
+                (1,6),
+                (1,7),
+                (1,8),
+                (1,9),
+                (1,10),
+                (1,11),
+				(2,1),
+				(2,2),
+				(2,3),
+				(2,4),
+                (2,5),
+                (2,6),
+                (2,7),
+                (2,8),
+                (2,9),
+                (2,10),
+                (2,11),
+				(3,1),
+				(3,2),
+				(3,3),
+				(3,4),
+                (3,5),
+                (3,6),
+                (3,7),
+                (3,8),
+                (3,9),
+                (3,10),
+                (3,11),
+				(4,1),
+				(4,2),
+				(4,3),
+				(4,4),
+                (4,5),
+                (4,6),
+                (4,7),
+                (4,8),
+                (4,9),
+                (4,10),
+                (4,11),
+				(5,1),
+				(5,2),
+				(5,3),
+				(5,4),
+                (5,5),
+                (5,6),
+                (5,7),
+                (5,8),
+                (5,9),
+                (5,10),
+                (5,11)
+			;
+            
+		CREATE TABLE `TGv1000`.`comics_literals` (
 		  `comicId` int(11) NOT NULL,
 		  `literalId` int(11) NOT NULL,
 		  PRIMARY KEY (`comicId`,`literalId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
+        insert comics_literals
+			VALUES
+				(1,1),
+				(1,2),
+				(1,3),
+				(1,4),
+                (1,5),
+                (1,6),
+                (1,7),
+                (1,8),
+                (1,9),
+				(2,1),
+				(2,2),
+				(2,3),
+				(2,4),
+                (2,5),
+                (2,6),
+                (2,7),
+                (2,8),
+                (2,9),
+				(3,1),
+				(3,2),
+				(3,3),
+				(3,4),
+                (3,5),
+                (3,6),
+                (3,7),
+                (3,8),
+                (3,9),
+				(4,1),
+				(4,2),
+				(4,3),
+				(4,4),
+                (4,5),
+                (4,6),
+                (4,7),
+                (4,8),
+                (4,9),
+				(5,1),
+				(5,2),
+				(5,3),
+				(5,4),
+                (5,5),
+                (5,6),
+                (5,7),
+                (5,8),
+                (5,9)
+			;
+            
+		UPDATE `tgv1000`.`methods` set workspace = '{}';
+            
 		ALTER TABLE `tgv1000`.`methods` 
 			CHANGE COLUMN `workspace` `workspace` JSON NOT NULL ;
             
