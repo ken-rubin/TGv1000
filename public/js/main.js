@@ -266,6 +266,7 @@ $(document).ready(function() {
 								                    "ExpressionLess", 
 								                    "ExpressionLessOrEqual", 
 								                    "ExpressionLogicalAnd", 
+								                    "ExpressionLogicalNot", 
 								                    "ExpressionLogicalOr", 
 								                    "ExpressionModulo", 
 								                    "ExpressionMultiply", 
@@ -288,9 +289,6 @@ $(document).ready(function() {
 								                    "LiteralString"
 								                ]
 								            };
-
-
-
 
 						                    // Allocate and create the layer manager.
 						                    manager = new Manager();

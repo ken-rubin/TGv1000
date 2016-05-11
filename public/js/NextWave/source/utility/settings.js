@@ -175,14 +175,14 @@ define(["NextWave/source/utility/prototypes"],
                             width: 0.2,
                             height: 0.8
                         },
-                        methodPanel: {
+                        centerPanel: {
 
                             x: 0.2,
                             width: 0.6,
                             height: 0.75
                         }
                     };
-                    self.methodBuilder = {
+                    self.centerPanel = {
 
                         font: "32px Arial",
                         lineHeight: 34,

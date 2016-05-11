@@ -84,6 +84,18 @@ define(["NextWave/source/utility/prototypes",
                             );
                     };
 
+                    // Invoked when the mouse is pressed down over this method.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            return window.manager.switchCenterPanelMode("Method");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Invoked when the mouse is clicked over this method.
                     self.click = function (objectReference) {
 

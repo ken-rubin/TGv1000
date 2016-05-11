@@ -290,7 +290,7 @@ define(["NextWave/source/utility/prototypes",
                             var areaTypeMethodPair =  new Area(new Point(m_areaMaximal.location.x + settings.general.margin, 
                                     m_areaMaximal.location.y + settings.general.margin),
                                 new Size(dWidth,
-                                    settings.methodBuilder.lineHeight));
+                                    settings.centerPanel.lineHeight));
                             var exceptionRet = self.methodTypeMethodPair.calculateLayout(areaTypeMethodPair, contextRender);
                             if (exceptionRet) {
 
@@ -300,7 +300,7 @@ define(["NextWave/source/utility/prototypes",
                             var areaParameters =  new Area(new Point(areaTypeMethodPair.location.x + areaTypeMethodPair.extent.width + settings.general.margin, 
                                     m_areaMaximal.location.y + settings.general.margin),
                                 new Size(areaMaximal.extent.width - (areaTypeMethodPair.extent.width + 3 * settings.general.margin),
-                                    settings.methodBuilder.lineHeight));
+                                    settings.centerPanel.lineHeight));
                             exceptionRet = self.methodParameters.calculateLayout(areaParameters, contextRender);
                             if (exceptionRet) {
 
@@ -308,9 +308,9 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             var areaStatements =  new Area(new Point(m_areaMaximal.location.x + settings.general.margin,
-                                    m_areaMaximal.location.y + 2 * settings.general.margin + settings.methodBuilder.lineHeight),
+                                    m_areaMaximal.location.y + 2 * settings.general.margin + settings.centerPanel.lineHeight),
                                 new Size(m_areaMaximal.extent.width - 2 * settings.general.margin,
-                                    m_areaMaximal.extent.height - (3 * settings.general.margin + settings.methodBuilder.lineHeight)));
+                                    m_areaMaximal.extent.height - (3 * settings.general.margin + settings.centerPanel.lineHeight)));
                             exceptionRet = self.methodStatements.calculateLayout(areaStatements, contextRender);
                             if (exceptionRet) {
 

@@ -578,7 +578,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Save off the layers.
-                            m_arrayLayers = [lb, self.panelLayer, ld, self.dragLayer, la];
+                            m_arrayLayers = [lb, self.panelLayer, ld, self.dragLayer];//, la];
 
                             // Get the parent references.
                             m_jqParent = $(settings.manager.hostSelector);
@@ -773,6 +773,19 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     }
+
+                    // Put the center panel into different modes.
+                    self.switchCenterPanelMode = function (strMode) {
+
+                        try {
+
+                            // Just pass to the panel layer.
+                            return self.panelLayer.switchCenterPanelMode(strMode);
+                        } catch (e) {
+
+                            return e;   
+                        }
+                    };
 
                     // Generates JavaScript string modules for each Type.
                     self.generateJavaScript = function () {

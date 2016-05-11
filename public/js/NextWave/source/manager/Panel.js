@@ -58,6 +58,8 @@ define(["NextWave/source/utility/prototypes",
                     self.currentExtent = new Size(0, 0);
                     // Contents of panel.
                     self.payload = null;
+                    // Perform a calc layout on next render.
+                    self.requiresCalculateLayout = false;
 
                     ////////////////////////
                     // Public methods.
@@ -321,6 +323,26 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Set and position the panel.
+                    self.setPayload = function (strTitle, objectPayload) {
+
+                        try {
+
+                            // Set title.
+                            self.title = strTitle;
+
+                            // Set and...
+                            self.payload = objectPayload;
+
+                            // ...forget it.
+                            self.requiresCalculateLayout = true;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Position and size the instance.
                     self.calculateLayout = function (sizeExtent, contextRender) {
 
@@ -427,6 +449,10 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) {
 
                             return e;
+                        } finally {
+
+                            // Always reset.
+                            self.requiresCalculateLayout = false;
                         }
                     };
 
@@ -442,6 +468,10 @@ define(["NextWave/source/utility/prototypes",
                             } else if (self.closing) {
 
                                 m_functionClosing(contextRender);
+                            } else if (self.requiresCalculateLayout) {
+
+                                self.calculateLayout(self.totalExtent,
+                                    contextRender);
                             }
 
                             var dCornerRadius = settings.panel.cornerRadius;
