@@ -34,7 +34,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Type() {
+        	var functionRet = function Type(ctName) {
 
                 try {
 
@@ -44,7 +44,7 @@ define(["NextWave/source/utility/prototypes",
                     // Public fields.
 
                     // Name of this type object.
-                    self.name = new CodeType();
+                    self.name = ctName || new CodeType();
                     // Colleciton of methods.
                     self.methods = new Methods(self);
                     // Colleciton of properties.
@@ -394,7 +394,9 @@ define(["NextWave/source/utility/prototypes",
                                     return window.manager.removeType(self);
                                 } else if (m_objectHighlight === self.name) {
 
-                                    return window.manager.setFocus(m_objectHighlight);
+                                    return window.manager.switchCenterPanelMode("Type");
+                                    // Don't focus, which selects the text for editing.
+                                    //return window.manager.setFocus(m_objectHighlight);
                                 } else if ($.isFunction(m_objectHighlight.mouseDown)) {
 
                                     return m_objectHighlight.mouseDown(objectReference);
@@ -443,8 +445,15 @@ define(["NextWave/source/utility/prototypes",
                             if (m_objectHighlight &&
                                 $.isFunction(m_objectHighlight.click)) {
 
-                                // Pass down.
-                                return m_objectHighlight.click(objectReference);
+                                // Process click as a "enter type mode".
+                                if (m_objectHighlight === self.name) {
+
+                                    // Do nothing.
+                                } else {
+
+                                    // Pass down.
+                                    return m_objectHighlight.click(objectReference);
+                                }
                             }
 
                             return null;

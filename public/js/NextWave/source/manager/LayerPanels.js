@@ -28,6 +28,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Property",
     "NextWave/source/type/Event",
+    "NextWave/source/type/TypeBuilder",
+    "NextWave/source/type/PropertyBuilder",
     "NextWave/source/name/NameList",
     "NextWave/source/name/Name",
     "NextWave/source/statement/StatementList",
@@ -38,7 +40,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/Parameter",
     "NextWave/source/methodBuilder/StatementList",
     "NextWave/source/methodBuilder/TypeMethodPair"],
-    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, ParameterList, Parameter, StatementList, TypeMethodPair) {
+    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, TypeBuilder, PropertyBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, ParameterList, Parameter, StatementList, TypeMethodPair) {
 
         try {
 
@@ -316,10 +318,10 @@ define(["NextWave/source/utility/prototypes",
                                     return e;
                                 }
                             };
-                            var panelMethod = new Panel("Method", 
+                            self.centerPanel = new Panel("Method", 
                                 orientation.south, 
-                                new Point(settings.layerPanels.methodPanel.x, 0), 
-                                new Size(settings.layerPanels.methodPanel.width, settings.layerPanels.methodPanel.height));
+                                new Point(settings.layerPanels.centerPanel.x, 0), 
+                                new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
 
                             // Add the TypeTree to the types Panel.
                             var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
@@ -356,9 +358,26 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Allocate the payloads of the center panel:
+                            exceptionRet = m_functionAllocateMethodBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateTypeBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocatePropertyBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // To be replaced by: load type/method.
-                            // Add the MethodBuilder to the method Panel.
-                            exceptionRet = m_functionAddMethodBuilderToMethodPanel(panelMethod);
+                            // Add the MethodBuilder to the center Panel.
+                            exceptionRet = self.switchCenterPanelMode("Method");
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -371,7 +390,7 @@ define(["NextWave/source/utility/prototypes",
                                 self.expressionsPanel, 
                                 self.literalsPanel, 
                                 self.typesPanel,
-                                panelMethod
+                                self.centerPanel
                             ];
 
                             // Indicate current state.
@@ -381,6 +400,29 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) {
 
                             return e;
+                        }
+                    };
+
+                    // Put the center panel into different modes.
+                    self.switchCenterPanelMode = function (strMode) {
+
+                        try {
+
+                            // Switch out the payload of the center panel.
+                            if (strMode === "Type") {
+
+                                return m_functionSetTypeBuilderInCenterPanel();
+                            } else if (strMode === "Method") {
+
+                                return m_functionSetMethodBuilderInCenterPanel();
+                            } else if (strMode === "Property") {
+
+                                return m_functionSetPropertyBuilderInCenterPanel();
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;   
                         }
                     };
 
@@ -601,6 +643,109 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
+                    // Allocate type builder instance.
+                    var m_functionAllocateTypeBuilder = function () {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.typeBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the type builder.
+                            // Store globally.
+                            window.typeBuilder = new TypeBuilder();
+                            var exceptionRet = window.typeBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Allocate property builder instance.
+                    var m_functionAllocatePropertyBuilder = function () {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.propertyBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the type builder.
+                            // Store globally.
+                            window.propertyBuilder = new PropertyBuilder();
+                            var exceptionRet = window.propertyBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Allocate method builder instance.
+                    var m_functionAllocateMethodBuilder = function () {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.methodBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate type-name object.
+                            var tmp = new TypeMethodPair();
+                            var exceptionRet = tmp.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            var pl = new ParameterList();
+                            exceptionRet = pl.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            var sl = new StatementList();
+                            exceptionRet = sl.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the object list.
+                            // Store globally so the drag layer can access.
+                            window.methodBuilder = new MethodBuilder();
+                            exceptionRet = window.methodBuilder.create(tmp, pl, sl);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Helper method adds typetree to types panel.
                     var m_functionAddTypeTreeToTypesPanel = function (panelTypes) {
 
@@ -722,46 +867,42 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Helper method adds MethodBuilder to method panel.
-                    var m_functionAddMethodBuilderToMethodPanel = function (panelMethod) {
+                    // Helper method sets MethodBuilder in the method panel.
+                    var m_functionSetMethodBuilderInCenterPanel = function () {
 
                         try {
 
-                            // Allocate type-name object.
-                            var tmp = new TypeMethodPair();
-                            var exceptionRet = tmp.create();
-                            if (exceptionRet) {
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Method",
+                                window.methodBuilder);
+                        } catch (e) {
 
-                                throw exceptionRet;
-                            }
+                            return e;
+                        }
+                    };
 
-                            var pl = new ParameterList();
-                            exceptionRet = pl.create();
-                            if (exceptionRet) {
+                    // Helper method sets TypeBuilder in the method panel.
+                    var m_functionSetTypeBuilderInCenterPanel = function () {
 
-                                throw exceptionRet;
-                            }
+                        try {
 
-                            var sl = new StatementList();
-                            exceptionRet = sl.create();
-                            if (exceptionRet) {
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Type",
+                                window.typeBuilder);
+                        } catch (e) {
 
-                                throw exceptionRet;
-                            }
+                            return e;
+                        }
+                    };
 
-                            // Allocate and create the object list.
-                            // Store globally so the drag layer can access.
-                            window.methodBuilder = new MethodBuilder();
-                            exceptionRet = window.methodBuilder.create(tmp, pl, sl);
-                            if (exceptionRet) {
+                    // Helper method sets PropertyBuilder in the method panel.
+                    var m_functionSetPropertyBuilderInCenterPanel = function () {
 
-                                throw exceptionRet;
-                            }
+                        try {
 
-                            // Set it.
-                            panelMethod.payload = window.methodBuilder;
-
-                            return null;
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Property",
+                                window.propertyBuilder);
                         } catch (e) {
 
                             return e;

@@ -50,6 +50,18 @@ define(["NextWave/source/utility/prototypes",
                         return "removeProperty";
                     }
 
+                    // Invoked when the mouse is pressed down over this method.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            return window.manager.switchCenterPanelMode("Property");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Generates JavaScript string for this property.
                     self.generateJavaScript = function () {
 
