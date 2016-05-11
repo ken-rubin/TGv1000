@@ -194,7 +194,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                         strQuery2,
                                         function(rows) {
 
-                                            // Add a refund-processed email to the user.
+                                            // Add a refund processed email to the user.
 
 
 

@@ -829,6 +829,113 @@ begin
         set @dbstate := 19;
     end if;
     
+    if @dbstate = 19 THEN
+
+		CREATE TABLE `statements` (
+		  `id` int(11) NOT NULL,
+		  `name` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `expressions` (
+		  `id` int(11) NOT NULL,
+		  `name` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `literals` (
+		  `id` int(11) NOT NULL,
+		  `name` varchar(255) NOT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `id_UNIQUE` (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        insert TGv1000.statements (id, `name`)
+			VALUES
+				(1,'StatementBreak'),
+				(2,'StatementContinue'),
+				(3,'StatementExpression'),
+				(4,'StatementFor'),
+				(5,'StatementForIn'),
+				(6,'StatementIf'),
+				(7,'StatementList'),
+				(8,'StatementReturn'),
+				(9,'StatementThrow'),
+				(10,'StatementTry'),
+				(11,'StatementVar'),
+                (12,'StatementWhile')
+                ;
+                
+        insert TGv1000.expressions (id, `name`)
+			VALUES
+				(1,'ExpressionAdd'),
+				(2,'ExpressionAssignment'),
+				(3,'ExpressionDecrement'),
+				(4,'ExpressionDelete'),
+				(5,'ExpressionDivide'),
+				(6,'ExpressionEqual'),
+				(7,'ExpressionGreater'),
+				(8,'ExpressionGreaterOrEqual'),
+				(9,'ExpressionIncrement'),
+				(10,'ExpressionInvocation'),
+				(11,'ExpressionLess'),
+                (12,'ExpressionLessOrEqual'),
+                (13,'ExpressionList'),
+                (14,'ExpressionLogicalAnd'),
+                (15,'ExpressionLogicalNot'),
+                (16,'ExpressionLogicalOr'),
+                (17,'ExpressionModulo'),
+                (18,'ExpressionMultiply'),
+                (19,'ExpressionNegate'),
+                (20,'ExpressionNew'),
+                (21,'ExpressionNotEqual'),
+                (22,'ExpressionParentheses'),
+                (23,'ExpressionRefinement'),
+                (24,'ExpressionSubtract'),
+                (25,'ExpressionTernary')
+                ;
+                
+		insert TGv1000.literals (id, `name`)
+			VALUES
+				(1,'LiteralArray'),
+				(2,'LiteralBoolean'),
+				(3,'LiteralInfinity'),
+				(4,'LiteralList'),
+				(5,'LiteralNaN'),
+				(6,'LiteralNull'),
+				(7,'LiteralNumber'),
+				(8,'LiteralObject'),
+				(9,'LiteralRegexp'),
+				(10,'LiteralString')
+                ;
+        
+		CREATE TABLE `TGv1000`.`comic_statement` (
+		  `comicId` int(11) NOT NULL,
+		  `statementId` int(11) NOT NULL,
+		  PRIMARY KEY (`comicId`,`statementId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`comic_expression` (
+		  `comicId` int(11) NOT NULL,
+		  `expressionId` int(11) NOT NULL,
+		  PRIMARY KEY (`comicId`,`expressionId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`comic_literal` (
+		  `comicId` int(11) NOT NULL,
+		  `literalId` int(11) NOT NULL,
+		  PRIMARY KEY (`comicId`,`literalId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		ALTER TABLE `tgv1000`.`methods` 
+			CHANGE COLUMN `workspace` `workspace` JSON NOT NULL ;
+            
+		UPDATE control set dbstate=20 where id=1;
+        set @dbstate := 20;
+    end if;
+    
 end//
 
 
