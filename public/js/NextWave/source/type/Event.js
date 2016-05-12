@@ -16,7 +16,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function Event(strName) {
+            var functionRet = function Event(typeOwner, strName) {
 
                 try {
 
@@ -26,6 +26,9 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(SectionPart,
                         strName,
                         "event");
+
+                    // Keep track of the owning Type.
+                    self.owner = typeOwner;
 
                     ////////////////////////////
                     // Public methods.

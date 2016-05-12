@@ -21,6 +21,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
     "NextWave/source/type/Property",
+    "NextWave/source/type/Events",
+    "NextWave/source/type/Event",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionName",
@@ -29,7 +31,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeType",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
     "NextWave/source/methodBuilder/CodeExpressionInvocation"],
-    function (prototypes, settings, Point, Size, Area, glyphs, TypeSections, Methods, Method, Properties, Property, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
+    function (prototypes, settings, Point, Size, Area, glyphs, TypeSections, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
 
         try {
 
@@ -49,6 +51,8 @@ define(["NextWave/source/utility/prototypes",
                     self.methods = new Methods(self);
                     // Colleciton of properties.
                     self.properties = new Properties(self);
+                    // Collection of events.
+                    self.events = new Events(self);
                     // Collection of contained method objects.
                     self.typeSections = [self.methods, 
                         self.properties];
@@ -140,6 +144,23 @@ define(["NextWave/source/utility/prototypes",
                                     var propertyNew = new Property(self,
                                         objectPropertyIth.name);
                                     var exceptionRet = self.properties.addPart(propertyNew);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+
+                            // Build the events.
+                            if (objectType.events) {
+
+                                for (var j = 0; j < objectType.events.length; j++) {
+
+                                    var objectEventIth = objectType.events[j];
+
+                                    var eventNew = new Event(self,
+                                        objectEventIth.name);
+                                    var exceptionRet = self.events.addPart(eventNew);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -286,10 +307,16 @@ define(["NextWave/source/utility/prototypes",
                             objectRet.methods = self.methods.save();
                         }
 
-                        // If there are methods, then save them up.
+                        // If there are properties, then save them up.
                         if (self.properties) {
 
                             objectRet.properties = self.properties.save();
+                        }
+
+                        // If there are events, then save them up.
+                        if (self.events) {
+
+                            objectRet.events = self.events.save();
                         }
 
                         return objectRet;

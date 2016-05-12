@@ -45,6 +45,7 @@
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
+- Jade has been renamed to pug. Install pug in package.json instead of Jade.
 - Disable 2nd menu list if no project. Wait for merge with Ken.
 - Use this code to display a Product's video (if I add that):
     ```

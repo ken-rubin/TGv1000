@@ -44,7 +44,7 @@ define(["NextWave/source/utility/prototypes",
                             );
                     };
 
-                    // Virtual name of the method to remove this section.  Overtride if not satisfied with method.
+                    // Virtual name of the method to remove this section.  Override if not satisfied with method.
                     self.removeMethod = function () {
 
                         return "removeProperty";

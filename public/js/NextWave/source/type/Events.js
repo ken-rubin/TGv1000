@@ -20,7 +20,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Events(arrayEvents) {
+        	var functionRet = function Events(typeOwner, arrayEvents) {
 
                 try {
 
@@ -28,6 +28,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from TypeSection.
                     self.inherits(TypeSection,
+                        typeOwner,
                         "Events",
                         "events",
                         arrayEvents);
