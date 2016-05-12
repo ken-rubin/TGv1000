@@ -608,7 +608,7 @@ begin
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (3,6);
 		INSERT TGv1000.ug_permissions (usergroupId, permissionId) VALUES (4,5);
 
-		ALTER TABLE `tgv1000`.`projects` 
+		ALTER TABLE `TGv1000`.`projects` 
 		ADD COLUMN `isOnlineClass` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isClass`;
         
 		CREATE TABLE `TGv1000`.`onlineclasses` (
@@ -675,7 +675,7 @@ begin
 
     if @dbstate = 3 THEN
     
-		ALTER TABLE `tgv1000`.`classes` 
+		ALTER TABLE `TGv1000`.`classes` 
 			ADD COLUMN `maxClassSize` INT(11) NULL DEFAULT 0 AFTER `classNotes`;
 
 		UPDATE control set dbstate=4 where id=1;
@@ -716,7 +716,7 @@ begin
 
     if @dbstate = 7 THEN
     
-		ALTER TABLE `tgv1000`.`classes` 
+		ALTER TABLE `TGv1000`.`classes` 
 		ADD COLUMN `loanComputersAvailable` TINYINT(1) NULL DEFAULT FALSE AFTER `maxClassSize`;
 
 		UPDATE control set dbstate=8 where id=1;
@@ -741,7 +741,7 @@ begin
     
     if @dbstate = 10 THEN
     
-		ALTER TABLE `tgv1000`.`permissions` 
+		ALTER TABLE `TGv1000`.`permissions` 
 		CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ,
 		DROP INDEX `id_UNIQUE` ;
 
@@ -752,7 +752,7 @@ begin
     if @dbstate = 11 THEN
     
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddUsergroup','post','routeAddUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
-		ALTER TABLE `tgv1000`.`usergroups` 
+		ALTER TABLE `TGv1000`.`usergroups` 
 		CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ;
 
 		UPDATE control set dbstate=12 where id=1;
@@ -794,11 +794,11 @@ begin
     
     if @dbstate = 16 THEN
     
-		ALTER TABLE `tgv1000`.`waitlist` 
+		ALTER TABLE `TGv1000`.`waitlist` 
 			ADD COLUMN `dtWaitlisted` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `userName`,
 			ADD COLUMN `dtInvited` DATETIME NULL AFTER `dtWaitlisted`;
 
-		ALTER TABLE `tgv1000`.`projects` 
+		ALTER TABLE `TGv1000`.`projects` 
 			ADD COLUMN `chargeId` VARCHAR(255) NULL DEFAULT '' AFTER `lastSaved`;
     
 		UPDATE control set dbstate=17 where id=1;
@@ -822,7 +822,7 @@ begin
 
     if @dbstate = 18 THEN
     
-		ALTER TABLE `tgv1000`.`refunds` 
+		ALTER TABLE `TGv1000`.`refunds` 
 			CHANGE COLUMN `usedId` `userId` INT(11) NOT NULL ;
 
 		UPDATE control set dbstate=19 where id=1;
@@ -1158,9 +1158,9 @@ begin
                 (5,9)
 			;
             
-		UPDATE `tgv1000`.`methods` set workspace = '{"statements": []}';
+		UPDATE `TGv1000`.`methods` set workspace = '{"statements": []}';
             
-		ALTER TABLE `tgv1000`.`methods` 
+		ALTER TABLE `TGv1000`.`methods` 
 			CHANGE COLUMN `workspace` `workspace` JSON NOT NULL ;
             
 		UPDATE control set dbstate=20 where id=1;
