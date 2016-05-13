@@ -84,12 +84,73 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 						try {
 
-							// Retrieve content of manager (in its own format) for updating into active comic.
+							// Retrieve content of manager (in its own abridged format) for updating into active comic.
 							var objContent = manager.save();
-							
-							var clComic = comics.getActiveComic();	// TODO: We're doing this for only 1 comic. Eventually, we'll loop through all comics.
+							// objContent looks like:
+							// {
+							// 	 types:[
+							// 		{
+							// 			name:"cc",
+							// 			methods:[
+							//				name:"zzz",
+							//				arguments:[{name:"abc"},...,{name:"cab"}],
+							//				statements:[{},...,{}]
+							//			],
+							// 			properties:[{name:"abc"}],
+							// 			events:[{name:"pop"}]
+							// 		}
+							// 	 ],
+							// 	 statements:["statementA",...,"statementZ"],
+							// 	 expressions:["expressionA",...,"expressionZ"],
+							// 	 literals:["literalA",...,"literalZ"]
+							// }
 
-							// The types, statements, expressions and literals in objContent have to be massaged and merged into comics.getActiveComic();
+							// TODO: We're doing this for only 1 comic ([0]). Eventually, we'll loop through all comics by surrounding the async.parallel with async.eachSeries.
+							var comic = comics.getComic(0).data;
+
+							async.parallel(
+								[
+									// Handle expressions, statements and literals.
+									function(cb) {
+										async.setImmediate(
+											function() {
+							                    
+							                    // In most cases expressions, statements and literals won't have changed, but, just in case....
+							                    comic.expressions.items = [];
+							                    comic.expressions.items.push.apply(clComic.data.expressions.items, objContent.expressions);
+							                    comic.statements.items = [];
+							                    comic.statements.items.push.apply(clComic.data.statements.items, objContent.statements);
+							                    comic.literals.items = [];
+							                    comic.literals.items.push.apply(clComic.data.literals.items, objContent.literals);
+							                    return cb(null);
+											}
+										);
+									},
+									// Handle types.
+									function(cb) {
+										async.eachSeries(
+											comic.types.items,
+											function(typeIth, cb) {
+
+											},
+											function(err) {
+												return cb(err);
+											}
+										)
+									}
+								],
+								function(err) { 
+									if ($.isFunction(callback)) {
+										callback(err.message);
+									} else {
+										errorHelper.show(err);
+									}
+								}
+							);
+
+							/*
+
+							// The types, statements, expressions and literals in objContent have to be massaged and merged into clComic.data;
 							// For each method in each type: arguments have to be joined and set into parameters; statements have to be set into workspace.
 							//
 		                    // This is basically the opposite of what goes on in manager.load();
@@ -169,6 +230,9 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 
 
+
+
+							*/
 
 							var data = {
 									// userId: g_profile["userId"], not needed; sent in JWT

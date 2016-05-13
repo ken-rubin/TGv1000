@@ -231,6 +231,11 @@ define(["Core/errorHelper", "Navbar/Comic", "Core/ScrollRegionV", "Core/resource
 						return m_clComicActive;
 					}
 
+					self.getComic = function(index) {
+
+						return m_arrayClComics[index];
+					}
+
 					///////////////////////////////////
 					// Private fields.
 

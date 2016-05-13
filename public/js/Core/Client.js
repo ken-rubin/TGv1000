@@ -526,7 +526,7 @@ define(["Core/errorHelper",
 				    		var exceptionRet = m_clProject.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
 
-				    		exceptionRet = manager.load(comics.getActiveComic().data);	// TODO: This will be comics[0] at this time. Eventually, all comics.
+				    		exceptionRet = manager.load(comics.getComic(0).data);	// TODO: This will be comics[0] at this time. Eventually, all comics.
 				    		if (exceptionRet) { return exceptionRet; }
 
 				    		// Play App Type's initialize Method to set the initial state of the designer frame

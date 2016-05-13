@@ -858,10 +858,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add the types from the initializer into this intance.
                             return self.loadTypes(self.initializer.types);
-                        } catch (e) {
 
-                            return e;
-                        }
+                        } catch (e) { return e; }
                     }
 
                     // Put the center panel into different modes.
