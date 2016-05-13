@@ -87,9 +87,87 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							// Retrieve content of manager (in its own format) for updating into active comic.
 							var objContent = manager.save();
 							
+							var clComic = comics.getActiveComic();	// TODO: We're doing this for only 1 comic. Eventually, we'll loop through all comics.
+
 							// The types, statements, expressions and literals in objContent have to be massaged and merged into comics.getActiveComic();
 							// For each method in each type: arguments have to be joined and set into parameters; statements have to be set into workspace.
-							var clComic = comics.getActiveComic();
+							//
+		                    // This is basically the opposite of what goes on in manager.load();
+
+		                    // In most cases expressions, statements and literals won't have changed, but, just in case....
+		                    clComic.data.expressions.items = [];
+		                    clComic.data.expressions.items.push.apply(clComic.data.expressions.items, objContent.expressions);
+		                    clComic.data.statements.items = [];
+		                    clComic.data.statements.items.push.apply(clComic.data.statements.items, objContent.statements);
+		                    clComic.data.literals.items = [];
+		                    clComic.data.literals.items.push.apply(clComic.data.literals.items, objContent.literals);
+
+		                    // At least for now, objContent.types and their property arrays have to be merged into clComic.data.types under items.
+		                    // Also, for now, we have to search and update pre-existing ones and create and set up new ones.
+		                    // This is because, at least for now, all ancillary information has not been preserved by manager.
+
+		                    // So here's the plan (which is sort of the opposite of what's done in manager.load()):
+		                    // (0) Loop through clComic.data.types.items and add a "found" property initialized to false to each type. At the same level as type.data.
+		                    // (1) Loop through objContent.types (typeIth). Find the type named the same in clComic.data.types.items. If found, call it ctypeJth.
+		                    // 	(2a) Set ctypeJth.found = true.
+		                    // 	(2b) Copy typeIth.expressions, statements and literals to ctypeJth.data.expressions, etc.
+		                    // 	(2c) Loop through ctypeJth.data.methods and add a property "found" initialized to false.
+		                    // 	(2d) Loop through each method in typeIth.methods (methodKth). Find the method named the same in ctypeJth.methods. If found, call it cmethodJth.
+		                    // 		(2d-1) Set cmethodJth.found = true.
+		                    // 		(2d-2) Set cmethodJth.parameters = methodKth.arguments.join(',');
+		                    // 		(2d-3) Set cmethodJth.workspace = methodKth.statements, one level down.
+		                    //		(2d-4) If not found, build a new method as described above (with found = true) and add it to ctypeJth.data.methods.
+		                    //	(2e) Remove all methods from ctypeJth.methods where !found.
+		                    // (3) If the type is not foundnot found, build a new type as described above (with found = true) and add it to clComic.data.types.items.
+		                    // (4) Remove all types from clComic.data.types where !found.
+
+		                    // (0)
+		                    clComic.data.types.items.forEach(
+		                    	function(type) {
+		                    		type.found = false;
+		                    	}
+		                    )
+		                    // (1)
+		                    for (var i = 0; i < objContent.types.length; i++) {
+		                    	
+		                    	var typeIth = objContent.types[i];
+		                    	for (j = 0; j < clComic.data.types.items.length; j++) {
+
+		                    		var ctypeJth = clComic.data.types.items[j];
+		                    		if (typeIth.name === ctypeJth.name) {
+
+		                    			// (2a)
+		                    			ctypeJth.found = true;
+
+		                    			// (2b)
+		                    			ctypeJth.data.expressions.items = [];
+		                    			ctypeJth.data.expressions.items.push.apply(ctypeJth.data.expressions.items, typeIth.expressions);
+		                    			ctypeJth.data.statements.items = [];
+		                    			ctypeJth.data.statements.items.push.apply(ctypeJth.data.statements.items, typeIth.statements);
+		                    			ctypeJth.data.literals.items = [];
+		                    			ctypeJth.data.literals.items.push.apply(ctypeJth.data.literals.items, typeIth.literals);
+
+		                    			// (2c)
+		                    			ctypeJth.data.methods.forEach(
+		                    				function(method) {
+		                    					method.found = false;
+		                    				}
+		                    			);
+
+		                    			// (2d)
+		                    			for (k = 0; k < typeIth.methods.length; k++) {
+
+		                    				var methodKth = typeIth.methods[k];
+		                    				if (methodKth.name )
+		                    			}
+		                    		}
+		                    	}
+		                    }
+
+
+
+
+
 
 
 							var data = {

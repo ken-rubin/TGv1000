@@ -749,6 +749,8 @@ define(["NextWave/source/utility/prototypes",
                     // into this manager instance from persistence.
                     // objectInitializer is comics[i].data as loaded from database.
                     // It needs to be massaged a bit.
+                    //
+                    // This is basically the opposite of what goes on in project.saveToDatabase();
                     self.load = function (objectInitializer) {
 
                         try {
@@ -764,43 +766,73 @@ define(["NextWave/source/utility/prototypes",
                             self.initializer.statements = [];
                             self.initializer.literals = [];
 
+                            // Push each type from objectInitializer.types to self.initalizer's types [].
+                            // But note:
+                            // (1) objectInitializer's types array is one level down, under items.
+                            // (2) The workspace property of each method of each type as it comes from the database is like {"statements": [..., ..., ...]}.
+                            //     We will add a statements property to each method for manager to use containing just the array itself.
+                            // (3) Each method of each type as it comes from the database contains the method's arguments joined in a single string property called parameters.
+                            //     We have to break up the string into an array, uniquify it (maybe not) and save the array to a new arguments property of the method.
+
+                            // Summary: we're pushing each original type to self.initializer.types with all original properties and with statements and arguments added to methods.
+                            // TODO: manager loses all properties it doesn't care about at this time. It will have to stop doing that.
+
+                            (1)
                             objectInitializer.types.items.forEach(
+
                                 function(typeIth) {
+
                                     typeIth.methods.forEach(
+
                                         function(methodIth) {
-                                            methodIth.statements = JSON.parse(methodIth.workspace).statements;
+
+                                            (2)
+                                            methodIth.statements = [];
+                                            methodIth.statements.push.apply(methodIth.statements, JSON.parse(methodIth.workspace).statements);
+
+                                            // (3)
                                             methodIth.arguments = [];
                                             if (methodIth.parameters.length) {
 
                                                 // Separate, de-dupe, recombine
-                                                var pArray = methodIth.parameters.match(/([\w\-]+)/g);
-                                                if (pArray.length) {
+                                                var uniqueArray = [];
+                                                var splitArray = methodIth.parameters.match(/([\w\-]+)/g);
+                                                if (splitArray.length) {
 
-                                                    // Remove possible dups from pArray.
-                                                    for (var i = 0; i < pArray.length; i++)
+                                                    // Remove possible dups from splitArray.
+                                                    for (var i = 0; i < splitArray.length; i++)
                                                     {
-                                                        if (($.inArray(pArray[i], uniqueArray)) == -1)
-                                                        {
-                                                            methodIth.arguments.push(pArray[i]);
+                                                        if (($.inArray(splitArray[i], uniqueArray)) == -1) {
+
+                                                            uniqueArray.push(splitArray[i]);
                                                         }
                                                     }
                                                 }
+
+                                                methodIth.arguments.push.apply(methodIth.arguments, uniqueArray);
                                             }
                                         }
                                     );
+
                                     self.initializer.types.push(typeIth);
                                 }
                             )
+
+                            // Push to expressions [].
                             objectInitializer.expressions.items.forEach(
                                 function(expressionIth) {
                                     self.initializer.expressions.push(expressionIth);
                                 }
                             )
+
+                            // Push to statements [].
                             objectInitializer.statements.items.forEach(
                                 function(statementIth) {
                                     self.initializer.statements.push(statementIth);
                                 }
                             )
+
+                            // Push to literals [].
                             objectInitializer.literals.items.forEach(
                                 function(literalIth) {
                                     self.initializer.literals.push(literalIth);
