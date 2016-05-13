@@ -65,10 +65,12 @@ define(["Core/errorHelper", "Navbar/Comics"],
 
 							self.data = null;
 
-							exceptionRet = code.reset(true);
-							if (exceptionRet) { throw exceptionRet; }
+							// exceptionRet = code.reset(true);
+							// if (exceptionRet) { throw exceptionRet; }
 
-							return designer.unload();
+							// return designer.unload();
+
+							return null;
 
 						} catch(e) {
 

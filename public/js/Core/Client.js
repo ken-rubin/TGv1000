@@ -891,16 +891,16 @@ define(["Core/errorHelper",
 										self.setBrowserTabAndBtns();
 
 										// Disable the TypeWell icons that are enabled if a project is loaded.
-										$(".disabledifnoproj").prop("disabled", true);
+										// $(".disabledifnoproj").prop("disabled", true);
 
 										// Remove tooltip functionality from TypeWell icons.
-										$(".disabledifnoproj").powerTip({
-											smartPlacement: true,
-											manual: true
-										});
+										// $(".disabledifnoproj").powerTip({
+										// 	smartPlacement: true,
+										// 	manual: true
+										// });
 										
 										// Empty the toolstrip, designer, comicstrip and typewell.
-										tools.empty();
+										// tools.empty();
 
 										if ($.isFunction(unloadedCallback)) {
  											unloadedCallback();

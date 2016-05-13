@@ -9,6 +9,7 @@
 var client = null;
 var navbar = null;
 var comics = null;
+var types = null;
 var validator = null;
 var g_clTypeApp = null;
 var manager = null;
@@ -21,6 +22,7 @@ $(document).ready(function() {
 
 		require(["Core/errorHelper", 
 				"Core/Client", 
+				"Code/Types",
 				"Navbar/Navbar", 
 				"Navbar/Comics", 
 				"Core/Validator",
@@ -30,6 +32,7 @@ $(document).ready(function() {
 			    "NextWave/source/manager/Manager"], 
 			function (errorHelper, 
 						Client, 
+						Types,
 						Navbar, 
 						Comics,
 						Validator,
@@ -63,6 +66,10 @@ $(document).ready(function() {
 									// Allocate comics.
 									comics = new Comics();
 									exceptionRet = comics.create();
+									if (exceptionRet) { throw exceptionRet; }
+
+									types = new Types();
+									exceptionRet = types.create();
 									if (exceptionRet) { throw exceptionRet; }
 
 									// Allocate and attach the manager/glyph objects.
