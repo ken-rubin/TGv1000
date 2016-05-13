@@ -6,10 +6,10 @@ delimiter //
 
 
 
-/* */
+/* 
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-/* */
+ */
 
 
 
@@ -19,7 +19,7 @@ SELECT database()//
 
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/* */ 
+/*  
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -54,11 +54,11 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
-/* */
+ */
 
 
 -- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/* */
+/* 
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 
@@ -84,7 +84,7 @@ begin
     RETURN @uniqueName;
 end //
 
-/* */
+ */
 
 create procedure maintainDB()
 begin
@@ -227,12 +227,12 @@ begin
           `baseTypeId` int(11) NULL,
           `isToolStrip` tinyint(1) NOT NULL DEFAULT '0',
 		  PRIMARY KEY (`id`),
-          INDEX idx_comicId (comicId)
+          INDEX idx_projectId (projectId)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
         ALTER TABLE `TGv1000`.`types`
 			ADD CONSTRAINT FK_types
-            FOREIGN KEY (comicId) REFERENCES comics(id)
+            FOREIGN KEY (projectId) REFERENCES projectss(id)
             ON DELETE CASCADE;
 
 		CREATE TABLE `TGv1000`.`type_tags` (
@@ -1186,6 +1186,23 @@ begin
     
 		UPDATE control set dbstate=21 where id=1;
         set @dbstate := 21;
+    end if;
+
+    if @dbstate = 21 THEN
+
+		ALTER TABLE `TGv1000`.`types` 
+			DROP FOREIGN KEY `FK_types`;
+		ALTER TABLE `TGv1000`.`types` 
+			DROP INDEX `idx_comicId` ;
+        ALTER TABLE `TGv1000`.`types`
+			ADD CONSTRAINT FK_types
+            FOREIGN KEY (projectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+
+		delete from TGv1000.projects where id>5;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
     end if;
 
 end//
