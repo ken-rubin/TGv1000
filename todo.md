@@ -4,6 +4,23 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
+- AZPPBuyersDialog.js
+    - Display project details at top above tabs
+    - Write m_setRecentRefundsTable
+    - In fnRemoveBuyer add entry to m_holdData.recentRefunds and redraw that table
+    - In fnInvite finish writing posting.done
+    - In fnInvite if numEnrollees + numInvited < maxClassSize, suggest to admin user that class could be made active
+    - Implement 1 second countdown timer in #InvitedTable
+- Cron.js
+    - Finish job2
+    - Add waitlist reminder emails
+- Login++
+    - Handle Accept link in invitation email: after login bring user to buy page with CC form open
+- Someplace
+    - Handle Decline link in invitation email
+- UtilityBO.js
+    - When placing charge, send our own email in addition to Stripe's
+    - In routeUndoPurchase, send refund processed email if refund was processed; also probably want to return refundId with success again so that #RecentRefunds can be updated
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
 - Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
