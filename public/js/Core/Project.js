@@ -108,46 +108,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 							// TODO: We're doing this for only 1 comic ([0]). Eventually, we'll loop through all comics by surrounding the async.parallel with async.eachSeries.
 							var comic = comics.getComic(0).data;
 
-							async.parallel(
-								[
-									// Handle expressions, statements and literals.
-									function(cb) {
-										async.setImmediate(
-											function() {
-							                    
-							                    // In most cases expressions, statements and literals won't have changed, but, just in case....
-							                    comic.expressions.items = [];
-							                    comic.expressions.items.push.apply(clComic.data.expressions.items, objContent.expressions);
-							                    comic.statements.items = [];
-							                    comic.statements.items.push.apply(clComic.data.statements.items, objContent.statements);
-							                    comic.literals.items = [];
-							                    comic.literals.items.push.apply(clComic.data.literals.items, objContent.literals);
-							                    return cb(null);
-											}
-										);
-									},
-									// Handle types.
-									function(cb) {
-										async.eachSeries(
-											comic.types.items,
-											function(typeIth, cb) {
-
-											},
-											function(err) {
-												return cb(err);
-											}
-										)
-									}
-								],
-								function(err) { 
-									if ($.isFunction(callback)) {
-										callback(err.message);
-									} else {
-										errorHelper.show(err);
-									}
-								}
-							);
-
 							/*
 
 							// The types, statements, expressions and literals in objContent have to be massaged and merged into clComic.data;
