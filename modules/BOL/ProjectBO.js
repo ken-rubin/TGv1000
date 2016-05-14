@@ -528,6 +528,21 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             function(err, tags) {
                                                 if (!err) {
                                                     method.tags = tags;
+
+                                                    // Database gave me back parameters (string) and workspace (JSON: {statements: []}).
+                                                    // Need to convert.
+                                                    var arsArray = method.parameters;
+                                                    if (arsArray.length) {
+
+                                                        method.arguments = arsArray.match(/([\w\-]+)/g);
+
+                                                    } else {
+
+                                                        method.arguments = [];
+                                                    }
+                                                    delete method.parameters;
+                                                    method.statements = JSON.parse(method.workspace).statements;
+                                                    delete method.workspace;
                                                     typeIth.methods.push(method);
                                                 }
                                                 return cb(err);
