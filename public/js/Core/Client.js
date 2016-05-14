@@ -522,9 +522,9 @@ define(["Core/errorHelper",
 							// $(".disabledifnoproj").prop("disabled", false);
 
 				    		// Allocate project.
-				    		m_clProject = new Project();
-				    		var exceptionRet = m_clProject.load(project);
-				    		if (exceptionRet) { return exceptionRet; }
+				    		// m_clProject = new Project();
+				    		// var exceptionRet = m_clProject.load(project);
+				    		// if (exceptionRet) { return exceptionRet; }
 
 				    		exceptionRet = manager.load(project);
 				    		if (exceptionRet) { return exceptionRet; }

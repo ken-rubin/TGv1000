@@ -102,10 +102,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             firstSaved: row.firstSaved,
                             lastSaved: row.lastSaved,
                             chargeId: row.chargeId,
-                            comics:
-                            {
-                                items: []
-                            },
+                            comics: [],
                             specialProjectData: {}
                         };
 
@@ -196,16 +193,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         // Sucess. The project is filled.
 
                                                         // Sort comics by ordinal.
-                                                        project.comics.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                        project.comics.sort(function(a,b){return a.ordinal - b.ordinal;});
 
                                                         // Sort lists inside comics by their own ordinals.
-                                                        project.comics.items.forEach(
+                                                        project.comics.forEach(
                                                             function(comic) {
 
                                                                 // Types. 
                                                                 // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
-                                                                comic.types.items.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                comic.types.items.forEach(
+                                                                comic.types.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                comic.types.forEach(
                                                                     function(type) {
                                                                         // Methods.
                                                                         type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
@@ -215,7 +212,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                         type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
                                                                     }
                                                                 );
-                                                                comic.comiccode.items.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                comic.comiccode.sort(function(a,b){return a.ordinal - b.ordinal;});
                                                             }
                                                         );
 
@@ -275,11 +272,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         function(comicIth, cbe) {
 
                             comicIth.originalComicId = comicIth.id;
-                            comicIth.comiccode = { items: [] };
-                            comicIth.types = { items: [] };
-                            comicIth.expressions = { items: [] };
-                            comicIth.statements = { items: [] };
-                            comicIth.literals = { items: [] };
+                            comicIth.comiccode = [];
+                            comicIth.types = [];
+                            comicIth.expressions = [];
+                            comicIth.statements = [];
+                            comicIth.literals = [];
 
                             // Fill comicIth's comiccode and types (including System Types).
                             m_functionRetProjDoComicInternals(  req, 
@@ -291,7 +288,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                     if (!err) {
 
                                                                         // Add the filled comic to the project.
-                                                                        project.comics.items.push(comicIth);
+                                                                        project.comics.push(comicIth);
                                                                     }
                                                                     return cbe(err); 
                                                                 }
@@ -354,7 +351,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         if (!err) {
                                                             
                                                             // Add the filled type to the comicIth.
-                                                            comicIth.types.items.push(typeIth);
+                                                            comicIth.types.push(typeIth);
                                                         }
                                                         return cbe1(err);
                                                     }
@@ -409,7 +406,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                         if (!err) {
                                                             // Add the filled type to the comicIth.
-                                                            comicIth.types.items.push(typeIth);
+                                                            comicIth.types.push(typeIth);
                                                         }
                                                         return cbe2(err); 
                                                     }
@@ -435,7 +432,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 async.eachSeries(rows,
                                     function(comiccodeIth, cbe3) {
 
-                                        comicIth.comiccode.items.push(comiccodeIth);
+                                        comicIth.comiccode.push(comiccodeIth);
                                         return cbe3(null);
                                     },
                                     function(err) {
@@ -455,7 +452,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             function(rows) {
                                 rows.forEach(
                                     function(rowIth) {
-                                        comicIth.expressions.items.push(rowIth.name);
+                                        comicIth.expressions.push(rowIth.name);
                                     }
                                 );
                                 return cb(null);
@@ -473,7 +470,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             function(rows) {
                                 rows.forEach(
                                     function(rowIth) {
-                                        comicIth.statements.items.push(rowIth.name);
+                                        comicIth.statements.push(rowIth.name);
                                     }
                                 );
                                 return cb(null);
@@ -491,7 +488,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             function(rows) {
                                 rows.forEach(
                                     function(rowIth) {
-                                        comicIth.literals.items.push(rowIth.name);
+                                        comicIth.literals.push(rowIth.name);
                                     }
                                 );
                                 return cb(null);
