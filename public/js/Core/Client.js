@@ -540,7 +540,7 @@ define(["Core/errorHelper",
 
 							if ($.isFunction(callback)) {
 
-								callback(m_clProject);
+								callback(project);
 							
 							} else {
 

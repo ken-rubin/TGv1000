@@ -63,6 +63,30 @@ $(document).ready(function() {
 						                        throw exceptionRet;
 						                    }
 
+											// Allocate and initialize the client.
+											client = new Client();
+											exceptionRet = client.create();
+											if (exceptionRet) { throw exceptionRet; }
+
+											// Allocate and attach the navbar module.
+											navbar = new Navbar();
+											exceptionRet = navbar.create();
+											if (exceptionRet) { throw exceptionRet; }
+
+											// Allocate and initialize the validator.
+											validator = new Validator();
+											var exceptionRet = validator.create();
+											if (exceptionRet) { throw exceptionRet; }
+
+											// Allocate comics.
+											comics = new Comics();
+											exceptionRet = comics.create();
+											if (exceptionRet) { throw exceptionRet; }
+
+											types = new Types();
+											exceptionRet = types.create();
+											if (exceptionRet) { throw exceptionRet; }
+
 						                 //    // Load up the object.
 						                 //    exceptionRet = manager.load(objectThe);
 						                 //    if (exceptionRet) {
@@ -90,29 +114,6 @@ $(document).ready(function() {
 						                }
 						            });
 
-									// Allocate and initialize the client.
-									client = new Client();
-									var exceptionRet = client.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									// Allocate and attach the navbar module.
-									navbar = new Navbar();
-									exceptionRet = navbar.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									// Allocate and initialize the validator.
-									validator = new Validator();
-									var exceptionRet = validator.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									// Allocate comics.
-									comics = new Comics();
-									exceptionRet = comics.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									types = new Types();
-									exceptionRet = types.create();
-									if (exceptionRet) { throw exceptionRet; }
 
 								} catch(e) { errorHelper.show(e); }
 							});
