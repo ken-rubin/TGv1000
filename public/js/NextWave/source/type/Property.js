@@ -10,10 +10,11 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/attributeHelper",
     "NextWave/source/type/SectionPart",
     "NextWave/source/methodBuilder/CodeExpressionRefinement",
     "NextWave/source/methodBuilder/CodeExpressionName"],
-    function (prototypes, SectionPart, CodeExpressionRefinement, CodeExpressionName) {
+    function (prototypes, attributeHelper, SectionPart, CodeExpressionRefinement, CodeExpressionName) {
 
         try {
 
@@ -42,6 +43,27 @@ define(["NextWave/source/utility/prototypes",
                                 new CodeExpressionName("instance"),
                                 new CodeExpressionName(self.name)
                             );
+                    };
+
+                    // Create this instance.
+                    self.create = function (objectProperty) {
+
+                        try {
+
+                            // Save the attributes along with this object.
+                            var exceptionRet = attributeHelper.fromJSON(objectProperty,
+                                self,
+                                ["name"]);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Virtual name of the method to remove this section.  Override if not satisfied with method.
@@ -77,7 +99,17 @@ define(["NextWave/source/utility/prototypes",
                     // Save.
                     self.save = function () {
 
-                        return { name: self.name };
+                        var objectRet = { name: self.name };
+
+                        // Save the attributes along with this object.
+                        var exceptionRet = attributeHelper.toJSON(self,
+                            objectRet);
+                        if (exceptionRet) {
+
+                            throw exceptionRet;
+                        }
+
+                        return objectRet;
                     };
                 } catch (e) {
 

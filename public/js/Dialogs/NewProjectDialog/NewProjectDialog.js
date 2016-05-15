@@ -455,6 +455,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								["Game", "Console", "Web Site", "HoloLens", "Mapping"].indexOf(m_projectType) + 1, 
 								function(clProject){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
+									return;
+									
 									clProject.data.id = 0;	// just to be sure it doesn't overwrite a core project
 									clProject.data.isCoreProject = false;
 

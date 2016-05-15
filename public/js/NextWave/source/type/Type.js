@@ -16,6 +16,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/glyphs",
+    "NextWave/source/utility/attributeHelper",
     "NextWave/source/type/TypeSection",
     "NextWave/source/type/Methods",
     "NextWave/source/type/Method",
@@ -31,7 +32,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeType",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
     "NextWave/source/methodBuilder/CodeExpressionInvocation"],
-    function (prototypes, settings, Point, Size, Area, glyphs, TypeSections, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
+    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSections, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
 
         try {
 
@@ -70,6 +71,15 @@ define(["NextWave/source/utility/prototypes",
                     self.create = function (objectType) {
 
                         try {
+
+                            // Save the attributes along with this object.
+                            var exceptionRet = attributeHelper.fromJSON(objectType,
+                                self,
+                                ["name", "methods", "properties", "events"]);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             // Set the name.
                             self.name = new CodeType(objectType.name);
@@ -121,7 +131,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     var methodNew = new Method(self,
                                         objectMethodIth.name);
-                                    var exceptionRet = methodNew.create(objectMethodIth);
+                                    exceptionRet = methodNew.create(objectMethodIth);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -143,7 +153,12 @@ define(["NextWave/source/utility/prototypes",
 
                                     var propertyNew = new Property(self,
                                         objectPropertyIth.name);
-                                    var exceptionRet = self.properties.addPart(propertyNew);
+                                    exceptionRet = propertyNew.create(objectPropertyIth);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                    exceptionRet = self.properties.addPart(propertyNew);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -160,7 +175,12 @@ define(["NextWave/source/utility/prototypes",
 
                                     var eventNew = new Event(self,
                                         objectEventIth.name);
-                                    var exceptionRet = self.events.addPart(eventNew);
+                                    exceptionRet = eventNew.create(objectEventIth);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                    exceptionRet = self.events.addPart(eventNew);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -297,6 +317,14 @@ define(["NextWave/source/utility/prototypes",
                     self.save = function () {
 
                         var objectRet = {};
+
+                        // Save the attributes along with this object.
+                        var exceptionRet = attributeHelper.toJSON(self,
+                            objectRet);
+                        if (exceptionRet) {
+
+                            throw exceptionRet;
+                        }
 
                         // Save name.
                         objectRet.name = self.name.payload;

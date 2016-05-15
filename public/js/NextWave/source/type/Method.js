@@ -10,6 +10,7 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/attributeHelper",
     "NextWave/source/type/SectionPart",
 
     "NextWave/source/methodBuilder/Block",
@@ -44,7 +45,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
 
     "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, SectionPart, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
+    function (prototypes, attributeHelper, SectionPart, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
 
         try {
 
@@ -115,6 +116,15 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Save the attributes along with this object.
+                            var exceptionRet = attributeHelper.fromJSON(objectMethod,
+                                self,
+                                ["name", "arguments", "statements"]);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Three bits of data.
                             var arrayParameters = objectMethod.arguments;
                             var arrayStatements = objectMethod.statements;
@@ -180,6 +190,14 @@ define(["NextWave/source/utility/prototypes",
                     self.save = function () {
 
                         var objectRet = {};
+
+                        // Save the attributes along with this object.
+                        var exceptionRet = attributeHelper.toJSON(self,
+                            objectRet);
+                        if (exceptionRet) {
+
+                            throw exceptionRet;
+                        }
 
                         // Name.
                         objectRet.name = self.name;

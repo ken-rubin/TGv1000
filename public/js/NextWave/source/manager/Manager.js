@@ -17,6 +17,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
+    "NextWave/source/utility/attributeHelper",
     "NextWave/source/manager/Layer",
     "NextWave/source/manager/LayerBackground",
     "NextWave/source/manager/LayerPanels",
@@ -37,7 +38,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
     "NextWave/source/type/Property"],
-    function (prototypes, settings, Area, Point, Size, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
+    function (prototypes, settings, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
 
         try {
 
@@ -751,33 +752,36 @@ define(["NextWave/source/utility/prototypes",
                     // It needs to be massaged a bit.
                     //
                     // This is basically the opposite of what goes on in project.saveToDatabase();
-                    self.load = function (objectInitializer) {
+                    self.load = function (objectProject) {
 
                         try {
 
+                            // Save the project attributes.
+                            self.initializer = objectProject;
+
                             // Massage objectInitializer into the format manager requires.
                             // Clone it into self.initializer.
-                            self.initializer = JSON.parse(JSON.stringify(objectInitializer));
+                            var objectComic = objectProject.comics[0];
 
                             // Load up panels.
-                            var exceptionRet = self.loadLiterals(self.initializer.literals);
+                            var exceptionRet = self.loadLiterals(objectComic.literals);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.loadExpressions(self.initializer.expressions);
+                            exceptionRet = self.loadExpressions(objectComic.expressions);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.loadStatements(self.initializer.statements);
+                            exceptionRet = self.loadStatements(objectComic.statements);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
                             // Add the types from the initializer into this intance.
-                            return self.loadTypes(self.initializer.types);
+                            return self.loadTypes(objectComic.types);
 
                         } catch (e) { return e; }
                     }

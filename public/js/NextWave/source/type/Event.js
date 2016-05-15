@@ -10,8 +10,9 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/attributeHelper",
     "NextWave/source/type/SectionPart"],
-    function (prototypes, SectionPart) {
+    function (prototypes, attributeHelper, SectionPart) {
 
         try {
 
@@ -39,10 +40,41 @@ define(["NextWave/source/utility/prototypes",
                         return new CodeExpressionName(self.name);
                     };
 
+                    // Create this instance.
+                    self.create = function (objectEvent) {
+
+                        try {
+
+                            // Save the attributes along with this object.
+                            var exceptionRet = attributeHelper.fromJSON(objectEvent,
+                                self,
+                                ["name"]);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Save.
                     self.save = function () {
 
-                        return { name: self.name };
+                        var objectRet = { name: self.name };
+
+                        // Save the attributes along with this object.
+                        var exceptionRet = attributeHelper.toJSON(self,
+                            objectRet);
+                        if (exceptionRet) {
+
+                            throw exceptionRet;
+                        }
+
+                        return objectRet;
                     };
                 } catch (e) {
 
