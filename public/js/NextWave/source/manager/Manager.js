@@ -789,7 +789,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Massage objectInitializer into the format manager requires.
                             // Clone it into self.initializer.
-                            var objectComic = objectProject.comics[0];
+                            var objectComic = objectProject.comics[objectProject.currentComicIndex];
 
                             // Load up panels.
                             var exceptionRet = self.loadLiterals(objectComic.literals);
@@ -866,7 +866,7 @@ define(["NextWave/source/utility/prototypes",
                         var objectRet = self.initializer;
 
                         // For now, only handling first comic.
-                        var objectComic = objectRet.comic[0];
+                        var objectComic = objectRet.comics[objectRet.currentComicIndex];
 
                         // First, types.
                         objectComic.types = [];

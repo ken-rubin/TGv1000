@@ -179,22 +179,6 @@ define(["Core/errorHelper", "Navbar/Comics"],
 						}
 					};
 
-					self.getStatus = function (nameInHolding) {
-
-						var objProject = manager.save();
-						var test = parseInt(g_profile['userId'], 10);
-						var nih = nameInHolding || '';
-						return {
-
-							inDBAlready: (objProject.id > 0),
-							userOwnsProject: (objProject.ownedByUserId === test),
-							allRequiredFieldsFilled: (	nih.trim().length > 0
-											&& (objProject.imageId > 0 || objProject.altImagePath.length > 0)
-										),
-							projectNameIsFilled: (objProject.name.trim().length > 0)
-						};
-					};
-
 					//////////////////////////////
 					// Private fields.
 

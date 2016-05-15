@@ -1348,7 +1348,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comicProjectId: project.comicProjectId,
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
-                            currentProjectIndex: project.currentProjectIndex
+                            currentComicIndex: project.currentComicIndex
                         };
 
                         if (project.specialProjectData.openMode === "searched") {
