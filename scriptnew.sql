@@ -1205,6 +1205,15 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
 
+    if @dbstate = 22 THEN
+
+		ALTER TABLE `TGv1000`.`projects` 
+			ADD COLUMN `currentComicIndex` INT(11) NOT NULL DEFAULT '0' AFTER `chargeId`;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
 end//
 
 

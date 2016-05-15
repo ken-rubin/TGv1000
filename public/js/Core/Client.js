@@ -877,16 +877,17 @@ define(["Core/errorHelper",
 
 						try {
 
-							if (m_clProject) {
+							if (manager.loaded) {
 							
 								m_functionAbandonProjectDialog(function() {	
 
 									// This callback will be called if the user wants to abandon the open project.
 									try {
-										var exceptionRet = m_clProject.unload();
+
+										var exceptionRet = manager.destroy;
 										if (exceptionRet) { throw exceptionRet; }
 
-										m_clProject = null;
+										// m_clProject = null;
 
 										self.setBrowserTabAndBtns();
 
@@ -929,9 +930,10 @@ define(["Core/errorHelper",
 					self.setBrowserTabAndBtns = function () {
 
 						document.title = "TechGroms";
-						if (m_clProject) {
+						if (manager.loaded) {
 
-							if (m_clProject.data.name.length > 0) { document.title = document.title + " / " + m_clProject.data.name; }
+							var objProject = manager.save();
+							if (objProject.name.length > 0) { document.title = document.title + " / " + objProject.name; }
 						}
 
 						// Something happened so refresh the navbar.
@@ -1006,7 +1008,7 @@ define(["Core/errorHelper",
 					}
 
 					// Private variables.
-					var m_clProject = null;
+					// var m_clProject = null;
 					var m_openDialog = null;
 
 					// This second one is used for the Image Search, Disk and URL dialogs, since they can open over another open dialog.
