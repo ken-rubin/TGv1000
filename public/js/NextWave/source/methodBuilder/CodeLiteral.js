@@ -35,6 +35,8 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // For now, all literals are strings.
                     self.payload = strPayload || "";
+                    // Set the maximum horizontal extent.
+                    self.maxWidth = null;
                     // Allocate the in place editor helper.
                     self.inPlaceEditor = new InPlaceEditHelper(self, 
                         "payload",      // Value member.
@@ -87,6 +89,12 @@ define(["NextWave/source/utility/prototypes",
 
                     // Returns the height of this type.
                     self.getWidth = function (contextRender) {
+
+                        // If max width set, always use it.
+                        if (self.maxWidth) {
+
+                            return self.maxWidth;
+                        }
 
                         if (!self.payload) {
 
@@ -151,7 +159,8 @@ define(["NextWave/source/utility/prototypes",
                                         contextRender.fillStyle = settings.general.fillText;
                                         contextRender.fillText(self.payload,
                                             m_area.location.x + settings.general.margin,
-                                            m_area.location.y);
+                                            m_area.location.y,
+                                            m_area.extent.width - 2 * settings.general.margin);
                                         return null;
                                     } catch (e) {
 

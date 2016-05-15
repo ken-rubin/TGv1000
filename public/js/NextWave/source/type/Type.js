@@ -574,7 +574,9 @@ define(["NextWave/source/utility/prototypes",
 
                             // Render the type CodeType.
                             var areaName = new Area(m_area.location.clone(),
-                                new Size(m_area.width, self.settingsNode.lineHeight));
+                                new Size(m_area.extent.width - 2 * settings.glyphs.width - settings.general.margin, 
+                                    self.settingsNode.lineHeight));
+                            self.name.maxWidth = areaName.extent.width;
                             exceptionRet = self.name.render(contextRender, 
                                 areaName,
                                 0);

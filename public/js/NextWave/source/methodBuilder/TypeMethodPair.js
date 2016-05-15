@@ -84,6 +84,7 @@ define(["NextWave/source/utility/prototypes",
                                     return e;
                                 }
                             };
+                            self.type.maxWidth = 100;
                     		self.method = new CodeName(strMethod || "method");
                             // Since these are not draggable,
                             // set the collection to itself.
@@ -128,6 +129,7 @@ define(["NextWave/source/utility/prototypes",
                                     return e;
                                 }
                             };
+                            self.method.maxWidth = 200;
 
                     		return null;
                     	} catch (e) {

@@ -365,6 +365,26 @@ define(["NextWave/source/utility/prototypes",
 
                                 dStartOffset = contextRender.measureText(strBefore).width;
                                 dLengthOffset = contextRender.measureText(strDuring).width;
+                                var dNominalLength = contextRender.measureText(self.owner[self.payloadElement]).width;
+
+                                // Get the total, normal width of the string -> dNominalWidth.
+                                // If dNominalWidth > maxWidth:
+                                // Calculate the ratio:
+                                // maxWidth / dNominalWidth -> dRatio
+                                // There are two critical points:
+                                // dStartOffset * dRatio -> dStartOffset, dLengthOffset * dRatio -> dLengthOffset.
+                                // These new offsets can be used to calculate fillText max render widths.
+                                // Only specify a max render width if maxWidth is set.
+                                if (self.owner.maxWidth) {
+
+                                    if (dNominalLength > areaRender.extent.width - 2 * settings.general.margin) {
+
+                                        var dRatio = (areaRender.extent.width - 2 * settings.general.margin) / dNominalLength;
+                                        dStartOffset *= dRatio;
+                                        dLengthOffset *= dRatio;
+                                        dNominalLength *= dRatio;
+                                    }
+                                }
 
                                 // If selecting a select cell, then color differently to instruct the user.
                                 if (m_bShowCursor ||
@@ -381,16 +401,19 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fillStyle = "#000";
                                 contextRender.fillText(strBefore,
                                     areaRender.location.x + settings.general.margin,
-                                    areaRender.location.y);
+                                    areaRender.location.y,
+                                    dStartOffset);
                                 contextRender.fillText(strAfter,
                                     areaRender.location.x + settings.general.margin + dStartOffset + dLengthOffset,
-                                    areaRender.location.y);
+                                    areaRender.location.y,
+                                    dNominalLength - dLengthOffset);
 
                                 // Now render the selected label.
                                 contextRender.fillStyle = "#fff";
                                 contextRender.fillText(strDuring,
                                     areaRender.location.x + settings.general.margin + dStartOffset,
-                                    areaRender.location.y);
+                                    areaRender.location.y,
+                                    dLengthOffset - dStartOffset);
                             } else {
 
                                 // If the timer is going, then stop it.
@@ -447,8 +470,6 @@ define(["NextWave/source/utility/prototypes",
                     var m_bShowCursor = true;
                     // The blink timer cookie.
                     var m_cookieBlinkTimer = null;
-                    // Collection of cell positions for mouse handling.
-                    var m_arrayInPlaceEditCellFormatOffsets = [];
 
                     ///////////////////////
                     // Perform owner injection!
