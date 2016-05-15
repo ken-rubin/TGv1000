@@ -103,7 +103,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             lastSaved: row.lastSaved,
                             chargeId: row.chargeId,
                             comics: [],
-                            specialProjectData: {}
+                            specialProjectData: {},
+                            currentComicIndex: row.currentComicIndex
                         };
 
                         m_functionFetchTags(
@@ -1346,7 +1347,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             isCoreProject: (project.isCoreProject ? 1 : 0),
                             comicProjectId: project.comicProjectId,
                             lastSaved: (new Date()),
-                            chargeId: project.chargeId
+                            chargeId: project.chargeId,
+                            currentProjectIndex: project.currentProjectIndex
                         };
 
                         if (project.specialProjectData.openMode === "searched") {

@@ -48,262 +48,12 @@ $(document).ready(function() {
 										errorHelper.show(strFromURL);
 									}
 
-									// Allocate and initialize the client.
-									client = new Client();
-									var exceptionRet = client.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									// Allocate and initialize the validator.
-									validator = new Validator();
-									var exceptionRet = validator.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									// Allocate and attach the navbar module.
-									navbar = new Navbar();
-									exceptionRet = navbar.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									// Allocate comics.
-									comics = new Comics();
-									exceptionRet = comics.create();
-									if (exceptionRet) { throw exceptionRet; }
-
-									types = new Types();
-									exceptionRet = types.create();
-									if (exceptionRet) { throw exceptionRet; }
-
 									// Allocate and attach the manager/glyph objects.
 						            // Create the glyphs module first, its 
 						            // complete callback will contiue things.
 						            glyphs.create(function () {
 
 						                try {
-
-								            // var objectThe = {
-
-								            //     types: [{
-
-								            //             name: "MyType",
-								            //             methods: [{
-
-								            //                     name: "SomeOtherMethod",
-								            //                     arguments: [],
-								            //                     statements: [{
-
-								            //                             type: "CodeStatementBreak"
-								            //                         }
-								            //                     ]
-								            //                 },{
-
-								            //                     name: "LoopAndAlert", 
-								            //                     arguments: [{
-
-								            //                             name: "iCount"
-								            //                         }
-								            //                     ],
-								            //                     statements: [{
-
-								            //                             type: "CodeStatementFor",
-								            //                             parameters: [{
-
-								            //                                     type: "CodeExpressionInfix",
-								            //                                     parameters: [{
-
-								            //                                             type: "CodeExpressionName",
-								            //                                             parameters: [{ 
-
-								            //                                                     type: "String",
-								            //                                                     value: "i" 
-								            //                                                 }
-								            //                                             ]
-								            //                                         }, {
-
-								            //                                             type: "String",
-								            //                                             value: "=" 
-								            //                                         }, {
-
-								            //                                             type: "CodeExpressionLiteral",
-								            //                                             parameters: [{
-
-								            //                                                     type: "String",
-								            //                                                     value: "0"
-								            //                                                 }
-								            //                                             ]
-								            //                                         }
-								            //                                     ]
-								            //                                 }, {
-
-								            //                                     type: "CodeExpressionInfix",
-								            //                                     parameters: [{
-
-								            //                                             type: "CodeExpressionName",
-								            //                                             parameters: [{ 
-
-								            //                                                     type: "String",
-								            //                                                     value: "i" 
-								            //                                                 }
-								            //                                             ]
-								            //                                         }, {
-
-								            //                                             type: "String",
-								            //                                             value: "<" 
-								            //                                         }, {
-
-								            //                                             type: "CodeExpressionName",
-								            //                                             parameters: [{
-
-								            //                                                     type: "String",
-								            //                                                     value: "iCount"
-								            //                                                 }
-								            //                                             ]
-								            //                                         }
-								            //                                     ]
-								            //                                 }, {
-
-								            //                                     type: "CodeExpressionPostfix",
-								            //                                     parameters: [{
-
-								            //                                             type: "CodeExpressionName",
-								            //                                             parameters: [{ 
-
-								            //                                                     type: "String",
-								            //                                                     value: "i" 
-								            //                                                 }
-								            //                                             ]
-								            //                                         }, {
-
-								            //                                             type: "String",
-								            //                                             value: "++" 
-								            //                                         }
-								            //                                     ]
-								            //                                 }, {
-
-								            //                                     type: "Block",
-								            //                                     parameters: [{
-
-								            //                                             type: "String",
-								            //                                             value: "Statements"
-								            //                                         },{
-
-								            //                                             type: "Array",
-								            //                                             parameters: [{
-
-								            //                                                     type: "CodeStatementExpression",
-								            //                                                     parameters: [{
-
-								            //                                                             type: "CodeExpressionInvocation",
-								            //                                                             parameters: [{
-
-								            //                                                                     type: "CodeExpressionRefinement",
-								            //                                                                     parameters: [{
-
-								            //                                                                             type: "CodeExpressionName",
-								            //                                                                             parameters: [{
-
-								            //                                                                                     type: "String",
-								            //                                                                                     value: "window"
-								            //                                                                                 }
-								            //                                                                             ]
-								            //                                                                         }, {
-
-								            //                                                                             type: "CodeExpressionName",
-								            //                                                                             parameters: [{
-
-								            //                                                                                     type: "String",
-								            //                                                                                     value: "alert"
-								            //                                                                                 }
-								            //                                                                             ]
-								            //                                                                         }
-								            //                                                                     ]
-								            //                                                                 }, {
-
-								            //                                                                     type: "ParameterList",
-								            //                                                                     parameters: [{
-
-								            //                                                                             type: "Array",
-								            //                                                                             parameters: [{
-
-								            //                                                                                     type: "Parameter",
-								            //                                                                                     parameters: [{
-
-								            //                                                                                             name: "i"
-								            //                                                                                         }
-								            //                                                                                     ]
-								            //                                                                                 }
-								            //                                                                             ]
-								            //                                                                         }
-								            //                                                                     ]
-								            //                                                                 }
-								            //                                                             ]
-								            //                                                         }
-								            //                                                     ]
-								            //                                                 }
-								            //                                             ]
-								            //                                         }
-								            //                                     ]
-								            //                                 }
-								            //                             ]
-								            //                         }
-								            //                     ] 
-								            //                 }
-								            //             ],
-								            //             properties: [
-
-								            //                 { name: "URL" }
-								            //             ],
-								            //             events: [
-
-								            //             ]
-								            //         }
-								            //     ],
-								            //     statements: ["StatementBreak",
-								            //         "StatementContinue",
-								            //         "StatementExpression",
-								            //         "StatementFor", 
-								            //         "StatementForIn", 
-								            //         "StatementIf", 
-								            //         "StatementReturn", 
-								            //         "StatementThrow", 
-								            //         "StatementTry", 
-								            //         "StatementVar", 
-								            //         "StatementWhile"
-								            //     ],
-								            //     expressions: ["ExpressionAdd", 
-								            //         "ExpressionAssignment", 
-								            //         "ExpressionDecrement", 
-								            //         "ExpressionDelete", 
-								            //         "ExpressionDivide", 
-								            //         "ExpressionEqual", 
-								            //         "ExpressionGreater", 
-								            //         "ExpressionGreaterOrEqual", 
-								            //         "ExpressionIncrement", 
-								            //         "ExpressionInvocation", 
-								            //         "ExpressionLess", 
-								            //         "ExpressionLessOrEqual", 
-								            //         "ExpressionLogicalAnd", 
-								            //         "ExpressionLogicalNot", 
-								            //         "ExpressionLogicalOr", 
-								            //         "ExpressionModulo", 
-								            //         "ExpressionMultiply", 
-								            //         "ExpressionNegate", 
-								            //         "ExpressionNew", 
-								            //         "ExpressionNotEqual", 
-								            //         "ExpressionParentheses", 
-								            //         "ExpressionRefinement", 
-								            //         "ExpressionSubtract", 
-								            //         "ExpressionTernary"
-								            //     ],
-								            //     literals: ["LiteralArray",
-								            //         "LiteralBoolean", 
-								            //         "LiteralInfinity", 
-								            //         "LiteralNaN", 
-								            //         "LiteralNull", 
-								            //         "LiteralNumber", 
-								            //         "LiteralObject", 
-								            //         "LiteralRegexp", 
-								            //         "LiteralString"
-								            //     ]
-								            // };
 
 						                    // Allocate and create the layer manager.
 						                    manager = new Manager();
@@ -339,6 +89,30 @@ $(document).ready(function() {
 						                    alert(e.message);
 						                }
 						            });
+
+									// Allocate and initialize the client.
+									client = new Client();
+									var exceptionRet = client.create();
+									if (exceptionRet) { throw exceptionRet; }
+
+									// Allocate and attach the navbar module.
+									navbar = new Navbar();
+									exceptionRet = navbar.create();
+									if (exceptionRet) { throw exceptionRet; }
+
+									// Allocate and initialize the validator.
+									validator = new Validator();
+									var exceptionRet = validator.create();
+									if (exceptionRet) { throw exceptionRet; }
+
+									// Allocate comics.
+									comics = new Comics();
+									exceptionRet = comics.create();
+									if (exceptionRet) { throw exceptionRet; }
+
+									types = new Types();
+									exceptionRet = types.create();
+									if (exceptionRet) { throw exceptionRet; }
 
 								} catch(e) { errorHelper.show(e); }
 							});

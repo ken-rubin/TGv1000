@@ -313,7 +313,7 @@ define(["Core/errorHelper"],
 					// anything with it. I believe this handles itself with modal dialogs in the right places.
 					self.enableOrDisableProjAndTypeMenuItems = function () {
 
-						var clProject = client.getProject();
+						// var clProject = client.getProject();
 
 						// New and search are enabled. others are disabled.
 						m_functionEnable("NewProject");
@@ -327,7 +327,7 @@ define(["Core/errorHelper"],
 						m_functionDisable("NewProperty");
 						m_functionDisable("NewEvent");
 
-						if (clProject !== null) {
+						if (manager.loaded) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
