@@ -114,6 +114,60 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+
+
+
+/*
+
+
+                    // Clear the tree of Types.
+                    self.clearTypes = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.typesPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Load up Types from list of Types.
+                    self.loadTypes = function (arrayList) {
+
+                        try {
+
+                            // Clear the old.
+                            var exceptionRet = self.clearTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the new.
+                            return self.typesPanel.payload.load(arrayList);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Save and return list of extant Types.
+                    self.saveTypes = function () {
+
+                        return self.typesPanel.payload.save();
+                    };
+
+
+
+
+
+*/
+
+
+
                     // Method adds a new Type.
                     self.addType = function (typeNew) {
 
@@ -155,6 +209,13 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+
+
+
+
+
+
 
                     // Clear the list of Statements.
                     self.clearStatements = function () {
