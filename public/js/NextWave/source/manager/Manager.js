@@ -644,27 +644,27 @@ define(["NextWave/source/utility/prototypes",
                             self.loaded = false;
 
                             // Clear panel data.
-                            var exceptionnRet = self.panelLayer.clearTypes();
+                            var exceptionRet = self.panelLayer.clearTypes();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionnRet = self.panelLayer.clearStatements();
+                            exceptionRet = self.panelLayer.clearStatements();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionnRet = self.panelLayer.clearExpressions();
+                            exceptionRet = self.panelLayer.clearExpressions();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionnRet = self.panelLayer.clearNames();
+                            exceptionRet = self.panelLayer.clearNames();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionnRet = self.panelLayer.clearCenter();
+                            exceptionRet = self.panelLayer.clearCenter();
                             if (exceptionRet) {
 
                                 return exceptionRet;

@@ -91,26 +91,26 @@ define(["Core/errorHelper"],
 
 																				try {
 
-																					// clProject.data.specialProjectData exists, but it's empty unless its a Purchasable Project in
+																					// clProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
 																					// which case is contains a property holding class, product or onlineClass data.
 																					// Create and merge rest of specialProjectData in.
 																					specialProjectData = {
 																						privilegedUser: bPrivilegedUser,
 																						ownedByUser: bOnlyOwnedByUser,
 																						othersProjects: bOnlyOthersProjects,
-																						normalProject: (clProject.data.isCoreProject+clProject.data.isClass+clProject.data.isProduct+clProject.data.isOnlineClass === 0),
-																						coreProject: clProject.data.isCoreProject,
-																						classProject: clProject.data.isClass,
-																						productProject: clProject.data.isProduct,
-																						onlineClassProject: clProject.data.isOnlineClass,
+																						normalProject: (clProject.isCoreProject+clProject.isClass+clProject.isProduct+clProject.isOnlineClass === 0),
+																						coreProject: clProject.isCoreProject,
+																						classProject: clProject.isClass,
+																						productProject: clProject.isProduct,
+																						onlineClassProject: clProject.isOnlineClass,
 																						comicsEdited: false,
 																						systemTypesEdited: false,
 																						openMode: 'searched'
 																					};
 
-																					$.extend(true, clProject.data.specialProjectData, specialProjectData);
+																					$.extend(true, clProject.specialProjectData, specialProjectData);
 
-																					if (!bPrivilegedUser && (clProject.data.specialProjectData.productProject || clProject.data.specialProjectData.classProject || clProject.data.specialProjectData.onlineClassProject)) {
+																					if (!bPrivilegedUser && (clProject.specialProjectData.productProject || clProject.specialProjectData.classProject || clProject.specialProjectData.onlineClassProject)) {
 
 																						// A non-privileged user will not have been able to search for a non-active or incomplete project.
 																						// So we're good to proceed to the buying process.
@@ -266,10 +266,10 @@ define(["Core/errorHelper"],
 								// 	mouseenter: function(event) {
 
 								// 		if ($("#ComicsLI").hasClass("disabled")) {
-								// 			$("#ComicsButton").data('powertip', 'You have to open a project before you can work on comics.');
+								// 			$("#ComicsButton")('powertip', 'You have to open a project before you can work on comics.');
 								// 			$.powerTip.show(this, event);
 								// 		} else {
-								// 			$("#ComicsButton").data('powertip', '');
+								// 			$("#ComicsButton")('powertip', '');
 								// 			$.powerTip.hide(this);
 								// 		}
 
