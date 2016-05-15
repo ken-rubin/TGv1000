@@ -1715,11 +1715,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         // Otherwise, only the comics' types and lower are saved.
         try {
 
-            m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.items.length);
+            m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.length);
 
             // async.eachSeries iterates over a collection, perform a single async task at a time.
             // Actually, we could process all comics in parallel. Maybe we'll change to that in the future. Or maybe it really makes no diff.
-            async.eachSeries(project.comics.items, 
+            async.eachSeries(project.comics, 
                 function(comicIth, cb) {
 
                     comicIth.projectId = project.comicProjectId;
@@ -1850,7 +1850,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // Save to comics_statements, using statements array to look up statementId.
                     function(cb) {
 
-                        async.eachSeries(comicIth.statements.items,
+                        async.eachSeries(comicIth.statements,
                             function(lIth, cb) {
 
                                 for (var i = 0; i < statements.length; i++) {
@@ -1914,7 +1914,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // Save to comics_expressions, using expressions array to look up expressionId.
                     function(cb) {
 
-                        async.eachSeries(comicIth.expressions.items,
+                        async.eachSeries(comicIth.expressions,
                             function(lIth, cb) {
 
                                 for (var i = 0; i < expressions.length; i++) {
@@ -1978,7 +1978,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // Save to comics_literals, using literals array to look up statementId.
                     function(cb) {
 
-                        async.eachSeries(comicIth.literals.items,
+                        async.eachSeries(comicIth.literals,
                             function(lIth, cb) {
 
                                 for (var i = 0; i < literals.length; i++) {
@@ -2026,7 +2026,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             var ord = 1;
 
-            async.eachSeries(comicIth.comiccode.items, 
+            async.eachSeries(comicIth.comiccode, 
                 function(ccIth, cb) {
 
                     ccIth.comicId = comicIth.id;
@@ -2123,9 +2123,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // We don't use async for this loop because we're looking for only one type. The loop is to find it amongst the comic's types.
             // (Of course, we know it will be the first.)
             var bFoundAppType = false;
-            for (var i = 0; i < passObj.comicIth.types.items.length; i++) {
+            for (var i = 0; i < passObj.comicIth.types.length; i++) {
 
-                var typeIth = passObj.comicIth.types.items[i];
+                var typeIth = passObj.comicIth.types[i];
 
                 if (typeIth.isApp) {
 
@@ -2226,7 +2226,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // async.eachSeries iterates over a collection, perform a single async task at a time.
             // Actually, we could process all types in parallel, but we'd have to pre-assign their ordinals.
             // Maybe we'll change to that in the future.
-            async.eachSeries(passObj.comicIth.types.items, 
+            async.eachSeries(passObj.comicIth.types, 
                 function(typeIth, cb) {
 
                     if (!typeIth.isApp) {
@@ -2432,7 +2432,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         try {
             // m_log("***In m_fixUpBaseTypeIdsInComicIth*** with passObj.typeIdTranslationArray=" + JSON.stringify(passObj.typeIdTranslationArray));
 
-            async.eachSeries(passObj.comicIth.types.items, 
+            async.eachSeries(passObj.comicIth.types, 
                 function(typeIth, cb) {
 
                     if (!typeIth.baseTypeId) { 
@@ -2498,7 +2498,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         typeId: typeIth.id,
                                                         name: method.name,
                                                         ordinal: method.ordinal,
-                                                        workspace: method.workspace,
+                                                        workspace: JSON.stringify({"statements": method.statements}),
                                                         imageId: method.imageId,
                                                         description: method.description,
                                                         parentMethodId: method.parentMethodId,
@@ -2508,7 +2508,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         public: method.public,
                                                         quarantined: method.quarantined,
                                                         methodTypeId: method.methodTypeId,
-                                                        parameters: method.parameters
+                                                        parameters: method.arguments.join(',')
                                                         };
 
                                             var strQuery = "insert " + self.dbname + "methods SET ?";
