@@ -607,6 +607,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									// 	};
 									// }
 
+						    		exceptionRet = manager.load(project);
+						    		if (exceptionRet) { throw exceptionRet; }
+
 									client.setBrowserTabAndBtns();
 								}
 							);

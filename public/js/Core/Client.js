@@ -544,6 +544,9 @@ define(["Core/errorHelper",
 							
 							} else {
 
+					    		exceptionRet = manager.load(project);
+					    		if (exceptionRet) { return exceptionRet; }
+
 								self.setBrowserTabAndBtns();
 							}
 
@@ -900,7 +903,7 @@ define(["Core/errorHelper",
 									// This callback will be called if the user wants to abandon the open project.
 									try {
 
-										var exceptionRet = manager.destroy();
+										var exceptionRet = manager.clearPanels();
 										if (exceptionRet) { throw exceptionRet; }
 
 										// m_clProject = null;
@@ -1017,19 +1020,19 @@ define(["Core/errorHelper",
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
 										
-										client.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
+										self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
 																			// This is the only place that calls client.unloadProject with 2nd param = false.
 										
 										// cause whichever dialog was open to close.
-										client.closeCurrentDialog();
+										self.closeCurrentDialog();
 
 										// Set up the modified project.
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
-										client.load_m_clProject(objectData.project);
+										self.load_m_clProject(objectData.project);
 
-										client.setBrowserTabAndBtns();
+										self.setBrowserTabAndBtns();
 
 										if ($.isFunction(callback)) {
 											callback(null);
@@ -1037,8 +1040,8 @@ define(["Core/errorHelper",
 									} else {
 
 										// !objectData.success -- error message in objectData.message
-										client.closeCurrentDialog();
-										client.unloadProject(null, false);
+										self.closeCurrentDialog();
+										self.unloadProject(null, false);
 
 										if ($.isFunction(callback)) {
 											callback(objectData.message);
