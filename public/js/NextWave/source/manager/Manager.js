@@ -64,6 +64,8 @@ define(["NextWave/source/utility/prototypes",
                     self.names = [];
                     // Collection of types available in the current context.
                     self.types = [];
+                    // Indicates there is a project which has been loaded up into this manager.
+                    self.loaded = false;
                     // Current type/method.
                     self.context = {
 
@@ -636,6 +638,32 @@ define(["NextWave/source/utility/prototypes",
                     // Destroy instance.
                     self.destroy = function () {
 
+                        try {
+
+                            // Reset loaded.
+                            self.loaded = false;
+
+                            // Clear panel data.
+                            var exceptionnRet = self.panelLayer.clearTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionnRet = self.panelLayer.clearStatements();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionnRet = self.panelLayer.clearExpressions();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.panelLayer.clearLiterals();
+                        } catch (e) {
+
+                            return e;
+                        }
                     }
 
                     // Clear the list of types.
@@ -781,8 +809,16 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add the types from the initializer into this intance.
-                            return self.loadTypes(objectComic.types);
+                            exceptionRet = self.loadTypes(objectComic.types);
+                            if (exceptionRet) {
 
+                                return exceptionRet;
+                            }
+
+                            // Set loaded.
+                            self.loaded = true;
+
+                            return null;
                         } catch (e) { return e; }
                     }
 
@@ -826,10 +862,14 @@ define(["NextWave/source/utility/prototypes",
                     // from this manager instance for persistence.
                     self.save = function () {
 
-                        var objectRet = {};
+                        // Extract the saved off project.
+                        var objectRet = self.initializer;
+
+                        // For now, only handling first comic.
+                        var objectComic = objectRet.comic[0];
 
                         // First, types.
-                        objectRet.types = [];
+                        objectComic.types = [];
 
                         // Add the list of Type objects to the types collection.
                         for (var i = 0; i < self.types.length; i++) {
@@ -839,17 +879,8 @@ define(["NextWave/source/utility/prototypes",
                             var objectType = typeIth.save();
 
                             // Add it to the result object.
-                            objectRet.types.push(objectType);
+                            objectComic.types.push(objectType);
                         }
-
-                        // Now statements.
-                        objectRet.statements = self.panelLayer.saveStatements();
-
-                        // Now literals.
-                        objectRet.literals = self.panelLayer.saveLiterals();
-
-                        // Now expressions.
-                        objectRet.expressions = self.panelLayer.saveExpressions();
 
                         // Return the fully qualified manager state object.
                         return objectRet;
