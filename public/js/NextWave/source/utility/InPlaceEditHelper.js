@@ -406,14 +406,14 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fillText(strAfter,
                                     areaRender.location.x + settings.general.margin + dStartOffset + dLengthOffset,
                                     areaRender.location.y,
-                                    dNominalLength - dLengthOffset);
+                                    dNominalLength - (dLengthOffset + dStartOffset));
 
                                 // Now render the selected label.
                                 contextRender.fillStyle = "#fff";
                                 contextRender.fillText(strDuring,
                                     areaRender.location.x + settings.general.margin + dStartOffset,
                                     areaRender.location.y,
-                                    dLengthOffset - dStartOffset);
+                                    dLengthOffset);
                             } else {
 
                                 // If the timer is going, then stop it.
