@@ -32,9 +32,9 @@ define(["NextWave/source/utility/prototypes",
                     // Public fields.
 
                     // Name of this type object.
-                    self.type = null;
+                    self.type = new CodeType();
                     // Name of this type object.
-                    self.method = null;
+                    self.method = new CodeName();
                     // Indicates the type is highlighted.
                     self.highlight = false;
 
@@ -47,8 +47,8 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Save off type and method.
-                            self.type.name = "";
-                            self.type.method = "";
+                            self.type = new CodeType();
+                            self.method = new CodeName();
 
                             return null;
                         } catch (e) {
@@ -125,7 +125,7 @@ define(["NextWave/source/utility/prototypes",
                                     var typeFromName = window.manager.getTypeFromName(self.type.payload);
                                     if (!typeFromName) {
 
-                                        throw { message: "Failed to find Type named: " + self.type.payload };
+                                        return null;
                                     }
 
                                     // Ensure the value is unique.

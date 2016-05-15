@@ -234,23 +234,29 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            window.methodBuilder = null;
+                            window.typeBuilder = null;
+                            window.propertyBuilder = null;
+
                             // Clear out the three possible 
                             // payloads for the center panel.
-                            var exceptionRet = window.methodBuilder.clearItems();
+                            var exceptionRet = m_functionAllocateMethodBuilder();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = window.typeBuilder.clearItems();
+                            exceptionRet = m_functionAllocateTypeBuilder();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = window.propertyBuilder.clearItems();
+                            exceptionRet = m_functionAllocatePropertyBuilder();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
+
+                            return self.switchCenterPanelMode("Method");
                         } catch (e) {
 
                             return e;

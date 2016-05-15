@@ -48,20 +48,21 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // First, statements.
-                            var exceptionRet = self.methodStatements.clearItems();
+                            var exceptionRet = self.methodTypeMethodPair.create("", "");
                             if (exceptionRet) {
 
-                                return exceptionRet;
+                                throw exceptionRet;
                             }
 
-                            // Then parameters.
-                            exceptionRet = self.methodParameters.clearItems();
+                            self.methodParameters = new ParameterList();
+                            exceptionRet = self.methodParameters.create();
                             if (exceptionRet) {
 
-                                return exceptionRet;
+                                throw exceptionRet;
                             }
-                            return self.methodTypeMethodPair.clearItems();
+
+                            self.methodStatements = new StatementList();
+                            return self.methodStatements.create();
                         } catch (e) {
 
                             return e;

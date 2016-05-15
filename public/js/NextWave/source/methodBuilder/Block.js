@@ -326,16 +326,20 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         // Return array of the name and the Array of parameters.
-                        return [{ 
+                        return {
 
-                                type: "String", 
-                                value: self.name
-                            }, {
+                                type: "Block",
+                                parameters: [{ 
 
-                                type: "Array",
-                                parameters: arrayParameters
-                            }
-                        ];
+                                        type: "String", 
+                                        value: self.name
+                                    }, {
+
+                                        type: "Array",
+                                        parameters: arrayParameters
+                                    }
+                                ]
+                            };
                     };
 
                     // Returns the height of this block as closed.

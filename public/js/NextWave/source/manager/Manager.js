@@ -640,6 +640,17 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Collection of named object pertinent to the current context.
+                            self.names = [];
+                            // Collection of types available in the current context.
+                            self.types = [];
+                            // Current type/method.
+                            self.context = {
+
+                                type: null,
+                                method: null
+                            };
+
                             // Reset loaded.
                             self.loaded = false;
 

@@ -65,12 +65,17 @@ define(["NextWave/source/utility/prototypes",
                     // Save constructor parameters.
                     self.save = function () {
 
-                        return [{
+                        var objectRet = {};
+
+                        objectRet.type = self.constructor.name;
+                        objectRet.parameters = [{
 
                                 type: "String",
                                 value: self.payload
                             }
                         ];
+
+                        return objectRet;
                     };
 
                     // Clear area.
