@@ -33,6 +33,12 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
+                    // Clear out state.
+                    self.clearItems = function () {
+
+                        return null;
+                    };
+
                     // Attach instance to DOM and initialize state.
                     self.create = function () {
 

@@ -216,6 +216,46 @@ define(["NextWave/source/utility/prototypes",
 
 
 
+                    // Clear the list of names.
+                    self.clearNames = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.namesPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+                    // Clear the center panel.
+                    self.clearCenter = function () {
+
+                        try {
+
+                            // Clear out the three possible 
+                            // payloads for the center panel.
+                            var exceptionRet = window.methodBuilder.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = window.typeBuilder.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = window.propertyBuilder.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Clear the list of Statements.
                     self.clearStatements = function () {

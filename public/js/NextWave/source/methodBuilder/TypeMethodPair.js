@@ -41,13 +41,29 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Reset names.
+                    self.clearItems = function () {
+
+                        try {
+
+                            // Save off type and method.
+                            self.type.name = "";
+                            self.type.method = "";
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Initialize instance.
                     self.create = function (strType, strMethod) {
 
                     	try {
 
                     		// Save off type and method.
-                    		self.type = new CodeType(strType || "type");
+                    		self.type = new CodeType(strType || "");
                             // Since these are not draggable,
                             // set the collection to itself.
                             self.type.collection = self.type;
@@ -85,7 +101,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             };
                             self.type.maxWidth = 100;
-                    		self.method = new CodeName(strMethod || "method");
+
+                    		self.method = new CodeName(strMethod || "");
                             // Since these are not draggable,
                             // set the collection to itself.
                             self.method.collection = self.method;

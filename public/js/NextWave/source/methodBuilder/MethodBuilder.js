@@ -43,6 +43,31 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
+                    // Clear all the statements from the statement list.
+                    self.clearItems = function () {
+
+                        try {
+
+                            // First, statements.
+                            var exceptionRet = self.methodStatements.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Then parameters.
+                            exceptionRet = self.methodParameters.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.methodTypeMethodPair.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Attach instance to DOM and initialize state.
                     self.create = function (tmpMethod, plMethod, slMethod) {
 

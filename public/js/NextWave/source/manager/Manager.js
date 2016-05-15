@@ -635,8 +635,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Destroy instance.
-                    self.destroy = function () {
+                    // Clear panels.
+                    self.clearPanels = function () {
 
                         try {
 
@@ -655,6 +655,16 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
                             exceptionnRet = self.panelLayer.clearExpressions();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionnRet = self.panelLayer.clearNames();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionnRet = self.panelLayer.clearCenter();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -784,6 +794,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // First, clear out any detritus.
+                            var exceptionRet = self.clearPanels();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Save the project attributes.
                             self.initializer = objectProject;
 
@@ -792,7 +809,7 @@ define(["NextWave/source/utility/prototypes",
                             var objectComic = objectProject.comics[objectProject.currentComicIndex];
 
                             // Load up panels.
-                            var exceptionRet = self.loadLiterals(objectComic.literals);
+                            exceptionRet = self.loadLiterals(objectComic.literals);
                             if (exceptionRet) {
 
                                 return exceptionRet;
