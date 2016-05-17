@@ -174,18 +174,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						$("#DescriptionDiv").html(htmlData);
 						$("#ProjectName").focus();
-						// $("#ProjectName").keyup(m_functionNameBlur);
-						$("#ProjectName").val(m_clProject.data.name);
+						$("#ProjectName").val(m_ppData.projectName);
 						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
 
-						$("#ProjectDescription").val(m_clProject.data.description);
-						$("#ProjectTags").val(m_clProject.data.tags);
-
-						// $("#ProjectDescription").blur(m_functionDescriptionBlur);
-						// $("#ProjectTags").blur(m_functionTagsBlur);
+						$("#ProjectDescription").val(m_ppData.projectDescription);
+						$("#ProjectTags").val(m_ppData.projectTags);																	// GONNA NEED THIS
 
 						$("#BuyHeader").empty();
-						if (m_clProject.data.specialProjectData.classProject) {
+						if (m_ppData.isClass) {
 
 							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Class you selected.</b></h4>';
 							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
@@ -202,56 +198,56 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// 		$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 							// 	}
 							// });
-							$("#ProjectDescription").val(m_clProject.data.specialProjectData.classData.classDescription);
-							$("#InstructorFirst").val(m_clProject.data.specialProjectData.classData.instructorFirstName);
-							$("#InstructorLast").val(m_clProject.data.specialProjectData.classData.instructorLastName);
-							$("#Phone").val(m_clProject.data.specialProjectData.classData.instructorPhone);
-							$("#Facility").val(m_clProject.data.specialProjectData.classData.facility);
-							$("#Address").val(m_clProject.data.specialProjectData.classData.address);
-							$("#Room").val(m_clProject.data.specialProjectData.classData.room);
-							$("#City").val(m_clProject.data.specialProjectData.classData.city);
+							$("#ProjectDescription").val(m_ppData.classData.classDescription);
+							$("#InstructorFirst").val(m_ppData.instructorFirstName);
+							$("#InstructorLast").val(m_ppData.instructorLastName);
+							$("#Phone").val(m_ppData.instructorPhone);
+							$("#Facility").val(m_ppData.facility);
+							$("#Address").val(m_ppData.address);
+							$("#Room").val(m_ppData.room);
+							$("#City").val(m_ppData.city);
 							// state combo
-							if(m_clProject.data.specialProjectData.classData.state.length > 0) {
+							if(m_ppData.state.length > 0) {
 								$('#State > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.classData.state)
+ 										if ($(this).text() === m_ppData.state)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
-							$("#Zip").val(m_clProject.data.specialProjectData.classData.zip);
+							$("#Zip").val(m_ppData.zip);
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_ppData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
-							if(m_clProject.data.specialProjectData.classData.level.length > 0) {
+							if(m_ppData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.classData.level)
+ 										if ($(this).text() === m_ppData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(m_clProject.data.specialProjectData.classData.difficulty.length > 0) {
+							if(m_ppData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.classData.difficulty)
+ 										if ($(this).text() === m_ppData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 
-							m_dPriceToCharge = m_clProject.data.specialProjectData.classData.price;
+							m_dPriceToCharge = m_ppData.price;
 
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
-							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
+							$("#Price").val(m_ppData.price.dollarFormat());
+							$("#Notes").val(m_ppData.classNotes);
 						
-						} else if (m_clProject.data.specialProjectData.productProject) {
+						} else if (m_ppData.isProduct) {
 
 							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Product you selected.</b></h4>';
 							strNewBuyHeader += '<h5>If you want to buy it, click the <b><i>Enter secure charge information</i></b> button.</h5>';
@@ -260,34 +256,34 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
-							$("#ProjectDescription").val(m_clProject.data.specialProjectData.productData.productDescription);
+							$("#ProjectDescription").val(m_ppData.productDescription);
 							
 							// level combo
-							if(m_clProject.data.specialProjectData.productData.level.length > 0) {
+							if(m_ppData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.productData.level)
+ 										if ($(this).text() === m_ppData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							
 							// difficulty combo
-							if(m_clProject.data.specialProjectData.productData.difficulty.length > 0) {
+							if(m_ppData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.productData.difficulty)
+ 										if ($(this).text() === m_ppData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							
-							m_dPriceToCharge = m_clProject.data.specialProjectData.productData.price;
+							m_dPriceToCharge = m_ppData.price;
 
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
+							$("#Price").val(m_ppData.price.dollarFormat());
 						
-						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
+						} else if (m_ppData.isOnlineClass) {
 
 							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Online Class you selected.</b></h4>';
 							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
@@ -299,38 +295,38 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
-							$("#ProjectDescription").val(m_clProject.data.specialProjectData.onlineClassData.classDescription);
-							$("#InstructorFirst").val(m_clProject.data.specialProjectData.onlineClassData.instructorFirstName);
-							$("#InstructorLast").val(m_clProject.data.specialProjectData.onlineClassData.instructorLastName);
-							$("#Email").val(m_clProject.data.specialProjectData.onlineClassData.instructorEmail);
+							$("#ProjectDescription").val(m_ppData.classDescription);
+							$("#InstructorFirst").val(m_ppData.instructorFirstName);
+							$("#InstructorLast").val(m_ppData.instructorLastName);
+							$("#Email").val(m_ppData.instructorEmail);
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.onlineClassData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_ppData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
-							if(m_clProject.data.specialProjectData.onlineClassData.level.length > 0) {
+							if(m_ppData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.level)
+ 										if ($(this).text() === m_ppData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(m_clProject.data.specialProjectData.onlineClassData.difficulty.length > 0) {
+							if(m_ppData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.difficulty)
+ 										if ($(this).text() === m_ppData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
-							m_dPriceToCharge = m_clProject.data.specialProjectData.onlineClassData.price;
+							m_dPriceToCharge = m_ppData.onlineClassData.price;
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.onlineClassData.price.dollarFormat());
-							$("#Notes").val(m_clProject.data.specialProjectData.onlineClassData.classNotes);
+							$("#Price").val(m_ppData.price.dollarFormat());
+							$("#Notes").val(m_ppData.classNotes);
 						}
 
 						$("#TheFieldset").prop("disabled", true);
@@ -447,6 +443,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 														// First, we'll create a fairly unique name, but a name conflict will still be checked on the server, and it's possible the name will be changed.
 
 														// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
+
+
+																																																			// I LEFT OFF HERE -- NEED PROJECT
+
+
+
+
 														m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
 														m_clProject.data.chargeId = chargeId;
 

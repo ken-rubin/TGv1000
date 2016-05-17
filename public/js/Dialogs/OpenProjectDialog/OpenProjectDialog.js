@@ -125,7 +125,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		var num = parseInt(jq[0].id.substring(8), 10);
 							    		var stripNum = Math.floor(num / 10) - 1;
 							    		var i = num % 10;
-							    		var projectId = m_searchResultRawArray[stripNum][i].id;
+							    		var projectId = m_searchResultRawArray[stripNum][i].projectId;
 
 							    		// From here we go to one of 2 places:
 							    		// (1) If privileged user or stripNum < 3, to the callback in navbar to open the project from the DB and load it into manager.
@@ -202,8 +202,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						                    m_searchResultProcessedArray[stripNum].push({
 
 						                    	index: i,	// 2nd dimension index of m_searchResultRawArray
-						                    	id: rowIth.id,
-						                    	name: rowIth.name,
+						                    	id: rowIth.projectId,
+						                    	name: rowIth.projectName,
 						                    	url: resourceHelper.toURL('resources', 
 						                    		rowIth.projectImageId, 
 						                    		'image', 
