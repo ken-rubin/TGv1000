@@ -52,11 +52,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
+					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 						try {
 
-							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass);
+							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -126,15 +126,42 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		var stripNum = Math.floor(num / 10) - 1;
 							    		var i = num % 10;
 							    		var projectId = m_searchResultRawArray[stripNum][i].id;
-							    		self.callFunctionOK(projectId, 
-							    							m_bPrivilegedUser, 
-							    							(stripNum === 1), 
-							    							(stripNum === 2),
-							    							(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].alreadyEnrolled),
-							    							(stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize),
-							    							(stripNum === 3 && !m_bPrivilegedUser && m_searchResultRawArray[3][i].alreadyBought),
-							    							(stripNum === 6 && !m_bPrivilegedUser && m_searchResultRawArray[6][i].alreadyEnrolled)
-							    		);
+
+							    		// From here we go to one of 2 places:
+							    		// (1) If privileged user or stripNum < 3, to the callback in navbar to open the project from the DB and load it into manager.
+							    		// (2) Else, to BuyDialog, passing along m_searchResultRawArray[stripnum][i].
+							    		// We do (1) if a privileged user; if a non-privileged user and stripnum===1 or 2; 
+							    		if (m_bPrivilegedUser || stripNum < 3) {
+								    		self.callFunctionOK(projectId, 
+								    							m_bPrivilegedUser, 
+								    							(stripNum === 1), 
+								    							(stripNum === 2)
+								    		);
+								    	} else {
+
+											if (stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].alreadyEnrolled) {
+
+												errorHelper.show("You've already enrolled in this class.");
+
+											} else if (stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize) {
+
+												exceptionRet = client.putUserOnWaitlist(iProjectId);
+												if (exceptionRet) { throw exceptionRet; }
+											
+											} else if (stripNum === 3 && !m_bPrivilegedUser && m_searchResultRawArray[3][i].alreadyBought) {
+
+												errorHelper.show("You've already purchased this product.");
+
+											} else if (stripNum === 5 && !m_bPrivilegedUser && m_searchResultRawArray[5][i].alreadyEnrolled) {
+
+												errorHelper.show("You've already enrolled in this online class.");
+
+											} else {
+
+												var exceptionRet = client.showBuyDialog(m_searchResultRawArray[stripnum][i]);
+												if (exceptionRet) { throw exceptionRet; }
+											}
+								    	}
 							    	});
 								if (exceptionRet) { throw exceptionRet; }
 							}
@@ -178,7 +205,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						                    	id: rowIth.id,
 						                    	name: rowIth.name,
 						                    	url: resourceHelper.toURL('resources', 
-						                    		rowIth.imageId, 
+						                    		rowIth.projectImageId, 
 						                    		'image', 
 						                    		'')
 						                    	}

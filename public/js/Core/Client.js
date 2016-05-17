@@ -115,12 +115,12 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.showBuyDialog = function () {
+					self.showBuyDialog = function (ppData) {
 
 						try {
 
 							m_openDialog = new BuyDialog();
-							var exceptionRet = m_openDialog.create(m_clProject);
+							var exceptionRet = m_openDialog.create(ppData);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;

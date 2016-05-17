@@ -55,8 +55,14 @@ define(["Core/errorHelper"],
 													var exceptionRet = client.showOpenProjectDialog(
 														// This callback is executed if the user searches for and chooses a project to open.
 														// It is called m_functionOK in OpenProjectDialog.
+														// OpenProjectDialog will come here only in these cases:
+														// (1) A privileged user is opening a project.
+														// (2) A non-privileged user is NOT considering buying a purchasable project.
+														// If a non-privileged user selects a purchasable project, OpenProjectDialog will close itself and call client to open BuyDialog with all the info
+														// that BuyDialog needs.
+
 														// iProjectId is the project to fetch.
-														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
+														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 															try {
 
@@ -64,64 +70,38 @@ define(["Core/errorHelper"],
 
 																if (iProjectId > 0) {
 
-																	if (bAlreadyBoughtClass) {
+																	exceptionRet = client.openProjectFromDB(iProjectId,
+																		// This callback is called from client.loadProjectIntoManager to add specialProjectData to the project.
+																		// Note: if the project is a Product, Class or Online Class, then that extra information is already
+																		// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
+																		function(objProject) {
 
-																		errorHelper.show("You've already enrolled in this class.");
+																			try {
 
-																	} else if (bPutOnWaitList) {
+																				// objProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
+																				// which case is contains a property holding class, product or onlineClass data.
+																				// Create and merge rest of specialProjectData in.
+																				specialProjectData = {
+																					privilegedUser: bPrivilegedUser,
+																					ownedByUser: bOnlyOwnedByUser,
+																					othersProjects: bOnlyOthersProjects,
+																					normalProject: (objProject.isCoreProject+objProject.isClass+objProject.isProduct+objProject.isOnlineClass === 0),
+																					coreProject: objProject.isCoreProject,
+																					classProject: objProject.isClass,
+																					productProject: objProject.isProduct,
+																					onlineClassProject: objProject.isOnlineClass,
+																					comicsEdited: false,
+																					systemTypesEdited: false,
+																					openMode: 'searched'
+																				};
 
-																		exceptionRet = client.putUserOnWaitlist(iProjectId);
-																		if (exceptionRet) { throw exceptionRet; }
-																	
-																	} else if (bAlreadyBoughtProduct) {
+																				$.extend(true, objProject.specialProjectData, specialProjectData);
 
-																		errorHelper.show("You've already purchased this product.");
+																			} catch (e) { errorHelper.show(e); }
+																		}
+																	);
+																	if (exceptionRet) { throw exceptionRet; }
 
-																	} else if (bAlreadyBoughtOnlineClass) {
-
-																		errorHelper.show("You've already enrolled in this online class.");
-
-																	} else {
-
-																		exceptionRet = client.openProjectFromDB(iProjectId,
-																			// This callback is called from client.loadProjectIntoManager to add specialProjectData to the project.
-																			// Note: if the project is a Product, Class or Online Class, then that extra information is already
-																			// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
-																			function(clProject) {
-
-																				try {
-
-																					// clProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
-																					// which case is contains a property holding class, product or onlineClass data.
-																					// Create and merge rest of specialProjectData in.
-																					specialProjectData = {
-																						privilegedUser: bPrivilegedUser,
-																						ownedByUser: bOnlyOwnedByUser,
-																						othersProjects: bOnlyOthersProjects,
-																						normalProject: (clProject.isCoreProject+clProject.isClass+clProject.isProduct+clProject.isOnlineClass === 0),
-																						coreProject: clProject.isCoreProject,
-																						classProject: clProject.isClass,
-																						productProject: clProject.isProduct,
-																						onlineClassProject: clProject.isOnlineClass,
-																						comicsEdited: false,
-																						systemTypesEdited: false,
-																						openMode: 'searched'
-																					};
-
-																					$.extend(true, clProject.specialProjectData, specialProjectData);
-
-																					if (!bPrivilegedUser && (clProject.specialProjectData.productProject || clProject.specialProjectData.classProject || clProject.specialProjectData.onlineClassProject)) {
-
-																						// A non-privileged user will not have been able to search for a non-active or incomplete project.
-																						// So we're good to proceed to the buying process.
-																						var exceptionRet = client.showBuyDialog();
-																						if (exceptionRet) { throw exceptionRet; }
-																					}
-																				} catch (e) { errorHelper.show(e); }
-																			}
-																		);
-																		if (exceptionRet) { throw exceptionRet; }
-																	}
 																} else {
 
 																	throw new Error("Invalid project id returned.");

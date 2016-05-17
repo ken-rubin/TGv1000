@@ -37,11 +37,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					// When Buy3 is closed the workspace is shown with the newly purchased project. User cannot back up out of Buy3 since the CC has been charged and
 					// the user's new project has been created and written to the DB.
 
-					self.create = function(clProject) {
+					self.create = function(ppData) {
 
 						try {
 
-							m_clProject = clProject;
+							m_ppData = ppData;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -102,7 +102,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						                action: function(dialogItself){
 
 						                    dialogItself.close();
-						                    client.unloadProject(null, false);	// No callback; no abandon dialog.
+						                    // client.unloadProject(null, false);	// No callback; no abandon dialog.
 						                }
 					            	}
 					            ],
@@ -126,15 +126,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// Get the appropriate snippet and display the second form of the buy dialog.
 							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
 							var templateToGet = null;
-							if (m_clProject.data.isClass) {
+							if (m_ppData.isClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
 
-							} else if (m_clProject.data.isProduct) {
+							} else if (m_ppData.isProduct) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
 
-							} else if (m_clProject.data.isOnlineClass) {
+							} else if (m_ppData.isOnlineClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
 							}
@@ -573,7 +573,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_clProject = null;
+				var m_ppData = null;
 				var m_buyMode = 1;
 				var m_strChargeNumber;
 				var m_iExpMonth;
