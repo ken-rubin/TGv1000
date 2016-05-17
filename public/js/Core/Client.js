@@ -482,6 +482,99 @@ define(["Core/errorHelper",
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
 					// Not all of these come back through client. Some places handle the processing internally.
 
+					// Called by BuyDialog with bChangeableName=true.
+					// Called by SaveProjectAsDialog with bChangeableName=false.
+					self.saveProjectToDB = function (bChangeableName) {
+
+						try {
+
+							// Retrieve content of manager: the whole project.
+							var objProject = manager.save();
+
+							var data = {
+									// userId: g_profile["userId"], not needed; sent in JWT
+									// userName: g_profile["userName"], not needed; sent in JWT
+									projectJson: objProject,
+									changeableName: bChangeableName || false
+							};
+
+							// If !projectJson.specialProjectData.systemTypesEdited, then success and error mean that the project was or wasn't saved to the database.
+							// If not saved, it was rolled back.
+							//
+							// If projectJson.specialProjectData.systemTypesEdited, the save code will collect and try to write a complete SQL script to the project root
+							// directory that can be run to propagate any changes or additions to System Types. This script is written to ST.sql.
+							// We attempt to write the SQL script only if the saving of the project to the database succeeded and wasn't rolled back.
+							// This means that we could encounter two cases: the project was saved to the database and the script file was created successfully;
+							// or the project was saved to the database and the script file wasn't created.
+							// Object data is returned for both these cases with success=true.
+							$.ajax({
+
+								type: 'POST',
+								url: '/BOL/ProjectBO/SaveProject',
+								contentType: 'application/json',
+								data: JSON.stringify(data),
+								dataType: 'json',
+								success: function (objectData, strTextStatus, jqxhr) {
+
+									if (objectData.success) {
+
+										// If was called from SaveProjectAsDialog, bChangeableName===false and we'll display results here.
+										// If called from BuyDialog, results will be displayed by that dialog.
+										if (!bChangeableName) {
+
+											if (!objectData.project.specialProjectData.systemTypesEdited) {
+
+												errorHelper.show('Project was saved', 2000);
+
+											} else {
+												
+												if (objectData.scriptSuccess) {
+													errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
+												} else {
+													errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + objectData.saveError.message + ".");
+												}
+											}
+										}
+
+										// objectData holds a completely filled in (likely modified) project: objectData.project.
+										// We need to replace this with that. Let's try:
+										
+										self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
+																			// This is the only place that calls client.unloadProject with 2nd param = false.
+										
+										// cause whichever dialog was open to close.
+										self.closeCurrentDialog();
+
+										// Set up the modified project.
+										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
+										// This will get saving to work correctly down the road.
+										objectData.project.specialProjectData.openMode = "searched";
+										self.loadProjectIntoManager(objectData.project);
+										self.setBrowserTabAndBtns();
+
+										return null;
+
+									} else {
+
+										// !objectData.success -- error message in objectData.message
+										self.closeCurrentDialog();
+										self.unloadProject(null, false);
+
+										return new Error(objectData.message);
+									}
+								},
+								error: function (jqxhr, strTextStatus, strError) {
+
+									// Non-computational error in strError
+									return new Error(strError);
+								}
+							});
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
 					// If iProjectId = 1-5 (New Projects), then projectType will be defined as a string telling
 					// the BO what kind of Project to build. Otherwise, it will be undefined.
 					self.openProjectFromDB = function (iProjectId, callback) {
@@ -517,26 +610,9 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Enable the TypeWell icons that are disabled if no project is loaded.
-							// Doing this before loading the project, because the Delete type icon is going to be disabled once the isApp type is selected.
-							// $(".disabledifnoproj").prop("disabled", false);
-
-				    		// Allocate project.
-				    		// m_clProject = new Project();
-				    		// var exceptionRet = m_clProject.load(project);
-				    		// if (exceptionRet) { return exceptionRet; }
-
+							// Send the passed-in project into manager.
 				    		exceptionRet = manager.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
-
-				    		// Play App Type's initialize Method to set the initial state of the designer frame
-		    				// designer.initializeWithWorkspace();
-
-							// // Fire bootstrap tooltip opt-in.
-							// $(".disabledifnoproj").powerTip({
-							// 	smartPlacement: true,
-							// 	manual: false
-							// });
 
 							if ($.isFunction(callback)) {
 
@@ -969,102 +1045,6 @@ define(["Core/errorHelper",
 
 						return m_clProject;
 					};
-
-					self.saveProject = function (bChangeableName, callback) {
-
-						try {
-
-							// Retrieve content of manager: the whole project.
-							var objProject = manager.save();
-
-							var data = {
-									// userId: g_profile["userId"], not needed; sent in JWT
-									// userName: g_profile["userName"], not needed; sent in JWT
-									projectJson: objProject,
-									changeableName: bChangeableName || false
-							};
-
-							// If !data.projectJson.specialProjectData.systemTypesEdited, then success and error mean that the project was or wasn't saved to the database.
-							// If not saved, it was rolled back.
-							//
-							// If data.projectJson.specialProjectData.systemTypesEdited, the save code will collect and try to write a complete SQL script to the project root
-							// directory that can be run to propagate any changes or additions to System Types. This script is written to ST.sql.
-							// We attempt to write the SQL script only if the saving of the project to the database succeeded and wasn't rolled back.
-							// This means that we could encounter two cases: the project was saved to the database and the script file was created successfully;
-							// or the project was saved to the database and the script file wasn't created.
-							// Object data is returned for both these cases with success=true.
-							$.ajax({
-
-								type: 'POST',
-								url: '/BOL/ProjectBO/SaveProject',
-								contentType: 'application/json',
-								data: JSON.stringify(data),
-								dataType: 'json',
-								success: function (objectData, strTextStatus, jqxhr) {
-
-									if (objectData.success) {
-
-										// If callback exists, then our errorHelper will be display in callback back in BuyDialog.js.
-										if (!$.isFunction(callback)) {
-											if (!objectData.project.specialProjectData.systemTypesEdited) {
-												errorHelper.show('Project was saved', 2000);
-											} else {
-												if (objectData.scriptSuccess) {
-													errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
-												} else {
-													errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + saveError.message + ".");
-												}
-											}
-										}
-
-										// objectData holds a completely filled in (likely modified) project: objectData.project.
-										// We need to replace this with that. Let's try:
-										
-										self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
-																			// This is the only place that calls client.unloadProject with 2nd param = false.
-										
-										// cause whichever dialog was open to close.
-										self.closeCurrentDialog();
-
-										// Set up the modified project.
-										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
-										// This will get saving to work correctly down the road.
-										objectData.project.specialProjectData.openMode = "searched";
-										self.loadProjectIntoManager(objectData.project);
-
-										self.setBrowserTabAndBtns();
-
-										if ($.isFunction(callback)) {
-											callback(null);
-										}
-									} else {
-
-										// !objectData.success -- error message in objectData.message
-										self.closeCurrentDialog();
-										self.unloadProject(null, false);
-
-										if ($.isFunction(callback)) {
-											callback(objectData.message);
-										} else {
-											errorHelper.show(objectData.message);
-										}
-									}
-								},
-								error: function (jqxhr, strTextStatus, strError) {
-
-									// Non-computational error in strError
-									if ($.isFunction(callback)) {
-										callback(strError);
-									} else {
-										errorHelper.show(strError);
-									}
-								}
-							});
-
-							return null;
-
-						} catch (e) { return e; }
-					}
 
 					self.closeCurrentDialog = function () {
 

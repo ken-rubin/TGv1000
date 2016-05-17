@@ -496,7 +496,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							client.setBrowserTabAndBtns();
 
-							exceptionRet = client.saveProject();
+							exceptionRet = client.saveProjectToDB(false);
 							if (exceptionRet) { throw exceptionRet; }
 
 						} catch(e) { errorHelper.show(e); }

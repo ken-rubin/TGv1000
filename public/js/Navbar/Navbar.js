@@ -280,27 +280,6 @@ define(["Core/errorHelper"],
 								// });
 							}
 
-							// Wire Play button click.
-							// $("#PlayBtn").click(function () {
-							// 	try {
-							// 		// Let client handle this.
-							// 		var exceptionRet = client.play();
-							// 		if (exceptionRet) { throw exceptionRet; }
-							// 	} catch (e) { errorHelper.show(e); }
-							// });
-
-							// Wire Play button click.
-							// $("#StopBtn").click(function () {
-							// 	try {
-							// 		// Let client handle this.
-							// 		var exceptionRet = client.stop();
-							// 		if (exceptionRet) { throw exceptionRet; }
-							// 	} catch (e) {
-
-							// 		errorHelper.show(e);
-							// 	}
-							// });
-
 							client.setBrowserTabAndBtns();
 
 							return null;
@@ -312,8 +291,6 @@ define(["Core/errorHelper"],
 					// During the buying process there's a project, but the user must not be allowed to do
 					// anything with it. I believe this handles itself with modal dialogs in the right places.
 					self.enableOrDisableProjAndTypeMenuItems = function () {
-
-						// var clProject = client.getProject();
 
 						// New and search are enabled. others are disabled.
 						m_functionEnable("NewProject");
@@ -364,12 +341,13 @@ define(["Core/errorHelper"],
 
 					self.enableOrDisablePlayAndStopButtons = function () {
 
-						// if (client.getProject()) {
-						// 	$("#PlayBtn").removeClass("disabled");
-						// } else {
-						// 	$("#PlayBtn").addClass("disabled");
-						// }
-						// $("#StopBtn").addClass("disabled");
+						if (manager.loaded) {
+							$("#PlayBtn").removeClass("disabled");
+						} else {
+							$("#PlayBtn").addClass("disabled");
+						}
+
+						$("#StopBtn").addClass("disabled");
 					}
 
 					// Private methods

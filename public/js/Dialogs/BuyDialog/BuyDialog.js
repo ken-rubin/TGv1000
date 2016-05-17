@@ -473,21 +473,18 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 														m_clProject.data.name += "_" + momNow.format("MM-DD-YYYY");
 
 														// But still send through an indication to routeSaveProject to change the name in case of conflict.
-														client.saveProject(true,
-															function(errMsg) {
+														var exceptionRet = client.saveProjectToDB(true);
+														if (exceptionRet) {
 
-																if (errMsg) {
+															errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + exceptionRet.message);
 
-																	errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + errMsg);
+														} else {
 
-																} else {
-
-																	//self.closeYourself();
-																	errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + client.getProject().data.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
-																		250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
-																}
-															}
-														);
+															var objProject = manager.save();
+															var projectName = objProject.name;
+															errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + projectName + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
+																250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
+														}
 													}
 												);
 											}
