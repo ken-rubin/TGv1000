@@ -797,10 +797,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Load all types and visible/existing panels 
                     // into this manager instance from persistence.
-                    // objectInitializer is comics[i].data as loaded from database.
-                    // It needs to be massaged a bit.
-                    //
-                    // This is basically the opposite of what goes on in project.saveToDatabase();
+                    // objectProject is the project as loaded from database.
+                    // objectProject.currentComicIndex tells manager which set of types, etc. to load.
                     self.load = function (objectProject) {
 
                         try {

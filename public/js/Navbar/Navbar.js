@@ -84,7 +84,7 @@ define(["Core/errorHelper"],
 																	} else {
 
 																		exceptionRet = client.openProjectFromDB(iProjectId,
-																			// This callback is called from client.load_m_clProject to add specialProjectData to the project.
+																			// This callback is called from client.loadProjectIntoManager to add specialProjectData to the project.
 																			// Note: if the project is a Product, Class or Online Class, then that extra information is already
 																			// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
 																			function(clProject) {

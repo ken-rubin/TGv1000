@@ -498,7 +498,7 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var exceptionRet = self.load_m_clProject(data.project, callback);
+									var exceptionRet = self.loadProjectIntoManager(data.project, callback);
 									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
 								} else {
@@ -513,7 +513,7 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.load_m_clProject = function (project, callback) {
+					self.loadProjectIntoManager = function (project, callback) {
 
 						try {
 
@@ -1030,7 +1030,7 @@ define(["Core/errorHelper",
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
-										self.load_m_clProject(objectData.project);
+										self.loadProjectIntoManager(objectData.project);
 
 										self.setBrowserTabAndBtns();
 
