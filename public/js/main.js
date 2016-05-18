@@ -87,27 +87,6 @@ $(document).ready(function() {
 											exceptionRet = types.create();
 											if (exceptionRet) { throw exceptionRet; }
 
-						                 //    // Load up the object.
-						                 //    exceptionRet = manager.load(objectThe);
-						                 //    if (exceptionRet) {
-
-						                 //        throw exceptionRet;
-						                 //    }
-
-						                 //    var objectSave = manager.save();
-						                 //    var strSave = JSON.stringify(objectSave,
-						                 //        null,
-						                 //        2);
-						                 //    console.log(strSave);
-
-						                 //    setTimeout( function () {
-
-							                //     var objectJavaScript = manager.generateJavaScript();
-							                //     var strJavaScript = JSON.stringify(objectJavaScript,
-							                //         null,
-							                //         2);
-							                //     console.log(strJavaScript);
-							                // }, 10000);
 						                } catch (e) {
 
 						                    alert(e.message);

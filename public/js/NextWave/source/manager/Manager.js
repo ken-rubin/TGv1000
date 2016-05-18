@@ -57,7 +57,7 @@ define(["NextWave/source/utility/prototypes",
                     // Hold reference to the panel layer.
                     self.panelLayer = null;
                     // Object used to initialize this instance.
-                    self.initializer = null;
+                    self.projectData = null;
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
                     // Collection of named object pertinent to the current context.
@@ -811,10 +811,10 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Save the project attributes.
-                            self.initializer = objectProject;
+                            self.projectData = objectProject;
 
                             // Massage objectInitializer into the format manager requires.
-                            // Clone it into self.initializer.
+                            // Clone it into self.projectData.
                             var objectComic = objectProject.comics[objectProject.currentComicIndex];
 
                             // Load up panels.
@@ -889,7 +889,7 @@ define(["NextWave/source/utility/prototypes",
                     self.save = function () {
 
                         // Extract the saved off project.
-                        var objectRet = self.initializer;
+                        var objectRet = self.projectData;
 
                         // For now, only handling first comic.
                         var objectComic = objectRet.comics[objectRet.currentComicIndex];

@@ -132,6 +132,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		// (2) Else, to BuyDialog, passing along m_searchResultRawArray[stripnum][i].
 							    		// We do (1) if a privileged user; if a non-privileged user and stripnum===1 or 2; 
 							    		if (m_bPrivilegedUser || stripNum < 3) {
+							    			
 								    		self.callFunctionOK(projectId, 
 								    							m_bPrivilegedUser, 
 								    							(stripNum === 1), 

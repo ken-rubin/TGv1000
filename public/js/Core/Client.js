@@ -482,9 +482,8 @@ define(["Core/errorHelper",
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
 					// Not all of these come back through client. Some places handle the processing internally.
 
-					// Called by BuyDialog with bChangeableName=true.
-					// Called by SaveProjectAsDialog with bChangeableName=false.
-					self.saveProjectToDB = function (bChangeableName) {
+					// Called by SaveProjectAsDialog.
+					self.saveProjectToDB = function () {
 
 						try {
 
@@ -495,7 +494,7 @@ define(["Core/errorHelper",
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
 									projectJson: objProject,
-									changeableName: bChangeableName || false
+									changeableName: false
 							};
 
 							// If !projectJson.specialProjectData.systemTypesEdited, then success and error mean that the project was or wasn't saved to the database.
@@ -518,21 +517,16 @@ define(["Core/errorHelper",
 
 									if (objectData.success) {
 
-										// If was called from SaveProjectAsDialog, bChangeableName===false and we'll display results here.
-										// If called from BuyDialog, results will be displayed by that dialog.
-										if (!bChangeableName) {
+										if (!objectData.project.specialProjectData.systemTypesEdited) {
 
-											if (!objectData.project.specialProjectData.systemTypesEdited) {
+											errorHelper.show('Project was saved', 2000);
 
-												errorHelper.show('Project was saved', 2000);
-
+										} else {
+											
+											if (objectData.scriptSuccess) {
+												errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
 											} else {
-												
-												if (objectData.scriptSuccess) {
-													errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
-												} else {
-													errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + objectData.saveError.message + ".");
-												}
+												errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + objectData.saveError.message + ".");
 											}
 										}
 
@@ -559,6 +553,77 @@ define(["Core/errorHelper",
 										// !objectData.success -- error message in objectData.message
 										self.closeCurrentDialog();
 										self.unloadProject(null, false);
+
+										return new Error(objectData.message);
+									}
+								},
+								error: function (jqxhr, strTextStatus, strError) {
+
+									// Non-computational error in strError
+									return new Error(strError);
+								}
+							});
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					// Called by BuyDialog.
+					self.saveProjectToDBNoGetFromManager = function (project) {
+
+						try {
+
+							var data = {
+									// userId: g_profile["userId"], not needed; sent in JWT
+									// userName: g_profile["userName"], not needed; sent in JWT
+									projectJson: project,
+									changeableName: true
+							};
+
+							// If !projectJson.specialProjectData.systemTypesEdited, then success and error mean that the project was or wasn't saved to the database.
+							// If not saved, it was rolled back.
+							//
+							// If projectJson.specialProjectData.systemTypesEdited, the save code will collect and try to write a complete SQL script to the project root
+							// directory that can be run to propagate any changes or additions to System Types. This script is written to ST.sql.
+							// We attempt to write the SQL script only if the saving of the project to the database succeeded and wasn't rolled back.
+							// This means that we could encounter two cases: the project was saved to the database and the script file was created successfully;
+							// or the project was saved to the database and the script file wasn't created.
+							// Object data is returned for both these cases with success=true.
+							$.ajax({
+
+								type: 'POST',
+								url: '/BOL/ProjectBO/SaveProject',
+								contentType: 'application/json',
+								data: JSON.stringify(data),
+								dataType: 'json',
+								success: function (objectData, strTextStatus, jqxhr) {
+
+									if (objectData.success) {
+
+										// objectData holds a completely filled in (likely modified) project: objectData.project.
+										// We need to replace this with that. Let's try:
+										
+										// self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
+										// 									// This is the only place that calls client.unloadProject with 2nd param = false.
+										
+										// cause whichever dialog was open to close.
+										self.closeCurrentDialog();
+
+										// Set up the modified project.
+										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
+										// This will get saving to work correctly down the road.
+										objectData.project.specialProjectData.openMode = "searched";
+										self.loadProjectIntoManager(objectData.project);
+										self.setBrowserTabAndBtns();
+
+										return null;
+
+									} else {
+
+										// !objectData.success -- error message in objectData.message
+										self.closeCurrentDialog();
+										// self.unloadProject(null, false);
 
 										return new Error(objectData.message);
 									}
@@ -606,6 +671,36 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					// This one is used in BuyDialog after a purchase is completed.
+					// callback is always present to return the project.
+					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
+
+						try {
+
+							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
+								{
+									projectId: iProjectId
+									// userId: g_profile["userId"] not needed; sent in JWT
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									callback(data.project);
+
+								} else {
+
+									// !data.success
+									errorHelper.show(data.message);
+								}
+							});
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
 					self.loadProjectIntoManager = function (project, callback) {
 
 						try {
@@ -616,12 +711,10 @@ define(["Core/errorHelper",
 
 							if ($.isFunction(callback)) {
 
+								// For some reason the callback is calling client.setBrowserTabAndBtns().
 								callback(project);
 							
 							} else {
-
-					    		exceptionRet = manager.load(project);
-					    		if (exceptionRet) { return exceptionRet; }
 
 								self.setBrowserTabAndBtns();
 							}
@@ -633,17 +726,16 @@ define(["Core/errorHelper",
 
 					self.getProjectStatus = function (nameInHolding) {
 
-						var objProject = manager.save();
 						var test = parseInt(g_profile['userId'], 10);
 						var nih = nameInHolding || '';
 						return {
 
-							inDBAlready: (objProject.id > 0),
-							userOwnsProject: (objProject.ownedByUserId === test),
+							inDBAlready: (manager.projectData.id > 0),
+							userOwnsProject: (manager.projectData.ownedByUserId === test),
 							allRequiredFieldsFilled: (	nih.trim().length > 0
-											&& (objProject.imageId > 0 || objProject.altImagePath.length > 0)
+											&& (manager.projectData.imageId > 0 || manager.projectData.altImagePath.length > 0)
 										),
-							projectNameIsFilled: (objProject.name.trim().length > 0)
+							projectNameIsFilled: (manager.projectData.name.trim().length > 0)
 						};
 					};
 
@@ -1027,8 +1119,7 @@ define(["Core/errorHelper",
 						document.title = "TechGroms";
 						if (manager.loaded) {
 
-							var objProject = manager.save();
-							if (objProject.name.length > 0) { document.title = document.title + " / " + objProject.name; }
+							if (manager.projectData.name.length > 0) { document.title = document.title + " / " + manager.projectData.name; }
 						}
 
 						// Something happened so refresh the navbar.

@@ -439,55 +439,50 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 															return;
 														}
 
-														// We will convert the Purchasable Project into a "bought" project and immediately save it.
-														// First, we'll create a fairly unique name, but a name conflict will still be checked on the server, and it's possible the name will be changed.
+														// m_ppData doesn't have a full project. We have to go get the correct project so that we can convert it into a "bought" project with suitable data changes.
+														var exceptionRet = openProjectFromDBNoLoadIntoManager(m_ppData.projectId,
+															function(project) {
 
-														// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
+																project.ownedByUserId = parseInt(g_profile['userId'], 10);
+																project.chargeId = chargeId;
 
+																if (project.specialProjectData.hasOwnProperty('classData')) {
+																	delete project.specialProjectData.classData;
+																	project.isClass = false;
+																	project.specialProjectData.classProject = false;
+																} else if (project.specialProjectData.hasOwnProperty('onlineClassData')) {
+																	delete project.specialProjectData.onlineClassData;
+																	project.isOnlineClass = false;
+																	project.specialProjectData.onlineClassProject = false;
+																} else if (project.specialProjectData.hasOwnProperty('productData')) {
+																	delete project.specialProjectData.productData;
+																	project.isProduct = false;
+																	project.specialProjectData.productProject = false;
+																}
+																project.specialProjectData.privilegedUser = false;
+																project.specialProjectData.ownedByUser = true;
+																project.specialProjectData.normalProject = true;
+																project.specialProjectData.openMode = 'bought';
 
-																																																			// I LEFT OFF HERE -- NEED PROJECT
+																// Generate a unique-ish name.
+																var momNow = new moment();
+																project.name += "_" + momNow.format("MM-DD-YYYY");
 
+																// Now we need to save the project to the DB and load it into manager.
+																// We can't use client.saveProjectToDB because it doesn't take a project object, but instead it gets the project via manager.save().
+																// After the save, the project is returned to saveProjectToDBNoGetFromManager. That function will load it into manager.
+																var exceptionRet = client.saveProjectToDBNoGetFromManager(project);
+																if (exceptionRet) {
 
+																	errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + exceptionRet.message);
 
+																} else {
 
-														m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
-														m_clProject.data.chargeId = chargeId;
-
-														if (m_clProject.data.specialProjectData.hasOwnProperty('classData')) {
-															delete m_clProject.data.specialProjectData.classData;
-															m_clProject.data.isClass = false;
-															m_clProject.data.specialProjectData.classProject = false;
-														} else if (m_clProject.data.specialProjectData.hasOwnProperty('onlineClassData')) {
-															delete m_clProject.data.specialProjectData.onlineClassData;
-															m_clProject.data.isOnlineClass = false;
-															m_clProject.data.specialProjectData.onlineClassProject = false;
-														} else if (m_clProject.data.specialProjectData.hasOwnProperty('productData')) {
-															delete m_clProject.data.specialProjectData.productData;
-															m_clProject.data.isProduct = false;
-															m_clProject.data.specialProjectData.productProject = false;
-														}
-														m_clProject.data.specialProjectData.privilegedUser = false;
-														m_clProject.data.specialProjectData.ownedByUser = true;
-														m_clProject.data.specialProjectData.normalProject = true;
-														m_clProject.data.specialProjectData.openMode = 'bought';
-
-														// Generate a unique-ish name.
-														var momNow = new moment();
-														m_clProject.data.name += "_" + momNow.format("MM-DD-YYYY");
-
-														// But still send through an indication to routeSaveProject to change the name in case of conflict.
-														var exceptionRet = client.saveProjectToDB(true);
-														if (exceptionRet) {
-
-															errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + exceptionRet.message);
-
-														} else {
-
-															var objProject = manager.save();
-															var projectName = objProject.name;
-															errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + projectName + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
-																250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
-														}
+																	errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + manager.projectData.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
+																		250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
+																}
+															}
+														);
 													}
 												);
 											}
