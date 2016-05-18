@@ -486,126 +486,126 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										openMode: 'new'
 									};
 
-									// if (m_bClassProject) {
+									if (m_bClassProject) {
 
-									// 	clProject.data.isClass = true;
+										clProject.isClass = true;
 
-									// 	// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
-									// 	var strInstructorFirst = $("#InstructorFirst").val().trim();
-									// 	var strInstructorLast = $("#InstructorLast").val().trim();
-									// 	var strPhone = $("#Phone").val().trim();
-									// 	var strFacility = $("#Facility").val().trim();
-									// 	var strAddress = $("#Address").val().trim();
-									// 	var strRoom = $("#Room").val().trim();
-									// 	var strCity = $("#City").val().trim();
-									// 	var strState = $("#USState option:selected").text();
-									// 	var strZip = $("#Zip").val().trim();
-									// 	var arrWhen = [];
-									// 	for (var i = 1; i <=8; i++) {
-									// 		var str = $("#When" + i).val().trim();
-									// 		if (str.length) { 
-									// 			arrWhen.push(m_funcWhenProcess(str)); 
-									// 		} else {
-									// 			arrWhen.push({ date: '', duration: 0});
-									// 		}
-									// 	}
-									// 	var strLevel = $("#Level option:selected").text();
-									// 	var strDifficulty = $("#Difficulty option:selected").text();
-									// 	var dPrice = 0.00;
-									// 	var strPrice = $("#Price").val().trim();
-									// 	if (strPrice.length) {
-									// 		dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-									// 	}
-									// 	var strNotes = $("#Notes").val().trim();
-									// 	var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
-									// 	var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
+										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
+										var strInstructorFirst = $("#InstructorFirst").val().trim();
+										var strInstructorLast = $("#InstructorLast").val().trim();
+										var strPhone = $("#Phone").val().trim();
+										var strFacility = $("#Facility").val().trim();
+										var strAddress = $("#Address").val().trim();
+										var strRoom = $("#Room").val().trim();
+										var strCity = $("#City").val().trim();
+										var strState = $("#USState option:selected").text();
+										var strZip = $("#Zip").val().trim();
+										var arrWhen = [];
+										for (var i = 1; i <=8; i++) {
+											var str = $("#When" + i).val().trim();
+											if (str.length) { 
+												arrWhen.push(m_funcWhenProcess(str)); 
+											} else {
+												arrWhen.push({ date: '', duration: 0});
+											}
+										}
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
+										var strNotes = $("#Notes").val().trim();
+										var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
+										var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
-									// 	clProject.data.specialProjectData.classData = {
-									// 		id: 0,
-									// 		active: false,
-									// 		classDescription: strProjectDescription,
-									// 		instructorFirstName: strInstructorFirst,
-									// 		instructorLastName: strInstructorLast,
-									// 		instructorPhone: strPhone,
-									// 		facility: strFacility,
-									// 		address: strAddress,
-									// 		room: strRoom,
-									// 		city: strCity,
-									// 		state: strState,
-									// 		zip: strZip,
-									// 		schedule: arrWhen,
-									// 		level: strLevel,
-									// 		difficulty: strDifficulty,
-									// 		price: dPrice,
-									// 		classNotes: strNotes,
-									// 		maxClassSize: iMaxClassSize,
-									// 		loanComputersAvailable: iLoanComputersAvailable,
-									// 		imageId: m_imageId
-									// 	};
+										clProject.specialProjectData.classData = {
+											id: 0,
+											active: false,
+											classDescription: strProjectDescription,
+											instructorFirstName: strInstructorFirst,
+											instructorLastName: strInstructorLast,
+											instructorPhone: strPhone,
+											facility: strFacility,
+											address: strAddress,
+											room: strRoom,
+											city: strCity,
+											state: strState,
+											zip: strZip,
+											schedule: arrWhen,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											classNotes: strNotes,
+											maxClassSize: iMaxClassSize,
+											loanComputersAvailable: iLoanComputersAvailable,
+											imageId: m_imageId
+										};
 
-									// } else if (m_bProductProject) {
+									} else if (m_bProductProject) {
 
-									// 	clProject.data.isProduct = true;
+										clProject.isProduct = true;
 
-									// 	// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
-									// 	var strLevel = $("#Level option:selected").text();
-									// 	var strDifficulty = $("#Difficulty option:selected").text();
-									// 	var dPrice = 0.00;
-									// 	var strPrice = $("#Price").val().trim();
-									// 	if (strPrice.length) {
-									// 		dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-									// 	}
+										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
 
-									// 	clProject.data.specialProjectData.productData = {
-									// 		id: 0,
-									// 		active: false,
-									// 		productDescription: strProjectDescription,
-									// 		level: strLevel,
-									// 		difficulty: strDifficulty,
-									// 		price: dPrice,
-									// 		imageId: m_imageId
-									// 	};
-									// } else if (m_bOnlineClassProject) {
+										clProject.specialProjectData.productData = {
+											id: 0,
+											active: false,
+											productDescription: strProjectDescription,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											imageId: m_imageId
+										};
+									} else if (m_bOnlineClassProject) {
 
-									// 	clProject.data.isOnlineClass = true;
+										clProject.isOnlineClass = true;
 
-									// 	// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
-									// 	var strInstructorFirst = $("#InstructorFirst").val().trim();
-									// 	var strInstructorLast = $("#InstructorLast").val().trim();
-									// 	var strEmail = $("#Email").val().trim();
-									// 	var arrWhen = [];
-									// 	for (var i = 1; i <=8; i++) {
-									// 		var str = $("#When" + i).val().trim();
-									// 		if (str.length) { 
-									// 			arrWhen.push(m_funcWhenProcess(str)); 
-									// 		} else {
-									// 			arrWhen.push({ date: '', duration: 0});
-									// 		}
-									// 	}
-									// 	var strLevel = $("#Level option:selected").text();
-									// 	var strDifficulty = $("#Difficulty option:selected").text();
-									// 	var dPrice = 0.00;
-									// 	var strPrice = $("#Price").val().trim();
-									// 	if (strPrice.length) {
-									// 		dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-									// 	}
-									// 	var strNotes = $("#Notes").val().trim();
+										// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
+										var strInstructorFirst = $("#InstructorFirst").val().trim();
+										var strInstructorLast = $("#InstructorLast").val().trim();
+										var strEmail = $("#Email").val().trim();
+										var arrWhen = [];
+										for (var i = 1; i <=8; i++) {
+											var str = $("#When" + i).val().trim();
+											if (str.length) { 
+												arrWhen.push(m_funcWhenProcess(str)); 
+											} else {
+												arrWhen.push({ date: '', duration: 0});
+											}
+										}
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
+										var strNotes = $("#Notes").val().trim();
 
-									// 	clProject.data.specialProjectData.onlineClassData = {
-									// 		id: 0,
-									// 		active: false,
-									// 		classDescription: strProjectDescription,
-									// 		instructorFirstName: strInstructorFirst,
-									// 		instructorLastName: strInstructorLast,
-									// 		instructorEmail: strEmail,
-									// 		schedule: arrWhen,
-									// 		level: strLevel,
-									// 		difficulty: strDifficulty,
-									// 		price: dPrice,
-									// 		classNotes: strNotes,
-									// 		imageId: m_imageId
-									// 	};
-									// }
+										clProject.specialProjectData.onlineClassData = {
+											id: 0,
+											active: false,
+											classDescription: strProjectDescription,
+											instructorFirstName: strInstructorFirst,
+											instructorLastName: strInstructorLast,
+											instructorEmail: strEmail,
+											schedule: arrWhen,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											classNotes: strNotes,
+											imageId: m_imageId
+										};
+									}
 
 						    		exceptionRet = manager.load(clProject);
 						    		if (exceptionRet) { throw exceptionRet; }
