@@ -551,8 +551,8 @@ define(["Core/errorHelper",
 									} else {
 
 										// !objectData.success -- error message in objectData.message
-										self.closeCurrentDialog();
-										self.unloadProject(null, false);
+										// self.closeCurrentDialog();
+										// self.unloadProject(null, false);
 
 										return new Error(objectData.message);
 									}
@@ -658,6 +658,8 @@ define(["Core/errorHelper",
 
 									var exceptionRet = self.loadProjectIntoManager(data.project, callback);
 									if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+									self.setBrowserTabAndBtns();
 
 								} else {
 

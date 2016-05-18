@@ -1511,7 +1511,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comicProjectId: project.comicProjectId,
                             firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
                             lastSaved: (new Date()),
-                            chargeId: chargeId
+                            chargeId: project.chargeId,
+                            currentComicIndex: project.currentComicIndex
                         };
 
                         var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;
