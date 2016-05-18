@@ -440,7 +440,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 														}
 
 														// m_ppData doesn't have a full project. We have to go get the correct project so that we can convert it into a "bought" project with suitable data changes.
-														var exceptionRet = openProjectFromDBNoLoadIntoManager(m_ppData.projectId,
+														var exceptionRet = client.openProjectFromDBNoLoadIntoManager(m_ppData.projectId,
 															function(project) {
 
 																project.ownedByUserId = parseInt(g_profile['userId'], 10);
@@ -471,16 +471,21 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 																// Now we need to save the project to the DB and load it into manager.
 																// We can't use client.saveProjectToDB because it doesn't take a project object, but instead it gets the project via manager.save().
 																// After the save, the project is returned to saveProjectToDBNoGetFromManager. That function will load it into manager.
-																var exceptionRet = client.saveProjectToDBNoGetFromManager(project);
-																if (exceptionRet) {
+																var exceptionRet = client.saveProjectToDBNoGetFromManager(project,
+																	function(err) {
 
-																	errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + exceptionRet.message);
+																		if (err) {
 
-																} else {
+																			errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + err.message);
 
-																	errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + manager.projectData.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
-																		250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
-																}
+																		} else {
+
+																			self.closeYourself();
+																			errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + manager.projectData.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
+																				250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
+																		}
+																	}
+																);
 															}
 														);
 													}
@@ -549,7 +554,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 		                    		{
 		                    			token: token,
 		                    			dAmount: m_dPriceToCharge,
-		                    			descriptionForReceipt: 'Purchase of NextWaveCoders product: ' + m_clProject.data.name,	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
+		                    			descriptionForReceipt: 'Purchase of NextWaveCoders product: ' + m_ppData.projectName,	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
 		                    			statementDescriptor: 'NextWaveCoders'		// An arbitrary string to be displayed (most of the time) on user's credit card statement. Limited to 22 chars, so kind of useless.
 		                    		},
 		                            'json');

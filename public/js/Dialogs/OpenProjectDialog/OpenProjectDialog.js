@@ -159,7 +159,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 											} else {
 
-												var exceptionRet = client.showBuyDialog(m_searchResultRawArray[stripnum][i]);
+												self.closeYourself();
+												var exceptionRet = client.showBuyDialog(m_searchResultRawArray[stripNum][i]);
 												if (exceptionRet) { throw exceptionRet; }
 											}
 								    	}

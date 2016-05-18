@@ -570,7 +570,7 @@ define(["Core/errorHelper",
 					}
 
 					// Called by BuyDialog.
-					self.saveProjectToDBNoGetFromManager = function (project) {
+					self.saveProjectToDBNoGetFromManager = function (project, callback) {
 
 						try {
 
@@ -607,9 +607,6 @@ define(["Core/errorHelper",
 										// self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
 										// 									// This is the only place that calls client.unloadProject with 2nd param = false.
 										
-										// cause whichever dialog was open to close.
-										self.closeCurrentDialog();
-
 										// Set up the modified project.
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
@@ -617,27 +614,20 @@ define(["Core/errorHelper",
 										self.loadProjectIntoManager(objectData.project);
 										self.setBrowserTabAndBtns();
 
-										return null;
+										callback(null);
 
 									} else {
 
-										// !objectData.success -- error message in objectData.message
-										self.closeCurrentDialog();
-										// self.unloadProject(null, false);
-
-										return new Error(objectData.message);
+										callback(new Error(objectData.message));
 									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
 
 									// Non-computational error in strError
-									return new Error(strError);
+									callback(new Error(strError));
 								}
 							});
-
-							return null;
-
-						} catch (e) { return e; }
+						} catch (e) { callback(e); }
 					}
 
 					// If iProjectId = 1-5 (New Projects), then projectType will be defined as a string telling
@@ -708,7 +698,7 @@ define(["Core/errorHelper",
 						try {
 
 							// Send the passed-in project into manager.
-				    		exceptionRet = manager.load(project);
+				    		var exceptionRet = manager.load(project);
 				    		if (exceptionRet) { return exceptionRet; }
 
 							if ($.isFunction(callback)) {
