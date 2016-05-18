@@ -1800,7 +1800,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         return cb(err); 
                                                     }
                                                 );
-                                            },
+                                            }
                                         ],
                                         function(err) {
                                             return cb(err);
@@ -1872,13 +1872,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 if (lIthId > 0) {
 
-                                        var guts = {
-                                            comicId: comicIth.id
-                                        };
+                                    var guts = {
+                                        comicId: comicIth.id
+                                    };
                                     if (which === 'statements') {
-                                        guts.statementId: lIthId
+                                        guts.statementId = lIthId
                                     } else if (which === 'expressions') {
-                                        guts.expressionId: lIthId
+                                        guts.expressionId = lIthId
                                     } else {
                                         guts.literalId = lIthId;
                                     }
