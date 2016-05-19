@@ -227,8 +227,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         if (err) {
                                             return res.json({success:false, message: err.message});
                                         }
-                                        // Save name of this project into profile and send back with cookie.
-                                        
+                                        // Save name and id of this project into profile and send back with cookie.
+
                                         return res.json({success:true, project:project});
                                     }
                                 );

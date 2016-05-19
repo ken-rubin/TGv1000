@@ -26,9 +26,11 @@ define(["Core/errorHelper",
 		"Dialogs/AZUsersDialog/AZUsersDialog",
 		"Dialogs/AZProjectsDialog/AZProjectsDialog",
 		"Dialogs/AZSavePPDataDialog/AZSavePPDataDialog",
-		"Dialogs/AZPPBuyersDialog/AZPPBuyersDialog",
-		"Core/Project",
-		"Code/Type"],
+		"Dialogs/AZPPBuyersDialog/AZPPBuyersDialog"
+		// ,
+		// "Core/Project",
+		// "Code/Type"
+		],
 	function (errorHelper, 
 				NewProjectDialog, 
 				OpenProjectDialog,
@@ -50,9 +52,11 @@ define(["Core/errorHelper",
 				AZUsersDialog,
 				AZProjectsDialog,
 				AZSavePPDataDialog,
-				AZPPBuyersDialog,
-				Project,
-				Type) {
+				AZPPBuyersDialog
+				// ,
+				// Project,
+				// Type
+				) {
 
 		try {
 
@@ -82,16 +86,22 @@ define(["Core/errorHelper",
 							var profileJSON = localStorage.getItem("profile");
 							g_profile = JSON.parse(profileJSON);
 
+							// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
+							// At least it didn't work at the bottom of the callback in main.js.
 							var lastProject = g_profile["lastProject"];
-							var lastProjectId = parseInt(g_profile["lastProjectId"], 10);
+							var lastProjectId = 0;
+							if (g_profile["lastProjectId"]) {
+
+								lastProjectId = parseInt(g_profile["lastProjectId"], 10);
+							}
 
 							// If lastProjectId, fetch it and load it into manager.
 							if (lastProjectId) {
 
 								client.openProjectFromDB(lastProjectId);
-								BootstrapDialog.alert({
-
-									message: "Your latest project, " + lastProject + ", has been loaded.",
+								BootstrapDialog.show({
+									type: BootstrapDialog.TYPE_INFO,
+									message: "Your latest project, " + lastProject + ", has been loaded. (Click outside this area to close it.)",
 									closable: true, // <-- Default value is false
 									draggable: true // <-- Default value is false
 								});
@@ -747,320 +757,320 @@ define(["Core/errorHelper",
 					};
 
 
-//used
-					self.addTypeToProject = function(clType) {
+// //used
+// 					self.addTypeToProject = function(clType) {
 
-						try {
+// 						try {
 
-							return m_clProject.addType(clType);
+// 							return m_clProject.addType(clType);
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					// Note: updateClType has .data; origType doesn't.
-					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
+// //used
+// 					// Note: updateClType has .data; origType doesn't.
+// 					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
 
-						try {
+// 						try {
 
-							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
+// 							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
 
-							var origClType = new Type();
-							origClType.load(origType);
-							exceptionRet = code.replaceType(updatedClType, origClType);
-							if (exceptionRet) { throw exceptionRet; }
+// 							var origClType = new Type();
+// 							origClType.load(origType);
+// 							exceptionRet = code.replaceType(updatedClType, origClType);
+// 							if (exceptionRet) { throw exceptionRet; }
 							
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					self.addTypeToProjectFromDB = function (iTypeId) {
+// //used
+// 					self.addTypeToProjectFromDB = function (iTypeId) {
 
-						try {
+// 						try {
 
-							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
-								{
-									typeId: iTypeId
-								},
-								'json');
-							posting.done(function(data){
+// 							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
+// 								{
+// 									typeId: iTypeId
+// 								},
+// 								'json');
+// 							posting.done(function(data){
 
-								if (data.success) {
+// 								if (data.success) {
 
-									var clType = new Type();
-									clType.load(data.type);
-									return m_clProject.addType(clType);
+// 									var clType = new Type();
+// 									clType.load(data.type);
+// 									return m_clProject.addType(clType);
 
-								} else {
+// 								} else {
 
-									// !data.success
-									return new Error(data.message);
-								}
-							});
-							return null;
+// 									// !data.success
+// 									return new Error(data.message);
+// 								}
+// 							});
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					// We are going to add the method to the bottom of the methods array
-					// of the active Type; then add requisite info to code's schema info;
-					// then rebuild the TypeWell methods grid;
-					// then we'll hand-click the method in the grid.
-					self.addMethodToActiveType = function (method) {
+// //used
+// 					// We are going to add the method to the bottom of the methods array
+// 					// of the active Type; then add requisite info to code's schema info;
+// 					// then rebuild the TypeWell methods grid;
+// 					// then we'll hand-click the method in the grid.
+// 					self.addMethodToActiveType = function (method) {
 
-						try {
+// 						try {
 
-							var activeClType = types.getActiveClType();
-							activeClType.data.methods.push(method);
+// 							var activeClType = types.getActiveClType();
+// 							activeClType.data.methods.push(method);
 
-							var iMethodIndex = activeClType.data.methods.length - 1;
+// 							var iMethodIndex = activeClType.data.methods.length - 1;
 
-							// var exceptionRet = types.functionSetActiveMethodIndex(iMethodIndex);
-							// if (exceptionRet) { throw exceptionRet; }
+// 							// var exceptionRet = types.functionSetActiveMethodIndex(iMethodIndex);
+// 							// if (exceptionRet) { throw exceptionRet; }
 
-							// Add the method to code.
-							var exceptionRet = code.addMethod(activeClType, 
-								method);
-							if (exceptionRet) { throw exceptionRet; }
+// 							// Add the method to code.
+// 							var exceptionRet = code.addMethod(activeClType, 
+// 								method);
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							// exceptionRet = code.load(method.workspace);
-							// if (exceptionRet) { throw exceptionRet; }
+// 							// exceptionRet = code.load(method.workspace);
+// 							// if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = types.regenTWMethodsTable();
-							if (exceptionRet) { throw exceptionRet; }
+// 							exceptionRet = types.regenTWMethodsTable();
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							// Scroll the methods grid to the bottom.
-							$("#methodrename_" + iMethodIndex.toString()).scrollintoview();
+// 							// Scroll the methods grid to the bottom.
+// 							$("#methodrename_" + iMethodIndex.toString()).scrollintoview();
 
-							// Now click the new method in the grid to load the code pane.
-							$("#method_" + iMethodIndex.toString()).click();
+// 							// Now click the new method in the grid to load the code pane.
+// 							$("#method_" + iMethodIndex.toString()).click();
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
-// used
-					self.updateMethodInActiveType = function(updatedMethod, origMethod, iMethodIndex, activeClType) {
+// 						} catch (e) { return e; }
+// 					}
+// // used
+// 					self.updateMethodInActiveType = function(updatedMethod, origMethod, iMethodIndex, activeClType) {
 
-						try {
+// 						try {
 
-							activeClType.data.methods[iMethodIndex] = updatedMethod;
+// 							activeClType.data.methods[iMethodIndex] = updatedMethod;
 
-							var exceptionRet = types.regenTWMethodsTable();
-							if (exceptionRet) { throw exceptionRet; }
+// 							var exceptionRet = types.regenTWMethodsTable();
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = code.replaceMethod(updatedMethod, origMethod, activeClType);
-							if (exceptionRet) { throw exceptionRet; }
+// 							exceptionRet = code.replaceMethod(updatedMethod, origMethod, activeClType);
+// 							if (exceptionRet) { throw exceptionRet; }
 							
-							// Now click the updated method in the grid to load the code pane.
-							$("#method_" + iMethodIndex.toString()).click();
+// 							// Now click the updated method in the grid to load the code pane.
+// 							$("#method_" + iMethodIndex.toString()).click();
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					self.addEventToActiveType = function (event) {
+// //used
+// 					self.addEventToActiveType = function (event) {
 
-						try {
+// 						try {
 
-							var activeClType = types.getActiveClType();
-							activeClType.data.events.push(event);
+// 							var activeClType = types.getActiveClType();
+// 							activeClType.data.events.push(event);
 
-							// Add the method to code.
-							var exceptionRet = code.addEvent(activeClType, 
-								event);
-							if (exceptionRet) { throw exceptionRet; }
+// 							// Add the method to code.
+// 							var exceptionRet = code.addEvent(activeClType, 
+// 								event);
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = types.regenTWEventsTable();
-							if (exceptionRet) { throw exceptionRet; }
+// 							exceptionRet = types.regenTWEventsTable();
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							// Now do something to scroll the events grid to the bottom.
-							$("#eventrename_" + (activeClType.data.events.length - 1).toString()).scrollintoview();
+// 							// Now do something to scroll the events grid to the bottom.
+// 							$("#eventrename_" + (activeClType.data.events.length - 1).toString()).scrollintoview();
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					self.addPropertyToActiveType = function (property) {
+// //used
+// 					self.addPropertyToActiveType = function (property) {
 
-						try {
+// 						try {
 
-							var activeClType = types.getActiveClType();
-							return self.addPropertyToType(property,
-								activeClType);
+// 							var activeClType = types.getActiveClType();
+// 							return self.addPropertyToType(property,
+// 								activeClType);
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-					self.addPropertyToType = function (property, clType) {
+// 					self.addPropertyToType = function (property, clType) {
 
-						try {
+// 						try {
 
-							clType.data.properties.push(property);
+// 							clType.data.properties.push(property);
 
-							// Add the property to code.
-							var exceptionRet = code.addProperty(clType, 
-								property);
-							if (exceptionRet) { throw exceptionRet; }
+// 							// Add the property to code.
+// 							var exceptionRet = code.addProperty(clType, 
+// 								property);
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = types.regenTWPropertiesTable();
-							if (exceptionRet) { throw exceptionRet; }
+// 							exceptionRet = types.regenTWPropertiesTable();
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							// Now do something to scroll the props grid to the bottom.
-							$("#propertyedit_" + (clType.data.properties.length - 1).toString()).scrollintoview();
+// 							// Now do something to scroll the props grid to the bottom.
+// 							$("#propertyedit_" + (clType.data.properties.length - 1).toString()).scrollintoview();
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					self.updatePropertyInActiveType	= function (property, index, strOriginalName) {
+// //used
+// 					self.updatePropertyInActiveType	= function (property, index, strOriginalName) {
 
-						try {
+// 						try {
 
-							var activeClType = types.getActiveClType();
-							activeClType.data.properties[index] = property;
+// 							var activeClType = types.getActiveClType();
+// 							activeClType.data.properties[index] = property;
 
-							// Add the property to code.
-							var exceptionRet = code.replaceProperty(activeClType, 
-								property,
-								strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+// 							// Add the property to code.
+// 							var exceptionRet = code.replaceProperty(activeClType, 
+// 								property,
+// 								strOriginalName);
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							exceptionRet = types.regenTWPropertiesTable();
-							if (exceptionRet) { throw exceptionRet; }
+// 							exceptionRet = types.regenTWPropertiesTable();
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {
+// //used
+// 					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {
 
-						try {
+// 						try {
 
-							var activeClType = types.getActiveClType();
-							var oldEvent = activeClType.data.events[index];
-							oldEvent.name = strNewName;
-							activeClType.data.events[index] = oldEvent;
+// 							var activeClType = types.getActiveClType();
+// 							var oldEvent = activeClType.data.events[index];
+// 							oldEvent.name = strNewName;
+// 							activeClType.data.events[index] = oldEvent;
 
-							// Call Code.js#renameEvent(clType, event, strOriginalName).
-							var exceptionRet = code.renameEvent(activeClType, oldEvent, strOriginalName);
-							if (exceptionRet) { throw exceptionRet; }
+// 							// Call Code.js#renameEvent(clType, event, strOriginalName).
+// 							var exceptionRet = code.renameEvent(activeClType, oldEvent, strOriginalName);
+// 							if (exceptionRet) { throw exceptionRet; }
 
-							return types.regenTWEventsTable();
+// 							return types.regenTWEventsTable();
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-//used
-					self.addMethodToTypeFromDB = function (iMethodId) {
+// //used
+// 					self.addMethodToTypeFromDB = function (iMethodId) {
 
-						try {
+// 						try {
 
-							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
-								{
-									methodId: iMethodId
-								},
-								'json');
-							posting.done(function(data){
+// 							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
+// 								{
+// 									methodId: iMethodId
+// 								},
+// 								'json');
+// 							posting.done(function(data){
 
-								if (data.success) {
+// 								if (data.success) {
 
-									return self.addMethodToActiveType(data.method);
+// 									return self.addMethodToActiveType(data.method);
 
-								} else {
+// 								} else {
 
-									// !data.success
-									return new Error(data.message);
-								}
-							});
+// 									// !data.success
+// 									return new Error(data.message);
+// 								}
+// 							});
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-					// Delete types.getActiveClType() from ???
-					// Remove from code, toolstrip, designer, etc.
-//used					
-					self.deleteType = function() {
+// 					// Delete types.getActiveClType() from ???
+// 					// Remove from code, toolstrip, designer, etc.
+// //used					
+// 					self.deleteType = function() {
 
-						try {
+// 						try {
 
-							var clType = types.getActiveClType(true);	// Param true tells method we're removing so a new active type needs assigning.
+// 							var clType = types.getActiveClType(true);	// Param true tells method we're removing so a new active type needs assigning.
 
-							var exceptionRet = comics.removeType(clType);
-							if (exceptionRet) { return exceptionRet; }
+// 							var exceptionRet = comics.removeType(clType);
+// 							if (exceptionRet) { return exceptionRet; }
 
-							exceptionRet = code.removeType(clType);
-							if (exceptionRet) { return exceptionRet; }
+// 							exceptionRet = code.removeType(clType);
+// 							if (exceptionRet) { return exceptionRet; }
 
-							// clType has been returned so we can now remove it from tools. It has already been spliced out of project.comic.types.
-							// This will remove it from the tools strip and tidy that up (height of Slider, etc.).
-							exceptionRet = tools.removeItem(clType);
-							if (exceptionRet) { return exceptionRet; }
+// 							// clType has been returned so we can now remove it from tools. It has already been spliced out of project.comic.types.
+// 							// This will remove it from the tools strip and tidy that up (height of Slider, etc.).
+// 							exceptionRet = tools.removeItem(clType);
+// 							if (exceptionRet) { return exceptionRet; }
 
-							return null;
+// 							return null;
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-					// Delete types.getActiveClType().data.methods[index].
-					// Remove from code.
-//used					
-					self.deleteMethod = function(index) {
+// 					// Delete types.getActiveClType().data.methods[index].
+// 					// Remove from code.
+// //used					
+// 					self.deleteMethod = function(index) {
 
-						try {
+// 						try {
 
-							return types.deleteMethod(index);
+// 							return types.deleteMethod(index);
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-					// Delete types.getActiveClType().data.properties[index].
-					// Remove from code.
-//used					
-					self.deleteProperty = function(index) {
+// 					// Delete types.getActiveClType().data.properties[index].
+// 					// Remove from code.
+// //used					
+// 					self.deleteProperty = function(index) {
 
-						try {
+// 						try {
 
-							return types.deleteProperty(index);
+// 							return types.deleteProperty(index);
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-					// Delete types.getActiveClType().data.events[index].
-					// Remove from code.
-//used					
-					self.deleteEvent = function(index) {
+// 					// Delete types.getActiveClType().data.events[index].
+// 					// Remove from code.
+// //used					
+// 					self.deleteEvent = function(index) {
 						
-						try {
+// 						try {
 
-							return types.deleteEvent(index);
+// 							return types.deleteEvent(index);
 
-						} catch (e) { return e; }
-					}
+// 						} catch (e) { return e; }
+// 					}
 
-					//////////////////////////////
-					// Miscellaneous helpers.
-					self.getNumberOfTypesInActiveComic = function () {
+// 					//////////////////////////////
+// 					// Miscellaneous helpers.
+// 					self.getNumberOfTypesInActiveComic = function () {
 
-						try {
+// 						try {
 
-							return types.getLength();
+// 							return types.getLength();
 
-						} catch (e) { throw e; }
-					}
+// 						} catch (e) { throw e; }
+// 					}
 
 					// If no active project, returns call unloadedCallback in order to proceed to New Project or whatever.
 					// If active project, displays BootstrapDialog asking user.
