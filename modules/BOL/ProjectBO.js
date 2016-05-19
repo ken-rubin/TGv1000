@@ -6,6 +6,8 @@ var fs = require("fs");
 var async = require("async");
 var os = require("os");
 var moment = require("moment-timezone");
+var jwt = require('jsonwebtoken');
+var mysql = require("mysql");
 
 module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
@@ -227,9 +229,33 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         if (err) {
                                             return res.json({success:false, message: err.message});
                                         }
-                                        // Save name and id of this project into profile and send back with cookie.
 
-                                        return res.json({success:true, project:project});
+                                        // Save project.name and project.id to user row in DB.
+                                        var sqlQuery = "update " + self.dbname + "user set lastproject=" + mysql.escape(project.name) + ", lastProjectId=" + project.id + " where id=" + req.user.userId + ";";
+                                        sql.execute(
+                                            sqlQuery,
+                                            function(rows) {
+
+                                                // Save name and id of this project into profile and send back with cookie.
+                                                var encodedToken = req.cookies.token.split('.')[1];
+                                                if (encodedToken) {
+
+                                                    var bufDecoded = new Buffer(encodedToken, 'base64').toString('ascii');
+                                                    var profile = JSON.parse(bufDecoded);
+                                                    profile["lastProject"] = project.name;
+                                                    profile["lastProjectId"] = project.id;
+                                                    var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
+                                                    res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
+                                                }
+
+                                                return res.json({success:true, project:project});
+                                            },
+                                            function(strError) {
+
+                                                return res.json( {success:false, message: strError} );
+                                            }
+                                        );
+
                                     }
                                 );
                             }
