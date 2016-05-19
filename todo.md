@@ -4,16 +4,50 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
+- Delete (after being sure and removing references from require section at top of other modules):
+    - Project.js
+    - ScrollRegionV.js
+    - Simulator.js
+    - Designer/*
+    - Comic.js
+    - Comics.js
+    - Code.js
+    - Type.js
+    - Types.js
+    - contextMenu.js(?)
+    - Validator.js(?)
+- AZUsersDialog 
+    - Users tab
+        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
+        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
 - AZPPBuyersDialog.js
+    - Buyers tab
+        - Finish dropping someone from a class and optionally giving a refund thru Stripe.
+        - Add an email to the user if a refund has been processed.
+    - Waitlisted tab
+        - Invite user, tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class. Implement all of this.
+        - Allow instructor to overbook by inviting multiple waitlist people.
+    - Invited tab
+        - Fetch data. Do it. **Done. Test it.**
+    - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
+        - Handle the Accept and Decline links in the email.
     - Display project details at top above tabs
     - Write m_setRecentRefundsTable
     - In fnRemoveBuyer add entry to m_holdData.recentRefunds and redraw that table
     - In fnInvite finish writing posting.done
     - In fnInvite if numEnrollees + numInvited < maxClassSize, suggest to admin user that class could be made active
     - Implement 1 second countdown timer in #InvitedTable
+- AZProjectsDialog
+    - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
+        - *Public* means other non-privileged users can find it.
+            - What starts off as public?
+            - What starts off as private?
+        - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
+        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public --  with observation of quarantined material.
 - Cron.js
     - Finish job2
     - Add waitlist reminder emails
+    - Got a bug at 1PM.
 - Login++
     - Handle Accept link in invitation email: after login bring user to buy page with CC form open
 - Someplace
@@ -21,6 +55,7 @@
 - UtilityBO.js
     - When placing charge, send our own email in addition to Stripe's
     - In routeUndoPurchase, send refund processed email if refund was processed; also probably want to return refundId with success again so that #RecentRefunds can be updated
+- Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
 - Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
@@ -32,38 +67,16 @@
 - We need a way to let teachers setting up curriculum for their classes when the school has purchased a site license.
     - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
     - The class is free to the students.
-- AZUsersDialog 
-    - Users tab
-        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
-        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
-- AZPPBuyersDialog
-    - Display PP info above the tabs.
-    - Buyers tab
-        - Finish dropping someone from a class and optionally giving a refund thru Stripe.
-        - Add an email to the user if a refund has been processed.
-    - Waitlisted tab
-        - Invite user, tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class. Implement all of this.
-        - Allow instructor to overbook by inviting multiple waitlist people.
-    - Invited tab
-        - Fetch data. Do it. **Done. Test it.**
-    - Add 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
-        - Handle the Accept and Decline links in the email.
-- AZProjectsDialog
-    - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
-        - *Public* means other non-privileged users can find it.
-            - What starts off as public?
-            - What starts off as private?
-        - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
-        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public --  with observation of quarantined material.
 
 ## Jerry's seldom- or non-reproducable Bugs
-- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
+- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when it recurs I should be able to see what's wrong.**
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above. Didn't help. Still happens sometimes to John.**
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
 - Jade has been renamed to pug. Install pug in package.json instead of Jade.
 - Disable 2nd menu list if no project. Wait for merge with Ken.
+    - Remove some items from 2nd menu list.
 - Use this code to display a Product's video (if I add that):
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -77,15 +90,12 @@
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
-- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. Do I really need to load the project? I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
-    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-    + Add waitlist reminders emails.
-- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - go to AdminZone; 
+    + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
+        * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+        * Add waitlist reminders emails.
+    + Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
-- Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
     + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?

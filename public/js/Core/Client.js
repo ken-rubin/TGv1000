@@ -81,6 +81,21 @@ define(["Core/errorHelper",
 							// Set global profile for everyone to use.
 							var profileJSON = localStorage.getItem("profile");
 							g_profile = JSON.parse(profileJSON);
+
+							var lastProject = g_profile["lastProject"];
+							var lastProjectId = parseInt(g_profile["lastProjectId"], 10);
+
+							// If lastProjectId, fetch it and load it into manager.
+							if (lastProjectId) {
+
+								client.openProjectFromDB(lastProjectId);
+								BootstrapDialog.alert({
+
+									message: "Your latest project, " + lastProject + ", has been loaded.",
+									closable: true, // <-- Default value is false
+									draggable: true // <-- Default value is false
+								});
+							}
 							return null;
 
 						} catch (e) { return e; }

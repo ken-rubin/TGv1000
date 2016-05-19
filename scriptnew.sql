@@ -1214,6 +1214,17 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
 
+    if @dbstate = 23 THEN
+
+		ALTER TABLE `tgv1000`.`user` 
+			ADD COLUMN `lastProject` VARCHAR(255) NOT NULL DEFAULT '' AFTER `timezone`;
+		ALTER TABLE `tgv1000`.`user` 
+			ADD COLUMN `lastProjectId` INT(11) NOT NULL DEFAULT 0 AFTER `lastProject`;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
 end//
 
 

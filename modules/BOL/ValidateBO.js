@@ -427,7 +427,7 @@ module.exports = function ValidateBO(app, sql, logger, mailWrapper) {
             console.log("Entered routeUserAuthenticate with req.body=" + JSON.stringify(req.body));
 
             // Retrieve and validate password against hash.
-            var exceptionRet = sql.execute("select id, pwHash, usergroupId from " + self.dbname + "user where userName='" + req.body.userName + "';",
+            var exceptionRet = sql.execute("select id, pwHash, usergroupId, lastProject, lastProjectId from " + self.dbname + "user where userName='" + req.body.userName + "';",
                 function(rows){
 
                     if (!rows) {
@@ -445,6 +445,8 @@ module.exports = function ValidateBO(app, sql, logger, mailWrapper) {
                         var id = rows[0].id;
                         var pwHash = rows[0].pwHash;
                         var usergroupId = rows[0].usergroupId;
+                        var lastProject = rows[0].lastProject;
+                        var lastProjectId = rows[0].lastProjectId;
 
                         bcrypt.compare(req.body.password, pwHash, function(err, result){
 
@@ -457,7 +459,9 @@ module.exports = function ValidateBO(app, sql, logger, mailWrapper) {
                                 var profile = {
                                     userName: req.body.userName,
                                     userId: id,
-                                    usergroupId: usergroupId
+                                    usergroupId: usergroupId,
+                                    lastProject: lastProject,
+                                    lastProjectId: lastProjectId
                                 };
 
                                 // Add permissions to profile, based on usergroupId.
