@@ -230,32 +230,26 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             return res.json({success:false, message: err.message});
                                         }
 
-                                        // Save project.name and project.id to user row in DB.
-                                        var sqlQuery = "update " + self.dbname + "user set lastproject=" + mysql.escape(project.name) + ", lastProjectId=" + project.id + " where id=" + req.user.userId + ";";
-                                        sql.execute(
-                                            sqlQuery,
-                                            function(rows) {
+                                        m_functionUpdateUserJWTCookie(
+                                            req,
+                                            res,
+                                            project,
+                                            function(err) {
 
-                                                // Save name and id of this project into profile and send back with cookie.
-                                                var encodedToken = req.cookies.token.split('.')[1];
-                                                if (encodedToken) {
+                                                if (err) {
 
-                                                    var bufDecoded = new Buffer(encodedToken, 'base64').toString('ascii');
-                                                    var profile = JSON.parse(bufDecoded);
-                                                    profile["lastProject"] = project.name;
-                                                    profile["lastProjectId"] = project.id;
-                                                    var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
-                                                    res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
+                                                    return res.json({
+                                                        success: false,
+                                                        message: err.message
+                                                    });
                                                 }
 
-                                                return res.json({success:true, project:project});
-                                            },
-                                            function(strError) {
-
-                                                return res.json( {success:false, message: strError} );
+                                                return res.json({
+                                                    success: true,
+                                                    project: project
+                                                });
                                             }
                                         );
-
                                     }
                                 );
                             }
@@ -275,6 +269,41 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) {
 
             res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionUpdateUserJWTCookie = function(req, res, project, callback) {
+
+        try {
+
+            // Save project.name and project.id to user row in DB.
+            var sqlQuery = "update " + self.dbname + "user set lastproject=" + mysql.escape(project.name) + ", lastProjectId=" + project.id + " where id=" + req.user.userId + ";";
+            sql.execute(
+                sqlQuery,
+                function(rows) {
+
+                    // Save name and id of this project into profile and send back with cookie.
+                    var encodedToken = req.cookies.token.split('.')[1];
+                    if (encodedToken) {
+
+                        var bufDecoded = new Buffer(encodedToken, 'base64').toString('ascii');
+                        var profile = JSON.parse(bufDecoded);
+                        profile["lastProject"] = project.name;
+                        profile["lastProjectId"] = project.id;
+                        var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
+                        res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
+                    }
+
+                    return callback(null);
+                },
+                function(strError) {
+
+                    return callback(new Error(strError));
+                }
+            );
+        } catch (e) {
+
+            callback(e);
         }
     }
 
@@ -993,7 +1022,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             m_functionDetermineSaveOrSaveAs(connection, req, res,
                                                 function(err, typeOfSave) {
                                                     if (err) {
-                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), res, null, null);
+                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
                                                     } else {
                                                         if (typeOfSave === 'save') {
 
@@ -1001,10 +1030,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             m_functionSaveProject(connection, req, res, project, 
                                                                 function(err) {
                                                                     if (err) {
-                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                        m_functionFinalCallback(err, req, res, null, null);
                                                                     } else {
                                                                         m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                        m_functionFinalCallback(null, req, res, connection, project);
                                                                     }
                                                                 }
                                                             );
@@ -1014,10 +1043,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             m_functionSaveProjectWithSameId(connection, req, res, project, 
                                                                 function(err) {
                                                                     if (err) {
-                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                        m_functionFinalCallback(err, req, res, null, null);
                                                                     } else {
                                                                         m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                        m_functionFinalCallback(null, req, res, connection, project);
                                                                     }
                                                                 }
                                                             );
@@ -1027,10 +1056,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             m_functionSaveProjectAs(connection, req, res, project, 
                                                                 function(err) {
                                                                     if (err) {
-                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                        m_functionFinalCallback(err, req, res, null, null);
                                                                     } else {
                                                                         m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                        m_functionFinalCallback(null, req, res, connection, project);
                                                                     }
                                                                 }
                                                             );
@@ -2680,7 +2709,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { callback(e); }
     }
 
-    var m_functionFinalCallback = function (err, res, connection, project) {
+    var m_functionFinalCallback = function (err, req, res, connection, project) {
 
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
@@ -2699,37 +2728,55 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             message: 'Committing transaction failed with ' + err.message
                         });
                     } else {
-                        if (project.hasOwnProperty("script")) {
-                            // There's a sql script that needs to be written to project root.
-                            // In the callback from that file creation, we'll return to the client.
-                            // m_log("About to write sql script containing " + project.script.length + " lines.");
-                            m_functionWriteSqlScript(project, function(err) {
 
-                                delete project.script;
-                                delete project.idnum;
+                        // Update JWT and user DB record to reflect project just saved.
+                        m_functionUpdateUserJWTCookie(
+                            req,
+                            res,
+                            project,
+                            function(err) {
+
                                 if (err) {
-                                    // Writing the file didn't work, but saving the project has already been committed to the DB.
-                                    // We'll inform the user, but do so in a way that the project is saved.
-                                    res.json({
-                                        success: true,
-                                        project: project,
-                                        scriptSuccess: false,
-                                        saveError: err
+
+                                    return res.json({
+                                        success: false,
+                                        message: err.message
+                                    });
+                                }
+
+                                if (project.hasOwnProperty("script")) {
+                                    // There's a sql script that needs to be written to project root.
+                                    // In the callback from that file creation, we'll return to the client.
+                                    // m_log("About to write sql script containing " + project.script.length + " lines.");
+                                    m_functionWriteSqlScript(project, function(err) {
+
+                                        delete project.script;
+                                        delete project.idnum;
+                                        if (err) {
+                                            // Writing the file didn't work, but saving the project has already been committed to the DB.
+                                            // We'll inform the user, but do so in a way that the project is saved.
+                                            res.json({
+                                                success: true,
+                                                project: project,
+                                                scriptSuccess: false,
+                                                saveError: err
+                                            });
+                                        } else {
+                                            res.json({
+                                                success: true,
+                                                project: project,
+                                                scriptSuccess: true
+                                            });
+                                        }
                                     });
                                 } else {
                                     res.json({
                                         success: true,
-                                        project: project,
-                                        scriptSuccess: true
+                                        project: project
                                     });
                                 }
-                            });
-                        } else {
-                            res.json({
-                                success: true,
-                                project: project
-                            });
-                        }
+                            }
+                        );
                     }
                 }
             );

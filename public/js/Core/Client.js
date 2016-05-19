@@ -98,13 +98,17 @@ define(["Core/errorHelper",
 							// If lastProjectId, fetch it and load it into manager.
 							if (lastProjectId) {
 
-								client.openProjectFromDB(lastProjectId);
-								BootstrapDialog.show({
-									type: BootstrapDialog.TYPE_INFO,
-									message: "Your latest project, " + lastProject + ", has been loaded. (Click outside this area to close it.)",
-									closable: true, // <-- Default value is false
-									draggable: true // <-- Default value is false
-								});
+								self.openProjectFromDB(lastProjectId,
+									function(project) {
+
+										BootstrapDialog.show({
+											type: BootstrapDialog.TYPE_INFO,
+											message: "Your latest project, " + lastProject + ", has been loaded. (Click outside this area to proceed.)",
+											closable: true, // <-- Default value is false
+											draggable: true // <-- Default value is false
+										});
+									}
+								);
 							}
 							return null;
 
@@ -689,6 +693,7 @@ define(["Core/errorHelper",
 					}
 
 					// This one is used in BuyDialog after a purchase is completed.
+					// It is also used when client is created to load latest project.
 					// callback is always present to return the project.
 					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
 
