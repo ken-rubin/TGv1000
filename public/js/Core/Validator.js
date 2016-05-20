@@ -197,23 +197,23 @@ define(["Core/errorHelper"],
 						return null;
 					}
 
-					self.isComicNameAvailable = function(strName) {
+					// self.isComicNameAvailable = function(strName) {
 
-						var clProject = client.getProject();
-						if (clProject) {
+					// 	var clProject = client.getProject();
+					// 	if (clProject) {
 
-							for (var i = 0; i < clProject.data.comics.items.length; i++) {
+					// 		for (var i = 0; i < clProject.data.comics.items.length; i++) {
 
-								var comicIth = clProject.data.comics.items[i];
-								if (comicIth.name === strName) {
+					// 			var comicIth = clProject.data.comics.items[i];
+					// 			if (comicIth.name === strName) {
 
-										return new Error("That name is already used for a comic in this project. Please enter another.");
-								}
-							}
-						}
+					// 					return new Error("That name is already used for a comic in this project. Please enter another.");
+					// 			}
+					// 		}
+					// 	}
 
-						return null;
-					}
+					// 	return null;
+					// }
 
 					self.isTypeNameAvailableInActiveComic = function(strName, myIndex) {
 

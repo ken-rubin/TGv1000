@@ -27,8 +27,6 @@ define(["Core/errorHelper",
 		"Dialogs/AZProjectsDialog/AZProjectsDialog",
 		"Dialogs/AZSavePPDataDialog/AZSavePPDataDialog",
 		"Dialogs/AZPPBuyersDialog/AZPPBuyersDialog"
-		// ,
-		// "Core/Project",
 		// "Code/Type"
 		],
 	function (errorHelper, 
@@ -53,8 +51,6 @@ define(["Core/errorHelper",
 				AZProjectsDialog,
 				AZSavePPDataDialog,
 				AZPPBuyersDialog
-				// ,
-				// Project,
 				// Type
 				) {
 
@@ -1154,10 +1150,10 @@ define(["Core/errorHelper",
 						}
 					}
 
-					self.getProject = function () {
+					// self.getProject = function () {
 
-						return m_clProject;
-					};
+					// 	return m_clProject;
+					// };
 
 					self.closeCurrentDialog = function () {
 

@@ -453,26 +453,26 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var exceptionRet = client.openProjectFromDB(
 								// 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
 								["Game", "Console", "Web Site", "HoloLens", "Mapping"].indexOf(m_projectType) + 1, 
-								function(clProject){	// callback is used to set fields after async fetch of empty-ish core project from db.
+								function(projectData){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
-									clProject.id = 0;	// just to be sure it doesn't overwrite a core project
-									clProject.isCoreProject = false;
+									projectData.id = 0;	// just to be sure it doesn't overwrite a core project
+									projectData.isCoreProject = false;
 
 									// We could also do these things that used to be done in the BO, but we aren't--at least for now.
 					                        //     comicIth.id = 0; 
 	                                        //     method.id = 0; AND property.id = 0; AND event.id = 0;
 
-									clProject.name = strProjectName;
-									clProject.tags = strProjectTags;
-									clProject.description = strProjectDescription;
-									clProject.imageId = m_imageId;
+									projectData.name = strProjectName;
+									projectData.tags = strProjectTags;
+									projectData.description = strProjectDescription;
+									projectData.imageId = m_imageId;
 									if (m_imageId) {
-										clProject.altImagePath = '';
+										projectData.altImagePath = '';
 									}
-									clProject.ownedByUserId = parseInt(g_profile["userId"], 10);
+									projectData.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-									clProject.specialProjectData = {
+									projectData.specialProjectData = {
 										privilegedUser: m_bPrivilegedUser,
 										ownedByUser: false,
 										othersProjects: false,
@@ -488,7 +488,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									if (m_bClassProject) {
 
-										clProject.isClass = true;
+										projectData.isClass = true;
 
 										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -520,7 +520,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
 										var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
-										clProject.specialProjectData.classData = {
+										projectData.specialProjectData.classData = {
 											id: 0,
 											active: false,
 											classDescription: strProjectDescription,
@@ -545,7 +545,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									} else if (m_bProductProject) {
 
-										clProject.isProduct = true;
+										projectData.isProduct = true;
 
 										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
 										var strLevel = $("#Level option:selected").text();
@@ -556,7 +556,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 										}
 
-										clProject.specialProjectData.productData = {
+										projectData.specialProjectData.productData = {
 											id: 0,
 											active: false,
 											productDescription: strProjectDescription,
@@ -567,7 +567,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										};
 									} else if (m_bOnlineClassProject) {
 
-										clProject.isOnlineClass = true;
+										projectData.isOnlineClass = true;
 
 										// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -591,7 +591,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										}
 										var strNotes = $("#Notes").val().trim();
 
-										clProject.specialProjectData.onlineClassData = {
+										projectData.specialProjectData.onlineClassData = {
 											id: 0,
 											active: false,
 											classDescription: strProjectDescription,
@@ -607,7 +607,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										};
 									}
 
-						    		exceptionRet = manager.load(clProject);
+						    		exceptionRet = manager.load(projectData);
 						    		if (exceptionRet) { throw exceptionRet; }
 
 									client.setBrowserTabAndBtns();

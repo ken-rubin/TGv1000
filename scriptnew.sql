@@ -1225,6 +1225,34 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
 
+    if @dbstate = 24 THEN
+
+		insert `tgv1000`.`usergroups` set name='site_teacher';
+        insert `tgv1000`.`permissions` set description='can_manage_site';
+        set @usergroupId := (select id from usergroups where name='site_teacher');
+        set @permissionId := (select id from permissions where description='can_manage_site');
+		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 25 THEN
+
+		insert `tgv1000`.`usergroups` set name='site_student';
+        insert `tgv1000`.`permissions` set description='can_register_for_sites';
+        set @usergroupId := (select id from usergroups where name='site_student');
+        set @permissionId := (select id from permissions where description='can_register_for_sites');
+		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+        set @permissionId := (select id from permissions where description='can_open_free_projects');
+		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+        set @permissionId := (select id from permissions where description='can_buy_projects');
+		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
 end//
 
 

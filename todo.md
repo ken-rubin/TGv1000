@@ -4,18 +4,26 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
+- We need a way to let teachers setting up curriculum for their classes when the school has purchased a site license.
+    - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
+    - The class is free to the students.
+- Some sort of display prolem in horizontal scroller in one of the image search dialogs.
 - Delete (after being sure and removing references from require section at top of other modules):
-    - Project.js
     - ScrollRegionV.js
     - Simulator.js
     - Designer/*
+    - SourceScanner/*
+    - Code/*
     - Comic.js
     - Comics.js
-    - Code.js
-    - Type.js
-    - Types.js
     - contextMenu.js(?)
     - Validator.js(?)
+    - NewTypeDIalog
+    - GenericRenameDialog(?)
+    - NewEventDialog
+    - NewPropertyDialog
+    - PropertyGrid(?)
+    - DeleteConfirmDialog(?)
 - AZUsersDialog 
     - Users tab
         - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
@@ -29,8 +37,6 @@
         - Allow instructor to overbook by inviting multiple waitlist people.
     - Invited tab
         - Fetch data. Do it. **Done. Test it.**
-    - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
-        - Handle the Accept and Decline links in the email.
     - Display project details at top above tabs
     - Write m_setRecentRefundsTable
     - In fnRemoveBuyer add entry to m_holdData.recentRefunds and redraw that table
@@ -48,6 +54,8 @@
     - Finish job2
     - Add waitlist reminder emails
     - Got a bug at 1PM.
+    - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
+        - Handle the Accept and Decline links in the email.
 - Login++
     - Handle Accept link in invitation email: after login bring user to buy page with CC form open
 - Someplace
@@ -59,14 +67,10 @@
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
 - Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
-- Save place (like for student working in a project) and jump right back to it when the user signs in again.
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
     + Lengthen to like 2 weeks.
     + Save project to DB with every change.
-- We need a way to let teachers setting up curriculum for their classes when the school has purchased a site license.
-    - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
-    - The class is free to the students.
 
 ## Jerry's seldom- or non-reproducable Bugs
 - I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when it recurs I should be able to see what's wrong.**
