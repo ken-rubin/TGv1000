@@ -135,13 +135,6 @@ define(["Core/errorHelper"],
 								}, true);
 							});
 
-							$("#NewTypeButton").click(function() {
-								try {
-									var exceptionRet = client.showNewTypeDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
 							$("#SearchTypeButton").click(function() {
 								try {
 									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
@@ -156,13 +149,6 @@ define(["Core/errorHelper"],
 								} catch (e) { errorHelper.show(e); }
 							});
 
-							$("#NewMethodButton").click(function() {
-								try {
-									var exceptionRet = client.showNewMethodDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
 							$("#SearchMethodButton").click(function() {
 								try {
 									var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
@@ -175,20 +161,6 @@ define(["Core/errorHelper"],
 									});
 									if (exceptionRet) { throw exceptionRet; }
 								} catch (e) { errorHelper.show(e); }
-							});
-
-							$("#NewPropertyButton").click(function() {
-								try {
-									var exceptionRet = client.showNewPropertyDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
-							$("#NewEventButton").click(function() {
-								try {
-									var exceptionRet = client.showNewEventDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
 							});
 
 							if (g_profile.can_visit_adminzone) {
@@ -239,6 +211,22 @@ define(["Core/errorHelper"],
 									} catch(e) { errorHelper.show(e); }
 								});
 
+								$("#SiteMaintButton").click(
+									function() {
+										try {
+
+											client.unloadProject(
+												function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+													var exceptionRet = client.showAZSitesDialog();
+													if (exceptionRet) { throw exceptionRet; }
+											},
+											true);
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								);
+
 								// This is how to connect enabled/disabled tooltips to menu items:
 								//
 								// $("#ComicsButton").powerTip({ manual: true });
@@ -260,6 +248,45 @@ define(["Core/errorHelper"],
 								// });
 							}
 
+							if (g_profile.can_manage_site) {
+
+								// Show Sitezone button.
+								$("#SitezoneLI").css("display", "block");
+
+								$("#SZUsersButton").click(
+									function() {
+										try {
+
+											client.unloadProject(
+												function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+													var exceptionRet = client.showSZUsersDialog();
+													if (exceptionRet) { throw exceptionRet; }
+											},
+											true);
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								);
+
+								$("#SZProjectsButton").click(
+									function() {
+										try {
+
+											client.unloadProject(
+												function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+													var exceptionRet = client.showSZProjectsDialog();
+													if (exceptionRet) { throw exceptionRet; }
+											},
+											true);
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								);
+
+							}
+
 							client.setBrowserTabAndBtns();
 
 							return null;
@@ -277,24 +304,16 @@ define(["Core/errorHelper"],
 						m_functionEnable("OpenProject");
 						m_functionDisable("SaveProject");
 						m_functionDisable("CloseProject");
-						m_functionDisable("NewType");
 						m_functionDisable("SearchType");
-						m_functionDisable("NewMethod");
 						m_functionDisable("SearchMethod");
-						m_functionDisable("NewProperty");
-						m_functionDisable("NewEvent");
 
 						if (manager.loaded) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 							m_functionEnable("SaveProject");
-							m_functionEnable("NewType");
 							m_functionEnable("SearchType");
-							m_functionEnable("NewMethod");
 							m_functionEnable("SearchMethod");
-							m_functionEnable("NewProperty");
-							m_functionEnable("NewEvent");
 						}
 					}
 
@@ -316,6 +335,23 @@ define(["Core/errorHelper"],
 							m_functionEnable("ActivatePP");
 						} else {
 							m_functionDisable("ActivatePP");
+						}
+
+						if (g_profile.can_manage_sites) {
+							m_functionEnable("SiteMaint");
+						} else {
+							m_functionDisable("SiteMaint");
+						}
+					}
+
+					self.enableOrDisableSiteZoneMenuItems = function () {
+
+						if (g_profile.can_manage_site) {
+							m_functionEnable("SZUsers");
+							m_functionEnable("SZProjects");
+						} else {
+							m_functionDisable("SZUsers");
+							m_functionDisable("SZProjects");
 						}
 					}
 

@@ -502,6 +502,45 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					self.showAZSitesDialog = function() {
+
+						try {
+
+							m_openDialog = new AZSitesDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					self.showSZUsersDialog = function() {
+
+						try {
+
+							m_openDialog = new SZUsersDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
+					self.showSZProjectsDialog = function() {
+
+						try {
+
+							m_openDialog = new SZProjectsDialog();
+							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							return null;
+
+						} catch (e) { return e; }
+					}
+
 					//////////////////////////////
 					// "functionOK" links.
 					// These are callbacks from, e.g., Select or Create buttons in dialogs.
@@ -1147,6 +1186,11 @@ define(["Core/errorHelper",
 						if (g_profile.can_visit_adminzone) {
 
 							navbar.enableOrDisableAminZoneMenuItems();
+						}
+
+						if (g_profile.can_manage_site) {
+
+							navbar.enableOrDisableSiteZoneMenuItems();
 						}
 					}
 

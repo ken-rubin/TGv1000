@@ -43,18 +43,10 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
           a.dropdown-toggle(href="#" data-toggle="dropdown" role="button" aria-expanded="false") Types&nbsp;
             span.caret
           ul.dropdown-menu(role="menu")
-              li#NewTypeLI
-                a#NewTypeButton(href="#") New Type...
               li#SearchTypeLI
                 a#SearchTypeButton(href="#") Search for Type...
-              li#NewMethodLI
-                a#NewMethodButton(href="#") New Method...
               li#SearchMethodLI
                 a#SearchMethodButton(href="#") Search for Method...
-              li#NewPropertyLI
-                a#NewPropertyButton(href="#") New Property...
-              li#NewEventLI
-                a#NewEventButton(href="#") New Event...
 
         //- Adminzone
         li#AdminzoneLI.dropdown(style="display:none;")
@@ -67,6 +59,18 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
                 a#ProjectsButton(href="#") Projects...
               li#ActivatePPLI
                 a#ActivatePPButton(href="#") Purchasable Products...
+              li#SiteMaintLI
+                a#SiteMaintButton(href="#") Sites...
+
+        //- Sitezone
+        li#SitezoneLI.dropdown(style="display:none;")
+          a.dropdown-toggle(href="#" data-toggle="dropdown" role="button" aria-expanded="false") SiteZone&nbsp;
+            span.caret
+          ul.dropdown-menu(role="menu")
+              li#SZUsersLI
+                a#SZUsersButton(href="#") Users...
+              li#SZProjectsLI
+                a#SZProjectsButton(href="#") Projects...
 
       button#StopBtn.btn.disabledifnoproj.hiddenifnotrunning.navbar-right(type="button" data-toggle="tooltip" title="Stop Simulation" aria-label="Stop Simulation" style="margin-left: 10px; margin-right: 10px; margin-top: 10px;")
         span.glyphicon.glyphicon-stop(aria-hidden="true")
