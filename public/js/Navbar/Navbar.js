@@ -121,6 +121,8 @@ define(["Core/errorHelper"],
 
 							$("#SaveProjectButton").click(function () {
 								try {
+
+									if ($("#SaveProjectLI").hasClass('disabled')) { return false; }
 									var exceptionRet = client.showSaveProjectDialog();
 									if (exceptionRet) { throw exceptionRet; }
 								} catch (e) { errorHelper.show(e); }
@@ -128,6 +130,7 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
+								if ($("#CloseProjectLI").hasClass('disabled')) { return false; }
 								client.unloadProject(function(){ 
 									self.enableOrDisableProjAndTypeMenuItems(); 
 									self.enableOrDisableAminZoneMenuItems(); 
@@ -136,6 +139,8 @@ define(["Core/errorHelper"],
 							});
 
 							$("#SearchTypeButton").click(function() {
+
+								if ($("#SearchTypeLI").hasClass('disabled')) { return false; }
 								try {
 									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
 										try {
@@ -150,6 +155,8 @@ define(["Core/errorHelper"],
 							});
 
 							$("#SearchMethodButton").click(function() {
+
+								if ($("#SearchMethodLI").hasClass('disabled')) { return false; }
 								try {
 									var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
 										try {
@@ -170,6 +177,7 @@ define(["Core/errorHelper"],
 
 								$("#UsersButton").click(function() {
 
+									if ($("#UsersLI").hasClass('disabled')) { return false; }
 									// AZUsersDialog is where user maintenance takes place, including usergroup creation, modification
 									// and assignment. Other user maintenance might be forcing a password reset, etc.
 									try {
@@ -184,6 +192,7 @@ define(["Core/errorHelper"],
 
 								$("#ProjectsButton").click(function() {
 
+									if ($("#ProjectsLI").hasClass('disabled')) { return false; }
 									// AZProjectsDialog is the place for making non-public projects public. Maybe it will also
 									// do Types and Methods. It may also un-quarantine images, videos and sounds.
 									try {
@@ -198,6 +207,7 @@ define(["Core/errorHelper"],
 
 								$("#ActivatePPButton").click(function() {
 
+									if ($("#ActivatePPLI").hasClass('disabled')) { return false; }
 									// AZActivatePPDialog is where Purchasable Projects are finalized, activated or de-activated.
 									// This dialog is not meant to load the project for actual maintenance, just the data from the
 									// classes, onlineclasses or products table for editing.
@@ -213,6 +223,8 @@ define(["Core/errorHelper"],
 
 								$("#SiteMaintButton").click(
 									function() {
+
+										if ($("#SiteMaintLI").hasClass('disabled')) { return false; }
 										try {
 
 											client.unloadProject(
@@ -255,6 +267,8 @@ define(["Core/errorHelper"],
 
 								$("#SZUsersButton").click(
 									function() {
+
+										if ($("#SZUsersLI").hasClass('disabled')) { return false; }
 										try {
 
 											client.unloadProject(
@@ -271,6 +285,8 @@ define(["Core/errorHelper"],
 
 								$("#SZProjectsButton").click(
 									function() {
+
+										if ($("#SZProjectsLI").hasClass('disabled')) { return false; }
 										try {
 
 											client.unloadProject(

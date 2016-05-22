@@ -124,7 +124,6 @@
         - OpenProjectDialog
         - PropertyGrid
         - TypeSearchDialog
-- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 
 ## A Discussion of Projects and Purchasable Projects
 
