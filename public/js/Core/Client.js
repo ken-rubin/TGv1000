@@ -27,7 +27,6 @@ define(["Core/errorHelper",
 		"Dialogs/AZProjectsDialog/AZProjectsDialog",
 		"Dialogs/AZSavePPDataDialog/AZSavePPDataDialog",
 		"Dialogs/AZPPBuyersDialog/AZPPBuyersDialog"
-		// "Code/Type"
 		],
 	function (errorHelper, 
 				NewProjectDialog, 
@@ -51,7 +50,6 @@ define(["Core/errorHelper",
 				AZProjectsDialog,
 				AZSavePPDataDialog,
 				AZPPBuyersDialog
-				// Type
 				) {
 
 		try {

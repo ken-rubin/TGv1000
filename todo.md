@@ -56,6 +56,9 @@
     - Got a bug at 1PM.
     - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
         - Handle the Accept and Decline links in the email.
+    + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
+        * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+        * Add waitlist reminders emails.
 - Login++
     - Handle Accept link in invitation email: after login bring user to buy page with CC form open
 - Someplace
@@ -79,8 +82,6 @@
 
 ### To consider
 - Jade has been renamed to pug. Install pug in package.json instead of Jade.
-- Disable 2nd menu list if no project. Wait for merge with Ken.
-    - Remove some items from 2nd menu list.
 - Use this code to display a Product's video (if I add that):
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -94,10 +95,7 @@
     + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
-    + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
-        * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-        * Add waitlist reminders emails.
-    + Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
++ Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
