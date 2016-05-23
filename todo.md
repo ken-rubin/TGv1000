@@ -11,8 +11,8 @@
 - Delete (after being sure and removing references from require section at top of other modules):
     - ScrollRegionV.js
     - Simulator.js
-    - Designer/*
-    - SourceScanner/*
+    - Designer/* - deleted
+    - SourceScanner/* - deleted
     - Code/*
     - Comic.js
     - Comics.js

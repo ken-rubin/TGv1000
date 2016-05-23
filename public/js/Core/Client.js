@@ -9,13 +9,10 @@ define(["Core/errorHelper",
 		"Dialogs/NewProjectDialog/NewProjectDialog", 
 		"Dialogs/OpenProjectDialog/OpenProjectDialog", 
 		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
-		"Dialogs/NewTypeDialog/NewTypeDialog", 
 		"Dialogs/TypeSearchDialog/TypeSearchDialog", 
 		"Dialogs/ImageDiskDialog/ImageDiskDialog", 
 		"Dialogs/ImageURLDialog/ImageURLDialog", 
 		"Dialogs/ImageSearchDialog/ImageSearchDialog",
-		"Dialogs/DeleteConfirmDialog/DeleteConfirmDialog",
-		"Dialogs/GenericRenameDialog/GenericRenameDialog",
 		"Dialogs/MethodSearchDialog/MethodSearchDialog",
 		"Dialogs/NewEventDialog/NewEventDialog",
 		"Dialogs/NewMethodDialog/NewMethodDialog",
@@ -32,13 +29,10 @@ define(["Core/errorHelper",
 				NewProjectDialog, 
 				OpenProjectDialog,
 				SaveProjectAsDialog,
-				NewTypeDialog, 
 				TypeSearchDialog, 
 				ImageDiskDialog, 
 				ImageURLDialog, 
 				ImageSearchDialog, 
-				DeleteConfirmDialog,
-				GenericRenameDialog,
 				MethodSearchDialog,
 				NewEventDialog,
 				NewMethodDialog,
@@ -217,19 +211,6 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.showNewTypeDialog = function () {
-
-						try {
-
-							m_openDialog = new NewTypeDialog();
-							var exceptionRet = m_openDialog.create("New", -1);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
 					self.showEditTypeDialog = function (index) {
 
 						try {
@@ -327,66 +308,6 @@ define(["Core/errorHelper",
 
 							m_openDialog = new NewEventDialog();
 							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showGenericRenameDialog = function (itemType, index) {
-
-						try {
-
-							m_openDialog = new GenericRenameDialog();
-							var exceptionRet = m_openDialog.create(itemType, index);
-							if (exceptionRet) { throw exceptionRet; }
-							
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showDeleteConfirmDialog = function (objectType, index) {
-
-						try {
-
-							// Figure out if this item is referenced anywhere
-							var methodReference = null;
-							var clActiveType = types.getActiveClType();
-							if (objectType === "type") {
-
-								methodReference = code.isTypeReferencedInWorkspace(clActiveType);
-
-							} else if (objectType === "property") {
-
-								methodReference = code.isPropertyReferencedInWorkspace(clActiveType, clActiveType.data.properties[index]);
-
-							} else if (objectType === "method") {
-
-								methodReference = code.isMethodReferencedInWorkspace(clActiveType, clActiveType.data.methods[index]);
-
-							} else if (objectType === "event") {
-
-								methodReference = code.isEventReferencedInWorkspace(clActiveType, clActiveType.data.events[index]);
-							}
-
-							// If a reference was found, report it and drop out.
-							if (methodReference) {
-
-								BootstrapDialog.alert({
-
-									title: "WARNING",
-									message: "Cannot delete! Object in use: " + methodReference.type.data.name + " :: " + methodReference.name,
-									type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-									closable: true, // <-- Default value is false
-									draggable: true // <-- Default value is false
-								});
-								return;
-       						}
-
-							m_openDialog = new DeleteConfirmDialog();
-							var exceptionRet = m_openDialog.create(objectType, index);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
