@@ -14,9 +14,6 @@ define(["Core/errorHelper",
 		"Dialogs/ImageURLDialog/ImageURLDialog", 
 		"Dialogs/ImageSearchDialog/ImageSearchDialog",
 		"Dialogs/MethodSearchDialog/MethodSearchDialog",
-		"Dialogs/NewEventDialog/NewEventDialog",
-		"Dialogs/NewMethodDialog/NewMethodDialog",
-		"Dialogs/NewPropertyDialog/NewPropertyDialog",
 		"Dialogs/PropertyGrid/PropertyGrid",
 		"Dialogs/BuyDialog/BuyDialog",
 		"Dialogs/AZActivatePPDialog/AZActivatePPDialog",
@@ -34,9 +31,6 @@ define(["Core/errorHelper",
 				ImageURLDialog, 
 				ImageSearchDialog, 
 				MethodSearchDialog,
-				NewEventDialog,
-				NewMethodDialog,
-				NewPropertyDialog,
 				PropertyGrid,
 				BuyDialog,
 				AZActivatePPDialog,
@@ -237,32 +231,6 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.showNewMethodDialog = function () {
-
-						try {
-
-							m_openDialog = new NewMethodDialog();
-							var exceptionRet = m_openDialog.create("New", -1);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showEditMethodDialog = function (index) {
-
-						try {
-
-							m_openDialog = new NewMethodDialog();
-							var exceptionRet = m_openDialog.create("Edit", index);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
 					self.showMethodSearchDialog = function (functionOK) {
 
 						try {
@@ -276,38 +244,12 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.showNewPropertyDialog = function () {
-
-						try {
-
-							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('New', -1);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
 					self.showEditPropertyDialog = function (index) {
 
 						try {
 
 							m_openDialog = new NewPropertyDialog();
 							var exceptionRet = m_openDialog.create('Edit', index);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showNewEventDialog = function () {
-
-						try {
-
-							m_openDialog = new NewEventDialog();
-							var exceptionRet = m_openDialog.create();
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
