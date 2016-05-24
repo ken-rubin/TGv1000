@@ -6,19 +6,20 @@
 ## Jerry's High Priority Issues
 - From John:
     - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
-- Some sort of display problem in horizontal scroller in one of the image search dialogs.
-- Delete (after being sure and removing references from require section at top of other modules):
-    - PropertyGrid(?)
+- Saw some sort of display problem in horizontal scroller in one of the image search dialogs.
 - AZUsersDialog 
     - Users tab
-        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
+        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive, since there are so many and we're client side--but on the other hand it's an admin using this.
         - Add reset email button? Is it necessary given that the user has a link to click on the login page?
 - AZPPBuyersDialog.js
     - Buyers tab
-        - Finish dropping someone from a class and optionally giving a refund thru Stripe.
+        - Finish dropping someone from a class and (optionally) giving a refund thru Stripe.
         - Add an email to the user if a refund has been processed.
     - Waitlisted tab
-        - Invite user, tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class. Implement all of this.
+        - Invite user--tell waitlisted user that a position has opened. This will send an email with Accept and Decline links. The Accept link has to be used within 24 hours. Only with the code can someone buy such a class.
+            - The Accept link will work similarly to what I do in reset password. I have no idea (yet) how to do the Decline link.
+            + For Accept, after login bring user to BuyDialog with project detail loaded and the CC entry form at the bottom displayed.
+            * The Decline link will most likely be our first real API call, since there's really no reason to have a user log in in order to decline. We just have to make it so that the 1-minute Cron job knows to expire an invitation before the 24 hours are up--like immediately.
         - Allow instructor to overbook by inviting multiple waitlist people.
     - Invited tab
         - Fetch data. Do it. **Done. Test it.**
@@ -29,6 +30,7 @@
     - In fnInvite if numEnrollees + numInvited < maxClassSize, suggest to admin user that class could be made active
     - Implement 1 second countdown timer in #InvitedTable
 - AZProjectsDialog
+    - How are projects, types, methods and images saved now? Should not be accessible to normal users until the actions in this dialog are done.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.
             - What starts off as public?
@@ -38,23 +40,17 @@
 - Cron.js
     - Finish job2
     - Add waitlist reminder emails
-    - Got a bug at 1PM.
+    - Got a bug noted at 1PM. Huh?
     - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
-        - Handle the Accept and Decline links in the email.
     + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
         * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
         * Add waitlist reminders emails.
-- Login++
-    - Handle Accept link in invitation email: after login bring user to buy page with CC form open
-- Someplace
-    - Handle Decline link in invitation email
 - UtilityBO.js
     - When placing charge, send our own email in addition to Stripe's
     - In routeUndoPurchase, send refund processed email if refund was processed; also probably want to return refundId with success again so that #RecentRefunds can be updated
 - Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
     - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
-- Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
     + Lengthen to like 2 weeks.
@@ -66,7 +62,7 @@
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
-- Consider saving to database (or maybe LocalStorage) on every action. Or maybe to a checkpoint store so user never loses anything even if he closes the browser. Then we'd check the checkpoint and ask the user if he'd like to load from it. We'd remove the checkpoint any time we store to or retrieve from the DB.
+- Consider checkpointing manager's data (to LocalStorage or other local datastore) on every action in Ken's area so that user never loses anything even if he closes the browser. Then we'd check the checkpoint and ask the user if he'd like to load from it. We'd remove the checkpoint any time we store to or retrieve from the DB.
 - Jade has been renamed to pug. Install pug in package.json instead of Jade.
 - Use this code to display a Product's video (if I add that):
     ```
@@ -83,18 +79,11 @@
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
-- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
-    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Need rest of the dialogs to submit on Enter key.
     - These are already done:
         + EnrollDialog
-        + NewEventDialog
-        + NewMethodDialog
         + NewProjectDialog
-        + NewPropertyDialog
-        + NewTypeDialog
         + SaveProjectAsDialog
         + ImageDiskDialog
     - Still may want to do these (where it makes sense): 
