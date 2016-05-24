@@ -14,7 +14,6 @@ define(["Core/errorHelper",
 		"Dialogs/ImageURLDialog/ImageURLDialog", 
 		"Dialogs/ImageSearchDialog/ImageSearchDialog",
 		"Dialogs/MethodSearchDialog/MethodSearchDialog",
-		"Dialogs/PropertyGrid/PropertyGrid",
 		"Dialogs/BuyDialog/BuyDialog",
 		"Dialogs/AZActivatePPDialog/AZActivatePPDialog",
 		"Dialogs/AZUsersDialog/AZUsersDialog",
@@ -31,7 +30,6 @@ define(["Core/errorHelper",
 				ImageURLDialog, 
 				ImageSearchDialog, 
 				MethodSearchDialog,
-				PropertyGrid,
 				BuyDialog,
 				AZActivatePPDialog,
 				AZUsersDialog,
@@ -301,19 +299,6 @@ define(["Core/errorHelper",
 
 						} catch (e) { return e; }
 					};
-
-					self.showPropertyGrid = function(toolInstance, functionManipulate) {
-
-						try {
-
-							m_openDialog = new PropertyGrid();
-							var exceptionRet = m_openDialog.create(toolInstance, functionManipulate);
-							if (exceptionRet) { throw exceptionRet; }
-							
-							return null;
-
-						} catch (e) { return e; }
-					}
 
 					self.showAZUsersDialog = function() {
 

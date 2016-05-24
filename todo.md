@@ -66,6 +66,7 @@
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
+- Consider saving to database (or maybe LocalStorage) on every action. Or maybe to a checkpoint store so user never loses anything even if he closes the browser. Then we'd check the checkpoint and ask the user if he'd like to load from it. We'd remove the checkpoint any time we store to or retrieve from the DB.
 - Jade has been renamed to pug. Install pug in package.json instead of Jade.
 - Use this code to display a Product's video (if I add that):
     ```
@@ -76,8 +77,6 @@
     </div>
     ```
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
 + Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
@@ -99,13 +98,10 @@
         + SaveProjectAsDialog
         + ImageDiskDialog
     - Still may want to do these (where it makes sense): 
-        - DeleteConfirmDialog
-        - GenericRenameDialog
         - ImageSearchDialog
         - ImageURLDialog
         - MethodSearchDialog
         - OpenProjectDialog
-        - PropertyGrid
         - TypeSearchDialog
 
 ## A Discussion of Projects and Purchasable Projects
