@@ -1216,9 +1216,9 @@ begin
 
     if @dbstate = 23 THEN
 
-		ALTER TABLE `tgv1000`.`user` 
+		ALTER TABLE `TGv1000`.`user` 
 			ADD COLUMN `lastProject` VARCHAR(255) NOT NULL DEFAULT '' AFTER `timezone`;
-		ALTER TABLE `tgv1000`.`user` 
+		ALTER TABLE `TGv1000`.`user` 
 			ADD COLUMN `lastProjectId` INT(11) NOT NULL DEFAULT 0 AFTER `lastProject`;
 
 		set @dbstate := @dbstate + 1;
@@ -1227,11 +1227,11 @@ begin
 
     if @dbstate = 24 THEN
 
-		insert `tgv1000`.`usergroups` set name='site_teacher';
-        insert `tgv1000`.`permissions` set description='can_manage_site';
+		insert `TGv1000`.`usergroups` set name='site_teacher';
+        insert `TGv1000`.`permissions` set description='can_manage_site';
         set @usergroupId := (select id from usergroups where name='site_teacher');
         set @permissionId := (select id from permissions where description='can_manage_site');
-		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
@@ -1239,15 +1239,23 @@ begin
 
     if @dbstate = 25 THEN
 
-		insert `tgv1000`.`usergroups` set name='site_student';
-        insert `tgv1000`.`permissions` set description='can_register_for_sites';
+		insert `TGv1000`.`usergroups` set name='site_student';
+        insert `TGv1000`.`permissions` set description='can_register_for_sites';
         set @usergroupId := (select id from usergroups where name='site_student');
         set @permissionId := (select id from permissions where description='can_register_for_sites');
-		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
         set @permissionId := (select id from permissions where description='can_open_free_projects');
-		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
         set @permissionId := (select id from permissions where description='can_buy_projects');
-		insert `tgv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 26 THEN
+
+		update `TGv1000`.`projects` set quarantined=0 where id<6;
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;

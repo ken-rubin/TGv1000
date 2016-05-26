@@ -36,7 +36,12 @@
             - What starts off as public?
             - What starts off as private?
         - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
-        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public --  with observation of quarantined material.
+        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public--with observation of quarantined material.
+        - Just created project by a@a.com. The project is both public and quarantined.
+        - All core projects were quarantined and public, but I just changed scriptnew to make quarantined = 0. After running this update, a@a.com created a new project. It copied q and p from the core project. It appears the 2 fields are just being copied and not being actively set to public (false), quarantined (true). **Wrong**
+        - An active product for sale (Prod1) is quarantined and public, but I just set quarantined = 0 in Workbench.
+        - A purchased product is quarantined and public. It should be quarantined and private. **Wrong**
+        - Added image to project owned by a@a.com. It has both public and quarantined set to false. This is correct.
 - Cron.js
     - Finish job2
     - Add waitlist reminder emails

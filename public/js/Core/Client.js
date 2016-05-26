@@ -540,8 +540,6 @@ define(["Core/errorHelper",
 						} catch (e) { callback(e); }
 					}
 
-					// If iProjectId = 1-5 (New Projects), then projectType will be defined as a string telling
-					// the BO what kind of Project to build. Otherwise, it will be undefined.
 					self.openProjectFromDB = function (iProjectId, callback) {
 
 						try {
