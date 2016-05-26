@@ -123,7 +123,14 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					};
 
 					var m_setDataDisplay = function () {
-						// properties of m_holdData: project [obj]; one of classesdata, productsdata, onlineclassesdata [obj]; buyers [array of objs]; waitlisted [array of objs]; recentRefunds [array of objs] success [bool]
+
+						// Properties of m_holdData: 
+							// project [obj]; 
+							// one of classesdata, productsdata, onlineclassesdata [obj]; 
+							// buyers [array of objs]; 
+							// waitlisted [array of objs]; 
+							// recentRefunds [array of objs] 
+							// success [bool]
 
 						if (!m_bClass) {
 							// Completely remove the #Waitlisted tab by removing $(".remove").
@@ -150,6 +157,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setProjectData = function () {
 
+						$("#ProjectData").empty();
+						var innerHTML = "<h4>Project:&nbsp;&nbsp;" + m_holdData.project.name + "</h4>";
+
+						if (m_bClass) {
+
+							var strStartDate = "";
+							var strNumSessions = "";
+							innerHTML += "<span>This is a physical class starting " + strStartDate + " with " + strNumSessions + " sessions.</span><br>";
+							innerHTML += "<span>Max enrollment: " + m_holdData.classesdata.maxClassSize + "; enrolled: " + m_holdData.buyers.length + "; waitlisted: " + m_holdData.waitlisted.length + "; invited: " + m_holdData.invited.length + "</span><br>";
+
+						} else if (m_bOnlineClass) {
+
+							var strStartDate = "";
+							var strNumSessions = "";
+							innerHTML += "<span>This is an online class starting " + strStartDate + " with " + strNumSessions + " sessions.</span><br>";
+							innerHTML += "<span>There are " + m_holdData.buyers.length + " users enrolled.</span><br>";
+
+						} else {
+
+							innerHTML += "<span>This is a kit product.</span><br>";
+							innerHTML += "<span>There have been " + m_holdData.buyers.length + " sales to date.</span><br>";
+						}
+
+						$("#ProjectData").append(innerHTML);
 					}
 
 					var m_setBuyersTable = function () {

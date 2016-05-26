@@ -2897,7 +2897,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 async.eachSeries(arIth,
                                     function(arIthJth, cb) {
 
-                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.id + " and id<>" + arIthJth.id + ";";
+                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
                                         sql.execute(strQuery,
                                             function(rows){
 

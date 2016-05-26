@@ -8,9 +8,10 @@
     - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
 - Saw some sort of display problem in horizontal scroller in one of the image search dialogs.
 - AZPPBuyersDialog.js
+    - Display project details at top above tabs
     - Buyers tab
         - Finish dropping someone from a class and (optionally) giving a refund thru Stripe.
-        - Add an email to the user if a refund has been processed.
+        - Send an email to the user if a refund has been processed. Maybe in both cases (2 different emails).
     - Waitlisted tab
         - Invite user--tell waitlisted user that a position has opened. This will send an email with Accept and Decline links. The Accept link has to be used within 24 hours. Only with the code can someone buy such a class.
             - The Accept link will work similarly to what I do in reset password. I have no idea (yet) how to do the Decline link.
@@ -19,12 +20,11 @@
         - Allow instructor to overbook by inviting multiple waitlist people.
     - Invited tab
         - Fetch data. Do it. **Done. Test it.**
-    - Display project details at top above tabs
+        - Implement 1 second countdown timer in #InvitedTable
     - Write m_setRecentRefundsTable
     - In fnRemoveBuyer add entry to m_holdData.recentRefunds and redraw that table
     - In fnInvite finish writing posting.done
     - In fnInvite if numEnrollees + numInvited < maxClassSize, suggest to admin user that class could be made active
-    - Implement 1 second countdown timer in #InvitedTable
 - AZProjectsDialog
     - How are projects, types, methods and images saved now? Should not be accessible to normal users until the actions in this dialog are done.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
