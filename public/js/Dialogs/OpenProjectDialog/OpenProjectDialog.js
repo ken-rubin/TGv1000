@@ -146,7 +146,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 											} else if (stripNum === 4 && !m_bPrivilegedUser && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize) {
 
-												exceptionRet = client.putUserOnWaitlist(iProjectId);
+												exceptionRet = client.putUserOnWaitlist(projectId);
 												if (exceptionRet) { throw exceptionRet; }
 											
 											} else if (stripNum === 3 && !m_bPrivilegedUser && m_searchResultRawArray[3][i].alreadyBought) {

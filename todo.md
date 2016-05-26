@@ -7,10 +7,6 @@
 - From John:
     - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
 - Saw some sort of display problem in horizontal scroller in one of the image search dialogs.
-- AZUsersDialog 
-    - Users tab
-        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive, since there are so many and we're client side--but on the other hand it's an admin using this.
-        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
 - AZPPBuyersDialog.js
     - Buyers tab
         - Finish dropping someone from a class and (optionally) giving a refund thru Stripe.
@@ -67,6 +63,10 @@
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
+- AZUsersDialog 
+    - Users tab
+        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive, since there are so many and we're client side--but on the other hand it's an admin using this.
+        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
 - Consider checkpointing manager's data (to LocalStorage or other local datastore) on every action in Ken's area so that user never loses anything even if he closes the browser. Then we'd check the checkpoint and ask the user if he'd like to load from it. We'd remove the checkpoint any time we store to or retrieve from the DB.
 - Jade has been renamed to pug. Install pug in package.json instead of Jade.
 - Use this code to display a Product's video (if I add that):

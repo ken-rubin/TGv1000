@@ -19,14 +19,15 @@ br
 .col-xs-10
     textarea.form-control#ProjectDescription(spellcheck=true cols=40 rows=2 placeholder="Enter a complete description of your Class." tabindex=2)
 br
-br
-br
-.col-xs-2
-        label.control-label(for="ProjectTags", style="margin-top:6px;display:block;text-align:right;") Search tags
-.col-xs-10
-        textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help people search for this Class." tabindex=3)
-br
-br
+.OnlyForPrivileged(style="display:block;")
+    br
+    br
+    .col-xs-2
+            label.control-label(for="ProjectTags", style="margin-top:6px;display:block;text-align:right;") Search tags
+    .col-xs-10
+            textarea#ProjectTags.form-control(spellcheck=true cols=40 rows=2 placeholder="Enter words to help people search for this Class." tabindex=3)
+    br
+    br
 br
 .col-xs-2
     label.control-label(for="InstructorFirst", style="margin-top:6px;display:block;text-align:right;") Instructor
@@ -116,7 +117,7 @@ br
 .col-xs-2
 .col-xs-4
     input.form-control#When8(placeholder="Class 8 date / start-end times (24-hr)" tabindex=23)
-#OnlyForPrivileged(style="display:block;")
+.OnlyForPrivileged(style="display:block;")
     br
     br
     .col-xs-2

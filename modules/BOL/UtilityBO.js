@@ -1285,7 +1285,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         async.eachSeries(passOn.projects[4],
                             function(projectIth, cb) {
 
-                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.id + " and id<>" + projectIth.id + ";";
+                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
                                 sql.execute(strQuery,
                                     function(rows){

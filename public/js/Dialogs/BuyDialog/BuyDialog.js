@@ -178,7 +178,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
 
 						$("#ProjectDescription").val(m_ppData.projectDescription);
-						$("#ProjectTags").val(m_ppData.projectTags);																	// GONNA NEED THIS
 
 						$("#BuyHeader").empty();
 						if (m_ppData.isClass) {
@@ -188,7 +187,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and a reminder with dates, times and location.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
 
-							$("#OnlyForPrivileged").css("display","none");
+							$(".OnlyForPrivileged").css("display","none");
 
 							// jQuery(function($){
 							// 	$("#Phone").mask("(999) 999-9999? x99999");
@@ -198,7 +197,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// 		$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 							// 	}
 							// });
-							$("#ProjectDescription").val(m_ppData.classData.classDescription);
+							$("#ProjectDescription").val(m_ppData.classDescription);
 							$("#InstructorFirst").val(m_ppData.instructorFirstName);
 							$("#InstructorLast").val(m_ppData.instructorLastName);
 							$("#Phone").val(m_ppData.instructorPhone);
@@ -217,6 +216,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 							$("#Zip").val(m_ppData.zip);
 							// when array
+							m_ppData.schedule = JSON.parse(m_ppData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
 								var whenIth = m_ppData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
@@ -300,6 +300,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#InstructorLast").val(m_ppData.instructorLastName);
 							$("#Email").val(m_ppData.instructorEmail);
 							// when array
+							m_ppData.schedule = JSON.parse(m_ppData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
 								var whenIth = m_ppData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
