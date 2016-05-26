@@ -162,16 +162,30 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						if (m_bClass) {
 
-							var strStartDate = "";
-							var strNumSessions = "";
-							innerHTML += "<span>This is a physical class starting " + strStartDate + " with " + strNumSessions + " sessions.</span><br>";
+							var iNumSessions = 0;
+							var schedule = JSON.parse(m_holdData.classesdata.schedule);
+							var strStartDate = m_getJustDate(schedule[0]);
+							for (var i = 0; i < 8; i++) {
+								
+								if(schedule[i].date) {
+									iNumSessions++;
+								}
+							}
+							innerHTML += "<span>This is a physical class starting " + strStartDate + " with " + iNumSessions + " sessions.</span><br>";
 							innerHTML += "<span>Max enrollment: " + m_holdData.classesdata.maxClassSize + "; enrolled: " + m_holdData.buyers.length + "; waitlisted: " + m_holdData.waitlisted.length + "; invited: " + m_holdData.invited.length + "</span><br>";
 
 						} else if (m_bOnlineClass) {
 
-							var strStartDate = "";
-							var strNumSessions = "";
-							innerHTML += "<span>This is an online class starting " + strStartDate + " with " + strNumSessions + " sessions.</span><br>";
+							var iNumSessions = 0;
+							var schedule = JSON.parse(m_holdData.onlineclassesdata.schedule);
+							var strStartDate = m_getJustDate(schedule[0]);
+							for (var i = 0; i < 8; i++) {
+								
+								if(schedule[i].date) {
+									iNumSessions++;
+								}
+							}
+							innerHTML += "<span>This is an online class starting " + strStartDate + " with " + iNumSessions + " sessions.</span><br>";
 							innerHTML += "<span>There are " + m_holdData.buyers.length + " users enrolled.</span><br>";
 
 						} else {
@@ -181,6 +195,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 
 						$("#ProjectData").append(innerHTML);
+					}
+
+					var m_getJustDate = function(objDateDuration) {
+
+						var mntDate = moment(objDateDuration.date).local();
+						return mntDate.format('MMMM Do YYYY');
 					}
 
 					var m_setBuyersTable = function () {
