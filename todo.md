@@ -19,7 +19,7 @@
         - Allow instructor to overbook by inviting multiple waitlist people.
     - Invited tab
         - Fetch data. Do it. **Done. Test it.**
-        - Implement 1 second countdown timer in #InvitedTable
+        - Implement 1 second countdown timer in #InvitedTable. This involves both counting down and, when it reaches 0, removing the waitlist table record from the DB (maybe sending an email) and from the invited table in memory and rebuilding the datatable.
     - Write m_setRecentRefundsTable
     - In fnRemoveBuyer add entry to m_holdData.recentRefunds and redraw that table
     - In fnInvite finish writing posting.done
@@ -40,7 +40,6 @@
 - Cron.js
     - Finish job2
     - Add waitlist reminder emails
-    - Got a bug noted at 1PM. Huh?
     - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
     + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
         * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.

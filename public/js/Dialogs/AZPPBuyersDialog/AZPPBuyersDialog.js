@@ -487,7 +487,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var posting = $.post("/BOL/UtilityBO/UndoPurchase", 
 							{
 								projectId: m_holdData.project.id,
-								userid: iUserid,
+								userid: iUserId,
 								refund: bRefund
 							},
 							'json'
@@ -566,7 +566,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var posting = $.post("/BOL/UtilityBO/SendClassInvite", 
 							{
 								projectId: m_holdData.project.id,
-								userid: iUserid
+								userid: iUserId
 							},
 							'json'
 						);
