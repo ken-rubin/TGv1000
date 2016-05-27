@@ -207,7 +207,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						var strHTML = '<thead><tr><th>id</th><th>userName</th>';
 						if (!m_bProduct) {
-							strHTML += '<th></th><th></th>';
+							strHTML += '<th>Remove w/Refund</th><th>Remove w/o Refund</th>';
 						}
 						strHTML += '<th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
 						strHTML += '<tfoot><tr><th></th><th>userName</th>';
@@ -228,8 +228,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.userName + '</td>';
 								// buttons for classes and onlineclasses
 								if (!m_bProduct) {
-									strHTML += '<td class="dt-body-center t4btnb"><button type="button" name="RemRefund-' + u.id + '">Remove w/Refund</button></td>'
-									strHTML += '<td class="dt-body-center t4btnb"><button type="button" name="RemNoRefund-' + u.id + '">Remove w/no Refund</button></td>'
+									strHTML += '<td class="dt-body-center t4btnb"><button type="button" name="RemRefund-' + u.id + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></td>'
+									strHTML += '<td class="dt-body-center t4btnb"><button type="button" name="RemNoRefund-' + u.id + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></td>'
 								}
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
@@ -266,6 +266,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								scrollX: true,
 								scrollCollapse: true,
 								dom: 'lrtip'	// Remove top right search input. 'f' is excluded.
+								// ,
+								// columnDefs: [
+								// 	{width: "20%", targets: [2,3]}
+								// ]
 							}
 						);
 
@@ -290,8 +294,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					
 					var m_setWaitlistedTable = function () {
 
-						var strHTML = '<thead><tr><th>id</th><th>userName</th><th></th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
-						strHTML += '<tfoot><tr><th></th><th>userName</th><th></th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>w/l since</th><th>Invite</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						strHTML += '<tfoot><tr><th></th><th>userName</th><th></th><th></th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></tfoot>';
 						strHTML += '<tbody>';
 
 						m_holdData.waitlisted.forEach(
@@ -303,8 +307,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.id + '</td>';
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
+								// On waitlist since
+								strHTML += '<td>2016-07-08 23:45</td>'
 								// Send email giving opportun ity to enroll.
-								strHTML += '<td class="dt-body-center t4btnw"><button type="button" name="Invite-' + u.id + '">Invite to Enroll</button></td>'
+								strHTML += '<td class="dt-body-center t4btnw"><button type="button" name="Invite-' + u.id + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></td>'
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
 								// lastName
@@ -329,7 +335,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					    // Set up for searching
 					    $('#WaitlistedTable tfoot th').each( function () {
 					        var title = $(this).text();
-					        if (title) {
+					        if (title && title !== 'w/l since') {
 					        	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
 					        }
 					    } );
@@ -364,7 +370,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setInvitedTable = function () {
 
-						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>Expires</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>expires in</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
 						strHTML += '<tbody>';
 
 						m_holdData.invited.forEach(
@@ -376,8 +382,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.id + '</td>';
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
-								// invitation expires dt.
-								strHTML += '<td>2016-0708 23:45</td>'
+								// invitation expires in hh:mm:ss.
+								strHTML += '<td>23:45:02</td>'
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
 								// lastName
@@ -433,13 +439,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						var iUserId = parseInt(parts[1], 10);
 						switch (parts[0]) {
 							case 'RemRefund':
-								fnRemoveBuyer(iUserid, true);
+								fnRemoveBuyer(iUserId, true);
 								break;
 							case 'RemNoRefund':
-								fnRemoveBuyer(iUserid, false);
+								fnRemoveBuyer(iUserId, false);
 								break;
 							case 'Invite':
-								fnInvite(iUserid)
+								fnInvite(iUserId)
 								break;
 						}
 					}
@@ -472,7 +478,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 								if (!result) {
 
-									BootstrapDialog.show("OK. Have it your way.");
+									BootstrapDialog.show({message: "OK. Have it your way."});
 									return;
 								}
 							}
@@ -528,6 +534,35 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						// In the case of an Accepted Invitation, when the user clicks the Accept link in the email, he is taken to the login page; after login he is
 						// taken directly to NewProjectDialog in mode 2 with the credit card entry form visible.
+
+						var iUserIndex = null;
+						for (var i = 0; i < m_holdData.waitlisted.length; i++) {
+
+							var userIth = m_holdData.waitlisted[i];
+							if (userIth.id === iUserId) {
+
+								iUserIndex = i;
+								break;
+							}
+
+							if (!iUserIndex) {
+
+								errorHelper.show("Strange error: we could not find the user in the table. This is rather impossible.");
+								return;
+							}
+						}
+
+						BootstrapDialog.confirm("Are you sure you want to invite " + m_holdData.buyers[iUserIndex].userName + " to enroll in this class?",
+							function (result) {
+
+								if (!result) {
+
+									BootstrapDialog.show({message: "OK. Have it your way."});
+									return;
+								}
+							}
+						);
+
 						var posting = $.post("/BOL/UtilityBO/SendClassInvite", 
 							{
 								projectId: m_holdData.project.id,

@@ -397,14 +397,14 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 
 				try {
 
-					var strQuery = "select w.*, u.*, p.name from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
+					var strQuery = "select w.*, u.userName, p.name from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
 					sql.execute (
 						strQuery,
 						function(rows) {
 							if (rows.length) {
 
-								rows.forEach(row, 
-									function() {
+								rows.forEach( 
+									function(row) {
 
 										// If within 4 hours of expiring, send a warning version of the invite.
 

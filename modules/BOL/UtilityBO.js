@@ -433,7 +433,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
                         // This function adds passOn.waitlisted.
 
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is null order by dtWaitlisted asc);";
+                        var strQuery = "select u.*, ug.name as usergroupName, w.dtWaitlisted from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id inner join " + self.dbname + "waitlist w on w.userId=u.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is null order by dtWaitlisted asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -452,7 +452,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers, waitlisted.
                         // This function adds passOn.invited.
 
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is not null order by dtInvited asc);";
+                        var strQuery = "select u.*, ug.name as usergroupName, w.dtWaitlisted, w.dtInvited from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id inner join " + self.dbname + "waitlist w on w.userId=u.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is not null order by dtInvited asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {
