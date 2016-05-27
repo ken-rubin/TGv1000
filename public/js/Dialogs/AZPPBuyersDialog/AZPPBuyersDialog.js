@@ -465,15 +465,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								iUserIndex = i;
 								break;
 							}
-
-							if (!iUserIndex) {
-
-								errorHelper.show("Strange error: we could not find the user in the table. This is rather impossible.");
-								return;
-							}
 						}
 
-						BootstrapDialog.confirm("Are you sure you want to remove " + m_holdData.buyers[iUserIndex].userName + " from this class?",
+						if (!iUserIndex) {
+
+							errorHelper.show("Strange error: we could not find the user in the table. This is rather impossible.");
+							return;
+						}
+
+						var userName = m_holdData.buyers[iUserIndex].userName;
+						BootstrapDialog.confirm("Are you sure you want to remove " + userName + " from this class?",
 							function (result) {
 
 								if (!result) {
@@ -506,7 +507,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										m_holdData.project.numEnrollees--;
 										m_setBuyersTable();
 
-										errorHelper.show('The project has been deleted.' + (bRefund ? ' And the refund has been sent through Stripe.' : ''));
+										errorHelper.show(userName + "'s project has been deleted." + (bRefund ? " The refund has been issued through Stripe." : " No refund was processed."));
 
 									} else {
 
@@ -544,15 +545,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								iUserIndex = i;
 								break;
 							}
-
-							if (!iUserIndex) {
-
-								errorHelper.show("Strange error: we could not find the user in the table. This is rather impossible.");
-								return;
-							}
 						}
 
-						BootstrapDialog.confirm("Are you sure you want to invite " + m_holdData.buyers[iUserIndex].userName + " to enroll in this class?",
+						if (!iUserIndex) {
+
+							errorHelper.show("Strange error: we could not find the user in the table. This is rather impossible.");
+							return;
+						}
+
+						var userName = m_holdData.buyers[iUserIndex].userName;
+						BootstrapDialog.confirm("Are you sure you want to invite " + userName + " to enroll in this class?",
 							function (result) {
 
 								if (!result) {
@@ -587,7 +589,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 
 
-										errorHelper.show('The user has been sent an email about the class opening has been deleted. He/she has 24 hours to respond.');
+										errorHelper.show(userName + ' has been sent an email about the opening in this class. He/she has 24 hours to respond.');
 
 									} else {
 
