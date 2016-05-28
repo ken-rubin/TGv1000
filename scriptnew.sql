@@ -1260,6 +1260,15 @@ begin
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
+    
+    if @dbstate = 27 THEN
+    
+		ALTER TABLE `tgv1000`.`waitlist` 
+			ADD COLUMN `fourHourWarningSent` TINYINT(1) NULL DEFAULT 0 AFTER `dtInvited`;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
 
 end//
 

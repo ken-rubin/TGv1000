@@ -408,14 +408,14 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 								rows.forEach( 
 									function(row) {
 
-										var momDtExpires = moment(rows[0].dtInvited).add(1, 'd');
+										var momDtExpires = moment(row.dtInvited).add(1, 'd');
 
-										if (momNow.isAfter(momDtExpires)) {	// Invite is expired, delete waitlist row, send an expired email and, if there's someone else on the waitlist, invite that user, giving a new 24-hour deadline.
-
-
+										if (momNow.isAfter(momDtExpires)) {	// Invite is expired, delete waitlist row, send an expired invitation email and, if there's someone else on the waitlist, invite that user, starting a new 24-hour deadline.
 
 
-										} else if (momDtExpires.isBefore(momIn4Hours)) { // If within 4 hours of expiring, send a warning version of the invite.
+
+
+										} else if (momDtExpires.isBefore(momIn4Hours) && !row.fourHourWarningSent) { // If within 4 hours of expiring, just send an update notification version of the invite. WE MUST SEND THIS ONLY ONCE!!! Almost blew that one.
 
 
 
