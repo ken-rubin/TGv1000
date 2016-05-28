@@ -317,8 +317,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
 								// On waitlist since
-								var momDtWaitlisted = moment(u.dtWaitlisted);
-								strHTML += '<td>' + momDtWaitlisted.format() +'</td>';
+								var momDtWaitlisted = moment(u.dtWaitlisted).local();
+								strHTML += '<td>' + momDtWaitlisted.format('YYYY-MM-DD H:mm:ss') +'</td>';
 								// Send email giving opportun ity to enroll.
 								strHTML += '<td class="dt-body-center t4btnw"><button type="button" name="Invite-' + u.id + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></td>';
 								// firstName
@@ -380,7 +380,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_setInvitedTable = function () {
 
-						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>expires in</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
+						var strHTML = '<thead><tr><th>id</th><th>userName</th><th>expires</th><th>firstName</th><th>lastName</th><th>usergroup</th><th>zipcode</th><th>timezone</th></tr></thead>';
 						strHTML += '<tbody>';
 
 						m_holdData.invited.forEach(
@@ -392,8 +392,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								strHTML += '<td>' + u.id + '</td>';
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
-								// invitation expires in hh:mm:ss.
-								strHTML += '<td>23:45:02</td>'
+								// invitation expires in .... (pretty time)
+								var momInvitationExpires = moment(u.dtInvited).add(1, 'd');
+								var momNow = new moment();
+								strHTML += '<td>' + momNow.to(momInvitationExpires) + '</td>';
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
 								// lastName

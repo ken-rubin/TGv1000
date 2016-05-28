@@ -397,6 +397,8 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 
 				try {
 
+					var momNow = new moment();
+					var momIn4Hours = momNow.add(4, 'h');
 					var strQuery = "select w.*, u.userName, p.name from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
 					sql.execute (
 						strQuery,
@@ -406,14 +408,20 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 								rows.forEach( 
 									function(row) {
 
-										// If within 4 hours of expiring, send a warning version of the invite.
+										var momDtExpires = moment(rows[0].dtInvited).add(1, 'd');
+
+										if (momNow.isAfter(momDtExpires)) {	// Invite is expired, delete waitlist row, send an expired email and, if there's someone else on the waitlist, invite that user, giving a new 24-hour deadline.
 
 
 
-										// If expired, send an expired email and, if there's someone else on the waitlist, invite that user, giving a new 24-hour deadline.
+
+										} else if (momDtExpires.isBefore(momIn4Hours)) { // If within 4 hours of expiring, send a warning version of the invite.
 
 
-										// Some will be in their first 20 hours. We do nothing with them.
+
+										}
+
+										// Any that fall through are in their first 20 hours. We do nothing with them.
 									}
 								);
 							}
