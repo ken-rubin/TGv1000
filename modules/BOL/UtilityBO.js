@@ -136,7 +136,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // Processes a Stripe refund and upon success delete the purchased project (cascading).
 
             console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
-            // req.body.projectId: product project id
+            // req.body.projectId: product project id -- NOT USER'S PROJECT TO DELETE
             // req.body.userid: iUserid of owner of project
             // req.body.refund: bRefund
 
@@ -159,6 +159,85 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                         chargeId = rows[0].chargeId;
                         id = rows[0].id;
+
+                        var charge = stripe.refunds.create(
+                            {
+                                charge: chargeId
+                            },
+                            function(err, refund) {
+
+                                if (err) {
+                                    res.json({
+                                        success: false,
+                                        message: "Received this error processing refund with Stripe: " + err.message
+                                    });
+                                } else {
+
+                                    // Do a cascading deletion of the project.
+                                    var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                                    sql.execute(
+                                        strQuery,
+                                        function(rows) {
+
+                                            // Success. Add a row to the refunds table. id is AUTO_INCREMENT and dtRefund defaults to CURRENT_TIMESTAMP.
+                                            var strQuery2 = "insert " + self.dbname + "refunds (userId, projectId, refundId) values(" + req.body.userId + "," + req.body.projectId + ",'" + refund.id + "');";
+                                            sql.execute(
+                                                strQuery2,
+                                                function(rows) {
+
+                                                    // Send a refund processed email to the user.
+                                                    var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
+                                                    var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
+                                                    mailOptions = {
+                                             
+                                                        from: "TechGroms <techgroms@gmail.com>", // sender address
+                                                        to: (!aORz) ? userIth.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
+                                                        subject: "A refund has been issued for the Next Wave Coders class", // Subject line
+                                                        text: "Hi, " + userIth.firstName + ". " +
+                                                        "For your reference, your refund ID is " + refund.id + ". This refund should appear soon in your card account." +
+                                                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+                                                        html: "Hi, " + userIth.firstName + ". " +
+                                                        "For your reference, your refund ID is " + refund.id + ". This refund should appear soon in your card account." +
+                                                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+                                                    };
+
+                                                    mailWrapper.mail(mailOptions,
+                                                        function(error) {
+
+                                                            if (error) {
+
+                                                                return res.json({
+                                                                    success: false,
+                                                                    message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + error.message
+                                                                });
+                                                            }
+
+                                                            // Return success
+                                                            return res.json({
+                                                                success: true
+                                                            });
+                                                        }
+                                                    );
+                                                },
+                                                function(strError) {
+
+                                                    return res.json({
+                                                        success: false,
+                                                        message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + strError
+                                                    });
+                                                }
+                                            );
+                                        },
+                                        function(strError) {
+                                            return res.json({
+                                                success: false,
+                                                message: "Received this error deleting user's project AFTER the refund was processed successfully: " + strError
+                                            });
+                                        }
+                                    );
+                                }
+                            }
+                        );
                     },
                     function(strError) {
 
@@ -166,63 +245,6 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             success: false,
                             message: "Received this error retrieving charge Id: " + strError
                         });
-                    }
-                );
-
-                var charge = stripe.refunds.create(
-                    {
-                        charge: chargeId
-                    },
-                    function(err, refund) {
-
-                        if (err) {
-                            res.json({
-                                success: false,
-                                message: "Received this error processing refund with Stripe: " + err.message
-                            });
-                        } else {
-
-                            // Do a cascading deletion of the project.
-                            var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
-                            sql.execute(
-                                strQuery,
-                                function(rows) {
-
-                                    // Success. Add a row to the refunds table.
-                                    var strQuery2 = "insert " + self.dbname + " (userId, projectId, refundId) values(" + req.body.userId + "," + req.body.projectId + ",'" + refund.id + "');";
-                                    sql.execute(
-                                        strQuery2,
-                                        function(rows) {
-
-                                            // Add a refund processed email to the user.
-
-
-
-
-
-
-                                            // Return success
-                                            res.json({
-                                                success: true
-                                            });
-                                        },
-                                        function(strError) {
-
-                                            return res.json({
-                                                success: false,
-                                                message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + strError
-                                            });
-                                        }
-                                    );
-                                },
-                                function(strError) {
-                                    return res.json({
-                                        success: false,
-                                        message: "Received this error deleting user's project AFTER the refund was processed successfully: " + strError
-                                    });
-                                }
-                            );
-                        }
                     }
                 );
             } else {
@@ -243,31 +265,31 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         }
 
                         id = rows[0].id;
+
+                        // Now do the cascading deletion of the project.
+                        var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+
+                                // Return success
+                                res.json({
+                                    success: true
+                                });
+                            },
+                            function(strError) {
+                                return res.json({
+                                    success: false,
+                                    message: "Received this error deleting user's project: " + strError
+                                });
+                            }
+                        );
                     },
                     function(strError) {
 
                         return res.json({
                             success: false,
                             message: "Received this error retrieving user's project Id: " + strError
-                        });
-                    }
-                );
-
-                // Now do the cascading deletion of the project.
-                var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
-                sql.execute(
-                    strQuery,
-                    function(rows) {
-
-                        // Return success
-                        res.json({
-                            success: true
-                        });
-                    },
-                    function(strError) {
-                        return res.json({
-                            success: false,
-                            message: "Received this error deleting user's project: " + strError
                         });
                     }
                 );
@@ -340,7 +362,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // (3) array of purchasers (users); 
             // (4) array of waitlisted users, if any (in order).
             // (5) array of users in the 24-hour period after being invited to enroll. Will be displayed with active countdown.
-            // (6) array of up to 10 latest refunds.
+            // (6) array of up to 100 latest refunds.
 
             async.waterfall(
                 [
@@ -725,6 +747,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         try {
 
             console.log("Entered UtilityBO/routeSendClassInvite with req.body = " + JSON.stringify(req.body));
+            // req.body.projectId -- if of product project user is being invited to enroll in (getting off waitlist)
+            // req.body.userId -- id of user being invited
             
 
         } catch (e) {

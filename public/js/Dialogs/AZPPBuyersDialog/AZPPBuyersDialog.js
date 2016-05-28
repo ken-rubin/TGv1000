@@ -92,35 +92,41 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							m_dialog = dialogItself;
 
-							var posting = $.post("/BOL/UtilityBO/GetPPBuyers", 
-								{
-									projectId: m_iProjectId
-								},
-								'json');
-							posting.done(function(data){
-								
-								try {
+							m_refreshData();
 
-									if (data.success) {
-
-										m_bClass = data.hasOwnProperty("classesdata");
-										m_bOnlineClass = data.hasOwnProperty("onlineclassesdata");
-										m_bProduct = data.hasOwnProperty("productsdata");
-										m_holdData = data;
-										m_setDataDisplay();
-
-									} else {
-
-										// !data.success
-										 throw new Error(data.message);
-									}
-								} catch (e) {
-
-									errorHelper.show(e);
-								}
-  							});
 						} catch (e) { errorHelper.show(e); }
 					};
+
+					var m_refreshData = function () {
+
+						var posting = $.post("/BOL/UtilityBO/GetPPBuyers", 
+							{
+								projectId: m_iProjectId
+							},
+							'json');
+						posting.done(function(data){
+							
+							try {
+
+								if (data.success) {
+
+									m_bClass = data.hasOwnProperty("classesdata");
+									m_bOnlineClass = data.hasOwnProperty("onlineclassesdata");
+									m_bProduct = data.hasOwnProperty("productsdata");
+									m_holdData = data;
+									m_setDataDisplay();
+
+								} else {
+
+									// !data.success
+									 throw new Error(data.message);
+								}
+							} catch (e) {
+
+								errorHelper.show(e);
+							}
+						});
+					}
 
 					var m_setDataDisplay = function () {
 
@@ -133,9 +139,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// success [bool]
 
 						if (!m_bClass) {
-							// Completely remove the #Waitlisted tab by removing $(".remove").
+							// Completely remove all tabs other than #Buyers by removing $(".remove").
 							$(".remove").remove();
 						}
+
 						jqTabs = $("#tabs");
 						jqTabs.on('tabscreate', fnTabscreate);
 						jqTabs.tabs();
@@ -148,10 +155,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						m_setProjectData();
 						m_setBuyersTable();
+
 						if (m_bClass) {
 							m_setWaitlistedTable();
 							m_setInvitedTable();
 						}
+
 						m_setRecentRefundsTable();
 					}
 
@@ -308,9 +317,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								// userName
 								strHTML += '<td>' + u.userName + '</td>';
 								// On waitlist since
-								strHTML += '<td>2016-07-08 23:45</td>'
+								var momDtWaitlisted = moment(u.dtWaitlisted);
+								strHTML += '<td>' + momDtWaitlisted.format() +'</td>';
 								// Send email giving opportun ity to enroll.
-								strHTML += '<td class="dt-body-center t4btnw"><button type="button" name="Invite-' + u.id + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></td>'
+								strHTML += '<td class="dt-body-center t4btnw"><button type="button" name="Invite-' + u.id + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button></td>';
 								// firstName
 								strHTML += '<td>' + u.firstName + '</td>';
 								// lastName
@@ -501,6 +511,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (data.success) {
 
 										// If there was a refund requested, a row has been added to the refunds table.
+										// TODO: We'll need to refresh that datatable somehow.
 
 										// Delete the user from m_holdData.buyers and reset #BuyersTable.
 										m_holdData.buyers.splice(iUserIndex, 1);
