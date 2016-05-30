@@ -389,7 +389,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 			}
 		);
 
-		// Schedule a job to run every minute and check for expiring or expired waitlist invitees.
+		// Schedule a job that runs every minute and checks for expiring-within-4-hours or expired invitees.
 		var rule2 = new schedule.RecurrenceRule();
 		rule2.minute = [new schedule.Range()]; // every minute
 
@@ -399,128 +399,175 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 
 					var momNow = new moment();
 					var momIn4Hours = momNow.add(4, 'h');
-					var strQuery = "select w.*, u.userName, u.firstName, p.name, p.id as projectId from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
+
+					// Retrieve all records (plus a bit more) from waitlist where the user has been invited to enroll or decline.
+					var strQuery = "select w.*, u.userName, u.firstName, p.name as projectName, p.id as projectId from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
 					sql.execute (
 						strQuery,
 						function(rows) {
-							if (rows.length) {
 
-								rows.forEach( 
-									function(row) {
+							// Loop through all waitlist records for which we're awaiting Accept or Decline.
+							async.eachSeries(rows,
+								function(row, outerCb) {
 
-										var momDtExpires = moment(row.dtInvited).add(1, 'd');
+									// row contains one applicable waitlist row++.
+									var momDtExpires = moment(row.dtInvited).add(1, 'd');
 
-										if (momNow.isAfter(momDtExpires)) {	// Invite is expired, delete waitlist row, send an expired invitation email and, if there's someone else on the waitlist, invite that user, starting a new 24-hour deadline.
+									if (momNow.isAfter(momDtExpires)) {	// Invite is expired, delete waitlist row, send an expired invitation email and, if there's someone else on the waitlist, invite that user, starting a new 24-hour deadline.
 
-											async.waterfall(
-												[
-													// (1) Delete waitlist row.
-													function(cb) {
-														sql.execute(
-															"delete from " + self.dbname + "waitlist where id=" + row.id + ";",
-															function (rows) {
-																return cb(null, 
-																	{
-																		projectName: row.name,
-																		projectId: row.projectId,
-																		userName: row.userName,
-																		firstName: row.firstName
+										async.waterfall(
+											[
+												// (1) Delete waitlist row.
+												function(innerCb) {
+													sql.execute(
+														"delete from " + self.dbname + "waitlist where id=" + row.id + ";",
+														function (rows) {
+															// We assume it worked. Pretty safe assumption.
+															return innerCb(null, 
+																{
+																	waitlistId: row.id,
+																	projectName: row.projectName,
+																	projectId: row.projectId,
+																	userName: row.userName,
+																	firstName: row.firstName
+																}
+															);
+														},
+														function (strError) {
+															return innerCb(new Error(strError), {});
+														}
+													);
+												},
+												// (2) Send expired email.
+												function(passOn, innerCb) {
+
+							                        var aORz = (passOn.userName === 'a@a.com' || passOn.userName === 'z@z.com');
+							                        var mailOptions = {
+							                 
+							                            from: "TechGroms <techgroms@gmail.com>", // sender address
+							                            to: (!aORz) ? passOn.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
+							                            subject: "Your invitation to enroll in " + passOn.projectName + " has expired.", // Subject line
+							                            text: "Hi, " + passOn.firstName + ". " +
+							                            "We're sorry to say that your invitation to enroll was good for only 24 hours, and we had to invite the next person on the waitlist. " +
+							                            "Please keep checking back for the next class that interests you." +
+								                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+							                            html: "Hi, " + passOn.firstName + ". " +
+							                            "We're sorry to say that your invitation to enroll was good for only 24 hours, and we had to invite the next person on the waitlist. " +
+							                            "Please keep checking back for the next class that interests you." +
+								                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+							                        };
+
+							                        mailWrapper.mail(mailOptions,
+							                        	function(error) {
+
+							                        		if (error) { return innerCb(new Error("Error sending invitation expired email: " + error.toString()), null); }
+								                            return innerCb(null, passOn);
+							                        	}
+							                        );
+												},
+												// (3) Invite next person waitlisted for this class if any.
+												function(passOn, innerCb) {
+
+													var strQuery = "select userName, firstName from " + self.dbname + "user where id=(select userId from " + self.dbname + "waitlist where projectId=" + passOn.projectId + " and dtInvited is null order by dtWaitlisted asc limit 1);";
+													sql.execute(
+														strQuery,
+														function(rows) {
+															if (rows.length === 0) {
+																return innerCb(null, passOn); // No one left to invite. This is not an error.
+															}
+															if (rows.length > 1) {
+																return innerCb(new Error("More than 1 row retrieved when trying to fetch top person on waitlist for class  " + passOn.projectName), passOn); // This is an error in the query.
+															}
+
+															var row = rows[0];
+															// Use async.series to send the invitation email and then update dtInvited in the user's waitlist record in the DB.
+															async.series(
+																[
+																	function(wayInnerCb) {
+
+																		// rows[0] contains user to invite (userName and firstName).
+																		// Send e-mail and update waitlist row dtInvited.
+												                        var aORz = (row.userName === 'a@a.com' || row.userName === 'z@z.com');
+												                        var mailOptions = {
+												                 
+												                            from: "TechGroms <techgroms@gmail.com>", // sender address
+												                            to: (!aORz) ? row.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
+												                            subject: "Waitlists do work! Here is your invitation to enroll in " + passOn.projectName + ".", // Subject line
+												                            text: "Hi, " + row.firstName + ". " +
+												                            "" +
+												                            "" +
+													                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+												                            html: "Hi, " + row.firstName + ". " +
+												                            "" +
+												                            "" +
+													                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+												                        };
+
+												                        mailWrapper.mail(mailOptions,
+												                        	function(error) {
+
+												                        		if (error) { return wayInnerCb(new Error("Error sending invitation expired email: " + error.toString())); }
+													                            return wayInnerCb(null);
+												                        	}
+												                        );
+																	},
+																	function(wayInnerCb) {
+
+												                        // And update dtInvited in the correct waitlist record.
+												                        var strQuery = "update " + self.dbname + "waitlist set dtInvited=CURRENT_TIMESTAMP where id=" + passOn.waitlistId + ";";
+												                        sql.execute(
+												                        	strQuery,
+												                        	function(rows) {
+												                        		// Assume it worked
+												                        		return wayInnerCb(null);
+												                        	},
+												                        	function(strError) {
+												                        		return wayInnerCb(new Error(strError));
+												                        	}
+												                        );
 																	}
-																);
-															},
-															function (strError) {
-																return db(new Error(strError), {});
-															}
-														);
-													},
-													// (2) Send expired email.
-													function(passOn, cb) {
-
-								                        var aORz = (passOn.userName === 'a@a.com' || passOn.userName === 'z@z.com');
-								                        mailOptions = {
-								                 
-								                            from: "TechGroms <techgroms@gmail.com>", // sender address
-								                            to: (!aORz) ? passOn.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
-								                            subject: "Your invitation to enroll in " + passOn.projectName + " has expired.", // Subject line
-								                            text: "Hi, " + passOn.firstName + ". " +
-								                            "We're sorry to say that your invitation to enroll was good for only 24 hours, and we had to invite the next person on the waitlist. " +
-								                            "Please keep checking back for the next class that interests you." +
-									                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
-								                            html: "Hi, " + passOn.firstName + ". " +
-								                            "We're sorry to say that your invitation to enroll was good for only 24 hours, and we had to invite the next person on the waitlist. " +
-								                            "Please keep checking back for the next class that interests you." +
-									                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
-								                        };
-
-								                        mailWrapper.mail(mailOptions,
-								                        	function(error) {
-
-								                        		if (error) { return cb(new Error("Error sending invitation expired email: " + error.toString()), null); }
-									                            return cb(null, passOn);
-								                        	}
-								                        );
-													},
-													// (3) Invite next person waitlisted for this class if any.
-													function(passOn, cb) {
-
-														var strQuery = "select userName, firstName from " + self.dbname + "user where id=(select userId from " + self.dbname + "waitlist where projectId=" + passOn.projectId + " and dtInvited is null order by dtWaitlisted asc limit 1);";
-														sql.execute(
-															strQuery,
-															function(rows) {
-																if (rows.length === 0) {
-																	return cb(null, passOn); // No one left to invite.
+																],
+																function(err) {
+																	return innerCb(err, passOn);
 																}
-																if (rows.length > 1) {
-																	return cb(new Error("More than 1 row retrieved when trying to fetch top person on waitlist for class  " + passOn.projectName), passOn);
-																}
-																// rows[0] contains user to invite (userName and firstName).
-																// Send e-mail and update waitlist row dtInvited.
-										                        var aORz = (rows[0].userName === 'a@a.com' || rows[0].userName === 'z@z.com');
-										                        mailOptions = {
-										                 
-										                            from: "TechGroms <techgroms@gmail.com>", // sender address
-										                            to: (!aORz) ? rows[0].userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
-										                            subject: "Waitlists do work! Here is your invitation to enroll in " + passOn.projectName + ".", // Subject line
-										                            text: "Hi, " + rows[0].firstName + ". " +
-										                            "" +
-										                            "" +
-											                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
-										                            html: "Hi, " + row.firstName + ". " +
-										                            "" +
-										                            "" +
-											                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
-										                        };
-
-										                        mailWrapper.mail(mailOptions,
-										                        	function(error) {
-
-										                        		if (error) { return cb(new Error("Error sending invitation expired email: " + error.toString()), null); }
-											                            return cb(null, passOn);
-										                        	}
-										                        );
-															},
-															function(strError) {
-																return cb(new Error("Error trying to invite next person on waitlist: " + strError), passOn);
-															}
-														);
-													}
-												],
-												function(err, passOn) {
-													if (err) {
-														console.log("This error received in 1-minute cron job expired invitation process: " + err.message);
-													}
+															);
+														},
+														function(strError) {
+															return innerCb(new Error("Error trying to invite next person on waitlist: " + strError), passOn);
+														}
+													);
 												}
-											);
-										} else if (momDtExpires.isBefore(momIn4Hours) && !row.fourHourWarningSent) { // If within 4 hours of expiring, just send an update notification version of the invite. WE MUST SEND THIS ONLY ONCE!!! Almost blew that one.
+											],
+											// This is innerCb.
+											function(err, passOn) {
+												return outerCb(err);
+											}
+										);
+									} else if (momDtExpires.isBefore(momIn4Hours) && !row.fourHourWarningSent) { 
+
+										// If within 4 hours of expiring, just send an update notification version of the invite.
+										// WE MUST SEND THIS ONLY ONCE!!!
+										// So, set update fourHourWarningSent in DB.
 
 
 
-										}
 
-										// Any that fall through are in their first 20 hours. We do nothing with them.
+
+
+
+
 									}
-								);
-							}
+
+									// Any that fall through are in their first 20 hours. We do nothing with them.
+									return outerCb(null);
+								},
+								// This is outerCb.
+								function(err) {
+									if (err) {
+										console.log("This error received in 1-minute cron job expired invitation process: " + err.message);
+									}
+								}
+							);
 						},
 						function(strError) {
 							throw new Error("Received this error fetching Invitees: " + strError);
