@@ -547,15 +547,54 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 
 										// If within 4 hours of expiring, just send an update notification version of the invite.
 										// WE MUST SEND THIS ONLY ONCE!!!
-										// So, set update fourHourWarningSent in DB.
+										// So, then set update fourHourWarningSent in DB.
+										async.series(
+											[
+												function(innerCb2) {
 
+							                        var aORz = (row.userName === 'a@a.com' || row.userName === 'z@z.com');
+							                        var mailOptions = {
+							                 
+							                            from: "TechGroms <techgroms@gmail.com>", // sender address
+							                            to: (!aORz) ? row.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
+							                            subject: "Waitlists do work! Here is your invitation to enroll in " + passOn.projectName + ".", // Subject line
+							                            text: "Hi, " + row.firstName + ". " +
+							                            "" +
+							                            "" +
+								                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+							                            html: "Hi, " + row.firstName + ". " +
+							                            "" +
+							                            "" +
+								                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+							                        };
 
+							                        mailWrapper.mail(mailOptions,
+							                        	function(error) {
 
+							                        		if (error) { return wayInnerCb(new Error("Error sending invitation expired email: " + error.toString())); }
+								                            return wayInnerCb(null);
+							                        	}
+							                        );
+												},
+												function(innerCb2) {
 
-
-
-
-
+							                        var strQuery = "update " + self.dbname + "waitlist set fourHourWarningSent=1 where id=" + row.id + ";";
+							                        sql.execute(
+							                        	strQuery,
+							                        	function(rows) {
+							                        		// Assume it worked
+							                        		return innerCb2(null);
+							                        	},
+							                        	function(strError) {
+							                        		return innerCb2(new Error(strError));
+							                        	}
+							                        );
+												}
+											],
+											function(err) {
+												return outerCb(err);
+											}
+										);
 									}
 
 									// Any that fall through are in their first 20 hours. We do nothing with them.
