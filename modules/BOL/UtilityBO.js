@@ -749,6 +749,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             console.log("Entered UtilityBO/routeSendClassInvite with req.body = " + JSON.stringify(req.body));
             // req.body.projectId -- if of product project user is being invited to enroll in (getting off waitlist)
             // req.body.userId -- id of user being invited
+
+
+
+
+
+
             
 
         } catch (e) {

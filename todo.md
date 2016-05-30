@@ -8,7 +8,8 @@
     - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
 - Saw some sort of display problem in horizontal scroller in one of the image search dialogs.
 - AZPPBuyersDialog.js
-    - The way I've had to do the buttons on the Buyers and Waitlisted tabs is ugly. Work on them.
+    - The way I've had to do the buttons on the Buyers and Waitlisted tabs is ugly. Work on them. In fact, work on many column width problems (like also w/l since).
+    - As changes are made that affect the DB (and thus each of the datatables, I could do manual stuff or I could just refresh from scratch. Which way is better? **I think refreshing from the DB and rebuilding the datatables is better for several reasons: (1) easier; (2) just being used by admin users; (3) functionality is used infrequently, so why bother?
     - Buyers tab
         - Finish dropping someone from a class and (optionally) giving a refund thru Stripe. **Done. Needs testing.**
         - Send an email to the user if a refund has been processed. **Done. Needs testing.**
@@ -41,10 +42,9 @@
 - Cron.js
     - Finish job2
     - Add waitlist reminder emails
-    - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
+    - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist.
     + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
         * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-        * Add waitlist reminders emails.
 - UtilityBO.js
     - When placing charge, send our own email in addition to Stripe's
     - In routeUndoPurchase, send refund processed email if refund was processed; also probably want to return refundId with success again so that #RecentRefunds can be updated
