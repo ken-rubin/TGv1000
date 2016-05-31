@@ -83,12 +83,36 @@ $(document).ready(function () {
 					// Cause the code and designer panels to size themselves.
 					$(window).resize();
 
+					///////////////////////////////////////////////////////////
+					//
+					// Following are all of our handlers for URL-encoded launches due to users clicking on email-included links.
+					//
+					//////////////////////////////////////////////////////////
+
 					// Look for password reset token.
 					strFromURL = m_functionCheckForURLEncoding("reset");
-					if (strFromURL !== "") {
+					if (strFromURL) {
 						
 						m_functionShowPasswordResetDialog(strFromURL, errorHelper);
+						return;
 					}
+
+					// Accept invitation to enroll in online class.
+					strFromURL = m_functionCheckForURLEncoding("accept");
+					if (strFromURL) {
+
+						m_functionHandleAcceptEmailClick();
+						return;
+					}
+
+					// Decline invitation to enroll in online class.
+					strFromURL = m_functionCheckForURLEncoding("decline");
+					if (strFromURL) {
+
+						m_functionHandleDeclineEmailClick();
+						return;
+					}
+
 				} catch (e) {
 
 					errorHelper.show(e);
@@ -101,15 +125,25 @@ $(document).ready(function () {
 	}
 });
 
-var m_functionCheckForURLEncoding = function( name ) {
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null )
-    return "";
-  else
-    return decodeURI(results[1]);
+var m_functionCheckForURLEncoding = function(name) {
+
+	var mname = name.replace(/[\[]/, "\\\[").replace(/[\]]/,"\\\]");
+	var regexS = "[\\?&]" + mname + "=([^&#]*)";
+	var regex = new RegExp(regexS);
+	var results = regex.exec(window.location.href);
+	if(results == null) {
+		return "";
+	}
+
+	return decodeURI(results[1]);
+}
+
+var m_functionHandleAcceptEmailClick = function() {
+
+}
+
+var m_functionHandleDeclineEmailClick = function() {
+
 }
 
 var m_functionEnrollButtonClk = function(errorHelper) {

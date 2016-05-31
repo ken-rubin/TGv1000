@@ -546,8 +546,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 									} else if (momDtExpires.isBefore(momIn4Hours) && !row.fourHourWarningSent) { 
 
 										// If within 4 hours of expiring, just send an update notification version of the invite.
-										// WE MUST SEND THIS ONLY ONCE!!!
-										// So, then set update fourHourWarningSent in DB.
+										// WE MUST SEND THIS ONLY ONCE!!! So, send the email and then update fourHourWarningSent in DB.
 										async.series(
 											[
 												function(innerCb2) {
