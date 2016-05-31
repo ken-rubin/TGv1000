@@ -5,8 +5,8 @@
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/Types"], 
-	function (snippetHelper, errorHelper, resourceHelper, Types) {
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
 
@@ -37,11 +37,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 					// When Buy3 is closed the workspace is shown with the newly purchased project. User cannot back up out of Buy3 since the CC has been charged and
 					// the user's new project has been created and written to the DB.
 
-					self.create = function(clProject) {
+					self.create = function(ppData) {
 
 						try {
 
-							m_clProject = clProject;
+							m_ppData = ppData;
 
 							// Get the dialog DOM.
 							$.ajax({
@@ -102,7 +102,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 						                action: function(dialogItself){
 
 						                    dialogItself.close();
-						                    client.unloadProject(null, false);	// No callback; no abandon dialog.
+						                    // client.unloadProject(null, false);	// No callback; no abandon dialog.
 						                }
 					            	}
 					            ],
@@ -126,15 +126,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// Get the appropriate snippet and display the second form of the buy dialog.
 							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
 							var templateToGet = null;
-							if (m_clProject.data.isClass) {
+							if (m_ppData.isClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
 
-							} else if (m_clProject.data.isProduct) {
+							} else if (m_ppData.isProduct) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
 
-							} else if (m_clProject.data.isOnlineClass) {
+							} else if (m_ppData.isOnlineClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
 							}
@@ -174,25 +174,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 						$("#DescriptionDiv").html(htmlData);
 						$("#ProjectName").focus();
-						// $("#ProjectName").keyup(m_functionNameBlur);
-						$("#ProjectName").val(m_clProject.data.name);
+						$("#ProjectName").val(m_ppData.projectName);
 						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
 
-						$("#ProjectDescription").val(m_clProject.data.description);
-						$("#ProjectTags").val(m_clProject.data.tags);
-
-						// $("#ProjectDescription").blur(m_functionDescriptionBlur);
-						// $("#ProjectTags").blur(m_functionTagsBlur);
+						$("#ProjectDescription").val(m_ppData.projectDescription);
 
 						$("#BuyHeader").empty();
-						if (m_clProject.data.specialProjectData.classProject) {
+						if (m_ppData.isClass) {
 
 							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Class you selected.</b></h4>';
 							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
 							strNewBuyHeader += '<h5>After completing the purchase, you will receive two emails: a charge receipt and a reminder with dates, times and location.</h5>';
 							$("#BuyHeader").append(strNewBuyHeader);
 
-							$("#OnlyForPrivileged").css("display","none");
+							$(".OnlyForPrivileged").css("display","none");
 
 							// jQuery(function($){
 							// 	$("#Phone").mask("(999) 999-9999? x99999");
@@ -202,56 +197,57 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							// 		$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 							// 	}
 							// });
-							$("#ProjectDescription").val(m_clProject.data.specialProjectData.classData.classDescription);
-							$("#InstructorFirst").val(m_clProject.data.specialProjectData.classData.instructorFirstName);
-							$("#InstructorLast").val(m_clProject.data.specialProjectData.classData.instructorLastName);
-							$("#Phone").val(m_clProject.data.specialProjectData.classData.instructorPhone);
-							$("#Facility").val(m_clProject.data.specialProjectData.classData.facility);
-							$("#Address").val(m_clProject.data.specialProjectData.classData.address);
-							$("#Room").val(m_clProject.data.specialProjectData.classData.room);
-							$("#City").val(m_clProject.data.specialProjectData.classData.city);
+							$("#ProjectDescription").val(m_ppData.classDescription);
+							$("#InstructorFirst").val(m_ppData.instructorFirstName);
+							$("#InstructorLast").val(m_ppData.instructorLastName);
+							$("#Phone").val(m_ppData.instructorPhone);
+							$("#Facility").val(m_ppData.facility);
+							$("#Address").val(m_ppData.address);
+							$("#Room").val(m_ppData.room);
+							$("#City").val(m_ppData.city);
 							// state combo
-							if(m_clProject.data.specialProjectData.classData.state.length > 0) {
+							if(m_ppData.state.length > 0) {
 								$('#State > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.classData.state)
+ 										if ($(this).text() === m_ppData.state)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
-							$("#Zip").val(m_clProject.data.specialProjectData.classData.zip);
+							$("#Zip").val(m_ppData.zip);
 							// when array
+							m_ppData.schedule = JSON.parse(m_ppData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_ppData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
-							if(m_clProject.data.specialProjectData.classData.level.length > 0) {
+							if(m_ppData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.classData.level)
+ 										if ($(this).text() === m_ppData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(m_clProject.data.specialProjectData.classData.difficulty.length > 0) {
+							if(m_ppData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.classData.difficulty)
+ 										if ($(this).text() === m_ppData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 
-							m_dPriceToCharge = m_clProject.data.specialProjectData.classData.price;
+							m_dPriceToCharge = m_ppData.price;
 
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.classData.price.dollarFormat());
-							$("#Notes").val(m_clProject.data.specialProjectData.classData.classNotes);
+							$("#Price").val(m_ppData.price.dollarFormat());
+							$("#Notes").val(m_ppData.classNotes);
 						
-						} else if (m_clProject.data.specialProjectData.productProject) {
+						} else if (m_ppData.isProduct) {
 
 							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Product you selected.</b></h4>';
 							strNewBuyHeader += '<h5>If you want to buy it, click the <b><i>Enter secure charge information</i></b> button.</h5>';
@@ -260,34 +256,34 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
-							$("#ProjectDescription").val(m_clProject.data.specialProjectData.productData.productDescription);
+							$("#ProjectDescription").val(m_ppData.productDescription);
 							
 							// level combo
-							if(m_clProject.data.specialProjectData.productData.level.length > 0) {
+							if(m_ppData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.productData.level)
+ 										if ($(this).text() === m_ppData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							
 							// difficulty combo
-							if(m_clProject.data.specialProjectData.productData.difficulty.length > 0) {
+							if(m_ppData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.productData.difficulty)
+ 										if ($(this).text() === m_ppData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							
-							m_dPriceToCharge = m_clProject.data.specialProjectData.productData.price;
+							m_dPriceToCharge = m_ppData.price;
 
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.productData.price.dollarFormat());
+							$("#Price").val(m_ppData.price.dollarFormat());
 						
-						} else if (m_clProject.data.specialProjectData.onlineClassProject) {
+						} else if (m_ppData.isOnlineClass) {
 
 							var strNewBuyHeader = '<h4 style="margin-top:-5px;"><b>Here are the details for the Online Class you selected.</b></h4>';
 							strNewBuyHeader += '<h5>If you want to enroll, click the <b><i>Enter secure charge information</i></b> button.</h5>';
@@ -299,38 +295,39 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
-							$("#ProjectDescription").val(m_clProject.data.specialProjectData.onlineClassData.classDescription);
-							$("#InstructorFirst").val(m_clProject.data.specialProjectData.onlineClassData.instructorFirstName);
-							$("#InstructorLast").val(m_clProject.data.specialProjectData.onlineClassData.instructorLastName);
-							$("#Email").val(m_clProject.data.specialProjectData.onlineClassData.instructorEmail);
+							$("#ProjectDescription").val(m_ppData.classDescription);
+							$("#InstructorFirst").val(m_ppData.instructorFirstName);
+							$("#InstructorLast").val(m_ppData.instructorLastName);
+							$("#Email").val(m_ppData.instructorEmail);
 							// when array
+							m_ppData.schedule = JSON.parse(m_ppData.schedule);
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = m_clProject.data.specialProjectData.onlineClassData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = m_ppData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
-							if(m_clProject.data.specialProjectData.onlineClassData.level.length > 0) {
+							if(m_ppData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.level)
+ 										if ($(this).text() === m_ppData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(m_clProject.data.specialProjectData.onlineClassData.difficulty.length > 0) {
+							if(m_ppData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === m_clProject.data.specialProjectData.onlineClassData.difficulty)
+ 										if ($(this).text() === m_ppData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
-							m_dPriceToCharge = m_clProject.data.specialProjectData.onlineClassData.price;
+							m_dPriceToCharge = m_ppData.onlineClassData.price;
 							// formatted price
-							$("#Price").val(m_clProject.data.specialProjectData.onlineClassData.price.dollarFormat());
-							$("#Notes").val(m_clProject.data.specialProjectData.onlineClassData.classNotes);
+							$("#Price").val(m_ppData.price.dollarFormat());
+							$("#Notes").val(m_ppData.classNotes);
 						}
 
 						$("#TheFieldset").prop("disabled", true);
@@ -443,49 +440,53 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 															return;
 														}
 
-														// We will convert the Purchasable Project into a "bought" project and immediately save it.
-														// First, we'll create a fairly unique name, but a name conflict will still be checked on the server, and it's possible the name will be changed.
+														// m_ppData doesn't have a full project. We have to go get the correct project so that we can convert it into a "bought" project with suitable data changes.
+														var exceptionRet = client.openProjectFromDBNoLoadIntoManager(m_ppData.projectId,
+															function(project) {
 
-														// Change some things about the project in memory so it doesn't look like a product anymore, but instead it looks like a normal project.
-														m_clProject.data.ownedByUserId = parseInt(g_profile['userId'], 10);
-														m_clProject.data.chargeId = chargeId;
+																project.ownedByUserId = parseInt(g_profile['userId'], 10);
+																project.chargeId = chargeId;
 
-														if (m_clProject.data.specialProjectData.hasOwnProperty('classData')) {
-															delete m_clProject.data.specialProjectData.classData;
-															m_clProject.data.isClass = false;
-															m_clProject.data.specialProjectData.classProject = false;
-														} else if (m_clProject.data.specialProjectData.hasOwnProperty('onlineClassData')) {
-															delete m_clProject.data.specialProjectData.onlineClassData;
-															m_clProject.data.isOnlineClass = false;
-															m_clProject.data.specialProjectData.onlineClassProject = false;
-														} else if (m_clProject.data.specialProjectData.hasOwnProperty('productData')) {
-															delete m_clProject.data.specialProjectData.productData;
-															m_clProject.data.isProduct = false;
-															m_clProject.data.specialProjectData.productProject = false;
-														}
-														m_clProject.data.specialProjectData.privilegedUser = false;
-														m_clProject.data.specialProjectData.ownedByUser = true;
-														m_clProject.data.specialProjectData.normalProject = true;
-														m_clProject.data.specialProjectData.openMode = 'bought';
-
-														// Generate a unique-ish name.
-														var momNow = new moment();
-														m_clProject.data.name += "_" + momNow.format("MM-DD-YYYY");
-
-														// But still send through an indication to routeSaveProject to change the name in case of conflict.
-														client.saveProject(true,
-															function(errMsg) {
-
-																if (errMsg) {
-
-																	errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + errMsg);
-
-																} else {
-
-																	//self.closeYourself();
-																	errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + client.getProject().data.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
-																		250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
+																if (project.specialProjectData.hasOwnProperty('classData')) {
+																	delete project.specialProjectData.classData;
+																	project.isClass = false;
+																	project.specialProjectData.classProject = false;
+																} else if (project.specialProjectData.hasOwnProperty('onlineClassData')) {
+																	delete project.specialProjectData.onlineClassData;
+																	project.isOnlineClass = false;
+																	project.specialProjectData.onlineClassProject = false;
+																} else if (project.specialProjectData.hasOwnProperty('productData')) {
+																	delete project.specialProjectData.productData;
+																	project.isProduct = false;
+																	project.specialProjectData.productProject = false;
 																}
+																project.specialProjectData.privilegedUser = false;
+																project.specialProjectData.ownedByUser = true;
+																project.specialProjectData.normalProject = true;
+																project.specialProjectData.openMode = 'bought';
+
+																// Generate a unique-ish name.
+																var momNow = new moment();
+																project.name += "_" + momNow.format("MM-DD-YYYY");
+
+																// Now we need to save the project to the DB and load it into manager.
+																// We can't use client.saveProjectToDB because it doesn't take a project object, but instead it gets the project via manager.save().
+																// After the save, the project is returned to saveProjectToDBNoGetFromManager. That function will load it into manager.
+																var exceptionRet = client.saveProjectToDBNoGetFromManager(project,
+																	function(err) {
+
+																		if (err) {
+
+																			errorHelper.show("An unexpected error occurred: after we processed your credit card, we could not save your purchased project.<br><br>Please contact us so we can investigate and process a refund. Tell tech support error received was: " + err.message);
+
+																		} else {
+
+																			self.closeYourself();
+																			errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + manager.projectData.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
+																				250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
+																		}
+																	}
+																);
 															}
 														);
 													}
@@ -554,7 +555,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 		                    		{
 		                    			token: token,
 		                    			dAmount: m_dPriceToCharge,
-		                    			descriptionForReceipt: 'Purchase of NextWaveCoders product: ' + m_clProject.data.name,	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
+		                    			descriptionForReceipt: 'Purchase of NextWaveCoders product: ' + m_ppData.projectName,	// An arbitrary string to be attached to the charge object. It is included in the receipt email sent to the user by Stripe.
 		                    			statementDescriptor: 'NextWaveCoders'		// An arbitrary string to be displayed (most of the time) on user's credit card statement. Limited to 22 chars, so kind of useless.
 		                    		},
 		                            'json');
@@ -576,7 +577,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Code/T
 
 				// Reference to the dialog object instance.
 				var m_dialog = null;
-				var m_clProject = null;
+				var m_ppData = null;
 				var m_buyMode = 1;
 				var m_strChargeNumber;
 				var m_iExpMonth;

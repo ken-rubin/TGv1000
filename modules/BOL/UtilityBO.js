@@ -136,7 +136,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // Processes a Stripe refund and upon success delete the purchased project (cascading).
 
             console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
-            // req.body.projectId: product project id
+            // req.body.projectId: product project id -- NOT USER'S PROJECT TO DELETE
             // req.body.userid: iUserid of owner of project
             // req.body.refund: bRefund
 
@@ -159,6 +159,85 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                         chargeId = rows[0].chargeId;
                         id = rows[0].id;
+
+                        var charge = stripe.refunds.create(
+                            {
+                                charge: chargeId
+                            },
+                            function(err, refund) {
+
+                                if (err) {
+                                    res.json({
+                                        success: false,
+                                        message: "Received this error processing refund with Stripe: " + err.message
+                                    });
+                                } else {
+
+                                    // Do a cascading deletion of the project.
+                                    var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                                    sql.execute(
+                                        strQuery,
+                                        function(rows) {
+
+                                            // Success. Add a row to the refunds table. id is AUTO_INCREMENT and dtRefund defaults to CURRENT_TIMESTAMP.
+                                            var strQuery2 = "insert " + self.dbname + "refunds (userId, projectId, refundId) values(" + req.body.userId + "," + req.body.projectId + ",'" + refund.id + "');";
+                                            sql.execute(
+                                                strQuery2,
+                                                function(rows) {
+
+                                                    // Send a refund processed email to the user.
+                                                    var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
+                                                    var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
+                                                    mailOptions = {
+                                             
+                                                        from: "TechGroms <techgroms@gmail.com>", // sender address
+                                                        to: (!aORz) ? userIth.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
+                                                        subject: "A refund has been issued for the Next Wave Coders class", // Subject line
+                                                        text: "Hi, " + userIth.firstName + ". " +
+                                                        "For your reference, your refund ID is " + refund.id + ". This refund should appear soon in your card account." +
+                                                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+                                                        html: "Hi, " + userIth.firstName + ". " +
+                                                        "For your reference, your refund ID is " + refund.id + ". This refund should appear soon in your card account." +
+                                                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+                                                    };
+
+                                                    mailWrapper.mail(mailOptions,
+                                                        function(error) {
+
+                                                            if (error) {
+
+                                                                return res.json({
+                                                                    success: false,
+                                                                    message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + error.message
+                                                                });
+                                                            }
+
+                                                            // Return success
+                                                            return res.json({
+                                                                success: true
+                                                            });
+                                                        }
+                                                    );
+                                                },
+                                                function(strError) {
+
+                                                    return res.json({
+                                                        success: false,
+                                                        message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + strError
+                                                    });
+                                                }
+                                            );
+                                        },
+                                        function(strError) {
+                                            return res.json({
+                                                success: false,
+                                                message: "Received this error deleting user's project AFTER the refund was processed successfully: " + strError
+                                            });
+                                        }
+                                    );
+                                }
+                            }
+                        );
                     },
                     function(strError) {
 
@@ -166,63 +245,6 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             success: false,
                             message: "Received this error retrieving charge Id: " + strError
                         });
-                    }
-                );
-
-                var charge = stripe.refunds.create(
-                    {
-                        charge: chargeId
-                    },
-                    function(err, refund) {
-
-                        if (err) {
-                            res.json({
-                                success: false,
-                                message: "Received this error processing refund with Stripe: " + err.message
-                            });
-                        } else {
-
-                            // Do a cascading deletion of the project.
-                            var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
-                            sql.execute(
-                                strQuery,
-                                function(rows) {
-
-                                    // Success. Add a row to the refunds table.
-                                    var strQuery2 = "insert " + self.dbname + " (userId, projectId, refundId) values(" + req.body.userId + "," + req.body.projectId + ",'" + refund.id + "');";
-                                    sql.execute(
-                                        strQuery2,
-                                        function(rows) {
-
-                                            // Add a refund processed email to the user.
-
-
-
-
-
-
-                                            // Return success
-                                            res.json({
-                                                success: true
-                                            });
-                                        },
-                                        function(strError) {
-
-                                            return res.json({
-                                                success: false,
-                                                message: "Received this error insert refund row into OUR database AFTER the refund was processed successfully: " + strError
-                                            });
-                                        }
-                                    );
-                                },
-                                function(strError) {
-                                    return res.json({
-                                        success: false,
-                                        message: "Received this error deleting user's project AFTER the refund was processed successfully: " + strError
-                                    });
-                                }
-                            );
-                        }
                     }
                 );
             } else {
@@ -243,31 +265,31 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         }
 
                         id = rows[0].id;
+
+                        // Now do the cascading deletion of the project.
+                        var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+
+                                // Return success
+                                res.json({
+                                    success: true
+                                });
+                            },
+                            function(strError) {
+                                return res.json({
+                                    success: false,
+                                    message: "Received this error deleting user's project: " + strError
+                                });
+                            }
+                        );
                     },
                     function(strError) {
 
                         return res.json({
                             success: false,
                             message: "Received this error retrieving user's project Id: " + strError
-                        });
-                    }
-                );
-
-                // Now do the cascading deletion of the project.
-                var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
-                sql.execute(
-                    strQuery,
-                    function(rows) {
-
-                        // Return success
-                        res.json({
-                            success: true
-                        });
-                    },
-                    function(strError) {
-                        return res.json({
-                            success: false,
-                            message: "Received this error deleting user's project: " + strError
                         });
                     }
                 );
@@ -340,7 +362,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // (3) array of purchasers (users); 
             // (4) array of waitlisted users, if any (in order).
             // (5) array of users in the 24-hour period after being invited to enroll. Will be displayed with active countdown.
-            // (6) array of up to 10 latest refunds.
+            // (6) array of up to 100 latest refunds.
 
             async.waterfall(
                 [
@@ -433,7 +455,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers.
                         // This function adds passOn.waitlisted.
 
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is null order by dtWaitlisted asc);";
+                        var strQuery = "select u.*, ug.name as usergroupName, w.dtWaitlisted from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id inner join " + self.dbname + "waitlist w on w.userId=u.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is null order by dtWaitlisted asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -452,7 +474,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata; buyers, waitlisted.
                         // This function adds passOn.invited.
 
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is not null order by dtInvited asc);";
+                        var strQuery = "select u.*, ug.name as usergroupName, w.dtWaitlisted, w.dtInvited from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id inner join " + self.dbname + "waitlist w on w.userId=u.id where u.id in (select userId from " + self.dbname + "waitlist where projectId=" + req.body.projectId + " and dtInvited is not null order by dtInvited asc);";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -725,6 +747,14 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         try {
 
             console.log("Entered UtilityBO/routeSendClassInvite with req.body = " + JSON.stringify(req.body));
+            // req.body.projectId -- if of product project user is being invited to enroll in (getting off waitlist)
+            // req.body.userId -- id of user being invited
+
+
+
+
+
+
             
 
         } catch (e) {
@@ -978,49 +1008,49 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         
                         // Core projects for privileged users. Empty array for non.
                         if (req.body.privilegedUser === "1") {
-                            strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=1;";
+                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
-                            strQuery = "select p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
+                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
                         }
 
                         if (passOn.idString.length) {
                             // Owned by user. Same for both priv and non-priv.
-                            strQuery += "select distinct p.id, p.name, p.description, p.imageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                             // Products
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                             // Classes
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
 
                             // Online classes
                             if (req.body.privilegedUser === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id, p.name, p.description, p.imageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             }
                         }
 
@@ -1037,15 +1067,15 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                         return cb(null, passOn);
                                     }
 
-                                    // Sort rows on name, since async retrieval doesn't let us sort in the query.
+                                    // Sort rows on projectName, since async retrieval doesn't let us sort in the query.
                                     for (var i = 0; i < 6; i++) {
                                         if (rows[i].length) {
 
                                             rows[i].sort(function(a,b){
 
-                                                if (a.name > b.name)
+                                                if (a.projectName > b.projectName)
                                                     return 1;
-                                                if (a.name < b.name)
+                                                if (a.projectName < b.projectName)
                                                     return -1;
                                                 return 0;
                                             });
@@ -1215,7 +1245,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
                                     var pJth = passOn.projects[1][j];
-                                    if (pJth.comicProjectId === pIth.id) {
+                                    if (pJth.comicProjectId === pIth.projectId) {
 
                                         pIth.alreadyBought = true;
                                         break;
@@ -1241,7 +1271,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
                                     var pJth = passOn.projects[1][j];
-                                    if (pJth.comicProjectId === pIth.id) {
+                                    if (pJth.comicProjectId === pIth.projectId) {
 
                                         pIth.alreadyEnrolled = true;
                                         break;
@@ -1267,7 +1297,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
                                     var pJth = passOn.projects[1][j];
-                                    if (pJth.comicProjectId === pIth.id) {
+                                    if (pJth.comicProjectId === pIth.projectId) {
 
                                         pIth.alreadyEnrolled = true;
                                         break;
@@ -1285,7 +1315,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         async.eachSeries(passOn.projects[4],
                             function(projectIth, cb) {
 
-                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.id + " and id<>" + projectIth.id + ";";
+                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
                                 sql.execute(strQuery,
                                     function(rows){

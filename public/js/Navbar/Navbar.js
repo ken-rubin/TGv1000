@@ -55,8 +55,14 @@ define(["Core/errorHelper"],
 													var exceptionRet = client.showOpenProjectDialog(
 														// This callback is executed if the user searches for and chooses a project to open.
 														// It is called m_functionOK in OpenProjectDialog.
+														// OpenProjectDialog will come here only in these cases:
+														// (1) A privileged user is opening a project.
+														// (2) A non-privileged user is NOT considering buying a purchasable project.
+														// If a non-privileged user selects a purchasable project, OpenProjectDialog will close itself and call client to open BuyDialog with all the info
+														// that BuyDialog needs.
+
 														// iProjectId is the project to fetch.
-														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects, bAlreadyBoughtClass, bPutOnWaitList, bAlreadyBoughtProduct, bAlreadyBoughtOnlineClass) {
+														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 															try {
 
@@ -64,64 +70,38 @@ define(["Core/errorHelper"],
 
 																if (iProjectId > 0) {
 
-																	if (bAlreadyBoughtClass) {
+																	exceptionRet = client.openProjectFromDB(iProjectId,
+																		// This callback is called from client.loadProjectIntoManager to add specialProjectData to the project.
+																		// Note: if the project is a Product, Class or Online Class, then that extra information is already
+																		// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
+																		function(objProject) {
 
-																		errorHelper.show("You've already enrolled in this class.");
+																			try {
 
-																	} else if (bPutOnWaitList) {
+																				// objProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
+																				// which case is contains a property holding class, product or onlineClass data.
+																				// Create and merge rest of specialProjectData in.
+																				specialProjectData = {
+																					privilegedUser: bPrivilegedUser,
+																					ownedByUser: bOnlyOwnedByUser,
+																					othersProjects: bOnlyOthersProjects,
+																					normalProject: (objProject.isCoreProject+objProject.isClass+objProject.isProduct+objProject.isOnlineClass === 0),
+																					coreProject: objProject.isCoreProject,
+																					classProject: objProject.isClass,
+																					productProject: objProject.isProduct,
+																					onlineClassProject: objProject.isOnlineClass,
+																					comicsEdited: false,
+																					systemTypesEdited: false,
+																					openMode: 'searched'
+																				};
 
-																		exceptionRet = client.putUserOnWaitlist(iProjectId);
-																		if (exceptionRet) { throw exceptionRet; }
-																	
-																	} else if (bAlreadyBoughtProduct) {
+																				$.extend(true, objProject.specialProjectData, specialProjectData);
 
-																		errorHelper.show("You've already purchased this product.");
+																			} catch (e) { errorHelper.show(e); }
+																		}
+																	);
+																	if (exceptionRet) { throw exceptionRet; }
 
-																	} else if (bAlreadyBoughtOnlineClass) {
-
-																		errorHelper.show("You've already enrolled in this online class.");
-
-																	} else {
-
-																		exceptionRet = client.openProjectFromDB(iProjectId,
-																			// This callback is called from client.load_m_clProject to add specialProjectData to the project.
-																			// Note: if the project is a Product, Class or Online Class, then that extra information is already
-																			// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
-																			function(clProject) {
-
-																				try {
-
-																					// clProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
-																					// which case is contains a property holding class, product or onlineClass data.
-																					// Create and merge rest of specialProjectData in.
-																					specialProjectData = {
-																						privilegedUser: bPrivilegedUser,
-																						ownedByUser: bOnlyOwnedByUser,
-																						othersProjects: bOnlyOthersProjects,
-																						normalProject: (clProject.isCoreProject+clProject.isClass+clProject.isProduct+clProject.isOnlineClass === 0),
-																						coreProject: clProject.isCoreProject,
-																						classProject: clProject.isClass,
-																						productProject: clProject.isProduct,
-																						onlineClassProject: clProject.isOnlineClass,
-																						comicsEdited: false,
-																						systemTypesEdited: false,
-																						openMode: 'searched'
-																					};
-
-																					$.extend(true, clProject.specialProjectData, specialProjectData);
-
-																					if (!bPrivilegedUser && (clProject.specialProjectData.productProject || clProject.specialProjectData.classProject || clProject.specialProjectData.onlineClassProject)) {
-
-																						// A non-privileged user will not have been able to search for a non-active or incomplete project.
-																						// So we're good to proceed to the buying process.
-																						var exceptionRet = client.showBuyDialog();
-																						if (exceptionRet) { throw exceptionRet; }
-																					}
-																				} catch (e) { errorHelper.show(e); }
-																			}
-																		);
-																		if (exceptionRet) { throw exceptionRet; }
-																	}
 																} else {
 
 																	throw new Error("Invalid project id returned.");
@@ -141,6 +121,8 @@ define(["Core/errorHelper"],
 
 							$("#SaveProjectButton").click(function () {
 								try {
+
+									if ($("#SaveProjectLI").hasClass('disabled')) { return false; }
 									var exceptionRet = client.showSaveProjectDialog();
 									if (exceptionRet) { throw exceptionRet; }
 								} catch (e) { errorHelper.show(e); }
@@ -148,6 +130,7 @@ define(["Core/errorHelper"],
 
 							$("#CloseProjectButton").click(function () {
 
+								if ($("#CloseProjectLI").hasClass('disabled')) { return false; }
 								client.unloadProject(function(){ 
 									self.enableOrDisableProjAndTypeMenuItems(); 
 									self.enableOrDisableAminZoneMenuItems(); 
@@ -155,14 +138,9 @@ define(["Core/errorHelper"],
 								}, true);
 							});
 
-							$("#NewTypeButton").click(function() {
-								try {
-									var exceptionRet = client.showNewTypeDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
 							$("#SearchTypeButton").click(function() {
+
+								if ($("#SearchTypeLI").hasClass('disabled')) { return false; }
 								try {
 									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
 										try {
@@ -176,14 +154,9 @@ define(["Core/errorHelper"],
 								} catch (e) { errorHelper.show(e); }
 							});
 
-							$("#NewMethodButton").click(function() {
-								try {
-									var exceptionRet = client.showNewMethodDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
 							$("#SearchMethodButton").click(function() {
+
+								if ($("#SearchMethodLI").hasClass('disabled')) { return false; }
 								try {
 									var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
 										try {
@@ -197,20 +170,6 @@ define(["Core/errorHelper"],
 								} catch (e) { errorHelper.show(e); }
 							});
 
-							$("#NewPropertyButton").click(function() {
-								try {
-									var exceptionRet = client.showNewPropertyDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
-							$("#NewEventButton").click(function() {
-								try {
-									var exceptionRet = client.showNewEventDialog();
-									if (exceptionRet) { throw exceptionRet; }
-								} catch(e) { errorHelper.show(e); }
-							});
-
 							if (g_profile.can_visit_adminzone) {
 
 								// Show Adminzone button.
@@ -218,6 +177,7 @@ define(["Core/errorHelper"],
 
 								$("#UsersButton").click(function() {
 
+									if ($("#UsersLI").hasClass('disabled')) { return false; }
 									// AZUsersDialog is where user maintenance takes place, including usergroup creation, modification
 									// and assignment. Other user maintenance might be forcing a password reset, etc.
 									try {
@@ -232,6 +192,7 @@ define(["Core/errorHelper"],
 
 								$("#ProjectsButton").click(function() {
 
+									if ($("#ProjectsLI").hasClass('disabled')) { return false; }
 									// AZProjectsDialog is the place for making non-public projects public. Maybe it will also
 									// do Types and Methods. It may also un-quarantine images, videos and sounds.
 									try {
@@ -246,6 +207,7 @@ define(["Core/errorHelper"],
 
 								$("#ActivatePPButton").click(function() {
 
+									if ($("#ActivatePPLI").hasClass('disabled')) { return false; }
 									// AZActivatePPDialog is where Purchasable Projects are finalized, activated or de-activated.
 									// This dialog is not meant to load the project for actual maintenance, just the data from the
 									// classes, onlineclasses or products table for editing.
@@ -258,6 +220,24 @@ define(["Core/errorHelper"],
 										true);
 									} catch(e) { errorHelper.show(e); }
 								});
+
+								$("#SiteMaintButton").click(
+									function() {
+
+										if ($("#SiteMaintLI").hasClass('disabled')) { return false; }
+										try {
+
+											client.unloadProject(
+												function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+													var exceptionRet = client.showAZSitesDialog();
+													if (exceptionRet) { throw exceptionRet; }
+											},
+											true);
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								);
 
 								// This is how to connect enabled/disabled tooltips to menu items:
 								//
@@ -280,26 +260,48 @@ define(["Core/errorHelper"],
 								// });
 							}
 
-							// Wire Play button click.
-							// $("#PlayBtn").click(function () {
-							// 	try {
-							// 		// Let client handle this.
-							// 		var exceptionRet = client.play();
-							// 		if (exceptionRet) { throw exceptionRet; }
-							// 	} catch (e) { errorHelper.show(e); }
-							// });
+							if (g_profile.can_manage_site) {
 
-							// Wire Play button click.
-							// $("#StopBtn").click(function () {
-							// 	try {
-							// 		// Let client handle this.
-							// 		var exceptionRet = client.stop();
-							// 		if (exceptionRet) { throw exceptionRet; }
-							// 	} catch (e) {
+								// Show Sitezone button.
+								$("#SitezoneLI").css("display", "block");
 
-							// 		errorHelper.show(e);
-							// 	}
-							// });
+								$("#SZUsersButton").click(
+									function() {
+
+										if ($("#SZUsersLI").hasClass('disabled')) { return false; }
+										try {
+
+											client.unloadProject(
+												function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+													var exceptionRet = client.showSZUsersDialog();
+													if (exceptionRet) { throw exceptionRet; }
+											},
+											true);
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								);
+
+								$("#SZProjectsButton").click(
+									function() {
+
+										if ($("#SZProjectsLI").hasClass('disabled')) { return false; }
+										try {
+
+											client.unloadProject(
+												function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
+													var exceptionRet = client.showSZProjectsDialog();
+													if (exceptionRet) { throw exceptionRet; }
+											},
+											true);
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								);
+
+							}
 
 							client.setBrowserTabAndBtns();
 
@@ -313,31 +315,21 @@ define(["Core/errorHelper"],
 					// anything with it. I believe this handles itself with modal dialogs in the right places.
 					self.enableOrDisableProjAndTypeMenuItems = function () {
 
-						// var clProject = client.getProject();
-
 						// New and search are enabled. others are disabled.
 						m_functionEnable("NewProject");
 						m_functionEnable("OpenProject");
 						m_functionDisable("SaveProject");
 						m_functionDisable("CloseProject");
-						m_functionDisable("NewType");
 						m_functionDisable("SearchType");
-						m_functionDisable("NewMethod");
 						m_functionDisable("SearchMethod");
-						m_functionDisable("NewProperty");
-						m_functionDisable("NewEvent");
 
 						if (manager.loaded) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 							m_functionEnable("SaveProject");
-							m_functionEnable("NewType");
 							m_functionEnable("SearchType");
-							m_functionEnable("NewMethod");
 							m_functionEnable("SearchMethod");
-							m_functionEnable("NewProperty");
-							m_functionEnable("NewEvent");
 						}
 					}
 
@@ -360,16 +352,34 @@ define(["Core/errorHelper"],
 						} else {
 							m_functionDisable("ActivatePP");
 						}
+
+						if (g_profile.can_manage_sites) {
+							m_functionEnable("SiteMaint");
+						} else {
+							m_functionDisable("SiteMaint");
+						}
+					}
+
+					self.enableOrDisableSiteZoneMenuItems = function () {
+
+						if (g_profile.can_manage_site) {
+							m_functionEnable("SZUsers");
+							m_functionEnable("SZProjects");
+						} else {
+							m_functionDisable("SZUsers");
+							m_functionDisable("SZProjects");
+						}
 					}
 
 					self.enableOrDisablePlayAndStopButtons = function () {
 
-						// if (client.getProject()) {
-						// 	$("#PlayBtn").removeClass("disabled");
-						// } else {
-						// 	$("#PlayBtn").addClass("disabled");
-						// }
-						// $("#StopBtn").addClass("disabled");
+						if (manager.loaded) {
+							$("#PlayBtn").removeClass("disabled");
+						} else {
+							$("#PlayBtn").addClass("disabled");
+						}
+
+						$("#StopBtn").addClass("disabled");
 					}
 
 					// Private methods

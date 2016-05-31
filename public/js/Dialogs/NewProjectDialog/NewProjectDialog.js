@@ -453,26 +453,26 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var exceptionRet = client.openProjectFromDB(
 								// 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
 								["Game", "Console", "Web Site", "HoloLens", "Mapping"].indexOf(m_projectType) + 1, 
-								function(clProject){	// callback is used to set fields after async fetch of empty-ish core project from db.
+								function(projectData){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
-									clProject.id = 0;	// just to be sure it doesn't overwrite a core project
-									clProject.isCoreProject = false;
+									projectData.id = 0;	// just to be sure it doesn't overwrite a core project
+									projectData.isCoreProject = false;
 
 									// We could also do these things that used to be done in the BO, but we aren't--at least for now.
 					                        //     comicIth.id = 0; 
 	                                        //     method.id = 0; AND property.id = 0; AND event.id = 0;
 
-									clProject.name = strProjectName;
-									clProject.tags = strProjectTags;
-									clProject.description = strProjectDescription;
-									clProject.imageId = m_imageId;
+									projectData.name = strProjectName;
+									projectData.tags = strProjectTags;
+									projectData.description = strProjectDescription;
+									projectData.imageId = m_imageId;
 									if (m_imageId) {
-										clProject.altImagePath = '';
+										projectData.altImagePath = '';
 									}
-									clProject.ownedByUserId = parseInt(g_profile["userId"], 10);
+									projectData.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-									clProject.specialProjectData = {
+									projectData.specialProjectData = {
 										privilegedUser: m_bPrivilegedUser,
 										ownedByUser: false,
 										othersProjects: false,
@@ -486,128 +486,128 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										openMode: 'new'
 									};
 
-									// if (m_bClassProject) {
+									if (m_bClassProject) {
 
-									// 	clProject.data.isClass = true;
+										projectData.isClass = true;
 
-									// 	// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
-									// 	var strInstructorFirst = $("#InstructorFirst").val().trim();
-									// 	var strInstructorLast = $("#InstructorLast").val().trim();
-									// 	var strPhone = $("#Phone").val().trim();
-									// 	var strFacility = $("#Facility").val().trim();
-									// 	var strAddress = $("#Address").val().trim();
-									// 	var strRoom = $("#Room").val().trim();
-									// 	var strCity = $("#City").val().trim();
-									// 	var strState = $("#USState option:selected").text();
-									// 	var strZip = $("#Zip").val().trim();
-									// 	var arrWhen = [];
-									// 	for (var i = 1; i <=8; i++) {
-									// 		var str = $("#When" + i).val().trim();
-									// 		if (str.length) { 
-									// 			arrWhen.push(m_funcWhenProcess(str)); 
-									// 		} else {
-									// 			arrWhen.push({ date: '', duration: 0});
-									// 		}
-									// 	}
-									// 	var strLevel = $("#Level option:selected").text();
-									// 	var strDifficulty = $("#Difficulty option:selected").text();
-									// 	var dPrice = 0.00;
-									// 	var strPrice = $("#Price").val().trim();
-									// 	if (strPrice.length) {
-									// 		dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-									// 	}
-									// 	var strNotes = $("#Notes").val().trim();
-									// 	var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
-									// 	var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
+										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
+										var strInstructorFirst = $("#InstructorFirst").val().trim();
+										var strInstructorLast = $("#InstructorLast").val().trim();
+										var strPhone = $("#Phone").val().trim();
+										var strFacility = $("#Facility").val().trim();
+										var strAddress = $("#Address").val().trim();
+										var strRoom = $("#Room").val().trim();
+										var strCity = $("#City").val().trim();
+										var strState = $("#USState option:selected").text();
+										var strZip = $("#Zip").val().trim();
+										var arrWhen = [];
+										for (var i = 1; i <=8; i++) {
+											var str = $("#When" + i).val().trim();
+											if (str.length) { 
+												arrWhen.push(m_funcWhenProcess(str)); 
+											} else {
+												arrWhen.push({ date: '', duration: 0});
+											}
+										}
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
+										var strNotes = $("#Notes").val().trim();
+										var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
+										var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
-									// 	clProject.data.specialProjectData.classData = {
-									// 		id: 0,
-									// 		active: false,
-									// 		classDescription: strProjectDescription,
-									// 		instructorFirstName: strInstructorFirst,
-									// 		instructorLastName: strInstructorLast,
-									// 		instructorPhone: strPhone,
-									// 		facility: strFacility,
-									// 		address: strAddress,
-									// 		room: strRoom,
-									// 		city: strCity,
-									// 		state: strState,
-									// 		zip: strZip,
-									// 		schedule: arrWhen,
-									// 		level: strLevel,
-									// 		difficulty: strDifficulty,
-									// 		price: dPrice,
-									// 		classNotes: strNotes,
-									// 		maxClassSize: iMaxClassSize,
-									// 		loanComputersAvailable: iLoanComputersAvailable,
-									// 		imageId: m_imageId
-									// 	};
+										projectData.specialProjectData.classData = {
+											id: 0,
+											active: false,
+											classDescription: strProjectDescription,
+											instructorFirstName: strInstructorFirst,
+											instructorLastName: strInstructorLast,
+											instructorPhone: strPhone,
+											facility: strFacility,
+											address: strAddress,
+											room: strRoom,
+											city: strCity,
+											state: strState,
+											zip: strZip,
+											schedule: arrWhen,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											classNotes: strNotes,
+											maxClassSize: iMaxClassSize,
+											loanComputersAvailable: iLoanComputersAvailable,
+											imageId: m_imageId
+										};
 
-									// } else if (m_bProductProject) {
+									} else if (m_bProductProject) {
 
-									// 	clProject.data.isProduct = true;
+										projectData.isProduct = true;
 
-									// 	// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
-									// 	var strLevel = $("#Level option:selected").text();
-									// 	var strDifficulty = $("#Difficulty option:selected").text();
-									// 	var dPrice = 0.00;
-									// 	var strPrice = $("#Price").val().trim();
-									// 	if (strPrice.length) {
-									// 		dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-									// 	}
+										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
 
-									// 	clProject.data.specialProjectData.productData = {
-									// 		id: 0,
-									// 		active: false,
-									// 		productDescription: strProjectDescription,
-									// 		level: strLevel,
-									// 		difficulty: strDifficulty,
-									// 		price: dPrice,
-									// 		imageId: m_imageId
-									// 	};
-									// } else if (m_bOnlineClassProject) {
+										projectData.specialProjectData.productData = {
+											id: 0,
+											active: false,
+											productDescription: strProjectDescription,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											imageId: m_imageId
+										};
+									} else if (m_bOnlineClassProject) {
 
-									// 	clProject.data.isOnlineClass = true;
+										projectData.isOnlineClass = true;
 
-									// 	// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
-									// 	var strInstructorFirst = $("#InstructorFirst").val().trim();
-									// 	var strInstructorLast = $("#InstructorLast").val().trim();
-									// 	var strEmail = $("#Email").val().trim();
-									// 	var arrWhen = [];
-									// 	for (var i = 1; i <=8; i++) {
-									// 		var str = $("#When" + i).val().trim();
-									// 		if (str.length) { 
-									// 			arrWhen.push(m_funcWhenProcess(str)); 
-									// 		} else {
-									// 			arrWhen.push({ date: '', duration: 0});
-									// 		}
-									// 	}
-									// 	var strLevel = $("#Level option:selected").text();
-									// 	var strDifficulty = $("#Difficulty option:selected").text();
-									// 	var dPrice = 0.00;
-									// 	var strPrice = $("#Price").val().trim();
-									// 	if (strPrice.length) {
-									// 		dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-									// 	}
-									// 	var strNotes = $("#Notes").val().trim();
+										// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
+										var strInstructorFirst = $("#InstructorFirst").val().trim();
+										var strInstructorLast = $("#InstructorLast").val().trim();
+										var strEmail = $("#Email").val().trim();
+										var arrWhen = [];
+										for (var i = 1; i <=8; i++) {
+											var str = $("#When" + i).val().trim();
+											if (str.length) { 
+												arrWhen.push(m_funcWhenProcess(str)); 
+											} else {
+												arrWhen.push({ date: '', duration: 0});
+											}
+										}
+										var strLevel = $("#Level option:selected").text();
+										var strDifficulty = $("#Difficulty option:selected").text();
+										var dPrice = 0.00;
+										var strPrice = $("#Price").val().trim();
+										if (strPrice.length) {
+											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+										}
+										var strNotes = $("#Notes").val().trim();
 
-									// 	clProject.data.specialProjectData.onlineClassData = {
-									// 		id: 0,
-									// 		active: false,
-									// 		classDescription: strProjectDescription,
-									// 		instructorFirstName: strInstructorFirst,
-									// 		instructorLastName: strInstructorLast,
-									// 		instructorEmail: strEmail,
-									// 		schedule: arrWhen,
-									// 		level: strLevel,
-									// 		difficulty: strDifficulty,
-									// 		price: dPrice,
-									// 		classNotes: strNotes,
-									// 		imageId: m_imageId
-									// 	};
-									// }
+										projectData.specialProjectData.onlineClassData = {
+											id: 0,
+											active: false,
+											classDescription: strProjectDescription,
+											instructorFirstName: strInstructorFirst,
+											instructorLastName: strInstructorLast,
+											instructorEmail: strEmail,
+											schedule: arrWhen,
+											level: strLevel,
+											difficulty: strDifficulty,
+											price: dPrice,
+											classNotes: strNotes,
+											imageId: m_imageId
+										};
+									}
 
-						    		exceptionRet = manager.load(clProject);
+						    		exceptionRet = manager.load(projectData);
 						    		if (exceptionRet) { throw exceptionRet; }
 
 									client.setBrowserTabAndBtns();

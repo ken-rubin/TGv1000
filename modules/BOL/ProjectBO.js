@@ -6,6 +6,8 @@ var fs = require("fs");
 var async = require("async");
 var os = require("os");
 var moment = require("moment-timezone");
+var jwt = require('jsonwebtoken');
+var mysql = require("mysql");
 
 module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
@@ -227,7 +229,27 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         if (err) {
                                             return res.json({success:false, message: err.message});
                                         }
-                                        return res.json({success:true, project:project});
+
+                                        m_functionUpdateUserJWTCookie(
+                                            req,
+                                            res,
+                                            project,
+                                            function(err) {
+
+                                                if (err) {
+
+                                                    return res.json({
+                                                        success: false,
+                                                        message: err.message
+                                                    });
+                                                }
+
+                                                return res.json({
+                                                    success: true,
+                                                    project: project
+                                                });
+                                            }
+                                        );
                                     }
                                 );
                             }
@@ -247,6 +269,41 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) {
 
             res.json({success: false, message: e.message});
+        }
+    }
+
+    var m_functionUpdateUserJWTCookie = function(req, res, project, callback) {
+
+        try {
+
+            // Save project.name and project.id to user row in DB.
+            var sqlQuery = "update " + self.dbname + "user set lastproject=" + mysql.escape(project.name) + ", lastProjectId=" + project.id + " where id=" + req.user.userId + ";";
+            sql.execute(
+                sqlQuery,
+                function(rows) {
+
+                    // Save name and id of this project into profile and send back with cookie.
+                    var encodedToken = req.cookies.token.split('.')[1];
+                    if (encodedToken) {
+
+                        var bufDecoded = new Buffer(encodedToken, 'base64').toString('ascii');
+                        var profile = JSON.parse(bufDecoded);
+                        profile["lastProject"] = project.name;
+                        profile["lastProjectId"] = project.id;
+                        var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
+                        res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
+                    }
+
+                    return callback(null);
+                },
+                function(strError) {
+
+                    return callback(new Error(strError));
+                }
+            );
+        } catch (e) {
+
+            callback(e);
         }
     }
 
@@ -965,7 +1022,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             m_functionDetermineSaveOrSaveAs(connection, req, res,
                                                 function(err, typeOfSave) {
                                                     if (err) {
-                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), res, null, null);
+                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
                                                     } else {
                                                         if (typeOfSave === 'save') {
 
@@ -973,10 +1030,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             m_functionSaveProject(connection, req, res, project, 
                                                                 function(err) {
                                                                     if (err) {
-                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                        m_functionFinalCallback(err, req, res, null, null);
                                                                     } else {
                                                                         m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                        m_functionFinalCallback(null, req, res, connection, project);
                                                                     }
                                                                 }
                                                             );
@@ -986,10 +1043,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             m_functionSaveProjectWithSameId(connection, req, res, project, 
                                                                 function(err) {
                                                                     if (err) {
-                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                        m_functionFinalCallback(err, req, res, null, null);
                                                                     } else {
                                                                         m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                        m_functionFinalCallback(null, req, res, connection, project);
                                                                     }
                                                                 }
                                                             );
@@ -999,10 +1056,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             m_functionSaveProjectAs(connection, req, res, project, 
                                                                 function(err) {
                                                                     if (err) {
-                                                                        m_functionFinalCallback(err, res, null, null);
+                                                                        m_functionFinalCallback(err, req, res, null, null);
                                                                     } else {
                                                                         m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, res, connection, project);
+                                                                        m_functionFinalCallback(null, req, res, connection, project);
                                                                     }
                                                                 }
                                                             );
@@ -1511,7 +1568,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comicProjectId: project.comicProjectId,
                             firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
                             lastSaved: (new Date()),
-                            chargeId: chargeId
+                            chargeId: project.chargeId,
+                            currentComicIndex: project.currentComicIndex
                         };
 
                         var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;
@@ -1750,6 +1808,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     // Do content of comic: comiccode and types (and all their content) in parallel.
                                     // Also do the juntion tables comics_statements, comics_Expressions and comics_literals.
+
                                     async.parallel(
                                         [
                                             function(cb){
@@ -1772,8 +1831,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             },
                                             function(cb){
 
-                                                m_log("Going to m_saveComics_StatementsInComicIthToDB");
-                                                m_saveComics_StatementsInComicIthToDB(connection, req, res, project, comicIth,
+                                                m_log("Going to m_saveComics_XInComicIthToDB for statements");
+                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    'statements',
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -1781,8 +1841,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             },
                                             function(cb){
 
-                                                m_log("Going to m_saveComics_ExpressionsInComicIthToDB");
-                                                m_saveComics_ExpressionsInComicIthToDB(connection, req, res, project, comicIth,
+                                                m_log("Going to m_saveComics_XInComicIthToDB for expressions");
+                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    'expressions',
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -1790,8 +1851,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             },
                                             function(cb){
 
-                                                m_log("Going to m_saveComics_LiteralsInComicIthToDB");
-                                                m_saveComics_LiteralsInComicIthToDB(connection, req, res, project, comicIth,
+                                                m_log("Going to m_saveComics_XInComicIthToDB for literals");
+                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    'literals',
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -1825,184 +1887,72 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch (e) { callback(e); }
     }
 
-    var m_saveComics_StatementsInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+    var m_saveComics_XInComicIthToDB = function (connection, req, res, project, comicIth, 
+        which,
+        callback) {
 
         try {
 
-            m_log("***In m_saveComics_StatementsInComicIthToDB***");
+            m_log("***In m_saveComics_XInComicIthToDB for " + which + "***");
 
-            var statements = [];
+            var items = [];
 
             async.series(
                 [
-                    // Fill statements array.
+                    // Fill items array.
                     function(cb) {
 
-                        var strQuery = "select * from " + self.dbname + "statements;";
+                        var strQuery = "select * from " + self.dbname + which + ";";
                         sql.queryWithCxn(connection,
                             strQuery,
                             function(err, rows) {
                                 if (err) {
                                     return cb(err);
                                 }
-                                statements = rows;
+                                items = rows;
+                                return cb(null);
                             }
                         );
                     },
-                    // Save to comics_statements, using statements array to look up statementId.
+                    // Save to comics_statements, using items array to look up statementId.
                     function(cb) {
 
-                        async.eachSeries(comicIth.statements,
+                        async.eachSeries(comicIth[which],
                             function(lIth, cb) {
 
-                                for (var i = 0; i < statements.length; i++) {
-                                    if (lIth === statements[i].name) {
-                                        lIth.statementId = statements[i].id;
+                                var lIthId = 0;
+                                for (var i = 0; i < items.length; i++) {
+                                    if (lIth === items[i].name) {
+                                        lIthId = items[i].id;
                                         break;
                                     }
                                 }
 
-                                lIth.comicId = comicIth.id;
-                                var guts = {
-                                    comicId: lIth.comicId,
-                                    statementId: lIth.statementId
-                                };
-                                var strQuery = "INSERT " + self.dbname + "comics_statements SET ?";
-                                sql.queryWithCxnWithPlaceholders(connection,
-                                    strQuery,
-                                    guts,
-                                    function(err, rows) {
-                                        return cb(err);
+                                if (lIthId > 0) {
+
+                                    var guts = {
+                                        comicId: comicIth.id
+                                    };
+                                    if (which === 'statements') {
+                                        guts.statementId = lIthId
+                                    } else if (which === 'expressions') {
+                                        guts.expressionId = lIthId
+                                    } else {
+                                        guts.literalId = lIthId;
                                     }
-                                );
-                            },
-                            // final callback
-                            function(err) { return cb(err); }
-                        );
-                    }
-                ],
-                //final callback of async.series
-                function(err) {
-                    return callback(err);
-                }
-            );
-        } catch(e) { callback(e); }
-    }
-            
-    var m_saveComics_ExpressionsInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
-        try {
+                                    var strQuery = "INSERT " + self.dbname + "comics_" + which + " SET ?";
+                                    sql.queryWithCxnWithPlaceholders(connection,
+                                        strQuery,
+                                        guts,
+                                        function(err, rows) {
+                                            return cb(err);
+                                        }
+                                    );
+                                } else {
 
-            m_log("***In m_saveComics_ExpressionsInComicIthToDB***");
-
-            var expressions = [];
-
-            async.series(
-                [
-                    // Fill expressions array.
-                    function(cb) {
-
-                        var strQuery = "select * from " + self.dbname + "expressions;";
-                        sql.queryWithCxn(connection,
-                            strQuery,
-                            function(err, rows) {
-                                if (err) {
-                                    return cb(err);
+                                    return cb(null);
                                 }
-                                expressions = rows;
-                            }
-                        );
-                    },
-                    // Save to comics_expressions, using expressions array to look up expressionId.
-                    function(cb) {
-
-                        async.eachSeries(comicIth.expressions,
-                            function(lIth, cb) {
-
-                                for (var i = 0; i < expressions.length; i++) {
-                                    if (lIth === expressions[i].name) {
-                                        lIth.expressionId = expressions[i].id;
-                                        break;
-                                    }
-                                }
-
-                                lIth.comicId = comicIth.id;
-                                var guts = {
-                                    comicId: lIth.comicId,
-                                    expressionId: lIth.expressionId
-                                };
-                                var strQuery = "INSERT " + self.dbname + "comics_expressions SET ?";
-                                sql.queryWithCxnWithPlaceholders(connection,
-                                    strQuery,
-                                    guts,
-                                    function(err, rows) {
-                                        return cb(err);
-                                    }
-                                );
-                            },
-                            // final callback
-                            function(err) { return cb(err); }
-                        );
-                    }
-                ],
-                //final callback of async.series
-                function(err) {
-                    return callback(err);
-                }
-            );
-        } catch(e) { callback(e); }
-    }
-            
-    var m_saveComics_LiteralsInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
-
-        try {
-
-            m_log("***In m_saveComics_LiteralsInComicIthToDB***");
-
-            var literals = [];
-
-            async.series(
-                [
-                    // Fill literals array.
-                    function(cb) {
-
-                        var strQuery = "select * from " + self.dbname + "literals;";
-                        sql.queryWithCxn(connection,
-                            strQuery,
-                            function(err, rows) {
-                                if (err) {
-                                    return cb(err);
-                                }
-                                literals = rows;
-                            }
-                        );
-                    },
-                    // Save to comics_literals, using literals array to look up statementId.
-                    function(cb) {
-
-                        async.eachSeries(comicIth.literals,
-                            function(lIth, cb) {
-
-                                for (var i = 0; i < literals.length; i++) {
-                                    if (lIth === literals[i].name) {
-                                        lIth.literalId = literals[i].id;
-                                        break;
-                                    }
-                                }
-
-                                lIth.comicId = comicIth.id;
-                                var guts = {
-                                    comicId: lIth.comicId,
-                                    literalId: lIth.literalId
-                                };
-                                var strQuery = "INSERT " + self.dbname + "comics_literals SET ?";
-                                sql.queryWithCxnWithPlaceholders(connection,
-                                    strQuery,
-                                    guts,
-                                    function(err, rows) {
-                                        return cb(err);
-                                    }
-                                );
                             },
                             // final callback
                             function(err) { return cb(err); }
@@ -2759,7 +2709,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { callback(e); }
     }
 
-    var m_functionFinalCallback = function (err, res, connection, project) {
+    var m_functionFinalCallback = function (err, req, res, connection, project) {
 
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
@@ -2778,37 +2728,55 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             message: 'Committing transaction failed with ' + err.message
                         });
                     } else {
-                        if (project.hasOwnProperty("script")) {
-                            // There's a sql script that needs to be written to project root.
-                            // In the callback from that file creation, we'll return to the client.
-                            // m_log("About to write sql script containing " + project.script.length + " lines.");
-                            m_functionWriteSqlScript(project, function(err) {
 
-                                delete project.script;
-                                delete project.idnum;
+                        // Update JWT and user DB record to reflect project just saved.
+                        m_functionUpdateUserJWTCookie(
+                            req,
+                            res,
+                            project,
+                            function(err) {
+
                                 if (err) {
-                                    // Writing the file didn't work, but saving the project has already been committed to the DB.
-                                    // We'll inform the user, but do so in a way that the project is saved.
-                                    res.json({
-                                        success: true,
-                                        project: project,
-                                        scriptSuccess: false,
-                                        saveError: err
+
+                                    return res.json({
+                                        success: false,
+                                        message: err.message
+                                    });
+                                }
+
+                                if (project.hasOwnProperty("script")) {
+                                    // There's a sql script that needs to be written to project root.
+                                    // In the callback from that file creation, we'll return to the client.
+                                    // m_log("About to write sql script containing " + project.script.length + " lines.");
+                                    m_functionWriteSqlScript(project, function(err) {
+
+                                        delete project.script;
+                                        delete project.idnum;
+                                        if (err) {
+                                            // Writing the file didn't work, but saving the project has already been committed to the DB.
+                                            // We'll inform the user, but do so in a way that the project is saved.
+                                            res.json({
+                                                success: true,
+                                                project: project,
+                                                scriptSuccess: false,
+                                                saveError: err
+                                            });
+                                        } else {
+                                            res.json({
+                                                success: true,
+                                                project: project,
+                                                scriptSuccess: true
+                                            });
+                                        }
                                     });
                                 } else {
                                     res.json({
                                         success: true,
-                                        project: project,
-                                        scriptSuccess: true
+                                        project: project
                                     });
                                 }
-                            });
-                        } else {
-                            res.json({
-                                success: true,
-                                project: project
-                            });
-                        }
+                            }
+                        );
                     }
                 }
             );
@@ -2929,7 +2897,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 async.eachSeries(arIth,
                                     function(arIthJth, cb) {
 
-                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.id + " and id<>" + arIthJth.id + ";";
+                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
                                         sql.execute(strQuery,
                                             function(rows){
 

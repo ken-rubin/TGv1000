@@ -4,66 +4,70 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
+- From John:
+    - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
+- Saw some sort of display problem in horizontal scroller in one of the image search dialogs.
 - AZPPBuyersDialog.js
-    - Display project details at top above tabs
+    - The way I've had to do the buttons on the Buyers and Waitlisted tabs is ugly. Work on them. In fact, work on many column width problems (like also w/l since).
+    - As changes are made that affect the DB (and thus each of the datatables, I could do manual stuff or I could just refresh from scratch. Which way is better? **I think refreshing from the DB and rebuilding the datatables is better for several reasons: (1) easier; (2) just being used by admin users; (3) functionality is used infrequently, so why bother?
+    - Buyers tab
+        - Finish dropping someone from a class and (optionally) giving a refund thru Stripe. **Done. Needs testing.**
+        - Send an email to the user if a refund has been processed. **Done. Needs testing.**
+    - Waitlisted tab
+        - Invite user--tell waitlisted user that a position has opened. This will send an email with Accept and Decline links. The Accept link has to be used within 24 hours. Only with the code can someone buy such a class.
+            - The Accept link will work similarly to what I do in reset password. I have no idea (yet) how to do the Decline link.
+            + For Accept, after login bring user to BuyDialog with project detail loaded and the CC entry form at the bottom displayed.
+            * The Decline link will most likely be our first real API call, since there's really no reason to have a user log in in order to decline. We just have to make it so that the 1-minute Cron job knows to expire an invitation before the 24 hours are up--like immediately.
+        - Allow instructor to overbook by inviting multiple waitlist people.
+    - Invited tab
+        - Fetch data. Do it. **Done. Test it.**
+        - Implement 1 second countdown timer in #InvitedTable. This involves both counting down and, when it reaches 0, removing the waitlist table record from the DB (maybe sending an email) and from the invited table in memory and rebuilding the datatable.
     - Write m_setRecentRefundsTable
     - In fnRemoveBuyer add entry to m_holdData.recentRefunds and redraw that table
     - In fnInvite finish writing posting.done
     - In fnInvite if numEnrollees + numInvited < maxClassSize, suggest to admin user that class could be made active
-    - Implement 1 second countdown timer in #InvitedTable
-- Cron.js
-    - Finish job2
-    - Add waitlist reminder emails
-- Login++
-    - Handle Accept link in invitation email: after login bring user to buy page with CC form open
-- Someplace
-    - Handle Decline link in invitation email
-- UtilityBO.js
-    - When placing charge, send our own email in addition to Stripe's
-    - In routeUndoPurchase, send refund processed email if refund was processed; also probably want to return refundId with success again so that #RecentRefunds can be updated
-- If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
-    - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
-- Send our own email whenever someone completes a purchase. This is in addition to the one from Stripe.
-- Save place (like for student working in a project) and jump right back to it when the user signs in again.
-- Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
-    + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
-    + Lengthen to like 2 weeks.
-    + Save project to DB with every change.
-- We need a way to let teachers setting up curriculum for their classes when the school has purchased a site license.
-    - John: need more structure around classes to allow specific students to join or be signed up by the class creator, etc.
-    - The class is free to the students.
-- AZUsersDialog 
-    - Users tab
-        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive.
-        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
-- AZPPBuyersDialog
-    - Display PP info above the tabs.
-    - Buyers tab
-        - Finish dropping someone from a class and optionally giving a refund thru Stripe.
-        - Add an email to the user if a refund has been processed.
-    - Waitlisted tab
-        - Invite user, tell waitlisted user that a position has opened. Send an email with a link containing a code that has to be used within 24 hours. Only with the code can someone buy such a class. Implement all of this.
-        - Allow instructor to overbook by inviting multiple waitlist people.
-    - Invited tab
-        - Fetch data. Do it. **Done. Test it.**
-    - Add 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist. **Started. Finish and test it.**
-        - Handle the Accept and Decline links in the email.
 - AZProjectsDialog
+    - How are projects, types, methods and images saved now? Should not be accessible to normal users until the actions in this dialog are done.
     - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.
             - What starts off as public?
             - What starts off as private?
         - All images, videos and sounds start off as *quarantined* so an admin can look at them for non-permitted content and possibly remove the quarantine.
-        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public --  with observation of quarantined material.
+        - All new stuff goes in as private / quarantined. If the user wants to make it public or even sell it, then they have to make a request to share it for $n. Then an admin approves and it becomes public--with observation of quarantined material.
+        - Just created project by a@a.com. The project is both public and quarantined.
+        - All core projects were quarantined and public, but I just changed scriptnew to make quarantined = 0. After running this update, a@a.com created a new project. It copied q and p from the core project. It appears the 2 fields are just being copied and not being actively set to public (false), quarantined (true). **Wrong**
+        - An active product for sale (Prod1) is quarantined and public, but I just set quarantined = 0 in Workbench.
+        - A purchased product is quarantined and public. It should be quarantined and private. **Wrong**
+        - Added image to project owned by a@a.com. It has both public and quarantined set to false. This is correct.
+- Cron.js
+    - Finish job2
+    - Add waitlist reminder emails
+    - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist.
+    + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
+        * Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
+- UtilityBO.js
+    - When placing charge, send our own email in addition to Stripe's
+    - In routeUndoPurchase, send refund processed email if refund was processed; also probably want to return refundId with success again so that #RecentRefunds can be updated
+- Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
+- If a privileged user is editing/saving a purchasable product that has been bought by someone (which we *do* already know in ProjectBO routeSaveProject), we need to ask the user if the changes made are breaking changes and, if so, save a new version of the project and disable the original from further purchases. Better flow: when privileged user retrieves a project that has been purchased, tell the user and have the user decide what to do before saving. This kind-of has to be up to the privileged user except in cases like deleting a comic.
+    - John's idea: tell the previous buyers about the changes/bug fixes and give them the option to keep or delete the old one and get the new one for free.
+- Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
+    + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
+    + Lengthen to like 2 weeks.
+    + Save project to DB with every change.
 
 ## Jerry's seldom- or non-reproducable Bugs
-- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when the recurs I should be able to see what's wrong.**
+- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when it recurs I should be able to see what's wrong.**
 - Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above. Didn't help. Still happens sometimes to John.**
 - Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
 
 ### To consider
+- AZUsersDialog 
+    - Users tab
+        - Open some fields for in-place editing: zipcode; first and last names. Timezone would be incredibly memory expensive, since there are so many and we're client side--but on the other hand it's an admin using this.
+        - Add reset email button? Is it necessary given that the user has a link to click on the login page?
+- Consider checkpointing manager's data (to LocalStorage or other local datastore) on every action in Ken's area so that user never loses anything even if he closes the browser. Then we'd check the checkpoint and ask the user if he'd like to load from it. We'd remove the checkpoint any time we store to or retrieve from the DB.
 - Jade has been renamed to pug. Install pug in package.json instead of Jade.
-- Disable 2nd menu list if no project. Wait for merge with Ken.
 - Use this code to display a Product's video (if I add that):
     ```
     <div align="center" class="embed-responsive embed-responsive-16by9">
@@ -73,44 +77,25 @@
     </div>
     ```
 - Consider adding paging to search results--like 100 at a time. See code sample below which shows an efficient way to do MySQL paging.
-- Deleting
-    + What validation is done for deleting? If a property is being used in a method, is it deletable? I know that a Type cannot be deleted if any Tool Instances exist in the Designer pane.
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
-- During the buying process there's a project, but the user must **not** be allowed to do anything with it--like accessing menus or working with it in the canvas. Do I really need to load the project? I believe this handles itself with modal dialogs in the right places. **Test now. And more after Ken's stuff is done.**
-- Test the 1AM cron job that sends emails regarding upcoming classes, etc.
-    + Add waitlist checking to cron. If base PP id changes, update waitlist.projectId of all matching items to new projectId.
-    + Add waitlist reminders emails.
-- Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - go to AdminZone; 
++ Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
     - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
-- Finish tooltip enhancements in OpenProjectDialog.js. Actually, all that's left would involve shared public projects. A description field would be good in this case. But that whole area isn't finished or ready to be finished.
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
-- **Will change with elimination of Blockly** If I drag a Tool Instance in the Designer and the App initialize method is in the Code pane, the Blockly change listener handler takes so much time that dragging is jerky--just about impossible.
-    + **Ken:** With initialize blocks showing in the code pane, dragging a tool instance blanks out the code pane. It redraws after one stops dragging. This is not as desirable behavior as it was previously. Should we strive to make it display continuously?
-- No projects, types, methods, properties or events can have embedded spaces. Replace with underscore. **Confirm with Ken.**
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
 - Need rest of the dialogs to submit on Enter key.
     - These are already done:
         + EnrollDialog
-        + NewEventDialog
-        + NewMethodDialog
         + NewProjectDialog
-        + NewPropertyDialog
-        + NewTypeDialog
         + SaveProjectAsDialog
         + ImageDiskDialog
     - Still may want to do these (where it makes sense): 
-        - DeleteConfirmDialog
-        - GenericRenameDialog
         - ImageSearchDialog
         - ImageURLDialog
         - MethodSearchDialog
         - OpenProjectDialog
-        - PropertyGrid
         - TypeSearchDialog
-- In TypeWell: Delete current type should be disabled for: App Type; any SystemType; any Type in the current Comic that is a base type for another type in that comic; clicking on a Base Type shouldn't load into code if !canEditSystemTypes. **May not apply since TW is going away.**
 
 ## A Discussion of Projects and Purchasable Projects
 
@@ -786,70 +771,6 @@ Keeping the code schema and workspace XML in sync and complete while Types, Tool
 ##### Add
 ##### Rename
 ##### Delete
-
-
-### Validator.js
-Name validation is being systemetized and consolidated into /Core/Validator.js. Types of validation to be checked are: name collisions, reserved word use and reserved character use. Checks in Validator.js will be run when new items are created and when existing items are renamed. Validator.js in instantiated in main.js and is available in the global namespace as *validator*.
-
-*I noticed I am not calling reserved character checking. I want to implement an intelligent dispatcher in Validator.js that is called once with enough information to do all proper internal calls.*
-#### Name collisions
-- A user's Projects must have unique names. This is checked at project save time, not in Validator.js.
-- A Type name may be used only once in a comic.
-- In fact, all of these must be collectively distinct: Type name, Method name, Property name and Event name.
-- A Type name may not be the same as a Tool Instance name in the same comic.
-#### Reserved words
-- X, Y, Width and Height are not allowed as Type or Tool Instance names.
-#### Reserved characters
-- At this time the only reserved character is the double quote (\").
-#### Implementation status
-##### Key
-- **Complete** -- complete and in Validator.js
-- **Done** -- done, but not moved into Validator.js
-- **Started**
-
-<table>
-    <tr>
-        <td>Item</td>
-        <td>New</td>
-        <td>Rename</td>
-    </tr>
-    <tr>
-        <td>Project</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Comic</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Type</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Method</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Property</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Event</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Tool Instance</td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
-
 
 ## Just saving this here for possible implementation of ScrollRegion paging
 
