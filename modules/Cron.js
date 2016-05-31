@@ -6,6 +6,7 @@
 var schedule = require("node-schedule");
 var async = require("async");
 var moment = require("moment-timezone");
+var jwt = require('jsonwebtoken');
 
 module.exports = function Cron(app, sql, logger, mailWrapper) {
 
@@ -401,7 +402,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 					var momIn4Hours = momNow.add(4, 'h');
 
 					// Retrieve all records (plus a bit more) from waitlist where the user has been invited to enroll or decline.
-					var strQuery = "select w.*, u.userName, u.firstName, p.name as projectName, p.id as projectId from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
+					var strQuery = "select w.*, u.userName, u.id as userId, u.firstName, p.name as projectName, p.id as projectId from " + self.dbname + " waitlist w inner join user u on w.userId=u.id inner join projects p on p.id=w.projectId where dtInvited is not null;";
 					sql.execute (
 						strQuery,
 						function(rows) {
@@ -429,7 +430,8 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 																	projectName: row.projectName,
 																	projectId: row.projectId,
 																	userName: row.userName,
-																	firstName: row.firstName
+																	firstName: row.firstName,
+																	userId: row.userId
 																}
 															);
 														},
@@ -527,6 +529,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 												                        );
 																	}
 																],
+																// This is wayInnerCb.
 																function(err) {
 																	return innerCb(err, passOn);
 																}
@@ -551,20 +554,42 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 											[
 												function(innerCb2) {
 
+													var bSecure = (app.get("development") !== "development");
+													var protocol = bSecure ? "https" : "http";
+													var host = bSecure ? "www.nextwavecoders.com" : "localhost:8080";	// TODO: change once we get domain
+
+													var profile = 
+														{
+															userName: passOn.userName,
+															projectId: passOn.projectId,
+															waitlistId: passOn.waitlistId,
+															projectName: passOn.projectName,
+															userId: passOn.userId
+														};
+						                            var token = jwt.sign(profile, "jwt_secret", { expiresIn: 4*60*60});  // token expires in 4 hours. cron will expire the invitation then in any case.
+
+													// First we set up the Accept link.
+													var acceptUrl = protocol + '://' + host + '/?accept=' + token;
+
+													// Then we set up the Decline link.
+													var declineUrl = protocol + '://' + host + '/invite/?decline=' + token;
+
 							                        var aORz = (row.userName === 'a@a.com' || row.userName === 'z@z.com');
 							                        var mailOptions = {
 							                 
 							                            from: "TechGroms <techgroms@gmail.com>", // sender address
 							                            to: (!aORz) ? row.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
-							                            subject: "Waitlists do work! Here is your invitation to enroll in " + passOn.projectName + ".", // Subject line
+							                            subject: "Only 4 hours left to ACCEPT your invitation to enroll in " + passOn.projectName + ".", // Subject line
 							                            text: "Hi, " + row.firstName + ". " +
-							                            "" +
-							                            "" +
-								                        "\r\n\r\n\r\n\r\nWarm regards, The nextwavecoders Team",
+							                            "\r\n\r\n20 hours ago we invited you to enroll in the class for which you had been waitlisted. We can wait only 4 more hours before we have to invite the next person on the list." +
+							                            "\r\n\r\nACCEPT link: " + acceptUrl + " (Click to open a browser and go straight to enrollment for this class.)" +
+							                            "\r\n\r\nDECLINE link: " + declineUrl + " (You won't see anything happen, but thank you for opening a spot for someone else.)" +
+								                        "\r\n\r\n\r\n\r\nRegards, The nextwavecoders Team",
 							                            html: "Hi, " + row.firstName + ". " +
-							                            "" +
-							                            "" +
-								                        "<br><br><br><br>Warm regards, The nextwavecoders Team"
+							                            "<br><br>20 hours ago we invited you to enroll in the class for which you had been waitlisted. We can wait only 4 more hours before we have to invite the next person on the list." +
+							                            "<br><br>ACCEPT link: <a href='" + acceptUrl + "'>Click to open a browser and go straight to enrollment for this class.</a>" +
+							                            "<br><br>DECLINE link: <a href='" + declineUrl + "'>Click to decline. You won't see anything happen, but thank you for opening a spot for someone else.</a>" +
+								                        "<br><br><br><br>Regards, The nextwavecoders Team"
 							                        };
 
 							                        mailWrapper.mail(mailOptions,
@@ -594,10 +619,11 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 												return outerCb(err);
 											}
 										);
-									}
+									} else {
 
-									// Any that fall through are in their first 20 hours. We do nothing with them.
-									return outerCb(null);
+										// Any that fall through are in their first 20 hours. We do nothing with them.
+										return outerCb(null);
+									}
 								},
 								// This is outerCb.
 								function(err) {

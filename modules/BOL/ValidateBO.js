@@ -4,7 +4,6 @@
 //////////////////////////////////
 
 var bcrypt = require("bcrypt-nodejs");
-
 var jwt = require('jsonwebtoken');
 var async = require("async");
 var mysql = require("mysql");
