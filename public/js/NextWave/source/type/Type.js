@@ -84,7 +84,7 @@ define(["NextWave/source/utility/prototypes",
                             // Set the name.
                             self.name = new CodeType(objectType.name);
                             // Since these are not draggable,
-                            // set the collection to itself.
+                            /* set the collection to itself.
                             self.name.collection = self.name;
                             self.name.beforeChange = function () {
 
@@ -120,7 +120,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     return e;
                                 }
-                            };
+                            };*/
 
                             // Build the methods.
                             if (objectType.methods) {
@@ -392,7 +392,7 @@ define(["NextWave/source/utility/prototypes",
                                     if (bIn) {
 
                                         m_objectHighlight = self.name;
-                                        self.name.highlight = true;
+                                        //self.name.highlight = true;
                                     } else {
 
                                         // Then test the Methods.
@@ -449,9 +449,7 @@ define(["NextWave/source/utility/prototypes",
                                     return window.manager.removeType(self);
                                 } else if (m_objectHighlight === self.name) {
 
-                                    return window.manager.switchCenterPanelMode("Type");
-                                    // Don't focus, which selects the text for editing.
-                                    //return window.manager.setFocus(m_objectHighlight);
+                                    return window.manager.selectType(self);
                                 } else if ($.isFunction(m_objectHighlight.mouseDown)) {
 
                                     return m_objectHighlight.mouseDown(objectReference);
@@ -574,7 +572,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Render the type CodeType.
                             var areaName = new Area(m_area.location.clone(),
-                                new Size(m_area.extent.width - 2 * settings.glyphs.width - settings.general.margin, 
+                                new Size(m_area.extent.width - 2 * settings.glyphs.width + settings.general.margin, 
                                     self.settingsNode.lineHeight));
                             self.name.maxWidth = areaName.extent.width;
                             exceptionRet = self.name.render(contextRender, 

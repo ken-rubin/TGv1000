@@ -2,8 +2,8 @@
 // TypeBuilder module.
 //
 // Gui component responsible for showing 
-// a method and all its parts (e.g. type
-// name, parameters, statement-block).
+// a type and all its parts and also 
+// allowing for their modification.
 //
 // Return constructor function.
 //
@@ -15,8 +15,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
-    "NextWave/source/utility/Area"],
-    function (prototypes, settings, Point, Size, Area) {
+    "NextWave/source/utility/Area",
+    "NextWave/source/utility/DialogHost"],
+    function (prototypes, settings, Point, Size, Area, DialogHost) {
 
         try {
 
@@ -27,17 +28,11 @@ define(["NextWave/source/utility/prototypes",
 
                     var self = this;                        // Uber closure.
 
-                    ///////////////////////
-                    // Public fields.
+                    // Inherit from DialogHost.
+                    self.inherits(DialogHost);
 
                     ///////////////////////
                     // Public methods.
-
-                    // Clear out state.
-                    self.clearItems = function () {
-
-                        return null;
-                    };
 
                     // Attach instance to DOM and initialize state.
                     self.create = function () {
@@ -49,6 +44,242 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "Instance already created!" };
                             }
+
+                            // Create the dialog.
+                            var exceptionRet = self.dialog.create({
+
+                                nameLabel: {
+
+                                    type: "Label",
+                                    text: "Name",
+                                    x: settings.general.margin,
+                                    y: settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                nameEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    enterFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Store the current value for comparison after.
+                                            localSelf.saveTypeName = localSelf.text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    },
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // If the name has changed, update the name.
+                                            if (localSelf.saveTypeName !== localSelf.text) {
+
+                                                // Ensure the value is unique.
+                                                var strPayload = localSelf.text;
+                                                localSelf.text = "Hopefully A Unique Value That Is Never Duplicated";
+                                                localSelf.text = window.manager.getUniqueName(strPayload,
+                                                    window.manager.types,
+                                                    "name",
+                                                    "payload");
+
+                                                // Update.
+                                                return window.manager.editTypeName(localSelf.saveTypeName,
+                                                    localSelf.text);
+                                            }
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                },
+                                baseLabel: {
+
+                                    type: "Label",
+                                    text: "Base",
+                                    x: settings.general.margin,
+                                    y: settings.dialog.lineHeight + 
+                                        2 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                baseEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: settings.dialog.lineHeight + 
+                                        2 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    enterFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Save the original base, for resetting on invalid new name.
+                                            localSelf.saveBase = localSelf.text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    },
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Ensure the current value is a valid 
+                                            // type, not equal to the current type:
+
+                                            // Get the current type name.
+                                            var strCurrentTypeName = localSelf.dialog.controlObject["nameEdit"].text;
+
+                                            // Test it.
+                                            if (localSelf.text === strCurrentTypeName ||
+                                                !window.manager.isValidBaseTypeName(strCurrentTypeName,
+                                                        localSelf.text)) {
+
+                                                // Reset base class on error.
+                                                localSelf.text = localSelf.saveBase;
+                                            } else {
+
+                                                // Save value.                                                                                            // Get the current type.
+                                                var typeContext = localSelf.dialog.host.typeContext;
+
+                                                // Update it description.
+                                                typeContext.stowage.base = localSelf.text;
+                                            }
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                },
+                                descriptionLabel: {
+
+                                    type: "Label",
+                                    text: "Description",
+                                    x: settings.general.margin,
+                                    y: 2 * settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                descriptionEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 2 * settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight * 5,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Get the current type.
+                                            var typeContext = localSelf.dialog.host.typeContext;
+
+                                            // Update it description.
+                                            typeContext.stowage.description = localSelf.text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                },
+                                creatorLabel: {
+
+                                    type: "Label",
+                                    text: "Creator",
+                                    x: settings.general.margin,
+                                    y: 7 * settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                creatorEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 7 * settings.dialog.lineHeight + 
+                                        4 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Get the current type.
+                                            var typeContext = localSelf.dialog.host.typeContext;
+
+                                            // Update it description.
+                                            typeContext.stowage.creator = localSelf.text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                },
+                                createdLabel: {
+
+                                    type: "Label",
+                                    text: "Created",
+                                    x: settings.general.margin,
+                                    y: 8 * settings.dialog.lineHeight + 
+                                        5 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                createdEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 8 * settings.dialog.lineHeight + 
+                                        5 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Get the current type.
+                                            var typeContext = localSelf.dialog.host.typeContext;
+
+                                            // Update it description.
+                                            typeContext.stowage.created = localSelf.text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                }
+                            });
 
                             // Because it is!
                             m_bCreated = true;
@@ -80,168 +311,63 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Invoked when the mouse is moved over the tree.
-                    self.mouseMove = function (objectReference) {
+                    // Load type into type builder.
+                    self.loadType = function (type) {
 
                         try {
 
-                            return null;
-                        } catch (e) {
+                            // Ensure the type has the requisit attributes.
+                            if (!type.stowage) {
 
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is moved away from the canvas.
-                    self.mouseOut = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor) {
-
-                                if (m_objectCursor.mouseOut) {
-
-                                    m_objectCursor.mouseOut(objectReference);
-                                }
-                                m_objectCursor.highlight = false;
-                                m_objectCursor = null;
+                                type.stowage = {};
                             }
-                            return null;
-                        } catch (e) {
+                            if (!type.stowage.base) {
 
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is pressed down over the canvas.
-                    self.mouseDown = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.mouseDown)) {
-
-                                return m_objectCursor.mouseDown(objectReference);
+                                type.stowage.base = "BaseObject";
                             }
-                            return null;
-                        } catch (e) {
+                            if (!type.stowage.description) {
 
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is let up over the canvas.
-                    self.mouseUp = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.mouseUp)) {
-
-                                return m_objectCursor.mouseUp(objectReference);
+                                type.stowage.description = "[description goes here]";
                             }
-                            return null;
-                        } catch (e) {
+                            if (!type.stowage.creator) {
 
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is clicked over the canvas.
-                    self.click = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.click)) {
-
-                                return m_objectCursor.click(objectReference);
+                                type.stowage.creator = "[creator goes here]";
                             }
-                            return null;
-                        } catch (e) {
+                            if (!type.stowage.created) {
 
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse wheel is scrolled over the canvas.
-                    self.mouseWheel = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.mouseWheel)) {
-
-                                return m_objectCursor.mouseWheel(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Calculate the section rectangles.
-                    self.calculateLayout = function (areaMaximal, contextRender) {
-
-                        try {
-
-                            // Calculate the maximal area.
-                            m_areaMaximal = areaMaximal;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Render out the objects.
-                    self.render = function (contextRender) {
-                        
-                        try {
-
-                            var exceptionRet = m_areaMaximal.generateRoundedRectPath(contextRender);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
+                                type.stowage.created = "[created goes here]";
                             }
 
-                            contextRender.save();
-                            contextRender.clip();
+                            // Store the context.
+                            self.typeContext = type;
 
-                            contextRender.fillStyle = "#990";
-                            contextRender.fillRect(m_areaMaximal.location.x,
-                                m_areaMaximal.location.y,
-                                m_areaMaximal.extent.width,
-                                m_areaMaximal.extent.height);
-
-                            contextRender.restore();
-
+                            // Update controls.
+                            self.dialog.controlObject["nameEdit"].text = type.name.payload;
+                            self.dialog.controlObject["baseEdit"].text = type.stowage.base;
+                            self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
+                            self.dialog.controlObject["creatorEdit"].text = type.stowage.creator;
+                            self.dialog.controlObject["createdEdit"].text = type.stowage.created;
                             return null;
                         } catch (e) {
-                            
+
                             return e;
                         }
                     };
-
-                    ///////////////////////
-                    // Private methods.
 
                     ///////////////////////
                     // Private fields.
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-                    // The whole area.
-                    var m_areaMaximal = null;
-                    // Object under cursor.
-                    var m_objectCursor = null;
                 } catch (e) {
 
                     alert(e.message);
                 }
             };
+
+            // Inherit from Control.  Wire 
+            // up prototype chain to Control.
+            functionRet.inheritsFrom(DialogHost);
 
             return functionRet;
         } catch (e) {

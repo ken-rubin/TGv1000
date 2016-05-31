@@ -343,7 +343,7 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.fillText(self.name,
                                 self.area.location.x + settings.general.margin,
                                 self.area.location.y,
-                                self.area.extent.width - settings.general.margin - settings.glyphs.width + settings.general.margin);
+                                self.area.extent.width - settings.general.margin - 2 * settings.glyphs.width);
 
                             // If open, render TypeSection.
                             var glyph = glyphs.expand;

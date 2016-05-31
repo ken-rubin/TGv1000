@@ -85,7 +85,7 @@ define(["NextWave/source/utility/prototypes",
                             );
                     };
 
-                    // Invoked when the mouse is pressed down over this method.
+                    /* Invoked when the mouse is pressed down over this method.
                     self.mouseDown = function (objectReference) {
 
                         try {
@@ -95,7 +95,7 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
-                    };
+                    };*/
 
                     // Invoked when the mouse is clicked over this method.
                     self.click = function (objectReference) {
@@ -104,7 +104,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Load new data into method builder.
                             return window.manager.setContext(self.owner,
-                                self.name);
+                                self);
                         } catch (e) {
 
                             return e;

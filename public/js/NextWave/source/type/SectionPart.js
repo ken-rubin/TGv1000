@@ -120,12 +120,15 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Height needed in a few places, save off here.
+                            var dHeight = self.getHeight();
+
                             // Define the containing area.
                             m_area = new Area(
                                 new Point(areaRender.location.x + settings.general.margin, 
                                     areaRender.location.y + settings.general.margin + dYOffset),
                                 new Size(areaRender.extent.width - 2 * settings.general.margin, 
-                                    self.getHeight() - 2 * settings.general.margin)
+                                    dHeight - 2 * settings.general.margin)
                             );
 
                             // Generate the path.
@@ -165,14 +168,14 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.fillText(self.name,
                                 m_area.location.x + settings.general.margin,
                                 m_area.location.y + settings.general.margin,
-                                m_area.extent.width - 2 * settings.general.margin);
+                                m_area.extent.width - dHeight);
 
                             // Render the delete icon.
                             m_areaRemove = new Area(
-                                new Point(m_area.location.x + m_area.extent.width - (self.getHeight() - settings.general.margin),
+                                new Point(m_area.location.x + m_area.extent.width - (dHeight - settings.general.margin),
                                     m_area.location.y),
-                                new Size(self.getHeight() - 2 * settings.general.margin, 
-                                    self.getHeight() - 2 * settings.general.margin));
+                                new Size(dHeight - 2 * settings.general.margin, 
+                                    dHeight - 2 * settings.general.margin));
 
                             // Render glyph.
                             exceptionRet = glyphs.render(contextRender,

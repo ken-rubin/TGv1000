@@ -214,20 +214,6 @@ define([],
                 // cause problems for the new this.prototype.
                 this.prototype.constructor = this;
             };
-            
-//            Function.defineProperty(Function.prototype,
-//                "inherits",
-//                {
-//            		value: function (ParentConstructorFunction) {
-//            			
-//                        this.prototype = new ParentConstructorFunction();
-//                        this.prototype.constructor = this;
-//            		},
-//                    enumerable: false,
-//                    configurable: true,
-//                    writable: true
-//                });
-
         } catch (e) {
 
             alert(e.message);

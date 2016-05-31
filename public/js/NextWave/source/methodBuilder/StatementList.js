@@ -28,6 +28,8 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(List,
                     	true);
 
+                    self.randomNumber = Math.random(10000);
+
                     //////////////////////
                     // Public methods.
 

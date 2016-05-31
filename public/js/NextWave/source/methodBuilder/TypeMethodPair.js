@@ -5,6 +5,7 @@
 //
 // Return constructor function.
 //
+// This type is no longer used.
 
 "use strict";
 

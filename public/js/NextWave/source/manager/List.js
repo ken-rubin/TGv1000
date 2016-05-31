@@ -578,6 +578,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Make a slightly smaller copy of the maximal area--with borders.
+                            areaMaximal = new Area(new Point(areaMaximal.location.x + settings.general.margin,
+                                    areaMaximal.location.y + settings.general.margin),
+                                new Size(Math.max(0, areaMaximal.extent.width - 2 * settings.general.margin),
+                                    Math.max(0, areaMaximal.extent.height - 2 * settings.general.margin)));
+
                             // Calculate the maximal area.
                             m_areaMaximal = areaMaximal;
 
@@ -642,6 +648,19 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) {
 
                                 throw exceptionRet;
+                            }
+
+                            // Draw focus recangle if highlighted.
+                            if (self.highlight) {
+
+                                contextRender.fillStyle = settings.general.fillBackgroundHighlight;
+                                contextRender.fill();
+                                contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
+                                contextRender.stroke();
+                            } else {
+
+                                contextRender.fillStyle = settings.general.fillBackground;
+                                contextRender.fill();
                             }
 
                             // Save canvas state.

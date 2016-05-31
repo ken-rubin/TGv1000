@@ -46,7 +46,7 @@ define(["NextWave/source/utility/prototypes",
                             // Load up background image.
                             m_imageBackground = new Image();
                             m_imageBackground.onload = m_functionBackgroundImageLoaded;
-                            var i = Math.floor(Math.random() * 7);
+                            var i = Math.floor(Math.random() * 8);
                             m_imageBackground.src = settings.background.imageURLs[i];
 
                             return null;

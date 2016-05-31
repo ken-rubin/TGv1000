@@ -57,7 +57,7 @@ define(["NextWave/source/utility/prototypes",
                     // Hold reference to the panel layer.
                     self.panelLayer = null;
                     // Object used to initialize this instance.
-                    self.initializer = null;
+                    self.projectData = null;
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
                     // Collection of named object pertinent to the current context.
@@ -139,7 +139,14 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return self.addType(typeNew);
+                            exceptionRet = self.addType(typeNew);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select it into the GUI.
+                            return self.selectType(typeNew);
                         } catch (e) {
 
                             return e;
@@ -226,10 +233,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // TODO: Update any allocation associated with this type.
-                            // Also, update the type name in the method builder.
-                            // Not sure if this will conflict with the type-name 
-                            // editing if done directly from the type name....
+                            // TODO: Update every occurance of this type name everywhere.
 
                             return null;
                         } catch (e) {
@@ -262,6 +266,37 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Test the provisional base type name for validity.
+                    self.isValidBaseTypeName = function (strTypeName, strProvisionalBaseTypeName) {
+
+                        // TODO: check base chain to avoid circular inheritance.
+                        // For now, just ensure the provisional name is a valid type name.
+                        for (var i = 0; i < self.types.length; i++) {
+
+                            var typeIth = self.types[i];
+                            if (typeIth.name.payload === strProvisionalBaseTypeName) {
+
+                                return true;
+                            }
+                        }
+                        return false;
+                    };
+
+                    // Test the provisional property type name for validity.
+                    self.isValidPropertyTypeName = function (strProvisionalPropertyTypeName) {
+
+                        // Ensure the provisional name is a valid type name.
+                        for (var i = 0; i < self.types.length; i++) {
+
+                            var typeIth = self.types[i];
+                            if (typeIth.name.payload === strProvisionalPropertyTypeName) {
+
+                                return true;
+                            }
+                        }
+                        return false;
                     };
 
                     // Remove method from specified type.
@@ -326,7 +361,34 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // TODO: Update any allocation associated with this type.
+                            // TODO: Update any allocation associated with this method.
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits a Property name.
+                    self.editPropertyName = function (type, strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < type.properties.parts.length; i++) {
+
+                                // Find match...
+                                if (type.properties.parts[i].name === strOriginalName) {
+
+                                    // ...and update.
+                                    type.properties.parts[i].name = strNewName;
+
+                                    break;
+                                }
+                            }
+
+                            // TODO: Update any allocation associated with this property.
 
                             return null;
                         } catch (e) {
@@ -473,11 +535,18 @@ define(["NextWave/source/utility/prototypes",
                             self.context = {
 
                                 type: type,
-                                method: type.methods.parts[iIndex]
+                                method: (iIndex.allocateCodeInstance ? iIndex : type.methods.parts[iIndex])
                             };
 
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Method");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Load up the method into the method builder.
-                            var exceptionRet = window.methodBuilder.loadTypeMethod(self.context);
+                            exceptionRet = window.methodBuilder.loadTypeMethod(self.context);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -524,7 +593,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Initialze instance.
-                    self.create = function (objectInitializer) {
+                    self.create = function () {
 
                         try {
 
@@ -797,7 +866,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Load all types and visible/existing panels 
                     // into this manager instance from persistence.
-                    // objectInitializer is comics[i].data as loaded from database.
+                    // objectprojectData is comics[i].data as loaded from database.
                     // It needs to be massaged a bit.
                     //
                     // This is basically the opposite of what goes on in project.saveToDatabase();
@@ -813,10 +882,9 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Save the project attributes.
-                            self.initializer = objectProject;
+                            self.projectData = objectProject;
 
-                            // Massage objectInitializer into the format manager requires.
-                            // Clone it into self.initializer.
+                            // Extract the comic.
                             var objectComic = objectProject.comics[objectProject.currentComicIndex];
 
                             // Load up panels.
@@ -836,7 +904,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Add the types from the initializer into this intance.
+                            // Add the types from the comic into this instance.
                             exceptionRet = self.loadTypes(objectComic.types);
                             if (exceptionRet) {
 
@@ -848,6 +916,88 @@ define(["NextWave/source/utility/prototypes",
 
                             return null;
                         } catch (e) { return e; }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for a type.
+                    self.selectType = function (type) {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Type");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the type into the type builder.
+                            exceptionRet = window.typeBuilder.loadType(type);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for a Property.
+                    self.selectProperty = function (type, iIndex) {
+
+                        try {
+
+                            // If iIndex is a string, find its matching index.
+                            if (iIndex.substring) {
+
+                                for (var i = 0; i < type.properties.parts.length; i++) {
+
+                                    var propertyIth = type.properties.parts[i];
+                                    if (propertyIth.name === iIndex) {
+
+                                        iIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // If did not find an index, set to 0.
+                            if (iIndex.substring) {
+
+                                iIndex = 0;
+                            }
+
+                            // Default to an actual property object.
+                            var property = iIndex;
+
+                            // If it is not a property (it is an integer), load it from the type.
+                            if (!property.allocateCodeInstance) {
+
+                                property = type.properties.parts[iIndex]
+                            }
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Property");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the type into the type builder.
+                            exceptionRet = window.propertyBuilder.loadProperty(type,
+                                property);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     }
 
                     // Put the center panel into different modes.
@@ -891,7 +1041,7 @@ define(["NextWave/source/utility/prototypes",
                     self.save = function () {
 
                         // Extract the saved off project.
-                        var objectRet = self.initializer;
+                        var objectRet = self.projectData;
 
                         // For now, only handling first comic.
                         var objectComic = objectRet.comics[objectRet.currentComicIndex];
@@ -932,10 +1082,18 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Call exit focus.
+                            var exceptionRet = m_functionCallAlternateFocusExit();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Set the alternate focus object.
                             self.alternateFocus = objectFocus;
 
-                            return null;
+                            // Call enter focus.
+                            return m_functionCallAlternateFocusEnter();
                         } catch (e) {
 
                             return e;
@@ -946,6 +1104,13 @@ define(["NextWave/source/utility/prototypes",
                     self.setDragObject = function (objectDrag) {
 
                         try {
+
+                            // Call exit focus.
+                            var exceptionRet = m_functionCallAlternateFocusExit();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             // Clear out any alternate.
                             self.alternateFocus = null;
@@ -973,6 +1138,52 @@ define(["NextWave/source/utility/prototypes",
 
                     //////////////////////////
                     // Private methods.
+
+                    // Helper method.
+                    var m_functionCallAlternateFocusEnter = function () {
+
+                        try {
+
+                            // If the alternateFocus object is a control, 
+                            // then it will have a configuration.  If that 
+                            // object has a enterFocus method, call it now.
+                            if (self.alternateFocus &&
+                                self.alternateFocus.configuration &&
+                                $.isFunction(self.alternateFocus.configuration.enterFocus)) {
+
+                                // Call event.
+                                self.alternateFocus.configuration.enterFocus(self.alternateFocus);
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method.
+                    var m_functionCallAlternateFocusExit = function () {
+
+                        try {
+
+                            // If the alternateFocus object is a control, 
+                            // then it will have a configuration.  If that 
+                            // object has a exitFocus method, call it now.
+                            if (self.alternateFocus &&
+                                self.alternateFocus.configuration &&
+                                $.isFunction(self.alternateFocus.configuration.exitFocus)) {
+
+                                // Call event.
+                                self.alternateFocus.configuration.exitFocus(self.alternateFocus);
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Calculate e.offsetX and e.offsetY 
                     // if they are undefined (as in Firefox).
@@ -1103,6 +1314,13 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw exceptionRet;
                             }
+                            // Call exit focus.
+                            var exceptionRet = m_functionCallAlternateFocusExit();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             self.alternateFocus = null;
 
                             // Handle dragging.

@@ -73,6 +73,15 @@ define(["NextWave/source/utility/prototypes",
                             // Calculate a good, relative corner radius.
                             var dCornerRadius = settings.area.cornerRadius;
 
+                            // Ensure their are no calculated negative sizes.
+                            if (dCornerRadius > self.extent.height) {
+
+                                dCornerRadius = self.extent.height;
+                            } else if (dCornerRadius > self.extent.width) {
+
+                                dCornerRadius = self.extent.width;
+                            }
+
                             // Generate the rounded path.
                             contextRender.beginPath();
                             contextRender.moveTo(self.location.x,

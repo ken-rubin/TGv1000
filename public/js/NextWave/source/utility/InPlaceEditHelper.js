@@ -320,7 +320,16 @@ define(["NextWave/source/utility/prototypes",
 
                             // Determine if the focus element has focus to determine 
                             // whether or not to defer to the non-focused callback.
-                            var bFocused = window.manager.hasFocus(self.owner[self.focusElement]);
+                            var bFocused = false;
+
+                            // If self, don't access property.
+                            if (self.focusElement === "self") {
+
+                                bFocused = window.manager.hasFocus(self.owner);
+                            } else {
+
+                                bFocused = window.manager.hasFocus(self.owner[self.focusElement]);
+                            }
 
                             // Render the selection if focused...
                             if (bFocused) {

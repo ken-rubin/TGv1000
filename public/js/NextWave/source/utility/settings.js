@@ -42,10 +42,18 @@ define(["NextWave/source/utility/prototypes"],
                         fillBackgroundSelected: "#f0f",
                         strokeBackgroundHighlight: "#000",
                         fillBackgroundHighlight: "#fff",
+                        fillBackground: "rgba(0,0,0,0.5)",
                         strokeBackground: "#000",
                         fillText: "#000",
                         blinkMS: 500,
-                        maximumCharacters: 32
+                        maximumCharacters: 32,
+                        font: "30px Arial"
+                    };
+                    self.dialog = {
+
+                        firstColumnWidth: 200,
+                        lineHeight: 34,
+                        font: "30px Arial"
                     };
                     self.area = {
 
@@ -61,7 +69,14 @@ define(["NextWave/source/utility/prototypes"],
                             "./js/NextWave/media/background3.jpg",
                             "./js/NextWave/media/background4.jpg",
                             "./js/NextWave/media/background5.jpg",
-                            "./js/NextWave/media/background6.png"]
+                            "./js/NextWave/media/background6.png",
+                            "./js/NextWave/media/background7.JPG"]
+                    };
+                    self.typeBuilder = {
+
+                        firstColumnWidthPercent: 0.25,
+                        lineHeight: 34,
+                        font: "30px Arial"
                     };
                     self.manager = {
 
@@ -147,38 +162,38 @@ define(["NextWave/source/utility/prototypes"],
 
                         namesPanel: {
 
-                            x: 0.2,
-                            width: 0.2,
+                            x: 0,
+                            width: 0.25,
                             height: 0.25
                         },
                         statementsPanel: {
 
-                            x: 0.4,
-                            width: 0.2,
+                            x: 0.25,
+                            width: 0.25,
+                            height: 0.25
+                        },
+                        literalsPanel: {
+
+                            x: 0.5,
+                            width: 0.25,
                             height: 0.25
                         },
                         expressionsPanel: {
 
-                            x: 0.8,
-                            width: 0.2,
-                            height: 0.8
-                        },
-                        literalsPanel: {
-
-                            x: 0.6,
-                            width: 0.2,
+                            x: 0.75,
+                            width: 0.25,
                             height: 0.25
                         },
                         typesPanel: {
 
-                            y: 0.2,
-                            width: 0.2,
-                            height: 0.8
+                            y: 0.25,
+                            width: 0.3,
+                            height: 0.75
                         },
                         centerPanel: {
 
-                            x: 0.2,
-                            width: 0.6,
+                            x: 0.3,
+                            width: 0.7,
                             height: 0.75
                         }
                     };

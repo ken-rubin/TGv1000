@@ -35,12 +35,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/statement/StatementList",
     "NextWave/source/expression/ExpressionList",
     "NextWave/source/literal/LiteralList",
-    "NextWave/source/methodBuilder/MethodBuilder",
-    "NextWave/source/methodBuilder/ParameterList",
-    "NextWave/source/methodBuilder/Parameter",
-    "NextWave/source/methodBuilder/StatementList",
-    "NextWave/source/methodBuilder/TypeMethodPair"],
-    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, TypeBuilder, PropertyBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, ParameterList, Parameter, StatementList, TypeMethodPair) {
+    "NextWave/source/methodBuilder/MethodBuilder"],
+    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, TypeBuilder, PropertyBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
 
         try {
 
@@ -114,60 +110,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-
-
-
-/*
-
-
-                    // Clear the tree of Types.
-                    self.clearTypes = function () {
-
-                        try {
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.typesPanel.payload.clearItems();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Load up Types from list of Types.
-                    self.loadTypes = function (arrayList) {
-
-                        try {
-
-                            // Clear the old.
-                            var exceptionRet = self.clearTypes();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Add the new.
-                            return self.typesPanel.payload.load(arrayList);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Save and return list of extant Types.
-                    self.saveTypes = function () {
-
-                        return self.typesPanel.payload.save();
-                    };
-
-
-
-
-
-*/
-
-
-
                     // Method adds a new Type.
                     self.addType = function (typeNew) {
 
@@ -210,12 +152,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-
-
-
-
-
-
                     // Clear the list of names.
                     self.clearNames = function () {
 
@@ -229,11 +165,17 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
                     // Clear the center panel.
-                    self.clearCenter = function () {
+                    self.clearCenter = function (strActiveCenterPanel) {
 
                         try {
 
+                            // Ensure there is always a good active center panel.
+                            if (!strActiveCenterPanel) {
+
+                                strActiveCenterPanel = "Method";
+                            }
                             window.methodBuilder = null;
                             window.typeBuilder = null;
                             window.propertyBuilder = null;
@@ -256,7 +198,8 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return self.switchCenterPanelMode("Method");
+                            // Set the active section.
+                            return self.switchCenterPanelMode(strActiveCenterPanel);
                         } catch (e) {
 
                             return e;
@@ -815,32 +758,10 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
-                            // Allocate type-name object.
-                            var tmp = new TypeMethodPair();
-                            var exceptionRet = tmp.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            var pl = new ParameterList();
-                            exceptionRet = pl.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            var sl = new StatementList();
-                            exceptionRet = sl.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
                             // Allocate and create the object list.
                             // Store globally so the drag layer can access.
                             window.methodBuilder = new MethodBuilder();
-                            exceptionRet = window.methodBuilder.create(tmp, pl, sl);
+                            var exceptionRet = window.methodBuilder.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;

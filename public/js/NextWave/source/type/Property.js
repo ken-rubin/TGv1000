@@ -72,12 +72,14 @@ define(["NextWave/source/utility/prototypes",
                         return "removeProperty";
                     }
 
-                    // Invoked when the mouse is pressed down over this method.
-                    self.mouseDown = function (objectReference) {
+                    // Invoked when the mouse is clicked over this method.
+                    self.click = function (objectReference) {
 
                         try {
 
-                            return window.manager.switchCenterPanelMode("Property");
+                            // Load new data into method builder.
+                            return window.manager.selectProperty(self.owner,
+                                self);
                         } catch (e) {
 
                             return e;

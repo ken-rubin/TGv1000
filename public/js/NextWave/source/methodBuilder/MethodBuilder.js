@@ -16,10 +16,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
-    "NextWave/source/methodBuilder/TypeMethodPair",
-    "NextWave/source/methodBuilder/ParameterList",
-    "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, settings, Point, Size, Area, TypeMethodPair, ParameterList, StatementList) {
+    "NextWave/source/utility/DialogHost"],
+    function (prototypes, settings, Point, Size, Area, DialogHost) {
 
         try {
 
@@ -30,11 +28,16 @@ define(["NextWave/source/utility/prototypes",
 
                     var self = this;                        // Uber closure.
 
+                    // Inherit from DialogHost.
+                    self.inherits(DialogHost);
+
                     ///////////////////////
                     // Public fields.
 
                     // .
-                    self.methodTypeMethodPair = null;
+                    self.typeLabel = null;
+                    // .
+                    self.methodEdit = null;
                     // .
                     self.methodParameters = null;
                     // .
@@ -43,34 +46,8 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
-                    // Clear all the statements from the statement list.
-                    self.clearItems = function () {
-
-                        try {
-
-                            var exceptionRet = self.methodTypeMethodPair.create("", "");
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            self.methodParameters = new ParameterList();
-                            exceptionRet = self.methodParameters.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            self.methodStatements = new StatementList();
-                            return self.methodStatements.create();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Attach instance to DOM and initialize state.
-                    self.create = function (tmpMethod, plMethod, slMethod) {
+                    self.create = function () {
 
                         try {
 
@@ -79,23 +56,115 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "Instance already created!" };
                             }
-                            if (!tmpMethod) {
 
-                                throw { message: "Must specify a type-name object!" };
-                            }
-                            if (!plMethod) {
+                            // Create the dialog.
+                            var exceptionRet = self.dialog.create({
 
-                                throw { message: "Must specify a parameter list!" };
-                            }
-                            if (!slMethod) {
+                                typeLabel: {
 
-                                throw { message: "Must specify a code statement list!" };
-                            }
+                                    type: "Label",
+                                    text: "",
+                                    x: settings.general.margin,
+                                    y: settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth - 20,
+                                    height: settings.dialog.lineHeight
+                                },
+                                separatorLabel: {
+
+                                    type: "Label",
+                                    text: "::",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth - 20,
+                                    y: settings.general.margin,
+                                    width: 20,
+                                    height: settings.dialog.lineHeight
+                                },
+                                nameEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    enterFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Store the current value for comparison after.
+                                            localSelf.saveMethodName = localSelf.text;
+
+                                            // Also store the value of the type label.
+                                            localSelf.saveTypeName = localSelf.dialog.controlObject["typeLabel"].text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    },
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // If the name has changed, update the name.
+                                            if (localSelf.saveMethodName !== localSelf.text) {
+
+                                                // Lookup the type from its name.
+                                                var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
+                                                if (!typeFromName) {
+
+                                                    return null;
+                                                }
+
+                                                // Ensure the value is unique.
+                                                localSelf.text = window.manager.getUniqueName(localSelf.text,
+                                                    typeFromName.methods.parts,
+                                                    "name");
+
+                                                // Update.
+                                                window.manager.editMethodName(typeFromName,
+                                                    localSelf.saveMethodName,
+                                                    localSelf.text);
+                                            }
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                },
+                                argumentsParameterList: {
+
+                                    type: "ParameterListHost",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth * 2,
+                                    y: 0,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth * 2,
+                                    height: settings.dialog.lineHeight + 
+                                    2 * settings.general.margin
+                                },
+                                statementsStatementList: {
+
+                                    type: "StatementListHost",
+                                    x: settings.general.margin,
+                                    y: settings.dialog.lineHeight + 
+                                        2 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 2 * settings.general.margin,
+                                    heightType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    height: settings.dialog.lineHeight + 
+                                        3 * settings.general.margin
+                                }
+                            });
 
                             // Save the parameters.
-                            self.methodTypeMethodPair = tmpMethod;
-                            self.methodParameters = plMethod;
-                            self.methodStatements = slMethod;
+                            self.typeLabel = self.dialog.controlObject["typeLabel"];
+                            self.methodEdit = self.dialog.controlObject["nameEdit"];
+                            self.methodParameters = self.dialog.controlObject["argumentsParameterList"];
+                            self.methodStatements = self.dialog.controlObject["statementsStatementList"];
 
                             // Because it is!
                             m_bCreated = true;
@@ -133,7 +202,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Pass on down the line.
-                            return self.methodStatements.accumulateDragTargets(arrayAccumulator);
+                            return self.methodStatements.statementList.statementList.accumulateDragTargets(arrayAccumulator);
                         } catch (e) {
 
                             return e;
@@ -146,9 +215,9 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Pass on down the line.
-                            return self.methodStatements.accumulateDragStubInsertionPoints(arrayAccumulator,
+                            return self.methodStatements.statementList.accumulateDragStubInsertionPoints(arrayAccumulator,
                                 statementDragStub,
-                                m_areaMaximal);
+                                self.dialog.position);
                         } catch (e) {
 
                             return e;
@@ -162,7 +231,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Pass on down the line.
-                            return self.methodStatements.purgeStatementDragStubs();
+                            return self.methodStatements.statementList.purgeStatementDragStubs();
                         } catch (e) {
 
                             return e;
@@ -175,288 +244,18 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Set parameters.
-                            self.methodParameters = objectContext.method.parameters;
+                            self.dialog.controlObject["argumentsParameterList"].parameterList = objectContext.method.parameters;
+                            //self.methodParameters = objectContext.method.parameters;
 
                             // Set statements.
-                            self.methodStatements = objectContext.method.statements;
+                            self.dialog.controlObject["statementsStatementList"].statementList = objectContext.method.statements;
+                            //self.methodStatements = objectContext.method.statements;
 
-                            // Set the name.
-                            return self.methodTypeMethodPair.create(objectContext.type.name.payload,
-                                objectContext.method.name);
-                        } catch (e) {
+                            // Set the type.
+                            self.typeLabel.text = objectContext.type.name.payload;
 
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is moved over the tree.
-                    self.mouseMove = function (objectReference) {
-
-                        try {
-
-                            // Determine which object is under the cursor.
-                            var exceptionRet = m_functionTestPoint(objectReference);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            if (m_objectCursor) {
-
-                                return m_objectCursor.mouseMove(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is moved away from the canvas.
-                    self.mouseOut = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor) {
-
-                                if (m_objectCursor.mouseOut) {
-
-                                    m_objectCursor.mouseOut(objectReference);
-                                }
-                                m_objectCursor.highlight = false;
-                                m_objectCursor = null;
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is pressed down over the canvas.
-                    self.mouseDown = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.mouseDown)) {
-
-                                return m_objectCursor.mouseDown(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is let up over the canvas.
-                    self.mouseUp = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.mouseUp)) {
-
-                                return m_objectCursor.mouseUp(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is clicked over the canvas.
-                    self.click = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.click)) {
-
-                                return m_objectCursor.click(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse wheel is scrolled over the canvas.
-                    self.mouseWheel = function (objectReference) {
-
-                        try {
-
-                            if (m_objectCursor &&
-                                $.isFunction(m_objectCursor.mouseWheel)) {
-
-                                return m_objectCursor.mouseWheel(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Calculate the section rectangles.
-                    self.calculateLayout = function (areaMaximal, contextRender) {
-
-                        try {
-
-                            // Calculate the maximal area.
-                            m_areaMaximal = areaMaximal;
-
-                            // See how wide the type name wants to be.
-                            var dWidth = self.methodTypeMethodPair.getWidth(contextRender);
-
-                            // Make the area according to its type-name width.
-                            var areaTypeMethodPair =  new Area(new Point(m_areaMaximal.location.x + settings.general.margin, 
-                                    m_areaMaximal.location.y + settings.general.margin),
-                                new Size(dWidth,
-                                    settings.centerPanel.lineHeight));
-                            var exceptionRet = self.methodTypeMethodPair.calculateLayout(areaTypeMethodPair, contextRender);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            var areaParameters =  new Area(new Point(areaTypeMethodPair.location.x + areaTypeMethodPair.extent.width + settings.general.margin, 
-                                    m_areaMaximal.location.y + settings.general.margin),
-                                new Size(areaMaximal.extent.width - (areaTypeMethodPair.extent.width + 3 * settings.general.margin),
-                                    settings.centerPanel.lineHeight));
-                            exceptionRet = self.methodParameters.calculateLayout(areaParameters, contextRender);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            var areaStatements =  new Area(new Point(m_areaMaximal.location.x + settings.general.margin,
-                                    m_areaMaximal.location.y + 2 * settings.general.margin + settings.centerPanel.lineHeight),
-                                new Size(m_areaMaximal.extent.width - 2 * settings.general.margin,
-                                    m_areaMaximal.extent.height - (3 * settings.general.margin + settings.centerPanel.lineHeight)));
-                            exceptionRet = self.methodStatements.calculateLayout(areaStatements, contextRender);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Render out the objects.
-                    self.render = function (contextRender) {
-                        
-                        try {
-
-                            var exceptionRet = m_areaMaximal.generateRoundedRectPath(contextRender);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            contextRender.save();
-                            contextRender.clip();
-
-                            exceptionRet = self.methodTypeMethodPair.render(contextRender);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            exceptionRet = self.methodParameters.render(contextRender);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            exceptionRet = self.methodStatements.render(contextRender);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            contextRender.restore();
-
-                            return null;
-                        } catch (e) {
-                            
-                            return e;
-                        }
-                    };
-
-                    ///////////////////////
-                    // Private methods.
-
-                    // Helper method tests cursor point.
-                    var m_functionTestPoint = function (objectReference) {
-
-                        try {
-
-                            // Do nothing if no cursor.
-                            if (!objectReference.pointCursor) {
-
-                                return null;
-                            }
-
-                            // Remember the current object cursor.
-                            var objectOriginal = m_objectCursor;
-
-                            // See if the cursor point is in any type.
-                            if (m_objectCursor) {
-
-                                m_objectCursor.highlight = false;
-                                m_objectCursor = null;
-                            }
-
-                            // Test each region/object.
-                            if (self.methodParameters.pointIn(objectReference.contextRender,
-                                objectReference.pointCursor)) {
-
-                                m_objectCursor = self.methodParameters;
-                                m_objectCursor.highlight = true;
-                                var exceptionRet = m_objectCursor.mouseMove(objectReference);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            } else if (self.methodStatements.pointIn(objectReference.contextRender,
-                                objectReference.pointCursor)) {
-
-                                m_objectCursor = self.methodStatements;
-                                m_objectCursor.highlight = true;
-                                var exceptionRet = m_objectCursor.mouseMove(objectReference);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            }  else if (self.methodTypeMethodPair.pointIn(objectReference.contextRender,
-                                objectReference.pointCursor)) {
-
-                                m_objectCursor = self.methodTypeMethodPair;
-                                m_objectCursor.highlight = true;
-                            } 
-
-                            // Deactivate the selection in the 
-                            // current type, if it changed.
-                            if (objectOriginal &&
-                                m_objectCursor !== objectOriginal) {
-
-                                if (objectOriginal.mouseOut) {
-
-                                    var exceptionRet = objectOriginal.mouseOut(objectReference);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
-                            }
+                            // Set the method.
+                            self.methodEdit.text = objectContext.method.name;
 
                             return null;
                         } catch (e) {
@@ -470,19 +269,15 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-                    // The whole area.
-                    var m_areaMaximal = null;
-                    // .
-                    var m_areaTypeMethodPair = null;
-                    // .
-                    var m_areaStatements = null;
-                    // Object under cursor.
-                    var m_objectCursor = null;
                 } catch (e) {
 
                     alert(e.message);
                 }
             };
+
+            // Inherit from Control.  Wire 
+            // up prototype chain to Control.
+            functionRet.inheritsFrom(DialogHost);
 
             return functionRet;
         } catch (e) {
