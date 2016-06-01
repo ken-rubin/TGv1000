@@ -900,6 +900,11 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Set visible to property builder.
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = true;
+                            window.typeBuilder.visible = false;
+
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Method",
                                 window.methodBuilder);
@@ -914,6 +919,11 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Set visible to property builder.
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = true;
+
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Type",
                                 window.typeBuilder);
@@ -927,6 +937,11 @@ define(["NextWave/source/utility/prototypes",
                     var m_functionSetPropertyBuilderInCenterPanel = function () {
 
                         try {
+
+                            // Set visible to property builder.
+                            window.propertyBuilder.visible = true;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Property",

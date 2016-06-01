@@ -423,9 +423,9 @@ define(["NextWave/source/utility/prototypes",
                                 } else if (m_objectHighlight === m_areaDeleteIcon) {
 
                                     return window.manager.removeType(self);
-                                } else if (m_objectHighlight === self.name) {
+//                                } else if (m_objectHighlight === self.name) {
 
-                                    return window.manager.selectType(self);
+//                                    return window.manager.selectType(self);
                                 } else if ($.isFunction(m_objectHighlight.mouseDown)) {
 
                                     return m_objectHighlight.mouseDown(objectReference);
@@ -471,14 +471,18 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Reset highlight.
-                            if (m_objectHighlight &&
-                                $.isFunction(m_objectHighlight.click)) {
+                            if (m_objectHighlight) {
 
                                 // Process click as a "enter type mode".
                                 if (m_objectHighlight === self.name) {
 
-                                    // Do nothing.
-                                } else {
+                                    var exceptionRet = window.manager.selectType(self);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                                if ($.isFunction(m_objectHighlight.click)) {
 
                                     // Pass down.
                                     return m_objectHighlight.click(objectReference);

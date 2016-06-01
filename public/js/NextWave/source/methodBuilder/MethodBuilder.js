@@ -201,6 +201,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
+
                             // Pass on down the line.
                             return self.methodStatements.statementList.accumulateDragTargets(arrayAccumulator);
                         } catch (e) {
@@ -213,6 +219,12 @@ define(["NextWave/source/utility/prototypes",
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub) {
 
                         try {
+
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
 
                             // Pass on down the line.
                             return self.methodStatements.statementList.accumulateDragStubInsertionPoints(arrayAccumulator,
@@ -229,6 +241,12 @@ define(["NextWave/source/utility/prototypes",
                     self.purgeStatementDragStubs = function () {
 
                         try {
+
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
 
                             // Pass on down the line.
                             return self.methodStatements.statementList.purgeStatementDragStubs();
