@@ -4,6 +4,7 @@
 - Replace Blockly.
 
 ## Jerry's High Priority Issues
+- John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.
 - From John:
     - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
 - Saw some sort of display problem in horizontal scroller in one of the image search dialogs.

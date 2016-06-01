@@ -18,8 +18,10 @@ module.exports = function API(app, sql) {
     ////////////////////////////////////
     // Public methods
     
+    // Invoked when user accesses .../invite/?decline=...
     self.processDecline = function(token) {
 
+    	console.log("API token: " + token);
     }
 
     ////////////////////////////////////

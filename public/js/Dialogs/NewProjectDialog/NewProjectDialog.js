@@ -279,6 +279,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									method: "POST",
 									url: "/renderJadeSnippet"
 								}).done(m_functionRenderJadeSnippetResponse2b).error(errorHelper.show);
+							
+							} else {
+
+								// A normal project.
+								$("#ProjectName").focus();
+								$("#ProjectName").keyup(m_functionEnableDisableCreateProjBtn);
+								m_functionEnableDisableCreateProjBtn();
 							}
 						} catch (e) {
 

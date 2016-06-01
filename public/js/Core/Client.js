@@ -66,29 +66,33 @@ define(["Core/errorHelper",
 							var profileJSON = localStorage.getItem("profile");
 							g_profile = JSON.parse(profileJSON);
 
-							// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
-							// At least it didn't work at the bottom of the callback in main.js.
-							var lastProject = g_profile["lastProject"];
-							var lastProjectId = 0;
-							if (g_profile["lastProjectId"]) {
+							// "Normal" users get their last project loaded automatically.
+							if (!(g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"])) {
 
-								lastProjectId = parseInt(g_profile["lastProjectId"], 10);
-							}
+								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
+								// At least it didn't work at the bottom of the callback in main.js.
+								var lastProject = g_profile["lastProject"];
+								var lastProjectId = 0;
+								if (g_profile["lastProjectId"]) {
 
-							// If lastProjectId, fetch it and load it into manager.
-							if (lastProjectId) {
+									lastProjectId = parseInt(g_profile["lastProjectId"], 10);
+								}
 
-								self.openProjectFromDB(lastProjectId,
-									function(project) {
+								// If lastProjectId, fetch it and load it into manager.
+								if (lastProjectId) {
 
-										BootstrapDialog.show({
-											type: BootstrapDialog.TYPE_INFO,
-											message: "Your latest project, " + lastProject + ", has been loaded. (Click outside this area to proceed.)",
-											closable: true, // <-- Default value is false
-											draggable: true // <-- Default value is false
-										});
-									}
-								);
+									self.openProjectFromDB(lastProjectId,
+										function(project) {
+
+											BootstrapDialog.show({
+												type: BootstrapDialog.TYPE_INFO,
+												message: "Your latest project, " + lastProject + ", has been loaded. (Click outside this area to proceed.)",
+												closable: true, // <-- Default value is false
+												draggable: true // <-- Default value is false
+											});
+										}
+									);
+								}
 							}
 							return null;
 
