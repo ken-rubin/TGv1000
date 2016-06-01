@@ -595,7 +595,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 							                        mailWrapper.mail(mailOptions,
 							                        	function(error) {
 
-							                        		if (error) { return wayInnerCb(new Error("Error sending invitation expired email: " + error.toString())); }
+							                        		if (error) { return wayInnerCb(new Error("Error sending 4-hour-warning email: " + error.toString())); }
 								                            return wayInnerCb(null);
 							                        	}
 							                        );

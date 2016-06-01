@@ -221,6 +221,23 @@ app.use(multer(
 ));
 
 /////////////////////////////////////
+console.log("Set up api module.");
+var API = require("./modules/API");
+var api = new API(app, sql);
+
+/////////////////////////////////////
+console.log("Map DECLINE waitlist invite route.");
+app.get("/invite", function (req, res) {
+
+    try {
+        console.log("*** /invite")
+        console.log("req.query.decline: " + req.query.decline);
+        api.processDecline(req.query.decline);
+        res.end();
+    } catch(e) { console.log("Failure handling /invite route.")}
+});
+
+/////////////////////////////////////
 var moduleInstances = {};
 sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
     function(rows){
