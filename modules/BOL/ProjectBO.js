@@ -2434,6 +2434,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         m_log("Doing methods");
                         var ordinal = 0;
+
                         async.eachSeries(typeIth.methods,
                             function(method, cb) {
                                 async.series(
@@ -2449,15 +2450,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         name: method.name,
                                                         ordinal: method.ordinal,
                                                         workspace: JSON.stringify({"statements": method.statements}),
-                                                        imageId: method.imageId,
-                                                        description: method.description,
-                                                        parentMethodId: method.parentMethodId,
-                                                        parentPrice: method.parentPrice,
-                                                        priceBump: method.priceBump,
+                                                        imageId: method.imageId || 0,
+                                                        description: method.description || '[No description provided]',
+                                                        parentMethodId: method.parentMethodId || 0,
+                                                        parentPrice: method.parentPrice || 0,
+                                                        priceBump: method.priceBump || 0,
                                                         ownedByUserId: method.ownedByUserId,
-                                                        public: method.public,
-                                                        quarantined: method.quarantined,
-                                                        methodTypeId: method.methodTypeId,
+                                                        public: method.public || 0,
+                                                        quarantined: method.quarantined || 1,
+                                                        methodTypeId: method.methodTypeId || 1, // 1 = statement; 2 = expression -- need this from Ken
                                                         parameters: method.arguments.join(',')
                                                         };
 
@@ -2522,114 +2523,109 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (2) properties
                     function(cb) {
 
-                        if (typeIth.properties.length) {
+                        m_log("Doing properties");
+                        var ordinal = 0;
 
-                            m_log("Doing properties");
-                            var ordinal = 0;
-                            async.eachSeries(typeIth.properties,
-                                function(property, cb) {
+                        async.eachSeries(typeIth.properties,
+                            function(property, cb) {
 
-                                    property.typeId = typeIth.id;
-                                    property.ordinal = ordinal++;
+                                property.typeId = typeIth.id;
+                                property.ordinal = ordinal++;
 
-                                    var guts = {
-                                                typeId: typeIth.id,
-                                                propertyTypeId: property.propertyTypeId,
-                                                name: property.name,
-                                                initialValue: property.initialValue,
-                                                ordinal: property.ordinal,
-                                                isHidden: (property.isHidden ? 1 : 0)
-                                                };
-                                    strQuery = "insert " + self.dbname + "propertys SET ?";
-                                    m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                        function(err, rows) {
+                                var guts = {
+                                            typeId: typeIth.id,
+                                            propertyTypeId: property.propertyTypeId,
+                                            name: property.name,
+                                            initialValue: property.initialValue,
+                                            ordinal: property.ordinal,
+                                            isHidden: (property.isHidden ? 1 : 0)
+                                            };
+                                strQuery = "insert " + self.dbname + "propertys SET ?";
+                                m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                    function(err, rows) {
 
-                                            try {
-                                                if (err) { return cb(err); }
-                                                if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
+                                        try {
+                                            if (err) { return cb(err); }
+                                            if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
 
-                                                property.id = rows[0].insertId;
+                                            property.id = rows[0].insertId;
 
-                                                // If this is a System Type property, push onto passObj.project.script.
-                                                if (typeIth.ordinal === 10000) {
-                                                    var scriptGuts = " SET typeId=" + atid
-                                                                + ",propertyTypeId=" + property.propertyTypeId
-                                                                + ",name=" + connection.escape(property.name)
-                                                                + ",initialValue=" + connection.escape(property.initialValue)
-                                                                + ",ordinal=" + property.ordinal
-                                                                + ",isHidden=" + (property.isHidden ? 1 : 0)
-                                                                ;
-                                                    project.script.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
-                                                }
-                                                return cb(null);
+                                            // If this is a System Type property, push onto passObj.project.script.
+                                            if (typeIth.ordinal === 10000) {
+                                                var scriptGuts = " SET typeId=" + atid
+                                                            + ",propertyTypeId=" + property.propertyTypeId
+                                                            + ",name=" + connection.escape(property.name)
+                                                            + ",initialValue=" + connection.escape(property.initialValue)
+                                                            + ",ordinal=" + property.ordinal
+                                                            + ",isHidden=" + (property.isHidden ? 1 : 0)
+                                                            ;
+                                                project.script.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+                                            }
+                                            return cb(null);
 
-                                            } catch (ep) { return cb(ep); }
-                                        }
-                                    );
-                                },
-                                // final callback for eachSeries (2)
-                                function(err) { return cb(err); }
-                            );
-                        } else {
-                            m_log("No properties to do");
-                            return cb(null);
-                        }
+                                        } catch (ep) { return cb(ep); }
+                                    }
+                                );
+                            },
+                            // final callback for eachSeries (2)
+                            function(err) { 
+                                return cb(err); 
+                            }
+                        );
                     },
                     // (3) events
                     function(cb) {
 
-                        if (typeIth.events.length) {
+                        m_log("Doing events");
+                        var ordinal = 0;
+                        async.eachSeries(typeIth.events,
+                            function(event, cb) {
 
-                            m_log("Doing events");
-                            var ordinal = 0;
-                            async.eachSeries(typeIth.events,
-                                function(event, cb) {
+                                event.typeId = typeIth.id;
+                                event.ordinal = ordinal++;
 
-                                    event.typeId = typeIth.id;
-                                    event.ordinal = ordinal++;
+                                var guts = {
+                                            typeId: typeIth.id,
+                                            name: event.name,
+                                            ordinal: event.ordinal
+                                            };
+                                strQuery = "insert " + self.dbname + "events SET ?";
+                                m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                    function(err, rows) {
 
-                                    var guts = {
-                                                typeId: typeIth.id,
-                                                name: event.name,
-                                                ordinal: event.ordinal
-                                                };
-                                    strQuery = "insert " + self.dbname + "events SET ?";
-                                    m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                        function(err, rows) {
+                                        try {
+                                            if (err) { throw err; }
+                                            if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
-                                            try {
-                                                if (err) { throw err; }
-                                                if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+                                            event.id = rows[0].insertId;
 
-                                                event.id = rows[0].insertId;
+                                            // If this is a System Type event, push onto passObj.project.script.
+                                            if (typeIth.ordinal === 10000) {
+                                                var scriptGuts = " SET typeId=" + atid
+                                                            + ",name=" + connection.escape(event.name)
+                                                            + ",ordinal=" + event.ordinal
+                                                            ;
+                                                project.script.push("insert " + self.dbname + "events" + scriptGuts + ";");
+                                            }
+                                            return cb(null);
 
-                                                // If this is a System Type event, push onto passObj.project.script.
-                                                if (typeIth.ordinal === 10000) {
-                                                    var scriptGuts = " SET typeId=" + atid
-                                                                + ",name=" + connection.escape(event.name)
-                                                                + ",ordinal=" + event.ordinal
-                                                                ;
-                                                    project.script.push("insert " + self.dbname + "events" + scriptGuts + ";");
-                                                }
-                                                return cb(null);
-
-                                            } catch (ee) { return cb(ee); }
-                                        }
-                                    );
-                                },
-                                // final callback for eachSeries (3)
-                                function(err) { return cb(err); }
-                            );
-                        } else {
-                            m_log("No events to do");
-                            return cb(null);
-                        }
+                                        } catch (ee) { return cb(ee); }
+                                    }
+                                );
+                            },
+                            // final callback for eachSeries (3)
+                            function(err) { 
+                                return cb(err); 
+                            }
+                        );
                     }
                 ],
                 // final callback for parallel
-                function(err) { return callback(err); }
+                function(err) { 
+                    return callback(err); 
+                }
             );
         } catch (e) {
 
