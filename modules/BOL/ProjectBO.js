@@ -2458,7 +2458,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         ownedByUserId: method.ownedByUserId,
                                                         public: method.public || 0,
                                                         quarantined: method.quarantined || 1,
-                                                        methodTypeId: method.methodTypeId || 1, // 1 = statement; 2 = expression -- need this from Ken
+                                                        methodTypeId: method.methodTypeId || 2, // Not needed anymore
                                                         parameters: method.arguments.join(',')
                                                         };
 
