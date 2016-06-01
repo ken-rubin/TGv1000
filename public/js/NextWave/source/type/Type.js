@@ -63,6 +63,10 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // Get the node containing settings for this type.
                     self.settingsNode = settings.tree.type;
+                    // Default the name.
+                    self.creator = g_profile["userName"];
+                    // Default the date too.
+                    self.created = new Date().toString();
                     // Object holds data members which are 
                     // not differentiated by this client.
                     self.stowage = {};
@@ -78,7 +82,7 @@ define(["NextWave/source/utility/prototypes",
                             // Save the attributes along with this object.
                             var exceptionRet = attributeHelper.fromJSON(objectType,
                                 self,
-                                ["name", "methods", "properties", "events"]);
+                                ["name", "methods", "properties", "events", "creator", "created"]);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -86,44 +90,11 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set the name.
                             self.name = new CodeType(objectType.name);
-                            // Since these are not draggable,
-                            /* set the collection to itself.
-                            self.name.collection = self.name;
-                            self.name.beforeChange = function () {
 
-                                try {
-
-                                    m_strTypeBefore = self.name.payload;
-                                    return null;
-                                } catch (e) {
-
-                                    return e;
-                                }
-                            };
-                            self.name.afterChange = function () {
-
-                                try {
-
-                                    // Ensure the value is unique.
-                                    var strPayload = self.name.payload;
-                                    self.name.payload = "Hopefully A Unique Value That Is Never Duplicated";
-                                    self.name.payload = window.manager.getUniqueName(strPayload,
-                                        window.manager.types,
-                                        "name",
-                                        "payload");
-
-                                    // Update.
-                                    if (m_strTypeBefore !== self.name.payload) {
-
-                                        return window.manager.editTypeName(m_strTypeBefore,
-                                            self.name.payload);
-                                    }
-                                    return null;
-                                } catch (e) {
-
-                                    return e;
-                                }
-                            };*/
+                            // Also load up creator.
+                            self.creator = objectType.creator;
+                            // Also load up created.
+                            self.created = objectType.created;
 
                             // Build the methods.
                             if (objectType.methods) {
@@ -331,6 +302,8 @@ define(["NextWave/source/utility/prototypes",
 
                         // Save name.
                         objectRet.name = self.name.payload;
+                        objectRet.creator = self.creator;
+                        objectRet.created = self.created;
 
                         // If there are methods, then save them up.
                         if (self.methods) {

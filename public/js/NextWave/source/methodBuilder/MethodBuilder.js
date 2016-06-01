@@ -202,7 +202,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Pass on down the line.
-                            return self.methodStatements.statementList.statementList.accumulateDragTargets(arrayAccumulator);
+                            return self.methodStatements.statementList.accumulateDragTargets(arrayAccumulator);
                         } catch (e) {
 
                             return e;

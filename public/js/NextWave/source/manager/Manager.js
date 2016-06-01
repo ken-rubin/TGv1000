@@ -132,7 +132,10 @@ define(["NextWave/source/utility/prototypes",
                             var typeNew = new Type();
                             var exceptionRet = typeNew.create({
 
-                                name: strName
+                                name: strName,
+                                creator: g_profile["userName"],
+                                created: new Date().toString(),
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -166,7 +169,29 @@ define(["NextWave/source/utility/prototypes",
                             // Create type.
                             var methodNew = new Method(typeContaining,
                                 strName);
-                            return typeContaining.methods.addPart(methodNew);
+
+                            // Specify some default values...:
+                            var exceptionRet = methodNew.create({
+
+                                name: strName,
+                                creator: g_profile["userName"],
+                                created: new Date().toString(),
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = typeContaining.methods.addPart(methodNew);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select it into the GUI.
+                            return self.setContext(typeContaining, 
+                                methodNew);
                         } catch (e) {
 
                             return e;
@@ -186,7 +211,29 @@ define(["NextWave/source/utility/prototypes",
                             // Create type.
                             var propertyNew = new Property(typeContaining,
                                 strName);
-                            return typeContaining.properties.addPart(propertyNew);
+
+                            // Specify some default values...:
+                            var exceptionRet = propertyNew.create({
+
+                                name: strName,
+                                creator: g_profile["userName"],
+                                created: new Date().toString(),
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = typeContaining.properties.addPart(propertyNew);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select it into the GUI.
+                            return self.selectProperty(typeContaining, 
+                                propertyNew);
                         } catch (e) {
 
                             return e;
@@ -932,6 +979,62 @@ define(["NextWave/source/utility/prototypes",
 
                             // Load up the type into the type builder.
                             exceptionRet = window.typeBuilder.loadType(type);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for a Property.
+                    self.selectProperty = function (type, iIndex) {
+
+                        try {
+
+                            // If iIndex is a string, find its matching index.
+                            if (iIndex.substring) {
+
+                                for (var i = 0; i < type.properties.parts.length; i++) {
+
+                                    var propertyIth = type.properties.parts[i];
+                                    if (propertyIth.name === iIndex) {
+
+                                        iIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // If did not find an index, set to 0.
+                            if (iIndex.substring) {
+
+                                iIndex = 0;
+                            }
+
+                            // Default to an actual property object.
+                            var property = iIndex;
+
+                            // If it is not a property (it is an integer), load it from the type.
+                            if (!property.allocateCodeInstance) {
+
+                                property = type.properties.parts[iIndex]
+                            }
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Property");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the type into the type builder.
+                            exceptionRet = window.propertyBuilder.loadProperty(type,
+                                property);
                             if (exceptionRet) {
 
                                 return exceptionRet;

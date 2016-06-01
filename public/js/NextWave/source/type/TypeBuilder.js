@@ -205,7 +205,7 @@ define(["NextWave/source/utility/prototypes",
                                         }
                                     }
                                 },
-                                creatorLabel: {
+                                creatorHeaderLabel: {
 
                                     type: "Label",
                                     text: "Creator",
@@ -215,9 +215,9 @@ define(["NextWave/source/utility/prototypes",
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 },
-                                creatorEdit: {
+                                creatorLabel: {
 
-                                    type: "Edit",
+                                    type: "Label",
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: 7 * settings.dialog.lineHeight + 
@@ -226,23 +226,9 @@ define(["NextWave/source/utility/prototypes",
                                                                     //  the total width on calculateLayout.
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight,
-                                    exitFocus: function (localSelf) {
-
-                                        try {
-
-                                            // Get the current type.
-                                            var typeContext = localSelf.dialog.host.typeContext;
-
-                                            // Update it description.
-                                            typeContext.stowage.creator = localSelf.text;
-                                        } catch (e) {
-
-                                            alert(e.message);
-                                        }
-                                    }
+                                    height: settings.dialog.lineHeight
                                 },
-                                createdLabel: {
+                                createdHeaderLabel: {
 
                                     type: "Label",
                                     text: "Created",
@@ -252,9 +238,9 @@ define(["NextWave/source/utility/prototypes",
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 },
-                                createdEdit: {
+                                createdLabel: {
 
-                                    type: "Edit",
+                                    type: "Label",
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: 8 * settings.dialog.lineHeight + 
@@ -263,21 +249,7 @@ define(["NextWave/source/utility/prototypes",
                                                                     //  the total width on calculateLayout.
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight,
-                                    exitFocus: function (localSelf) {
-
-                                        try {
-
-                                            // Get the current type.
-                                            var typeContext = localSelf.dialog.host.typeContext;
-
-                                            // Update it description.
-                                            typeContext.stowage.created = localSelf.text;
-                                        } catch (e) {
-
-                                            alert(e.message);
-                                        }
-                                    }
+                                    height: settings.dialog.lineHeight
                                 }
                             });
 
@@ -329,13 +301,13 @@ define(["NextWave/source/utility/prototypes",
 
                                 type.stowage.description = "[description goes here]";
                             }
-                            if (!type.stowage.creator) {
+                            if (!type.creator) {
 
-                                type.stowage.creator = "[creator goes here]";
+                                type.creator = "[creator goes here]";
                             }
-                            if (!type.stowage.created) {
+                            if (!type.created) {
 
-                                type.stowage.created = "[created goes here]";
+                                type.created = "[created goes here]";
                             }
 
                             // Store the context.
@@ -345,8 +317,8 @@ define(["NextWave/source/utility/prototypes",
                             self.dialog.controlObject["nameEdit"].text = type.name.payload;
                             self.dialog.controlObject["baseEdit"].text = type.stowage.base;
                             self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
-                            self.dialog.controlObject["creatorEdit"].text = type.stowage.creator;
-                            self.dialog.controlObject["createdEdit"].text = type.stowage.created;
+                            self.dialog.controlObject["creatorLabel"].text = type.creator;
+                            self.dialog.controlObject["createdLabel"].text = type.created;
                             return null;
                         } catch (e) {
 

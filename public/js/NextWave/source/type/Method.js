@@ -70,6 +70,10 @@ define(["NextWave/source/utility/prototypes",
                     self.parameters = plMethod || new ParameterList();
                     // List of statement associated with this method.
                     self.statements = slMethod || new StatementList();
+                    // Default the name.
+                    self.creator = g_profile["userName"];
+                    // Default the date too.
+                    self.created = new Date().toString();
                     // Object holds data members which are 
                     // not differentiated by this client.
                     self.stowage = {};
@@ -87,18 +91,6 @@ define(["NextWave/source/utility/prototypes",
                                     )
                             );
                     };
-
-                    /* Invoked when the mouse is pressed down over this method.
-                    self.mouseDown = function (objectReference) {
-
-                        try {
-
-                            return window.manager.switchCenterPanelMode("Method");
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };*/
 
                     // Invoked when the mouse is clicked over this method.
                     self.click = function (objectReference) {
@@ -122,37 +114,50 @@ define(["NextWave/source/utility/prototypes",
                             // Save the attributes along with this object.
                             var exceptionRet = attributeHelper.fromJSON(objectMethod,
                                 self,
-                                ["name", "arguments", "statements"]);
+                                ["name", "arguments", "statements", "creator", "created"]);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
+
+                            // Set the name.
+                            self.name = objectMethod.name;
+                            // Also load up creator.
+                            self.creator = objectMethod.creator;
+                            // Also load up created.
+                            self.created = objectMethod.created;
 
                             // Three bits of data.
                             var arrayParameters = objectMethod.arguments;
                             var arrayStatements = objectMethod.statements;
 
                             // Set parameters.
-                            for (var i = 0; i < arrayParameters.length; i++) {
+                            if (arrayParameters) {
 
-                                var objectParameterIth = arrayParameters[i];
-                                var parameterNew = new Parameter(objectParameterIth.name);
-                                var exceptionRet = self.parameters.addItem(parameterNew);
-                                if (exceptionRet) {
+                                for (var i = 0; i < arrayParameters.length; i++) {
 
-                                    return exceptionRet;
+                                    var objectParameterIth = arrayParameters[i];
+                                    var parameterNew = new Parameter(objectParameterIth.name);
+                                    var exceptionRet = self.parameters.addItem(parameterNew);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
 
                             // Set statements.
-                            for (var i = 0; i < arrayStatements.length; i++) {
+                            if (arrayStatements) {
 
-                                var objectStatementIth = arrayStatements[i];
-                                var strAllocationString = m_functionRecurseGenerateAllocationString(objectStatementIth);
-                                var exceptionRet = self.statements.addItem(eval(strAllocationString));
-                                if (exceptionRet) {
+                                for (var i = 0; i < arrayStatements.length; i++) {
 
-                                    return exceptionRet;
+                                    var objectStatementIth = arrayStatements[i];
+                                    var strAllocationString = m_functionRecurseGenerateAllocationString(objectStatementIth);
+                                    var exceptionRet = self.statements.addItem(eval(strAllocationString));
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
 
@@ -204,6 +209,8 @@ define(["NextWave/source/utility/prototypes",
 
                         // Name.
                         objectRet.name = self.name;
+                        objectRet.created = self.created;
+                        objectRet.creator = self.creator;
 
                         // Parameters.
                         objectRet.arguments = self.parameters.save(true);

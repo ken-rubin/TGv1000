@@ -2219,20 +2219,20 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         var guts = {
                                             name: typeIth.name,
                                             isApp: 0,
-                                            imageId: typeIth.imageId,
-                                            altImagePath: typeIth.altImagePath,
+                                            imageId: typeIth.imageId || 0,
+                                            altImagePath: typeIth.altImagePath || "",
                                             ordinal: typeIth.ordinal,
                                             comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId),
                                             description: typeIth.description,
-                                            parentTypeId: typeIth.parentTypeId,
-                                            parentPrice: typeIth.parentPrice,
-                                            priceBump: typeIth.priceBump,
+                                            parentTypeId: typeIth.parentTypeId || 0,
+                                            parentPrice: typeIth.parentPrice || 0,
+                                            priceBump: typeIth.priceBump || 0,
                                             ownedByUserId: typeIth.ownedByUserId,
-                                            public: typeIth.public,
-                                            quarantined: typeIth.quarantined,
-                                            baseTypeId: typeIth.baseTypeId,
+                                            public: typeIth.public || 0,
+                                            quarantined: typeIth.quarantined || 1,
+                                            baseTypeId: typeIth.baseTypeId || 0,
                                             projectId: passObj.project.id,
-                                            isToolStrip: typeIth.isToolStrip
+                                            isToolStrip: typeIth.isToolStrip || 0
                                             };
 
                                         var strQuery;

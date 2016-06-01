@@ -32,6 +32,10 @@ define(["NextWave/source/utility/prototypes",
 
                     // Keep track of the owning Type.
                     self.owner = typeOwner;
+                    // Default the name.
+                    self.creator = g_profile["userName"];
+                    // Default the date too.
+                    self.created = new Date().toString();
                     // Object holds data members which are 
                     // not differentiated by this client.
                     self.stowage = {};
@@ -56,11 +60,18 @@ define(["NextWave/source/utility/prototypes",
                             // Save the attributes along with this object.
                             var exceptionRet = attributeHelper.fromJSON(objectProperty,
                                 self,
-                                ["name"]);
+                                ["name", "creator", "created"]);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
+
+                            // Set the name.
+                            self.name = objectProperty.name;
+                            // Also load up creator.
+                            self.creator = objectProperty.creator;
+                            // Also load up created.
+                            self.created = objectProperty.created;
 
                             return null;
                         } catch (e) {
@@ -104,7 +115,12 @@ define(["NextWave/source/utility/prototypes",
                     // Save.
                     self.save = function () {
 
-                        var objectRet = { name: self.name };
+                        var objectRet = { 
+
+                            name: self.name,
+                            creator: self.creator,
+                            created: self.created
+                        };
 
                         // Save the attributes along with this object.
                         var exceptionRet = attributeHelper.toJSON(self,
