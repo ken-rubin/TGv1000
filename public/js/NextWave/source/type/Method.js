@@ -70,6 +70,9 @@ define(["NextWave/source/utility/prototypes",
                     self.parameters = plMethod || new ParameterList();
                     // List of statement associated with this method.
                     self.statements = slMethod || new StatementList();
+                    // Object holds data members which are 
+                    // not differentiated by this client.
+                    self.stowage = {};
 
                     ////////////////////////////
                     // Public methods.

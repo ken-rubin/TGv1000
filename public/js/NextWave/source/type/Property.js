@@ -32,6 +32,9 @@ define(["NextWave/source/utility/prototypes",
 
                     // Keep track of the owning Type.
                     self.owner = typeOwner;
+                    // Object holds data members which are 
+                    // not differentiated by this client.
+                    self.stowage = {};
 
                     ////////////////////////////
                     // Public methods.

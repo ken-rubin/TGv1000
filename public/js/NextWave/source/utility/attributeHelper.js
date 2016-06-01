@@ -88,6 +88,13 @@ define(["NextWave/source/utility/prototypes"],
                                 strTargetProperty = "stowage";
                             }
 
+                            // Ensure that there is a target property.
+                            if (!objectSource.hasOwnProperty(strTargetProperty)) {
+
+                                // Just set to an empty object.
+                                objectSource[strTargetProperty] = {};
+                            }
+
                             // Get the stowage object from the source.
                             var objectStowage = objectSource[strTargetProperty];
 

@@ -63,6 +63,9 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // Get the node containing settings for this type.
                     self.settingsNode = settings.tree.type;
+                    // Object holds data members which are 
+                    // not differentiated by this client.
+                    self.stowage = {};
 
                     ///////////////////////////
                     // Public methods.
