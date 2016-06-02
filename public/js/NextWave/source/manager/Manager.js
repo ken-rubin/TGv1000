@@ -66,6 +66,8 @@ define(["NextWave/source/utility/prototypes",
                     self.types = [];
                     // Indicates there is a project which has been loaded up into this manager.
                     self.loaded = false;
+                    // Indicates that the current user is priviliged--e.g. can save system types.
+                    self.priviledged = false;
                     // Current type/method.
                     self.context = {
 
@@ -1913,7 +1915,7 @@ define(["NextWave/source/utility/prototypes",
                         "java", "JavaArray", "JavaClass", "JavaObject", "JavaPackage",
                         "let", "long", "layer", "laysers", "length", "link", "location",
                         "Math", "mimeTypes", 
-                        "native", "new", "null", "name", "NaN", "navigate", "navigator", "Number",
+                        "native", "new", "null", "name", "NaN", "navigate", "navigator",
                         "Object", "offscreenBuffering", "open", "opener", "option", "outerHeight", "outerWidth", "onbeforeunload", "onblur", "ondragdrop", "onclick", "oncontextmenu", "onerror", "onfocus", "onkeydown", "onkeypress", "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onsubmit", "onunload",
                         "package", "private", "protected", "public", "packages", "pageXOffset", "pageYOffset", "parent", "pargeFloat", "parseInt", "password", "pkcs11", "plugin", "prompt", "propertyIsEnum", "prototype",
                         "return", "radio", "reset",

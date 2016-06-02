@@ -63,6 +63,10 @@ $(document).ready(function() {
 											exceptionRet = navbar.create();
 											if (exceptionRet) { throw exceptionRet; }
 
+											// Calculate if the user is priviledged, set in manager.
+				                            manager.priviledged = (g_profile["can_create_classes"] || 
+				                                g_profile["can_create_products"] || 
+				                                g_profile["can_create_onlineClasses"]) || false;
 						                } catch (e) {
 
 						                    alert(e.message);

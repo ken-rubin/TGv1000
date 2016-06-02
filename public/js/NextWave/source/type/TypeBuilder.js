@@ -45,8 +45,8 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance already created!" };
                             }
 
-                            // Create the dialog.
-                            var exceptionRet = self.dialog.create({
+                            // Create the configuration object with which to initialize the type builder dialog.
+                            var objectConfiguration = {
 
                                 nameLabel: {
 
@@ -251,7 +251,55 @@ define(["NextWave/source/utility/prototypes",
                                         settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 }
-                            });
+                            };
+
+                            // If priviledged...
+                            if (window.manager.priviledged) {
+
+                                // Add two new controls to the dialog.
+                                objectConfiguration.systemTypeLabel = {
+
+                                    type: "Label",
+                                    text: "System Type",
+                                    x: settings.general.margin,
+                                    y: 9 * settings.dialog.lineHeight + 
+                                        6 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                };
+
+                                objectConfiguration.systemTypeEdit = {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 9 * settings.dialog.lineHeight + 
+                                        6 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Get the current type.
+                                            var typeContext = localSelf.dialog.host.typeContext;
+
+                                            // Update it description.
+                                            typeContext.stowage.isSystemType = localSelf.text;
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            // Create the dialog.
+                            var exceptionRet = self.dialog.create(objectConfiguration);
 
                             // Because it is!
                             m_bCreated = true;
@@ -309,6 +357,10 @@ define(["NextWave/source/utility/prototypes",
 
                                 type.created = "[created goes here]";
                             }
+                            if (!type.stowage.isSystemType) {
+
+                                type.stowage.isSystemType = "0";
+                            }
 
                             // Store the context.
                             self.typeContext = type;
@@ -319,6 +371,7 @@ define(["NextWave/source/utility/prototypes",
                             self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
                             self.dialog.controlObject["creatorLabel"].text = type.creator;
                             self.dialog.controlObject["createdLabel"].text = type.created;
+                            self.dialog.controlObject["systemTypeEdit"].text = type.stowage.isSystemType;
                             return null;
                         } catch (e) {
 
