@@ -2152,7 +2152,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         // Don't assign an ordinal to an SystemType. It's always 10000.
                         // Don't set an SystemType's comicId either.
-                        if (typeIth.ordinal === 10000 || !typeIth.isSystemType) {
+                        if ((typeIth.ordinal || 0) === 10000 || typeIth.isSystemType) {
 
                             if (!passObj.project.specialProjectData.systemTypesEdited || passObj.comicIth.ordinal > 0) {
                                 // We process System Types only if the setting is on in the project AND we're in the first comic of the project. 
