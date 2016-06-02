@@ -21,7 +21,9 @@ module.exports = function API(app, sql) {
     // Invoked when user accesses .../invite/?decline=...
     self.processDecline = function(token) {
 
-    	console.log("API token: " + token);
+        console.log(token);
+        // var profile = JSON.parse(window.atob(token.split('.')[1]));
+        // Profile has this structure:
     }
 
     ////////////////////////////////////

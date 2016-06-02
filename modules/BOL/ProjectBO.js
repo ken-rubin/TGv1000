@@ -2534,9 +2534,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 var guts = {
                                             typeId: typeIth.id,
-                                            propertyTypeId: property.propertyTypeId,
+                                            propertyTypeId: property.propertyTypeId || 6,    // WORK ON THIS
                                             name: property.name,
-                                            initialValue: property.initialValue,
+                                            initialValue: property.initialValue || '',
                                             ordinal: property.ordinal,
                                             isHidden: (property.isHidden ? 1 : 0)
                                             };
