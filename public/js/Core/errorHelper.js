@@ -32,7 +32,7 @@ define(function () {
 						} else { dispError = error;
 						}
 
-						if (error.hasOwnProperty('message') && error.hasOwnProperty('stack') && (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"])) {
+						if (error.hasOwnProperty('message') && error.hasOwnProperty('stack') && (manager.privileged)) {
 							dispError += '<br><br>' + error.stack;
 						}
 

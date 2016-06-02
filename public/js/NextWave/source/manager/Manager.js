@@ -67,7 +67,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates there is a project which has been loaded up into this manager.
                     self.loaded = false;
                     // Indicates that the current user is priviliged--e.g. can save system types.
-                    self.priviledged = false;
+                    self.privileged = false;
                     // Current type/method.
                     self.context = {
 

@@ -2027,21 +2027,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             };
 
             // async.series runs each of an array of functions in order, waiting for each to finish in turn.
-            // Actually, the first and second could be done in parallel, but the third must come after those two are done.
-            // We should try that after all settles down.
             async.series(
                 [
                     // (1)
                     function(cb) {
-                        m_saveAppTypeInComicIthToDB(passObj, 
-                            function(err) {
-                                return cb(err); 
-                            }
-                        );
-                    },
-                    // (2)
-                    function(cb) {
-                        m_saveNonAppTypesInComicIthToDB(passObj, 
+                        m_saveAllTypesInComicIthToDB(passObj, 
                             function(err) {
                                 return cb(err); 
                             }
@@ -2066,20 +2056,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
-    var m_saveAppTypeInComicIthToDB = function(passObj, callback) {
+    var m_saveAllTypesInComicIthToDB = function(passObj, callback) {
 
         try {
 
-            m_log("***In m_saveAppTypeInComicIthToDB***");
-
-            // We will use async.seachSeries for this loop even though we're looking for only one type and know it will be first.
-            // Passing over non-App types will be fast and easy, and this will handle asynchronicity perfectly.
-            var bFoundAppType = false;
+            m_log("***In m_saveAllTypesInComicIthToDB***");
 
             async.eachSeries(passObj.comicIth.types,
                 function(typeIth, cb) {
 
-                    if (typeIth.isApp) {
+                    if (typeIth.isApp || 0) {
 
                         bFoundAppType = true;
                         // But we can use nested async calls here to do (1) and (2) serially:
@@ -2154,224 +2140,199 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 }
                             ],
                             // series final callback
-                            function(err){ return callback(err); }
+                            function(err){ return cb(err); }
                         );
+                    } else {
+                        // non-App type
+
+                        var processTypeIth = true;
+
+                        // If !project.specialProjectData.systemTypesEdited, there won't be any SystemTypes with id < 0, but there will be SystemTypes
+                        // with id > 0 which need to be skipped but counted down.
+
+                        // Don't assign an ordinal to an SystemType. It's always 10000.
+                        // Don't set an SystemType's comicId either.
+                        if (typeIth.ordinal === 10000 || !typeIth.isSystemType) {
+
+                            if (!passObj.project.specialProjectData.systemTypesEdited || passObj.comicIth.ordinal > 0) {
+                                // We process System Types only if the setting is on in the project AND we're in the first comic of the project. 
+                                processTypeIth = false; 
+                            }
+                        } else {
+
+                            typeIth.comicId = passObj.comicIth.id;
+                            typeIth.ordinal = passObj.ordinal++;
+                        }
+
+                        if (processTypeIth) {
+
+                            // Again, we can use nested async calls here to do (1) and (2) serially:
+                            // (1) insert the App type
+                            // (2) and then do (2a) and (2b) in parallel:
+                            //  (2a) write tags
+                            //  (2b) write the App type's arrays (methods, properties and events).
+
+                            async.series(
+                                [
+                                    // (1)
+                                    function(cb) {
+
+                                        // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
+                                        var guts = {
+                                            name: typeIth.name,
+                                            isApp: 0,
+                                            imageId: typeIth.imageId || 0,
+                                            altImagePath: typeIth.altImagePath || "",
+                                            ordinal: typeIth.ordinal,
+                                            comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId),
+                                            description: typeIth.description,
+                                            parentTypeId: typeIth.parentTypeId || 0,
+                                            parentPrice: typeIth.parentPrice || 0,
+                                            priceBump: typeIth.priceBump || 0,
+                                            ownedByUserId: typeIth.ownedByUserId,
+                                            public: typeIth.public || 0,
+                                            quarantined: typeIth.quarantined || 1,
+                                            baseTypeId: typeIth.baseTypeId || 0,
+                                            projectId: passObj.project.id,
+                                            isToolStrip: typeIth.isToolStrip || 0
+                                            };
+
+                                        var strQuery;
+                                        var weInserted;
+                                        if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
+
+                                            // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
+
+                                            // First the update statement.
+                                            strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id;
+                                            
+                                            // Then delete methods, properties and events which will be re-inserted.
+                                            strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
+                                            strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
+                                            strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
+                                            
+                                            // Then type_tags.
+                                            strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
+                                            weInserted = false;
+
+                                        } else {
+
+                                            // It's either a new System Type or a non-System Type that was deleted or never existed.
+                                            strQuery = "insert " + self.dbname + "types SET ?";
+                                            weInserted = true;
+                                        }
+
+                                        m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+
+                                        // If this is a System Type, push SQL statements onto passObj.project.script.
+
+                                        // atid is to be used as a unique id in the doTags MySql procedure to
+                                        // let subsequent steps insert according to a specific type's id.
+                                        typeIth.atid = null;
+                                        if (typeIth.ordinal === 10000) {
+
+                                            passObj.project.idnum += 1;
+                                            typeIth.atid = "@id" + passObj.project.idnum;
+
+                                            var scriptGuts = 
+                                                "SET name='" + typeIth.name + "'"
+                                                +",isApp=0"
+                                                +",imageId=" + typeIth.imageId
+                                                +",altImagePath=" + typeIth.altImagePath
+                                                +",ordinal=" + typeIth.ordinal
+                                                +",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
+                                                +",description='" + typeIth.description + "'"
+                                                +",parentTypeId=" + typeIth.parentTypeId
+                                                +",parentPrice=" + typeIth.parentPrice
+                                                +",priceBump=" + typeIth.priceBump
+                                                +",ownedByUserId=" + typeIth.ownedByUserId
+                                                +",public=" + typeIth.public
+                                                +",quarantined=" + typeIth.quarantined
+                                                +",baseTypeId=" + typeIth.baseTypeId
+                                                +",projectId=" + passObj.project.id
+                                                +",isToolStrip=" + typeIth.isToolStrip
+                                                ;
+
+
+                                            passObj.project.script.push('set @guts := "' + scriptGuts + '";');
+                                            passObj.project.script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                                            passObj.project.script.push('if ' + typeIth.atid + ' is not null then');
+                                            passObj.project.script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                            passObj.project.script.push('   delete from types where id=' + typeIth.atid + ';');
+                                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+                                            passObj.project.script.push('   prepare insstmt from @s;');
+                                            passObj.project.script.push('   execute insstmt;');
+                                            passObj.project.script.push('else');
+                                            passObj.project.script.push('   /* New System Types are inserted with a new id. */');
+                                            passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
+                                            passObj.project.script.push('   prepare insstmt from @s;');
+                                            passObj.project.script.push('   execute insstmt;');
+                                            passObj.project.script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+                                            passObj.project.script.push('end if;');
+                                            passObj.project.script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                        }
+
+                                        sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
+                                            function(err, rows) {
+
+                                                try {
+                                                    if (err) { return cb(err); }
+                                                    if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
+
+                                                    if (weInserted) {
+                                                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
+                                                        typeIth.id = rows[0].insertId;
+                                                    } else {
+                                                        // We updated.
+                                                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+                                                    }
+
+                                                    return cb(null);
+
+                                                } catch (e3) {
+                                                    return cb(e3);
+                                                }
+                                            }
+                                        );
+                                    },
+                                    // (2)
+                                    function(cb) {
+                                        async.parallel(
+                                            [
+                                                // (2a)
+                                                function(cb) {
+
+                                                    m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.user.userName, typeIth.tags, typeIth.name, 
+                                                        (typeIth.ordinal === 10000 ? passObj.project.script : null),
+                                                        function(err) { return cb(err); },
+                                                        typeIth.atid
+                                                    );
+                                                },
+                                                // (2b)
+                                                function(cb) {
+
+                                                    m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
+                                                        function(err) { return cb(err); },
+                                                        typeIth.atid
+                                                    );
+                                                }
+                                            ],
+                                            // final callback for parallel
+                                            function(err) { return cb(err); }
+                                        );
+                                    }
+                                ],
+                                // final callback for series
+                                function(err) { return cb(err); }
+                            );
+                        } else {
+                            // Even though we didn't write it out, we'll have it for lookups.
+                            passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+
+                            return cb(null);
+                        }
                     }
                 },
-                function(err) {
-
-                    if (!bFoundAppType) {
-                        return callback(new Error("No App type found in comic"));
-                    }
-
-                    return callback(err);
-                }
-            );
-        } catch (e) { callback(e); }
-    }
-
-    var m_saveNonAppTypesInComicIthToDB = function(passObj, callback) {
-
-        try {
-
-            m_log("***In m_saveNonAppTypesInComicIthToDB***");
-
-            // async.eachSeries iterates over a collection, perform a single async task at a time.
-            // Actually, we could process all types in parallel, but we'd have to pre-assign their ordinals.
-            // Maybe we'll change to that in the future.
-            async.eachSeries(passObj.comicIth.types, 
-                function(typeIth, cb) {
-
-                    if (typeIth.isApp) { return cb(null); }
-
-                    var processTypeIth = true;
-
-                    // If !project.specialProjectData.systemTypesEdited, there won't be any SystemTypes with id < 0, but there will be SystemTypes
-                    // with id > 0 which need to be skipped but counted down.
-
-                    // Don't assign an ordinal to an SystemType. It's always 10000.
-                    // Don't set an SystemType's comicId either.
-                    if (typeIth.ordinal === 10000) {
-
-                        if (!passObj.project.specialProjectData.systemTypesEdited || passObj.comicIth.ordinal > 0) {
-                            // We process System Types only if the setting is on in the project AND we're in the first comic of the project. 
-                            processTypeIth = false; 
-                        }
-                    } else {
-
-                        typeIth.comicId = passObj.comicIth.id;
-                        typeIth.ordinal = passObj.ordinal++;
-                    }
-
-                    if (processTypeIth) {
-
-                        // Again, we can use nested async calls here to do (1) and (2) serially:
-                        // (1) insert the App type
-                        // (2) and then do (2a) and (2b) in parallel:
-                        //  (2a) write tags
-                        //  (2b) write the App type's arrays (methods, properties and events).
-
-                        async.series(
-                            [
-                                // (1)
-                                function(cb) {
-
-                                    // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
-                                    var guts = {
-                                        name: typeIth.name,
-                                        isApp: 0,
-                                        imageId: typeIth.imageId || 0,
-                                        altImagePath: typeIth.altImagePath || "",
-                                        ordinal: typeIth.ordinal,
-                                        comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId),
-                                        description: typeIth.description,
-                                        parentTypeId: typeIth.parentTypeId || 0,
-                                        parentPrice: typeIth.parentPrice || 0,
-                                        priceBump: typeIth.priceBump || 0,
-                                        ownedByUserId: typeIth.ownedByUserId,
-                                        public: typeIth.public || 0,
-                                        quarantined: typeIth.quarantined || 1,
-                                        baseTypeId: typeIth.baseTypeId || 0,
-                                        projectId: passObj.project.id,
-                                        isToolStrip: typeIth.isToolStrip || 0
-                                        };
-
-                                    var strQuery;
-                                    var weInserted;
-                                    if (typeIth.ordinal === 10000 && typeIth.id >= 0) {
-
-                                        // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
-
-                                        // First the update statement.
-                                        strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id;
-                                        
-                                        // Then delete methods, properties and events which will be re-inserted.
-                                        strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
-                                        strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
-                                        strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
-                                        
-                                        // Then type_tags.
-                                        strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
-                                        weInserted = false;
-
-                                    } else {
-
-                                        // It's either a new System Type or a non-System Type that was deleted or never existed.
-                                        strQuery = "insert " + self.dbname + "types SET ?";
-                                        weInserted = true;
-                                    }
-
-                                    m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-
-                                    // If this is a System Type, push SQL statements onto passObj.project.script.
-
-                                    // atid is to be used as a unique id in the doTags MySql procedure to
-                                    // let subsequent steps insert according to a specific type's id.
-                                    typeIth.atid = null;
-                                    if (typeIth.ordinal === 10000) {
-
-                                        passObj.project.idnum += 1;
-                                        typeIth.atid = "@id" + passObj.project.idnum;
-
-                                        var scriptGuts = 
-                                            "SET name='" + typeIth.name + "'"
-                                            +",isApp=0"
-                                            +",imageId=" + typeIth.imageId
-                                            +",altImagePath=" + typeIth.altImagePath
-                                            +",ordinal=" + typeIth.ordinal
-                                            +",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
-                                            +",description='" + typeIth.description + "'"
-                                            +",parentTypeId=" + typeIth.parentTypeId
-                                            +",parentPrice=" + typeIth.parentPrice
-                                            +",priceBump=" + typeIth.priceBump
-                                            +",ownedByUserId=" + typeIth.ownedByUserId
-                                            +",public=" + typeIth.public
-                                            +",quarantined=" + typeIth.quarantined
-                                            +",baseTypeId=" + typeIth.baseTypeId
-                                            +",projectId=" + passObj.project.id
-                                            +",isToolStrip=" + typeIth.isToolStrip
-                                            ;
-
-
-                                        passObj.project.script.push('set @guts := "' + scriptGuts + '";');
-                                        passObj.project.script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
-                                        passObj.project.script.push('if ' + typeIth.atid + ' is not null then');
-                                        passObj.project.script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
-                                        passObj.project.script.push('   delete from types where id=' + typeIth.atid + ';');
-                                        passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
-                                        passObj.project.script.push('   prepare insstmt from @s;');
-                                        passObj.project.script.push('   execute insstmt;');
-                                        passObj.project.script.push('else');
-                                        passObj.project.script.push('   /* New System Types are inserted with a new id. */');
-                                        passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
-                                        passObj.project.script.push('   prepare insstmt from @s;');
-                                        passObj.project.script.push('   execute insstmt;');
-                                        passObj.project.script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
-                                        passObj.project.script.push('end if;');
-                                        passObj.project.script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
-                                    }
-
-                                    sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
-                                        function(err, rows) {
-
-                                            try {
-                                                if (err) { return cb(err); }
-                                                if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
-
-                                                if (weInserted) {
-                                                    passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
-                                                    typeIth.id = rows[0].insertId;
-                                                } else {
-                                                    // We updated.
-                                                    passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-                                                }
-
-                                                return cb(null);
-
-                                            } catch (e3) {
-                                                return cb(e3);
-                                            }
-                                        }
-                                    );
-                                },
-                                // (2)
-                                function(cb) {
-                                    async.parallel(
-                                        [
-                                            // (2a)
-                                            function(cb) {
-
-                                                m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.user.userName, typeIth.tags, typeIth.name, 
-                                                    (typeIth.ordinal === 10000 ? passObj.project.script : null),
-                                                    function(err) { return cb(err); },
-                                                    typeIth.atid
-                                                );
-                                            },
-                                            // (2b)
-                                            function(cb) {
-
-                                                m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
-                                                    function(err) { return cb(err); },
-                                                    typeIth.atid
-                                                );
-                                            }
-                                        ],
-                                        // final callback for parallel
-                                        function(err) { return cb(err); }
-                                    );
-                                }
-                            ],
-                            // final callback for series
-                            function(err) { return cb(err); }
-                        );
-                    } else {
-                        // Even though we didn't write it out, we'll have it for lookups.
-                        passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-
-                        return cb(null);
-                    }
-                }, 
-                // final callback
                 function(err) { return callback(err); }
             );
         } catch (e) { callback(e); }

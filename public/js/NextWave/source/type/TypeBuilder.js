@@ -253,8 +253,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             };
 
-                            // If priviledged...
-                            if (window.manager.priviledged) {
+                            // If privileged...
+                            if (window.manager.privileged) {
 
                                 // Add two new controls to the dialog.
                                 objectConfiguration.systemTypeLabel = {
@@ -359,7 +359,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             if (!type.stowage.isSystemType) {
 
-                                type.stowage.isSystemType = "0";
+                                type.stowage.isSystemType = 0;
                             }
 
                             // Store the context.
@@ -371,7 +371,7 @@ define(["NextWave/source/utility/prototypes",
                             self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
                             self.dialog.controlObject["creatorLabel"].text = type.creator;
                             self.dialog.controlObject["createdLabel"].text = type.created;
-                            self.dialog.controlObject["systemTypeEdit"].text = type.stowage.isSystemType;
+                            self.dialog.controlObject["systemTypeEdit"].text = type.stowage.isSystemType.toString();
                             return null;
                         } catch (e) {
 

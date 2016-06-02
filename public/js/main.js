@@ -48,10 +48,7 @@ $(document).ready(function() {
 						                    // Allocate and create the layer manager.
 						                    manager = new Manager();
 						                    var exceptionRet = manager.create();
-						                    if (exceptionRet) {
-
-						                        throw exceptionRet;
-						                    }
+						                    if (exceptionRet) { throw exceptionRet; }
 
 											// Allocate and initialize the client.
 											client = new Client();
@@ -63,10 +60,15 @@ $(document).ready(function() {
 											exceptionRet = navbar.create();
 											if (exceptionRet) { throw exceptionRet; }
 
-											// Calculate if the user is priviledged, set in manager.
-				                            manager.priviledged = (g_profile["can_create_classes"] || 
+											// Calculate if the user is privileged, set in manager.
+				                            manager.privileged = (g_profile["can_create_classes"] || 
 				                                g_profile["can_create_products"] || 
 				                                g_profile["can_create_onlineClasses"]) || false;
+
+				                            // Now that manager and client are ready:
+				                            exceptionRet = client.postCreate();
+				                            if (exceptionRet) { throw exceptionRet; }
+
 						                } catch (e) {
 
 						                    alert(e.message);

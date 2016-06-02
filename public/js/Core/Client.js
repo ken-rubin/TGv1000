@@ -66,8 +66,18 @@ define(["Core/errorHelper",
 							var profileJSON = localStorage.getItem("profile");
 							g_profile = JSON.parse(profileJSON);
 
+							return null;
+
+						} catch (e) { return e; }
+					};
+
+					// To remedy an order of creation problem.
+					self.postCreate = function () {
+
+						try {
+
 							// "Normal" users get their last project loaded automatically.
-							if (!(g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"])) {
+							if (!manager.privileged) {
 
 								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
 								// At least it didn't work at the bottom of the callback in main.js.
@@ -94,10 +104,11 @@ define(["Core/errorHelper",
 									);
 								}
 							}
+
 							return null;
 
 						} catch (e) { return e; }
-					};
+					}
 
 					//////////////////////////////
 					// Dialog creators/openers

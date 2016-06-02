@@ -71,8 +71,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the primary button or press Enter.
 
 							var buttons = [];
-							m_bPrivilegedUser = (g_profile["can_create_classes"] || g_profile["can_create_products"] || g_profile["can_create_onlineClasses"]) || false;
-							if (m_bPrivilegedUser) {
+							if (manager.privileged) {
 
 							    buttons = [
 					            	{
@@ -132,7 +131,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
 							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
 
-							if (m_bPrivilegedUser) {
+							if (manager.privileged) {
 								$("#PrivilegedUsersDiv").css("display", "block");
 								$("#ContinueBtn").prop('disabled', true);
 							}
@@ -370,7 +369,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							if (m_bPrivilegedUser) {
+							if (manager.privileged) {
 
 								var jq;
 								if (m_projectType) {
@@ -480,7 +479,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
 									projectData.specialProjectData = {
-										privilegedUser: m_bPrivilegedUser,
+										privilegedUser: manager.privileged,
 										ownedByUser: false,
 										othersProjects: false,
 										normalProject: m_bNormalProject,
@@ -723,7 +722,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_bClassProject = false;
 				var m_bProductProject = false;
 				var m_bOnlineClassProject = false;
-				var m_bPrivilegedUser = false;
 			};
 
 			// Return the constructor function as the module object.
