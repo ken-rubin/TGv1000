@@ -718,6 +718,14 @@ define(["NextWave/source/utility/prototypes",
 
                                     position: "absolute"
                                 });
+                            m_jqCanvas.on('dragstart', function(evt) {
+
+                                return false;
+                            });
+                            m_jqCanvas.on('drop', function(evt) {
+
+                                return false;
+                            });
                             m_jqParent.append(m_canvasRender);
 
                             // Hook the resize to update the size of the dashboard when the browser is resized.
