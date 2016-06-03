@@ -107,6 +107,27 @@ define(["NextWave/source/utility/prototypes",
                                         return exceptionRet;
                                     }
                                 }
+                            } else {
+
+                                // This Type doesn't have a 'construct' method. It must be new, since all Types have a construct method.
+                                // Let's add one.
+                                var methodContruct = new Method(self,
+                                    'construct');   // No parameters; no statements.
+
+                                exceptionRet = methodContruct.create({
+                                    name: 'construct',
+                                    ownedByUserId: parseInt(g_profile["userId"], 10)
+                                });
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                                
+                                exceptionRet = self.methods.addPart(methodContruct);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
                             }
 
                             // Build the properties.

@@ -1,7 +1,15 @@
 
 ## Ken's Issues
 
-- Replace Blockly.
+- System Type in Type has to be a checkbox.
+- Base in Type has to be a combo.
+- We need a way to delete a Type, but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type.
+- Type field in Property has to become a combo.
+- Methods named initialize or construct should not be renameable. 
+- If other methods are renamed, that has to propogate throughout comic. Unless in System Types: then everyplace.
+- App Type cannot be renamed.
+- If any non-system types are renamed, that has to propogate throughout the comic.
+- If a System Type is renamed, that has to be propogated everywhere.
 
 ## Jerry's High Priority Issues
 - John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.

@@ -1415,6 +1415,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             guts.firstSaved = moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss");
                         }
 
+                        var exceptionRet = m_checkGutsForUndefined('project', guts);
+                        if (exceptionRet) {
+                            return cb(exceptionRet);
+                        }
+
                         var strQuery = "INSERT " + self.dbname + "projects SET ?";
                         m_log('Inserting project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                         sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
@@ -1571,6 +1576,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             chargeId: project.chargeId,
                             currentComicIndex: project.currentComicIndex
                         };
+
+                        var exceptionRet = m_checkGutsForUndefined('project', guts);
+                        if (exceptionRet) {
+                            return cb(exceptionRet);
+                        }
 
                         var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;
                         m_log('Updating project record with id ' + project.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(guts));
@@ -1731,6 +1741,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 }
 
                 if (dbname.length > 0) {
+
+                    var exceptionRet = m_checkGutsForUndefined(dbname, guts);
+                    if (exceptionRet) {
+                        return cb(exceptionRet);
+                    }
 
                     var strQuery = "INSERT " + self.dbname + dbname + " SET ?";
                     m_log('Inserting purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
@@ -2113,6 +2128,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         projectId: passObj.project.id,
                                         isToolStrip: typeIth.isToolStrip
                                     };
+
+                                    var exceptionRet = m_checkGutsForUndefined('app type', guts);
+                                    if (exceptionRet) {
+                                        return cb(exceptionRet);
+                                    }
+
                                     var strQuery = "insert " + self.dbname + "types SET ?";
                                     m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                     sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
@@ -2226,6 +2247,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             projectId: passObj.project.id,
                                             isToolStrip: typeIth.isToolStrip || 0
                                             };
+
+                                        var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
+                                        if (exceptionRet) {
+                                            return cb(exceptionRet);
+                                        }
 
                                         var strQuery;
                                         var weInserted;
@@ -2453,6 +2479,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         parameters: method.arguments.join(',')
                                                         };
 
+                                            var exceptionRet = m_checkGutsForUndefined('method', guts);
+                                            if (exceptionRet) {
+                                                return cb(exceptionRet);
+                                            }
+
                                             var strQuery = "insert " + self.dbname + "methods SET ?";
                                             m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
@@ -2531,6 +2562,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             ordinal: property.ordinal,
                                             isHidden: 0
                                             };
+
+                                var exceptionRet = m_checkGutsForUndefined('property', guts);
+                                if (exceptionRet) {
+                                    return cb(exceptionRet);
+                                }
+
                                 strQuery = "insert " + self.dbname + "propertys SET ?";
                                 m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
@@ -2582,6 +2619,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             name: event.name,
                                             ordinal: event.ordinal
                                             };
+
+                                var exceptionRet = m_checkGutsForUndefined('event', guts);
+                                if (exceptionRet) {
+                                    return cb(exceptionRet);
+                                }
+
                                 strQuery = "insert " + self.dbname + "events SET ?";
                                 m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
@@ -2623,6 +2666,25 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             callback(e);
         }
+    }
+
+    var m_checkGutsForUndefined = function(ident, guts) {
+
+        var strError = '';
+        Object.keys(guts).forEach(function(key, index) {
+
+            if (typeof guts[key] === 'undefined') {
+
+                strError += 'undefined value found in an ' + ident + ' for property ' + key + '; ';
+            }
+        });
+
+        if (strError) {
+
+            console.log(strError);
+            return new Error(strError);
+        }
+        return null;
     }
 
     // atid is null or undefined unless an id is needed for a System Type or one of its components.
