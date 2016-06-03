@@ -199,52 +199,6 @@ define(["NextWave/source/utility/prototypes",
                                             alert(e.message);
                                         }
                                     }
-                                },
-                                creatorHeaderLabel: {
-
-                                    type: "Label",
-                                    text: "Creator",
-                                    x: settings.general.margin,
-                                    y: 7 * settings.dialog.lineHeight + 
-                                        3 * settings.general.margin,
-                                    width: settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                creatorLabel: {
-
-                                    type: "Label",
-                                    x: 2 * settings.general.margin + 
-                                        settings.dialog.firstColumnWidth,
-                                    y: 7 * settings.dialog.lineHeight + 
-                                        4 * settings.general.margin,
-                                    widthType: "reserve",           // Reserve means: subtract the width from
-                                                                    //  the total width on calculateLayout.
-                                    width: 3 * settings.general.margin +
-                                        settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                createdHeaderLabel: {
-
-                                    type: "Label",
-                                    text: "Created",
-                                    x: settings.general.margin,
-                                    y: 8 * settings.dialog.lineHeight + 
-                                        5 * settings.general.margin,
-                                    width: settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                createdLabel: {
-
-                                    type: "Label",
-                                    x: 2 * settings.general.margin + 
-                                        settings.dialog.firstColumnWidth,
-                                    y: 8 * settings.dialog.lineHeight + 
-                                        5 * settings.general.margin,
-                                    widthType: "reserve",           // Reserve means: subtract the width from
-                                                                    //  the total width on calculateLayout.
-                                    width: 3 * settings.general.margin +
-                                        settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
                                 }
                             });
 
@@ -296,14 +250,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 property.stowage.description = "[description goes here]";
                             }
-                            if (!property.stowage.creator) {
-
-                                property.stowage.creator = "[creator goes here]";
-                            }
-                            if (!property.stowage.created) {
-
-                                property.stowage.created = "[created goes here]";
-                            }
 
                             // Store the context.
                             self.typeContext = type;
@@ -313,8 +259,6 @@ define(["NextWave/source/utility/prototypes",
                             self.dialog.controlObject["nameEdit"].text = property.name;
                             self.dialog.controlObject["typeEdit"].text = property.stowage.typeName;
                             self.dialog.controlObject["descriptionEdit"].text = property.stowage.description;
-                            self.dialog.controlObject["creatorLabel"].text = property.creator;
-                            self.dialog.controlObject["createdLabel"].text = property.created;
                             return null;
                         } catch (e) {
 

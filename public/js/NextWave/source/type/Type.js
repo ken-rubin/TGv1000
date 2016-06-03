@@ -63,10 +63,6 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // Get the node containing settings for this type.
                     self.settingsNode = settings.tree.type;
-                    // Default the name.
-                    self.creator = g_profile["userName"];
-                    // Default the date too.
-                    self.created = new Date().toString();
                     // Object holds data members which are 
                     // not differentiated by this client.
                     self.stowage = {};
@@ -82,7 +78,7 @@ define(["NextWave/source/utility/prototypes",
                             // Save the attributes along with this object.
                             var exceptionRet = attributeHelper.fromJSON(objectType,
                                 self,
-                                ["name", "methods", "properties", "events", "creator", "created"]);
+                                ["name", "methods", "properties", "events"]);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -90,11 +86,6 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set the name.
                             self.name = new CodeType(objectType.name);
-
-                            // Also load up creator.
-                            self.creator = objectType.creator;
-                            // Also load up created.
-                            self.created = objectType.created;
 
                             // Build the methods.
                             if (objectType.methods) {
@@ -302,8 +293,6 @@ define(["NextWave/source/utility/prototypes",
 
                         // Save name.
                         objectRet.name = self.name.payload;
-                        objectRet.creator = self.creator;
-                        objectRet.created = self.created;
 
                         // If there are methods, then save them up.
                         if (self.methods) {

@@ -70,10 +70,6 @@ define(["NextWave/source/utility/prototypes",
                     self.parameters = plMethod || new ParameterList();
                     // List of statement associated with this method.
                     self.statements = slMethod || new StatementList();
-                    // Default the name.
-                    self.creator = g_profile["userName"];
-                    // Default the date too.
-                    self.created = new Date().toString();
                     // Object holds data members which are 
                     // not differentiated by this client.
                     self.stowage = {};
@@ -114,7 +110,7 @@ define(["NextWave/source/utility/prototypes",
                             // Save the attributes along with this object.
                             var exceptionRet = attributeHelper.fromJSON(objectMethod,
                                 self,
-                                ["name", "arguments", "statements", "creator", "created"]);
+                                ["name", "arguments", "statements"]);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -122,10 +118,6 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set the name.
                             self.name = objectMethod.name;
-                            // Also load up creator.
-                            self.creator = objectMethod.creator;
-                            // Also load up created.
-                            self.created = objectMethod.created;
 
                             // Three bits of data.
                             var arrayParameters = objectMethod.arguments;
@@ -209,8 +201,6 @@ define(["NextWave/source/utility/prototypes",
 
                         // Name.
                         objectRet.name = self.name;
-                        objectRet.created = self.created;
-                        objectRet.creator = self.creator;
 
                         // Parameters.
                         objectRet.arguments = self.parameters.save(true);

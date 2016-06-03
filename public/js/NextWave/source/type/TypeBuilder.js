@@ -204,52 +204,6 @@ define(["NextWave/source/utility/prototypes",
                                             alert(e.message);
                                         }
                                     }
-                                },
-                                creatorHeaderLabel: {
-
-                                    type: "Label",
-                                    text: "Creator",
-                                    x: settings.general.margin,
-                                    y: 7 * settings.dialog.lineHeight + 
-                                        3 * settings.general.margin,
-                                    width: settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                creatorLabel: {
-
-                                    type: "Label",
-                                    x: 2 * settings.general.margin + 
-                                        settings.dialog.firstColumnWidth,
-                                    y: 7 * settings.dialog.lineHeight + 
-                                        4 * settings.general.margin,
-                                    widthType: "reserve",           // Reserve means: subtract the width from
-                                                                    //  the total width on calculateLayout.
-                                    width: 3 * settings.general.margin +
-                                        settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                createdHeaderLabel: {
-
-                                    type: "Label",
-                                    text: "Created",
-                                    x: settings.general.margin,
-                                    y: 8 * settings.dialog.lineHeight + 
-                                        5 * settings.general.margin,
-                                    width: settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                createdLabel: {
-
-                                    type: "Label",
-                                    x: 2 * settings.general.margin + 
-                                        settings.dialog.firstColumnWidth,
-                                    y: 8 * settings.dialog.lineHeight + 
-                                        5 * settings.general.margin,
-                                    widthType: "reserve",           // Reserve means: subtract the width from
-                                                                    //  the total width on calculateLayout.
-                                    width: 3 * settings.general.margin +
-                                        settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
                                 }
                             };
 
@@ -262,8 +216,8 @@ define(["NextWave/source/utility/prototypes",
                                     type: "Label",
                                     text: "System Type",
                                     x: settings.general.margin,
-                                    y: 9 * settings.dialog.lineHeight + 
-                                        6 * settings.general.margin,
+                                    y: 7 * settings.dialog.lineHeight + 
+                                        4 * settings.general.margin,
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 };
@@ -273,8 +227,8 @@ define(["NextWave/source/utility/prototypes",
                                     type: "Edit",
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
-                                    y: 9 * settings.dialog.lineHeight + 
-                                        6 * settings.general.margin,
+                                    y: 7 * settings.dialog.lineHeight + 
+                                        4 * settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
                                     width: 3 * settings.general.margin +
@@ -349,14 +303,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 type.stowage.description = "[description goes here]";
                             }
-                            if (!type.creator) {
-
-                                type.creator = "[creator goes here]";
-                            }
-                            if (!type.created) {
-
-                                type.created = "[created goes here]";
-                            }
                             if (!type.stowage.isSystemType) {
 
                                 type.stowage.isSystemType = 0;
@@ -369,8 +315,6 @@ define(["NextWave/source/utility/prototypes",
                             self.dialog.controlObject["nameEdit"].text = type.name.payload;
                             self.dialog.controlObject["baseEdit"].text = type.stowage.baseTypeName;
                             self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
-                            self.dialog.controlObject["creatorLabel"].text = type.creator;
-                            self.dialog.controlObject["createdLabel"].text = type.created;
                             self.dialog.controlObject["systemTypeEdit"].text = type.stowage.isSystemType.toString();
                             return null;
                         } catch (e) {

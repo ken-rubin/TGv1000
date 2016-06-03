@@ -135,8 +135,6 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = typeNew.create({
 
                                 name: strName,
-                                creator: g_profile["userName"],
-                                created: new Date().toString(),
                                 ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
@@ -176,8 +174,6 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = methodNew.create({
 
                                 name: strName,
-                                creator: g_profile["userName"],
-                                created: new Date().toString(),
                                 ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
@@ -218,8 +214,6 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = propertyNew.create({
 
                                 name: strName,
-                                creator: g_profile["userName"],
-                                created: new Date().toString(),
                                 ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
