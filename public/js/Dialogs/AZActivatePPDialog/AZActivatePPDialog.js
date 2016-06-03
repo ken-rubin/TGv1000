@@ -104,12 +104,12 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 									function(bShiftKey) {
 
 										// id was created like this:
-										// var combo = (stripNum + 1) * 10 + i;
+										// var combo = (stripNum + 1) * 10000 + i;
 							   			// "carousel" + combo.toString(),
 							   			// We want to parse the id to get back stripNum and i.
 							    		var jq = this;
 							    		var num = parseInt(jq[0].id.substring(8), 10);
-							    		var stripNum = Math.floor(num / 10) - 1;
+							    		var stripNum = Math.floor(num / 10000) - 1;
 							    		var i = num % 10;
 										if (bShiftKey) {
 											var exceptionRet = client.showAZPPBuyersDialog(m_searchResultRawArray[stripNum][i].baseProjectId);
@@ -226,7 +226,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        var rowIth = m_searchResultProcessedArray[stripNum][i];
 
 							        // Add each processed image to the region.
-							        var combo = (stripNum + 1) * 10 + i;
+							        var combo = (stripNum + 1) * 10000 + i;
 							        // For the tooltip get name from rowIth.name; get more fields from m_searchResultRawArray[stripNum][rowIth.index].*
 							        var tooltip = rowIth.name + "<br>" + (m_searchResultRawArray[stripNum][rowIth.index].active ? "ACTIVE" : "NOT ACTIVE");
 							        switch(stripNum) {

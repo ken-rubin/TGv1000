@@ -203,7 +203,7 @@ define(["Core/errorHelper", "Core/resourceHelper"],
                     var jItem = $(this);
 
                     // Get position calculation base.
-                    var iBase = parseInt(jItem.context.attributes['data-ibase'].value, 10) % 10;
+                    var iBase = parseInt(jItem.context.attributes['data-ibase'].value, 10) % 10000;
 
                     // Add to collection--but we want it in position iBase.
                     m_arrayItems.splice(iBase, 0, jItem);

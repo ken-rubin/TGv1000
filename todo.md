@@ -57,11 +57,6 @@
     + Lengthen to like 2 weeks.
     + Save project to DB with every change.
 
-## Jerry's seldom- or non-reproducable Bugs
-- I got e is not defined when trying to save a new Online Class. No error in F12. The Project was created, but when I went to save it all info beneath Search tags was missing. Created it from new again, and it worked fine. Look at SaveProjectAs.js line 274. I think specialProjectData.onlineClassData is undefined. **A bug I introduced into errorHelper caused a valid error to display this way. I've fixed that bug, so when it recurs I should be able to see what's wrong.**
-- Happened several times (but not always): created new product project. Entered only name. After clicking Create Project, everything looked good (i.e., vertical scroll regions were drawn), but then got errorHelper dlg: "Cannot read property 'trim' of undefined". There is no error in the F12 console. I have no idea where this error is being thrown from. **See errorHelper bug noted above. Didn't help. Still happens sometimes to John.**
-- Fetching from DB for AZUsersDialog stopped working one time after it had been working fine. Restarted server, and it worked again. Hasn't broken again.
-
 ### To consider
 - AZUsersDialog 
     - Users tab
