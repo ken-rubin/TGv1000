@@ -2080,6 +2080,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     typeIth.comicId = passObj.comicIth.id;
                                     typeIth.ordinal = 0;
+
+                                    // TODO if typeIth.baseTypeName then look it up and set baseTypeId; else 0.
+
                                     var guts = {
                                         name: typeIth.name,
                                         isApp: 1,
@@ -2176,6 +2179,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 [
                                     // (1)
                                     function(cb) {
+
+                                        // TODO if typeIth.baseTypeName then look it up and set baseTypeId; else 0.
 
                                         // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
                                         var guts = {
@@ -2495,11 +2500,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 var guts = {
                                             typeId: typeIth.id,
-                                            propertyTypeId: property.propertyTypeId || 6,    // WORK ON THIS
+                                            propertyTypeId: 6,
                                             name: property.name,
-                                            initialValue: property.initialValue || '',
+                                            initialValue: property.typeName,
                                             ordinal: property.ordinal,
-                                            isHidden: (property.isHidden ? 1 : 0)
+                                            isHidden: 0
                                             };
                                 strQuery = "insert " + self.dbname + "propertys SET ?";
                                 m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
@@ -2513,6 +2518,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             property.id = rows[0].insertId;
 
                                             // If this is a System Type property, push onto passObj.project.script.
+                                            // TODO
                                             if (typeIth.ordinal === 10000) {
                                                 var scriptGuts = " SET typeId=" + atid
                                                             + ",propertyTypeId=" + property.propertyTypeId

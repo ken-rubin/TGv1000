@@ -160,7 +160,7 @@ define(["NextWave/source/utility/prototypes",
                                                 var typeContext = localSelf.dialog.host.typeContext;
 
                                                 // Update it description.
-                                                typeContext.stowage.base = localSelf.text;
+                                                typeContext.stowage.baseTypeName = localSelf.text;
                                             }
                                         } catch (e) {
 
@@ -341,9 +341,9 @@ define(["NextWave/source/utility/prototypes",
 
                                 type.stowage = {};
                             }
-                            if (!type.stowage.base) {
+                            if (!type.stowage.baseTypeName) {
 
-                                type.stowage.base = "BaseObject";
+                                type.stowage.baseTypeName = "";
                             }
                             if (!type.stowage.description) {
 
@@ -367,7 +367,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Update controls.
                             self.dialog.controlObject["nameEdit"].text = type.name.payload;
-                            self.dialog.controlObject["baseEdit"].text = type.stowage.base;
+                            self.dialog.controlObject["baseEdit"].text = type.stowage.baseTypeName;
                             self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
                             self.dialog.controlObject["creatorLabel"].text = type.creator;
                             self.dialog.controlObject["createdLabel"].text = type.created;

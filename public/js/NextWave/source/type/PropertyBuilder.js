@@ -155,7 +155,7 @@ define(["NextWave/source/utility/prototypes",
                                                 var propertyContext = localSelf.dialog.host.propertyContext;
 
                                                 // Update it description.
-                                                propertyContext.stowage.type = localSelf.text;
+                                                propertyContext.stowage.typeName = localSelf.text;
                                             }
                                         } catch (e) {
 
@@ -288,9 +288,9 @@ define(["NextWave/source/utility/prototypes",
 
                                 property.stowage = {};
                             }
-                            if (!property.stowage.type) {
+                            if (!property.stowage.typeName) {
 
-                                property.stowage.type = "Number";
+                                property.stowage.typeName = "Number";
                             }
                             if (!property.stowage.description) {
 
@@ -311,7 +311,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Update controls.
                             self.dialog.controlObject["nameEdit"].text = property.name;
-                            self.dialog.controlObject["typeEdit"].text = property.stowage.type;
+                            self.dialog.controlObject["typeEdit"].text = property.stowage.typeName;
                             self.dialog.controlObject["descriptionEdit"].text = property.stowage.description;
                             self.dialog.controlObject["creatorLabel"].text = property.creator;
                             self.dialog.controlObject["createdLabel"].text = property.created;
