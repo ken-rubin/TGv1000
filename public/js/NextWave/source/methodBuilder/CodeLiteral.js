@@ -144,7 +144,12 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Draw border on highlight.
-                            if (self.highlight) {
+                            if ((window.draggingStatement || window.draggingExpression) &&
+                                self.collection) {
+
+                                //contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
+                                //contextRender.stroke();
+                            } else if (self.highlight) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.fill();

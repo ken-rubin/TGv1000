@@ -190,6 +190,13 @@ define(["NextWave/source/utility/prototypes",
                             // Only care about mouse down if over some regon.
                             if (self.highlightControl) {
 
+                                // Store the cursor item as the focus object.
+                                var exceptionRet = window.manager.setFocus(self.highlightControl);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
                                 // Call if function.
                                 if ($.isFunction(self.highlightControl.mouseDown)) {
 
@@ -199,9 +206,6 @@ define(["NextWave/source/utility/prototypes",
                                         return exceptionRet;
                                     }
                                 }
-
-                                // Store the cursor item as the focus object.
-                                return window.manager.setFocus(self.highlightControl);
                             }
                             return null;
                         } catch (e) {
