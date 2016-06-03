@@ -2067,8 +2067,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                     if (typeIth.isApp || 0) {
 
-                        bFoundAppType = true;
-                        // But we can use nested async calls here to do (1) and (2) serially:
+                        // We can use nested async calls here to do (1) and (2) serially:
                         // (1) insert the App type
                         // (2) and then do (2a) and (2b) in parallel:
                         //  (2a) write tags
@@ -2081,7 +2080,20 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     typeIth.comicId = passObj.comicIth.id;
                                     typeIth.ordinal = 0;
 
-                                    // TODO if typeIth.baseTypeName then look it up and set baseTypeId; else 0.
+                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in this comic's types.
+                                    // TODO: Handle id re-numbering problems.
+                                    // TODO: Go do type loading in project and type.
+                                    typeIth.baseTypeId = 0;
+                                    if (typeIth.baseTypeName) {
+                                        for (var j = 0; j < passObj.comicIth.types; j++) {
+                                            
+                                            var typeJth = passObj.comicIth.types[j];
+                                            if (typeIth.baseTypeName === typeJth.name) {
+                                                typeIth.baseTypeId = typeJth.id;
+                                                break;
+                                            }
+                                        }
+                                    }
 
                                     var guts = {
                                         name: typeIth.name,
@@ -2180,7 +2192,20 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     // (1)
                                     function(cb) {
 
-                                        // TODO if typeIth.baseTypeName then look it up and set baseTypeId; else 0.
+                                        // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in this comic's types.
+                                        // TODO: Handle id re-numbering problems.
+                                        // TODO: Go do type loading in project and type.
+                                        typeIth.baseTypeId = 0;
+                                        if (typeIth.baseTypeName) {
+                                            for (var j = 0; j < passObj.comicIth.types; j++) {
+                                                
+                                                var typeJth = passObj.comicIth.types[j];
+                                                if (typeIth.baseTypeName === typeJth.name) {
+                                                    typeIth.baseTypeId = typeJth.id;
+                                                    break;
+                                                }
+                                            }
+                                        }
 
                                         // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
                                         var guts = {
@@ -2502,7 +2527,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             typeId: typeIth.id,
                                             propertyTypeId: 6,
                                             name: property.name,
-                                            initialValue: property.typeName,
+                                            initialValue: property.initialValue,
                                             ordinal: property.ordinal,
                                             isHidden: 0
                                             };
