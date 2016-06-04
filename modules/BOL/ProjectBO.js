@@ -393,6 +393,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         typeIth.methods = [];
                                         typeIth.properties = [];
                                         typeIth.events = [];
+                                        typeIth.isSystemType = 0;
 
                                         m_functionFetchTags(
                                             typeIth.id,
@@ -442,10 +443,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     function(typeIth, cbe2) {
 
                                         typeIth.originalTypeId = typeIth.id;
-                                        typeIth.isApp = (typeIth.isApp === 1 ? true : false);
+                                        typeIth.isApp = false; // Probably false without setting it.
                                         typeIth.methods = [];
                                         typeIth.properties = [];
                                         typeIth.events = [];
+                                        typeIth.isSystemType = 1;
 
                                         m_functionFetchTags(
                                             typeIth.id,
@@ -711,6 +713,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             tags: '',
                             baseTypeId: row.baseTypeId,
                             baseTypeName: row.baseTypeName,
+                            isSystemType: 0,
                             properties: [],
                             methods: [],
                             events: []
@@ -2368,18 +2371,24 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 function(cb) {
 
                                                     m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
-                                                        function(err) { return cb(err); },
+                                                        function(err) { 
+                                                            return cb(err); 
+                                                        },
                                                         typeIth.atid
                                                     );
                                                 }
                                             ],
                                             // final callback for parallel
-                                            function(err) { return cb(err); }
+                                            function(err) { 
+                                                return cb(err); 
+                                            }
                                         );
                                     }
                                 ],
                                 // final callback for series
-                                function(err) { return cb(err); }
+                                function(err) { 
+                                    return cb(err); 
+                                }
                             );
                         } else {
                             // Even though we didn't write it out, we'll have it for lookups.
@@ -2389,9 +2398,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         }
                     }
                 },
-                function(err) { return callback(err); }
+                function(err) { 
+                    return callback(err); 
+                }
             );
-        } catch (e) { callback(e); }
+        } catch (e) { 
+            callback(e); 
+        }
     }
 
     var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
@@ -2444,10 +2457,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("***Arrived in m_saveArraysInTypeIthToDB for type named " + typeIth.name + "***.");
 
-            async.parallel(
+            // We use async.parallel here because methods, properties and events are totally independent.
+            // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
+            
+            async.series( // TODO change back to parallel after debugging
                 [
                     // (1) methods
-                    function(cb) {
+                    function(cbp1) {
 
                         m_log("Doing methods");
                         var ordinal = 0;
@@ -2534,16 +2550,20 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             );
                                         }
                                     ],
-                                    // final callback for series (1)
-                                    function(err) { return cb(err); }
+                                    // final callback for async.series in methods
+                                    function(err) { 
+                                        return cb(err); 
+                                    }
                                 );
                             },
-                            // final callback for eachSeries (1)
-                            function(err) { return cb(err); }
+                            // final callback for async.eachSeries in methods
+                            function(err) { 
+                                return cbp1(err); 
+                            }
                         );
                     },
                     // (2) properties
-                    function(cb) {
+                    function(cbp2) {
 
                         m_log("Doing properties");
                         var ordinal = 0;
@@ -2597,14 +2617,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     }
                                 );
                             },
-                            // final callback for eachSeries (2)
+                            // final callback for async.eachSeries in properties
                             function(err) { 
-                                return cb(err); 
+                                return cbp2(err); 
                             }
                         );
                     },
                     // (3) events
-                    function(cb) {
+                    function(cbp3) {
 
                         m_log("Doing events");
                         var ordinal = 0;
@@ -2650,14 +2670,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     }
                                 );
                             },
-                            // final callback for eachSeries (3)
+                            // final callback for async.eachSeries in events
                             function(err) { 
-                                return cb(err); 
+                                return cbp3(err); 
                             }
                         );
                     }
                 ],
-                // final callback for parallel
+                // final callback for outer async.parallel for methods, properties and events.
                 function(err) { 
                     return callback(err); 
                 }
@@ -2675,7 +2695,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             if (typeof guts[key] === 'undefined') {
 
-                strError += 'undefined value found in an ' + ident + ' for property ' + key + '; ';
+                strError += 'undefined value found in a "' + ident + '" for property "' + key + '"; ';
             }
         });
 
