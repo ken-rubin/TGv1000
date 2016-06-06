@@ -52,6 +52,70 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         throw e;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                  SystemTypes stuff
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    self.routeFetchForPanels_S_L_E_ST = function (req, res) {
+
+        try {
+
+            m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
+
+            // Returns [4][] where [0] are all fully-loaded systemtypes; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
+            var strQuery = "select * from " + self.dbname + "systemtypes order by name asc; select * from " + self.dbname + "statements; select * from " + self.dbname + "literals; select * from " + self.dbname + "expressions;"
+            sql.execute(strQuery,
+                function(rows) {
+
+                    if (rows.length !== 4) {
+                        return res.json({
+                            success: false,
+                            message: "Failed to retrieve 4 arrays in fetching system types."
+                        });
+                    }
+
+                    // [1-3] are fine. Flesh out [0].
+
+
+
+
+                    res.json({
+                        success: true,
+                        data: rows
+                    });
+                },
+                function(strError) {
+                    return res.json({
+                        success: false,
+                        message: "System Types fetch failed with error: " + strError
+                    });
+                }
+            );
+        } catch (e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
+    self.routeSaveSystemTypes = function (req, res) {
+
+        try {
+
+            m_log("Entered ProjectBO/routeSaveSystemTypes");
+            // req.body.systemtypesarray
+
+
+
+
+        } catch (e) {
+
+            res.json({success: false, message: e.message});
+        }
+    }
+
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //

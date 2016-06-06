@@ -1290,6 +1290,22 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
         
+    if @dbstate = 29 THEN
+    
+		INSERT `TGv1000`.`systemtypes` SET id=1,name='Array',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=2,name='Boolean',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=3,name='Date',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=4,name='Math',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=5,name='Number',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=6,name='RegExp',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=7,name='String',ownedByUserId=1;
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchForPanels_S_L_E_ST','post','routeFetchForPanels_S_L_E_ST',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveSystemTypes','post','routeSaveSystemTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
 end//
 
 
