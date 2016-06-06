@@ -1306,6 +1306,15 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
         
+    if @dbstate = 30 THEN
+    
+		DELETE FROM `TGv1000`.`projects` where id>5;
+		UPDATE `TGv1000`.`types` SET ordinal=1 where ordinal=10000;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
 end//
 
 

@@ -1077,27 +1077,19 @@ define(["NextWave/source/utility/prototypes",
 
                             // Load up panels.
                             exceptionRet = self.loadLiterals(objectComic.literals);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.loadExpressions(objectComic.expressions);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.loadStatements(objectComic.statements);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
 
                             // Add the types from the comic into this instance.
                             exceptionRet = self.loadTypes(objectComic.types);
-                            if (exceptionRet) {
+                            if (exceptionRet) { return exceptionRet; }
 
-                                return exceptionRet;
-                            }
+                            // Add project's system types into their panel.
+                            exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
+                            if (exceptionRet) { return exceptionRet; }
 
                             // Set loaded.
                             self.loaded = true;
