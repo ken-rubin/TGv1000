@@ -64,6 +64,8 @@ define(["NextWave/source/utility/prototypes",
                     self.names = [];
                     // Collection of types available in the current context.
                     self.types = [];
+                    // Collection of systemTypes available in the current context.
+                    self.systemTypes = [];
                     // Indicates there is a project which has been loaded up into this manager.
                     self.loaded = false;
                     // Indicates that the current user is priviliged--e.g. can save system types.
@@ -150,6 +152,43 @@ define(["NextWave/source/utility/prototypes",
 
                             // Select it into the GUI.
                             return self.selectType(typeNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Create a new, empty systemType. We couldn't be here if the user weren't privileged.
+                    self.createSystemType = function () {
+
+                        try {
+
+                            // Generate a new type-name.
+                            var strName = self.getUniqueName("MySystemType",
+                                self.systemTypes,
+                                "name",
+                                "payload");;
+
+                            // Create type.
+                            var typeNew = new Type();
+                            var exceptionRet = typeNew.create({
+
+                                name: strName,
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = self.addSystemType(typeNew);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select it into the GUI.
+                            return self.selectSystemType(typeNew);
                         } catch (e) {
 
                             return e;
@@ -635,6 +674,39 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Method adds a new SystemType.
+                    self.addSystemType = function (typeNew) {
+
+                        try {
+
+                            // If there are no systemTypes, then set context to this systemType,
+                            // unless this systemType has no methods, in which case, wait.
+                            if (self.context.systemType === null &&
+                                typeNew &&
+                                typeNew.methods &&
+                                typeNew.methods.parts &&
+                                typeNew.methods.parts.length > 0) {
+
+                                // Set context.
+                                var exceptionRet = self.setContext(typeNew,
+                                    0);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                            }
+
+                            // Add to list.
+                            self.systemTypes.push(typeNew);
+
+                            return self.panelLayer.addSystemType(typeNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Initialze instance.
                     self.create = function () {
 
@@ -780,6 +852,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
+                            var exceptionRet = self.panelLayer.clearSystemTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
                             exceptionRet = self.panelLayer.clearStatements();
                             if (exceptionRet) {
 
@@ -848,6 +925,60 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Add it to the system.
                                 exceptionRet = self.addType(typeNew);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Clear the list of systemTypes.
+                    self.clearSystemTypes = function () {
+
+                        try {
+
+                            self.systemTypes = [];
+
+                            return self.panelLayer.clearSystemTypes();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Load up a set of systemTypes.
+                    self.loadSystemTypes = function (arrayList) {
+
+                        try {
+
+                            // Start with a clean slate.
+                            var exceptionRet = self.clearSystemTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // "Play" the list of Types.
+                            for (var i = 0; i < arrayList.length; i++) {
+
+                                // Extract the type.
+                                var objectTypeIth = arrayList[i];
+
+                                var typeNew = new Type();
+                                exceptionRet = typeNew.create(objectTypeIth);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                                // Add it to the system.
+                                exceptionRet = self.addSystemType(typeNew);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -971,6 +1102,32 @@ define(["NextWave/source/utility/prototypes",
 
                     // Helper method clears out the center panel and sets it up for a type.
                     self.selectType = function (type) {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Type");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the type into the type builder.
+                            exceptionRet = window.typeBuilder.loadType(type);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for a systemType.
+                    self.selectSystemType = function (type) {
 
                         try {
 

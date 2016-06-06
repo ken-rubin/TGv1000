@@ -22,14 +22,16 @@ $(document).ready(function() {
 			    "NextWave/source/utility/prototypes",
 			    "NextWave/source/utility/settings",
 			    "NextWave/source/utility/glyphs",
-			    "NextWave/source/manager/Manager"], 
+			    "NextWave/source/manager/Manager",
+			    "NextWave/source/utility/settings"], 
 			function (errorHelper, 
 						Client, 
 						Navbar, 
 						prototypes,
 						settings,
 						glyphs,
-						Manager) {
+						Manager,
+						settings) {
 
 								try {
 
@@ -64,6 +66,21 @@ $(document).ready(function() {
 				                            manager.privileged = (g_profile["can_create_classes"] || 
 				                                g_profile["can_create_products"] || 
 				                                g_profile["can_create_onlineClasses"]) || false;
+
+				                            // This had to be postponed.
+				                            if (g_profile["can_edit_system_types"]) {
+				                                manager.panelLayer.systemTypesPanel.addNew = function () {
+
+				                                    try {
+
+				                                        // What to do when the icon is clicked....
+				                                        return window.manager.createSystemType();
+				                                    } catch (e) {
+
+				                                        return e;
+				                                    }
+				                                };
+				                            }
 
 				                            // Now that manager and client are ready:
 				                            exceptionRet = client.postCreate();

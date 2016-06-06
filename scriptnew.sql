@@ -1270,6 +1270,26 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
 
+    if @dbstate = 28 THEN
+    
+		CREATE TABLE `TGv1000`.`systemtypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` varchar(255) NOT NULL,
+          `ownedByUserId` int(11) NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
+          `description` mediumtext NULL,
+          `baseTypeId` int(11) NULL,
+          `isToolStrip` tinyint(1) NOT NULL DEFAULT '0',
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+        INSERT ug_permissions SET usergroupId=1, permissionId=2;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
 end//
 
 

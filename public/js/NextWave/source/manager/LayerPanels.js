@@ -55,6 +55,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Panel of types.
                     self.typesPanel = null;
+                    // Panel of systemTypes.
+                    self.systemTypesPanel = null;
                     // Panel of names.
                     self.namesPanel = null;
                     // Panel of statements.
@@ -146,6 +148,48 @@ define(["NextWave/source/utility/prototypes",
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.typesPanel.payload.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method adds a new SystemType.
+                    self.addSystemType = function (typeNew) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.systemTypesPanel.payload.addType(typeNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method removes an existing SystemType.
+                    self.removeSystemype = function (typeToRemove) {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.systemTypesPanel.payload.removeType(typeToRemove);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear the list of systemTypes.
+                    self.clearSystemTypes = function () {
+
+                        try {
+
+                            // Skip Panel in this object-chain so all panels 
+                            // can just be generic instances of the base class.
+                            return self.systemTypesPanel.payload.clearItems();
                         } catch (e) {
 
                             return e;
@@ -357,6 +401,10 @@ define(["NextWave/source/utility/prototypes",
                                 orientation.west, 
                                 new Point(0, settings.layerPanels.typesPanel.y), 
                                 new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
+                            self.systemTypesPanel = new Panel("System Types", 
+                                orientation.west, 
+                                new Point(0, settings.layerPanels.systemTypesPanel.y), 
+                                new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
                             self.typesPanel.addNew = function () {
 
                                 try {
@@ -375,6 +423,13 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add the TypeTree to the types Panel.
                             var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Add the SystemTypeTree to the systemTypes Panel.
+                            var exceptionRet = m_functionAddSystemTypeTreeToSystemTypesPanel(self.systemTypesPanel);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -440,6 +495,7 @@ define(["NextWave/source/utility/prototypes",
                                 self.expressionsPanel, 
                                 self.literalsPanel, 
                                 self.typesPanel,
+                                self.systemTypesPanel,
                                 self.centerPanel
                             ];
 
@@ -792,6 +848,32 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set it.
                             panelTypes.payload = tt;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method adds systemtypetree to systemTypes panel.
+                    var m_functionAddSystemTypeTreeToSystemTypesPanel = function (panelSystemTypes) {
+
+                        try {
+
+                            // Some dummy data for now....
+                            var arraySystemTypes = [];
+
+                            // Allocate and create the object tree, passing the initialization object.
+                            var tt = new TypeTree();
+                            var exceptionRet = tt.create(arraySystemTypes);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Set it.
+                            panelSystemTypes.payload = tt;
 
                             return null;
                         } catch (e) {
