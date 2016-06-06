@@ -124,6 +124,8 @@ define(["Core/errorHelper",
 										exceptionRet = manager.loadExpressions(data.data[3]);
 										if (exceptionRet) { errorHelper.show(exceptionRet); }
 
+										manager.openAndPinAllPanels();
+
 										// self.setBrowserTabAndBtns();
 
 									} else {

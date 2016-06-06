@@ -884,6 +884,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+                    // Open all panels. This is used for a user with can_edit_system_types permission on entry into client.
+                    self.openAndPinAllPanels = function () {
+
+                        self.panelLayer.openAndPinAllPanels();
+                    }
+
                     // Clear the list of types.
                     self.clearTypes = function () {
 

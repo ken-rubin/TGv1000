@@ -532,6 +532,16 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Open and Pin all panels.
+                    self.openAndPinAllPanels = function () {
+
+                        m_arrayPanels.forEach(
+                            function(panelIth) {
+                                panelIth.openAndPin();
+                            }
+                        );
+                    }
+
                     // Take mouse move--set handled in reference object if handled.
                     self.mouseMove = function (objectReference) {
 
