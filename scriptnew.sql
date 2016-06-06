@@ -1284,8 +1284,6 @@ begin
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         
-        INSERT ug_permissions SET usergroupId=1, permissionId=2;
-
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;

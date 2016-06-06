@@ -78,6 +78,17 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     }
 
                     var twodim = new Array(4);
+                    rows[0].forEach(
+                        function(row) {
+
+                            row.originalTypeId = row.id;
+                            row.isApp = false;
+                            row.methods = [];
+                            row.properties = [];
+                            row.events = [];
+                            row.isSystemType = 1;
+                        }
+                    );
                     twodim[0] = rows[0];
                     for (i = 1; i < 4; i++) {
 
@@ -195,11 +206,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 project.tags = tags;
 
-                                // In parallel:
+                                // In series:
                                 //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
                                 //  2. Retrieve project's comics and their content.
-                                //  3. Retrieve all system types, fleshed out.
-                                async.parallel(
+                                //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
+                                //  4. Retrieve all system types (fleshed out) and push them onto projects.systemTypes.
+                                async.series(
                                     [
                                         // 1. PP data, potentially.
                                         function(cb) {
@@ -279,7 +291,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             function(comic) {
 
                                                                 // Types. 
-                                                                // WHAT HAPPENS WITH SYSTEM TYPES IN THE SORTING? All to the end, but do we need a secondary sort?
                                                                 comic.types.sort(function(a,b){return a.ordinal - b.ordinal;});
                                                                 comic.types.forEach(
                                                                     function(type) {
@@ -300,7 +311,37 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 );
                                             } catch(e) { return cb(e); }
                                         },
-                                        // 3. System types.
+                                        // 3. App type's base type.
+                                        function(cb) {
+
+                                            try {
+
+                                                var baseTypeId = project.comics[0].types[0].baseTypeId;
+                                                var strQuery = "select * from " + self.dbname + "types where id=" + baseTypeId + ";";
+                                                sql.execute(strQuery,
+                                                    function(rows) {
+
+                                                        if (rows.length !== 1) { return cb(new Error("App type's base type types could be retrieved."));}
+
+                                                        rows[0].originalTypeId = rows[0].id;
+                                                        rows[0].isApp = false;
+                                                        rows[0].methods = [];
+                                                        rows[0].properties = [];
+                                                        rows[0].events = [];
+                                                        rows[0].isSystemType = 0;
+                                                        
+                                                        project.systemTypes.push(rows[0]);
+                                                        return cb(null);
+                                                    },
+                                                    function(strError) {
+                                                        return cb(new Error(strError));
+                                                    }
+                                                );
+                                            } catch(e) {
+                                                return cb(e);
+                                            }
+                                        },
+                                        // 4. System types.
                                         function(cb) {
 
                                             try {
@@ -311,14 +352,26 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                         if (rows.length === 0) { return cb(new Error("No system types could be retrieved."));}
 
-                                                        project.systemTypes = rows;
+                                                        rows.forEach(
+                                                            function(row) {
+
+                                                                row.originalTypeId = row.id;
+                                                                row.isApp = false;
+                                                                row.methods = [];
+                                                                row.properties = [];
+                                                                row.events = [];
+                                                                row.isSystemType = 1;
+                                                                
+                                                                project.systemTypes.push(row);
+                                                            }
+                                                        );
+
                                                         return cb(null);
                                                     },
                                                     function(strError) {
                                                         return cb(new Error(strError));
                                                     }
                                                 );
-
                                             } catch (e) { return cb(e); }
                                         }
                                     ],
@@ -474,11 +527,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             async.parallel([
                     function(cbp1) {    // comicIth's types
 
-                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + ";";
+                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + " order by t1.ordinal asc;";
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
                                 
-                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Failed because comic containing no types.")); }
+                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Failed because comic contained no types.")); }
 
                                 // Use async to process each type and fetch its internals.
                                 // After review, could change eachSeries to each perhaps.
