@@ -77,7 +77,7 @@ define(["Core/errorHelper",
 						try {
 
 							// "Normal" users get their last project loaded automatically.
-							if (!manager.privileged) {
+							if (!g_profile['can_edit_system_types']) {
 
 								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
 								// At least it didn't work at the bottom of the callback in main.js.
@@ -103,6 +103,35 @@ define(["Core/errorHelper",
 										}
 									);
 								}
+							} else {
+
+								// While others get all system types, statements, literals and expressions loaded.
+								var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+									{},
+									'json');
+								posting.done(function(data){
+
+									if (data.success) {
+
+										// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
+										// Load them into the manager
+										var exceptionRet = manager.loadSystemTypes(data.data[0]);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+										exceptionRet = manager.loadStatements(data.data[1]);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+										exceptionRet = manager.loadLiterals(data.data[2]);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+										exceptionRet = manager.loadExpressions(data.data[3]);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+										// self.setBrowserTabAndBtns();
+
+									} else {
+
+										// !data.success
+										errorHelper.show(data.message);
+									}
+								});
 							}
 
 							return null;

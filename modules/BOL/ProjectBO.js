@@ -66,7 +66,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
 
             // Returns [4][] where [0] are all fully-loaded systemtypes; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
-            var strQuery = "select * from " + self.dbname + "systemtypes order by name asc; select * from " + self.dbname + "statements; select * from " + self.dbname + "literals; select * from " + self.dbname + "expressions;"
+            var strQuery = "select * from " + self.dbname + "systemtypes order by name asc; select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc;"
             sql.execute(strQuery,
                 function(rows) {
 
@@ -77,14 +77,24 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         });
                     }
 
-                    // [1-3] are fine. Flesh out [0].
+                    var twodim = new Array(4);
+                    twodim[0] = rows[0];
+                    for (i = 1; i < 4; i++) {
 
+                        var names = new Array();
+                        rows[i].forEach(
+                            function(itemIth) {
+                                names.push(itemIth.name);
+                            }
+                        );
+                        twodim[i] = names;
+                    }
 
 
 
                     res.json({
                         success: true,
-                        data: rows
+                        data: twodim
                     });
                 },
                 function(strError) {
