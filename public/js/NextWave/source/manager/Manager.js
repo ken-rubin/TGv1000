@@ -66,10 +66,17 @@ define(["NextWave/source/utility/prototypes",
                     self.types = [];
                     // Collection of systemTypes available in the current context.
                     self.systemTypes = [];
+
+                    // Only one of the following can be true, but both can be false.
                     // Indicates there is a project which has been loaded up into this manager.
-                    self.loaded = false;
-                    // Indicates that the current user is priviliged--e.g. can save system types.
-                    self.privileged = false;
+                    self.projectLoaded = false;
+                    // Indicates the manager is set to work on System Types.
+                    self.systemTypesLoaded = false;
+                    
+                    // Indicates that the current user is allowed to create or edit classes, products or online classes.
+                    self.userAllowedToCreateEditPurchProjs = false;
+                    // Special privilege allows editing and saving (creating sql script files) of System Types or App base types
+                    self.userCanWorkWithSystemTypesAndAppBaseTypes = false;
                     // Current type/method.
                     self.context = {
 
@@ -843,8 +850,9 @@ define(["NextWave/source/utility/prototypes",
                                 method: null
                             };
 
-                            // Reset loaded.
-                            self.loaded = false;
+                            // Reset *Loaded.
+                            self.projectLoaded = false;
+                            self.systemTypesLoaded = false;
 
                             // Clear panel data.
                             var exceptionRet = self.panelLayer.clearTypes();
@@ -877,7 +885,13 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            return self.panelLayer.clearLiterals();
+                            exceptionRet = self.panelLayer.clearLiterals();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.panelLayer.unpinAllPanels();
+                            
                         } catch (e) {
 
                             return e;
@@ -1092,7 +1106,7 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) { return exceptionRet; }
 
                             // Set loaded.
-                            self.loaded = true;
+                            self.projectLoaded = true;
 
                             return null;
                         } catch (e) { return e; }

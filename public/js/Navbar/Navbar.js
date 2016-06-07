@@ -323,7 +323,7 @@ define(["Core/errorHelper"],
 						m_functionDisable("SearchType");
 						m_functionDisable("SearchMethod");
 
-						if (manager.loaded) {
+						if (manager.projectLoaded) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
@@ -373,7 +373,7 @@ define(["Core/errorHelper"],
 
 					self.enableOrDisablePlayAndStopButtons = function () {
 
-						if (manager.loaded) {
+						if (manager.projectLoaded) {
 							$("#PlayBtn").removeClass("disabled");
 						} else {
 							$("#PlayBtn").addClass("disabled");

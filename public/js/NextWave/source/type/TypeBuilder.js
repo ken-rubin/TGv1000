@@ -208,7 +208,7 @@ define(["NextWave/source/utility/prototypes",
                             };
 
                             // If privileged...
-                            if (window.manager.privileged) {
+                            if (window.manager.userAllowedToCreateEditPurchProjs) {
 
                                 // Add two new controls to the dialog.
                                 objectConfiguration.systemTypeLabel = {

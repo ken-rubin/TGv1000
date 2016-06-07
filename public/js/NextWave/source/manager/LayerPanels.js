@@ -540,6 +540,18 @@ define(["NextWave/source/utility/prototypes",
                                 panelIth.openAndPin();
                             }
                         );
+
+                        manager.systemTypesLoaded = true;
+                    }
+
+                    // Unpin all panels. They are cleared.
+                    self.unpinAllPanels = function () {
+
+                        m_arrayPanels.forEach(
+                            function(panelIth) {
+                                panelIth.unpin();
+                            }
+                        );
                     }
 
                     // Take mouse move--set handled in reference object if handled.

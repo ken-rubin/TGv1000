@@ -342,6 +342,25 @@ define(["NextWave/source/utility/prototypes",
                         self.pinned = true;
                     }
 
+                    // Opposite of prior function. Unpins and closes this panel.
+                    self.unpin = function () {
+
+                        self.pinned = false;
+
+                        if (self.open ||
+                            self.opening) {
+
+                            // Stop opening, if opening.
+                            if (self.opening) {
+
+                                self.opening = false;
+                            }
+
+                            // Start the closing.
+                            self.closing = true;
+                        }
+                    }
+
                     // Set and position the panel.
                     self.setPayload = function (strTitle, objectPayload) {
 

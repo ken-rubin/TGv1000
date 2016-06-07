@@ -77,7 +77,7 @@ define(["Core/errorHelper",
 						try {
 
 							// "Normal" users get their last project loaded automatically.
-							if (!g_profile['can_edit_system_types']) {
+							if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
 								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
 								// At least it didn't work at the bottom of the callback in main.js.
@@ -113,6 +113,8 @@ define(["Core/errorHelper",
 
 									if (data.success) {
 
+										manager.clearPanels();
+
 										// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
 										// Load them into the manager
 										var exceptionRet = manager.loadSystemTypes(data.data[0]);
@@ -126,7 +128,7 @@ define(["Core/errorHelper",
 
 										manager.openAndPinAllPanels();
 
-										// self.setBrowserTabAndBtns();
+										self.setBrowserTabAndBtns();
 
 									} else {
 
@@ -1011,7 +1013,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							if (manager.loaded) {
+							if (manager.projectLoaded) {
 							
 								m_functionAbandonProjectDialog(function() {	
 
@@ -1021,21 +1023,7 @@ define(["Core/errorHelper",
 										var exceptionRet = manager.clearPanels();
 										if (exceptionRet) { throw exceptionRet; }
 
-										// m_clProject = null;
-
 										self.setBrowserTabAndBtns();
-
-										// Disable the TypeWell icons that are enabled if a project is loaded.
-										// $(".disabledifnoproj").prop("disabled", true);
-
-										// Remove tooltip functionality from TypeWell icons.
-										// $(".disabledifnoproj").powerTip({
-										// 	smartPlacement: true,
-										// 	manual: true
-										// });
-										
-										// Empty the toolstrip, designer, comicstrip and typewell.
-										// tools.empty();
 
 										if ($.isFunction(unloadedCallback)) {
  											unloadedCallback();
@@ -1064,7 +1052,7 @@ define(["Core/errorHelper",
 					self.setBrowserTabAndBtns = function () {
 
 						document.title = "TechGroms";
-						if (manager.loaded) {
+						if (manager.projectLoaded) {
 
 							if (manager.projectData.name.length > 0) { document.title = document.title + " / " + manager.projectData.name; }
 						}
