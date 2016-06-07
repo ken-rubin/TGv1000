@@ -89,24 +89,37 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             row.isSystemType = 1;
                         }
                     );
-                    twodim[0] = rows[0];
-                    for (i = 1; i < 4; i++) {
+                    m_functionFillInTypes(
+                        rows[0],
+                        function(err) {
 
-                        var names = new Array();
-                        rows[i].forEach(
-                            function(itemIth) {
-                                names.push(itemIth.name);
+                            if (err) {
+                                return res.json({
+                                    success: false,
+                                    message: "System Types fetch failed with error: " + err.message
+                                });
                             }
-                        );
-                        twodim[i] = names;
-                    }
 
+                            twodim[0] = rows[0];
 
+                            // Now the strings.
+                            for (i = 1; i < 4; i++) {
 
-                    res.json({
-                        success: true,
-                        data: twodim
-                    });
+                                var names = new Array();
+                                rows[i].forEach(
+                                    function(itemIth) {
+                                        names.push(itemIth.name);
+                                    }
+                                );
+                                twodim[i] = names;
+                            }
+
+                            res.json({
+                                success: true,
+                                data: twodim
+                            });
+                        }
+                    );
                 },
                 function(strError) {
                     return res.json({
@@ -119,6 +132,25 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             res.json({success: false, message: e.message});
         }
+    }
+
+    var m_functionFillInTypes = function(arrTypes, callback) {
+
+        try {
+
+            async.eachSeries(arrTypes,
+                function(typeIth, cb) {
+
+                    m_functionDoTypeArrays(
+                        typeIth,
+                        function(err) { return cb(err); }
+                    );
+                },
+                function(err) {
+                    callback(err);
+                }
+            );
+        } catch (e) { callback(e); }
     }
 
     self.routeSaveSystemTypes = function (req, res) {
@@ -329,9 +361,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         rows[0].properties = [];
                                                         rows[0].events = [];
                                                         rows[0].isSystemType = 0;
-                                                        
-                                                        project.systemTypes.push(rows[0]);
-                                                        return cb(null);
+
+                                                        m_functionFillInTypes([rows[0]], function(err) {
+
+                                                            if (err) { return cb(err); }                                                    
+                                                            project.systemTypes.push(rows[0]);
+                                                            return cb(null);
+                                                        });
                                                     },
                                                     function(strError) {
                                                         return cb(new Error(strError));
@@ -361,12 +397,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 row.properties = [];
                                                                 row.events = [];
                                                                 row.isSystemType = 1;
-                                                                
-                                                                project.systemTypes.push(row);
                                                             }
                                                         );
+                                                                
+                                                        m_functionFillInTypes(rows, function(err) {
 
-                                                        return cb(null);
+                                                            if (err) { return cb(err); }
+
+                                                            Array.prototype.push.apply(project.systemTypes, rows);
+                                                            return cb(null);
+                                                        });
                                                     },
                                                     function(strError) {
                                                         return cb(new Error(strError));
@@ -579,60 +619,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         );
                         if (exceptionRet) { return cbp1(exceptionRet); }
                     },
-                    // function(cbp2) {    // System types.
-
-                    //     var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.comicId IS NULL;";
-                    //     var exceptionRet = sql.execute(sqlQuery,
-                    //         function(rows) {
-                                
-                    //             if (rows.length === 0) { return cbp2(new Error("Unable to retrieve project. Failed to load any System Types types.")); }
-
-                    //             // Use async to process each type and fetch its internals.
-                    //             // After review, could change eachSeries to each perhaps.
-                    //             async.eachSeries(rows,
-                    //                 function(typeIth, cbe2) {
-
-                    //                     typeIth.originalTypeId = typeIth.id;
-                    //                     typeIth.isApp = false; // Probably false without setting it.
-                    //                     typeIth.methods = [];
-                    //                     typeIth.properties = [];
-                    //                     typeIth.events = [];
-                    //                     typeIth.isSystemType = 1;
-
-                    //                     m_functionFetchTags(
-                    //                         typeIth.id,
-                    //                         'type',
-                    //                         function(err, tags) {
-
-                    //                             if (err) { 
-
-                    //                                 return cbe2(err); 
-                    //                             }
-                    //                             typeIth.tags = tags;
-
-                    //                             m_functionDoTypeArrays(
-                    //                                 typeIth,
-                    //                                 function(err) { 
-
-                    //                                     if (!err) {
-                    //                                         // Add the filled type to the comicIth.
-                    //                                         comicIth.types.push(typeIth);
-                    //                                     }
-                    //                                     return cbe2(err); 
-                    //                                 }
-                    //                             );
-                    //                         }
-                    //                     );
-                    //                 },
-                    //                 function(err) { // Main callback for outer async.eachSeries.
-                    //                     return cbp2(err);
-                    //                 }
-                    //             );
-                    //         },
-                    //         function(strError) { return cbp2(new Error(strError)); }
-                    //     );
-                    //     if (exceptionRet) { return cbp2(exceptionRet); }
-                    // },
                     function(cbp3) {    // comiccode rows
 
                         var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
