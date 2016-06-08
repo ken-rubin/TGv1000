@@ -1313,6 +1313,57 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
         
+    if @dbstate = 31 THEN
+    
+		CREATE TABLE `TGv1000`.`typetypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		INSERT `TGv1000`.`typetypes` VALUES (1, 'normal'), (2, 'system'), (3, 'appbase');
+
+		ALTER TABLE `tgv1000`.`types` 
+		DROP COLUMN `isToolStrip`,
+		ADD COLUMN `typeTypeId` INT(11) NOT NULL DEFAULT 1 AFTER `name`;
+
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Array',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Boolean',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Date',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Math',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Number',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='RegExp',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='String',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		UPDATE `TGv1000`.`types` SET typeTypeId=3 WHERE id<6;
+        
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+		DROP TABLE `TGv1000`.`systemtypes`;
+
+    end if;
+        
 end//
 
 

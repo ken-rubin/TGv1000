@@ -1323,6 +1323,19 @@ define(["NextWave/source/utility/prototypes",
                         // Extract the saved off project.
                         var objectRet = self.projectData;
 
+                        // Get system types if user has permission to have worked with them.
+                        objectRet.systemTypes = [];
+                        if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
+
+                            for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                var typeIth = self.systemTypes[i];
+                                var objectType = typeIth.save();
+
+                                objectRet.systemTypes.push(objectType);
+                            }
+                        }
+
                         // For now, only handling first comic.
                         var objectComic = objectRet.comics[objectRet.currentComicIndex];
 
@@ -1343,6 +1356,22 @@ define(["NextWave/source/utility/prototypes",
                         // Return the fully qualified manager state object.
                         return objectRet;
                     };
+
+                    // Returns array of system types (including, maybe, app type's base type in [0]) to caller.
+                    self.saveSystemTypes = function () {
+
+                        var arraySystemTypes = [];
+
+                        for (var i = 0; i < self.systemTypes.length; i++) {
+
+                            var typeIth = self.systemTypes[i];
+                            var objectType = typeIth.save();
+
+                            arraySystemTypes.push(objectType);
+                        }
+
+                        return arraySystemTypes;
+                    }
 
                     // Test object for input focus.
                     self.hasFocus = function (objectTest) {

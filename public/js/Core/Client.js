@@ -256,6 +256,37 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					// This is done without a pre-save dialog.
+					self.saveSystemTypes = function () {
+
+						try {
+
+							var arraySystemTypes = manager.saveSystemTypes();
+
+							var posting = $.post("/BOL/ProjectBO/SaveSystemTypes", 
+								{
+									systemtypesarray: arraySystemTypes
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									errorHelper.show("System types were saved", 2000);
+									return null;
+
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
+						} catch (e) {
+
+							return e;
+						}
+					}
+
 					self.showEditTypeDialog = function (index) {
 
 						try {

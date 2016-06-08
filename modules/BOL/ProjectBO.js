@@ -66,7 +66,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
 
             // Returns [4][] where [0] are all fully-loaded systemtypes; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
-            var strQuery = "select * from " + self.dbname + "systemtypes order by name asc; select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc;"
+            var strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc; select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc;"
             sql.execute(strQuery,
                 function(rows) {
 
@@ -157,11 +157,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            m_log("Entered ProjectBO/routeSaveSystemTypes");
+            m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.systemtypesarray
 
+            // req.body.systemtypesarray[0] is potentially the App Type's Base Type. But maybe not. We'll need to check.
 
 
+
+
+            res.json({ success: true });
 
         } catch (e) {
 
@@ -382,7 +386,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             try {
 
-                                                var strQuery = "select * from " + self.dbname + "systemtypes order by name asc;";
+                                                var strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc;";
                                                 sql.execute(strQuery,
                                                     function(rows) {
 
