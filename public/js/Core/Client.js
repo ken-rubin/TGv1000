@@ -1090,10 +1090,12 @@ define(["Core/errorHelper",
 						if (manager.projectLoaded) {
 
 							if (manager.projectData.name.length > 0) { document.title += " / " + manager.projectData.name; }
+							navbar.setSaveBtnText("Save Project");
 						
 						} else if (manager.systemTypesLoaded) {
 
 							document.title += " / System types";
+							navbar.setSaveBtnText("Save System Types");
 						}
 
 						// Something happened so refresh the navbar.

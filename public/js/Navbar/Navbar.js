@@ -345,6 +345,11 @@ define(["Core/errorHelper"],
 						} catch (e) { return e; }
 					};
 
+					self.setSaveBtnText = function (strText) {
+
+						$("#SaveProjectButton").text(strText);
+					}
+
 					// A bunch of functions that enable/disable navbar menu items.
 					// During the buying process there's a project, but the user must not be allowed to do
 					// anything with it. I believe this handles itself with modal dialogs in the right places.
