@@ -890,8 +890,12 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            return self.panelLayer.unpinAllPanels();
-                            
+
+                            // // The following breaks a lot.                            
+                            // self.panelLayer.unpinAllPanels();
+
+                            return null;
+
                         } catch (e) {
 
                             return e;

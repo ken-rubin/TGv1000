@@ -105,42 +105,47 @@ define(["Core/errorHelper",
 								}
 							} else {
 
-								// While others get all system types, statements, literals and expressions loaded.
-								var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
-									{},
-									'json');
-								posting.done(function(data){
-
-									if (data.success) {
-
-										manager.clearPanels();
-
-										// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
-										// Load them into the manager
-										var exceptionRet = manager.loadSystemTypes(data.data[0]);
-										if (exceptionRet) { errorHelper.show(exceptionRet); }
-										exceptionRet = manager.loadStatements(data.data[1]);
-										if (exceptionRet) { errorHelper.show(exceptionRet); }
-										exceptionRet = manager.loadLiterals(data.data[2]);
-										if (exceptionRet) { errorHelper.show(exceptionRet); }
-										exceptionRet = manager.loadExpressions(data.data[3]);
-										if (exceptionRet) { errorHelper.show(exceptionRet); }
-
-										manager.openAndPinAllPanels();
-
-										self.setBrowserTabAndBtns();
-
-									} else {
-
-										// !data.success
-										errorHelper.show(data.message);
-									}
-								});
+								self.loadSystemTypesAndPinPanels();
 							}
 
 							return null;
 
 						} catch (e) { return e; }
+					}
+
+					self.loadSystemTypesAndPinPanels = function () {
+
+						// While others get all system types, statements, literals and expressions loaded.
+						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+							{},
+							'json');
+						posting.done(function(data){
+
+							if (data.success) {
+
+								manager.clearPanels();
+
+								// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
+								// Load them into the manager
+								var exceptionRet = manager.loadSystemTypes(data.data[0]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+								exceptionRet = manager.loadStatements(data.data[1]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+								exceptionRet = manager.loadLiterals(data.data[2]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+								exceptionRet = manager.loadExpressions(data.data[3]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+								manager.openAndPinAllPanels();
+
+								self.setBrowserTabAndBtns();
+
+							} else {
+
+								// !data.success
+								errorHelper.show(data.message);
+							}
+						});
 					}
 
 					//////////////////////////////
@@ -1013,7 +1018,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							if (manager.projectLoaded) {
+							if (manager.projectLoaded || manager.systemTypesLoaded) {
 							
 								m_functionAbandonProjectDialog(function() {	
 
@@ -1026,17 +1031,16 @@ define(["Core/errorHelper",
 										self.setBrowserTabAndBtns();
 
 										if ($.isFunction(unloadedCallback)) {
- 											unloadedCallback();
+											unloadedCallback();
 										}
-
-									} catch(e) { errorHelper.show(e); }
+									} catch(e) { errorHelper.show(e); return; }
 								},
 								bShowAbandonDlg);	// If bShowAbandonDlg is false, will just return. No better way.
-
 							} else {
-
-								if ($.isFunction(unloadedCallback))
+								
+								if ($.isFunction(unloadedCallback)) {
 									unloadedCallback();
+								}
 							}
 						} catch (e) { errorHelper.show(e); }
 					}
@@ -1051,10 +1055,14 @@ define(["Core/errorHelper",
 					// Project helper methods.
 					self.setBrowserTabAndBtns = function () {
 
-						document.title = "TechGroms";
+						document.title = "NWC";
 						if (manager.projectLoaded) {
 
-							if (manager.projectData.name.length > 0) { document.title = document.title + " / " + manager.projectData.name; }
+							if (manager.projectData.name.length > 0) { document.title += " / " + manager.projectData.name; }
+						
+						} else if (manager.systemTypesLoaded) {
+
+							document.title += " / System types";
 						}
 
 						// Something happened so refresh the navbar.

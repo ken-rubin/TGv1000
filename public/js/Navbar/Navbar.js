@@ -123,19 +123,55 @@ define(["Core/errorHelper"],
 								try {
 
 									if ($("#SaveProjectLI").hasClass('disabled')) { return false; }
-									var exceptionRet = client.showSaveProjectDialog();
-									if (exceptionRet) { throw exceptionRet; }
+
+									if (manager.projectLoaded) {
+
+										var exceptionRet = client.showSaveProjectDialog();
+										if (exceptionRet) { throw exceptionRet; }
+
+									} else if (manager.systemTypesLoaded) {
+
+										var exceptionRet = client.saveSystemTypes();
+										if (exceptionRet) { throw exceptionRet; }
+
+										client.loadSystemTypesAndPinPanels();
+									}
 								} catch (e) { errorHelper.show(e); }
 							});
 
 							$("#CloseProjectButton").click(function () {
 
 								if ($("#CloseProjectLI").hasClass('disabled')) { return false; }
-								client.unloadProject(function(){ 
-									self.enableOrDisableProjAndTypeMenuItems(); 
-									self.enableOrDisableAminZoneMenuItems(); 
-									self.enableOrDisablePlayAndStopButtons();
-								}, true);
+
+								if (manager.projectLoaded) {
+
+									client.unloadProject(function(){ 
+
+										setTimeout(function() {
+
+											if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+
+												client.loadSystemTypesAndPinPanels();
+											}
+											self.enableOrDisableProjAndTypeMenuItems(); 
+											self.enableOrDisableAminZoneMenuItems(); 
+											self.enableOrDisablePlayAndStopButtons();
+										}, 1000);
+									}, true);
+
+								} else {	// system types m.b. loaded; else, this menu item would be disabled.
+
+									client.unloadProject(function(){
+										
+										setTimeout(function() {
+
+											client.loadSystemTypesAndPinPanels();
+											self.enableOrDisableProjAndTypeMenuItems(); 
+											self.enableOrDisableAminZoneMenuItems(); 
+											self.enableOrDisablePlayAndStopButtons();
+										}, 1000);
+									}, true);
+								}
 							});
 
 							$("#SearchTypeButton").click(function() {
@@ -300,7 +336,6 @@ define(["Core/errorHelper"],
 										}
 									}
 								);
-
 							}
 
 							client.setBrowserTabAndBtns();
@@ -330,6 +365,12 @@ define(["Core/errorHelper"],
 							m_functionEnable("SaveProject");
 							m_functionEnable("SearchType");
 							m_functionEnable("SearchMethod");
+
+						} else if (manager.systemTypesLoaded) {
+
+							// Loaded system types can be cleared and abandoned with appropriate warning
+							m_functionEnable("CloseProject");
+							m_functionEnable("SaveProject");
 						}
 					}
 
