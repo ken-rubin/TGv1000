@@ -160,17 +160,252 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.systemtypesarray
 
-            // req.body.systemtypesarray[0] is potentially the App Type's Base Type. But maybe not. We'll may need to check. Or, now that all types live in one table, maybe not.
-            // If any type's id=0, then INSERT it. Otherwise, UPDATE it.
+            // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
+            var arrayTypes = req.body.systemtypesarray;
+            var cxn = null;
+            var typeIdTranslationArray = [];
+
+            // In async.series:
+            // 1. Get a DB connection.
+            // 2. beginTransaction.
+            // 3. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
+            // 4. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
+            // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
+            // 6. Commit the connection.
+
+            async.series(
+                [
+                    // 1. Get connection.
+                    function(cb) {
+
+                        sql.getCxnFromPool(
+                            function(err, connection) {
+                                if (err) {
+                                    return cb(err);
+                                }
+
+                                cxn = connection;
+                                return cb(null);
+                            }
+                        );
+                    },
+                    // 2. Begin transaction.
+                    function(cb) {
+
+                        connection.beginTransaction(
+                            function(err) {
+                                return cb(err);
+                            }
+                        );
+                    },
+                    // 3. Insert or update all types, deleting methods, properties and events of pre-existing ones.
+                    function(cb) {
+
+                        async.eachSeries(
+                            arrayTypes,
+                            function(typeIth, cb) {
+
+                                // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in the types array,
+                                // since base types for system types must be system types, too.
+                                typeIth.baseTypeId = 0;
+                                if (typeIth.baseTypeName) {
+                                    for (var j = 0; j < arrayTypes.length; j++) {
+                                        
+                                        var typeJth = arrayTypes[j];
+                                        if (typeIth.baseTypeName === typeJth.name) {
+                                            typeIth.baseTypeId = typeJth.id;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                var guts = {
+                                    name: typeIth.name,
+                                    typeTypeId: typeIth.typeTypeId,
+                                    // isApp: 0, defaults to 0 and should be 0
+                                    imageId: typeIth.imageId || 0,
+                                    altImagePath: typeIth.altImagePath || "",
+                                    // ordinal: typeIth.ordinal, defaults to NULL and should be NULL
+                                    // comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId), defaults to NULL and should be NULL
+                                    description: typeIth.description,
+                                    // parentTypeId: typeIth.parentTypeId || 0, defaults to NULL and should be NULL
+                                    // parentPrice: typeIth.parentPrice || 0, defaults to 0.00 and should be 0.00
+                                    // priceBump: typeIth.priceBump || 0, defaults to 0.00 and should be 0.00
+                                    ownedByUserId: 1, // defaults to NULL, but we want 1
+                                    public: typeIth.public || 1,
+                                    // quarantined: typeIth.quarantined || 1, defaults to 0 and should be 0
+                                    baseTypeId: typeIth.baseTypeId || 0,
+                                    // projectId: passObj.project.id defaults to NULL and should be NULL
+                                    };
+
+                                var exceptionRet = m_checkGutsForUndefined('System type', guts);
+                                if (exceptionRet) {
+                                    return cb(exceptionRet);
+                                }
+
+                                var strQuery;
+                                var weInserted;
+                                if (typeIth.id) {
+
+                                    // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
+
+                                    // First the update statement.
+                                    strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id;
+                                    
+                                    // Then delete methods, properties and events which will be re-inserted.
+                                    strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
+                                    strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
+                                    strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
+                                    
+                                    // Then type_tags.
+                                    strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
+                                    weInserted = false;
+
+                                } else {
+
+                                    // It's either a new System Type or a non-System Type that was deleted or never existed.
+                                    strQuery = "insert " + self.dbname + "types SET ?";
+                                    weInserted = true;
+                                }
+
+                                m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+
+                                // If this is a System Type, push SQL statements onto passObj.project.script.
+
+                                // atid is to be used as a unique id in the doTags MySql procedure to
+                                // let subsequent steps insert according to a specific type's id.
+                                // typeIth.atid = null;
+                                // if (typeIth.ordinal === 10000) {
+
+                                //     passObj.project.idnum += 1;
+                                //     typeIth.atid = "@id" + passObj.project.idnum;
+
+                                //     var scriptGuts = 
+                                //         "SET name='" + typeIth.name + "'"
+                                //         +",isApp=0"
+                                //         +",imageId=" + typeIth.imageId
+                                //         +",altImagePath=" + typeIth.altImagePath
+                                //         +",ordinal=" + typeIth.ordinal
+                                //         +",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
+                                //         +",description='" + typeIth.description + "'"
+                                //         +",parentTypeId=" + typeIth.parentTypeId
+                                //         +",parentPrice=" + typeIth.parentPrice
+                                //         +",priceBump=" + typeIth.priceBump
+                                //         +",ownedByUserId=" + typeIth.ownedByUserId
+                                //         +",public=" + typeIth.public
+                                //         +",quarantined=" + typeIth.quarantined
+                                //         +",baseTypeId=" + typeIth.baseTypeId
+                                //         +",projectId=" + passObj.project.id
+                                //         ;
+
+
+                                //     passObj.project.script.push('set @guts := "' + scriptGuts + '";');
+                                //     passObj.project.script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                                //     passObj.project.script.push('if ' + typeIth.atid + ' is not null then');
+                                //     passObj.project.script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                //     passObj.project.script.push('   delete from types where id=' + typeIth.atid + ';');
+                                //     passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+                                //     passObj.project.script.push('   prepare insstmt from @s;');
+                                //     passObj.project.script.push('   execute insstmt;');
+                                //     passObj.project.script.push('else');
+                                //     passObj.project.script.push('   /* New System Types are inserted with a new id. */');
+                                //     passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
+                                //     passObj.project.script.push('   prepare insstmt from @s;');
+                                //     passObj.project.script.push('   execute insstmt;');
+                                //     passObj.project.script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+                                //     passObj.project.script.push('end if;');
+                                //     passObj.project.script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                // }
+
+                                sql.executeWithPlaceholders(strQuery, guts,
+                                    function(rows) {
+
+                                        if (rows.length === 0) { return cb(new Error("Error writing system types to database.")); }
+
+                                        if (weInserted) {
+
+                                            typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
+                                            typeIth.id = rows[0].insertId;
+
+                                        } else {
+
+                                            // We updated.
+                                            typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+                                        }
+
+                                        return cb(null);
+                                    },
+                                    function(strError) {
+
+                                        return cb(new Error("Error received saving system types: " + strError));
+                                    }
+                                );
+                            },
+                            function(err) {
+
+                                return cb(err);
+                            }
+                        );
+                    },
+                    // 4. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
+                    function(cb) {
+
+                        async.eachSeries(arrayTypes, 
+                            function(typeIth, cb) {
+
+                                if (!typeIth.baseTypeId) { 
+                                    return cb(null); 
+                                }
+
+                                // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
+                                var didOne = false;
+                                for (var j = 0; j < typeIdTranslationArray.length; j++) {
+
+                                    var xlateIth = typeIdTranslationArray[j];
+                                    if (xlateIth.origId === typeIth.baseTypeId) {
+                                        if (xlateIth.newId !== xlateIth.origId) {
+                                            var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+                                            didOne = true;
+
+                                            // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
+                                            typeIth.baseTypeId = xlateIth.newId;
+                                            sql.queryWithCxn(connection, 
+                                                strQuery,
+                                                function(err, rows) {
+                                                    if (err) { return cb(err); }
+                                                    return cb(null);
+                                                }
+                                            );
+                                        }
+                                    }
+                                };
+                                if (!didOne) { return cb(null); }
+                            },
+                            // final callback for eachSeries
+                            function(err) {
+                                return cb(err);
+                            }
+                        );
+                    },
+                    // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
+                    function(cb) {
+
+                    },
+                    // 6. Commit the transaction.
+                    function(cb) {
+
+                    }
+                ],
+                function(err) {
+                    if (err) {
+                        // Rollback the transaction.
+                    }
+                }
+            );
 
 
 
-            
 
-
-
-
-            res.json({ success: true });
 
         } catch (e) {
 
@@ -2248,7 +2483,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
                                     if (typeIth.baseTypeName) {
-                                        for (var j = 0; j < passObj.comicIth.types; j++) {
+                                        for (var j = 0; j < passObj.comicIth.types.length; j++) {
                                             
                                             var typeJth = passObj.comicIth.types[j];
                                             if (typeIth.baseTypeName === typeJth.name) {
@@ -2260,6 +2495,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     var guts = {
                                         name: typeIth.name,
+                                        typeTypeId: typeIth.typeTypeId,
                                         isApp: 1,
                                         imageId: typeIth.imageId,
                                         altImagePath: typeIth.altImagePath,
@@ -2365,7 +2601,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         // TODO: Go do type loading in project and type.
                                         typeIth.baseTypeId = 0;
                                         if (typeIth.baseTypeName) {
-                                            for (var j = 0; j < passObj.comicIth.types; j++) {
+                                            for (var j = 0; j < passObj.comicIth.types.length; j++) {
                                                 
                                                 var typeJth = passObj.comicIth.types[j];
                                                 if (typeIth.baseTypeName === typeJth.name) {
@@ -2378,6 +2614,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
                                         var guts = {
                                             name: typeIth.name,
+                                            typeTypeId: typeIth.typeTypeId,
                                             isApp: 0,
                                             imageId: typeIth.imageId || 0,
                                             altImagePath: typeIth.altImagePath || "",
