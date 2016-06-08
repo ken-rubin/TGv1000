@@ -160,7 +160,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.systemtypesarray
 
-            // req.body.systemtypesarray[0] is potentially the App Type's Base Type. But maybe not. We'll need to check.
+            // req.body.systemtypesarray[0] is potentially the App Type's Base Type. But maybe not. We'll may need to check. Or, now that all types live in one table, maybe not.
+            // If any type's id=0, then INSERT it. Otherwise, UPDATE it.
+
+
+
+            
 
 
 
@@ -2268,8 +2273,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         public: typeIth.public,
                                         quarantined: typeIth.quarantined,
                                         baseTypeId: typeIth.baseTypeId,
-                                        projectId: passObj.project.id,
-                                        isToolStrip: typeIth.isToolStrip
+                                        projectId: passObj.project.id
                                     };
 
                                     var exceptionRet = m_checkGutsForUndefined('app type', guts);
@@ -2387,8 +2391,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             public: typeIth.public || 0,
                                             quarantined: typeIth.quarantined || 1,
                                             baseTypeId: typeIth.baseTypeId || 0,
-                                            projectId: passObj.project.id,
-                                            isToolStrip: typeIth.isToolStrip || 0
+                                            projectId: passObj.project.id
                                             };
 
                                         var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
@@ -2449,7 +2452,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 +",quarantined=" + typeIth.quarantined
                                                 +",baseTypeId=" + typeIth.baseTypeId
                                                 +",projectId=" + passObj.project.id
-                                                +",isToolStrip=" + typeIth.isToolStrip
                                                 ;
 
 
