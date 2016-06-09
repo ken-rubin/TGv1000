@@ -162,8 +162,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
             var arrayTypes = req.body.systemtypesarray;
-            var cxn = null;
-            var bTransactionIsBegun = false;
+            var connection = null;
             var typeIdTranslationArray = [];
             var idnum = 0;
             script = [
@@ -178,20 +177,21 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // 3. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
             // 4. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
             // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
-            // 6. Commit the connection.
+            // 6. Commit the connection. If any query failed along the way, SQL.js did the rollback.
 
             async.series(
                 [
                     // 1. Get connection.
                     function(cb) {
 
+                        m_log("1");
                         sql.getCxnFromPool(
-                            function(err, connection) {
+                            function(err, cxn) {
                                 if (err) {
                                     return cb(err);
                                 }
 
-                                cxn = connection;
+                                connection = cxn;
                                 return cb(null);
                             }
                         );
@@ -199,11 +199,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // 2. Begin transaction.
                     function(cb) {
 
+                        m_log("2");
                         connection.beginTransaction(
                             function(err) {
-                                if (!err) {
-                                    bTransactionIsBegun = true;
-                                }
                                 return cb(err);
                             }
                         );
@@ -211,6 +209,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // 3. Insert or update all types, deleting methods, properties and events of pre-existing ones.
                     function(cb) {
 
+                        m_log("3");
                         async.eachSeries(
                             arrayTypes,
                             function(typeIth, cb) {
@@ -260,7 +259,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
 
                                     // First the update statement.
-                                    strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id;
+                                    strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id + ";";
                                     
                                     // Then delete methods, properties and events which will be re-inserted.
                                     strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
@@ -278,16 +277,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     weInserted = true;
                                 }
 
-                                m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                // m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
 
-                                // If this is a System Type, push SQL statements onto passObj.project.script.
+                                // Since this is a System Type, push SQL statements onto script.
 
                                 // atid is to be used as a unique id in the doTags MySql procedure to
                                 // let subsequent steps insert according to a specific type's id.
-                                typeIth.atid = null;
+                                typeIth["atid"] = null;
 
                                 idnum += 1;
-                                typeIth.atid = "@id" + passObj.project.idnum;
+                                typeIth.atid = "@id" + idnum;
 
                                 var scriptGuts = 
                                     "SET name='" + typeIth.name + "'"
@@ -309,7 +308,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
 
                                 script.push('set @guts := "' + scriptGuts + '";');
-                                script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                                script.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
                                 script.push('if ' + typeIth.atid + ' is not null then');
                                 script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
                                 script.push('   delete from types where id=' + typeIth.atid + ';');
@@ -358,6 +357,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // 4. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
                     function(cb) {
 
+                        m_log("4");
                         async.eachSeries(arrayTypes, 
                             function(typeIth, cb) {
 
@@ -397,6 +397,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
                     function(cb) {
+
+                        m_log("5");
                         async.eachSeries(arrayTypes, 
                             function(typeIth, cb) {
 
@@ -406,9 +408,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 async.series( // TODO change back to parallel after debugging
                                     [
                                         // (1) methods
-                                        function(cbp1) {
+                                        function(cb) {
 
-                                            m_log("Doing methods");
+                                            // m_log("Doing methods");
                                             var ordinal = 0;
 
                                             async.eachSeries(typeIth.methods,
@@ -435,7 +437,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             public: method.public || 0,
                                                                             quarantined: method.quarantined || 1,
                                                                             methodTypeId: method.methodTypeId || 2, // Not needed anymore
-                                                                            parameters: method.arguments.join(',')
+                                                                            parameters: (method.arguments ? method.arguments.join(',') : '')
                                                                             };
 
                                                                 var exceptionRet = m_checkGutsForUndefined('method', guts);
@@ -444,7 +446,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 }
 
                                                                 var strQuery = "insert " + self.dbname + "methods SET ?";
-                                                                m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                                // m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                                                     function(err, rows) {
 
@@ -456,7 +458,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                                             // Re-do guts for use in ST.sql.
                                                                             // We could just patch the original guts, but....
-                                                                            var scriptGuts = " SET typeId=" + atid
+                                                                            var scriptGuts = " SET typeId=" + typeIth.atid
                                                                                         + ",name=" + connection.escape(method.name)
                                                                                         + ",ordinal=" + method.ordinal
                                                                                         + ",workspace=" + connection.escape(method.workspace)
@@ -500,14 +502,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 },
                                                 // final callback for async.eachSeries in methods
                                                 function(err) { 
-                                                    return cbp1(err); 
+                                                    return cb(err); 
                                                 }
                                             );
                                         },
                                         // (2) properties
-                                        function(cbp2) {
+                                        function(cb) {
 
-                                            m_log("Doing properties");
+                                            // m_log("Doing properties");
                                             var ordinal = 0;
 
                                             async.eachSeries(typeIth.properties,
@@ -531,7 +533,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     }
 
                                                     strQuery = "insert " + self.dbname + "propertys SET ?";
-                                                    m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                    // m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                                         function(err, rows) {
 
@@ -542,7 +544,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 property.id = rows[0].insertId;
 
                                                                 // If this is a System Type property, push onto passObj.project.script.
-                                                                var scriptGuts = " SET typeId=" + atid
+                                                                var scriptGuts = " SET typeId=" + typeIth.atid
                                                                             + ",propertyTypeId=" + property.propertyTypeId
                                                                             + ",name=" + connection.escape(property.name)
                                                                             + ",initialValue=" + connection.escape(property.initialValue)
@@ -558,14 +560,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 },
                                                 // final callback for async.eachSeries in properties
                                                 function(err) { 
-                                                    return cbp2(err); 
+                                                    return cb(err); 
                                                 }
                                             );
                                         },
                                         // (3) events
-                                        function(cbp3) {
+                                        function(cb) {
 
-                                            m_log("Doing events");
+                                            // m_log("Doing events");
                                             var ordinal = 0;
                                             async.eachSeries(typeIth.events,
                                                 function(event, cb) {
@@ -585,7 +587,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     }
 
                                                     strQuery = "insert " + self.dbname + "events SET ?";
-                                                    m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                    // m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                                         function(err, rows) {
 
@@ -609,14 +611,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 },
                                                 // final callback for async.eachSeries in events
                                                 function(err) { 
-                                                    return cbp3(err); 
+                                                    return cb(err); 
                                                 }
                                             );
                                         }
                                     ],
-                                    // final callback for outer async.parallel for methods, properties and events.
+                                    // final callback for async.series for methods, properties and events.
                                     function(err) { 
-                                        return callback(err); 
+                                        return cb(err); 
                                     }
                                 );
                             },
@@ -629,6 +631,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // 6. Commit the transaction.
                     function(cb) {
 
+                        m_log("6");
                         sql.commitCxn(connection,
                             function(err){
 
@@ -641,13 +644,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     if (err) {
                                         // Writing the file didn't work, but saving the project has already been committed to the DB.
                                         // We'll inform the user, but do so in a way that the project is saved.
-                                        res.json({
+                                        return res.json({
                                             success: true,
                                             scriptSuccess: false,
                                             saveError: err
                                         });
                                     } else {
-                                        res.json({
+                                        return res.json({
                                             success: true,
                                             scriptSuccess: true
                                         });
@@ -659,13 +662,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 ],
                 function(err) {
                     if (err) {
-                        // Rollback the transaction.
+                        // Rollback has already happened.
+                        return res.json({success: false, message: err.message});
                     }
                 }
             );
         } catch (e) {
 
-            res.json({success: false, message: e.message});
+            return res.json({success: false, message: e.message});
         }
     }
 
@@ -2899,7 +2903,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
 
                                             // First the update statement.
-                                            strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id;
+                                            strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id + ";";
                                             
                                             // Then delete methods, properties and events which will be re-inserted.
                                             strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
