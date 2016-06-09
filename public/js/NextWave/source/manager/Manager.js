@@ -178,15 +178,25 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create type.
                             var typeNew = new Type();
-                            var exceptionRet = typeNew.create({
 
-                                name: strName,
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
-                            });
-                            if (exceptionRet) {
+                            // To make this a valid system type, we're going to pull from and modify an existing system type.
+                            var exceptionRet = typeNew.create(
+                                {
 
-                                return exceptionRet;
-                            }
+                                    name: strName,
+                                    ownedByUserId: parseInt(g_profile["userId"], 10),
+                                    isSystemType: 1,
+                                    id: 0,
+                                    methods: [],
+                                    properties: [],
+                                    events: [],
+                                    description: "",
+                                    baseTypeName: "",
+                                    baseTypeId: 0,
+                                    typeTypeId: 2
+                                }
+                            );
+                            if (exceptionRet) { return exceptionRet; }
 
                             exceptionRet = self.addSystemType(typeNew);
                             if (exceptionRet) {
