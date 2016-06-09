@@ -163,7 +163,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
             var arrayTypes = req.body.systemtypesarray;
             var cxn = null;
+            var bTransactionIsBegun = false;
             var typeIdTranslationArray = [];
+            var idnum = 0;
+            script = [
+                "delimiter //",
+                "create procedure doSystemTypes()",
+                "begin"
+            ];
 
             // In async.series:
             // 1. Get a DB connection.
@@ -194,6 +201,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         connection.beginTransaction(
                             function(err) {
+                                if (!err) {
+                                    bTransactionIsBegun = true;
+                                }
                                 return cb(err);
                             }
                         );
@@ -274,51 +284,53 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 // atid is to be used as a unique id in the doTags MySql procedure to
                                 // let subsequent steps insert according to a specific type's id.
-                                // typeIth.atid = null;
-                                // if (typeIth.ordinal === 10000) {
+                                typeIth.atid = null;
 
-                                //     passObj.project.idnum += 1;
-                                //     typeIth.atid = "@id" + passObj.project.idnum;
+                                idnum += 1;
+                                typeIth.atid = "@id" + passObj.project.idnum;
 
-                                //     var scriptGuts = 
-                                //         "SET name='" + typeIth.name + "'"
-                                //         +",isApp=0"
-                                //         +",imageId=" + typeIth.imageId
-                                //         +",altImagePath=" + typeIth.altImagePath
-                                //         +",ordinal=" + typeIth.ordinal
-                                //         +",comicId=" + (typeIth.ordinal === 10000 ? null : typeIth.comicId)
-                                //         +",description='" + typeIth.description + "'"
-                                //         +",parentTypeId=" + typeIth.parentTypeId
-                                //         +",parentPrice=" + typeIth.parentPrice
-                                //         +",priceBump=" + typeIth.priceBump
-                                //         +",ownedByUserId=" + typeIth.ownedByUserId
-                                //         +",public=" + typeIth.public
-                                //         +",quarantined=" + typeIth.quarantined
-                                //         +",baseTypeId=" + typeIth.baseTypeId
-                                //         +",projectId=" + passObj.project.id
-                                //         ;
+                                var scriptGuts = 
+                                    "SET name='" + typeIth.name + "'"
+                                    +",isApp=0"
+                                    +",imageId=" + typeIth.imageId
+                                    +",altImagePath=" + typeIth.altImagePath
+                                    +",ordinal=" + typeIth.ordinal
+                                    +",comicId=" + null
+                                    +",description='" + typeIth.description + "'"
+                                    +",parentTypeId=" + null
+                                    +",parentPrice=" + 0
+                                    +",priceBump=" + 0.00
+                                    +",ownedByUserId=" + 1
+                                    +",public=" + 1
+                                    +",quarantined=" + 0
+                                    +",baseTypeId=" + typeIth.baseTypeId
+                                    +",projectId=" + null
+                                    ;
 
 
-                                //     passObj.project.script.push('set @guts := "' + scriptGuts + '";');
-                                //     passObj.project.script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
-                                //     passObj.project.script.push('if ' + typeIth.atid + ' is not null then');
-                                //     passObj.project.script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
-                                //     passObj.project.script.push('   delete from types where id=' + typeIth.atid + ';');
-                                //     passObj.project.script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
-                                //     passObj.project.script.push('   prepare insstmt from @s;');
-                                //     passObj.project.script.push('   execute insstmt;');
-                                //     passObj.project.script.push('else');
-                                //     passObj.project.script.push('   /* New System Types are inserted with a new id. */');
-                                //     passObj.project.script.push('   set @s := (select concat("insert types ",@guts,";"));');
-                                //     passObj.project.script.push('   prepare insstmt from @s;');
-                                //     passObj.project.script.push('   execute insstmt;');
-                                //     passObj.project.script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
-                                //     passObj.project.script.push('end if;');
-                                //     passObj.project.script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
-                                // }
+                                script.push('set @guts := "' + scriptGuts + '";');
+                                script.push('set ' + typeIth.atid + ' := (select id from types where ordinal=10000 and name="' + typeIth.name + '");');
+                                script.push('if ' + typeIth.atid + ' is not null then');
+                                script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                script.push('   delete from types where id=' + typeIth.atid + ';');
+                                script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+                                script.push('   prepare insstmt from @s;');
+                                script.push('   execute insstmt;');
+                                script.push('else');
+                                script.push('   /* New System Types are inserted with a new id. */');
+                                script.push('   set @s := (select concat("insert types ",@guts,";"));');
+                                script.push('   prepare insstmt from @s;');
+                                script.push('   execute insstmt;');
+                                script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+                                script.push('end if;');
+                                script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
 
-                                sql.executeWithPlaceholders(strQuery, guts,
-                                    function(rows) {
+                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                    function(err, rows) {
+
+                                        if (err) {
+                                            return cb(err);
+                                        }
 
                                         if (rows.length === 0) { return cb(new Error("Error writing system types to database.")); }
 
@@ -334,10 +346,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
 
                                         return cb(null);
-                                    },
-                                    function(strError) {
-
-                                        return cb(new Error("Error received saving system types: " + strError));
                                     }
                                 );
                             },
@@ -389,11 +397,264 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
                     function(cb) {
+                        async.eachSeries(arrayTypes, 
+                            function(typeIth, cb) {
 
+                                // We use async.parallel here because methods, properties and events are totally independent.
+                                // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
+                                
+                                async.series( // TODO change back to parallel after debugging
+                                    [
+                                        // (1) methods
+                                        function(cbp1) {
+
+                                            m_log("Doing methods");
+                                            var ordinal = 0;
+
+                                            async.eachSeries(typeIth.methods,
+                                                function(method, cb) {
+                                                    async.series(
+                                                        [
+                                                            // (1a)
+                                                            function(cb) {
+
+                                                                method.typeId = typeIth.id;
+                                                                method.ordinal = ordinal++;
+
+                                                                var guts = {
+                                                                            typeId: typeIth.id,
+                                                                            name: method.name,
+                                                                            ordinal: method.ordinal,
+                                                                            workspace: JSON.stringify({"statements": method.statements}),
+                                                                            imageId: method.imageId || 0,
+                                                                            description: method.description || '[No description provided]',
+                                                                            parentMethodId: method.parentMethodId || 0,
+                                                                            parentPrice: method.parentPrice || 0,
+                                                                            priceBump: method.priceBump || 0,
+                                                                            ownedByUserId: method.ownedByUserId,
+                                                                            public: method.public || 0,
+                                                                            quarantined: method.quarantined || 1,
+                                                                            methodTypeId: method.methodTypeId || 2, // Not needed anymore
+                                                                            parameters: method.arguments.join(',')
+                                                                            };
+
+                                                                var exceptionRet = m_checkGutsForUndefined('method', guts);
+                                                                if (exceptionRet) {
+                                                                    return cb(exceptionRet);
+                                                                }
+
+                                                                var strQuery = "insert " + self.dbname + "methods SET ?";
+                                                                m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                                                    function(err, rows) {
+
+                                                                        try {
+                                                                            if (err) { return cb(err); }
+                                                                            if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+
+                                                                            method.id = rows[0].insertId;
+
+                                                                            // Re-do guts for use in ST.sql.
+                                                                            // We could just patch the original guts, but....
+                                                                            var scriptGuts = " SET typeId=" + atid
+                                                                                        + ",name=" + connection.escape(method.name)
+                                                                                        + ",ordinal=" + method.ordinal
+                                                                                        + ",workspace=" + connection.escape(method.workspace)
+                                                                                        + ",imageId=" + method.imageId
+                                                                                        + ",description=" + connection.escape(method.description)
+                                                                                        + ",parentMethodId=" + method.parentMethodId
+                                                                                        + ",parentPrice=" + method.parentPrice
+                                                                                        + ",priceBump=" + method.priceBump
+                                                                                        + ",ownedByUserId=" + method.ownedByUserId
+                                                                                        + ",public=" + method.public
+                                                                                        + ",quarantined=" + method.quarantined
+                                                                                        + ",methodTypeId=" + method.methodTypeId
+                                                                                        + ",parameters=" + connection.escape(method.parameters)
+                                                                                        ;
+                                                                            script.push("insert " + self.dbname + "methods" + scriptGuts + ";");
+                                                                            script.push('set @idm := (select LAST_INSERT_ID());')
+
+                                                                            return cb(null);
+
+                                                                        } catch (em) { return cb(em); }
+                                                                    }
+                                                                );
+                                                            }
+                                                            // No tags needed (maybe) for system types' methods.
+                                                            // ,
+                                                            // // (1b)
+                                                            // function(cb) {
+
+                                                            //     m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
+                                                            //         (typeIth.ordinal === 10000 ? project.script : null),
+                                                            //         function(err) { return cb(err); },
+                                                            //         '@idm'
+                                                            //     );
+                                                            // }
+                                                        ],
+                                                        // final callback for async.series in methods
+                                                        function(err) { 
+                                                            return cb(err); 
+                                                        }
+                                                    );
+                                                },
+                                                // final callback for async.eachSeries in methods
+                                                function(err) { 
+                                                    return cbp1(err); 
+                                                }
+                                            );
+                                        },
+                                        // (2) properties
+                                        function(cbp2) {
+
+                                            m_log("Doing properties");
+                                            var ordinal = 0;
+
+                                            async.eachSeries(typeIth.properties,
+                                                function(property, cb) {
+
+                                                    property.typeId = typeIth.id;
+                                                    property.ordinal = ordinal++;
+
+                                                    var guts = {
+                                                                typeId: typeIth.id,
+                                                                propertyTypeId: 6,
+                                                                name: property.name,
+                                                                initialValue: property.initialValue,
+                                                                ordinal: property.ordinal,
+                                                                isHidden: 0
+                                                                };
+
+                                                    var exceptionRet = m_checkGutsForUndefined('property', guts);
+                                                    if (exceptionRet) {
+                                                        return cb(exceptionRet);
+                                                    }
+
+                                                    strQuery = "insert " + self.dbname + "propertys SET ?";
+                                                    m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                                        function(err, rows) {
+
+                                                            try {
+                                                                if (err) { return cb(err); }
+                                                                if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
+
+                                                                property.id = rows[0].insertId;
+
+                                                                // If this is a System Type property, push onto passObj.project.script.
+                                                                var scriptGuts = " SET typeId=" + atid
+                                                                            + ",propertyTypeId=" + property.propertyTypeId
+                                                                            + ",name=" + connection.escape(property.name)
+                                                                            + ",initialValue=" + connection.escape(property.initialValue)
+                                                                            + ",ordinal=" + property.ordinal
+                                                                            + ",isHidden=" + (property.isHidden ? 1 : 0)
+                                                                            ;
+                                                                script.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+                                                                return cb(null);
+
+                                                            } catch (ep) { return cb(ep); }
+                                                        }
+                                                    );
+                                                },
+                                                // final callback for async.eachSeries in properties
+                                                function(err) { 
+                                                    return cbp2(err); 
+                                                }
+                                            );
+                                        },
+                                        // (3) events
+                                        function(cbp3) {
+
+                                            m_log("Doing events");
+                                            var ordinal = 0;
+                                            async.eachSeries(typeIth.events,
+                                                function(event, cb) {
+
+                                                    event.typeId = typeIth.id;
+                                                    event.ordinal = ordinal++;
+
+                                                    var guts = {
+                                                                typeId: typeIth.id,
+                                                                name: event.name,
+                                                                ordinal: event.ordinal
+                                                                };
+
+                                                    var exceptionRet = m_checkGutsForUndefined('event', guts);
+                                                    if (exceptionRet) {
+                                                        return cb(exceptionRet);
+                                                    }
+
+                                                    strQuery = "insert " + self.dbname + "events SET ?";
+                                                    m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                                                        function(err, rows) {
+
+                                                            try {
+                                                                if (err) { throw err; }
+                                                                if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+
+                                                                event.id = rows[0].insertId;
+
+                                                                var scriptGuts = " SET typeId=" + atid
+                                                                            + ",name=" + connection.escape(event.name)
+                                                                            + ",ordinal=" + event.ordinal
+                                                                            ;
+                                                                script.push("insert " + self.dbname + "events" + scriptGuts + ";");
+
+                                                                return cb(null);
+
+                                                            } catch (ee) { return cb(ee); }
+                                                        }
+                                                    );
+                                                },
+                                                // final callback for async.eachSeries in events
+                                                function(err) { 
+                                                    return cbp3(err); 
+                                                }
+                                            );
+                                        }
+                                    ],
+                                    // final callback for outer async.parallel for methods, properties and events.
+                                    function(err) { 
+                                        return callback(err); 
+                                    }
+                                );
+                            },
+                            // final callback for eachSeries
+                            function(err) {
+                                return cb(err);
+                            }
+                        );
                     },
                     // 6. Commit the transaction.
                     function(cb) {
 
+                        sql.commitCxn(connection,
+                            function(err){
+
+                                if (err) {
+                                    return cb(new Error('Committing transaction failed with ' + err.message));
+                                }
+
+                                m_functionWriteSqlScript(null, script, function(err) {
+
+                                    if (err) {
+                                        // Writing the file didn't work, but saving the project has already been committed to the DB.
+                                        // We'll inform the user, but do so in a way that the project is saved.
+                                        res.json({
+                                            success: true,
+                                            scriptSuccess: false,
+                                            saveError: err
+                                        });
+                                    } else {
+                                        res.json({
+                                            success: true,
+                                            scriptSuccess: true
+                                        });
+                                    }
+                                });
+                            }
+                        );
                     }
                 ],
                 function(err) {
@@ -402,11 +663,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     }
                 }
             );
-
-
-
-
-
         } catch (e) {
 
             res.json({success: false, message: e.message});
@@ -3195,7 +3451,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     // There's a sql script that needs to be written to project root.
                                     // In the callback from that file creation, we'll return to the client.
                                     // m_log("About to write sql script containing " + project.script.length + " lines.");
-                                    m_functionWriteSqlScript(project, function(err) {
+                                    m_functionWriteSqlScript(project, null, function(err) {
 
                                         delete project.script;
                                         delete project.idnum;
@@ -3230,18 +3486,26 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
-    var m_functionWriteSqlScript = function(project, callback) {
+    var m_functionWriteSqlScript = function(project, script, callback) {
 
         try {
 
-            // Finalize the procedure.
-            project.script.push("end;");
-            project.script.push("//");
-            project.script.push("delimiter ;");
-            project.script.push("call doSystemTypes();");
-            project.script.push("drop procedure doSystemTypes;");
+            // Can be called with script in project.script and script === null or with project === null and script holding the script.
+            var wscript;
+            if (!script) {
+                wscript = project.script;
+            } else {
+                wscript = script;
+            }
 
-            fs.writeFile('ST.sql', project.script.join(os.EOL), 
+            // Finalize the procedure.
+            wscript.push("end;");
+            wscript.push("//");
+            wscript.push("delimiter ;");
+            wscript.push("call doSystemTypes();");
+            wscript.push("drop procedure doSystemTypes;");
+
+            fs.writeFile('ST.sql', wscript.join(os.EOL), 
                 function (err) {
                     callback(err);
                 }
