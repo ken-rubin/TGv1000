@@ -113,7 +113,7 @@ else
    set @id7 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id7, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='MySystemType',isApp=0,imageId=undefined,altImagePath=undefined,ordinal=undefined,comicId=null,description='[description goes here]',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='MySystemType',isApp=0,imageId=0,altImagePath=,ordinal=undefined,comicId=null,description='[description goes here]',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
 set @id8 := (select id from types where typeTypeId=2 and name="MySystemType");
 if @id8 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */

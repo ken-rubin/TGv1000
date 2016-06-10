@@ -178,26 +178,40 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create type.
                             var typeNew = new Type();
-
-                            // To make this a valid system type, we're going to pull from and modify an existing system type.
                             var exceptionRet = typeNew.create(
                                 {
-
-                                    name: strName,
-                                    ownedByUserId: parseInt(g_profile["userId"], 10),
-                                    isSystemType: 1,
-                                    id: 0,
-                                    methods: [],
+                                    typeTypeId: 2,
+                                    originalTypeId: null,
+                                    isApp: false,
+                                    methods: [
+                                        {
+                                            
+                                        }
+                                    ],
                                     properties: [],
                                     events: [],
-                                    description: "",
+                                    isSystemType: 1,
+                                    name: strName,
+                                    id: null,
+                                    ownedByUserId: parseInt(g_profile["userId"], 10),
                                     baseTypeName: "",
-                                    baseTypeId: 0,
-                                    typeTypeId: 2
+                                    baseTypeId: null,
+                                    public: 1,
+                                    quarantined: 0,
+                                    imageId: 0,
+                                    altImagePath: "",
+                                    description: "",
+                                    parentTypeId: null,
+                                    parentPrice: 0.00,
+                                    priceBump: 0.00
                                 }
                             );
-                            if (exceptionRet) { return exceptionRet; }
+                            if (exceptionRet) {
 
+                                return exceptionRet;
+                            }
+
+                            // Add it to the system.
                             exceptionRet = self.addSystemType(typeNew);
                             if (exceptionRet) {
 
