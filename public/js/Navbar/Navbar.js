@@ -133,6 +133,8 @@ define(["Core/errorHelper"],
 
 										// No exceptionRet--it handles its own error or success display.
 										client.saveSystemTypes();
+
+										// Reload system types so the new ids are in memory.
 										client.loadSystemTypesAndPinPanels();
 									}
 								} catch (e) { errorHelper.show(e); }

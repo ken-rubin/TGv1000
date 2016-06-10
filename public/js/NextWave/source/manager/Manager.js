@@ -183,11 +183,7 @@ define(["NextWave/source/utility/prototypes",
                                     typeTypeId: 2,
                                     originalTypeId: null,
                                     isApp: false,
-                                    methods: [
-                                        {
-                                            
-                                        }
-                                    ],
+                                    methods: [],
                                     properties: [],
                                     events: [],
                                     isSystemType: 1,

@@ -434,9 +434,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             parentPrice: method.parentPrice || 0,
                                                                             priceBump: method.priceBump || 0,
                                                                             ownedByUserId: method.ownedByUserId,
-                                                                            public: method.public || 0,
-                                                                            quarantined: method.quarantined || 1,
-                                                                            methodTypeId: method.methodTypeId || 2, // Not needed anymore
+                                                                            public: method.public || 1,
+                                                                            quarantined: method.quarantined || 0,
+                                                                            methodTypeId: method.methodTypeId || 4, // Not needed anymore
                                                                             parameters: (method.arguments ? method.arguments.join(',') : '')
                                                                             };
 
