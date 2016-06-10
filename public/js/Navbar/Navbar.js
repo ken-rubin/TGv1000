@@ -131,9 +131,8 @@ define(["Core/errorHelper"],
 
 									} else if (manager.systemTypesLoaded) {
 
-										var exceptionRet = client.saveSystemTypes();
-										if (exceptionRet) { throw exceptionRet; }
-
+										// No exceptionRet--it handles its own error or success display.
+										client.saveSystemTypes();
 										client.loadSystemTypesAndPinPanels();
 									}
 								} catch (e) { errorHelper.show(e); }

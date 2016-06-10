@@ -647,7 +647,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         return res.json({
                                             success: true,
                                             scriptSuccess: false,
-                                            saveError: err
+                                            saveError: err.message
                                         });
                                     } else {
                                         return res.json({

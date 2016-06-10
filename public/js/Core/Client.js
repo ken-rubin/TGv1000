@@ -272,18 +272,20 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									errorHelper.show("System types were saved", 2000);
-									return null;
-
+									if (data.scriptSuccess) {
+										errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 5000);
+									} else {
+										errorHelper.show("System types were saved to the database, but we could not save ST.sql to your drive. Error received: " + data.saveError);
+									}
 								} else {
 
 									// !data.success
-									return new Error(data.message);
+									errorHelper.show("System types failed to save to the database with error: " + data.message);
 								}
 							});
 						} catch (e) {
 
-							return e;
+							errorHelper.show("System types failed to save to the database with error: " + e.message);
 						}
 					}
 
