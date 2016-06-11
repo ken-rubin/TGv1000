@@ -62,7 +62,7 @@ define(["Core/errorHelper"],
 														// that BuyDialog needs.
 
 														// iProjectId is the project to fetch.
-														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
+														function (iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 															try {
 
@@ -81,8 +81,9 @@ define(["Core/errorHelper"],
 																				// objProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
 																				// which case is contains a property holding class, product or onlineClass data.
 																				// Create and merge rest of specialProjectData in.
-																				specialProjectData = {
-																					privilegedUser: bPrivilegedUser,
+																				var specialProjectData = {
+																					userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
+																					userCanWorkWithSystemTypesAndAppBaseTypes: manager.userCanWorkWithSystemTypesAndAppBaseTypes,
 																					ownedByUser: bOnlyOwnedByUser,
 																					othersProjects: bOnlyOthersProjects,
 																					normalProject: (objProject.isCoreProject+objProject.isClass+objProject.isProduct+objProject.isOnlineClass === 0),

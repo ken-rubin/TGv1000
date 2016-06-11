@@ -906,21 +906,21 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // req.body.tags
             // req.user.userId
             // req.user.userName
-            // req.body.privilegedUser
+            // req.body.userAllowedToCreateEditPurchProjs
 
             // Will return arrayRows: [][] where first dimension is 
-            //  [0] core projects (empty if req.body.privilegedUser === "0")
+            //  [0] core projects (empty if req.body.userAllowedToCreateEditPurchProjs === "0")
             //  [1] user's own projects
-            //  [2] other's projects (if req.body.privilegedUser, then ignore public/private; else just public)
-            //  [3] products (if req.body.privilegedUser, then all, active or not; else just active)
-            //  [4] classes (if req.body.privilegedUser, then all, active or not, no matter when or where; else just active, near user and soon)
-            //  [5] online classes (if req.body.privilegedUser, then all, active or not, no matter when; else just active and soon)
+            //  [2] other's projects (if req.body.userAllowedToCreateEditPurchProjs, then ignore public/private; else just public)
+            //  [3] products (if req.body.userAllowedToCreateEditPurchProjs, then all, active or not; else just active)
+            //  [4] classes (if req.body.userAllowedToCreateEditPurchProjs, then all, active or not, no matter when or where; else just active, near user and soon)
+            //  [5] online classes (if req.body.userAllowedToCreateEditPurchProjs, then all, active or not, no matter when; else just active and soon)
 
             // Will use async.waterfall to build up passOn javascript object:
-            // (1) if req.body.privilegedUser === "0", retrieve user's home zipcode.
+            // (1) if req.body.userAllowedToCreateEditPurchProjs === "0", retrieve user's home zipcode.
             // (2) get string of tag id's; 
-            // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.privilegedUser; 
-            // (4) if req.body.privilegedUser === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
+            // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.userAllowedToCreateEditPurchProjs; 
+            // (4) if req.body.userAllowedToCreateEditPurchProjs === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
             // (5) Finally, for all surviving classes determine current number of users who bought the class.
 
             async.waterfall(
@@ -928,7 +928,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (1)
                     function(cb) {
 
-                        if (req.body.privilegedUser === "0") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "0") {
 
                             sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
                                 function(rows) {
@@ -1007,7 +1007,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // if the project should be retrieved in the first place. 
                         
                         // Core projects for privileged users. Empty array for non.
-                        if (req.body.privilegedUser === "1") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                             strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
                             strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
@@ -1018,7 +1018,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
-                            if (req.body.privilegedUser === "1") {
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about public/private.
                                 strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
@@ -1027,7 +1027,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             }
 
                             // Products
-                            if (req.body.privilegedUser === "1") {
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
                                 strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
@@ -1036,7 +1036,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             }
 
                             // Classes
-                            if (req.body.privilegedUser === "1") {
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
                                 strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
@@ -1045,7 +1045,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             }
 
                             // Online classes
-                            if (req.body.privilegedUser === "1") {
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
                                 strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
                             } else {
@@ -1092,7 +1092,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                     // And not crap out on the client side.
 
                                     passOn.projects = Array(6);
-                                    if (req.body.privilegedUser === '1') {
+                                    if (req.body.userAllowedToCreateEditPurchProjs === '1') {
                                         passOn.projects[0] = rows;
                                     } else {
                                         passOn.projects[0] = new Array();
@@ -1120,7 +1120,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // In (4c), (4d) and (4e) we check if Products, Online Classes or Classes are amongst the user's own projects in [1]. (This is synchronous.)
                     function(passOn, cb) {
 
-                        if (req.body.privilegedUser === "0") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // A normal user, retrieving classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months. They also must be within 35 miles of req.body.nearZip.
                             // Any non-qualified are removed from passOn.projects[4].
@@ -1195,7 +1195,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (4b)
                     function(passOn, cb) {
 
-                        if (req.body.privilegedUser === "0") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // A normal user, retrieving online classes, gets only active ones (already handled in the query) and
                             // only only those starting within 3 months.
                             // Any non-qualified are removed from passOn.projects[5].
@@ -1234,7 +1234,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (4c)
                     function(passOn, cb) {
 
-                        if (req.body.privilegedUser === "0") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through products left in passOn.projects[3] and add property alreadyBought by comparing to all projects in passOn.projects[1].
 
                             for (var i = 0; i < passOn.projects[3].length; i++) {
@@ -1260,7 +1260,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (4d)
                     function(passOn, cb) {
 
-                        if (req.body.privilegedUser === "0") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through online classes left in passOn.projects[5] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
                             for (var i = 0; i < passOn.projects[5].length; i++) {
@@ -1286,7 +1286,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (4e)
                     function(passOn, cb) {
 
-                        if (req.body.privilegedUser === "0") {
+                        if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through classes left in passOn.projects[2] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
                             for (var i = 0; i < passOn.projects[4].length; i++) {

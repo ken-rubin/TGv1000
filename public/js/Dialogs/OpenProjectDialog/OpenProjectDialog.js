@@ -51,11 +51,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
+					self.callFunctionOK = function(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 						try {
 
-							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects);
+							m_functionOK(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -133,7 +133,6 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		if (manager.userAllowedToCreateEditPurchProjs || stripNum < 3) {
 							    			
 								    		self.callFunctionOK(projectId, 
-								    							manager.userAllowedToCreateEditPurchProjs, 
 								    							(stripNum === 1), 
 								    							(stripNum === 2)
 								    		);
@@ -185,7 +184,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					        		tags: m_tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
-					        		privilegedUser: (manager.userAllowedToCreateEditPurchProjs ? 1 : 0)
+					        		userAllowedToCreateEditPurchProjs: (manager.userAllowedToCreateEditPurchProjs ? 1 : 0)
 					        	}, 
 					        	'json');
 					        posting.done(function(data){

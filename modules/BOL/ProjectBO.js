@@ -1776,7 +1776,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 project: project,
                                 newProj: (project.specialProjectData.openMode === "new" || project.specialProjectData.openMode === "bought"), 
                                 notMine: project.specialProjectData.othersProjects,
-                                editingCoreProject: (project.specialProjectData.privilegedUser && project.specialProjectData.coreProject)
+                                editingCoreProject: (project.specialprojectdata.userAllowedToCreateEditPurchProjs && project.specialProjectData.coreProject)
                             }
                         );
                     },
@@ -1848,7 +1848,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
                     function(resultArray, cb) {
 
-                        if (resultArray.project.specialProjectData.privilegedUser && resultArray.project.specialProjectData.openMode === 'searched') {
+                        if (resultArray.project.specialprojectdata.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
 
                             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + resultArray.project.id + ";";
                             sql.queryWithCxn(connection, strQuery,
@@ -2114,7 +2114,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 },
                                 // (2c)
                                 function(cb) {
-                                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
                                         m_log("Calling m_savePurchProductData");
                                         m_savePurchProductData(connection, req, res, project,
                                             function(err) {
@@ -2286,7 +2286,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 },
                                 // (3c)
                                 function(cb) {
-                                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                                         m_log("Calling m_savePurchProductData");
                                         m_savePurchProductData(connection, req, res, project,
@@ -2318,7 +2318,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             var dbname = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
-            if (project.specialProjectData.privilegedUser 
+            if (project.specialprojectdata.userAllowedToCreateEditPurchProjs 
                 && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
@@ -2442,7 +2442,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                     comicIth.projectId = project.comicProjectId;
 
-                    if (project.specialProjectData.privilegedUser && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
+                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
                         
                         var guts = {
                             projectId: comicIth.projectId,
