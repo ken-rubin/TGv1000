@@ -155,61 +155,103 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
     self.routeSaveSystemTypes = function (req, res) {
 
+        m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
+        // req.body.systemtypesarray
+
+        var connection = null;
+        sql.getCxnFromPool(
+            function(err, cxn) {
+
+                if (err) {
+
+                    return res.json({
+                        success: false,
+                        message: "Could not get database connection."
+                    });
+
+                    connection = cxn;
+                    connection.beginTransaction(
+                        function(err) {
+
+                            if (err) {
+
+                                return res.json({
+                                    success: false,
+                                    message: "Could not begin transaction on connection."
+                                });
+                            }
+
+                            var jsonResult = m_functionSaveSystemTypes(connection, req.body.systemtypesarray, false); // 2nd parameter says [0] is NOT an App base type.
+                            // jsonResult look like:
+                            // {
+                            //      DB: "OK" or err.message,
+                            //      stScript: "OK" or message   -- if DB !== "OK", stScript and baseScript won't exist, since we won't have tried to save the scripts.
+                            //      baseScript: "OK" or message -- if stScript !== "OK", baseScript won't exist, since we won't have tried to write it out.
+                            // }
+                            if (jsonResult.DB === "OK") {
+
+                                // Commit the transaction.
+                                sql.commitCxn(connection,
+                                    function(err) {
+
+                                        if (err) {
+
+                                            // Could not commit
+                                        }
+
+                                });
+                            } else {
+
+                            }
+
+                        }
+                    );
+                }
+            }
+        );
+    }
+
+    // connection exists and transaction is begun.
+    // Returns with connection still uncommitted, but the 2 sql scripts have been written out.
+    var m_functionSaveSystemTypes(connection, arrayTypes, bSub0IsAppBaseType) {
+
         try {
 
-            m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
-            // req.body.systemtypesarray
-
             // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
-            var arrayTypes = req.body.systemtypesarray;
-            var connection = null;
             var typeIdTranslationArray = [];
             var idnum = 0;
-            script = [
+            var stScript = [
                 "delimiter //",
                 "create procedure doSystemTypes()",
                 "begin"
             ];
+            var baseScript = [];
+            var fnBaseScript = '';
+            if (bSub0IsAppBaseType) {
+                
+                baseScript = [
+                    "delimiter //",
+                    "create procedure doSystemTypes()",
+                    "begin"
+                ];
+
+                fnBaseScript = arrayTypes[0].name.replace(' ', '_');
+            }
 
             // In async.series:
-            // 1. Get a DB connection.
-            // 2. beginTransaction.
-            // 3. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
-            // 4. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
-            // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
-            // 6. Commit the connection. If any query failed along the way, SQL.js did the rollback.
+            // 1. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
+            // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
+            // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
+
+            // If all the DB writing worked, write out ST.sql from scripts array and xxx_base_type.sql from btscript.
+            // If the DB stuff was rolled back, skip writing out the sql scripts and return the DB err.
 
             async.series(
                 [
-                    // 1. Get connection.
+                    // 1. Insert or update all types, deleting methods, properties and events of pre-existing ones.
                     function(cb) {
 
-                        m_log("1");
-                        sql.getCxnFromPool(
-                            function(err, cxn) {
-                                if (err) {
-                                    return cb(err);
-                                }
-
-                                connection = cxn;
-                                return cb(null);
-                            }
-                        );
-                    },
-                    // 2. Begin transaction.
-                    function(cb) {
-
-                        m_log("2");
-                        connection.beginTransaction(
-                            function(err) {
-                                return cb(err);
-                            }
-                        );
-                    },
-                    // 3. Insert or update all types, deleting methods, properties and events of pre-existing ones.
-                    function(cb) {
-
-                        m_log("3");
+                        m_log("Save system types func #1");
                         async.eachSeries(
                             arrayTypes,
                             function(typeIth, cb) {
@@ -354,10 +396,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
                         );
                     },
-                    // 4. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
+                    // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
                     function(cb) {
 
-                        m_log("4");
+                        m_log("Save system types func #2");
                         async.eachSeries(arrayTypes, 
                             function(typeIth, cb) {
 
@@ -395,10 +437,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
                         );
                     },
-                    // 5. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
+                    // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
                     function(cb) {
 
-                        m_log("5");
+                        m_log("Save system types func #3");
                         async.eachSeries(arrayTypes, 
                             function(typeIth, cb) {
 
@@ -627,49 +669,53 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 return cb(err);
                             }
                         );
-                    },
-                    // 6. Commit the transaction.
-                    function(cb) {
-
-                        m_log("6");
-                        sql.commitCxn(connection,
-                            function(err){
-
-                                if (err) {
-                                    return cb(new Error('Committing transaction failed with ' + err.message));
-                                }
-
-                                m_functionWriteSqlScript(null, script, function(err) {
-
-                                    if (err) {
-                                        // Writing the file didn't work, but saving the project has already been committed to the DB.
-                                        // We'll inform the user, but do so in a way that the project is saved.
-                                        return res.json({
-                                            success: true,
-                                            scriptSuccess: false,
-                                            saveError: err.message
-                                        });
-                                    } else {
-                                        return res.json({
-                                            success: true,
-                                            scriptSuccess: true
-                                        });
-                                    }
-                                });
-                            }
-                        );
                     }
                 ],
                 function(err) {
+                    
+                    // return:
+                    // {
+                    //      DB: "OK" or err.message,
+                    //      stScript: "OK" or message   -- if DB !== "OK", stScript and baseScript won't exist, since we won't have tried to save the scripts.
+                    //      baseScript: "OK" or message -- if stScript !== "OK", baseScript won't exist, since we won't have tried to write it out.
+                    // }
                     if (err) {
-                        // Rollback has already happened.
-                        return res.json({success: false, message: err.message});
+
+                        return {DB: err.message};
                     }
+
+                    m_functionWriteSqlScript(stScript, "ST.sql", function(err) {
+
+                        if (err) {
+                            return {
+                                DB: "OK",
+                                stScript: err.message
+                            };
+                        } else if (baseScript.length) {
+
+                            m_functionWriteSqlScript(baseScript, fnBaseScript, function(err) {
+
+                                if (err) {
+                                    return {
+                                        DB: "OK",
+                                        stScript: "OK",
+                                        baseScript: err.message
+                                    };
+                                }
+
+                                return {
+                                    DB: "OK",
+                                    stScript: "OK",
+                                    baseScript: "OK"
+                                };
+                            });
+                        }
+                    });
                 }
             );
         } catch (e) {
 
-            return res.json({success: false, message: e.message});
+            return {DB: e.message};
         }
     }
 
@@ -3500,26 +3546,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
-    var m_functionWriteSqlScript = function(project, script, callback) {
+    var m_functionWriteSqlScript = function(script, filename, callback) {
 
         try {
 
-            // Can be called with script in project.script and script === null or with project === null and script holding the script.
-            var wscript;
-            if (!script) {
-                wscript = project.script;
-            } else {
-                wscript = script;
-            }
-
             // Finalize the procedure.
-            wscript.push("end;");
-            wscript.push("//");
-            wscript.push("delimiter ;");
-            wscript.push("call doSystemTypes();");
-            wscript.push("drop procedure doSystemTypes;");
+            script.push("end;");
+            script.push("//");
+            script.push("delimiter ;");
+            script.push("call doSystemTypes();");
+            script.push("drop procedure doSystemTypes;");
 
-            fs.writeFile('ST.sql', wscript.join(os.EOL), 
+            fs.writeFile(filename, script.join(os.EOL), 
                 function (err) {
                     callback(err);
                 }
