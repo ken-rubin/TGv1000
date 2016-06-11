@@ -182,6 +182,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
 
                             var jsonResult = m_functionSaveSystemTypes(connection, req.body.systemtypesarray, false); // 2nd parameter says [0] is NOT an App base type.
+                            
                             // jsonResult look like:
                             // {
                             //      DB: "OK" or err.message,
@@ -203,7 +204,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             } else {
 
                             }
-
                         }
                     );
                 }
@@ -226,7 +226,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 "begin"
             ];
             var baseScript = [];
-            var fnBaseScript = '';
+            var filenameBaseScript = '';
             if (bSub0IsAppBaseType) {
                 
                 baseScript = [
@@ -235,7 +235,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     "begin"
                 ];
 
-                fnBaseScript = arrayTypes[0].name.replace(' ', '_');
+                filenameBaseScript = arrayTypes[0].name.replace(' ', '_');
             }
 
             // In async.series:
@@ -252,12 +252,19 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     function(cb) {
 
                         m_log("Save system types func #1");
+
+                        var bNeedToDoAppBaseType = false;
+                        if (bSub0IsAppBaseType) {
+                            bNeedToDoAppBaseType = true;
+                        }
                         async.eachSeries(
                             arrayTypes,
                             function(typeIth, cb) {
 
                                 // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in the types array,
                                 // since base types for system types must be system types, too.
+                                // If bSub0IsAppBaseType then arrayTypes[0] isn't a system type. It's an App type base type. But, still,
+                                // it can be based only on system types, so this loop still works.
                                 typeIth.baseTypeId = 0;
                                 if (typeIth.baseTypeName) {
                                     for (var j = 0; j < arrayTypes.length; j++) {
@@ -332,39 +339,53 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 var scriptGuts = 
                                     "SET name='" + typeIth.name + "'"
-                                    +",isApp=0"
+                                    +",typeTypeId=" + typeIth.typeTypeId
                                     +",imageId=" + typeIth.imageId
                                     +",altImagePath=" + typeIth.altImagePath
-                                    +",ordinal=" + typeIth.ordinal
-                                    +",comicId=" + null
                                     +",description='" + typeIth.description + "'"
-                                    +",parentTypeId=" + null
-                                    +",parentPrice=" + 0
-                                    +",priceBump=" + 0.00
                                     +",ownedByUserId=" + 1
                                     +",public=" + 1
-                                    +",quarantined=" + 0
                                     +",baseTypeId=" + typeIth.baseTypeId
-                                    +",projectId=" + null
                                     ;
 
+                                if (bNeedToDoAppBaseType) {
+                                    baseScript.push('set @guts := "' + scriptGuts + '";');
+                                    baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
+                                    baseScript.push('if ' + typeIth.atid + ' is not null then');
+                                    baseScript.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                    baseScript.push('   delete from types where id=' + typeIth.atid + ';');
+                                    baseScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+                                    baseScript.push('   prepare insstmt from @s;');
+                                    baseScript.push('   execute insstmt;');
+                                    baseScript.push('else');
+                                    baseScript.push('   /* New System Types are inserted with a new id. */');
+                                    baseScript.push('   set @s := (select concat("insert types ",@guts,";"));');
+                                    baseScript.push('   prepare insstmt from @s;');
+                                    baseScript.push('   execute insstmt;');
+                                    baseScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+                                    baseScript.push('end if;');
+                                    baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                    bNeedToDoAppBaseType = false;
+                                
+                                } else {
 
-                                script.push('set @guts := "' + scriptGuts + '";');
-                                script.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
-                                script.push('if ' + typeIth.atid + ' is not null then');
-                                script.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
-                                script.push('   delete from types where id=' + typeIth.atid + ';');
-                                script.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
-                                script.push('   prepare insstmt from @s;');
-                                script.push('   execute insstmt;');
-                                script.push('else');
-                                script.push('   /* New System Types are inserted with a new id. */');
-                                script.push('   set @s := (select concat("insert types ",@guts,";"));');
-                                script.push('   prepare insstmt from @s;');
-                                script.push('   execute insstmt;');
-                                script.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
-                                script.push('end if;');
-                                script.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                    stScript.push('set @guts := "' + scriptGuts + '";');
+                                    stScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
+                                    stScript.push('if ' + typeIth.atid + ' is not null then');
+                                    stScript.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                    stScript.push('   delete from types where id=' + typeIth.atid + ';');
+                                    stScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+                                    stScript.push('   prepare insstmt from @s;');
+                                    stScript.push('   execute insstmt;');
+                                    stScript.push('else');
+                                    stScript.push('   /* New System Types are inserted with a new id. */');
+                                    stScript.push('   set @s := (select concat("insert types ",@guts,";"));');
+                                    stScript.push('   prepare insstmt from @s;');
+                                    stScript.push('   execute insstmt;');
+                                    stScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+                                    stScript.push('end if;');
+                                    stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                }
 
                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                     function(err, rows) {
@@ -400,6 +421,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     function(cb) {
 
                         m_log("Save system types func #2");
+
                         async.eachSeries(arrayTypes, 
                             function(typeIth, cb) {
 
@@ -441,13 +463,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     function(cb) {
 
                         m_log("Save system types func #3");
+
                         async.eachSeries(arrayTypes, 
                             function(typeIth, cb) {
 
                                 // We use async.parallel here because methods, properties and events are totally independent.
                                 // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
                                 
-                                async.series( // TODO change back to parallel after debugging
+                                async.series( // Keep this as series, not parallel.
                                     [
                                         // (1) methods
                                         function(cb) {
@@ -457,6 +480,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             async.eachSeries(typeIth.methods,
                                                 function(method, cb) {
+
+                                                    var bNeedToDoAppBaseType = false;
+                                                    if (bSub0IsAppBaseType) {
+                                                        bNeedToDoAppBaseType = true;
+                                                    }
+
                                                     async.series(
                                                         [
                                                             // (1a)
@@ -515,8 +544,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                                         + ",methodTypeId=" + method.methodTypeId
                                                                                         + ",parameters=" + connection.escape(method.parameters)
                                                                                         ;
-                                                                            script.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                            script.push('set @idm := (select LAST_INSERT_ID());')
+
+                                                                            if (bNeedToDoAppBaseType) {
+                                                                                baseScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
+                                                                                baseScript.push('set @idm := (select LAST_INSERT_ID());')
+                                                                                bNeedToDoAppBaseType = false;
+                                                                            } else {
+                                                                                stScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
+                                                                                stScript.push('set @idm := (select LAST_INSERT_ID());')
+                                                                            }
 
                                                                             return cb(null);
 
@@ -557,6 +593,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             async.eachSeries(typeIth.properties,
                                                 function(property, cb) {
 
+                                                    var bNeedToDoAppBaseType = false;
+                                                    if (bSub0IsAppBaseType) {
+                                                        bNeedToDoAppBaseType = true;
+                                                    }
+
                                                     property.typeId = typeIth.id;
                                                     property.ordinal = ordinal++;
 
@@ -593,7 +634,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             + ",ordinal=" + property.ordinal
                                                                             + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                             ;
-                                                                script.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+                                                                 if (bNeedToDoAppBaseType) {
+                                                                    baseScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+                                                                    bNeedToDoAppBaseType = false;
+                                                                } else {
+                                                                    stScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+                                                                }
                                                                 return cb(null);
 
                                                             } catch (ep) { return cb(ep); }
@@ -613,6 +659,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             var ordinal = 0;
                                             async.eachSeries(typeIth.events,
                                                 function(event, cb) {
+
+                                                    var bNeedToDoAppBaseType = false;
+                                                    if (bSub0IsAppBaseType) {
+                                                        bNeedToDoAppBaseType = true;
+                                                    }
 
                                                     event.typeId = typeIth.id;
                                                     event.ordinal = ordinal++;
@@ -643,7 +694,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             + ",name=" + connection.escape(event.name)
                                                                             + ",ordinal=" + event.ordinal
                                                                             ;
-                                                                script.push("insert " + self.dbname + "events" + scriptGuts + ";");
+                                                                if (bNeedToDoAppBaseType) {
+                                                                    baseScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
+                                                                    bNeedToDoAppBaseType = false;
+                                                                } else {
+                                                                    stScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
+                                                                }
 
                                                                 return cb(null);
 
@@ -693,7 +749,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             };
                         } else if (baseScript.length) {
 
-                            m_functionWriteSqlScript(baseScript, fnBaseScript, function(err) {
+                            m_functionWriteSqlScript(baseScript, filenameBaseScript, function(err) {
 
                                 if (err) {
                                     return {
