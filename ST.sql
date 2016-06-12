@@ -1,7 +1,7 @@
 delimiter //
 create procedure doSystemTypes()
 begin
-set @guts := "SET name='Array',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='Array',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
 set @id1 := (select id from types where typeTypeId=2 and name="Array");
 if @id1 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -17,7 +17,7 @@ else
    set @id1 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id1, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='Boolean',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='Boolean',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
 set @id2 := (select id from types where typeTypeId=2 and name="Boolean");
 if @id2 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -33,7 +33,7 @@ else
    set @id2 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id2, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='Date',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='Date',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
 set @id3 := (select id from types where typeTypeId=2 and name="Date");
 if @id3 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -49,7 +49,7 @@ else
    set @id3 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id3, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='Math',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='Math',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
 set @id4 := (select id from types where typeTypeId=2 and name="Math");
 if @id4 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -65,7 +65,7 @@ else
    set @id4 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id4, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='MySystemType',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='[description goes here]',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='MySystemType',typeTypeId=2,imageId=0,altImagePath=,description='[description goes here]',ownedByUserId=1,public=1,baseTypeId=0";
 set @id5 := (select id from types where typeTypeId=2 and name="MySystemType");
 if @id5 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -81,7 +81,7 @@ else
    set @id5 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id5, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='MySystemType2',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='[description goes here]',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='MySystemType2',typeTypeId=2,imageId=0,altImagePath=,description='[description goes here]',ownedByUserId=1,public=1,baseTypeId=0";
 set @id6 := (select id from types where typeTypeId=2 and name="MySystemType2");
 if @id6 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -97,7 +97,7 @@ else
    set @id6 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id6, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='MySystemType3',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='[description goes here]',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
+set @guts := "SET name='MySystemType3',typeTypeId=2,imageId=0,altImagePath=,description='[description goes here]',ownedByUserId=1,public=1,baseTypeId=0";
 set @id7 := (select id from types where typeTypeId=2 and name="MySystemType3");
 if @id7 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -113,8 +113,8 @@ else
    set @id7 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id7, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='Number',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
-set @id8 := (select id from types where typeTypeId=2 and name="Number");
+set @guts := "SET name='MySystemType4',typeTypeId=2,imageId=0,altImagePath=,description='[description goes here]',ownedByUserId=1,public=1,baseTypeId=0";
+set @id8 := (select id from types where typeTypeId=2 and name="MySystemType4");
 if @id8 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
    delete from types where id=@id8;
@@ -129,8 +129,8 @@ else
    set @id8 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id8, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='RegExp',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
-set @id9 := (select id from types where typeTypeId=2 and name="RegExp");
+set @guts := "SET name='Number',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
+set @id9 := (select id from types where typeTypeId=2 and name="Number");
 if @id9 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
    delete from types where id=@id9;
@@ -145,8 +145,8 @@ else
    set @id9 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id9, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='String',isApp=0,imageId=0,altImagePath=,ordinal=,comicId=null,description='',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
-set @id10 := (select id from types where typeTypeId=2 and name="String");
+set @guts := "SET name='RegExp',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
+set @id10 := (select id from types where typeTypeId=2 and name="RegExp");
 if @id10 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
    delete from types where id=@id10;
@@ -161,8 +161,8 @@ else
    set @id10 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id10, to be used below for methods, properties, events and tags. */
-set @guts := "SET name='MySystemType4',isApp=0,imageId=0,altImagePath=,ordinal=undefined,comicId=null,description='[description goes here]',parentTypeId=null,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,baseTypeId=0,projectId=null";
-set @id11 := (select id from types where typeTypeId=2 and name="MySystemType4");
+set @guts := "SET name='String',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
+set @id11 := (select id from types where typeTypeId=2 and name="String");
 if @id11 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
    delete from types where id=@id11;
@@ -191,13 +191,13 @@ insert TGv1000.methods SET typeId=@id6,name='construct',ordinal=0,workspace=NULL
 set @idm := (select LAST_INSERT_ID());
 insert TGv1000.methods SET typeId=@id7,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=2,public=0,quarantined=1,methodTypeId=2,parameters=NULL;
 set @idm := (select LAST_INSERT_ID());
-insert TGv1000.methods SET typeId=@id8,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
+insert TGv1000.methods SET typeId=@id8,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=2,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 set @idm := (select LAST_INSERT_ID());
 insert TGv1000.methods SET typeId=@id9,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 set @idm := (select LAST_INSERT_ID());
 insert TGv1000.methods SET typeId=@id10,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 set @idm := (select LAST_INSERT_ID());
-insert TGv1000.methods SET typeId=@id11,name='construct',ordinal=0,workspace=NULL,imageId=undefined,description=NULL,parentMethodId=undefined,parentPrice=undefined,priceBump=undefined,ownedByUserId=2,public=undefined,quarantined=undefined,methodTypeId=undefined,parameters=NULL;
+insert TGv1000.methods SET typeId=@id11,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 set @idm := (select LAST_INSERT_ID());
 end;
 //

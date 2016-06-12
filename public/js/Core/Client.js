@@ -280,7 +280,7 @@ define(["Core/errorHelper",
 								} else {
 
 									// !data.success
-									errorHelper.show("System types failed to save to the database with error: " + data.message);
+									errorHelper.show(data.message);
 								}
 							});
 						} catch (e) {

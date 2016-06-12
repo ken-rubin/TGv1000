@@ -14,6 +14,10 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 
 	self.dbname = app.get("dbname");
 
+	if (app.get("development")) {
+		return;
+	}
+
 	try {
 
 		// Schedule a job to run every night at 1am to send emails.

@@ -168,52 +168,77 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         success: false,
                         message: "Could not get database connection."
                     });
-
-                    connection = cxn;
-                    connection.beginTransaction(
-                        function(err) {
-
-                            if (err) {
-
-                                return res.json({
-                                    success: false,
-                                    message: "Could not begin transaction on connection."
-                                });
-                            }
-
-                            var jsonResult = m_functionSaveSystemTypes(connection, req.body.systemtypesarray, false); // 2nd parameter says [0] is NOT an App base type.
-                            
-                            // jsonResult look like:
-                            // {
-                            //      DB: "OK" or err.message,
-                            //      stScript: "OK" or message   -- if DB !== "OK", stScript and baseScript won't exist, since we won't have tried to save the scripts.
-                            //      baseScript: "OK" or message -- if stScript !== "OK", baseScript won't exist, since we won't have tried to write it out.
-                            // }
-                            if (jsonResult.DB === "OK") {
-
-                                // Commit the transaction.
-                                sql.commitCxn(connection,
-                                    function(err) {
-
-                                        if (err) {
-
-                                            // Could not commit
-                                        }
-
-                                });
-                            } else {
-
-                            }
-                        }
-                    );
                 }
+
+                connection = cxn;
+                connection.beginTransaction(
+                    function(err) {
+
+                        if (err) {
+
+                            return res.json({
+                                success: false,
+                                message: "Could not begin transaction on connection."
+                            });
+                        }
+
+                        m_functionSaveSystemTypes(connection, req.body.systemtypesarray, false, // 3rd parameter says [0] is NOT an App base type.
+                            function(jsonResult) {
+
+                                // jsonResult looks like:
+                                // {
+                                //      DB: "OK" or err.message,
+                                //      stScript: "OK" or message   -- if DB !== "OK", the stScript property won't exist, since we won't have tried to save the scripts.
+                                // }
+                                if (jsonResult.DB === "OK") {
+
+                                    // Commit the transaction.
+                                    sql.commitCxn(connection,
+                                        function(err) {
+
+                                            if (err) {
+
+                                                // Could not commit.
+                                                var msg = "Could not commit database updates.";
+
+                                                return res.json({
+                                                    success: false,
+                                                    message: msg
+                                                });
+                                            }
+
+                                            if (jsonResult.stScript === "OK") {
+
+                                                return res.json({
+                                                    success: true,
+                                                    scriptSuccess: true
+                                                });
+                                            }
+
+                                            return res.json({
+                                                success: true,
+                                                scriptSuccess: false,
+                                                saveError: jsonResult.stScript
+                                            });
+                                    });
+                                } else {
+
+                                    return res.json({
+                                        success: false,
+                                        message: jsonResult.DB
+                                    });
+                                }
+                            }
+                        );
+                    }
+                );
             }
         );
     }
 
     // connection exists and transaction is begun.
     // Returns with connection still uncommitted, but the 2 sql scripts have been written out.
-    var m_functionSaveSystemTypes(connection, arrayTypes, bSub0IsAppBaseType) {
+    var m_functionSaveSystemTypes = function (connection, arrayTypes, bSub0IsAppBaseType, callback) {
 
         try {
 
@@ -734,44 +759,54 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     //      DB: "OK" or err.message,
                     //      stScript: "OK" or message   -- if DB !== "OK", stScript and baseScript won't exist, since we won't have tried to save the scripts.
                     //      baseScript: "OK" or message -- if stScript !== "OK", baseScript won't exist, since we won't have tried to write it out.
+                    //                                      also, there won't be a baseScript property at all if we're being called by routeSaveSystemTypes.
                     // }
                     if (err) {
 
-                        return {DB: err.message};
+                        return callback({DB: err.message});
                     }
 
+                    // We always write out ST.sql. If that write fails, we don't even try to write out baseScript.
                     m_functionWriteSqlScript(stScript, "ST.sql", function(err) {
 
                         if (err) {
-                            return {
+                            return callback({
                                 DB: "OK",
                                 stScript: err.message
-                            };
-                        } else if (baseScript.length) {
+                            });
+                        }
+
+                        // We write out baseScript only if we're called from routeSaveProject; not if we're called from routeSaveSystemTypes.
+                        if (baseScript.length) {
 
                             m_functionWriteSqlScript(baseScript, filenameBaseScript, function(err) {
 
                                 if (err) {
-                                    return {
+                                    return callback({
                                         DB: "OK",
                                         stScript: "OK",
                                         baseScript: err.message
-                                    };
+                                    });
                                 }
 
-                                return {
+                                return callback({
                                     DB: "OK",
                                     stScript: "OK",
                                     baseScript: "OK"
-                                };
+                                });
                             });
-                        }
+                        } 
+
+                        return callback({
+                            DB: "OK",
+                            stScript: "OK"
+                        });
                     });
                 }
             );
         } catch (e) {
 
-            return {DB: e.message};
+            return callback({DB: e.message});
         }
     }
 
