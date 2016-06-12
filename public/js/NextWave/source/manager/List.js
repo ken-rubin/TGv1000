@@ -124,7 +124,6 @@ define(["NextWave/source/utility/prototypes",
                     // Clear out every item from the collection.
                     self.clearItems = function () {
 
-
                         try {
 
                             self.items = [];
@@ -676,7 +675,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith item.
                                 var itemIth = self.items[i];
 
-                                // Ask the parent how tall it is.
+                                // Ask the item for it extent.
                                 var dExtent = itemIth[self.methodAccessor](contextRender);
 
                                 // Don't start rendering until at least

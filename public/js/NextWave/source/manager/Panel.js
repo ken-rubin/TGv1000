@@ -445,7 +445,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 return null;
                             }
-                            return self.payload.calculateLayout(m_areaPayload, contextRender);
+                            return self.payload.calculateLayout(m_areaPayload, 
+                                contextRender);
                         } catch (e) {
 
                             return e;

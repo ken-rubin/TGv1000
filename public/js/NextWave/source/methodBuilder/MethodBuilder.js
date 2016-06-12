@@ -92,7 +92,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Store the current value for comparison after.
-                                            localSelf.saveMethodName = localSelf.text;
+                                            localSelf.saveMethodName = localSelf.getText();
 
                                             // Also store the value of the type label.
                                             localSelf.saveTypeName = localSelf.dialog.controlObject["typeLabel"].text;
@@ -106,7 +106,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // If the name has changed, update the name.
-                                            if (localSelf.saveMethodName !== localSelf.text) {
+                                            if (localSelf.saveMethodName !== localSelf.getText()) {
 
                                                 // Lookup the type from its name.
                                                 var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
@@ -116,14 +116,18 @@ define(["NextWave/source/utility/prototypes",
                                                 }
 
                                                 // Ensure the value is unique.
-                                                localSelf.text = window.manager.getUniqueName(localSelf.text,
+                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.text,
                                                     typeFromName.methods.parts,
-                                                    "name");
+                                                    "name"));
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
 
                                                 // Update.
                                                 window.manager.editMethodName(typeFromName,
                                                     localSelf.saveMethodName,
-                                                    localSelf.text);
+                                                    localSelf.getText());
                                             }
                                         } catch (e) {
 
@@ -273,9 +277,7 @@ define(["NextWave/source/utility/prototypes",
                             self.typeLabel.text = objectContext.type.name.payload;
 
                             // Set the method.
-                            self.methodEdit.text = objectContext.method.name;
-
-                            return null;
+                            return self.methodEdit.setText(objectContext.method.name);
                         } catch (e) {
 
                             return e;

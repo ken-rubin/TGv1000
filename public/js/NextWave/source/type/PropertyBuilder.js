@@ -73,7 +73,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Store the current value for comparison after.
-                                            localSelf.savePropertyName = localSelf.text;
+                                            localSelf.savePropertyName = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -84,20 +84,24 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // If the name has changed, update the name.
-                                            if (localSelf.savePropertyName !== localSelf.text) {
+                                            if (localSelf.savePropertyName !== localSelf.getText()) {
 
                                                 // Extract the context type from the host.
                                                 var typeContext = localSelf.dialog.host.typeContext;
 
                                                 // Ensure the value is unique.
-                                                localSelf.text = window.manager.getUniqueName(localSelf.text,
+                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.getText,
                                                     typeContext.properties.parts,
-                                                    "name");
+                                                    "name"));
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
 
                                                 // Update.
                                                 window.manager.editPropertyName(typeContext,
                                                     localSelf.savePropertyName,
-                                                    localSelf.text);
+                                                    localSelf.getText());
                                             }
                                         } catch (e) {
 
@@ -132,7 +136,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Save the original base, for resetting on invalid new name.
-                                            localSelf.saveType = localSelf.text;
+                                            localSelf.saveType = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -145,17 +149,21 @@ define(["NextWave/source/utility/prototypes",
                                             // Ensure the type value is a valid type:
 
                                             // Test it.
-                                            if (!window.manager.isValidPropertyTypeName(localSelf.text)) {
+                                            if (!window.manager.isValidPropertyTypeName(localSelf.getText())) {
 
                                                 // Reset base class on error.
-                                                localSelf.text = localSelf.saveType;
+                                                var exceptionRet = localSelf.setText(localSelf.saveType);
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
                                             } else {
 
                                                 // Save value.                                                                                            // Get the current type.
                                                 var propertyContext = localSelf.dialog.host.propertyContext;
 
                                                 // Update it description.
-                                                propertyContext.stowage.typeName = localSelf.text;
+                                                propertyContext.stowage.typeName = localSelf.getText();
                                             }
                                         } catch (e) {
 
@@ -193,7 +201,7 @@ define(["NextWave/source/utility/prototypes",
                                             var propertyContext = localSelf.dialog.host.propertyContext;
 
                                             // Update it description.
-                                            propertyContext.stowage.description = localSelf.text;
+                                            propertyContext.stowage.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -256,10 +264,17 @@ define(["NextWave/source/utility/prototypes",
                             self.propertyContext = property;
 
                             // Update controls.
-                            self.dialog.controlObject["nameEdit"].text = property.name;
-                            self.dialog.controlObject["typeEdit"].text = property.stowage.typeName;
-                            self.dialog.controlObject["descriptionEdit"].text = property.stowage.description;
-                            return null;
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description);
                         } catch (e) {
 
                             return e;

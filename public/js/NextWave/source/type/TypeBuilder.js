@@ -73,7 +73,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Store the current value for comparison after.
-                                            localSelf.saveTypeName = localSelf.text;
+                                            localSelf.saveTypeName = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -87,16 +87,19 @@ define(["NextWave/source/utility/prototypes",
                                             if (localSelf.saveTypeName !== localSelf.text) {
 
                                                 // Ensure the value is unique.
-                                                var strPayload = localSelf.text;
-                                                localSelf.text = "Hopefully A Unique Value That Is Never Duplicated";
-                                                localSelf.text = window.manager.getUniqueName(strPayload,
+                                                var strPayload = localSelf.getText();
+                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(strPayload,
                                                     window.manager.types,
                                                     "name",
-                                                    "payload");
+                                                    "payload"));
+                                                if (exceptionRet) {
+
+                                                    return exceptionRet;
+                                                }
 
                                                 // Update.
                                                 return window.manager.editTypeName(localSelf.saveTypeName,
-                                                    localSelf.text);
+                                                    localSelf.getText());
                                             }
                                         } catch (e) {
 
@@ -131,7 +134,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Save the original base, for resetting on invalid new name.
-                                            localSelf.saveBase = localSelf.text;
+                                            localSelf.saveBase = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -145,22 +148,26 @@ define(["NextWave/source/utility/prototypes",
                                             // type, not equal to the current type:
 
                                             // Get the current type name.
-                                            var strCurrentTypeName = localSelf.dialog.controlObject["nameEdit"].text;
+                                            var strCurrentTypeName = localSelf.dialog.controlObject["nameEdit"].getText();
 
                                             // Test it.
-                                            if (localSelf.text === strCurrentTypeName ||
+                                            if (localSelf.getText() === strCurrentTypeName ||
                                                 !window.manager.isValidBaseTypeName(strCurrentTypeName,
-                                                        localSelf.text)) {
+                                                        localSelf.getText())) {
 
                                                 // Reset base class on error.
-                                                localSelf.text = localSelf.saveBase;
+                                                var exceptionRet = localSelf.setText(localSelf.saveBase);
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
                                             } else {
 
                                                 // Save value.                                                                                            // Get the current type.
                                                 var typeContext = localSelf.dialog.host.typeContext;
 
                                                 // Update it description.
-                                                typeContext.stowage.baseTypeName = localSelf.text;
+                                                typeContext.stowage.baseTypeName = localSelf.getText();
                                             }
                                         } catch (e) {
 
@@ -198,7 +205,7 @@ define(["NextWave/source/utility/prototypes",
                                             var typeContext = localSelf.dialog.host.typeContext;
 
                                             // Update it description.
-                                            typeContext.stowage.description = localSelf.text;
+                                            typeContext.stowage.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -242,7 +249,7 @@ define(["NextWave/source/utility/prototypes",
                                             var typeContext = localSelf.dialog.host.typeContext;
 
                                             // Update it description.
-                                            typeContext.stowage.isSystemType = localSelf.text;
+                                            typeContext.stowage.isSystemType = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -301,7 +308,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             if (!type.stowage.description) {
 
-                                type.stowage.description = "[description goes here]";
+                                type.stowage.description = "This\nis a test of the emergency broadcast system.  If this had been an actual emergency, you would be dead.";
                             }
                             if (!type.stowage.isSystemType) {
 
@@ -312,11 +319,22 @@ define(["NextWave/source/utility/prototypes",
                             self.typeContext = type;
 
                             // Update controls.
-                            self.dialog.controlObject["nameEdit"].text = type.name.payload;
-                            self.dialog.controlObject["baseEdit"].text = type.stowage.baseTypeName;
-                            self.dialog.controlObject["descriptionEdit"].text = type.stowage.description;
-                            self.dialog.controlObject["systemTypeEdit"].text = type.stowage.isSystemType.toString();
-                            return null;
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name.payload);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
                         } catch (e) {
 
                             return e;
@@ -344,3 +362,11 @@ define(["NextWave/source/utility/prototypes",
             alert(e.message);
         }
     });
+
+
+//This is
+//a
+//test
+
+
+//of selection.
