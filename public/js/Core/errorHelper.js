@@ -32,7 +32,7 @@ define(function () {
 						} else { dispError = error;
 						}
 
-						if (error.hasOwnProperty('message') && error.hasOwnProperty('stack') && (manager.privileged)) {
+						if (error.hasOwnProperty('message') && error.hasOwnProperty('stack') && (manager.userAllowedToCreateEditPurchProjs)) {
 							dispError += '<br><br>' + error.stack;
 						}
 

@@ -62,7 +62,7 @@ define(["Core/errorHelper"],
 														// that BuyDialog needs.
 
 														// iProjectId is the project to fetch.
-														function (iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
+														function (iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 															try {
 
@@ -81,8 +81,9 @@ define(["Core/errorHelper"],
 																				// objProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
 																				// which case is contains a property holding class, product or onlineClass data.
 																				// Create and merge rest of specialProjectData in.
-																				specialProjectData = {
-																					privilegedUser: bPrivilegedUser,
+																				var specialProjectData = {
+																					userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
+																					userCanWorkWithSystemTypesAndAppBaseTypes: manager.userCanWorkWithSystemTypesAndAppBaseTypes,
 																					ownedByUser: bOnlyOwnedByUser,
 																					othersProjects: bOnlyOthersProjects,
 																					normalProject: (objProject.isCoreProject+objProject.isClass+objProject.isProduct+objProject.isOnlineClass === 0),
@@ -123,19 +124,56 @@ define(["Core/errorHelper"],
 								try {
 
 									if ($("#SaveProjectLI").hasClass('disabled')) { return false; }
-									var exceptionRet = client.showSaveProjectDialog();
-									if (exceptionRet) { throw exceptionRet; }
+
+									if (manager.projectLoaded) {
+
+										var exceptionRet = client.showSaveProjectDialog();
+										if (exceptionRet) { throw exceptionRet; }
+
+									} else if (manager.systemTypesLoaded) {
+
+										// No exceptionRet--it handles its own error or success display.
+										client.saveSystemTypes();
+
+										// Reload system types so the new ids are in memory.
+										client.loadSystemTypesAndPinPanels();
+									}
 								} catch (e) { errorHelper.show(e); }
 							});
 
 							$("#CloseProjectButton").click(function () {
 
 								if ($("#CloseProjectLI").hasClass('disabled')) { return false; }
-								client.unloadProject(function(){ 
-									self.enableOrDisableProjAndTypeMenuItems(); 
-									self.enableOrDisableAminZoneMenuItems(); 
-									self.enableOrDisablePlayAndStopButtons();
-								}, true);
+
+								if (manager.projectLoaded) {
+
+									client.unloadProject(function(){ 
+
+										setTimeout(function() {
+
+											if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+
+												client.loadSystemTypesAndPinPanels();
+											}
+											self.enableOrDisableProjAndTypeMenuItems(); 
+											self.enableOrDisableAminZoneMenuItems(); 
+											self.enableOrDisablePlayAndStopButtons();
+										}, 1000);
+									}, true);
+
+								} else {	// system types m.b. loaded; else, this menu item would be disabled.
+
+									client.unloadProject(function(){
+										
+										setTimeout(function() {
+
+											client.loadSystemTypesAndPinPanels();
+											self.enableOrDisableProjAndTypeMenuItems(); 
+											self.enableOrDisableAminZoneMenuItems(); 
+											self.enableOrDisablePlayAndStopButtons();
+										}, 1000);
+									}, true);
+								}
 							});
 
 							$("#SearchTypeButton").click(function() {
@@ -300,7 +338,6 @@ define(["Core/errorHelper"],
 										}
 									}
 								);
-
 							}
 
 							client.setBrowserTabAndBtns();
@@ -309,6 +346,11 @@ define(["Core/errorHelper"],
 
 						} catch (e) { return e; }
 					};
+
+					self.setSaveBtnText = function (strText) {
+
+						$("#SaveProjectButton").text(strText);
+					}
 
 					// A bunch of functions that enable/disable navbar menu items.
 					// During the buying process there's a project, but the user must not be allowed to do
@@ -323,13 +365,19 @@ define(["Core/errorHelper"],
 						m_functionDisable("SearchType");
 						m_functionDisable("SearchMethod");
 
-						if (manager.loaded) {
+						if (manager.projectLoaded) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 							m_functionEnable("SaveProject");
 							m_functionEnable("SearchType");
 							m_functionEnable("SearchMethod");
+
+						} else if (manager.systemTypesLoaded) {
+
+							// Loaded system types can be cleared and abandoned with appropriate warning
+							m_functionEnable("CloseProject");
+							m_functionEnable("SaveProject");
 						}
 					}
 
@@ -373,7 +421,7 @@ define(["Core/errorHelper"],
 
 					self.enableOrDisablePlayAndStopButtons = function () {
 
-						if (manager.loaded) {
+						if (manager.projectLoaded) {
 							$("#PlayBtn").removeClass("disabled");
 						} else {
 							$("#PlayBtn").addClass("disabled");

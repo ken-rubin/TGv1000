@@ -106,12 +106,12 @@ $(document).ready(function () {
 					}
 
 					// Decline invitation to enroll in online class.
-					strFromURL = m_functionCheckForURLEncoding("decline");
-					if (strFromURL) {
+					// strFromURL = m_functionCheckForURLEncoding("decline");
+					// if (strFromURL) {
 
-						m_functionHandleDeclineEmailClick();
-						return;
-					}
+					// 	m_functionHandleDeclineEmailClick();
+					// 	return;
+					// }
 
 				} catch (e) {
 
@@ -142,9 +142,9 @@ var m_functionHandleAcceptEmailClick = function() {
 
 }
 
-var m_functionHandleDeclineEmailClick = function() {
+// var m_functionHandleDeclineEmailClick = function() {
 
-}
+// }
 
 var m_functionEnrollButtonClk = function(errorHelper) {
 	

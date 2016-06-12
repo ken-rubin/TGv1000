@@ -186,7 +186,8 @@
         2. The other information added to a new Purchasable Project looks like this:
         ```
                 clProject.data.specialProjectData = {
-                    privilegedUser: [bool],
+                    userAllowedToCreateEditPurchProjs: [bool],
+                    userCanWorkWithSystemTypesAndAppBaseTypes: [bool],
                     ownedByUser: [bool],
                     othersProject: [bool],
                     normalProject: [bool],
@@ -240,7 +241,8 @@
     + **clProject.data.specialProjectData** for a privileged user planning to edit a Purchasable Project:
         ```
                 clProject.data.specialProjectData = {
-                    privilegedUser: true,
+                    userAllowedToCreateEditPurchProjs: true,
+                    userCanWorkWithSystemTypesAndAppBaseTypes: true,
                     ownedByUser: [bool],
                     othersProject: [bool],
                     normalProject: false,

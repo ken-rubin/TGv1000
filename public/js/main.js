@@ -22,14 +22,16 @@ $(document).ready(function() {
 			    "NextWave/source/utility/prototypes",
 			    "NextWave/source/utility/settings",
 			    "NextWave/source/utility/glyphs",
-			    "NextWave/source/manager/Manager"], 
+			    "NextWave/source/manager/Manager",
+			    "NextWave/source/utility/settings"], 
 			function (errorHelper, 
 						Client, 
 						Navbar, 
 						prototypes,
 						settings,
 						glyphs,
-						Manager) {
+						Manager,
+						settings) {
 
 								try {
 
@@ -60,35 +62,46 @@ $(document).ready(function() {
 											exceptionRet = navbar.create();
 											if (exceptionRet) { throw exceptionRet; }
 
-											// Calculate if the user is privileged, set in manager.
-				                            manager.privileged = (g_profile["can_create_classes"] || 
+											// Calculate user privileges; set in manager.
+				                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
 				                                g_profile["can_create_products"] || 
 				                                g_profile["can_create_onlineClasses"]) || false;
+				                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
+
+				                            // This had to be postponed due to non-readiness.
+				                            if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+
+				                                manager.panelLayer.systemTypesPanel.addNew = function () {
+
+				                                    try {
+
+				                                        // What to do when the icon is clicked....
+				                                        return window.manager.createSystemType();
+
+				                                    } catch (e) { throw e; }
+				                                };
+				                            }
 
 				                            // Now that manager and client are ready:
 				                            exceptionRet = client.postCreate();
 				                            if (exceptionRet) { throw exceptionRet; }
 
-						                } catch (e) {
-
-						                    alert(e.message);
-						                }
+						                } catch (e) { alert(e.message); }
 						            });
-
-
 								} catch(e) { errorHelper.show(e); }
 							});
 	} catch(e) { alert(e.message);}
 });
 
 var m_functionCheckForURLEncoding = function( name ) {
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null )
-    return "";
-  else
-    return decodeURI(results[1]);
+	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regex = new RegExp( regexS );
+	var results = regex.exec( window.location.href );
+	if( results == null ) {
+		return "";
+	}
+
+	return decodeURI(results[1]);
 }
 

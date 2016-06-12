@@ -51,11 +51,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects) {
+					self.callFunctionOK = function(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects) {
 
 						try {
 
-							m_functionOK(iProjectId, bPrivilegedUser, bOnlyOwnedByUser, bOnlyOthersProjects);
+							m_functionOK(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -97,7 +97,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 						try {
 
-							if (!manager.privileged) {
+							if (!manager.userAllowedToCreateEditPurchProjs) {
 								$(".HideIfNonPriv").css("display", "none");
 							}
 
@@ -106,7 +106,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							$("#ISSearchInput").focus();
 
 							// Attach 5 or 6 scroll regions to the DOM.
-							var minIndex = manager.privileged ? 0 : 1;
+							var minIndex = manager.userAllowedToCreateEditPurchProjs ? 0 : 1;
 							for (var stripNum = minIndex; stripNum <= 5; stripNum++) {
 
 								m_scISImageStrip[stripNum] = new ScrollRegionMulti();
@@ -130,29 +130,28 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    		// (1) If privileged user or stripNum < 3, to the callback in navbar to open the project from the DB and load it into manager.
 							    		// (2) Else, to BuyDialog, passing along m_searchResultRawArray[stripnum][i].
 							    		// We do (1) if a privileged user; if a non-privileged user and stripnum===1 or 2; 
-							    		if (manager.privileged || stripNum < 3) {
+							    		if (manager.userAllowedToCreateEditPurchProjs || stripNum < 3) {
 							    			
 								    		self.callFunctionOK(projectId, 
-								    							manager.privileged, 
 								    							(stripNum === 1), 
 								    							(stripNum === 2)
 								    		);
 								    	} else {
 
-											if (stripNum === 4 && !manager.privileged && m_searchResultRawArray[4][i].alreadyEnrolled) {
+											if (stripNum === 4 && !manager.userAllowedToCreateEditPurchProjs && m_searchResultRawArray[4][i].alreadyEnrolled) {
 
 												errorHelper.show("You've already enrolled in this class.");
 
-											} else if (stripNum === 4 && !manager.privileged && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize) {
+											} else if (stripNum === 4 && !manager.userAllowedToCreateEditPurchProjs && m_searchResultRawArray[4][i].numEnrollees >= m_searchResultRawArray[4][i].maxClassSize) {
 
 												exceptionRet = client.putUserOnWaitlist(projectId);
 												if (exceptionRet) { throw exceptionRet; }
 											
-											} else if (stripNum === 3 && !manager.privileged && m_searchResultRawArray[3][i].alreadyBought) {
+											} else if (stripNum === 3 && !manager.userAllowedToCreateEditPurchProjs && m_searchResultRawArray[3][i].alreadyBought) {
 
 												errorHelper.show("You've already purchased this product.");
 
-											} else if (stripNum === 5 && !manager.privileged && m_searchResultRawArray[5][i].alreadyEnrolled) {
+											} else if (stripNum === 5 && !manager.userAllowedToCreateEditPurchProjs && m_searchResultRawArray[5][i].alreadyEnrolled) {
 
 												errorHelper.show("You've already enrolled in this online class.");
 
@@ -185,7 +184,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 					        		tags: m_tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
-					        		privilegedUser: (manager.privileged ? 1 : 0)
+					        		userAllowedToCreateEditPurchProjs: (manager.userAllowedToCreateEditPurchProjs ? 1 : 0)
 					        	}, 
 					        	'json');
 					        posting.done(function(data){
@@ -235,7 +234,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 						    if (m_searchResultProcessedArray[stripNum].length === 0) {
 
-						    	if (manager.privileged) {
+						    	if (manager.userAllowedToCreateEditPurchProjs) {
 						    		// Core projects will always be present so no wellmessage is required for [0].
 							    	if (m_tags.length) {
 
@@ -365,7 +364,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        				+ "<br>Difficulty: " + m_searchResultRawArray[stripNum][rowIth.index].difficulty
 							        				+ "<br>Description: " + m_searchResultRawArray[stripNum][rowIth.index].productDescription
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
-							        		if (!manager.privileged && m_searchResultRawArray[stripNum][rowIth.index].alreadyBought) {
+							        		if (!manager.userAllowedToCreateEditPurchProjs && m_searchResultRawArray[stripNum][rowIth.index].alreadyBought) {
 							        			tooltip += "<br><b>You've already purchased this product.</b>";
 							        		}
 							        		break;
@@ -388,7 +387,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
 							        		var maxClassSize = m_searchResultRawArray[stripNum][rowIth.index].maxClassSize;
 							        		var numEnrollees = m_searchResultRawArray[stripNum][rowIth.index].numEnrollees;
-							        		if (!manager.privileged) {
+							        		if (!manager.userAllowedToCreateEditPurchProjs) {
 								        		if ( m_searchResultRawArray[stripNum][rowIth.index].alreadyEnrolled) {
 								        			tooltip += "<br><b>You've already enrolled in this class.</b>";
 								        		} else if (numEnrollees >= maxClassSize) {
@@ -415,7 +414,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							        				+ "<br>Notes: " + m_searchResultRawArray[stripNum][rowIth.index].classNotes
 							        				+ "<br>First class: " + strFirstClass
 							        				+ "<br>Price: " + m_searchResultRawArray[stripNum][rowIth.index].price.dollarFormat();
-							        		if (!manager.privileged && m_searchResultRawArray[stripNum][rowIth.index].alreadyEnrolled) {
+							        		if (!manager.userAllowedToCreateEditPurchProjs && m_searchResultRawArray[stripNum][rowIth.index].alreadyEnrolled) {
 							        			tooltip += "<br><b>You've already enrolled in this online class.</b>";
 							        		}
 							        		break;

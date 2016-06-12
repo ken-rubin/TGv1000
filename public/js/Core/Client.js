@@ -77,7 +77,7 @@ define(["Core/errorHelper",
 						try {
 
 							// "Normal" users get their last project loaded automatically.
-							if (!manager.privileged) {
+							if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
 								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
 								// At least it didn't work at the bottom of the callback in main.js.
@@ -103,11 +103,49 @@ define(["Core/errorHelper",
 										}
 									);
 								}
+							} else {
+
+								self.loadSystemTypesAndPinPanels();
 							}
 
 							return null;
 
 						} catch (e) { return e; }
+					}
+
+					self.loadSystemTypesAndPinPanels = function () {
+
+						// While others get all system types, statements, literals and expressions loaded.
+						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+							{},
+							'json');
+						posting.done(function(data){
+
+							if (data.success) {
+
+								manager.clearPanels();
+
+								// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
+								// Load them into the manager
+								var exceptionRet = manager.loadSystemTypes(data.data[0]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+								exceptionRet = manager.loadStatements(data.data[1]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+								exceptionRet = manager.loadLiterals(data.data[2]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+								exceptionRet = manager.loadExpressions(data.data[3]);
+								if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+								manager.openAndPinAllPanels();
+
+								self.setBrowserTabAndBtns();
+
+							} else {
+
+								// !data.success
+								errorHelper.show(data.message);
+							}
+						});
 					}
 
 					//////////////////////////////
@@ -216,6 +254,39 @@ define(["Core/errorHelper",
 							return null;
 
 						} catch (e) { return e; }
+					}
+
+					// This is done without a pre-save dialog.
+					self.saveSystemTypes = function () {
+
+						try {
+
+							var arraySystemTypes = manager.saveSystemTypes();
+
+							var posting = $.post("/BOL/ProjectBO/SaveSystemTypes", 
+								{
+									systemtypesarray: arraySystemTypes
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									if (data.scriptSuccess) {
+										errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 5000);
+									} else {
+										errorHelper.show("System types were saved to the database, but we could not save ST.sql to your drive. Error received: " + data.saveError);
+									}
+								} else {
+
+									// !data.success
+									errorHelper.show(data.message);
+								}
+							});
+						} catch (e) {
+
+							errorHelper.show("System types failed to save to the database with error: " + e.message);
+						}
 					}
 
 					self.showEditTypeDialog = function (index) {
@@ -980,7 +1051,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							if (manager.loaded) {
+							if (manager.projectLoaded || manager.systemTypesLoaded) {
 							
 								m_functionAbandonProjectDialog(function() {	
 
@@ -990,34 +1061,19 @@ define(["Core/errorHelper",
 										var exceptionRet = manager.clearPanels();
 										if (exceptionRet) { throw exceptionRet; }
 
-										// m_clProject = null;
-
 										self.setBrowserTabAndBtns();
 
-										// Disable the TypeWell icons that are enabled if a project is loaded.
-										// $(".disabledifnoproj").prop("disabled", true);
-
-										// Remove tooltip functionality from TypeWell icons.
-										// $(".disabledifnoproj").powerTip({
-										// 	smartPlacement: true,
-										// 	manual: true
-										// });
-										
-										// Empty the toolstrip, designer, comicstrip and typewell.
-										// tools.empty();
-
 										if ($.isFunction(unloadedCallback)) {
- 											unloadedCallback();
+											unloadedCallback();
 										}
-
-									} catch(e) { errorHelper.show(e); }
+									} catch(e) { errorHelper.show(e); return; }
 								},
 								bShowAbandonDlg);	// If bShowAbandonDlg is false, will just return. No better way.
-
 							} else {
-
-								if ($.isFunction(unloadedCallback))
+								
+								if ($.isFunction(unloadedCallback)) {
 									unloadedCallback();
+								}
 							}
 						} catch (e) { errorHelper.show(e); }
 					}
@@ -1032,10 +1088,16 @@ define(["Core/errorHelper",
 					// Project helper methods.
 					self.setBrowserTabAndBtns = function () {
 
-						document.title = "TechGroms";
-						if (manager.loaded) {
+						document.title = "NWC";
+						if (manager.projectLoaded) {
 
-							if (manager.projectData.name.length > 0) { document.title = document.title + " / " + manager.projectData.name; }
+							if (manager.projectData.name.length > 0) { document.title += " / " + manager.projectData.name; }
+							navbar.setSaveBtnText("Save Project");
+						
+						} else if (manager.systemTypesLoaded) {
+
+							document.title += " / System types";
+							navbar.setSaveBtnText("Save System Types");
 						}
 
 						// Something happened so refresh the navbar.

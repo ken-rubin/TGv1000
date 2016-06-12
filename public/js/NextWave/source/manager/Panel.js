@@ -323,6 +323,44 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Simulate hover and pin click.
+                    self.openAndPin = function () {
+
+                        if (!self.open &&
+                            !self.opening) {
+
+                            // Stop closing, if closing.
+                            if (self.closing) {
+
+                                self.closing = false;
+                            }
+
+                            // Start the opening.
+                            self.opening = true;
+                        }
+
+                        self.pinned = true;
+                    }
+
+                    // Opposite of prior function. Unpins and closes this panel.
+                    self.unpin = function () {
+
+                        self.pinned = false;
+
+                        if (self.open ||
+                            self.opening) {
+
+                            // Stop opening, if opening.
+                            if (self.opening) {
+
+                                self.opening = false;
+                            }
+
+                            // Start the closing.
+                            self.closing = true;
+                        }
+                    }
+
                     // Set and position the panel.
                     self.setPayload = function (strTitle, objectPayload) {
 

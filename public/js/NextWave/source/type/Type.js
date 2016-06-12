@@ -88,7 +88,7 @@ define(["NextWave/source/utility/prototypes",
                             self.name = new CodeType(objectType.name);
 
                             // Build the methods.
-                            if (objectType.methods) {
+                            if (objectType.methods && objectType.methods.length) {
 
                                 for (var j = 0; j < objectType.methods.length; j++) {
 

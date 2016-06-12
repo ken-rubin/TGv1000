@@ -1270,6 +1270,100 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
     end if;
 
+    if @dbstate = 28 THEN
+    
+		CREATE TABLE `TGv1000`.`systemtypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` varchar(255) NOT NULL,
+          `ownedByUserId` int(11) NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
+          `description` mediumtext NULL,
+          `baseTypeId` int(11) NULL,
+          `isToolStrip` tinyint(1) NOT NULL DEFAULT '0',
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
+    if @dbstate = 29 THEN
+    
+		INSERT `TGv1000`.`systemtypes` SET id=1,name='Array',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=2,name='Boolean',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=3,name='Date',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=4,name='Math',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=5,name='Number',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=6,name='RegExp',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=7,name='String',ownedByUserId=1;
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchForPanels_S_L_E_ST','post','routeFetchForPanels_S_L_E_ST',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveSystemTypes','post','routeSaveSystemTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
+    if @dbstate = 30 THEN
+    
+		DELETE FROM `TGv1000`.`projects` where id>5;
+		UPDATE `TGv1000`.`types` SET ordinal=1 where ordinal=10000;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
+    if @dbstate = 31 THEN
+    
+		CREATE TABLE `TGv1000`.`typetypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		INSERT `TGv1000`.`typetypes` VALUES (1, 'normal'), (2, 'system'), (3, 'appbase');
+
+		ALTER TABLE `tgv1000`.`types` 
+		DROP COLUMN `isToolStrip`,
+		ADD COLUMN `typeTypeId` INT(11) NOT NULL DEFAULT 1 AFTER `name`;
+
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Array',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Boolean',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Date',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Math',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Number',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='RegExp',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='String',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		UPDATE `TGv1000`.`types` SET typeTypeId=3 WHERE id<6;
+
+		DROP TABLE `TGv1000`.`systemtypes`;
+        
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+        
 end//
 
 

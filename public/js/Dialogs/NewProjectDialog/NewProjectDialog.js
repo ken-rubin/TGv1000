@@ -71,7 +71,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// the primary button or press Enter.
 
 							var buttons = [];
-							if (manager.privileged) {
+							if (manager.userAllowedToCreateEditPurchProjs) {
 
 							    buttons = [
 					            	{
@@ -131,7 +131,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
 							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
 
-							if (manager.privileged) {
+							if (manager.userAllowedToCreateEditPurchProjs) {
 								$("#PrivilegedUsersDiv").css("display", "block");
 								$("#ContinueBtn").prop('disabled', true);
 							}
@@ -369,7 +369,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							if (manager.privileged) {
+							if (manager.userAllowedToCreateEditPurchProjs) {
 
 								var jq;
 								if (m_projectType) {
@@ -479,7 +479,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
 									projectData.specialProjectData = {
-										privilegedUser: manager.privileged,
+										userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
+										userCanWorkWithSystemTypesAndAppBaseTypes: manager.userCanWorkWithSystemTypesAndAppBaseTypes,
 										ownedByUser: false,
 										othersProjects: false,
 										normalProject: m_bNormalProject,
