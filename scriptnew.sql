@@ -1356,11 +1356,11 @@ begin
 			VALUES
 				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
 		UPDATE `TGv1000`.`types` SET typeTypeId=3 WHERE id<6;
+
+		DROP TABLE `TGv1000`.`systemtypes`;
         
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-
-		DROP TABLE `TGv1000`.`systemtypes`;
 
     end if;
         

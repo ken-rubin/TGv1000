@@ -182,7 +182,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             });
                         }
 
-                        m_functionSaveSystemTypes(connection, req.body.systemtypesarray, false, // 3rd parameter says [0] is NOT an App base type.
+                        m_functionSaveSystemTypes(connection,
+                            true,   // indicate permission to edit system types (because, after all, that's their only reason for being here)
+                            req.body.systemtypesarray, 
+                            false, // this parameter says [0] is NOT an App base type.
                             function(jsonResult) {
 
                                 // jsonResult looks like:
@@ -237,10 +240,24 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     }
 
     // connection exists and transaction is begun.
-    // Returns with connection still uncommitted, but the 2 sql scripts have been written out.
-    var m_functionSaveSystemTypes = function (connection, arrayTypes, bSub0IsAppBaseType, callback) {
+    // Returns with connection still uncommitted, but 1 or 2 sql scripts have been written out.
+    // Actually, if we calling from routeSaveProject, we may not do anything here, but we'll need to call the callback to proceed with
+    // saving the project.
+    var m_functionSaveSystemTypes = function (  connection, 
+                                                bCanEditSystemTypesAndAppBaseTypes,
+                                                arrayTypes, 
+                                                bSub0IsAppBaseType, 
+                                                callback) {
 
         try {
+
+            if (!bCanEditSystemTypesAndAppBaseTypes) {
+
+                // Not doing anything. Just call the callback appropriately.
+                return callback({
+                    DB: "Skipped"
+                });
+            }
 
             // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
             var typeIdTranslationArray = [];
@@ -1809,51 +1826,68 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         } else {
 
                                             m_log('Connection has a transaction');
-                                            m_functionDetermineSaveOrSaveAs(connection, req, res,
-                                                function(err, typeOfSave) {
-                                                    if (err) {
-                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
+
+                                            m_functionSaveSystemTypes(  
+                                                connection,
+                                                project.specialprojectdata.userCanWorkWithSystemTypesAndAppBaseTypes,
+                                                project.systemTypes,
+                                                true,   // Says that project.systemTypes[0] is and App base type
+                                                function(jsonResult) {
+
+                                                    if (jsonResult.DB === "Skipped" || jsonResult.DB === "OK") {
+
+                                                        m_functionDetermineSaveOrSaveAs(connection, req, res,
+                                                            function(err, typeOfSave) {
+                                                                if (err) {
+                                                                    m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
+                                                                } else {
+                                                                    if (typeOfSave === 'save') {
+
+                                                                        m_log('Going into m_functionSaveProject');
+                                                                        m_functionSaveProject(connection, req, res, project, 
+                                                                            function(err) {
+                                                                                if (err) {
+                                                                                    m_functionFinalCallback(err, req, res, null, null);
+                                                                                } else {
+                                                                                    m_log("***Full successm_function xxx***");
+                                                                                    m_functionFinalCallback(null, req, res, connection, project);
+                                                                                }
+                                                                            }
+                                                                        );
+                                                                    } else if (typeOfSave === 'saveWithSameId') {
+
+                                                                        m_log('Going into m_functionSaveProjectWithSameId');
+                                                                        m_functionSaveProjectWithSameId(connection, req, res, project, 
+                                                                            function(err) {
+                                                                                if (err) {
+                                                                                    m_functionFinalCallback(err, req, res, null, null);
+                                                                                } else {
+                                                                                    m_log("***Full success***");
+                                                                                    m_functionFinalCallback(null, req, res, connection, project);
+                                                                                }
+                                                                            }
+                                                                        );
+                                                                    } else {    // 'saveAs'
+
+                                                                        m_log('Going into m_functionSaveProjectAs');
+                                                                        m_functionSaveProjectAs(connection, req, res, project, 
+                                                                            function(err) {
+                                                                                if (err) {
+                                                                                    m_functionFinalCallback(err, req, res, null, null);
+                                                                                } else {
+                                                                                    m_log("***Full success***");
+                                                                                    m_functionFinalCallback(null, req, res, connection, project);
+                                                                                }
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                }
+                                                            }
+                                                        );
                                                     } else {
-                                                        if (typeOfSave === 'save') {
 
-                                                            m_log('Going into m_functionSaveProject');
-                                                            m_functionSaveProject(connection, req, res, project, 
-                                                                function(err) {
-                                                                    if (err) {
-                                                                        m_functionFinalCallback(err, req, res, null, null);
-                                                                    } else {
-                                                                        m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, req, res, connection, project);
-                                                                    }
-                                                                }
-                                                            );
-                                                        } else if (typeOfSave === 'saveWithSameId') {
-
-                                                            m_log('Going into m_functionSaveProjectWithSameId');
-                                                            m_functionSaveProjectWithSameId(connection, req, res, project, 
-                                                                function(err) {
-                                                                    if (err) {
-                                                                        m_functionFinalCallback(err, req, res, null, null);
-                                                                    } else {
-                                                                        m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, req, res, connection, project);
-                                                                    }
-                                                                }
-                                                            );
-                                                        } else {    // 'saveAs'
-
-                                                            m_log('Going into m_functionSaveProjectAs');
-                                                            m_functionSaveProjectAs(connection, req, res, project, 
-                                                                function(err) {
-                                                                    if (err) {
-                                                                        m_functionFinalCallback(err, req, res, null, null);
-                                                                    } else {
-                                                                        m_log("***Full success***");
-                                                                        m_functionFinalCallback(null, req, res, connection, project);
-                                                                    }
-                                                                }
-                                                            );
-                                                        }
+                                                        // Something went wrong saving system types array.
+                                                        m_functionFinalCallback(new Error(jsonResult.DB), req, res, null, null);
                                                     }
                                                 }
                                             );
