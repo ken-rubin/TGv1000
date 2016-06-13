@@ -277,7 +277,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     "begin"
                 ];
 
-                filenameBaseScript = arrayTypes[0].name.replace(' ', '_');
+                filenameBaseScript = arrayTypes[0].name.replace(/\s/g, '_') + ".sql";
             }
 
             // In async.series:
@@ -392,21 +392,21 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 if (bNeedToDoAppBaseType) {
                                     baseScript.push('set @guts := "' + scriptGuts + '";');
-                                    baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
+                                    baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=3 and name="' + typeIth.name + '");');
                                     baseScript.push('if ' + typeIth.atid + ' is not null then');
-                                    baseScript.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                    baseScript.push('   /* Existing Base Types are deleted and re-inserted with the same id they had before. */');
                                     baseScript.push('   delete from types where id=' + typeIth.atid + ';');
                                     baseScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
                                     baseScript.push('   prepare insstmt from @s;');
                                     baseScript.push('   execute insstmt;');
                                     baseScript.push('else');
-                                    baseScript.push('   /* New System Types are inserted with a new id. */');
+                                    baseScript.push('   /* New Base Types are inserted with a new id. */');
                                     baseScript.push('   set @s := (select concat("insert types ",@guts,";"));');
                                     baseScript.push('   prepare insstmt from @s;');
                                     baseScript.push('   execute insstmt;');
                                     baseScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
                                     baseScript.push('end if;');
-                                    baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                    baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
                                     bNeedToDoAppBaseType = false;
                                 
                                 } else {
@@ -426,7 +426,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     stScript.push('   execute insstmt;');
                                     stScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
                                     stScript.push('end if;');
-                                    stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                    stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
                                 }
 
                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
@@ -589,11 +589,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                                             if (bNeedToDoAppBaseType) {
                                                                                 baseScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                                baseScript.push('set @idm := (select LAST_INSERT_ID());')
                                                                                 bNeedToDoAppBaseType = false;
                                                                             } else {
                                                                                 stScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                                stScript.push('set @idm := (select LAST_INSERT_ID());')
                                                                             }
 
                                                                             return cb(null);
@@ -602,16 +600,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                     }
                                                                 );
                                                             }
-                                                            // No tags needed (maybe) for system types' methods.
-                                                            // ,
-                                                            // // (1b)
-                                                            // function(cb) {
-
-                                                            //     m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
-                                                            //         function(err) { return cb(err); },
-                                                            //         '@idm'
-                                                            //     );
-                                                            // }
                                                         ],
                                                         // final callback for async.series in methods
                                                         function(err) { 
@@ -811,18 +799,40 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     baseScript: "OK"
                                 });
                             });
-                        } 
+                        } else {
 
-                        return callback({
-                            DB: "OK",
-                            stScript: "OK"
-                        });
+                            return callback({
+                                DB: "OK",
+                                stScript: "OK"
+                            });
+                        }
                     });
                 }
             );
         } catch (e) {
 
             return callback({DB: e.message});
+        }
+    }
+
+    var m_functionWriteSqlScript = function(script, filename, callback) {
+
+        try {
+
+            // Finalize the procedure.
+            script.push("end;");
+            script.push("//");
+            script.push("delimiter ;");
+            script.push("call doSystemTypes();");
+            script.push("drop procedure doSystemTypes;");
+
+            fs.writeFile(filename, script.join(os.EOL), 
+                function (err) {
+                    callback(err);
+                }
+            );
+        } catch(e) {
+            callback(e);
         }
     }
 
@@ -1805,7 +1815,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         if (err) { 
 
                             // Cannot finish in m_functionFinalCallback until we have a connection and is has begun.
-                            res.json({
+                            return res.json({
                                 success: false,
                                 message: 'Could not get a database connection: ' + err.message
                             });
@@ -1818,7 +1828,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     try {
                                         if (err) {
 
-                                            res.json({
+                                            return res.json({
                                                 success: false,
                                                 message: 'Could not "begin" database transaction: ' + err.message
                                             });
@@ -1828,7 +1838,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_functionSaveSystemTypes(  
                                                 connection,
-                                                project.specialprojectdata.userCanWorkWithSystemTypesAndAppBaseTypes,
+                                                project.specialProjectData.userCanWorkWithSystemTypesAndAppBaseTypes,
                                                 project.systemTypes,
                                                 true,   // Says that project.systemTypes[0] is and App base type
                                                 function(jsonResult) {
@@ -1892,7 +1902,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             );
                                         }
                                     } catch(e1) { 
-                                        res.json({
+                                        return res.json({
                                             success: false,
                                             message: 'Could not "begin" database transaction: ' + e1.message
                                         });
@@ -1901,7 +1911,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             );
                         }
                     } catch (e2) { 
-                        res.json({
+                        return res.json({
                             success: false,
                             message: 'Could not get a database connection: ' + e2.message
                         });
@@ -1909,7 +1919,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 }
             );
         } catch(e) { 
-            res.json({
+            return res.json({
                 success: false,
                 message: 'Could not save project due to error: ' + e.message
             });
@@ -1956,7 +1966,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 project: project,
                                 newProj: (project.specialProjectData.openMode === "new" || project.specialProjectData.openMode === "bought"), 
                                 notMine: project.specialProjectData.othersProjects,
-                                editingCoreProject: (project.specialprojectdata.userAllowedToCreateEditPurchProjs && project.specialProjectData.coreProject)
+                                editingCoreProject: (project.specialProjectData.userAllowedToCreateEditPurchProjs && project.specialProjectData.coreProject)
                             }
                         );
                     },
@@ -2028,7 +2038,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
                     function(resultArray, cb) {
 
-                        if (resultArray.project.specialprojectdata.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
+                        if (resultArray.project.specialProjectData.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
 
                             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + resultArray.project.id + ";";
                             sql.queryWithCxn(connection, strQuery,
@@ -2272,7 +2282,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 },
                                 // (2c)
                                 function(cb) {
-                                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
                                         m_log("Calling m_savePurchProductData");
                                         m_savePurchProductData(connection, req, res, project,
                                             function(err) {
@@ -2422,7 +2432,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 },
                                 // (3c)
                                 function(cb) {
-                                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                                         m_log("Calling m_savePurchProductData");
                                         m_savePurchProductData(connection, req, res, project,
@@ -2454,7 +2464,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             var dbname = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
-            if (project.specialprojectdata.userAllowedToCreateEditPurchProjs 
+            if (project.specialProjectData.userAllowedToCreateEditPurchProjs 
                 && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
@@ -2578,7 +2588,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                     comicIth.projectId = project.comicProjectId;
 
-                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
+                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
                         
                         var guts = {
                             projectId: comicIth.projectId,
@@ -3431,7 +3441,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
-            res.json({
+            return res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
@@ -3440,7 +3450,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 function(err){
 
                     if (err) {
-                        res.json({
+                        return res.json({
                             success: false,
                             message: 'Committing transaction failed with ' + err.message
                         });
@@ -3461,7 +3471,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     });
                                 }
 
-                                res.json({
+                                return res.json({
                                     success: true,
                                     project: project
                                 });
@@ -3470,27 +3480,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     }
                 }
             );
-        }
-    }
-
-    var m_functionWriteSqlScript = function(script, filename, callback) {
-
-        try {
-
-            // Finalize the procedure.
-            script.push("end;");
-            script.push("//");
-            script.push("delimiter ;");
-            script.push("call doSystemTypes();");
-            script.push("drop procedure doSystemTypes;");
-
-            fs.writeFile(filename, script.join(os.EOL), 
-                function (err) {
-                    callback(err);
-                }
-            );
-        } catch(e) {
-            callback(e);
         }
     }
 
