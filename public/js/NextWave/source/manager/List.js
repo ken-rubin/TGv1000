@@ -465,7 +465,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Calculate the total height.
+                            // Calculate the total extent.
                             var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
 
                             // Do nothing if nothing to scroll.

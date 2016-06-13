@@ -92,7 +92,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Returns the height of this type.
+                    // Returns the width of this type.
                     self.getWidth = function (contextRender) {
 
                         // If max width set, always use it.

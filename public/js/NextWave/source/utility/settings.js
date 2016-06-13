@@ -47,7 +47,8 @@ define(["NextWave/source/utility/prototypes"],
                         fillText: "#000",
                         blinkMS: 500,
                         maximumCharacters: 32,
-                        font: "30px Arial"
+                        font: "30px Arial",
+                        monoSpaceFont: "30px Courier New"
                     };
                     self.dialog = {
 

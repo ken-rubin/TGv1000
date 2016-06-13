@@ -43,6 +43,15 @@ define(["NextWave/source/utility/prototypes",
                     self.scrollStubVisible = [false, false];
                     // Indicates that the corresponding scroll stud is visible--set in render.
                     self.scrollStubArea = [null, null];
+                    // Indicates how things are measured and how they scroll.
+                    self.vertical = true;
+                    // Access this property based on orientation.
+                    self.propertyAccessor = (self.vertical ? "height" : "width");
+                    // Access this method based on orientation.
+                    self.methodAccessor = (self.vertical ? "getHeight" : "getWidth");
+                    // Access scroll cursor based on orientation.
+                    self.scrollCursor = [(self.vertical ? "n-resize" : "w-resize"),
+                        (self.vertical ? "s-resize" : "e-resize")];
 
                     ///////////////////////
                     // Public methods.
@@ -74,6 +83,23 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Helper method calculates usable total extent of list.
+                    self.getTotalExtent = function (contextRender) {
+
+                        if (self.vertical) {
+
+                            // Sum each line.
+                            if (self.lines === "requireFormat") {
+
+                                return 0;
+                            }
+                            return settings.dialog.lineHeight * self.lines.length;
+                        } else {
+
+                            return contextRender.measureText(self.text).width;                            
+                        }
+                    };
+
                     // Reset format.
                     self.innerCalculateLayout = function (areaMaximal, contextRender) {
 
@@ -82,7 +108,30 @@ define(["NextWave/source/utility/prototypes",
                             // Reset lines--to cause the next render to reformat.
                             self.lines = "requireFormat";
 
-                            return null;
+                            if (self.vertical) {
+
+                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
+                                        areaMaximal.location.y + settings.general.scrollStub.yOffset), 
+                                    new Size(settings.general.scrollStub.width, settings.general.scrollStub.height));
+
+                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
+                                        areaMaximal.location.y + areaMaximal.extent.height + settings.general.scrollStub.yOffset), 
+                                    new Size(settings.general.scrollStub.width, settings.general.scrollStub.height));
+                            } else {
+
+                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x - settings.general.scrollStub.height / 2, 
+                                        areaMaximal.location.y - settings.general.scrollStub.yOffset / 5), 
+                                    new Size(settings.general.scrollStub.height /* this one is on its side */, 
+                                        areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
+
+                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + areaMaximal.extent.width - settings.general.scrollStub.height / 2, 
+                                        areaMaximal.location.y - settings.general.scrollStub.yOffset / 5), 
+                                    new Size(settings.general.scrollStub.height /* this one is on its side */, 
+                                        areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
+                            }
+
+                            // Adjust scroll offset, if necessary.
+                            return self.possiblyAdjustScrollOffset();
                         } catch (e) {
 
                             return e;
@@ -94,6 +143,158 @@ define(["NextWave/source/utility/prototypes",
 
                         self.lines = [];
                         return null;
+                    };
+
+                    // Invoked when the mouse is moved over the list.
+                    self.mouseMove = function (objectReference) {
+
+                        try {
+
+                            // Test for scrolling.
+                            if (self.scrollStubVisible[0] &&
+                                self.scrollStubArea[0].pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor)) {
+
+                                // Start scrolling, if not already.
+                                if (!m_functionScroll) {
+
+                                    // Set the scroll function to "up".
+                                    m_functionScroll = function () {
+
+                                        // Special case, scroll down.
+                                        if (m_dScrollOffset > 0) {
+
+                                            m_dScrollOffset -= settings.general.scrollStub.amount;
+                                        }
+                                        // Pin to bounds.
+                                        if (m_dScrollOffset < 0) {
+
+                                            m_dScrollOffset = 0;
+                                        }
+                                    };
+                                }
+
+                                // Set the cursor.
+                                objectReference.cursor = self.scrollCursor[0];
+
+                                return null;
+                            } else if (self.scrollStubVisible[1] &&
+                                self.scrollStubArea[1].pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor)) {
+
+                                // Start scrolling, if not already.
+                                if (!m_functionScroll) {
+
+                                    // Calculate the total height.
+                                    var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
+
+                                    // Set the scroll function to "down".
+                                    m_functionScroll = function () {
+
+                                        // Special case, scroll up.
+                                        if (m_dScrollOffset < (dTotalExtent - self.position.extent[self.propertyAccessor])) {
+
+                                            m_dScrollOffset += settings.general.scrollStub.amount;
+                                        }
+                                        // Pin to bounds.
+                                        if (m_dScrollOffset > (dTotalExtent - self.position.extent[self.propertyAccessor])) {
+
+                                            m_dScrollOffset = (dTotalExtent - self.position.extent[self.propertyAccessor]);
+                                        }
+                                    };
+                                }
+
+                                // Set the cursor.
+                                objectReference.cursor = self.scrollCursor[1];
+
+                                // Possibly mouseout selection....
+                                return null;
+                            } else {
+
+                                // Stop all scrolling.
+                                m_functionScroll = null;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse wheel is scrolled over the canvas.
+                    self.mouseWheel = function (objectReference) {
+
+                        try {
+
+                            // Calculate the total extent.
+                            var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
+
+                            // Do nothing if nothing to scroll.
+                            if (dTotalExtent < self.position.extent[self.propertyAccessor]) {
+
+                                return null;
+                            }
+
+                            // Get the direction of scrolling based on wheel change.
+                            // For now, I don't think you can scroll to ther side...test....
+                            var strDeltaAccessor = (self.vertical ? "deltaY" : "deltaY");
+
+                            // Calculate distance.
+                            var dAmount = -objectReference.event[strDeltaAccessor] * objectReference.event.deltaFactor;
+
+                            // Scroll up if negative, else, down.
+                            if (dAmount < 0) {
+
+                                // Move it.
+                                if (m_dScrollOffset > 0) {
+
+                                    m_dScrollOffset += dAmount;
+                                }
+                                // Pin to bounds.
+                                if (m_dScrollOffset < 0) {
+
+                                    m_dScrollOffset = 0;
+                                }
+                            } else {
+
+                                // Move it.
+                                if (m_dScrollOffset < (dTotalExtent - self.position.extent[self.propertyAccessor])) {
+
+                                    m_dScrollOffset += dAmount;
+                                }
+                                // Pin to bounds.
+                                if (m_dScrollOffset > (dTotalExtent - self.position.extent[self.propertyAccessor])) {
+
+                                    m_dScrollOffset = (dTotalExtent - self.position.extent[self.propertyAccessor]);
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Adjust the scroll offset if sizes have changed on next render.
+                    self.possiblyAdjustScrollOffset = function () {
+
+                        try {
+
+                            m_bPossiblyAdjustScrollOffsets = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Expose private field.
+                    self.scrollOffset = function () {
+
+                        return m_dScrollOffset;
                     };
 
                     // Handle the keypress, either backspace, delete, or normal keys.
@@ -153,9 +354,6 @@ define(["NextWave/source/utility/prototypes",
                             // Let derived class do something  
                             // before handling the key press.
                             var exceptionRet = null;
-
-                            // Reset lines--to cause the next render to reformat.
-                            self.lines = "requireFormat";
 
                             // Save this state.
                             var bShift = (e.shiftKey);
@@ -271,6 +469,45 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Key is handled.
                                 e.stopPropagation();
+                            } else if (e.which === 38) {                     // Up arrow.
+
+                                // Figure out where the "end of selection" marker is.
+                                var iLine = (m_iSelectionLength < 0 ? self.startingLine : self.endingLine);
+                                var iColumn = (m_iSelectionLength < 0 ? self.startingColumn : self.endingColumn);
+
+                                if (iLine === 0) {
+
+                                    // Key is handled.
+                                    e.stopPropagation();
+                                    return null;
+                                }
+
+                                // Try to get the equivalent column in the previous line.
+                                var lineWork = self.lines[iLine - 1];
+                                if (lineWork.text.length >= iColumn) {
+
+                                    if (bShift) {
+
+                                        m_iSelectionLength -= (lineWork.text.length + 1);
+                                    } else {
+
+                                        m_iSelectionStart -= (lineWork.text.length + 1 - m_iSelectionLength);
+                                        m_iSelectionLength = 0;
+                                    }
+                                } else {
+
+                                    if (bShift) {
+
+                                        m_iSelectionLength -= (iColumn + 1);
+                                    } else {
+
+                                        m_iSelectionStart -= (iColumn + 1);
+                                        m_iSelectionLength = 0;
+                                    }
+                                }
+
+                                // Key is handled.
+                                e.stopPropagation();
                             } else if (e.which === 39) {              // Right arrow.
 
                                 // Always want to show the cursor after a character is typed.
@@ -313,7 +550,51 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Key is handled.
                                 e.stopPropagation();
-                            } else if (e.which === 13) {
+                            } else if (e.which === 40) {                     // Down arrow.
+
+                                // Figure out where the "end of selection" marker is.
+                                var iLine = (m_iSelectionLength < 0 ? self.startingLine : self.endingLine);
+                                var iColumn = (m_iSelectionLength < 0 ? self.startingColumn : self.endingColumn);
+
+                                if ((iLine >= self.lines.length - 1) ||
+                                    ((!bShift) &&
+                                        (iLine === self.lines.length - 2) && 
+                                        (self.lines[self.lines.length - 1].text.length === 0))) {  // -2 because there is technically always an extra line, but it is only accessible in certain circumstances.
+
+                                    // Key is handled.
+                                    e.stopPropagation();
+                                    return null;
+                                }
+
+                                // Try to get the equivalent column in the previous line.
+                                var lineWork = self.lines[iLine + 1];
+                                if (lineWork.text.length >= iColumn) {
+
+                                    var lineCurrent = self.lines[iLine];
+                                    if (bShift) {
+
+                                        m_iSelectionLength += (lineCurrent.text.length + 1);
+                                    } else {
+
+                                        m_iSelectionStart += (lineCurrent.text.length + 1 - m_iSelectionLength);
+                                        m_iSelectionLength = 0;
+                                    }
+                                } else {
+
+                                    var lineCurrent = self.lines[iLine];
+                                    if (bShift) {
+
+                                        m_iSelectionLength += (lineWork.text.length + 1 + lineCurrent.text.length - iColumn);
+                                    } else {
+
+                                        m_iSelectionStart += (lineWork.text.length + 1 + lineCurrent.text.length - iColumn);
+                                        m_iSelectionLength = 0;
+                                    }
+                                }
+
+                                // Key is handled.
+                                e.stopPropagation();
+                            } else if (e.which === 13) {                    // Enter.
                
                                 // Intercept the dredded enter key!
 
@@ -339,6 +620,10 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) {
 
                             return e;
+                        } finally {
+
+                            // Reset lines--to cause the next render to reformat.
+                            self.lines = "requireFormat";
                         }
                     };
 
@@ -349,7 +634,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set the font up front, before 
                             // potentially formatting lines.
-                            contextRender.font = settings.general.font;
+                            contextRender.font = settings.general.monoSpaceFont;
 
                             // If lines require formatting, then format.
                             var exceptionRet = null;
@@ -362,8 +647,29 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
+                            // If scrolling, then scroll first.
+                            if (m_functionScroll) {
+
+                                // Just call it.
+                                m_functionScroll();
+                            }
+
+                            // If previously instructed, possibly adjust scroll offsets here.
+                            if (m_bPossiblyAdjustScrollOffsets) {
+
+                                // Calculate the total extent.
+                                var dTotalExtent = self.getTotalExtent(contextRender);
+
+                                // Adjust down the scroll, if necessary.
+                                if (m_dScrollOffset > (dTotalExtent - self.position.extent[self.propertyAccessor])) {
+
+                                    m_dScrollOffset = Math.max(0, 
+                                        dTotalExtent - self.position.extent[self.propertyAccessor]);
+                                }
+                            }
+
                             // Generate the path.
-                            var exceptionRet = self.position.generateRoundedRectPath(contextRender);
+                            exceptionRet = self.position.generateRoundedRectPath(contextRender);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -382,12 +688,67 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fill();
                             }
 
+                            // Save canvas state.
+                            contextRender.save();
+
+                            // Set clip to background shape
+                            contextRender.clip();
+
                             // Determine if the focus element has focus.
                             var bFocused = window.manager.hasFocus(self);
 
                             // Render all the lines.
-                            return m_functionRenderLines(contextRender,
+                            exceptionRet = m_functionRenderLines(contextRender,
                                 bFocused);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            var dCursor = self.getTotalExtent();
+
+                            self.scrollStubVisible[0] = false;
+                            self.scrollStubVisible[1] = false;
+                            // Only show scroll stubs if can scroll.
+                            if (dCursor + m_dScrollOffset > self.position.extent[self.propertyAccessor]) {
+
+                                // Render the scroll up region.
+                                if (Math.floor(self.position.extent[self.propertyAccessor]) < Math.floor(dCursor)) {
+
+                                    exceptionRet = self.scrollStubArea[1].generateRoundedRectPath(contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    contextRender.fillStyle = settings.general.scrollStub.fillBackground;
+                                    contextRender.fill();
+                                    contextRender.strokeStyle = settings.general.strokeBackground;
+                                    contextRender.stroke();
+
+                                    self.scrollStubVisible[1] = true;
+                                }
+
+                                // Render the scroll down region.
+                                if (m_dScrollOffset > 0) {
+
+                                    exceptionRet = self.scrollStubArea[0].generateRoundedRectPath(contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    contextRender.fillStyle = settings.general.scrollStub.fillBackground;
+                                    contextRender.fill();
+                                    contextRender.strokeStyle = settings.general.strokeBackground;
+                                    contextRender.stroke();
+
+                                    self.scrollStubVisible[0] = true;
+                                }
+                            }
+
+                            // Restore original canvas state.
+                            contextRender.restore();
+                            
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -412,11 +773,14 @@ define(["NextWave/source/utility/prototypes",
                                 iLocalSelectionLength *= -1;
                             }
 
-                            // Measure a space.
-                            var dSpaceWidth = contextRender.measureText(" ").width;
+                            // Measure a character.
+                            var dCharacterWidth = contextRender.measureText("W").width;
 
                             // The width of a single line.
                             var dLineWidth = self.position.extent.width - 2 * settings.general.margin;
+
+                            // Save this for up and down key accounting.
+                            self.charactersPerLine = Math.floor(dLineWidth / dCharacterWidth);
 
                             // Split based on space.  Space characters
                             // are the only separators that matter here.
@@ -460,7 +824,8 @@ define(["NextWave/source/utility/prototypes",
                                 var dWordWidth = contextRender.measureText(strWordIth).width;
 
                                 // Test for new line.
-                                if (dCursor + dWordWidth >= dLineWidth) {
+                                if ((dCursor + dWordWidth >= dLineWidth) &&
+                                    (strCurrentLine.length > 0)) {
 
                                     // Add it:
                                     // This is the *normal* new-line wrap.
@@ -501,12 +866,15 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Add the part-word as a line:
                                     // This is the *run-on* word wrap.
-                                    var objectLine = {
+                                    if (strCurrentLine.length > 0) {
 
-                                        text: strCurrentLine,
-                                        endOfLine: 0
-                                    };
-                                    self.lines.push(objectLine);
+                                        var objectLine = {
+
+                                            text: strCurrentLine,
+                                            endOfLine: 0
+                                        };
+                                        self.lines.push(objectLine);
+                                    }
 
                                     // Prepare for next line:
                                     strCurrentLine = strAccumulator;
@@ -543,8 +911,17 @@ define(["NextWave/source/utility/prototypes",
                                 });
                             }
 
+                            // Always add one extra line for the "last line is blank"-case.
+                            self.lines.push({ 
+
+                                text: "",
+                                endOfLine: 0
+                            });
+
                             ////////////////////
                             // Handle selection.
+                            self.startingLine = -1;
+                            var bHandledSelection = false;
                             for (var i = 0; i < self.lines.length; i++) {
 
                                 // Get ith line.
@@ -558,7 +935,15 @@ define(["NextWave/source/utility/prototypes",
                                     delete objectLine.selectionLength;
                                 } else if (iLocalSelectionStart <= objectLine.text.length) {
 
+                                    bHandledSelection = true;
                                     objectLine.selectionStart = iLocalSelectionStart;
+
+                                    // Save for up and down arrow keys.
+                                    if (self.startingLine === -1) {
+
+                                        self.startingLine = i;
+                                        self.startingColumn = objectLine.selectionStart;
+                                    }
 
                                     // Just use the entire length--if it is too long, 
                                     // it will be adjusted on the next statement.
@@ -585,16 +970,27 @@ define(["NextWave/source/utility/prototypes",
                                         // *This is where selection processing ends*.
                                         iLocalSelectionStart = -1;
 
+                                        // Save for up and down arrow keys.
+                                        self.endingLine = i;
+                                        self.endingColumn = objectLine.selectionStart + objectLine.selectionLength;
+
                                         // If self.text[m_iSelectionStart + m_iSelectionLength - 1] = \n or [space], put a "fake" o-length cursor on the next line, if there is one.
                                         var strLastFullySelectedCharacter = self.text[m_iSelectionStart + m_iSelectionLength - 1];
-                                        if ((strLastFullySelectedCharacter === '\n' ||
+                                        if ((objectLine.selectionStart + objectLine.selectionLength >= objectLine.text.length) &&
+                                            (strLastFullySelectedCharacter === '\n' ||
                                             strLastFullySelectedCharacter === ' ') &&
                                             (i < self.lines.length - 1) &&
                                             (m_iSelectionLength > 0)) {
 
                                             self.lines[i + 1].selectionStart = 0;
                                             self.lines[i + 1].selectionLength = 0;
+
+                                            // Save for up and down arrow keys.
+                                            self.endingLine = i + 1;
+                                            self.endingColumn = 0;
                                         }
+
+                                        console.log("(" + self.startingLine + ", " + self.startingColumn + ") (" + self.endingLine + ", " + self.endingColumn + ")");
 
                                         break;
                                     } else {
@@ -678,8 +1074,8 @@ define(["NextWave/source/utility/prototypes",
                                 var exceptionRet = m_functionRenderLine(contextRender,
                                     objectLine,
                                     bFocused,
-                                    new Area(new Point(self.position.location.x,
-                                            self.position.location.y + i * settings.dialog.lineHeight),
+                                    new Area(new Point(self.position.location.x - (!self.vertical ? m_dScrollOffset : 0),
+                                            self.position.location.y + i * settings.dialog.lineHeight - (self.vertical ? m_dScrollOffset : 0)),
                                         new Size(self.position.extent.width,
                                             settings.dialog.lineHeight)));
                                 if (exceptionRet) {
@@ -788,6 +1184,8 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////////
                     // Private fields.
 
+                    // How far the tree is scrolled.
+                    var m_dScrollOffset = 0;
                     // Start of the selection.
                     var m_iSelectionStart = 0;
                     // Selection length.
@@ -796,6 +1194,10 @@ define(["NextWave/source/utility/prototypes",
                     var m_bShowCursor = true;
                     // The blink timer cookie.
                     var m_cookieBlinkTimer = null;
+                    // Scroll callback--set for up or down when cursor over stub.
+                    var m_functionScroll = null;
+                    // Update the scroll offset if necessary.
+                    var m_bPossiblyAdjustScrollOffsets = false;
                 } catch (e) {
 
                     alert(e.message);
