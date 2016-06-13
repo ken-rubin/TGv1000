@@ -288,6 +288,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // If all the DB writing worked, write out ST.sql from scripts array and xxx_base_type.sql from btscript.
             // If the DB stuff was rolled back, skip writing out the sql scripts and return the DB err.
 
+            arrayTypes[0].bNeedToDoAppBaseType = bSub0IsAppBaseType;
+
             async.series(
                 [
                     // 1. Insert or update all types, deleting methods, properties and events of pre-existing ones.
@@ -295,10 +297,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         m_log("Save system types func #1");
 
-                        var bNeedToDoAppBaseType = false;
-                        if (bSub0IsAppBaseType) {
-                            bNeedToDoAppBaseType = true;
-                        }
                         async.eachSeries(
                             arrayTypes,
                             function(typeIth, cb) {
@@ -390,7 +388,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     +",baseTypeId=" + typeIth.baseTypeId
                                     ;
 
-                                if (bNeedToDoAppBaseType) {
+                                if (typeIth.bNeedToDoAppBaseType) {
                                     baseScript.push('set @guts := "' + scriptGuts + '";');
                                     baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=3 and name="' + typeIth.name + '");');
                                     baseScript.push('if ' + typeIth.atid + ' is not null then');
@@ -407,7 +405,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     baseScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
                                     baseScript.push('end if;');
                                     baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
-                                    bNeedToDoAppBaseType = false;
                                 
                                 } else {
 
@@ -523,11 +520,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             async.eachSeries(typeIth.methods,
                                                 function(method, cb) {
 
-                                                    var bNeedToDoAppBaseType = false;
-                                                    if (bSub0IsAppBaseType) {
-                                                        bNeedToDoAppBaseType = true;
-                                                    }
-
                                                     async.series(
                                                         [
                                                             // (1a)
@@ -587,9 +579,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                                         + ",parameters=" + connection.escape(method.parameters)
                                                                                         ;
 
-                                                                            if (bNeedToDoAppBaseType) {
+                                                                            if (typeIth.bNeedToDoAppBaseType) {
                                                                                 baseScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                                bNeedToDoAppBaseType = false;
                                                                             } else {
                                                                                 stScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
                                                                             }
@@ -621,11 +612,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             async.eachSeries(typeIth.properties,
                                                 function(property, cb) {
-
-                                                    var bNeedToDoAppBaseType = false;
-                                                    if (bSub0IsAppBaseType) {
-                                                        bNeedToDoAppBaseType = true;
-                                                    }
 
                                                     property.typeId = typeIth.id;
                                                     property.ordinal = ordinal++;
@@ -663,9 +649,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             + ",ordinal=" + property.ordinal
                                                                             + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                             ;
-                                                                 if (bNeedToDoAppBaseType) {
+                                                                 if (typeIth.bNeedToDoAppBaseType) {
                                                                     baseScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
-                                                                    bNeedToDoAppBaseType = false;
                                                                 } else {
                                                                     stScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
                                                                 }
@@ -686,13 +671,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             // m_log("Doing events");
                                             var ordinal = 0;
+
                                             async.eachSeries(typeIth.events,
                                                 function(event, cb) {
-
-                                                    var bNeedToDoAppBaseType = false;
-                                                    if (bSub0IsAppBaseType) {
-                                                        bNeedToDoAppBaseType = true;
-                                                    }
 
                                                     event.typeId = typeIth.id;
                                                     event.ordinal = ordinal++;
@@ -723,7 +704,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             + ",name=" + connection.escape(event.name)
                                                                             + ",ordinal=" + event.ordinal
                                                                             ;
-                                                                if (bNeedToDoAppBaseType) {
+                                                                if (typeIth.bNeedToDoAppBaseType) {
                                                                     baseScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
                                                                     bNeedToDoAppBaseType = false;
                                                                 } else {
@@ -3380,10 +3361,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
             var tagArray = [];
             tagArray.push(strItemType);
-            if (projectScript === null){
-                // Not right to use user name for a System Type tag.
-                tagArray.push(userName);
-            }
             if (strName.length > 0) {
 
                 tagArray.push(strName.trim().replace(/\s/g, '_').toLowerCase());
