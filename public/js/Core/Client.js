@@ -123,22 +123,15 @@ define(["Core/errorHelper",
 
 							if (data.success) {
 
-								manager.clearPanels();
+								var exceptionRet = manager.loadSystemTypesProject(data.data);
+								if (exceptionRet) {
 
-								// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
-								// Load them into the manager
-								var exceptionRet = manager.loadSystemTypes(data.data[0]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
-								exceptionRet = manager.loadStatements(data.data[1]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
-								exceptionRet = manager.loadLiterals(data.data[2]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
-								exceptionRet = manager.loadExpressions(data.data[3]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
+									errorHelper.show(exceptionRet);
 
-								manager.openAndPinAllPanels();
+								} else {
 
-								self.setBrowserTabAndBtns();
+									self.setBrowserTabAndBtns();
+								}
 
 							} else {
 
@@ -693,7 +686,7 @@ define(["Core/errorHelper",
 						try {
 
 							// Send the passed-in project into manager.
-				    		var exceptionRet = manager.load(project);
+				    		var exceptionRet = manager.loadProject(project);
 				    		if (exceptionRet) { return exceptionRet; }
 
 							if ($.isFunction(callback)) {

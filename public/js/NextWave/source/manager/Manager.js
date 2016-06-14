@@ -22,6 +22,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/manager/LayerBackground",
     "NextWave/source/manager/LayerPanels",
     "NextWave/source/manager/LayerDebug",
+    "NextWave/source/manager/LayerDesigner",
     "NextWave/source/manager/LayerDrag",
     "NextWave/source/manager/LayerAl",
     "NextWave/source/expression/Expression",
@@ -38,7 +39,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
     "NextWave/source/type/Property"],
-    function (prototypes, settings, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
+    function (prototypes, settings, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDesigner, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
 
         try {
 
@@ -56,6 +57,8 @@ define(["NextWave/source/utility/prototypes",
                     self.dragLayer = null;
                     // Hold reference to the panel layer.
                     self.panelLayer = null;
+                    // Holds reference to the designer layer.
+                    self.designerLayer = null;
                     // Object used to initialize this instance.
                     self.projectData = null;
                     // Directly set focus object, overrides dragObject.
@@ -86,6 +89,296 @@ define(["NextWave/source/utility/prototypes",
 
                     ////////////////////////
                     // Public methods.
+
+                    // Initialze instance.
+                    self.create = function () {
+
+                        try {
+
+                            // Can only create an uncreated instance.
+                            if (m_bCreated) {
+
+                                throw { message: "Instance already created!" };
+                            }
+
+                            // Store the manager in window, 
+                            // so it is universally accessible.
+                            window.manager = self;
+
+                            // Allocate and create the background layer.
+                            var lb = new LayerBackground();
+                            var exceptionRet = lb.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the regions layer.
+                            // Pass in statements, expressions and literals.
+                            // Types will be "played" later on in create.
+                            self.panelLayer = new LayerPanels();
+                            exceptionRet = self.panelLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the debug layer.
+                            var ld = new LayerDebug();
+                            exceptionRet = ld.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the drag layer.
+                            self.dragLayer = new LayerDrag();
+                            exceptionRet = self.dragLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the designer layer.
+                            self.designerLayer = new LayerDesigner();
+                            exceptionRet = self.designerLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the Al layer.
+                            var la = new LayerAl();
+                            exceptionRet = la.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Save off the layers.
+                            // The order of entries in this array serve to designate back to front.
+                            // For example, panelLayer is "above" lb which is below ld.
+                            // Mouse actions are passed to layers in reverse order, i.e., from front to back.
+                            // If a layer doesn't see fit to handle a mouse action, the action is passed to the
+                            // next lower layer for possible handling.
+                            m_arrayLayers = 
+                                [
+                                    lb,
+                                    self.designerLayer,
+                                    self.panelLayer,
+                                    ld,
+                                    self.dragLayer
+                                    //, la
+                                ];
+
+                            // Get the parent references.
+                            m_jqParent = $(settings.manager.hostSelector);
+                            if (m_jqParent.length === 0) {
+
+                                throw { message: "Failed to select parent element: " + settings.manager.hostSelector };
+                            }
+
+                            // Create the render canvas.
+                            m_canvasRender = document.createElement("canvas");
+                            m_canvasRender.id = "LayerManagerSurface";
+                            m_canvasRender.tabIndex = "1";
+                            m_contextRender = m_canvasRender.getContext("2d");
+                            m_jqCanvas = $(m_canvasRender);
+                            m_jqCanvas.css({
+
+                                    position: "absolute"
+                                });
+                            m_jqCanvas.on('dragstart', function(evt) {
+
+                                return false;
+                            });
+                            m_jqCanvas.on('drop', function(evt) {
+
+                                return false;
+                            });
+                            m_jqParent.append(m_canvasRender);
+
+                            // Hook the resize to update the size of the dashboard when the browser is resized.
+                            $(window).bind("resize",
+                                m_functionWindowResize);
+
+                            // Wire events to canvas.
+                            m_jqCanvas.bind("mouseup",
+                                m_functionMouseUp);
+                            m_jqCanvas.bind("mousedown",
+                                m_functionMouseDown);
+                            m_jqCanvas.bind("mousemove",
+                                m_functionMouseMove);
+                            m_jqCanvas.bind("mousewheel", 
+                                m_functionMouseWheel);
+                            m_jqCanvas.bind("mouseout",
+                                m_functionMouseOut);
+
+                            m_jqCanvas.bind("keydown",
+                                m_functionKeyDown);
+                            m_jqCanvas.bind("keypress",
+                                m_functionKeyPressed);
+                            m_jqCanvas.bind("keyup",
+                                m_functionKeyUp);
+
+                            // Start the rendering.
+                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear panels.
+                    self.clearPanels = function () {
+
+                        try {
+
+                            // Collection of named object pertinent to the current context.
+                            self.names = [];
+                            // Collection of types available in the current context.
+                            self.types = [];
+                            // Current type/method.
+                            self.context = {
+
+                                type: null,
+                                method: null
+                            };
+
+                            // Reset *Loaded.
+                            self.projectLoaded = false;
+                            self.systemTypesLoaded = false;
+
+                            // Clear panel data.
+                            var exceptionRet = self.panelLayer.clearTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            var exceptionRet = self.panelLayer.clearSystemTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.panelLayer.clearStatements();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.panelLayer.clearExpressions();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.panelLayer.clearNames();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.panelLayer.clearCenter();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.panelLayer.clearLiterals();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // // The following breaks a lot.                            
+                            // self.panelLayer.unpinAllPanels();
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Load all types and visible/existing panels 
+                    // into this manager instance from persistence.
+                    // objectprojectData is comics[i].data as loaded from database.
+                    // It needs to be massaged a bit.
+                    //
+                    // This is basically the opposite of what goes on in project.saveToDatabase();
+                    self.loadProject = function (objectProject) {
+
+                        try {
+
+                            // First, clear out any detritus.
+                            var exceptionRet = self.clearPanels();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Save the project attributes.
+                            self.projectData = objectProject;
+
+                            // Extract the comic.
+                            var objectComic = objectProject.comics[objectProject.currentComicIndex];
+
+                            // Load up panels.
+                            exceptionRet = self.loadLiterals(objectComic.literals);
+                            if (exceptionRet) { return exceptionRet; }
+                            exceptionRet = self.loadExpressions(objectComic.expressions);
+                            if (exceptionRet) { return exceptionRet; }
+                            exceptionRet = self.loadStatements(objectComic.statements);
+                            if (exceptionRet) { return exceptionRet; }
+
+                            // Add the types from the comic into this instance.
+                            exceptionRet = self.loadTypes(objectComic.types);
+                            if (exceptionRet) { return exceptionRet; }
+
+                            // Add project's system types into their panel.
+                            exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
+                            if (exceptionRet) { return exceptionRet; }
+
+                            // Set loaded.
+                            self.projectLoaded = true;
+
+                            return null;
+                        } catch (e) { return e; }
+                    }
+
+                    //
+                    self.loadSystemTypesProject = function (objectData) {
+
+                        try {
+
+                            self.clearPanels();
+
+                            // objectData is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
+                            // Load them into the manager
+                            var exceptionRet = self.loadSystemTypes(objectData[0]);
+                            if (exceptionRet) { 
+                                self.clearPanels();
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.loadStatements(objectData[1]);
+                            if (exceptionRet) { 
+                                self.clearPanels();
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.loadLiterals(objectData[2]);
+                            if (exceptionRet) { 
+                                self.clearPanels();
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.loadExpressions(objectData[3]);
+                            if (exceptionRet) { 
+                                self.clearPanels();
+                                return exceptionRet;
+                            }
+
+                            self.openAndPinAllPanels();
+
+                        } catch (e) { return e; }
+                    }
 
                     // Method adds a new name.
                     self.addName = function (strName) {
@@ -734,194 +1027,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Initialze instance.
-                    self.create = function () {
-
-                        try {
-
-                            // Can only create an uncreated instance.
-                            if (m_bCreated) {
-
-                                throw { message: "Instance already created!" };
-                            }
-
-                            // Store the manager in window, 
-                            // so it is universally accessible.
-                            window.manager = self;
-
-                            // Allocate and create the background layer.
-                            var lb = new LayerBackground();
-                            var exceptionRet = lb.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Allocate and create the regions layer.
-                            // Pass in statements, expressions and literals.
-                            // Types will be "played" later on in create.
-                            self.panelLayer = new LayerPanels();
-                            exceptionRet = self.panelLayer.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Allocate and create the debug layer.
-                            var ld = new LayerDebug();
-                            exceptionRet = ld.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Allocate and create the drag layer.
-                            self.dragLayer = new LayerDrag();
-                            exceptionRet = self.dragLayer.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Allocate and create the Al layer.
-                            var la = new LayerAl();
-                            exceptionRet = la.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Save off the layers.
-                            m_arrayLayers = [lb, self.panelLayer, ld, self.dragLayer];//, la];
-
-                            // Get the parent references.
-                            m_jqParent = $(settings.manager.hostSelector);
-                            if (m_jqParent.length === 0) {
-
-                                throw { message: "Failed to select parent element: " + settings.manager.hostSelector };
-                            }
-
-                            // Create the render canvas.
-                            m_canvasRender = document.createElement("canvas");
-                            m_canvasRender.id = "LayerManagerSurface";
-                            m_canvasRender.tabIndex = "1";
-                            m_contextRender = m_canvasRender.getContext("2d");
-                            m_jqCanvas = $(m_canvasRender);
-                            m_jqCanvas.css({
-
-                                    position: "absolute"
-                                });
-                            m_jqCanvas.on('dragstart', function(evt) {
-
-                                return false;
-                            });
-                            m_jqCanvas.on('drop', function(evt) {
-
-                                return false;
-                            });
-                            m_jqParent.append(m_canvasRender);
-
-                            // Hook the resize to update the size of the dashboard when the browser is resized.
-                            $(window).bind("resize",
-                                m_functionWindowResize);
-
-                            // Wire events to canvas.
-                            m_jqCanvas.bind("mouseup",
-                                m_functionMouseUp);
-                            m_jqCanvas.bind("mousedown",
-                                m_functionMouseDown);
-                            m_jqCanvas.bind("mousemove",
-                                m_functionMouseMove);
-                            m_jqCanvas.bind("mousewheel", 
-                                m_functionMouseWheel);
-                            m_jqCanvas.bind("mouseout",
-                                m_functionMouseOut);
-
-                            m_jqCanvas.bind("keydown",
-                                m_functionKeyDown);
-                            m_jqCanvas.bind("keypress",
-                                m_functionKeyPressed);
-                            m_jqCanvas.bind("keyup",
-                                m_functionKeyUp);
-
-                            // Start the rendering.
-                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear panels.
-                    self.clearPanels = function () {
-
-                        try {
-
-                            // Collection of named object pertinent to the current context.
-                            self.names = [];
-                            // Collection of types available in the current context.
-                            self.types = [];
-                            // Current type/method.
-                            self.context = {
-
-                                type: null,
-                                method: null
-                            };
-
-                            // Reset *Loaded.
-                            self.projectLoaded = false;
-                            self.systemTypesLoaded = false;
-
-                            // Clear panel data.
-                            var exceptionRet = self.panelLayer.clearTypes();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            var exceptionRet = self.panelLayer.clearSystemTypes();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.panelLayer.clearStatements();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.panelLayer.clearExpressions();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.panelLayer.clearNames();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.panelLayer.clearCenter();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.panelLayer.clearLiterals();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // // The following breaks a lot.                            
-                            // self.panelLayer.unpinAllPanels();
-
-                            return null;
-
-                        } catch (e) {
-
-                            return e;
-                        }
-                    }
-
                     // Open all panels. This is used for a user with can_edit_system_types permission on entry into client.
                     self.openAndPinAllPanels = function () {
 
@@ -1089,52 +1194,6 @@ define(["NextWave/source/utility/prototypes",
 
                         return self.panelLayer.saveLiterals();
                     };
-
-                    // Load all types and visible/existing panels 
-                    // into this manager instance from persistence.
-                    // objectprojectData is comics[i].data as loaded from database.
-                    // It needs to be massaged a bit.
-                    //
-                    // This is basically the opposite of what goes on in project.saveToDatabase();
-                    self.load = function (objectProject) {
-
-                        try {
-
-                            // First, clear out any detritus.
-                            var exceptionRet = self.clearPanels();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Save the project attributes.
-                            self.projectData = objectProject;
-
-                            // Extract the comic.
-                            var objectComic = objectProject.comics[objectProject.currentComicIndex];
-
-                            // Load up panels.
-                            exceptionRet = self.loadLiterals(objectComic.literals);
-                            if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.loadExpressions(objectComic.expressions);
-                            if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.loadStatements(objectComic.statements);
-                            if (exceptionRet) { return exceptionRet; }
-
-                            // Add the types from the comic into this instance.
-                            exceptionRet = self.loadTypes(objectComic.types);
-                            if (exceptionRet) { return exceptionRet; }
-
-                            // Add project's system types into their panel.
-                            exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
-                            if (exceptionRet) { return exceptionRet; }
-
-                            // Set loaded.
-                            self.projectLoaded = true;
-
-                            return null;
-                        } catch (e) { return e; }
-                    }
 
                     // Helper method clears out the center panel and sets it up for a type.
                     self.selectType = function (type) {
