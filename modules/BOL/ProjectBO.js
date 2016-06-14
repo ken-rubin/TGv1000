@@ -1001,7 +1001,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 sql.execute(strQuery,
                                                     function(rows) {
 
-                                                        if (rows.length !== 1) { return cb(new Error("App type's base type types could be retrieved."));}
+                                                        if (rows.length !== 1) { return cb(new Error("App type's base type could not be retrieved."));}
 
                                                         rows[0].originalTypeId = rows[0].id;
                                                         rows[0].isApp = false;
@@ -2865,14 +2865,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     typeIth.comicId = passObj.comicIth.id;
                                     typeIth.ordinal = 0;
 
-                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in this comic's types.
+                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
+                                    // Since this is the app type, it would be in the project's systemTypes.
                                     // TODO: Handle id re-numbering problems.
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
                                     if (typeIth.baseTypeName) {
-                                        for (var j = 0; j < passObj.comicIth.types.length; j++) {
+                                        for (var j = 0; j < passObj.project.systemTypes.length; j++) {
                                             
-                                            var typeJth = passObj.comicIth.types[j];
+                                            var typeJth = passObj.project.systemTypes[j];
                                             if (typeIth.baseTypeName === typeJth.name) {
                                                 typeIth.baseTypeId = typeJth.id;
                                                 break;
@@ -2964,7 +2965,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 // (1)
                                 function(cb) {
 
-                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in this comic's types.
+                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
+                                    // The base type could either be in this comic's types or in project.systemTypes.
                                     // TODO: Handle id re-numbering problems.
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
@@ -2975,6 +2977,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             if (typeIth.baseTypeName === typeJth.name) {
                                                 typeIth.baseTypeId = typeJth.id;
                                                 break;
+                                            }
+                                        }
+
+                                        if (typeIth.baseTypeId === 0) {
+
+                                            for (var j = 0; j < passObj.project.systemTypes.length; j++) {
+                                                
+                                                var typeJth = passObj.project.systemTypes[j];
+                                                if (typeIth.baseTypeName === typeJth.name) {
+                                                    typeIth.baseTypeId = typeJth.id;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }

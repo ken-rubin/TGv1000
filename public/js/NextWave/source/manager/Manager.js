@@ -75,6 +75,10 @@ define(["NextWave/source/utility/prototypes",
                     self.projectLoaded = false;
                     // Indicates the manager is set to work on System Types.
                     self.systemTypesLoaded = false;
+                    // Holds configuration of panels.
+                    // 1 means panels are set for normal projects with all panels present.
+                    // 2 means panels are set for system types projects with the types panel missing and the system types panel stretched upward to take up the space.
+                    self.iPanelArrangement = 1;
                     
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
@@ -116,7 +120,7 @@ define(["NextWave/source/utility/prototypes",
                             // Allocate and create the regions layer.
                             // Pass in statements, expressions and literals.
                             // Types will be "played" later on in create.
-                            self.panelLayer = new LayerPanels();
+                            self.panelLayer = new LayerPanels(self.iPanelArrangement);
                             exceptionRet = self.panelLayer.create();
                             if (exceptionRet) {
 
@@ -232,9 +236,13 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Clear panels.
-                    self.clearPanels = function () {
+                    // iPanelArrangement = 1 for a normal project.
+                    // iPanelArrangement = 2 for a system types project.
+                    self.clearPanels = function (iPanelArrangement) {
 
                         try {
+
+                            self.iPanelArrangement = iPanelArrangement || self.iPanelArrangement;
 
                             // Collection of named object pertinent to the current context.
                             self.names = [];
@@ -310,7 +318,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // First, clear out any detritus.
-                            var exceptionRet = self.clearPanels();
+                            var exceptionRet = self.clearPanels(1);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -350,7 +358,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            self.clearPanels();
+                            self.clearPanels(2);
 
                             // objectData is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
                             // Load them into the manager
@@ -375,7 +383,13 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            self.openAndPinAllPanels();
+                            // In this mode, we open and pin all panels, since there's no reason to access a lower layer.
+                            self.panelLayer.openAndPinAllPanels();
+
+                            // Set loaded.
+                            self.systemTypesLoaded = true;
+
+                            return null;
 
                         } catch (e) { return e; }
                     }
@@ -437,7 +451,8 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = typeNew.create({
 
                                 name: strName,
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                                ownedByUserId: parseInt(g_profile["userId"], 10),
+                                typeTypeId: 1
                             });
                             if (exceptionRet) {
 
@@ -1026,12 +1041,6 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
-
-                    // Open all panels. This is used for a user with can_edit_system_types permission on entry into client.
-                    self.openAndPinAllPanels = function () {
-
-                        self.panelLayer.openAndPinAllPanels();
-                    }
 
                     // Clear the list of types.
                     self.clearTypes = function () {
