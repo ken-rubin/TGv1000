@@ -67,13 +67,15 @@ define(["NextWave/source/utility/prototypes",
                     self.literalsPanel = null;
                     // Panel of centers.
                     self.centerPanel = null;
+                    // Save arrangement
+                    self.iPanelArrangement = null;
 
                     ////////////////////////
                     // Public methods.
 
                     // Initialze instance.
-                    self.create = function () {
-
+                    self.create = function (iPanelArrangement) {
+                        // iPanelArrangement: 1 = normal project; 2 = system types project
                         try {
 
                             // Can only create an uncreated instance.
@@ -81,6 +83,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "Instance already created!" };
                             }
+
+                            self.iPanelArrangement = iPanelArrangement;
 
                             self.namesPanel = new Panel("Names", 
                                 orientation.north, 
@@ -98,35 +102,79 @@ define(["NextWave/source/utility/prototypes",
                                 orientation.north, 
                                 new Point(settings.layerPanels.literalsPanel.x, 0), 
                                 new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
-                            self.typesPanel = new Panel("Types", 
-                                orientation.west, 
-                                new Point(0, settings.layerPanels.typesPanel.y), 
-                                new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
-                            self.systemTypesPanel = new Panel("System Types", 
-                                orientation.west, 
-                                new Point(0, settings.layerPanels.systemTypesPanel.y), 
-                                new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
-                            self.typesPanel.addNew = function () {
-
-                                try {
-
-                                    // What to do when the icon is clicked....
-                                    return window.manager.createType();
-                                } catch (e) {
-
-                                    return e;
-                                }
-                            };
                             self.centerPanel = new Panel("Method", 
                                 orientation.south, 
                                 new Point(settings.layerPanels.centerPanel.x, 0), 
                                 new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
 
-                            // Add the TypeTree to the types Panel.
-                            var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
-                            if (exceptionRet) {
+                            if (iPanelArrangement === 1) {
 
-                                throw exceptionRet;
+                                self.typesPanel = new Panel("Types", 
+                                    orientation.west, 
+                                    new Point(0, settings.layerPanels.typesPanel.y), 
+                                    new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
+                                self.systemTypesPanel = new Panel("System Types", 
+                                    orientation.west, 
+                                    new Point(0, settings.layerPanels.systemTypesPanel.y), 
+                                    new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
+                                self.typesPanel.addNew = function () {
+
+                                    try {
+
+                                        // What to do when the icon is clicked....
+                                        return window.manager.createType();
+                                    } catch (e) {
+
+                                        return e;
+                                    }
+                                };
+                                // Add the TypeTree to the types Panel.
+                                var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+
+                                // Compile to generic list of panels for looping operations.
+                                m_arrayPanels = [
+                                    self.namesPanel, 
+                                    self.statementsPanel, 
+                                    self.expressionsPanel, 
+                                    self.literalsPanel, 
+                                    self.typesPanel,
+                                    self.systemTypesPanel,
+                                    self.centerPanel
+                                ];
+
+                            } else {
+
+                                self.typesPanel = null;
+
+                                self.systemTypesPanel = new Panel("System Types", 
+                                    orientation.west, 
+                                    new Point(0, settings.layerPanels.typesPanel.y), 
+                                    new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.typesPanel.height + settings.layerPanels.systemTypesPanel.height));
+                                self.systemTypesPanel.addNew = function () {
+
+                                    try {
+
+                                        // What to do when the icon is clicked....
+                                        return window.manager.createSystemType();
+                                    } catch (e) {
+
+                                        return e;
+                                    }
+                                };
+
+                                // Compile to generic list of panels for looping operations.
+                                m_arrayPanels = [
+                                    self.namesPanel, 
+                                    self.statementsPanel, 
+                                    self.expressionsPanel, 
+                                    self.literalsPanel, 
+                                    self.systemTypesPanel,
+                                    self.centerPanel
+                                ];
                             }
 
                             // Add the SystemTypeTree to the systemTypes Panel.
@@ -189,17 +237,6 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Compile to generic list of panels for looping operations.
-                            m_arrayPanels = [
-                                self.namesPanel, 
-                                self.statementsPanel, 
-                                self.expressionsPanel, 
-                                self.literalsPanel, 
-                                self.typesPanel,
-                                self.systemTypesPanel,
-                                self.centerPanel
-                            ];
-
                             // Indicate current state.
                             m_bCreated = true;
 
@@ -209,6 +246,19 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    // Destroy LayerPanels--we're about to create a new one with a different configuration.
+                    self.destroy = function () {
+
+                        self.typesPanel = null;
+                        self.systemTypesPanel = null;
+                        self.namesPanel = null;
+                        self.statementsPanel = null;
+                        self.expressionsPanel = null;
+                        self.literalsPanel = null;
+                        self.centerPanel = null;
+                        self.iPanelArrangement = null;
+                    }
 
                     // Method adds a new name.
                     self.addName = function (strName) {
@@ -258,6 +308,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.typesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.typesPanel.payload.addType(typeNew);
@@ -272,6 +324,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.typesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.typesPanel.payload.removeType(typeToRemove);
@@ -285,6 +339,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clearTypes = function () {
 
                         try {
+
+                            if (!self.typesPanel) { return null; }
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
@@ -539,7 +595,9 @@ define(["NextWave/source/utility/prototypes",
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
-                                panelIth.openAndPin();
+                                if (panelIth) {
+                                    panelIth.openAndPin();
+                                }
                             }
                         );
                     }
@@ -549,7 +607,9 @@ define(["NextWave/source/utility/prototypes",
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
-                                panelIth.unpin();
+                                if (panelIth) {
+                                    panelIth.unpin();
+                                }
                             }
                         );
                     }
@@ -574,17 +634,20 @@ define(["NextWave/source/utility/prototypes",
                             // Test all the panels.
                             for (var i = 0; i < m_arrayPanels.length; i++) {
 
-                                var exceptionRet = m_arrayPanels[i].mouseMove(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayPanels[i]) {
 
-                                    throw exceptionRet;
-                                }
+                                    var exceptionRet = m_arrayPanels[i].mouseMove(objectReference);
+                                    if (exceptionRet) {
 
-                                // If handled, then drop out.
-                                if (objectReference.handled) {
+                                        throw exceptionRet;
+                                    }
 
-                                    m_panelActive = m_arrayPanels[i];
-                                    break;
+                                    // If handled, then drop out.
+                                    if (objectReference.handled) {
+
+                                        m_panelActive = m_arrayPanels[i];
+                                        break;
+                                    }
                                 }
                             }
 
@@ -726,10 +789,13 @@ define(["NextWave/source/utility/prototypes",
                             // Set the extents of the panels.
                             for (var i = 0; i < m_arrayPanels.length; i++) {
 
-                                var exceptionRet = m_arrayPanels[i].calculateLayout(sizeExtent, contextRender);
-                                if (exceptionRet) {
+                                if (m_arrayPanels[i]) {
 
-                                    throw exceptionRet;
+                                    var exceptionRet = m_arrayPanels[i].calculateLayout(sizeExtent, contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 
@@ -754,10 +820,13 @@ define(["NextWave/source/utility/prototypes",
                             // Render the panels.
                             for (var i = m_arrayPanels.length - 1; i >= 0; i--) {
 
-                                var exceptionRet = m_arrayPanels[i].render(contextRender);
-                                if (exceptionRet) {
+                                if (m_arrayPanels[i]) {
 
-                                    throw exceptionRet;
+                                    var exceptionRet = m_arrayPanels[i].render(contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 

@@ -78,7 +78,7 @@ define(["NextWave/source/utility/prototypes",
                     // Holds configuration of panels.
                     // 1 means panels are set for normal projects with all panels present.
                     // 2 means panels are set for system types projects with the types panel missing and the system types panel stretched upward to take up the space.
-                    self.iPanelArrangement = 1;
+                    self.iPanelArrangement = 0;
                     
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
@@ -117,16 +117,6 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Allocate and create the regions layer.
-                            // Pass in statements, expressions and literals.
-                            // Types will be "played" later on in create.
-                            self.panelLayer = new LayerPanels(self.iPanelArrangement);
-                            exceptionRet = self.panelLayer.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
                             // Allocate and create the debug layer.
                             var ld = new LayerDebug();
                             exceptionRet = ld.create();
@@ -142,6 +132,14 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw exceptionRet;
                             }
+
+                            // Allocate and create the panel layer.
+                            self.panelLayer = new LayerPanels();
+                            // exceptionRet = self.panelLayer.create(1);
+                            // if (exceptionRet) {
+
+                            //     throw exceptionRet;
+                            // }
 
                             // Allocate and create the designer layer.
                             self.designerLayer = new LayerDesigner();
@@ -243,6 +241,23 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             self.iPanelArrangement = iPanelArrangement || self.iPanelArrangement;
+
+                            // If self.panelLayer, destroy it if the wrong kind.
+                            // if (self.panelLayer) {
+
+                            //     if (self.panelLayer.iPanelArrangement !== self.iPanelArrangement) {
+                            //         self.panelLayer.destroy();
+                            //         self.panelLayer = null;
+                            //     }
+                            // }
+
+                            // Allocate and create the regions layer.
+                            // self.panelLayer = new LayerPanels();
+                            exceptionRet = self.panelLayer.create(self.iPanelArrangement);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
 
                             // Collection of named object pertinent to the current context.
                             self.names = [];
@@ -1016,7 +1031,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // If there are no systemTypes, then set context to this systemType,
                             // unless this systemType has no methods, in which case, wait.
-                            if (self.context.systemType === null &&
+                            if (self.context.type === null &&
                                 typeNew &&
                                 typeNew.methods &&
                                 typeNew.methods.parts &&
@@ -1651,17 +1666,20 @@ define(["NextWave/source/utility/prototypes",
                             };
                             for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
 
-                                // Pass to the layer.
-                                exceptionRet = m_arrayLayers[i].mouseMove(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
-                                }
+                                    // Pass to the layer.
+                                    exceptionRet = m_arrayLayers[i].mouseMove(objectReference);
+                                    if (exceptionRet) {
 
-                                // Only one thing can intersect the mouse at a time.
-                                if (objectReference.handled) {
+                                        throw exceptionRet;
+                                    }
 
-                                    break;
+                                    // Only one thing can intersect the mouse at a time.
+                                    if (objectReference.handled) {
+
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1735,17 +1753,20 @@ define(["NextWave/source/utility/prototypes",
                             };
                             for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
 
-                                // Pass to the layers.
-                                var exceptionRet = m_arrayLayers[i].mouseDown(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
-                                }
+                                    // Pass to the layers.
+                                    var exceptionRet = m_arrayLayers[i].mouseDown(objectReference);
+                                    if (exceptionRet) {
 
-                                // Only one thing can intersect the mouse at a time.
-                                if (objectReference.handled) {
+                                        throw exceptionRet;
+                                    }
 
-                                    break;
+                                    // Only one thing can intersect the mouse at a time.
+                                    if (objectReference.handled) {
+
+                                        break;
+                                    }
                                 }
                             }
                         } catch (e) {
@@ -1779,17 +1800,20 @@ define(["NextWave/source/utility/prototypes",
                             };
                             for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
 
-                                // Pass to the layers.
-                                var exceptionRet = m_arrayLayers[i].mouseUp(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
-                                }
+                                    // Pass to the layers.
+                                    var exceptionRet = m_arrayLayers[i].mouseUp(objectReference);
+                                    if (exceptionRet) {
 
-                                // Only one thing can intersect the mouse at a time.
-                                if (objectReference.handled) {
+                                        throw exceptionRet;
+                                    }
 
-                                    break;
+                                    // Only one thing can intersect the mouse at a time.
+                                    if (objectReference.handled) {
+
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1813,17 +1837,20 @@ define(["NextWave/source/utility/prototypes",
                                     // Not dragging, raise click.
                                     for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
 
-                                        // Pass to the layers.
-                                        var exceptionRet = m_arrayLayers[i].click(objectReference);
-                                        if (exceptionRet) {
+                                        if (m_arrayLayers[i]) {
 
-                                            throw exceptionRet;
-                                        }
+                                            // Pass to the layers.
+                                            var exceptionRet = m_arrayLayers[i].click(objectReference);
+                                            if (exceptionRet) {
 
-                                        // Only one thing can intersect the mouse at a time.
-                                        if (objectReference.handled) {
+                                                throw exceptionRet;
+                                            }
 
-                                            break;
+                                            // Only one thing can intersect the mouse at a time.
+                                            if (objectReference.handled) {
+
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -1862,17 +1889,20 @@ define(["NextWave/source/utility/prototypes",
                             };
                             for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
 
-                                // Pass to the layers.
-                                var exceptionRet = m_arrayLayers[i].mouseWheel(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
-                                }
+                                    // Pass to the layers.
+                                    var exceptionRet = m_arrayLayers[i].mouseWheel(objectReference);
+                                    if (exceptionRet) {
 
-                                // Only one thing can intersect the mouse at a time.
-                                if (objectReference.handled) {
+                                        throw exceptionRet;
+                                    }
 
-                                    break;
+                                    // Only one thing can intersect the mouse at a time.
+                                    if (objectReference.handled) {
+
+                                        break;
+                                    }
                                 }
                             }
                         } catch (e) {
@@ -1901,11 +1931,14 @@ define(["NextWave/source/utility/prototypes",
                             // Count backwards, slowly from ten, ....
                             for (var i = m_arrayLayers.length - 1; i >= 0; i--) {
 
-                                // Pass to the layer.
-                                var exceptionRet = m_arrayLayers[i].mouseOut(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
+                                    // Pass to the layer.
+                                    var exceptionRet = m_arrayLayers[i].mouseOut(objectReference);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 
@@ -2105,11 +2138,14 @@ define(["NextWave/source/utility/prototypes",
                             // Update all layers.
                             for (var i = 0; i < m_arrayLayers.length; i++) {
 
-                                // Pass to layer.
-                                var exceptionRet = m_arrayLayers[i].calculateLayout(sizeExtent, m_contextRender);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
+                                    // Pass to layer.
+                                    var exceptionRet = m_arrayLayers[i].calculateLayout(sizeExtent, m_contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 
@@ -2145,12 +2181,15 @@ define(["NextWave/source/utility/prototypes",
                             // Render each layer.  From back to front.
                             for (var i = 0; i < m_arrayLayers.length; i++) {
 
-                                // Render out the layer.
-                                exceptionRet = m_arrayLayers[i].render(m_contextRender,
-                                    iMS);
-                                if (exceptionRet) {
+                                if (m_arrayLayers[i]) {
 
-                                    throw exceptionRet;
+                                    // Render out the layer.
+                                    exceptionRet = m_arrayLayers[i].render(m_contextRender,
+                                        iMS);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
                         } catch (e) {

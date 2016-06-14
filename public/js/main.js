@@ -69,18 +69,18 @@ $(document).ready(function() {
 				                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
 
 				                            // This had to be postponed due to non-readiness.
-				                            if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+				                            // if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
-				                                manager.panelLayer.systemTypesPanel.addNew = function () {
+				                            //     manager.panelLayer.systemTypesPanel.addNew = function () {
 
-				                                    try {
+				                            //         try {
 
-				                                        // What to do when the icon is clicked....
-				                                        return window.manager.createSystemType();
+				                            //             // What to do when the icon is clicked....
+				                            //             return window.manager.createSystemType();
 
-				                                    } catch (e) { throw e; }
-				                                };
-				                            }
+				                            //         } catch (e) { throw e; }
+				                            //     };
+				                            // }
 
 				                            // Now that manager and client are ready:
 				                            exceptionRet = client.postCreate();
