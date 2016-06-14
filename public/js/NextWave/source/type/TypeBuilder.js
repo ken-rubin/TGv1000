@@ -42,7 +42,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "TypeBuilder: Instance already created!" };
                             }
 
                             // Create the configuration object with which to initialize the type builder dialog.
@@ -283,6 +283,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
+                            window.TypeBuilder = null;
                             m_bCreated = false;
 
                             return null;

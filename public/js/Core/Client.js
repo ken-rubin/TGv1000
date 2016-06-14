@@ -62,20 +62,6 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Set global profile for everyone to use.
-							var profileJSON = localStorage.getItem("profile");
-							g_profile = JSON.parse(profileJSON);
-
-							return null;
-
-						} catch (e) { return e; }
-					};
-
-					// To remedy an order of creation problem.
-					self.postCreate = function () {
-
-						try {
-
 							// "Normal" users get their last project loaded automatically.
 							if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
@@ -105,40 +91,35 @@ define(["Core/errorHelper",
 								}
 							} else {
 
-								self.loadSystemTypesAndPinPanels();
+								// While others get all system types, statements, literals and expressions loaded.
+								var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+									{},
+									'json');
+								posting.done(function(data){
+
+									if (data.success) {
+
+										var exceptionRet = manager.loadSystemTypesProject(data.data);
+										if (exceptionRet) {
+
+											errorHelper.show(exceptionRet);
+
+										} else {
+
+											self.setBrowserTabAndBtns();
+										}
+
+									} else {
+
+										// !data.success
+										errorHelper.show(data.message);
+									}
+								});
 							}
 
 							return null;
 
 						} catch (e) { return e; }
-					}
-
-					self.loadSystemTypesAndPinPanels = function () {
-
-						// While others get all system types, statements, literals and expressions loaded.
-						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
-							{},
-							'json');
-						posting.done(function(data){
-
-							if (data.success) {
-
-								var exceptionRet = manager.loadSystemTypesProject(data.data);
-								if (exceptionRet) {
-
-									errorHelper.show(exceptionRet);
-
-								} else {
-
-									self.setBrowserTabAndBtns();
-								}
-
-							} else {
-
-								// !data.success
-								errorHelper.show(data.message);
-							}
-						});
 					}
 
 					//////////////////////////////

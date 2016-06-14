@@ -102,7 +102,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "Manager: Instance already created!" };
                             }
 
                             // Store the manager in window, 
@@ -135,11 +135,11 @@ define(["NextWave/source/utility/prototypes",
 
                             // Allocate and create the panel layer.
                             self.panelLayer = new LayerPanels();
-                            // exceptionRet = self.panelLayer.create(1);
-                            // if (exceptionRet) {
+                            exceptionRet = self.panelLayer.create(1);
+                            if (exceptionRet) {
 
-                            //     throw exceptionRet;
-                            // }
+                                throw exceptionRet;
+                            }
 
                             // Allocate and create the designer layer.
                             self.designerLayer = new LayerDesigner();
@@ -247,7 +247,7 @@ define(["NextWave/source/utility/prototypes",
 
                             //     if (self.panelLayer.iPanelArrangement !== self.iPanelArrangement) {
                             //         self.panelLayer.destroy();
-                            //         self.panelLayer = null;
+                            //         self.panelLayer = new LayerPanels();
                             //     }
                             // }
 

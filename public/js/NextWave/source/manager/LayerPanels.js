@@ -81,7 +81,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "LayerPanels: Instance already created!" };
                             }
 
                             self.iPanelArrangement = iPanelArrangement;
@@ -250,14 +250,26 @@ define(["NextWave/source/utility/prototypes",
                     // Destroy LayerPanels--we're about to create a new one with a different configuration.
                     self.destroy = function () {
 
-                        self.typesPanel = null;
-                        self.systemTypesPanel = null;
-                        self.namesPanel = null;
-                        self.statementsPanel = null;
-                        self.expressionsPanel = null;
-                        self.literalsPanel = null;
-                        self.centerPanel = null;
-                        self.iPanelArrangement = null;
+                        m_arrayPanels.forEach(
+                            function(panelIth) {
+                                if (panelIth) {
+                                    panelIth.destroy();
+                                }
+                            }
+                        );
+
+                        window.methodBuilder.destroy();
+                        window.typeBuilder.destroy();
+                        window.propertyBuilder.destroy();
+
+                        // self.typesPanel = null;
+                        // self.systemTypesPanel = null;
+                        // self.namesPanel = null;
+                        // self.statementsPanel = null;
+                        // self.expressionsPanel = null;
+                        // self.literalsPanel = null;
+                        // self.centerPanel = null;
+                        // self.iPanelArrangement = null;
                     }
 
                     // Method adds a new name.
@@ -384,6 +396,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.systemTypesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.systemTypesPanel.payload.clearItems();
@@ -398,6 +412,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.namesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.namesPanel.payload.clearItems();
@@ -411,6 +427,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clearCenter = function (strActiveCenterPanel) {
 
                         try {
+
+                            if (!self.centerPanel) { return null; }
 
                             // Ensure there is always a good active center panel.
                             if (!strActiveCenterPanel) {
@@ -452,6 +470,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.statementsPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.statementsPanel.payload.clearItems();
@@ -492,6 +512,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.expressionsPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.expressionsPanel.payload.clearItems();
@@ -531,6 +553,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clearLiterals = function () {
 
                         try {
+
+                            if (!self.literalsPanel) { return null; }
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.

@@ -142,7 +142,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "List: Instance already created!" };
                             }
 
                             // Call down inheritance chain.

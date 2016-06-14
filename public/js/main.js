@@ -9,7 +9,6 @@
 var client = null;
 var navbar = null;
 var manager = null;
-
 var g_profile = {};
 
 $(document).ready(function() {
@@ -33,63 +32,68 @@ $(document).ready(function() {
 						Manager,
 						settings) {
 
-								try {
+				try {
 
-									var strFromURL = m_functionCheckForURLEncoding("error");
-									if (strFromURL) {
-										errorHelper.show(strFromURL);
-									}
+					var strFromURL = m_functionCheckForURLEncoding("error");
+					if (strFromURL) {
+						errorHelper.show(strFromURL);
+					}
 
-									// Allocate and attach the manager/glyph objects.
-						            // Create the glyphs module first, its 
-						            // complete callback will contiue things.
-						            glyphs.create(function () {
+					// Set global profile for everyone to use.
+					var profileJSON = localStorage.getItem("profile");
+					g_profile = JSON.parse(profileJSON);
 
-						                try {
+					// Allocate and attach the manager/glyph objects.
+		            // Create the glyphs module first, its 
+		            // complete callback will contiue things.
+		            glyphs.create(function () {
 
-						                    // Allocate and create the layer manager.
-						                    manager = new Manager();
-						                    var exceptionRet = manager.create();
-						                    if (exceptionRet) { throw exceptionRet; }
+		                try {
 
-											// Allocate and initialize the client.
-											client = new Client();
-											exceptionRet = client.create();
-											if (exceptionRet) { throw exceptionRet; }
+		                    // Allocate and create the layer manager.
+		                    manager = new Manager();
 
-											// Allocate and attach the navbar module.
-											navbar = new Navbar();
-											exceptionRet = navbar.create();
-											if (exceptionRet) { throw exceptionRet; }
+							// Calculate user privileges; set in manager. They are used during manager.create().
+                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
+                                g_profile["can_create_products"] || 
+                                g_profile["can_create_onlineClasses"]) || false;
+                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
 
-											// Calculate user privileges; set in manager.
-				                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
-				                                g_profile["can_create_products"] || 
-				                                g_profile["can_create_onlineClasses"]) || false;
-				                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
+		                    var exceptionRet = manager.create();
+		                    if (exceptionRet) { throw exceptionRet; }
 
-				                            // This had to be postponed due to non-readiness.
-				                            // if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+							// Allocate and initialize the client.
+							client = new Client();
+							exceptionRet = client.create();
+							if (exceptionRet) { throw exceptionRet; }
 
-				                            //     manager.panelLayer.systemTypesPanel.addNew = function () {
+							// Allocate and attach the navbar module.
+							navbar = new Navbar();
+							exceptionRet = navbar.create();
+							if (exceptionRet) { throw exceptionRet; }
 
-				                            //         try {
+                            // This had to be postponed due to non-readiness.
+                            // if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
-				                            //             // What to do when the icon is clicked....
-				                            //             return window.manager.createSystemType();
+                            //     manager.panelLayer.systemTypesPanel.addNew = function () {
 
-				                            //         } catch (e) { throw e; }
-				                            //     };
-				                            // }
+                            //         try {
 
-				                            // Now that manager and client are ready:
-				                            exceptionRet = client.postCreate();
-				                            if (exceptionRet) { throw exceptionRet; }
+                            //             // What to do when the icon is clicked....
+                            //             return window.manager.createSystemType();
 
-						                } catch (e) { alert(e.message); }
-						            });
-								} catch(e) { errorHelper.show(e); }
-							});
+                            //         } catch (e) { throw e; }
+                            //     };
+                            // }
+
+                            // Now that manager and client are ready:
+                            // exceptionRet = client.postCreate();
+                            // if (exceptionRet) { throw exceptionRet; }
+
+		                } catch (e) { alert(e.message); }
+		            });
+				} catch(e) { errorHelper.show(e); }
+			});
 	} catch(e) { alert(e.message);}
 });
 

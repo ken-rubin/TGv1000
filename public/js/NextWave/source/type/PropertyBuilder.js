@@ -42,7 +42,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "PropertyBuilder: Instance already created!" };
                             }
 
                             // Create the dialog.
@@ -231,6 +231,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
+                            window.PropertyBuilder = null;
                             m_bCreated = false;
 
                             return null;

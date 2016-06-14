@@ -72,7 +72,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "Panel: Instance already created!" };
                             }
 
                             // Now it is.
@@ -84,6 +84,11 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    self.destroy = function () {
+
+                        m_bCreated = false;
+                    }
 
                     // Take mouse move--set handled in reference object if handled.
                     self.mouseMove = function (objectReference) {
