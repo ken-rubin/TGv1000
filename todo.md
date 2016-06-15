@@ -1,6 +1,7 @@
 
 ## Ken's Issues
 
+- Just load Stripe when it's needed.
 - System Type in Type has to be a checkbox.
 - Base in Type has to be a combo.
 - We need a way to delete a Type, but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type.

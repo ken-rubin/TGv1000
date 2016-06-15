@@ -55,7 +55,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Hold reference to the drag layer.
                     self.dragLayer = null;
-                    // Hold reference to the panel layer.
+                    // Holds the active panelLayer.
                     self.panelLayer = null;
                     // Holds reference to the designer layer.
                     self.designerLayer = null;
@@ -75,7 +75,7 @@ define(["NextWave/source/utility/prototypes",
                     self.projectLoaded = false;
                     // Indicates the manager is set to work on System Types.
                     self.systemTypesLoaded = false;
-                    // Holds configuration of panels.
+                    // Holds currently displayed version of panelLayer.
                     // 1 means panels are set for normal projects with all panels present.
                     // 2 means panels are set for system types projects with the types panel missing and the system types panel stretched upward to take up the space.
                     self.iPanelArrangement = 0;
@@ -133,12 +133,16 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Allocate and create the panel layer.
-                            self.panelLayer = new LayerPanels();
-                            exceptionRet = self.panelLayer.create(1);
-                            if (exceptionRet) {
+                            // Allocate and create the 3 panel layers.
+                            // [0]: No panels.
+                            // [1]: Panels in the normal project configuration.
+                            // [2]: Panels in the system types project configuration.
+                            for (var i = 0; i < 3; i++) {
 
-                                throw exceptionRet;
+                                var pl = new LayerPanels();
+                                exceptionRet = pl.create(i);
+                                if (exceptionRet) { throw exceptionRet; }
+                                m_arrayPanelLayers.push(pl);
                             }
 
                             // Allocate and create the designer layer.
@@ -223,8 +227,8 @@ define(["NextWave/source/utility/prototypes",
                             m_jqCanvas.bind("keyup",
                                 m_functionKeyUp);
 
-                            // Start the rendering.
-                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
+                            // Now activate the empty panelLayer.
+                            self.clearPanels(0);
 
                             return null;
                         } catch (e) {
@@ -234,30 +238,17 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Clear panels.
+                    // iPanelArrangement = 0 for an empty panelLayer.
                     // iPanelArrangement = 1 for a normal project.
                     // iPanelArrangement = 2 for a system types project.
                     self.clearPanels = function (iPanelArrangement) {
 
                         try {
 
-                            self.iPanelArrangement = iPanelArrangement || self.iPanelArrangement;
+                            var exceptionRet;
 
-                            // If self.panelLayer, destroy it if the wrong kind.
-                            // if (self.panelLayer) {
-
-                            //     if (self.panelLayer.iPanelArrangement !== self.iPanelArrangement) {
-                            //         self.panelLayer.destroy();
-                            //         self.panelLayer = new LayerPanels();
-                            //     }
-                            // }
-
-                            // Allocate and create the regions layer.
-                            // self.panelLayer = new LayerPanels();
-                            exceptionRet = self.panelLayer.create(self.iPanelArrangement);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
+                            self.iPanelArrangement = iPanelArrangement || 0;
+                            self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
 
                             // Collection of named object pertinent to the current context.
                             self.names = [];
@@ -276,43 +267,44 @@ define(["NextWave/source/utility/prototypes",
 
                             // Clear panel data.
                             var exceptionRet = self.panelLayer.clearTypes();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             var exceptionRet = self.panelLayer.clearSystemTypes();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearStatements();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearExpressions();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearNames();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearCenter();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearLiterals();
+                            if (exceptionRet) { return exceptionRet; }
+
+                            // // The following breaks a lot of things.                            
+                            // self.panelLayer.unpinAllPanels();
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    //
+                    self.loadNoProject = function () {
+
+                        try {
+
+                            var exceptionRet = self.clearPanels(0);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            // // The following breaks a lot.                            
-                            // self.panelLayer.unpinAllPanels();
+                            // Start the rendering.
+                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
 
@@ -332,7 +324,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // First, clear out any detritus.
                             var exceptionRet = self.clearPanels(1);
                             if (exceptionRet) {
 
@@ -363,6 +354,9 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set loaded.
                             self.projectLoaded = true;
+
+                            // Start the rendering.
+                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
                         } catch (e) { return e; }
@@ -403,6 +397,9 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set loaded.
                             self.systemTypesLoaded = true;
+
+                            // Start the rendering.
+                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
 
@@ -2205,6 +2202,8 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private fields.
 
+                    // Hold reference to the panel layer array. See self.create here and LayerPanels for explanations.
+                    var m_arrayPanelLayers = [];
                     // Cookie for animation callback.
                     var m_iAnimationFrameSequence = 0;
                     // jQuery object wrapping the parent DOM element.

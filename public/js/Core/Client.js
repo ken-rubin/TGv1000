@@ -91,35 +91,41 @@ define(["Core/errorHelper",
 								}
 							} else {
 
-								// While others get all system types, statements, literals and expressions loaded.
-								var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
-									{},
-									'json');
-								posting.done(function(data){
-
-									if (data.success) {
-
-										var exceptionRet = manager.loadSystemTypesProject(data.data);
-										if (exceptionRet) {
-
-											errorHelper.show(exceptionRet);
-
-										} else {
-
-											self.setBrowserTabAndBtns();
-										}
-
-									} else {
-
-										// !data.success
-										errorHelper.show(data.message);
-									}
-								});
+								self.loadSystemTypesAndPinPanels();
 							}
 
 							return null;
 
 						} catch (e) { return e; }
+					}
+
+					// Called here in client, but also by navbar.
+					self.loadSystemTypesAndPinPanels = function () {
+
+						// While others get all system types, statements, literals and expressions loaded.
+						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+							{},
+							'json');
+						posting.done(function(data){
+
+							if (data.success) {
+
+								var exceptionRet = manager.loadSystemTypesProject(data.data);
+								if (exceptionRet) {
+
+									errorHelper.show(exceptionRet);
+
+								} else {
+
+									self.setBrowserTabAndBtns();
+								}
+
+							} else {
+
+								// !data.success
+								errorHelper.show(data.message);
+							}
+						});
 					}
 
 					//////////////////////////////
