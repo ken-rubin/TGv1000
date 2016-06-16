@@ -228,7 +228,11 @@ define(["NextWave/source/utility/prototypes",
                                 m_functionKeyUp);
 
                             // Now activate the empty panelLayer.
-                            // self.clearPanels(2);
+                            exceptionRet = self.clearPanels(0);
+                            if (exceptionRet) { return exceptionRet; }
+
+                            // Start the rendering.
+                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
                         } catch (e) {
@@ -698,6 +702,32 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Remove system type from manager/project.
+                    self.removeSystemType = function (typeToRemove) {
+
+                        try {
+
+                            // Search for type.
+                            for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                // Find match...
+                                if (self.systemTypes[i].name.payload === typeToRemove.name.payload) {
+
+                                    // ...and remove.
+                                    self.systemTypes.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+
+                            // Also remove from panel layer.
+                            return self.panelLayer.removeSystemType(typeToRemove);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Test the provisional base type name for validity.
                     self.isValidBaseTypeName = function (strTypeName, strProvisionalBaseTypeName) {
 
@@ -1005,11 +1035,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Set context.
                                 var exceptionRet = self.setContext(typeNew,
                                     0);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-
+                                if (exceptionRet) { return exceptionRet; }
                             }
 
                             // Add to list.
@@ -1038,11 +1064,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Set context.
                                 var exceptionRet = self.setContext(typeNew,
                                     0);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-
+                                if (exceptionRet) { return exceptionRet; }
                             }
 
                             // Add to list.

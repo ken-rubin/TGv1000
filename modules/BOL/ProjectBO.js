@@ -281,6 +281,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             }
 
             // In async.series:
+            // 0. Delete any existing system types that are no longer in arrayTypes.
             // 1. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
             // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
             // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
@@ -292,6 +293,58 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             async.series(
                 [
+                    // 0. Delete any system types that aren't in arrayTypes.
+                    function (cb) {
+
+                        m_log("Save system types func #0");
+
+                        sql.queryWithCxn(
+                            connection,
+                            "select id, name from " + self.dbname + "types where typeTypeId=2;",
+                            function (err, rows) {
+
+                                if (err) { return cb(err); }
+
+                                async.eachSeries(rows,
+                                    function (row, cb) {
+
+                                        for (var i = 0; i < arrayTypes.length; i++) {
+
+                                            var bFound = false;
+                                            if (row.name === arrayTypes[i].name) {
+
+                                                bFound = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!bFound) {
+
+                                            // Delete row.id from the DB. Add similar delete to stScript--but will need to discover its ID, too.
+                                            sql.queryWithCxn(
+                                                connection,
+                                                "delete from " + self.dbname + "types where id=" + row.id + ";",
+                                                function (err, rows) {
+
+                                                    if (err) { return cb(err); }
+
+                                                    stScript.push('set @delId := (select id from types where typeTypeId=2 and name="' + row.name + '");');
+                                                    stScript.push('if @delId is not null then');
+                                                    stScript.push('   delete from types where id=@delId;');
+                                                    stScript.push('end if;');
+
+                                                    return cb(null);
+                                                }
+                                            );
+                                        } else { return cb(null); }
+                                    },
+                                    function(err) {
+                                        return cb(err);
+                                    }
+                                );
+                            }
+                        );
+                    },
                     // 1. Insert or update all types, deleting methods, properties and events of pre-existing ones.
                     function(cb) {
 

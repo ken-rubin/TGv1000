@@ -242,7 +242,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.systemTypesPanel = new Panel("System Types", 
                                         orientation.west, 
                                         new Point(0, settings.layerPanels.typesPanel.y), 
-                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.typesPanel.height + settings.layerPanels.systemTypesPanel.height));
+                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.typesPanel.height + settings.layerPanels.systemTypesPanel.height));  // Note the height.
                                     self.systemTypesPanel.addNew = function () {
 
                                         try {
@@ -468,7 +468,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing SystemType.
-                    self.removeSystemype = function (typeToRemove) {
+                    self.removeSystemType = function (typeToRemove) {
 
                         try {
 

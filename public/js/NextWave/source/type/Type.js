@@ -432,7 +432,12 @@ define(["NextWave/source/utility/prototypes",
                                     }
                                 } else if (m_objectHighlight === m_areaDeleteIcon) {
 
-                                    return window.manager.removeType(self);
+                                    if (!self.stowage.isSystemType) {
+                                        return window.manager.removeType(self);
+                                    } else {
+                                        return window.manager.removeSystemType(self);
+                                    }
+
 //                                } else if (m_objectHighlight === self.name) {
 
 //                                    return window.manager.selectType(self);

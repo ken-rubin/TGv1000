@@ -88,6 +88,9 @@ define(["Core/errorHelper",
 											});
 										}
 									);
+								} else {
+
+									manager.loadNoProject();
 								}
 							} else {
 
@@ -237,7 +240,7 @@ define(["Core/errorHelper",
 					}
 
 					// This is done without a pre-save dialog.
-					self.saveSystemTypes = function () {
+					self.saveSystemTypes = function (callback) {
 
 						try {
 
@@ -262,6 +265,8 @@ define(["Core/errorHelper",
 									// !data.success
 									errorHelper.show(data.message);
 								}
+
+								callback();
 							});
 						} catch (e) {
 
@@ -1038,7 +1043,7 @@ define(["Core/errorHelper",
 									// This callback will be called if the user wants to abandon the open project.
 									try {
 
-										var exceptionRet = manager.clearPanels();
+										var exceptionRet = manager.loadNoProject();
 										if (exceptionRet) { throw exceptionRet; }
 
 										self.setBrowserTabAndBtns();

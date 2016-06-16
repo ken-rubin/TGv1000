@@ -133,10 +133,13 @@ define(["Core/errorHelper"],
 									} else if (manager.systemTypesLoaded) {
 
 										// No exceptionRet--it handles its own error or success display.
-										client.saveSystemTypes();
+										client.saveSystemTypes(
+											function() {
 
-										// Reload system types so the new ids are in memory.
-										client.loadSystemTypesAndPinPanels();
+												// Reload system types so the new ids are in memory.
+												client.loadSystemTypesAndPinPanels();
+											}
+										);
 									}
 								} catch (e) { errorHelper.show(e); }
 							});
