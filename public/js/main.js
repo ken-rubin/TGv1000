@@ -63,13 +63,20 @@ $(document).ready(function() {
 		                    if (exceptionRet) { throw exceptionRet; }
 
 							// Allocate and initialize the client.
+							// For a normal user this will load last accessed project, if any or create an empty designer if not.
+							// For a user who can edit system types, this will load all system types into manager.
 							client = new Client();
-							exceptionRet = client.create();
-							if (exceptionRet) { throw exceptionRet; }
+							exceptionRet = client.create(
+								function() {
 
-							// Allocate and attach the navbar module.
-							navbar = new Navbar();
-							exceptionRet = navbar.create();
+									// Allocate and attach the navbar module.
+									navbar = new Navbar();
+									exceptionRet = navbar.create();
+									if (exceptionRet) { throw exceptionRet; }
+
+									client.setBrowserTabAndBtns();
+								}
+							);
 							if (exceptionRet) { throw exceptionRet; }
 
 		                } catch (e) { alert(e.message); }

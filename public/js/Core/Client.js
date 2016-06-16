@@ -58,7 +58,7 @@ define(["Core/errorHelper",
 					// Public methods.
 
 					// Start off the client.
-					self.create = function () {
+					self.create = function (callback) {
 
 						try {
 
@@ -86,15 +86,23 @@ define(["Core/errorHelper",
 												closable: true, // <-- Default value is false
 												draggable: true // <-- Default value is false
 											});
+
+											if ($.isFunction(callback)) {
+												callback();
+											}
 										}
 									);
 								} else {
 
 									manager.loadNoProject();
+
+									if ($.isFunction(callback)) {
+										callback();
+									}
 								}
 							} else {
 
-								self.loadSystemTypesAndPinPanels();
+								self.loadSystemTypesAndPinPanels(callback);
 							}
 
 							return null;
@@ -103,7 +111,7 @@ define(["Core/errorHelper",
 					}
 
 					// Called here in client, but also by navbar.
-					self.loadSystemTypesAndPinPanels = function () {
+					self.loadSystemTypesAndPinPanels = function (callback) {
 
 						// While others get all system types, statements, literals and expressions loaded.
 						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
@@ -118,15 +126,19 @@ define(["Core/errorHelper",
 
 									errorHelper.show(exceptionRet);
 
-								} else {
+								} 
 
-									self.setBrowserTabAndBtns();
+								if ($.isFunction(callback)) {
+									callback();
 								}
-
 							} else {
 
 								// !data.success
 								errorHelper.show(data.message);
+
+								if ($.isFunction(callback)) {
+									callback();
+								}
 							}
 						});
 					}
@@ -1072,6 +1084,11 @@ define(["Core/errorHelper",
 					//////////////////////////////
 					// Project helper methods.
 					self.setBrowserTabAndBtns = function () {
+
+						if (navbar === null) {
+
+							return;
+						}
 
 						document.title = "NWC";
 						if (manager.projectLoaded) {

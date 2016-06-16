@@ -343,7 +343,7 @@ define(["Core/errorHelper"],
 								);
 							}
 
-							client.setBrowserTabAndBtns();
+							// client.setBrowserTabAndBtns();
 
 							return null;
 
