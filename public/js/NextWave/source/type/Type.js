@@ -32,7 +32,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeType",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
     "NextWave/source/methodBuilder/CodeExpressionInvocation"],
-    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSections, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
+    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
 
         try {
 
