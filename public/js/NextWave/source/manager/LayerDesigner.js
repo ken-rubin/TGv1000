@@ -119,26 +119,8 @@ define(["NextWave/source/utility/prototypes",
                                 self.move = new Size(pointMove.x - self.down.x,
                                     pointMove.y - self.down.y);
 
-                                // Handle each drag-type differently.
-                                if (self.dragObject instanceof CodeStatement) {
-
-                                    return m_functionStartDragCodeStatement(pointDown,
-                                        pointMove);
-                                } else if (self.dragObject instanceof CodeExpression) {
-
-                                    return m_functionStartDragCodeExpression(pointDown,
-                                        pointMove);
-                                } else if (self.dragObject instanceof Statement) {
-
-                                    return m_functionStartDragStatement(pointDown,
-                                        pointMove);
-                                } else if (self.dragObject instanceof ListItem ||
-                                    self.dragObject instanceof Method ||
-                                    self.dragObject instanceof Property)  {
-
-                                    return m_functionStartDragNonStatementListItem(pointDown,
-                                        pointMove);
-                                } else if (self.dragObject instanceof Type)  {
+                                // LayerDesigner care only about dragged types--normal and system.
+                                if (self.dragObject instanceof Type)  {
 
                                     return m_functionStartDragType(pointDown,
                                         pointMove);
