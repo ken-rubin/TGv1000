@@ -228,7 +228,7 @@ define(["NextWave/source/utility/prototypes",
                                 m_functionKeyUp);
 
                             // Now activate the empty panelLayer.
-                            self.clearPanels(0);
+                            // self.clearPanels(2);
 
                             return null;
                         } catch (e) {
@@ -249,6 +249,7 @@ define(["NextWave/source/utility/prototypes",
 
                             self.iPanelArrangement = iPanelArrangement || 0;
                             self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
+                            m_arrayLayers[2] = self.panelLayer;
 
                             // Collection of named object pertinent to the current context.
                             self.names = [];
@@ -938,7 +939,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Setting dirty causes the next render to calculate layout.
-                            m_bDirty = true;
+                            m_bDirty[self.iPanelArrangement] = true;
 
                             // If iIndex is a string, find its matching index.
                             if (iIndex.substring) {
@@ -1624,7 +1625,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Setting dirty causes the next render to calculate layout.
-                            m_bDirty = true;
+                            m_bDirty[self.iPanelArrangement] = true;
                         } catch (e) {
 
                             alert(e.message);
@@ -2147,7 +2148,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // These pipes are clean!
-                            m_bDirty = false;
+                            m_bDirty[self.iPanelArrangement] = false;
 
                             return null;
                         } catch (e) {
@@ -2166,7 +2167,7 @@ define(["NextWave/source/utility/prototypes",
  
                             // Calculate the layout whenever dirty.
                             var exceptionRet = null;
-                            if (m_bDirty) {
+                            if (m_bDirty[self.iPanelArrangement]) {
 
                                 exceptionRet = m_functionCalculateLayout();
                                 if (exceptionRet !== null) {
@@ -2217,7 +2218,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates this instance is already created.
                     var m_bCreated = false;
                     // Define the dirty state.
-                    var m_bDirty = true;
+                    var m_bDirty = [true, true, true];
                     // Width of object.
                     var m_dWidth = 0;
                     // Height of object.
