@@ -121,10 +121,6 @@ define(["NextWave/source/utility/prototypes",
                                         orientation.west, 
                                         new Point(0, settings.layerPanels.typesPanel.y), 
                                         new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
-                                    self.systemTypesPanel = new Panel("System Types", 
-                                        orientation.west, 
-                                        new Point(0, settings.layerPanels.systemTypesPanel.y), 
-                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
                                     self.typesPanel.addNew = function () {
 
                                         try {
@@ -136,6 +132,23 @@ define(["NextWave/source/utility/prototypes",
                                             return e;
                                         }
                                     };
+                                    self.systemTypesPanel = new Panel("System Types", 
+                                        orientation.west, 
+                                        new Point(0, settings.layerPanels.systemTypesPanel.y), 
+                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
+                                    if(manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+                                        self.systemTypesPanel.addNew = function () {
+
+                                            try {
+
+                                                // What to do when the icon is clicked....
+                                                return window.manager.createSystemType();
+                                            } catch (e) {
+
+                                                return e;
+                                            }
+                                        };
+                                    }
                                     // Add the TypeTree to the types Panel.
                                     var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
                                     if (exceptionRet) {
@@ -241,8 +254,8 @@ define(["NextWave/source/utility/prototypes",
                                     // Special for iPanelConfiguration 2
                                     self.systemTypesPanel = new Panel("System Types", 
                                         orientation.west, 
-                                        new Point(0, settings.layerPanels.typesPanel.y), 
-                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.typesPanel.height + settings.layerPanels.systemTypesPanel.height));  // Note the height.
+                                        new Point(0, settings.layerPanels.systemTypesPanelSpecial.y), 
+                                        new Size(settings.layerPanels.systemTypesPanelSpecial.width, settings.layerPanels.systemTypesPanelSpecial.height));
                                     self.systemTypesPanel.addNew = function () {
 
                                         try {

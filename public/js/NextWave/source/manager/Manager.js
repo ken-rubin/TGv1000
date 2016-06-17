@@ -76,6 +76,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates the manager is set to work on System Types.
                     self.systemTypesLoaded = false;
                     // Holds currently displayed version of panelLayer.
+                    // 0 means panelLayer has no panels at all.
                     // 1 means panels are set for normal projects with all panels present.
                     // 2 means panels are set for system types projects with the types panel missing and the system types panel stretched upward to take up the space.
                     self.iPanelArrangement = 0;

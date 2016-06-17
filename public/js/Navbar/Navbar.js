@@ -156,11 +156,11 @@ define(["Core/errorHelper"],
 
 											if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
-												client.loadSystemTypesAndPinPanels();
+												client.loadSystemTypesAndPinPanels(function() {
+
+													client.setBrowserTabAndBtns();
+												});
 											}
-											self.enableOrDisableProjAndTypeMenuItems(); 
-											self.enableOrDisableAminZoneMenuItems(); 
-											self.enableOrDisablePlayAndStopButtons();
 										}, 1000);
 									}, true);
 
@@ -170,10 +170,10 @@ define(["Core/errorHelper"],
 										
 										setTimeout(function() {
 
-											client.loadSystemTypesAndPinPanels();
-											self.enableOrDisableProjAndTypeMenuItems(); 
-											self.enableOrDisableAminZoneMenuItems(); 
-											self.enableOrDisablePlayAndStopButtons();
+											client.loadSystemTypesAndPinPanels(function() {
+
+													client.setBrowserTabAndBtns();
+											});
 										}, 1000);
 									}, true);
 								}

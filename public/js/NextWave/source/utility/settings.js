@@ -185,17 +185,26 @@ define(["NextWave/source/utility/prototypes"],
                             width: 0.25,
                             height: 0.25
                         },
+                        // For normal projects:
                         typesPanel: {
 
                             y: 0.25,
                             width: 0.3,
                             height: 0.4
                         },
+                        // For normal projects:
                         systemTypesPanel: {
 
                             y: 0.65,
                             width: 0.3,
                             height: 0.35
+                        },
+                        // For system types projects:
+                        systemTypesPanelSpecial: {
+
+                            y: 0.25,
+                            width: 0.3,
+                            height: 0.75
                         },
                         centerPanel: {
 
