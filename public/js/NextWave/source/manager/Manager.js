@@ -229,7 +229,7 @@ define(["NextWave/source/utility/prototypes",
                                 m_functionKeyUp);
 
                             // Now activate the empty panelLayer.
-                            exceptionRet = self.clearPanels(0);
+                            exceptionRet = self.clearPanels(self.userCanWorkWithSystemTypesAndAppBaseTypes ? 2 : 1);
                             if (exceptionRet) { return exceptionRet; }
 
                             // Start the rendering.
