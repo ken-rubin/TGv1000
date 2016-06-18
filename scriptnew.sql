@@ -232,7 +232,7 @@ begin
         
         ALTER TABLE `TGv1000`.`types`
 			ADD CONSTRAINT FK_types
-            FOREIGN KEY (projectId) REFERENCES projectss(id)
+            FOREIGN KEY (projectId) REFERENCES projects(id)
             ON DELETE CASCADE;
 
 		CREATE TABLE `TGv1000`.`type_tags` (
@@ -1210,8 +1210,6 @@ begin
 
 		ALTER TABLE `TGv1000`.`types` 
 			DROP FOREIGN KEY `FK_types`;
-		ALTER TABLE `TGv1000`.`types` 
-			DROP INDEX `idx_comicId` ;
         ALTER TABLE `TGv1000`.`types`
 			ADD CONSTRAINT FK_types
             FOREIGN KEY (projectId) REFERENCES projects(id)
