@@ -12,22 +12,23 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
-    "NextWave/source/utility/settings",
-    "NextWave/source/utility/orientation",
-    "NextWave/source/utility/glyphs",
-    "NextWave/source/utility/Point",
-    "NextWave/source/utility/Size",
-    "NextWave/source/utility/Area"],
-    function (prototypes, settings, orientation, glyphs, Point, Size, Area) {
+        "NextWave/source/utility/settings",
+        "NextWave/source/utility/orientation",
+        "NextWave/source/utility/glyphs",
+        "NextWave/source/utility/Point",
+        "NextWave/source/utility/Size",
+        "NextWave/source/utility/Area"
+    ],
+    function(prototypes, settings, orientation, glyphs, Point, Size, Area) {
 
         try {
 
             // Constructor function.
-        	var functionRet = function Panel(strTitle, orientationDock, pointLocationPercent, sizeExtentPercent) {
+            var functionRet = function Panel(strTitle, orientationDock, pointLocationPercent, sizeExtentPercent) {
 
                 try {
 
-            		var self = this;                        // Uber closure.
+                    var self = this; // Uber closure.
 
                     ///////////////////////
                     // Public fields.
@@ -65,14 +66,16 @@ define(["NextWave/source/utility/prototypes",
                     // Public methods.
 
                     // Initialze instance.
-                    self.create = function () {
+                    self.create = function() {
 
                         try {
 
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw {
+                                    message: "Panel: Instance already created!"
+                                };
                             }
 
                             // Now it is.
@@ -85,8 +88,13 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    self.destroy = function() {
+
+                        m_bCreated = false;
+                    }
+
                     // Take mouse move--set handled in reference object if handled.
-                    self.mouseMove = function (objectReference) {
+                    self.mouseMove = function(objectReference) {
 
                         try {
 
@@ -172,7 +180,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle mouse down.
-                    self.mouseDown = function (objectReference) {
+                    self.mouseDown = function(objectReference) {
 
                         try {
 
@@ -207,14 +215,14 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             return null;
-                         } catch (e) {
+                        } catch (e) {
 
                             return e;
                         }
                     };
 
                     // Handle mouse up.
-                    self.mouseUp = function (objectReference) {
+                    self.mouseUp = function(objectReference) {
 
                         try {
 
@@ -226,14 +234,14 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             return null;
-                         } catch (e) {
+                        } catch (e) {
 
                             return e;
                         }
                     };
 
                     // Handle mouse wheel.
-                    self.mouseWheel = function (objectReference) {
+                    self.mouseWheel = function(objectReference) {
 
                         try {
 
@@ -257,7 +265,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle mouse out.
-                    self.mouseOut = function (objectReference) {
+                    self.mouseOut = function(objectReference) {
 
                         try {
 
@@ -303,7 +311,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle click.
-                    self.click = function (objectReference) {
+                    self.click = function(objectReference) {
 
                         try {
 
@@ -317,14 +325,14 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             return null;
-                         } catch (e) {
+                        } catch (e) {
 
                             return e;
                         }
                     };
 
                     // Simulate hover and pin click.
-                    self.openAndPin = function () {
+                    self.openAndPin = function() {
 
                         if (!self.open &&
                             !self.opening) {
@@ -343,7 +351,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Opposite of prior function. Unpins and closes this panel.
-                    self.unpin = function () {
+                    self.unpin = function() {
 
                         self.pinned = false;
 
@@ -362,7 +370,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Set and position the panel.
-                    self.setPayload = function (strTitle, objectPayload) {
+                    self.setPayload = function(strTitle, objectPayload) {
 
                         try {
 
@@ -382,7 +390,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Position and size the instance.
-                    self.calculateLayout = function (sizeExtent, contextRender) {
+                    self.calculateLayout = function(sizeExtent, contextRender) {
 
                         try {
 
@@ -390,9 +398,9 @@ define(["NextWave/source/utility/prototypes",
                             self.totalExtent = sizeExtent;
 
                             // First, calculate location and openExtent from the percentages.
-                            self.location = new Point(self.locationPercent.x * sizeExtent.width + settings.panel.gap, 
+                            self.location = new Point(self.locationPercent.x * sizeExtent.width + settings.panel.gap,
                                 self.locationPercent.y * sizeExtent.height + settings.panel.gap);
-                            self.openExtent = new Size(self.extentPercent.width * sizeExtent.width - 2 * settings.panel.gap, 
+                            self.openExtent = new Size(self.extentPercent.width * sizeExtent.width - 2 * settings.panel.gap,
                                 self.extentPercent.height * sizeExtent.height - 2 * settings.panel.gap);
 
                             // Set the closed and current extent 
@@ -483,7 +491,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return null;
                             }
-                            return self.payload.calculateLayout(m_areaPayload, 
+                            return self.payload.calculateLayout(m_areaPayload,
                                 contextRender);
                         } catch (e) {
 
@@ -496,8 +504,8 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out the panel.
-                    self.render = function (contextRender) {
-                        
+                    self.render = function(contextRender) {
+
                         try {
 
                             // Open if opening, close if closing.
@@ -567,7 +575,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.location.y + self.currentExtent.height - dCornerRadius);
                                 contextRender.quadraticCurveTo(self.location.x + self.currentExtent.width,
                                     self.location.y + self.currentExtent.height,
-                                    self.location.x +  + self.currentExtent.width - dCornerRadius,
+                                    self.location.x + +self.currentExtent.width - dCornerRadius,
                                     self.location.y + self.currentExtent.height);
                                 contextRender.lineTo(self.location.x,
                                     self.location.y + self.currentExtent.height);
@@ -604,15 +612,15 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Calculate where the pin is, also used for hittesting.
                                     m_areaGlyph = new Area(
-                                        new Point(self.location.x + self.currentExtent.width - settings.glyphs.width, 
+                                        new Point(self.location.x + self.currentExtent.width - settings.glyphs.width,
                                             self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),
-                                        new Size(settings.panel.north.lineHeight, 
+                                        new Size(settings.panel.north.lineHeight,
                                             settings.panel.north.lineHeight));
 
                                     // Render pushpin.
                                     var exceptionRet = glyphs.render(contextRender,
                                         m_areaGlyph,
-                                        glyph, 
+                                        glyph,
                                         settings.manager.showIconBackgrounds);
                                     if (exceptionRet) {
 
@@ -639,15 +647,15 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Calculate where the pin is, also used for hittesting.
                                     m_areaGlyph = new Area(
-                                        new Point(self.location.x + self.currentExtent.width - settings.glyphs.width, 
+                                        new Point(self.location.x + self.currentExtent.width - settings.glyphs.width,
                                             self.location.y),
-                                        new Size(settings.panel.north.lineHeight, 
+                                        new Size(settings.panel.north.lineHeight,
                                             settings.panel.north.lineHeight));
 
                                     // Render pushpin.
                                     var exceptionRet = glyphs.render(contextRender,
                                         m_areaGlyph,
-                                        glyph, 
+                                        glyph,
                                         settings.manager.showIconBackgrounds);
                                     if (exceptionRet) {
 
@@ -657,10 +665,9 @@ define(["NextWave/source/utility/prototypes",
                             } else if (self.dock === orientation.west) {
 
                                 contextRender.save();
-                                contextRender.rotate(Math.PI/2);
+                                contextRender.rotate(Math.PI / 2);
                                 contextRender.fillText(self.title,
-                                    self.location.y + settings.panel.west.offsetHeight,
-                                    -self.location.x - self.currentExtent.width + settings.panel.gap);
+                                    self.location.y + settings.panel.west.offsetHeight, -self.location.x - self.currentExtent.width + settings.panel.gap);
                                 contextRender.restore();
 
                                 // Render the pin if open.
@@ -674,15 +681,15 @@ define(["NextWave/source/utility/prototypes",
 
                                         // Calculate where the add new is, also used for hittesting.
                                         m_areaAddNew = new Area(
-                                            new Point(self.location.x + self.currentExtent.width - settings.glyphs.width, 
+                                            new Point(self.location.x + self.currentExtent.width - settings.glyphs.width,
                                                 self.location.y + 4 * settings.panel.gap + dTitleWidth),
-                                            new Size(settings.panel.north.lineHeight, 
+                                            new Size(settings.panel.north.lineHeight,
                                                 settings.panel.north.lineHeight));
 
                                         // Render pushpin.
                                         var exceptionRet = glyphs.render(contextRender,
                                             m_areaAddNew,
-                                            glyphs.addNew, 
+                                            glyphs.addNew,
                                             settings.manager.showIconBackgrounds);
                                         if (exceptionRet) {
 
@@ -702,13 +709,13 @@ define(["NextWave/source/utility/prototypes",
                                     m_areaGlyph = new Area(
                                         new Point(self.location.x + (self.currentExtent.width - self.closedExtent.width),
                                             self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),
-                                        new Size(settings.panel.north.lineHeight, 
+                                        new Size(settings.panel.north.lineHeight,
                                             settings.panel.north.lineHeight));
 
                                     // Render pushpin.
                                     var exceptionRet = glyphs.render(contextRender,
                                         m_areaGlyph,
-                                        glyph, 
+                                        glyph,
                                         settings.manager.showIconBackgrounds);
                                     if (exceptionRet) {
 
@@ -739,7 +746,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             return null;
                         } catch (e) {
-                            
+
                             alert(e.message);
                         }
                     };
@@ -748,7 +755,7 @@ define(["NextWave/source/utility/prototypes",
                     // Private methods.
 
                     // Called to open panel.
-                    var m_functionOpening = function (contextRender) {
+                    var m_functionOpening = function(contextRender) {
 
                         try {
 
@@ -817,7 +824,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return;
                             }
-                            var exceptionRet = self.payload.calculateLayout(m_areaPayload, 
+                            var exceptionRet = self.payload.calculateLayout(m_areaPayload,
                                 contextRender);
                             if (exceptionRet) {
 
@@ -830,7 +837,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Called to close panel.
-                    var m_functionClosing = function (contextRender) {
+                    var m_functionClosing = function(contextRender) {
 
                         try {
 
@@ -930,9 +937,9 @@ define(["NextWave/source/utility/prototypes",
 
                     alert(e.message);
                 }
-        	};
+            };
 
-        	return functionRet;
+            return functionRet;
         } catch (e) {
 
             alert(e.message);

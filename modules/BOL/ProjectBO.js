@@ -277,10 +277,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     "begin"
                 ];
 
-                filenameBaseScript = arrayTypes[0].name.replace(' ', '_');
+                filenameBaseScript = arrayTypes[0].name.replace(/\s/g, '_') + ".sql";
             }
 
             // In async.series:
+            // 0. Delete any existing system types that are no longer in arrayTypes.
             // 1. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
             // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
             // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
@@ -288,17 +289,67 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // If all the DB writing worked, write out ST.sql from scripts array and xxx_base_type.sql from btscript.
             // If the DB stuff was rolled back, skip writing out the sql scripts and return the DB err.
 
+            arrayTypes[0].bNeedToDoAppBaseType = bSub0IsAppBaseType;
+
             async.series(
                 [
+                    // 0. Delete any system types that aren't in arrayTypes.
+                    function (cb) {
+
+                        m_log("Save system types func #0");
+
+                        sql.queryWithCxn(
+                            connection,
+                            "select id, name from " + self.dbname + "types where typeTypeId=2;",
+                            function (err, rows) {
+
+                                if (err) { return cb(err); }
+
+                                async.eachSeries(rows,
+                                    function (row, cb) {
+
+                                        for (var i = 0; i < arrayTypes.length; i++) {
+
+                                            var bFound = false;
+                                            if (row.name === arrayTypes[i].name) {
+
+                                                bFound = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!bFound) {
+
+                                            // Delete row.id from the DB. Add similar delete to stScript--but will need to discover its ID, too.
+                                            sql.queryWithCxn(
+                                                connection,
+                                                "delete from " + self.dbname + "types where id=" + row.id + ";",
+                                                function (err, rows) {
+
+                                                    if (err) { return cb(err); }
+
+                                                    stScript.push('set @delId := (select id from types where typeTypeId=2 and name="' + row.name + '");');
+                                                    stScript.push('if @delId is not null then');
+                                                    stScript.push('   delete from types where id=@delId;');
+                                                    stScript.push('end if;');
+
+                                                    return cb(null);
+                                                }
+                                            );
+                                        } else { return cb(null); }
+                                    },
+                                    function(err) {
+                                        return cb(err);
+                                    }
+                                );
+                            }
+                        );
+                    },
                     // 1. Insert or update all types, deleting methods, properties and events of pre-existing ones.
                     function(cb) {
 
                         m_log("Save system types func #1");
 
-                        var bNeedToDoAppBaseType = false;
-                        if (bSub0IsAppBaseType) {
-                            bNeedToDoAppBaseType = true;
-                        }
                         async.eachSeries(
                             arrayTypes,
                             function(typeIth, cb) {
@@ -390,24 +441,23 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     +",baseTypeId=" + typeIth.baseTypeId
                                     ;
 
-                                if (bNeedToDoAppBaseType) {
+                                if (typeIth.bNeedToDoAppBaseType) {
                                     baseScript.push('set @guts := "' + scriptGuts + '";');
-                                    baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
+                                    baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=3 and name="' + typeIth.name + '");');
                                     baseScript.push('if ' + typeIth.atid + ' is not null then');
-                                    baseScript.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+                                    baseScript.push('   /* Existing Base Types are deleted and re-inserted with the same id they had before. */');
                                     baseScript.push('   delete from types where id=' + typeIth.atid + ';');
                                     baseScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
                                     baseScript.push('   prepare insstmt from @s;');
                                     baseScript.push('   execute insstmt;');
                                     baseScript.push('else');
-                                    baseScript.push('   /* New System Types are inserted with a new id. */');
+                                    baseScript.push('   /* New Base Types are inserted with a new id. */');
                                     baseScript.push('   set @s := (select concat("insert types ",@guts,";"));');
                                     baseScript.push('   prepare insstmt from @s;');
                                     baseScript.push('   execute insstmt;');
                                     baseScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
                                     baseScript.push('end if;');
-                                    baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
-                                    bNeedToDoAppBaseType = false;
+                                    baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
                                 
                                 } else {
 
@@ -426,7 +476,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     stScript.push('   execute insstmt;');
                                     stScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
                                     stScript.push('end if;');
-                                    stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties, events and tags. */");
+                                    stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
                                 }
 
                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
@@ -523,11 +573,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             async.eachSeries(typeIth.methods,
                                                 function(method, cb) {
 
-                                                    var bNeedToDoAppBaseType = false;
-                                                    if (bSub0IsAppBaseType) {
-                                                        bNeedToDoAppBaseType = true;
-                                                    }
-
                                                     async.series(
                                                         [
                                                             // (1a)
@@ -587,13 +632,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                                         + ",parameters=" + connection.escape(method.parameters)
                                                                                         ;
 
-                                                                            if (bNeedToDoAppBaseType) {
+                                                                            if (typeIth.bNeedToDoAppBaseType) {
                                                                                 baseScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                                baseScript.push('set @idm := (select LAST_INSERT_ID());')
-                                                                                bNeedToDoAppBaseType = false;
                                                                             } else {
                                                                                 stScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                                stScript.push('set @idm := (select LAST_INSERT_ID());')
                                                                             }
 
                                                                             return cb(null);
@@ -602,16 +644,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                     }
                                                                 );
                                                             }
-                                                            // No tags needed (maybe) for system types' methods.
-                                                            // ,
-                                                            // // (1b)
-                                                            // function(cb) {
-
-                                                            //     m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
-                                                            //         function(err) { return cb(err); },
-                                                            //         '@idm'
-                                                            //     );
-                                                            // }
                                                         ],
                                                         // final callback for async.series in methods
                                                         function(err) { 
@@ -633,11 +665,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             async.eachSeries(typeIth.properties,
                                                 function(property, cb) {
-
-                                                    var bNeedToDoAppBaseType = false;
-                                                    if (bSub0IsAppBaseType) {
-                                                        bNeedToDoAppBaseType = true;
-                                                    }
 
                                                     property.typeId = typeIth.id;
                                                     property.ordinal = ordinal++;
@@ -675,9 +702,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             + ",ordinal=" + property.ordinal
                                                                             + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                             ;
-                                                                 if (bNeedToDoAppBaseType) {
+                                                                 if (typeIth.bNeedToDoAppBaseType) {
                                                                     baseScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
-                                                                    bNeedToDoAppBaseType = false;
                                                                 } else {
                                                                     stScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
                                                                 }
@@ -698,13 +724,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             // m_log("Doing events");
                                             var ordinal = 0;
+
                                             async.eachSeries(typeIth.events,
                                                 function(event, cb) {
-
-                                                    var bNeedToDoAppBaseType = false;
-                                                    if (bSub0IsAppBaseType) {
-                                                        bNeedToDoAppBaseType = true;
-                                                    }
 
                                                     event.typeId = typeIth.id;
                                                     event.ordinal = ordinal++;
@@ -735,7 +757,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             + ",name=" + connection.escape(event.name)
                                                                             + ",ordinal=" + event.ordinal
                                                                             ;
-                                                                if (bNeedToDoAppBaseType) {
+                                                                if (typeIth.bNeedToDoAppBaseType) {
                                                                     baseScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
                                                                     bNeedToDoAppBaseType = false;
                                                                 } else {
@@ -811,18 +833,40 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     baseScript: "OK"
                                 });
                             });
-                        } 
+                        } else {
 
-                        return callback({
-                            DB: "OK",
-                            stScript: "OK"
-                        });
+                            return callback({
+                                DB: "OK",
+                                stScript: "OK"
+                            });
+                        }
                     });
                 }
             );
         } catch (e) {
 
             return callback({DB: e.message});
+        }
+    }
+
+    var m_functionWriteSqlScript = function(script, filename, callback) {
+
+        try {
+
+            // Finalize the procedure.
+            script.push("end;");
+            script.push("//");
+            script.push("delimiter ;");
+            script.push("call doSystemTypes();");
+            script.push("drop procedure doSystemTypes;");
+
+            fs.writeFile(filename, script.join(os.EOL), 
+                function (err) {
+                    callback(err);
+                }
+            );
+        } catch(e) {
+            callback(e);
         }
     }
 
@@ -1010,7 +1054,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 sql.execute(strQuery,
                                                     function(rows) {
 
-                                                        if (rows.length !== 1) { return cb(new Error("App type's base type types could be retrieved."));}
+                                                        if (rows.length !== 1) { return cb(new Error("App type's base type could not be retrieved."));}
 
                                                         rows[0].originalTypeId = rows[0].id;
                                                         rows[0].isApp = false;
@@ -1805,7 +1849,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         if (err) { 
 
                             // Cannot finish in m_functionFinalCallback until we have a connection and is has begun.
-                            res.json({
+                            return res.json({
                                 success: false,
                                 message: 'Could not get a database connection: ' + err.message
                             });
@@ -1818,7 +1862,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     try {
                                         if (err) {
 
-                                            res.json({
+                                            return res.json({
                                                 success: false,
                                                 message: 'Could not "begin" database transaction: ' + err.message
                                             });
@@ -1828,7 +1872,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_functionSaveSystemTypes(  
                                                 connection,
-                                                project.specialprojectdata.userCanWorkWithSystemTypesAndAppBaseTypes,
+                                                project.specialProjectData.userCanWorkWithSystemTypesAndAppBaseTypes,
                                                 project.systemTypes,
                                                 true,   // Says that project.systemTypes[0] is and App base type
                                                 function(jsonResult) {
@@ -1892,7 +1936,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             );
                                         }
                                     } catch(e1) { 
-                                        res.json({
+                                        return res.json({
                                             success: false,
                                             message: 'Could not "begin" database transaction: ' + e1.message
                                         });
@@ -1901,7 +1945,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             );
                         }
                     } catch (e2) { 
-                        res.json({
+                        return res.json({
                             success: false,
                             message: 'Could not get a database connection: ' + e2.message
                         });
@@ -1909,7 +1953,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 }
             );
         } catch(e) { 
-            res.json({
+            return res.json({
                 success: false,
                 message: 'Could not save project due to error: ' + e.message
             });
@@ -1956,7 +2000,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 project: project,
                                 newProj: (project.specialProjectData.openMode === "new" || project.specialProjectData.openMode === "bought"), 
                                 notMine: project.specialProjectData.othersProjects,
-                                editingCoreProject: (project.specialprojectdata.userAllowedToCreateEditPurchProjs && project.specialProjectData.coreProject)
+                                editingCoreProject: (project.specialProjectData.userAllowedToCreateEditPurchProjs && project.specialProjectData.coreProject)
                             }
                         );
                     },
@@ -2028,7 +2072,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
                     function(resultArray, cb) {
 
-                        if (resultArray.project.specialprojectdata.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
+                        if (resultArray.project.specialProjectData.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
 
                             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + resultArray.project.id + ";";
                             sql.queryWithCxn(connection, strQuery,
@@ -2272,7 +2316,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 },
                                 // (2c)
                                 function(cb) {
-                                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
                                         m_log("Calling m_savePurchProductData");
                                         m_savePurchProductData(connection, req, res, project,
                                             function(err) {
@@ -2422,7 +2466,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 },
                                 // (3c)
                                 function(cb) {
-                                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                                         m_log("Calling m_savePurchProductData");
                                         m_savePurchProductData(connection, req, res, project,
@@ -2454,7 +2498,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             var dbname = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
-            if (project.specialprojectdata.userAllowedToCreateEditPurchProjs 
+            if (project.specialProjectData.userAllowedToCreateEditPurchProjs 
                 && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
@@ -2578,7 +2622,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                     comicIth.projectId = project.comicProjectId;
 
-                    if (project.specialprojectdata.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
+                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
                         
                         var guts = {
                             projectId: comicIth.projectId,
@@ -2874,14 +2918,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     typeIth.comicId = passObj.comicIth.id;
                                     typeIth.ordinal = 0;
 
-                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in this comic's types.
+                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
+                                    // Since this is the app type, it would be in the project's systemTypes.
                                     // TODO: Handle id re-numbering problems.
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
                                     if (typeIth.baseTypeName) {
-                                        for (var j = 0; j < passObj.comicIth.types.length; j++) {
+                                        for (var j = 0; j < passObj.project.systemTypes.length; j++) {
                                             
-                                            var typeJth = passObj.comicIth.types[j];
+                                            var typeJth = passObj.project.systemTypes[j];
                                             if (typeIth.baseTypeName === typeJth.name) {
                                                 typeIth.baseTypeId = typeJth.id;
                                                 break;
@@ -2973,7 +3018,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 // (1)
                                 function(cb) {
 
-                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in this comic's types.
+                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
+                                    // The base type could either be in this comic's types or in project.systemTypes.
                                     // TODO: Handle id re-numbering problems.
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
@@ -2984,6 +3030,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             if (typeIth.baseTypeName === typeJth.name) {
                                                 typeIth.baseTypeId = typeJth.id;
                                                 break;
+                                            }
+                                        }
+
+                                        if (typeIth.baseTypeId === 0) {
+
+                                            for (var j = 0; j < passObj.project.systemTypes.length; j++) {
+                                                
+                                                var typeJth = passObj.project.systemTypes[j];
+                                                if (typeIth.baseTypeName === typeJth.name) {
+                                                    typeIth.baseTypeId = typeJth.id;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -3370,10 +3428,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
             var tagArray = [];
             tagArray.push(strItemType);
-            if (projectScript === null){
-                // Not right to use user name for a System Type tag.
-                tagArray.push(userName);
-            }
             if (strName.length > 0) {
 
                 tagArray.push(strName.trim().replace(/\s/g, '_').toLowerCase());
@@ -3431,7 +3485,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
-            res.json({
+            return res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
@@ -3440,7 +3494,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 function(err){
 
                     if (err) {
-                        res.json({
+                        return res.json({
                             success: false,
                             message: 'Committing transaction failed with ' + err.message
                         });
@@ -3461,7 +3515,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     });
                                 }
 
-                                res.json({
+                                return res.json({
                                     success: true,
                                     project: project
                                 });
@@ -3470,27 +3524,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     }
                 }
             );
-        }
-    }
-
-    var m_functionWriteSqlScript = function(script, filename, callback) {
-
-        try {
-
-            // Finalize the procedure.
-            script.push("end;");
-            script.push("//");
-            script.push("delimiter ;");
-            script.push("call doSystemTypes();");
-            script.push("drop procedure doSystemTypes;");
-
-            fs.writeFile(filename, script.join(os.EOL), 
-                function (err) {
-                    callback(err);
-                }
-            );
-        } catch(e) {
-            callback(e);
         }
     }
 

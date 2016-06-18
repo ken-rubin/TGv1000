@@ -133,10 +133,13 @@ define(["Core/errorHelper"],
 									} else if (manager.systemTypesLoaded) {
 
 										// No exceptionRet--it handles its own error or success display.
-										client.saveSystemTypes();
+										client.saveSystemTypes(
+											function() {
 
-										// Reload system types so the new ids are in memory.
-										client.loadSystemTypesAndPinPanels();
+												// Reload system types so the new ids are in memory.
+												client.loadSystemTypesAndPinPanels();
+											}
+										);
 									}
 								} catch (e) { errorHelper.show(e); }
 							});
@@ -153,11 +156,11 @@ define(["Core/errorHelper"],
 
 											if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
-												client.loadSystemTypesAndPinPanels();
+												client.loadSystemTypesAndPinPanels(function() {
+
+													client.setBrowserTabAndBtns();
+												});
 											}
-											self.enableOrDisableProjAndTypeMenuItems(); 
-											self.enableOrDisableAminZoneMenuItems(); 
-											self.enableOrDisablePlayAndStopButtons();
 										}, 1000);
 									}, true);
 
@@ -167,10 +170,10 @@ define(["Core/errorHelper"],
 										
 										setTimeout(function() {
 
-											client.loadSystemTypesAndPinPanels();
-											self.enableOrDisableProjAndTypeMenuItems(); 
-											self.enableOrDisableAminZoneMenuItems(); 
-											self.enableOrDisablePlayAndStopButtons();
+											client.loadSystemTypesAndPinPanels(function() {
+
+													client.setBrowserTabAndBtns();
+											});
 										}, 1000);
 									}, true);
 								}
@@ -340,7 +343,7 @@ define(["Core/errorHelper"],
 								);
 							}
 
-							client.setBrowserTabAndBtns();
+							// client.setBrowserTabAndBtns();
 
 							return null;
 

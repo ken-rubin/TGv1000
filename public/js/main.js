@@ -9,7 +9,6 @@
 var client = null;
 var navbar = null;
 var manager = null;
-
 var g_profile = {};
 
 $(document).ready(function() {
@@ -33,63 +32,60 @@ $(document).ready(function() {
 						Manager,
 						settings) {
 
-								try {
+				try {
 
-									var strFromURL = m_functionCheckForURLEncoding("error");
-									if (strFromURL) {
-										errorHelper.show(strFromURL);
+					var strFromURL = m_functionCheckForURLEncoding("error");
+					if (strFromURL) {
+						errorHelper.show(strFromURL);
+					}
+
+					// Set global profile for everyone to use.
+					var profileJSON = localStorage.getItem("profile");
+					g_profile = JSON.parse(profileJSON);
+
+					// Allocate and attach the manager/glyph objects.
+		            // Create the glyphs module first, its 
+		            // complete callback will contiue things.
+		            glyphs.create(function () {
+
+		                try {
+
+		                    // Allocate and create the layer manager.
+		                    manager = new Manager();
+
+							// Calculate user privileges; set in manager. They are used during manager.create().
+                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
+                                g_profile["can_create_products"] || 
+                                g_profile["can_create_onlineClasses"]) || false;
+                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
+
+		                    var exceptionRet = manager.create();
+		                    if (exceptionRet) { throw exceptionRet; }
+
+							// Allocate and initialize the client.
+							// For a normal user this will load last accessed project, if any or create an empty designer if not.
+							// For a user who can edit system types, this will load all system types into manager.
+							client = new Client();
+							exceptionRet = client.create(
+								function() {
+
+									// Allocate and attach the navbar module.
+									navbar = new Navbar();
+									exceptionRet = navbar.create();
+									if (exceptionRet) { 
+										alert(exceptionRet.message);
+										return;
 									}
 
-									// Allocate and attach the manager/glyph objects.
-						            // Create the glyphs module first, its 
-						            // complete callback will contiue things.
-						            glyphs.create(function () {
+									client.setBrowserTabAndBtns();
+								}
+							);
+							if (exceptionRet) { throw exceptionRet; }
 
-						                try {
-
-						                    // Allocate and create the layer manager.
-						                    manager = new Manager();
-						                    var exceptionRet = manager.create();
-						                    if (exceptionRet) { throw exceptionRet; }
-
-											// Allocate and initialize the client.
-											client = new Client();
-											exceptionRet = client.create();
-											if (exceptionRet) { throw exceptionRet; }
-
-											// Allocate and attach the navbar module.
-											navbar = new Navbar();
-											exceptionRet = navbar.create();
-											if (exceptionRet) { throw exceptionRet; }
-
-											// Calculate user privileges; set in manager.
-				                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
-				                                g_profile["can_create_products"] || 
-				                                g_profile["can_create_onlineClasses"]) || false;
-				                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
-
-				                            // This had to be postponed due to non-readiness.
-				                            if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
-
-				                                manager.panelLayer.systemTypesPanel.addNew = function () {
-
-				                                    try {
-
-				                                        // What to do when the icon is clicked....
-				                                        return window.manager.createSystemType();
-
-				                                    } catch (e) { throw e; }
-				                                };
-				                            }
-
-				                            // Now that manager and client are ready:
-				                            exceptionRet = client.postCreate();
-				                            if (exceptionRet) { throw exceptionRet; }
-
-						                } catch (e) { alert(e.message); }
-						            });
-								} catch(e) { errorHelper.show(e); }
-							});
+		                } catch (e) { alert(e.message); }
+		            });
+				} catch(e) { errorHelper.show(e); }
+			});
 	} catch(e) { alert(e.message);}
 });
 

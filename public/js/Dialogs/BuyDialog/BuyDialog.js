@@ -460,7 +460,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 																	project.isProduct = false;
 																	project.specialProjectData.productProject = false;
 																}
-																project.specialprojectdata.userAllowedToCreateEditPurchProjs = false;
+																project.specialProjectData.userAllowedToCreateEditPurchProjs = false;
 																project.specialProjectData.ownedByUser = true;
 																project.specialProjectData.normalProject = true;
 																project.specialProjectData.openMode = 'bought';

@@ -63,11 +63,317 @@ define(["NextWave/source/utility/prototypes",
                     self.statementsPanel = null;
                     // Panel of expressions.
                     self.expressionsPanel = null;
-                    // Panel of literal.
+                    // Panel of literals.
                     self.literalsPanel = null;
+                    // Panel of centers.
+                    self.centerPanel = null;
+                    // Save configuration.
+                    self.iPanelConfiguration = null;
 
                     ////////////////////////
                     // Public methods.
+
+                    // Initialze instance.
+                    self.create = function (iPanelConfiguration) {
+                        // iPanelConfiguration: 0 = no panels; 1 = normal project; 2 = system types project
+                        try {
+
+                            // Can only create an uncreated instance.
+                            if (m_bCreated) {
+
+                                throw { message: "LayerPanels: Instance already created!" };
+                            }
+
+                            self.iPanelConfiguration = iPanelConfiguration;
+
+                            switch (iPanelConfiguration) {
+
+                                case 0:
+
+                                    m_arrayPanels = [];
+                                    break;
+
+                                case 1:
+
+                                    self.namesPanel = new Panel("Names", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.namesPanel.x, 0), 
+                                        new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
+                                    self.statementsPanel = new Panel("Statements", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.statementsPanel.x, 0), 
+                                        new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
+                                    self.expressionsPanel = new Panel("Expressions", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.expressionsPanel.x, 0), 
+                                        new Size(settings.layerPanels.expressionsPanel.width, settings.layerPanels.expressionsPanel.height));
+                                    self.literalsPanel = new Panel("Literals", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.literalsPanel.x, 0), 
+                                        new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
+                                    self.centerPanel = new Panel("Method", 
+                                        orientation.south, 
+                                        new Point(settings.layerPanels.centerPanel.x, 0), 
+                                        new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
+
+                                    // Only in iPanelConfiguration 1
+                                    self.typesPanel = new Panel("Types", 
+                                        orientation.west, 
+                                        new Point(0, settings.layerPanels.typesPanel.y), 
+                                        new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
+                                    self.typesPanel.addNew = function () {
+
+                                        try {
+
+                                            // What to do when the icon is clicked....
+                                            return window.manager.createType();
+                                        } catch (e) {
+
+                                            return e;
+                                        }
+                                    };
+                                    self.systemTypesPanel = new Panel("System Types", 
+                                        orientation.west, 
+                                        new Point(0, settings.layerPanels.systemTypesPanel.y), 
+                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
+                                    if(manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+                                        self.systemTypesPanel.addNew = function () {
+
+                                            try {
+
+                                                // What to do when the icon is clicked....
+                                                return window.manager.createSystemType();
+                                            } catch (e) {
+
+                                                return e;
+                                            }
+                                        };
+                                    }
+                                    // Add the TypeTree to the types Panel.
+                                    var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Compile to generic list of panels for looping operations.
+                                    m_arrayPanels = [
+                                        self.namesPanel, 
+                                        self.statementsPanel, 
+                                        self.expressionsPanel, 
+                                        self.literalsPanel, 
+                                        self.typesPanel,
+                                        self.systemTypesPanel,
+                                        self.centerPanel
+                                    ];
+                                    
+                                    // Add the SystemTypeTree to the systemTypes Panel.
+                                    var exceptionRet = m_functionAddSystemTypeTreeToSystemTypesPanel(self.systemTypesPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the NameList to the names Panel.
+                                    exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the StatmentList to the statements Panel.
+                                    exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the ExpressionList to the expressions Panel.
+                                    exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the LiteralList to the literals Panel.
+                                    exceptionRet = m_functionAddLiteralListToLiteralsPanel(self.literalsPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Allocate the payloads of the center panel:
+                                    exceptionRet = m_functionAllocateMethodBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    exceptionRet = m_functionAllocateTypeBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    exceptionRet = m_functionAllocatePropertyBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // To be replaced by: load type/method.
+                                    // Add the MethodBuilder to the center Panel.
+                                    exceptionRet = self.switchCenterPanelMode("Method");
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    break;
+
+                                case 2:
+
+                                    self.namesPanel = new Panel("Names", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.namesPanel.x, 0), 
+                                        new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
+                                    self.statementsPanel = new Panel("Statements", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.statementsPanel.x, 0), 
+                                        new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
+                                    self.expressionsPanel = new Panel("Expressions", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.expressionsPanel.x, 0), 
+                                        new Size(settings.layerPanels.expressionsPanel.width, settings.layerPanels.expressionsPanel.height));
+                                    self.literalsPanel = new Panel("Literals", 
+                                        orientation.north, 
+                                        new Point(settings.layerPanels.literalsPanel.x, 0), 
+                                        new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
+                                    self.centerPanel = new Panel("Method", 
+                                        orientation.south, 
+                                        new Point(settings.layerPanels.centerPanel.x, 0), 
+                                        new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
+
+                                    // Special for iPanelConfiguration 2
+                                    self.systemTypesPanel = new Panel("System Types", 
+                                        orientation.west, 
+                                        new Point(0, settings.layerPanels.systemTypesPanelSpecial.y), 
+                                        new Size(settings.layerPanels.systemTypesPanelSpecial.width, settings.layerPanels.systemTypesPanelSpecial.height));
+                                    self.systemTypesPanel.addNew = function () {
+
+                                        try {
+
+                                            // What to do when the icon is clicked....
+                                            return window.manager.createSystemType();
+                                        } catch (e) {
+
+                                            return e;
+                                        }
+                                    };
+
+                                    // Compile to generic list of panels for looping operations.
+                                    m_arrayPanels = [
+                                        self.namesPanel, 
+                                        self.statementsPanel, 
+                                        self.expressionsPanel, 
+                                        self.literalsPanel, 
+                                        self.systemTypesPanel,
+                                        self.centerPanel
+                                    ];
+                                    
+                                    // Add the SystemTypeTree to the systemTypes Panel.
+                                    var exceptionRet = m_functionAddSystemTypeTreeToSystemTypesPanel(self.systemTypesPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the NameList to the names Panel.
+                                    exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the StatmentList to the statements Panel.
+                                    exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the ExpressionList to the expressions Panel.
+                                    exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Add the LiteralList to the literals Panel.
+                                    exceptionRet = m_functionAddLiteralListToLiteralsPanel(self.literalsPanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // Allocate the payloads of the center panel:
+                                    exceptionRet = m_functionAllocateMethodBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    exceptionRet = m_functionAllocateTypeBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    exceptionRet = m_functionAllocatePropertyBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
+                                    // To be replaced by: load type/method.
+                                    // Add the MethodBuilder to the center Panel.
+                                    exceptionRet = self.switchCenterPanelMode("Method");
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    break;
+                            }
+
+                            // Indicate current state.
+                            m_bCreated = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Destroy LayerPanels--we're about to create a new one with a different configuration.
+                    self.destroy = function () {
+
+                        m_arrayPanels.forEach(
+                            function(panelIth) {
+                                if (panelIth) {
+                                    panelIth.destroy();
+                                }
+                            }
+                        );
+
+                        window.methodBuilder.destroy();
+                        window.typeBuilder.destroy();
+                        window.propertyBuilder.destroy();
+
+                        // self.typesPanel = null;
+                        // self.systemTypesPanel = null;
+                        // self.namesPanel = null;
+                        // self.statementsPanel = null;
+                        // self.expressionsPanel = null;
+                        // self.literalsPanel = null;
+                        // self.centerPanel = null;
+                        // self.iPanelConfiguration = null;
+                    }
 
                     // Method adds a new name.
                     self.addName = function (strName) {
@@ -117,6 +423,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.typesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.typesPanel.payload.addType(typeNew);
@@ -131,6 +439,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.typesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.typesPanel.payload.removeType(typeToRemove);
@@ -144,6 +454,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clearTypes = function () {
 
                         try {
+
+                            if (!self.typesPanel) { return null; }
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
@@ -169,7 +481,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing SystemType.
-                    self.removeSystemype = function (typeToRemove) {
+                    self.removeSystemType = function (typeToRemove) {
 
                         try {
 
@@ -187,6 +499,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.systemTypesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.systemTypesPanel.payload.clearItems();
@@ -201,6 +515,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.namesPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.namesPanel.payload.clearItems();
@@ -214,6 +530,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clearCenter = function (strActiveCenterPanel) {
 
                         try {
+
+                            if (!self.centerPanel) { return null; }
 
                             // Ensure there is always a good active center panel.
                             if (!strActiveCenterPanel) {
@@ -255,6 +573,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.statementsPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.statementsPanel.payload.clearItems();
@@ -294,6 +614,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clearExpressions = function () {
 
                         try {
+
+                            if (!self.expressionsPanel) { return null; }
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
@@ -335,6 +657,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!self.literalsPanel) { return null; }
+
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
                             return self.literalsPanel.payload.clearItems();
@@ -370,145 +694,6 @@ define(["NextWave/source/utility/prototypes",
                         return self.literalsPanel.payload.save();
                     };
 
-                    // Initialze instance.
-                    self.create = function () {
-
-                        try {
-
-                            // Can only create an uncreated instance.
-                            if (m_bCreated) {
-
-                                throw { message: "Instance already created!" };
-                            }
-
-                            self.namesPanel = new Panel("Names", 
-                                orientation.north, 
-                                new Point(settings.layerPanels.namesPanel.x, 0), 
-                                new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
-                            self.statementsPanel = new Panel("Statements", 
-                                orientation.north, 
-                                new Point(settings.layerPanels.statementsPanel.x, 0), 
-                                new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
-                            self.expressionsPanel = new Panel("Expressions", 
-                                orientation.north, 
-                                new Point(settings.layerPanels.expressionsPanel.x, 0), 
-                                new Size(settings.layerPanels.expressionsPanel.width, settings.layerPanels.expressionsPanel.height));
-                            self.literalsPanel = new Panel("Literals", 
-                                orientation.north, 
-                                new Point(settings.layerPanels.literalsPanel.x, 0), 
-                                new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
-                            self.typesPanel = new Panel("Types", 
-                                orientation.west, 
-                                new Point(0, settings.layerPanels.typesPanel.y), 
-                                new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
-                            self.systemTypesPanel = new Panel("System Types", 
-                                orientation.west, 
-                                new Point(0, settings.layerPanels.systemTypesPanel.y), 
-                                new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
-                            self.typesPanel.addNew = function () {
-
-                                try {
-
-                                    // What to do when the icon is clicked....
-                                    return window.manager.createType();
-                                } catch (e) {
-
-                                    return e;
-                                }
-                            };
-                            self.centerPanel = new Panel("Method", 
-                                orientation.south, 
-                                new Point(settings.layerPanels.centerPanel.x, 0), 
-                                new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
-
-                            // Add the TypeTree to the types Panel.
-                            var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Add the SystemTypeTree to the systemTypes Panel.
-                            var exceptionRet = m_functionAddSystemTypeTreeToSystemTypesPanel(self.systemTypesPanel);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Add the NameList to the names Panel.
-                            exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Add the StatmentList to the statements Panel.
-                            exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Add the ExpressionList to the expressions Panel.
-                            exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Add the LiteralList to the literals Panel.
-                            exceptionRet = m_functionAddLiteralListToLiteralsPanel(self.literalsPanel);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Allocate the payloads of the center panel:
-                            exceptionRet = m_functionAllocateMethodBuilder();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-                            exceptionRet = m_functionAllocateTypeBuilder();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-                            exceptionRet = m_functionAllocatePropertyBuilder();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // To be replaced by: load type/method.
-                            // Add the MethodBuilder to the center Panel.
-                            exceptionRet = self.switchCenterPanelMode("Method");
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Compile to generic list of panels for looping operations.
-                            m_arrayPanels = [
-                                self.namesPanel, 
-                                self.statementsPanel, 
-                                self.expressionsPanel, 
-                                self.literalsPanel, 
-                                self.typesPanel,
-                                self.systemTypesPanel,
-                                self.centerPanel
-                            ];
-
-                            // Indicate current state.
-                            m_bCreated = true;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Put the center panel into different modes.
                     self.switchCenterPanelMode = function (strMode) {
 
@@ -537,11 +722,11 @@ define(["NextWave/source/utility/prototypes",
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
-                                panelIth.openAndPin();
+                                if (panelIth) {
+                                    panelIth.openAndPin();
+                                }
                             }
                         );
-
-                        manager.systemTypesLoaded = true;
                     }
 
                     // Unpin all panels. They are cleared.
@@ -549,7 +734,9 @@ define(["NextWave/source/utility/prototypes",
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
-                                panelIth.unpin();
+                                if (panelIth) {
+                                    panelIth.unpin();
+                                }
                             }
                         );
                     }
@@ -574,17 +761,20 @@ define(["NextWave/source/utility/prototypes",
                             // Test all the panels.
                             for (var i = 0; i < m_arrayPanels.length; i++) {
 
-                                var exceptionRet = m_arrayPanels[i].mouseMove(objectReference);
-                                if (exceptionRet) {
+                                if (m_arrayPanels[i]) {
 
-                                    throw exceptionRet;
-                                }
+                                    var exceptionRet = m_arrayPanels[i].mouseMove(objectReference);
+                                    if (exceptionRet) {
 
-                                // If handled, then drop out.
-                                if (objectReference.handled) {
+                                        throw exceptionRet;
+                                    }
 
-                                    m_panelActive = m_arrayPanels[i];
-                                    break;
+                                    // If handled, then drop out.
+                                    if (objectReference.handled) {
+
+                                        m_panelActive = m_arrayPanels[i];
+                                        break;
+                                    }
                                 }
                             }
 
@@ -726,10 +916,13 @@ define(["NextWave/source/utility/prototypes",
                             // Set the extents of the panels.
                             for (var i = 0; i < m_arrayPanels.length; i++) {
 
-                                var exceptionRet = m_arrayPanels[i].calculateLayout(sizeExtent, contextRender);
-                                if (exceptionRet) {
+                                if (m_arrayPanels[i]) {
 
-                                    throw exceptionRet;
+                                    var exceptionRet = m_arrayPanels[i].calculateLayout(sizeExtent, contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 
@@ -754,10 +947,13 @@ define(["NextWave/source/utility/prototypes",
                             // Render the panels.
                             for (var i = m_arrayPanels.length - 1; i >= 0; i--) {
 
-                                var exceptionRet = m_arrayPanels[i].render(contextRender);
-                                if (exceptionRet) {
+                                if (m_arrayPanels[i]) {
 
-                                    throw exceptionRet;
+                                    var exceptionRet = m_arrayPanels[i].render(contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 

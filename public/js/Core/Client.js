@@ -58,21 +58,7 @@ define(["Core/errorHelper",
 					// Public methods.
 
 					// Start off the client.
-					self.create = function () {
-
-						try {
-
-							// Set global profile for everyone to use.
-							var profileJSON = localStorage.getItem("profile");
-							g_profile = JSON.parse(profileJSON);
-
-							return null;
-
-						} catch (e) { return e; }
-					};
-
-					// To remedy an order of creation problem.
-					self.postCreate = function () {
+					self.create = function (callback) {
 
 						try {
 
@@ -100,12 +86,23 @@ define(["Core/errorHelper",
 												closable: true, // <-- Default value is false
 												draggable: true // <-- Default value is false
 											});
+
+											if ($.isFunction(callback)) {
+												callback();
+											}
 										}
 									);
+								} else {
+
+									manager.loadNoProject();
+
+									if ($.isFunction(callback)) {
+										callback();
+									}
 								}
 							} else {
 
-								self.loadSystemTypesAndPinPanels();
+								self.loadSystemTypesAndPinPanels(callback);
 							}
 
 							return null;
@@ -113,7 +110,8 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.loadSystemTypesAndPinPanels = function () {
+					// Called here in client, but also by navbar.
+					self.loadSystemTypesAndPinPanels = function (callback) {
 
 						// While others get all system types, statements, literals and expressions loaded.
 						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
@@ -123,27 +121,24 @@ define(["Core/errorHelper",
 
 							if (data.success) {
 
-								manager.clearPanels();
+								var exceptionRet = manager.loadSystemTypesProject(data.data);
+								if (exceptionRet) {
 
-								// data.data is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
-								// Load them into the manager
-								var exceptionRet = manager.loadSystemTypes(data.data[0]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
-								exceptionRet = manager.loadStatements(data.data[1]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
-								exceptionRet = manager.loadLiterals(data.data[2]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
-								exceptionRet = manager.loadExpressions(data.data[3]);
-								if (exceptionRet) { errorHelper.show(exceptionRet); }
+									errorHelper.show(exceptionRet);
 
-								manager.openAndPinAllPanels();
+								} 
 
-								self.setBrowserTabAndBtns();
-
+								if ($.isFunction(callback)) {
+									callback();
+								}
 							} else {
 
 								// !data.success
 								errorHelper.show(data.message);
+
+								if ($.isFunction(callback)) {
+									callback();
+								}
 							}
 						});
 					}
@@ -257,7 +252,7 @@ define(["Core/errorHelper",
 					}
 
 					// This is done without a pre-save dialog.
-					self.saveSystemTypes = function () {
+					self.saveSystemTypes = function (callback) {
 
 						try {
 
@@ -282,6 +277,8 @@ define(["Core/errorHelper",
 									// !data.success
 									errorHelper.show(data.message);
 								}
+
+								callback();
 							});
 						} catch (e) {
 
@@ -693,7 +690,7 @@ define(["Core/errorHelper",
 						try {
 
 							// Send the passed-in project into manager.
-				    		var exceptionRet = manager.load(project);
+				    		var exceptionRet = manager.loadProject(project);
 				    		if (exceptionRet) { return exceptionRet; }
 
 							if ($.isFunction(callback)) {
@@ -1058,7 +1055,7 @@ define(["Core/errorHelper",
 									// This callback will be called if the user wants to abandon the open project.
 									try {
 
-										var exceptionRet = manager.clearPanels();
+										var exceptionRet = manager.loadNoProject();
 										if (exceptionRet) { throw exceptionRet; }
 
 										self.setBrowserTabAndBtns();
@@ -1087,6 +1084,11 @@ define(["Core/errorHelper",
 					//////////////////////////////
 					// Project helper methods.
 					self.setBrowserTabAndBtns = function () {
+
+						if (navbar === null) {
+
+							return;
+						}
 
 						document.title = "NWC";
 						if (manager.projectLoaded) {

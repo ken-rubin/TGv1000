@@ -54,7 +54,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "Instance already created!" };
+                                throw { message: "MethodBuilder: Instance already created!" };
                             }
 
                             // Create the dialog.
@@ -191,6 +191,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "Instance not created!" };
                             }
+
+                            window.MethodBuilder = null;
 
                             m_bCreated = false;
 
