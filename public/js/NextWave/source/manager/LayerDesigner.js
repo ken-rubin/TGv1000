@@ -89,6 +89,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            JL().info("<<< in self.setDragObject in LayerDesigner: about to set self.dragObject >>>");
+            
                             // Set the drag object in the drag layer, and ...
                             self.dragObject = objectDrag;
                             // ...stow its area.
@@ -109,9 +111,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            JL().info("<<< in self.startDrag in LayerDesigner >>>");
+            
                             // Can only set a down (starting drag) if there is a dragObject.
                             if (self.dragObject) {
 
+                                JL().info("<<< in self.startDrag in LayerDesigner: self.dragObject is true >>>");
+            
                                 // Start dragging.
                                 self.down = pointDown;
 
@@ -236,8 +242,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // JL().info("<<< in self.mouseMove in LayerDesigner >>>");
+
                             // If dragging...
                             if (self.down) {
+
+                                JL().info("<<< in self.mouseMove in LayerDesigner: self.down is true >>>");
 
                                 var pointCursor = new Point(objectReference.event.offsetX,
                                     objectReference.event.offsetY);
@@ -269,6 +279,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            JL().info("<<< in self.mouseUp in LayerDesigner >>>");
+            
                             // If dragging...
                             if (self.down) {
 
@@ -332,6 +344,8 @@ define(["NextWave/source/utility/prototypes",
                             // If dragging...
                             if (self.down) {
 
+                                JL().info("<<< in self.render in LayerDesigner >>>");
+            
                                 // Calculate position to render.
                                 var pointRender = new Point(self.dragArea.location.x + self.move.width,
                                     self.dragArea.location.y + self.move.height);
@@ -378,39 +392,6 @@ define(["NextWave/source/utility/prototypes",
 
                     /////////////////////////
                     // Private methods.
-
-                    // Helper method handles dragging Statements.
-                    var m_functionStartDragStatement = function (pointDown, pointMove) {
-
-                        try {
-
-                            // Clone the ListItem.
-                            self.dragObject = new self.dragObject.constructor(self.dragObject.name);
-                            self.dragObject.highlight = false;
-
-                            // Allocate and turn into dragstub.
-                            var csDragStub = self.dragObject.allocateCodeInstance();
-                            csDragStub.dragStub = true;
-
-                            // Store in dragTargets (normally a collection).
-                            // ToDo: replace with something just for statements.
-                            self.dragTargets = csDragStub;
-
-                            // Set global dragging variable.
-                            window.draggingStatement = self.dragObject;
-
-                            /* Move the dragstub to the nearest to the cursor.
-                            var exceptionRet = m_functionPlaceStub(pointMove);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }*/
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
 
                     // Helper method handles dragging Types.
                     var m_functionStartDragType = function (pointDown, pointMove) {
@@ -464,108 +445,6 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }*/
 
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method handles dragging non-Statement 
-                    // list items: Names, literals, expressions.
-                    var m_functionStartDragNonStatementListItem = function (pointDown, pointMove) {
-
-                        try {
-
-                            // Clone the ListItem.
-                            self.dragObject = new self.dragObject.constructor(self.dragObject.name);
-                            self.dragObject.highlight = false;
-
-                            // Get the drag targets somehow else.
-                            var exceptionRet = window.methodBuilder.accumulateDragTargets(self.dragTargets);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Set global dragging variable.
-                            window.draggingExpression = self.dragObject;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method handles dragging CodeStatements.
-                    var m_functionStartDragCodeStatement = function (pointDown, pointMove) {
-
-                        try {
-
-                            // Save off the dragObject as the dragTargets object.
-                            // ToDo: make a different field for statement-types.
-                            self.dragTargets = self.dragObject;
-                            self.dragTargets.dragStub = true;
-
-                            // Clone statement and set as the drag object, 
-                            // the original Statement is now the dragStub.
-                            self.dragObject = self.dragObject.clone();
-
-                            // Close any open blocks.
-                            var exceptionRet = self.dragObject.closeBlocks();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Need its new height to compare with 
-                            // the old height to adjust the grab point.
-                            var dClosedHeight = self.dragObject.getClosedHeight();
-                            self.dragArea.extent.height = dClosedHeight;
-
-                            // If the statement is now above the grab point, move it down.
-                            if (self.dragArea.location.y + self.dragArea.extent.height < pointMove.y) {
-
-                                self.dragArea.location.y = pointMove.y - self.dragArea.extent.height + settings.general.margin;
-                            }
-
-                            // Set global dragging variable.
-                            window.draggingStatement = self.dragObject;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method handles dragging CodeExpression.
-                    var m_functionStartDragCodeExpression = function (pointDown, pointMove) {
-
-                        try {
-
-                            // Get container and remove from it.
-                            var collectionOwner = self.dragObject.collection;
-
-                            // Remove it.
-                            if (collectionOwner) {
-
-                                var exceptionRet = collectionOwner.removeItem(self.dragObject);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            }
-
-                            // Get the drag targets somehow else.
-                            var exceptionRet = window.methodBuilder.accumulateDragTargets(self.dragTargets);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Set global dragging variable.
-                            window.draggingExpression = self.dragObject;
                             return null;
                         } catch (e) {
 

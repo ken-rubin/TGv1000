@@ -864,7 +864,10 @@ begin
 				(8,'StatementThrow'),
 				(9,'StatementTry'),
 				(10,'StatementVar'),
-                (11,'StatementWhile')
+                (11,'StatementWhile'),
+                (12,'StatementComment'),
+                (13,'StatementDebugger'),
+                (14,'StatementFreeform')
                 ;
                 
         insert TGv1000.expressions (id, `name`)
@@ -927,6 +930,9 @@ begin
                 (1,9),
                 (1,10),
                 (1,11),
+                (1,12),
+                (1,13),
+                (1,14),
 				(2,1),
 				(2,2),
 				(2,3),
@@ -938,6 +944,9 @@ begin
                 (2,9),
                 (2,10),
                 (2,11),
+                (2,12),
+                (2,13),
+                (2,14),
 				(3,1),
 				(3,2),
 				(3,3),
@@ -949,6 +958,9 @@ begin
                 (3,9),
                 (3,10),
                 (3,11),
+                (3,12),
+                (3,13),
+                (3,14),
 				(4,1),
 				(4,2),
 				(4,3),
@@ -960,6 +972,9 @@ begin
                 (4,9),
                 (4,10),
                 (4,11),
+                (4,12),
+                (4,13),
+                (4,14),
 				(5,1),
 				(5,2),
 				(5,3),
@@ -970,7 +985,10 @@ begin
                 (5,8),
                 (5,9),
                 (5,10),
-                (5,11)
+                (5,11),
+                (5,12),
+                (5,13),
+                (5,14)
 			;
             
 		CREATE TABLE `TGv1000`.`comics_expressions` (
@@ -1297,6 +1315,7 @@ begin
 		INSERT `TGv1000`.`systemtypes` SET id=5,name='Number',ownedByUserId=1;
 		INSERT `TGv1000`.`systemtypes` SET id=6,name='RegExp',ownedByUserId=1;
 		INSERT `TGv1000`.`systemtypes` SET id=7,name='String',ownedByUserId=1;
+		INSERT `TGv1000`.`systemtypes` SET id=8,name='VisualObject',ownedByUserId=1;
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchForPanels_S_L_E_ST','post','routeFetchForPanels_S_L_E_ST',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveSystemTypes','post','routeSaveSystemTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 
@@ -1352,6 +1371,10 @@ begin
 			VALUES
 				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
 		INSERT `TGv1000`.`types` SET typeTypeId=2,name='String',ownedByUserId=1;
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
+		INSERT `TGv1000`.`types` SET typeTypeId=2,name='VisualObject',ownedByUserId=1;
 		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
 			VALUES
 				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
