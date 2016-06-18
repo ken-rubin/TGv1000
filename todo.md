@@ -13,11 +13,11 @@
 - If a System Type is renamed, that has to be propogated everywhere.
 
 ## Jerry's High Priority Issues
-- In no project mode, don't do types panel and increase size of system types panel.
+- Do LayerDesigner.
 - John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.
 - From John:
     - Playing off our strength I also envision a sort of "school-net" subscription where schools all have access to the classes that teachers at other schools in the network have created on the system in some contained ecosystem that blocks out the rest of the noise that could get created in an open world like this one.  That is either a key selling point or an add on for the system.  I am thinking key selling point since the crowd sourced classes is one of our biggest differentiating factors.  I can imagine a world where we have a tag driven button (School Net) that gives them a list of all the classes that have been built in this ecosystem and they add in their other tags for Science, math, geography, etc. classes.
-- Saw some sort of display problem in horizontal scroller in one of the image search dialogs.
+- Saw some sort of display problem in horizontal scroller in one of the image search dialogs. **Might have fixed this.**
 - AZPPBuyersDialog.js
     - The way I've had to do the buttons on the Buyers and Waitlisted tabs is ugly. Work on them. In fact, work on many column width problems (like also w/l since).
     - As changes are made that affect the DB (and thus each of the datatables, I could do manual stuff or I could just refresh from scratch. Which way is better? **I think refreshing from the DB and rebuilding the datatables is better for several reasons: (1) easier; (2) just being used by admin users; (3) functionality is used infrequently, so why bother?
