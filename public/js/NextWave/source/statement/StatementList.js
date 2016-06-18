@@ -22,8 +22,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/statement/StatementVar",
     "NextWave/source/statement/StatementExpression",
     "NextWave/source/statement/StatementBreak",
-    "NextWave/source/statement/StatementContinue"],
-    function (prototypes, List, StatementFor, StatementForIn, StatementWhile, StatementIf, StatementReturn, StatementTry, StatementThrow, StatementVar, StatementExpression, StatementBreak, StatementContinue) {
+    "NextWave/source/statement/StatementContinue",
+    "NextWave/source/statement/StatementDebugger",
+    "NextWave/source/statement/StatementComment",
+    "NextWave/source/statement/StatementFreeform"],
+    function (prototypes, List, StatementFor, StatementForIn, StatementWhile, StatementIf, StatementReturn, StatementTry, StatementThrow, StatementVar, StatementExpression, StatementBreak, StatementContinue, StatementDebugger, StatementComment, StatementFreeform) {
 
         try {
 
@@ -49,10 +52,13 @@ define(["NextWave/source/utility/prototypes",
                             // Add the Expressions.
                             var arrayItems = [/*
                                 new StatementBreak(),
+                                new StatementComment(),
                                 new StatementContinue(),
+                                new StatementDebugger(),
                                 new StatementExpression(),
                                 new StatementFor(),
                                 new StatementForIn(),
+                                new StatementFreeform(),
                                 new StatementIf(),
                                 new StatementReturn(),
                                 new StatementThrow(),

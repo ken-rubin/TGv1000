@@ -438,6 +438,7 @@ define(["NextWave/source/utility/prototypes",
                             // Clone the Type.
                             self.dragObject = new self.dragObject.constructor(self.dragObject.name);
                             self.dragObject.highlight = false;
+                            self.dragObject.dragObject = true;
 
                             // Close the type.
                             var exceptionRet = self.dragObject.close();
@@ -467,20 +468,6 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set global dragging variable.
                             window.draggingStatement = self.dragObject;
-
-                            // Move the dragstub to the nearest to the cursor.
-                            /*exceptionRet = m_functionPlaceStub(pointMove);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            exceptionRet = window.methodBuilder.methodStatements.insertAt(self.dragTargets,
-                                0);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }*/
 
                             return null;
                         } catch (e) {

@@ -37,7 +37,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Type(ctName) {
+        	var functionRet = function Type(strName) {
 
                 try {
 
@@ -47,7 +47,7 @@ define(["NextWave/source/utility/prototypes",
                     // Public fields.
 
                     // Name of this type object.
-                    self.name = ctName || new CodeType();
+                    self.name = strName;
                     // Colleciton of methods.
                     self.methods = new Methods(self);
                     // Colleciton of properties.
@@ -85,7 +85,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Set the name.
-                            self.name = new CodeType(objectType.name);
+                            self.name = objectType.name;
 
                             // Build the methods.
                             if (objectType.methods && objectType.methods.length) {
@@ -184,7 +184,7 @@ define(["NextWave/source/utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        var strName = self.name.payload.substring(0, 1).toLowerCase() + self.name.payload.substring(1);
+                        var strName = self.name.substring(0, 1).toLowerCase() + self.name.substring(1);
                         strName = window.manager.getUniqueName(strName);
                         var csvRet = new CodeStatementVar(
                             new CodeExpressionInfix(
@@ -199,7 +199,7 @@ define(["NextWave/source/utility/prototypes",
                                     new CodeExpressionInvocation(
                                         new CodeExpressionType(
                                             new CodeType(
-                                                self.name.payload
+                                                self.name
                                             )
                                         )
                                     )
@@ -275,9 +275,19 @@ define(["NextWave/source/utility/prototypes",
                     self.generateJavaScript = function () {
 
                         // Build the constructor function for the type.
-                        var strConstructorFunction = " window." + self.name.payload + 
+                        var strConstructorFunction = " window." + self.name + 
                             " = function (app) { " + 
-                            " /* Closure. */ var self = this; " + 
+                            " /* Closure. */ var self = this; ";
+
+                        // Call parent constructor.
+                        if (self.stowage.baseTypeName) {
+
+                            strConstructorFunction += 
+                                " /* Inherit from Base. */ self.inherits(" + 
+                                self.stowage.baseTypeName + 
+                                ", app); ";                            
+                        }
+                        strConstructorFunction += 
                             " /* Register with system. */ window.instances.push(self); " + 
                             " /* Reference to the application object. */ self.app = app; ";
 
@@ -294,6 +304,17 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         strConstructorFunction += " };";
+
+                        // Wire the prototype chain.
+                        if (self.stowage.baseTypeName) {
+
+                            strConstructorFunction += 
+                                " /* Complete inheritance from Base. */ window." +
+                                self.name +
+                                ".inheritsFrom(" + 
+                                self.stowage.baseTypeName + 
+                                "); ";                            
+                        }
 
                         // Return the module.
                         return strConstructorFunction;
@@ -313,7 +334,7 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         // Save name.
-                        objectRet.name = self.name.payload;
+                        objectRet.name = self.name;
 
                         // If there are methods, then save them up.
                         if (self.methods) {
@@ -372,36 +393,26 @@ define(["NextWave/source/utility/prototypes",
                                     objectReference.cursor = "cell";
                                 } else {
 
-                                    // Then test the name CodeType.
-                                    bIn = self.name.pointIn(objectReference.contextRender,
+                                    // Then test the Methods.
+                                    bIn = self.methods.pointIn(objectReference.contextRender,
                                         objectReference.pointCursor);
                                     if (bIn) {
 
-                                        m_objectHighlight = self.name;
-                                        //self.name.highlight = true;
+                                        m_objectHighlight = self.methods;
+                                        self.methods.highlight = true;
+
+                                        return self.methods.mouseMove(objectReference);
                                     } else {
 
-                                        // Then test the Methods.
-                                        bIn = self.methods.pointIn(objectReference.contextRender,
+                                        // Finally properties, (eventually events too)....
+                                        bIn = self.properties.pointIn(objectReference.contextRender,
                                             objectReference.pointCursor);
                                         if (bIn) {
 
-                                            m_objectHighlight = self.methods;
-                                            self.methods.highlight = true;
+                                            m_objectHighlight = self.properties;
+                                            self.properties.highlight = true;
 
-                                            return self.methods.mouseMove(objectReference);
-                                        } else {
-
-                                            // Finally properties, to be replaced by events....
-                                            bIn = self.properties.pointIn(objectReference.contextRender,
-                                                objectReference.pointCursor);
-                                            if (bIn) {
-
-                                                m_objectHighlight = self.properties;
-                                                self.properties.highlight = true;
-
-                                                return self.properties.mouseMove(objectReference);
-                                            }
+                                            return self.properties.mouseMove(objectReference);
                                         }
                                     }
                                 }
@@ -433,13 +444,13 @@ define(["NextWave/source/utility/prototypes",
                                 } else if (m_objectHighlight === m_areaDeleteIcon) {
 
                                     return window.manager.removeType(self);
-//                                } else if (m_objectHighlight === self.name) {
-
-//                                    return window.manager.selectType(self);
                                 } else if ($.isFunction(m_objectHighlight.mouseDown)) {
 
                                     return m_objectHighlight.mouseDown(objectReference);
                                 }
+                            } else {
+
+                                return window.manager.selectType(self);
                             }
                             return null;
                         } catch (e) {
@@ -541,7 +552,11 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Fill and stroke the path.
-                            if (window.draggingStatement || window.draggingExpression) {
+                            if (self.dragObject) {
+
+                                contextRender.fillStyle = self.settingsNode.fillBackground;
+                                contextRender.strokeStyle = settings.general.strokeBackground;
+                            } else if (window.draggingStatement || window.draggingExpression) {
 
                                 contextRender.fillStyle = settings.general.fillDrag;
                                 contextRender.strokeStyle = settings.general.strokeDrag;
@@ -560,18 +575,13 @@ define(["NextWave/source/utility/prototypes",
                             // Render the name.
                             contextRender.font = self.settingsNode.font;
 
-                            // Render the type CodeType.
-                            var areaName = new Area(m_area.location.clone(),
-                                new Size(m_area.extent.width - 2 * settings.glyphs.width + settings.general.margin, 
-                                    self.settingsNode.lineHeight));
-                            self.name.maxWidth = areaName.extent.width;
-                            exceptionRet = self.name.render(contextRender, 
-                                areaName,
-                                0);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
+                            // Render the type name.
+                            contextRender.font = settings.general.font;
+                            contextRender.fillStyle = settings.general.fillText;
+                            contextRender.fillText(self.name,
+                                m_area.location.x + settings.general.margin,
+                                m_area.location.y,
+                                m_area.extent.width - 2 * settings.glyphs.width);
 
                             // If open, render methods and properties.
                             var glyph = glyphs.expand;
@@ -599,37 +609,40 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Draw the open/close glyphs.
-                            m_areaOpenCloseIcon = new Area(
-                                new Point(m_area.location.x + m_area.extent.width - settings.glyphs.width,
-                                    m_area.location.y + settings.general.margin),
-                                new Size(settings.glyphs.width, 
-                                    settings.glyphs.height));
+                            if (!self.dragObject) {
 
-                            // Render glyph.
-                            exceptionRet = glyphs.render(contextRender,
-                                m_areaOpenCloseIcon,
-                                glyph, 
-                                settings.manager.showIconBackgrounds);
-                            if (exceptionRet) {
+                                m_areaOpenCloseIcon = new Area(
+                                    new Point(m_area.location.x + m_area.extent.width - settings.glyphs.width,
+                                        m_area.location.y + settings.general.margin),
+                                    new Size(settings.glyphs.width, 
+                                        settings.glyphs.height));
 
-                                throw exceptionRet;
-                            }
+                                // Render glyph.
+                                exceptionRet = glyphs.render(contextRender,
+                                    m_areaOpenCloseIcon,
+                                    glyph, 
+                                    settings.manager.showIconBackgrounds);
+                                if (exceptionRet) {
 
-                            // Draw the delete glyphs.
-                            m_areaDeleteIcon = new Area(
-                                new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
-                                    m_areaOpenCloseIcon.location.y),
-                                new Size(settings.glyphs.width, 
-                                    settings.glyphs.height));
+                                    throw exceptionRet;
+                                }
 
-                            // Render glyph.
-                            exceptionRet = glyphs.render(contextRender,
-                                m_areaDeleteIcon,
-                                glyphs.remove, 
-                                settings.manager.showIconBackgrounds);
-                            if (exceptionRet) {
+                                // Draw the delete glyphs.
+                                m_areaDeleteIcon = new Area(
+                                    new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
+                                        m_areaOpenCloseIcon.location.y),
+                                    new Size(settings.glyphs.width, 
+                                        settings.glyphs.height));
 
-                                throw exceptionRet;
+                                // Render glyph.
+                                exceptionRet = glyphs.render(contextRender,
+                                    m_areaDeleteIcon,
+                                    glyphs.remove, 
+                                    settings.manager.showIconBackgrounds);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
                             }
 
                             return null;

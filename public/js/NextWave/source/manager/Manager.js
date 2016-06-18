@@ -310,7 +310,7 @@ define(["NextWave/source/utility/prototypes",
                             // Find it.
                             for (var i = 0; i < self.types.length; i++) {
 
-                                if (self.types[i].name.payload === strTypeName) {
+                                if (self.types[i].name === strTypeName) {
 
                                     // ...and return it.
                                     return self.types[i];
@@ -333,10 +333,10 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name.payload === strOriginalName) {
+                                if (self.types[i].name === strOriginalName) {
 
                                     // ...and update.
-                                    self.types[i].name.payload = strNewName;
+                                    self.types[i].name = strNewName;
 
                                     break;
                                 }
@@ -360,7 +360,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name.payload === typeToRemove.name.payload) {
+                                if (self.types[i].name === typeToRemove.name) {
 
                                     // ...and remove.
                                     self.types.splice(i, 1);
@@ -385,7 +385,7 @@ define(["NextWave/source/utility/prototypes",
                         for (var i = 0; i < self.types.length; i++) {
 
                             var typeIth = self.types[i];
-                            if (typeIth.name.payload === strProvisionalBaseTypeName) {
+                            if (typeIth.name === strProvisionalBaseTypeName) {
 
                                 return true;
                             }
@@ -400,7 +400,7 @@ define(["NextWave/source/utility/prototypes",
                         for (var i = 0; i < self.types.length; i++) {
 
                             var typeIth = self.types[i];
-                            if (typeIth.name.payload === strProvisionalPropertyTypeName) {
+                            if (typeIth.name === strProvisionalPropertyTypeName) {
 
                                 return true;
                             }
@@ -417,7 +417,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name.payload === typeOwner.name.payload) {
+                                if (self.types[i].name === typeOwner.name) {
 
                                     // ...and remove.
                                     return self.types[i].methods.removePart(methodToRemove);
@@ -439,7 +439,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name.payload === typeOwner.name.payload) {
+                                if (self.types[i].name === typeOwner.name) {
 
                                     // ...and remove.
                                     return self.types[i].properties.removePart(propertyToRemove);

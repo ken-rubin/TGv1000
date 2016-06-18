@@ -15,14 +15,14 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/glyphs",
-    "NextWave/source/utility/InPlaceEditHelper",
+    "NextWave/source/utility/Edit",
     "NextWave/source/methodBuilder/CodeStatement"],
-    function (prototypes, settings, Point, Size, Area, glyphs, InPlaceEditHelper, CodeStatement) {
+    function (prototypes, settings, Point, Size, Area, glyphs, Edit, CodeStatement) {
 
         try {
 
             // Constructor function.
-        	var functionRet = function CodeLiteral(strPayload) {
+        	var functionRet = function CodeLiteral(strPayload, bMultiline) {
 
                 try {
 
@@ -33,14 +33,13 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates the type is highlighted.
                     self.highlight = false;
-                    // For now, all literals are strings.
-                    self.payload = strPayload || "";
+                    // Indicates this is a multiline edit.
+                    self.multiline = bMultiline || false;
+                    // For now, all literals are Edits.
+                    self.payload = new Edit(strPayload || "",
+                        self.multiline);
                     // Set the maximum horizontal extent.
                     self.maxWidth = null;
-                    // Allocate the in place editor helper.
-                    self.inPlaceEditor = new InPlaceEditHelper(self, 
-                        "payload",      // Value member.
-                        "collection");  // Focus member.
 
                     ////////////////////////
                     // Public methods.
@@ -48,7 +47,8 @@ define(["NextWave/source/utility/prototypes",
                     // Return a new instance of a CodeLiteral.
                     self.clone = function () {
 
-                        return new self.constructor(self.payload);
+                        return new self.constructor(self.payload.text, 
+                            self.multiline);
                     };
 
                     // Generate JavaScript for this literal.
@@ -56,7 +56,7 @@ define(["NextWave/source/utility/prototypes",
 
                         var strBlock = " ";
 
-                        strBlock += self.payload;
+                        strBlock += self.payload.text;
 
                         strBlock += " ";
                         return strBlock;
@@ -71,7 +71,7 @@ define(["NextWave/source/utility/prototypes",
                         objectRet.parameters = [{
 
                                 type: "String",
-                                value: self.payload
+                                value: self.payload.text
                             }
                         ];
 
@@ -101,84 +101,87 @@ define(["NextWave/source/utility/prototypes",
                             return self.maxWidth;
                         }
 
-                        if (!self.payload) {
-
-                            return settings.codeLiteral.emptyWidth;
-                        }
-                        return contextRender.measureText(self.payload).width + 
-                            2 * settings.general.margin;
+                        return self.payload.getWidth(contextRender);
                     };
 
                     // Test if the point is in this Type.
                     self.pointIn = function (contextRender, point) {
 
-                        // Return false if never rendered.
-                        if (!m_area) {
-
-                            return false;
-                        }
-
-                        // Return hit-test against generated path.
-                        return m_area.pointInArea(contextRender,
+                        // Return hit-test against payload.
+                        return self.payload.pointIn(contextRender,
                             point);
-                    }
+                    };
+
+                    // Wire up events:
+
+                    // Pass events to payload.
+                    self.mouseOut = function (objectReference) {
+
+                        try {
+
+                            return self.payload.mouseOut(objectReference);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass events to payload.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            // Set the payload as the selected object.
+                            var exceptionRet = window.manager.setFocus(self.payload);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return self.payload.mouseDown(objectReference);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass events to payload.
+                    self.mouseMove = function (objectReference) {
+
+                        try {
+
+                            return self.payload.mouseMove(objectReference);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass events to payload.
+                    self.mouseWheel = function (objectReference) {
+
+                        try {
+
+                            return self.payload.mouseWheel(objectReference);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Render out this type.
                     self.render = function (contextRender, areaRender, dX) {
 
                         try {
 
-                            // Define the containing area.
-                            m_area = new Area(
-                                new Point(areaRender.location.x + dX, 
-                                    areaRender.location.y),
-                                new Size(self.getWidth(contextRender), 
-                                    areaRender.extent.height)
-                            );
-
-                            // Generate the path.
-                            var exceptionRet = m_area.generateRoundedRectPath(contextRender);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Draw border on highlight.
-                            if ((window.draggingStatement || window.draggingExpression) &&
-                                self.collection) {
-
-                                //contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
-                                //contextRender.stroke();
-                            } else if (self.highlight) {
-
-                                contextRender.fillStyle = settings.general.fillBackgroundHighlight;
-                                contextRender.fill();
-                                contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
-                                contextRender.stroke();
-                            }
-
-                            // After defining location, and generating the path,
-                            // defer to the in place editor to handle rendering.
-                            // If will call back to the function parameter to
-                            // handle non-focused rendering that is non in-place.
-                            return self.inPlaceEditor.render(contextRender,
-                                m_area,
-                                function () {
-
-                                    try {
-
-                                        // Now render the label.
-                                        contextRender.fillStyle = settings.general.fillText;
-                                        contextRender.fillText(self.payload,
-                                            m_area.location.x + settings.general.margin,
-                                            m_area.location.y,
-                                            m_area.extent.width - 2 * settings.general.margin);
-                                        return null;
-                                    } catch (e) {
-
-                                        return e;
-                                    }
-                                });
+                            // Ask the payload to render itself.
+                            return self.payload.render(contextRender,
+                                false,
+                                new Area(
+                                    new Point(areaRender.location.x + dX, 
+                                        areaRender.location.y),
+                                    new Size(self.getWidth(contextRender), 
+                                        areaRender.extent.height)));
                         } catch (e) {
 
                             return e;
@@ -189,7 +192,10 @@ define(["NextWave/source/utility/prototypes",
                     // Private fields.
 
                     // The area, relative to the canvas, occupied by this instance.
-                    var m_area = null;
+                    //var m_area = null;
+                    // The last area rendered.  Helps call 
+                    // calculate layout in the Edit when necessary.
+                    //var m_areaLast = null;
                 } catch (e) {
 
                     alert(e.message);

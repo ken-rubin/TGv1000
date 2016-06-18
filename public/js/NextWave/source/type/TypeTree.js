@@ -52,7 +52,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // If found, remove it.
-                                if (self.items[i].name.payload === typeRemove.name.payload) {
+                                if (self.items[i].name === typeRemove.name) {
 
                                     self.items.splice(i, 1);
                                     break;

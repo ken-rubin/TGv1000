@@ -60,6 +60,7 @@ define(["NextWave/source/utility/prototypes",
                                 nameEdit: {
 
                                     type: "Edit",
+                                    multiline: false,
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: settings.general.margin,
@@ -120,6 +121,7 @@ define(["NextWave/source/utility/prototypes",
                                 baseEdit: {
 
                                     type: "Edit",
+                                    multiline: false,
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: settings.dialog.lineHeight + 
@@ -188,6 +190,7 @@ define(["NextWave/source/utility/prototypes",
                                 descriptionEdit: {
 
                                     type: "Edit",
+                                    multiline: true,
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: 2 * settings.dialog.lineHeight + 
@@ -232,6 +235,7 @@ define(["NextWave/source/utility/prototypes",
                                 objectConfiguration.systemTypeEdit = {
 
                                     type: "Edit",
+                                    multiline: false,
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: 7 * settings.dialog.lineHeight + 
@@ -308,7 +312,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             if (!type.stowage.description) {
 
-                                type.stowage.description = "This\nis a test of the emergency broadcast system.  If this had been an actual emergency, you would be dead.";
+                                type.stowage.description = "This is a test of the emergency broadcast system.  If this had been an actual emergency....";
                             }
                             if (!type.stowage.isSystemType) {
 
@@ -319,7 +323,7 @@ define(["NextWave/source/utility/prototypes",
                             self.typeContext = type;
 
                             // Update controls.
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name.payload);
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -333,6 +337,12 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) {
 
                                 return exceptionRet;
+                            }
+
+                            // Set the system type if present.
+                            if (!self.dialog.controlObject["systemTypeEdit"]) {
+
+                                return null;
                             }
                             return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
                         } catch (e) {
@@ -362,11 +372,3 @@ define(["NextWave/source/utility/prototypes",
             alert(e.message);
         }
     });
-
-
-//This is
-//a
-//test
-
-
-//of selection.

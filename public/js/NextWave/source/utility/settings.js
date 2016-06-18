@@ -257,6 +257,18 @@ define(["NextWave/source/utility/prototypes"],
 
                             fillBackground: "#faa"
                         },
+                        comment: {
+
+                            fillBackground: "#faa"
+                        },
+                        freeForm: {
+
+                            fillBackground: "#faa"
+                        },
+                        debugger: {
+
+                            fillBackground: "#faa"
+                        },
                         break: {
 
                             fillBackground: "#faa"

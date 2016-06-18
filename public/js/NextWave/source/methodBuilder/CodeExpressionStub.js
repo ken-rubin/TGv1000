@@ -320,14 +320,16 @@ define(["NextWave/source/utility/prototypes",
                                     contextRender.strokeStyle = settings.general.strokeDrag;
                                 }
                                 contextRender.stroke();
+                                contextRender.fill();
                             } else if (self.highlight) {
 
                                 contextRender.fillStyle = settings.codeExpressionStub.fillBackgroundHighlight;
+                                contextRender.fill();
                             } else {
 
                                 contextRender.fillStyle = settings.codeExpressionStub.fillBackground;
+                                contextRender.fill();
                             }
-                            contextRender.fill();
 
                             return null;
                         } catch (e) {

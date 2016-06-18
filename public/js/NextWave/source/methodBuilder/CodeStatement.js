@@ -15,9 +15,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/glyphs",
+    "NextWave/source/utility/Edit",
     "NextWave/source/methodBuilder/Block",
     "NextWave/source/methodBuilder/CodeExpressionStub"],
-    function (prototypes, settings, Point, Size, Area, glyphs, Block, CodeExpressionStub) {
+    function (prototypes, settings, Point, Size, Area, glyphs, Edit, Block, CodeExpressionStub) {
 
         try {
 
@@ -43,6 +44,8 @@ define(["NextWave/source/utility/prototypes",
                     self.blocks = [];
                     // Array containing CodeExpressionStubs.
                     self.expressionStubs = [];
+                    // Array containing other objects (not blocks and not stubs).
+                    self.others = [];
                     // Boolean indicates statement properties have been parsed.
                     self.parsed = false;
                     // Indicates that this object is displayed as and functions as a drag stub.
@@ -176,7 +179,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clone = function () {
 
                         // Just clone the base....
-                        return new self.constructor(strSettingsNode, strDisplayTemplate);
+                        return new self.constructor(strSettingsNode, 
+                            strDisplayTemplate);
                     };
 
                     // Method closes up all the blocks.
@@ -217,6 +221,13 @@ define(["NextWave/source/utility/prototypes",
                     // Returns the height of this type with all blocks closed.
                     self.getClosedHeight = function () {
 
+                        // If other is set, for now at least, there can be only one.
+                        // And in this case, it is always an Edit--return its height.
+                        if (self.others.length > 0) {
+
+                            return self.others[0].getHeight() + 2 * settings.general.margin;
+                        }
+
                         // All statements have an initial line.
                         var dHeight = settings.codeStatement.lineHeight + 2 * settings.general.margin;
 
@@ -242,6 +253,13 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
+                        }
+
+                        // If other is set, for now at least, there can be only one.
+                        // And in this case, it is always an Edit--return its height.
+                        if (self.others.length > 0) {
+
+                            return self.others[0].getHeight() + 2 * settings.general.margin;
                         }
 
                         // All statements have an initial line.
@@ -316,11 +334,24 @@ define(["NextWave/source/utility/prototypes",
 
                             if (m_objectHighlight) {
 
-                                // Store the cursor item as the drag object.
-                                var exceptionRet = window.manager.setDragObject(m_objectHighlight);
-                                if (exceptionRet) {
+                                // If other is set, for now at least, there can be only one.
+                                // And in this case, it is always an Edit--set focus to it.
+                                if (self.others.length > 0) {
 
-                                    return exceptionRet;
+                                    // Set focus object.
+                                    var exceptionRet = window.manager.setFocus(m_objectHighlight);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                } else {
+
+                                    // Store the cursor item as the drag object.
+                                    var exceptionRet = window.manager.setDragObject(m_objectHighlight);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
 
                                 // Pass down to highlight object.
@@ -337,6 +368,15 @@ define(["NextWave/source/utility/prototypes",
                     self.mouseMove = function (objectReference) {
 
                         try {
+
+                            // If other is set, for now at least, there can be only one.
+                            // And in this case, it is always an Edit--pass event to it.
+                            if (self.others.length > 0) {
+
+                                m_objectHighlight = self.others[0];
+                                m_objectHighlight.highlight = true;
+                                return m_objectHighlight.mouseMove(objectReference);
+                            }
 
                             // Reset highlight.
                             var exceptionRet = self.mouseOut(objectReference);
@@ -428,6 +468,24 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Pass down to highlight object.
                                 return m_objectHighlight.click(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse wheel is spun over the item.
+                    self.mouseWheel = function (objectReference) {
+
+                        try {
+
+                            if (m_objectHighlight &&
+                                $.isFunction(m_objectHighlight.mouseWheel)) {
+
+                                // Pass down to highlight object.
+                                return m_objectHighlight.mouseWheel(objectReference);
                             }
                             return null;
                         } catch (e) {
@@ -534,16 +592,34 @@ define(["NextWave/source/utility/prototypes",
                                     // Extract the property.
                                     var strProperty = strIth.substring(1, strIth.length - 1);
 
-                                    // Expression to render....
-                                    contextRender.font = settings.codeStatement.font;
-                                    var exceptionRet = self[strProperty].render(contextRender, 
-                                        areaRenderDisplay, 
-                                        dCursorX);
-                                    if (exceptionRet) {
+                                    // Handle edits differently....
+                                    if (self[strProperty] instanceof Edit) {
 
-                                        return exceptionRet;
+                                        // Make it symmetric.
+                                        var dWidth = areaRenderDisplay.extent.width - 2 * dCursorX;
+                                        var exceptionRet = self[strProperty].render(contextRender, 
+                                            false,
+                                            new Area(new Point(areaRenderDisplay.location.x + dCursorX, 
+                                                areaRenderDisplay.location.y), new Size(dWidth, 
+                                                settings.dialog.lineHeight * 5)));
+                                        if (exceptionRet) {
+
+                                            return exceptionRet;
+                                        }
+                                        dCursorX += dWidth;
+                                    } else {
+
+                                        // Expression to render....
+                                        contextRender.font = settings.codeStatement.font;
+                                        var exceptionRet = self[strProperty].render(contextRender, 
+                                            areaRenderDisplay, 
+                                            dCursorX);
+                                        if (exceptionRet) {
+
+                                            return exceptionRet;
+                                        }
+                                        dCursorX += self[strProperty].getWidth(contextRender);
                                     }
-                                    dCursorX += self[strProperty].getWidth(contextRender);
                                 } else {
 
                                     // Else do a fill text.
@@ -643,6 +719,10 @@ define(["NextWave/source/utility/prototypes",
 
                                     objectIth.collection = self;
                                     self.expressionStubs.push(objectIth);
+                                } else if (objectIth instanceof Edit) {
+
+                                    objectIth.collection = self;
+                                    self.others.push(objectIth);
                                 }
                             }
 

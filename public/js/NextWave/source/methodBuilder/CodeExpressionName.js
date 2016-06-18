@@ -62,60 +62,6 @@ define(["NextWave/source/utility/prototypes",
                             self.payload.save()
                         ];
                     };
-
-                    // Invoked when the keyboard is clicked whilest this item has focus.
-                    self.keyPressed = function (objectReference) {
-
-                        try {
-
-                            // Pass to payload if set.
-                            if (self.payload &&
-                                $.isFunction(self.payload.keyPressed)) {
-
-                                return self.payload.keyPressed(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the keyboard is depressed whilest this item has focus.
-                    self.keyDown = function (objectReference) {
-
-                        try {
-
-                            // Pass to payload if set.
-                            if (self.payload &&
-                                $.isFunction(self.payload.keyDown)) {
-
-                                return self.payload.keyDown(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the keyboard is let up whilest this item has focus.
-                    self.keyUp = function (objectReference) {
-
-                        try {
-
-                            // Pass to payload if set.
-                            if (self.payload &&
-                                $.isFunction(self.payload.keyUp)) {
-
-                                return self.payload.keyUp(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
                 } catch (e) {
 
                     alert(e.message);

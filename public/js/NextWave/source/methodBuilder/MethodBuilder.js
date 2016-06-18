@@ -82,6 +82,7 @@ define(["NextWave/source/utility/prototypes",
                                 nameEdit: {
 
                                     type: "Edit",
+                                    multiline: false,
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: settings.general.margin,
@@ -112,7 +113,7 @@ define(["NextWave/source/utility/prototypes",
                                                 var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
                                                 if (!typeFromName) {
 
-                                                    return null;
+                                                    return localSelf.setText(localSelf.saveMethodName);
                                                 }
 
                                                 // Ensure the value is unique.
@@ -274,7 +275,7 @@ define(["NextWave/source/utility/prototypes",
                             //self.methodStatements = objectContext.method.statements;
 
                             // Set the type.
-                            self.typeLabel.text = objectContext.type.name.payload;
+                            self.typeLabel.text = objectContext.type.name;
 
                             // Set the method.
                             return self.methodEdit.setText(objectContext.method.name);

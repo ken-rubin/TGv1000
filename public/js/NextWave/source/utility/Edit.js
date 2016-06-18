@@ -20,7 +20,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Edit() {
+        	var functionRet = function Edit(strText, bMultiline) {
 
                 try {
 
@@ -36,7 +36,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicate if this object is highlighted.
                     self.highlight = false;
                     // Content.  Lines of objects, each of which has selection information.
-                    self.text = "";
+                    self.text = strText || "";
                     // Either the token: "requireFormat", or an array of lines.
                     self.lines = "requireFormat";
                     // Indicates that the corresponding scroll stud is visible--set in render.
@@ -44,14 +44,14 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates that the corresponding scroll stud is visible--set in render.
                     self.scrollStubArea = [null, null];
                     // Indicates how things are measured and how they scroll.
-                    self.vertical = true;
+                    self.multiline = bMultiline || false;
                     // Access this property based on orientation.
-                    self.propertyAccessor = (self.vertical ? "height" : "width");
-                    // Access this method based on orientation.
-                    self.methodAccessor = (self.vertical ? "getHeight" : "getWidth");
+                    self.propertyAccessor = (self.multiline ? "height" : "width");
                     // Access scroll cursor based on orientation.
-                    self.scrollCursor = [(self.vertical ? "n-resize" : "w-resize"),
-                        (self.vertical ? "s-resize" : "e-resize")];
+                    self.scrollCursor = [(self.multiline ? "n-resize" : "w-resize"),
+                        (self.multiline ? "s-resize" : "e-resize")];
+                    // Width of a single character.
+                    self.characterWidth = 20;
 
                     ///////////////////////
                     // Public methods.
@@ -74,7 +74,7 @@ define(["NextWave/source/utility/prototypes",
                             self.lines = "requireFormat";
 
                             m_iSelectionStart = 0;
-                            m_iSelectionLength = self.text.length;
+                            m_iSelectionLength = 0;//self.text.length;
 
                             return null;
                         } catch (e) {
@@ -83,10 +83,21 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    self.getWidth = function (contextRender) {
+
+                        contextRender.font = settings.general.monoSpaceFont;
+                        return contextRender.measureText(self.text).width + 4 * settings.general.margin;                            
+                    }
+
+                    self.getHeight = function () {
+
+                        return self.position.extent.height + 2 * settings.general.margin;                            
+                    }
+
                     // Helper method calculates usable total extent of list.
                     self.getTotalExtent = function (contextRender) {
 
-                        if (self.vertical) {
+                        if (self.multiline) {
 
                             // Sum each line.
                             if (self.lines === "requireFormat") {
@@ -96,7 +107,7 @@ define(["NextWave/source/utility/prototypes",
                             return settings.dialog.lineHeight * self.lines.length;
                         } else {
 
-                            return contextRender.measureText(self.text).width;                            
+                            return self.getWidth(contextRender);
                         }
                     };
 
@@ -108,7 +119,8 @@ define(["NextWave/source/utility/prototypes",
                             // Reset lines--to cause the next render to reformat.
                             self.lines = "requireFormat";
 
-                            if (self.vertical) {
+                            // Position scroll stubs--they may not be visible.
+                            if (self.multiline) {
 
                                 self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
                                         areaMaximal.location.y + settings.general.scrollStub.yOffset), 
@@ -138,11 +150,135 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Set values as opposed to via the constructor.
+                    self.innerCreate = function () {
+
+                        try {
+
+                            // Configuration data in self.configuration.
+
+                            // Set multiline and comcamitant properties.
+                            self.multiline = self.configuration.multiline;
+                            if (self.multiline === undefined) {
+
+                                self.multiline = true;
+                            }
+                            self.propertyAccessor = (self.multiline ? "height" : "width");
+                            self.scrollCursor = [(self.multiline ? "n-resize" : "w-resize"),
+                                (self.multiline ? "s-resize" : "e-resize")];
+
+                            // Also update the text, possibly.
+                            if (self.configuration.text) {
+
+                                return self.setText(self.configuration.text);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Inner clear data.
                     self.innerClear = function () {
 
                         self.lines = [];
                         return null;
+                    };
+
+                    // Stop scrolling if scrolling.
+                    self.mouseOut = function (objectReference) {
+
+                        try {
+
+                            // Stop scrolling, if scrolling.
+                            if (m_functionScroll) {
+
+                                m_functionScroll = null;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set caret position on mouse down.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            // Figure out the position as close to the mouse down as possible.
+                            if (self.multiline) {
+
+                                // For multiline, figure out the line and column:
+                                // Line has scroll-logic associated.
+                                var iLine = Math.floor( (objectReference.pointCursor.y + m_dScrollOffset - self.position.location.y) / settings.dialog.lineHeight );
+                                if (iLine < 0) {
+
+                                    iLine = 0;
+                                }
+                                if (iLine > self.lines.length - 1) {
+
+                                    iLine = self.lines.length - 1;
+                                }
+                                var lineClick = self.lines[iLine];
+
+                                var iColumn = Math.floor( (objectReference.pointCursor.x + self.characterWidth / 2 - self.position.location.x - settings.general.margin) / self.characterWidth );
+                                if (iColumn < 0) {
+
+                                    iColumn = 0;
+                                }
+                                if (iColumn > lineClick.text.length) {
+
+                                    iColumn = lineClick.text.length;
+                                }
+
+                                // Set the start to the column index at the row.
+                                m_iSelectionStart = lineClick.startIndex + iColumn;                            
+                            } else {
+
+                                // Just figure out the column.
+                                var iColumn = Math.floor( (objectReference.pointCursor.x + self.characterWidth / 2 + m_dScrollOffset - self.position.location.x - settings.general.margin) / self.characterWidth );
+                                if (iColumn < 0) {
+
+                                    iColumn = 0;
+                                }
+                                if (iColumn > self.text.length) {
+
+                                    iColumn = self.text.length;
+                                }
+
+                                // Set the start to the column index.
+                                m_iSelectionStart = iColumn;                            
+                            }
+
+                            // Always set selection length to 0.
+                            m_iSelectionLength = 0;
+                            self.possiblyAdjustScrollOffset();
+                            self.possiblyEnsureCaretVisible();
+                            self.lines = "requireFormat";
+
+                            // Always want to show the cursor after a character is typed.
+                            m_bShowCursor = true;
+
+                            // Cancel the blink timer so it is started again, but
+                            // gives the whole duration of shown-ness before hiding.
+                            if (m_cookieBlinkTimer) {
+
+                                clearInterval(m_cookieBlinkTimer);
+                                m_cookieBlinkTimer = null;
+                            }
+                            // Do startup work.
+                            m_cookieBlinkTimer = setInterval(m_functionBlinkTimerTick,
+                                settings.general.blinkMS);
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Invoked when the mouse is moved over the list.
@@ -185,11 +321,11 @@ define(["NextWave/source/utility/prototypes",
                                 // Start scrolling, if not already.
                                 if (!m_functionScroll) {
 
-                                    // Calculate the total height.
-                                    var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
-
                                     // Set the scroll function to "down".
                                     m_functionScroll = function () {
+
+                                        // Calculate the total extent.
+                                        var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
 
                                         // Special case, scroll up.
                                         if (m_dScrollOffset < (dTotalExtent - self.position.extent[self.propertyAccessor])) {
@@ -238,7 +374,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Get the direction of scrolling based on wheel change.
                             // For now, I don't think you can scroll to ther side...test....
-                            var strDeltaAccessor = (self.vertical ? "deltaY" : "deltaY");
+                            var strDeltaAccessor = (self.multiline ? "deltaY" : "deltaY");
 
                             // Calculate distance.
                             var dAmount = -objectReference.event[strDeltaAccessor] * objectReference.event.deltaFactor;
@@ -283,6 +419,20 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             m_bPossiblyAdjustScrollOffsets = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set a flag so that the caret is checked for visibility on the next render.
+                    self.possiblyEnsureCaretVisible = function () {
+
+                        try {
+
+                            m_bPossiblyEnsureCaretVisible = true;
 
                             return null;
                         } catch (e) {
@@ -338,6 +488,7 @@ define(["NextWave/source/utility/prototypes",
                                 m_iSelectionLength = 0;
                             }
 
+                            // Ensure caret is visible.
                             return null;
                         } catch (e) {
 
@@ -353,7 +504,16 @@ define(["NextWave/source/utility/prototypes",
 
                             // Let derived class do something  
                             // before handling the key press.
-                            var exceptionRet = null;
+                            var exceptionRet = self.possiblyEnsureCaretVisible();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.possiblyAdjustScrollOffset();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             // Save this state.
                             var bShift = (e.shiftKey);
@@ -436,10 +596,20 @@ define(["NextWave/source/utility/prototypes",
                                 if (bShift) {
 
                                     // Don't allow stretch that can go before the first character.  
-                                    // But do, incidentally, allow negative lengths.
+                                    // But do, incidentally, allow for negative length values.
                                     if (m_iSelectionStart + m_iSelectionLength > 0) {
 
                                         m_iSelectionLength--;
+
+                                        // If the control key is down, move across a word. 
+                                        if (bCtrl) {
+
+                                            while ((m_iSelectionStart + m_iSelectionLength > 0) &&
+                                                ( self.text[m_iSelectionStart + m_iSelectionLength - 1].match(/\w/g) )) {
+
+                                                m_iSelectionLength--;
+                                            }
+                                        }
                                     }
                                 } else {
 
@@ -460,6 +630,16 @@ define(["NextWave/source/utility/prototypes",
 
                                             m_iSelectionStart--;
                                         }
+
+                                        // If the control key is down, move across a word. 
+                                        if (bCtrl) {
+
+                                            while ((m_iSelectionStart > 0) &&
+                                                ( self.text[m_iSelectionStart - 1].match(/\w/g) )) {
+
+                                                m_iSelectionStart--;
+                                            }
+                                        }
                                     } else {
 
                                         // If the selection is wide, then make it narrow before moving selection.
@@ -471,11 +651,19 @@ define(["NextWave/source/utility/prototypes",
                                 e.stopPropagation();
                             } else if (e.which === 38) {                     // Up arrow.
 
+                                // Convert down and up in the non-multiline case.
+                                if (self.multiline === false) {
+
+                                    // Convert to a left arrow and call into self.
+                                    e.which = 37;
+                                    return self.keyDown(e);
+                                }
+
                                 // Figure out where the "end of selection" marker is.
                                 var iLine = (m_iSelectionLength < 0 ? self.startingLine : self.endingLine);
                                 var iColumn = (m_iSelectionLength < 0 ? self.startingColumn : self.endingColumn);
 
-                                if (iLine === 0) {
+                                if (iLine <= 0) {
 
                                     // Key is handled.
                                     e.stopPropagation();
@@ -491,7 +679,8 @@ define(["NextWave/source/utility/prototypes",
                                         m_iSelectionLength -= (lineWork.text.length + 1);
                                     } else {
 
-                                        m_iSelectionStart -= (lineWork.text.length + 1 - m_iSelectionLength);
+                                        m_iSelectionStart += m_iSelectionLength;
+                                        m_iSelectionStart -= (lineWork.text.length + 1);
                                         m_iSelectionLength = 0;
                                     }
                                 } else {
@@ -501,9 +690,16 @@ define(["NextWave/source/utility/prototypes",
                                         m_iSelectionLength -= (iColumn + 1);
                                     } else {
 
+                                        m_iSelectionStart += m_iSelectionLength;
                                         m_iSelectionStart -= (iColumn + 1);
                                         m_iSelectionLength = 0;
                                     }
+                                }
+
+                                // Don't go too far.
+                                if (m_iSelectionStart < 0) {
+
+                                    m_iSelectionStart = 0;
                                 }
 
                                 // Key is handled.
@@ -520,6 +716,16 @@ define(["NextWave/source/utility/prototypes",
                                     if (m_iSelectionStart + m_iSelectionLength < self.text.length) {
 
                                         m_iSelectionLength++;
+
+                                        // If the control key is down, move across a word. 
+                                        if (bCtrl) {
+
+                                            while ((m_iSelectionStart + m_iSelectionLength < self.text.length) &&
+                                                ( self.text[m_iSelectionStart + m_iSelectionLength].match(/\w/g) )) {
+
+                                                m_iSelectionLength++;
+                                            }
+                                        }
                                     }
                                 } else {
 
@@ -532,13 +738,23 @@ define(["NextWave/source/utility/prototypes",
                                         m_iSelectionLength *= -1;
                                     }
 
-                                    // Only move the selection if narrow.
+                                    // Only move the start if narrow.
                                     if (m_iSelectionLength === 0) {
 
                                         // Only set the start if less than the end of the string.
                                         if (m_iSelectionStart < self.text.length) {
 
                                             m_iSelectionStart++;
+
+                                            // If the control key is down, move across a word. 
+                                            if (bCtrl) {
+
+                                                while ((m_iSelectionStart < self.text.length) &&
+                                                    ( self.text[m_iSelectionStart].match(/\w/g) )) {
+
+                                                    m_iSelectionStart++;
+                                                }
+                                            }                                        
                                         }
                                     } else {
 
@@ -552,21 +768,26 @@ define(["NextWave/source/utility/prototypes",
                                 e.stopPropagation();
                             } else if (e.which === 40) {                     // Down arrow.
 
+                                // Convert down and up in the non-multiline case.
+                                if (self.multiline === false) {
+
+                                    // Convert to a right arrow and call into self.
+                                    e.which = 39;
+                                    return self.keyDown(e);
+                                }
+
                                 // Figure out where the "end of selection" marker is.
                                 var iLine = (m_iSelectionLength < 0 ? self.startingLine : self.endingLine);
                                 var iColumn = (m_iSelectionLength < 0 ? self.startingColumn : self.endingColumn);
 
-                                if ((iLine >= self.lines.length - 1) ||
-                                    ((!bShift) &&
-                                        (iLine === self.lines.length - 2) && 
-                                        (self.lines[self.lines.length - 1].text.length === 0))) {  // -2 because there is technically always an extra line, but it is only accessible in certain circumstances.
+                                if (iLine >= self.lines.length - 1) {
 
                                     // Key is handled.
                                     e.stopPropagation();
                                     return null;
                                 }
 
-                                // Try to get the equivalent column in the previous line.
+                                // Try to get the equivalent column in the next line.
                                 var lineWork = self.lines[iLine + 1];
                                 if (lineWork.text.length >= iColumn) {
 
@@ -576,7 +797,8 @@ define(["NextWave/source/utility/prototypes",
                                         m_iSelectionLength += (lineCurrent.text.length + 1);
                                     } else {
 
-                                        m_iSelectionStart += (lineCurrent.text.length + 1 - m_iSelectionLength);
+                                        m_iSelectionStart += m_iSelectionLength;
+                                        m_iSelectionStart += (lineCurrent.text.length + 1);
                                         m_iSelectionLength = 0;
                                     }
                                 } else {
@@ -587,9 +809,16 @@ define(["NextWave/source/utility/prototypes",
                                         m_iSelectionLength += (lineWork.text.length + 1 + lineCurrent.text.length - iColumn);
                                     } else {
 
+                                        m_iSelectionStart += m_iSelectionLength;
                                         m_iSelectionStart += (lineWork.text.length + 1 + lineCurrent.text.length - iColumn);
                                         m_iSelectionLength = 0;
                                     }
+                                }
+
+                                // Don't go too far.
+                                if (m_iSelectionStart > self.text.length) {
+
+                                    m_iSelectionStart > self.text.length;                                    
                                 }
 
                                 // Key is handled.
@@ -628,9 +857,37 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render object.
-                    self.render = function (contextRender) {
+                    self.render = function (contextRender, bRenderBackground, areaRender) {
 
                         try {
+
+                            // If render area is specified, use this
+                            // to call calculateLayout if ever different.
+                            if (areaRender &&
+                                (m_areaLast === null || (
+                                    areaRender.location.x !== m_areaLast.location.x ||
+                                    areaRender.location.y !== m_areaLast.location.y ||
+                                    areaRender.extent.width !== m_areaLast.extent.width ||
+                                    areaRender.extent.height !== m_areaLast.extent.height
+                                    ))) {
+
+                                // Call calculate layout.
+                                var exceptionRet = self.calculateLayout(areaRender, 
+                                    contextRender);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                                // Save m_areaLast.
+                                m_areaLast = areaRender;
+                            }
+
+                            // Default to true.
+                            if (bRenderBackground === undefined) {
+
+                                bRenderBackground = true;
+                            }
 
                             // Set the font up front, before 
                             // potentially formatting lines.
@@ -640,10 +897,22 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = null;
                             if (self.lines == "requireFormat") {
 
-                                exceptionRet = m_functionFormatLines(contextRender);
-                                if (exceptionRet) {
+                                if (self.multiline) {
 
-                                    throw exceptionRet;
+                                    exceptionRet = m_functionFormatLines(contextRender);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                } else {
+
+                                    self.characterWidth = contextRender.measureText("w").width;
+                                    self.lines = [{ 
+
+                                        text: self.text, 
+                                        selectionStart: m_iSelectionStart, 
+                                        selectionLength: m_iSelectionLength
+                                    }]
                                 }
                             }
 
@@ -652,6 +921,20 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Just call it.
                                 m_functionScroll();
+                            }
+
+                            // Determine if the focus element has focus.
+                            var bFocused = window.manager.hasFocus(self);
+
+                            // Caret should always be visible if focused.
+                            if (m_bPossiblyEnsureCaretVisible) {
+
+                                exceptionRet = m_functionEnsureCaretIsVisible();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                                m_bPossiblyEnsureCaretVisible = false;
                             }
 
                             // If previously instructed, possibly adjust scroll offsets here.
@@ -665,7 +948,11 @@ define(["NextWave/source/utility/prototypes",
 
                                     m_dScrollOffset = Math.max(0, 
                                         dTotalExtent - self.position.extent[self.propertyAccessor]);
+                                } else if (m_dScrollOffset < 0) {
+
+                                    m_dScrollOffset = 0;
                                 }
+                                m_bPossiblyAdjustScrollOffsets = false;
                             }
 
                             // Generate the path.
@@ -676,13 +963,13 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Draw focus recangle if highlighted.
-                            if (self.highlight) {
+                            if (self.highlight || bFocused) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.fill();
                                 contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
                                 contextRender.stroke();
-                            } else {
+                            } else if (bRenderBackground) {
 
                                 contextRender.fillStyle = settings.general.fillBackground;
                                 contextRender.fill();
@@ -694,26 +981,43 @@ define(["NextWave/source/utility/prototypes",
                             // Set clip to background shape
                             contextRender.clip();
 
-                            // Determine if the focus element has focus.
-                            var bFocused = window.manager.hasFocus(self);
+                            var dExtent = self.getTotalExtent(contextRender);
 
                             // Render all the lines.
-                            exceptionRet = m_functionRenderLines(contextRender,
-                                bFocused);
-                            if (exceptionRet) {
+                            if (self.multiline) {
 
-                                return exceptionRet;
+                                exceptionRet = m_functionRenderLines(contextRender,
+                                    bFocused);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            } else {
+
+                                var exceptionRet = m_functionRenderLine(contextRender,
+                                    self.lines[0],
+                                    bFocused,
+                                    new Area(new Point(self.position.location.x - m_dScrollOffset,
+                                            self.position.location.y +
+                                            (self.position.extent.height - 
+                                                settings.dialog.lineHeight) / 2),
+                                        new Size(dExtent,
+                                            settings.dialog.lineHeight)));
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
                             }
 
-                            var dCursor = self.getTotalExtent();
+                            // help: for horizontal, index-zero goes to the right
 
                             self.scrollStubVisible[0] = false;
                             self.scrollStubVisible[1] = false;
                             // Only show scroll stubs if can scroll.
-                            if (dCursor + m_dScrollOffset > self.position.extent[self.propertyAccessor]) {
+                            if (dExtent > self.position.extent[self.propertyAccessor]) {
 
                                 // Render the scroll up region.
-                                if (Math.floor(self.position.extent[self.propertyAccessor]) < Math.floor(dCursor)) {
+                                if (Math.floor(self.position.extent[self.propertyAccessor]) < Math.floor(dExtent - m_dScrollOffset)) {
 
                                     exceptionRet = self.scrollStubArea[1].generateRoundedRectPath(contextRender);
                                     if (exceptionRet) {
@@ -758,6 +1062,53 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Private methods.
 
+                    // Scroll to ensure the caret is 
+                    // visible called after a keypress.
+                    var m_functionEnsureCaretIsVisible = function () {
+
+                        try {
+
+                            // If multiline, ensure the end-of-selection location is 
+                            // visible vertically, else horizontally.
+                            if (self.multiline) {
+
+                                // Figure out where the "end of selection" marker is.
+                                var iLine = (m_iSelectionLength < 0 ? self.startingLine : self.endingLine);
+
+                                // Vertical:
+                                // Calculate the y-coordinate of the line.
+                                var dY = iLine * settings.dialog.lineHeight;
+                                if (dY < m_dScrollOffset) {
+
+                                    m_dScrollOffset = Math.max(0, dY);
+                                    self.possiblyAdjustScrollOffset();
+                                } else if (dY - m_dScrollOffset + settings.dialog.lineHeight  >= self.position.extent.height) {
+
+                                    m_dScrollOffset = dY - self.position.extent.height + settings.dialog.lineHeight ;
+                                    self.possiblyAdjustScrollOffset();
+                                }
+                            } else {
+
+                                // Calculate the x-coordinate of the column.
+                                var dX = Math.max(m_iSelectionStart, m_iSelectionStart + m_iSelectionLength) * self.characterWidth;
+                                if (dX < m_dScrollOffset) {
+
+                                    m_dScrollOffset = Math.max(0, dX);
+                                    self.possiblyAdjustScrollOffset()
+                                } else if (dX - m_dScrollOffset + self.characterWidth >= self.position.extent.width) {
+
+                                    m_dScrollOffset = dX - self.position.extent.width + self.characterWidth;
+                                    self.possiblyAdjustScrollOffset()
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Format text in lines.
                     var m_functionFormatLines = function (contextRender) {
 
@@ -774,13 +1125,13 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Measure a character.
-                            var dCharacterWidth = contextRender.measureText("W").width;
+                            self.characterWidth = contextRender.measureText("W").width;
 
                             // The width of a single line.
                             var dLineWidth = self.position.extent.width - 2 * settings.general.margin;
 
                             // Save this for up and down key accounting.
-                            self.charactersPerLine = Math.floor(dLineWidth / dCharacterWidth);
+                            self.charactersPerLine = Math.floor(dLineWidth / self.characterWidth);
 
                             // Split based on space.  Space characters
                             // are the only separators that matter here.
@@ -901,20 +1252,10 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Complete final line.
-                            if (strCurrentLine.length > 0) {
-
-                                // This is the *All that's left* new-line.
-                                self.lines.push({ 
-
-                                    text: strCurrentLine,
-                                    endOfLine: 0
-                                });
-                            }
-
-                            // Always add one extra line for the "last line is blank"-case.
+                            // This is the *All that's left* new-line.
                             self.lines.push({ 
 
-                                text: "",
+                                text: strCurrentLine,
                                 endOfLine: 0
                             });
 
@@ -1012,6 +1353,15 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
+                            // Process selection start point.
+                            var iStartIndex = 0;
+                            for (var i = 0; i < self.lines.length; i++) {
+
+                                var lineIth = self.lines[i];
+                                lineIth.startIndex = iStartIndex;
+                                iStartIndex += (lineIth.endOfLine + lineIth.text.length);
+                            }
+
                             return null;
                         } catch(e) {
 
@@ -1074,8 +1424,10 @@ define(["NextWave/source/utility/prototypes",
                                 var exceptionRet = m_functionRenderLine(contextRender,
                                     objectLine,
                                     bFocused,
-                                    new Area(new Point(self.position.location.x - (!self.vertical ? m_dScrollOffset : 0),
-                                            self.position.location.y + i * settings.dialog.lineHeight - (self.vertical ? m_dScrollOffset : 0)),
+                                    new Area(new Point(self.position.location.x - (!self.multiline ? m_dScrollOffset : 0),
+                                                self.position.location.y + 
+                                                i * settings.dialog.lineHeight - 
+                                                (self.multiline ? m_dScrollOffset : 0)),
                                         new Size(self.position.extent.width,
                                             settings.dialog.lineHeight)));
                                 if (exceptionRet) {
@@ -1198,6 +1550,11 @@ define(["NextWave/source/utility/prototypes",
                     var m_functionScroll = null;
                     // Update the scroll offset if necessary.
                     var m_bPossiblyAdjustScrollOffsets = false;
+                    // Update caret visiblity on next render.
+                    var m_bPossiblyEnsureCaretVisible = false;
+                    // Cached Area for Edits which are passed an Area 
+                    // in render--to minimally call calculateLayout.
+                    var m_areaLast = null;
                 } catch (e) {
 
                     alert(e.message);

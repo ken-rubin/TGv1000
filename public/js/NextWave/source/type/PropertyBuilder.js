@@ -90,7 +90,7 @@ define(["NextWave/source/utility/prototypes",
                                                 var typeContext = localSelf.dialog.host.typeContext;
 
                                                 // Ensure the value is unique.
-                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.getText,
+                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.getText(),
                                                     typeContext.properties.parts,
                                                     "name"));
                                                 if (exceptionRet) {
