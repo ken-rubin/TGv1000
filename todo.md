@@ -13,7 +13,9 @@
 - If a System Type is renamed, that has to be propogated everywhere.
 
 ## Jerry's High Priority Issues
-- When delete Type or System type that's in center panel in any manifestation, pick another.
+- Prohibit renaming App type or App.initialize method or any construct method.
+- Prohibit a normal user from changing anything about a System Type.
+- Anyone can delete non-App types and we special users can delete any System Types (but probably shouldn't be allowed to). But no one can delete an App type Base type.
 - Do LayerDesigner.
 - John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.
 - From John:

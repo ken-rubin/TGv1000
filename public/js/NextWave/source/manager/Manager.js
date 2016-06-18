@@ -461,8 +461,7 @@ define(["NextWave/source/utility/prototypes",
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MyType",
                                 self.types,
-                                "name",
-                                "payload");;
+                                "name");
 
                             // Create type.
                             var typeNew = new Type();
@@ -499,8 +498,7 @@ define(["NextWave/source/utility/prototypes",
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MySystemType",
                                 self.systemTypes,
-                                "name",
-                                "payload");;
+                                "name");
 
                             // Create type.
                             var typeNew = new Type();
@@ -682,21 +680,44 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            var indexRemoved;
+                            var nameRemoved = typeToRemove.name;
+
                             // Search for type.
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name === typeToRemove.name) {
+                                if (self.types[i].name === nameRemoved) {
 
                                     // ...and remove.
                                     self.types.splice(i, 1);
-
+                                    indexRemoved = i;
                                     break;
                                 }
                             }
 
                             // Also remove from panel layer.
-                            return self.panelLayer.removeType(typeToRemove);
+                            var exceptionRet = self.panelLayer.removeType(typeToRemove);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select a different system type if the deleted one was the one in the center panel.
+                            if (window.typeBuilder.typeContext.name === nameRemoved) {
+
+                                var newTypeIndex = m_functionGetNewIndex(self.types, indexRemoved);
+                                if (newTypeIndex > -1) {
+
+                                    return self.selectType(self.types[newTypeIndex]);
+                                }
+
+                                // Nothing left -- cannot happen in Types, actually, because no one can delete App type.
+                                // But can happen in similar code in system types panel.
+                                self.panelLayer.clearCenter("Type");
+                            }
+
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -708,21 +729,44 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            var indexRemoved;
+                            var nameRemoved = typeToRemove.name;
+
                             // Search for type.
                             for (var i = 0; i < self.systemTypes.length; i++) {
 
                                 // Find match...
-                                if (self.systemTypes[i].name.payload === typeToRemove.name.payload) {
+                                if (self.systemTypes[i].name === nameRemoved) {
 
                                     // ...and remove.
                                     self.systemTypes.splice(i, 1);
-
+                                    indexRemoved = i;
                                     break;
                                 }
                             }
 
                             // Also remove from panel layer.
-                            return self.panelLayer.removeSystemType(typeToRemove);
+                            var exceptionRet = self.panelLayer.removeSystemType(typeToRemove);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select a different system type if the deleted one was the one in the center panel.
+                            if (window.typeBuilder.typeContext.name === nameRemoved) {
+
+                                var newTypeIndex = m_functionGetNewIndex(self.systemTypes, indexRemoved);
+                                if (newTypeIndex > -1) {
+
+                                    return self.selectSystemType(self.systemTypes[newTypeIndex]);
+                                }
+
+                                // Nothing left -- cannot happen in Types, actually, because no one can delete App type.
+                                // But can happen in similar code in system types panel.
+                                self.panelLayer.clearCenter("Type");
+                            }
+
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -1571,6 +1615,24 @@ define(["NextWave/source/utility/prototypes",
 
                     //////////////////////////
                     // Private methods.
+
+                    // Chooses type or systemType to display in center panel if one has been deleted.
+                    var m_functionGetNewIndex = function (typeArray, indexRemoved) {
+
+                        var len = typeArray.length;
+
+                        if (len === 0) {
+
+                            return -1;
+                        }
+
+                        if (len === indexRemoved) {
+
+                            return len - 1;
+                        }
+
+                        return indexRemoved;
+                    }
 
                     // Helper method.
                     var m_functionCallAlternateFocusEnter = function () {

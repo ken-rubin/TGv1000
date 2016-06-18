@@ -385,7 +385,7 @@ define(["NextWave/source/utility/prototypes",
                             } else {
 
                                 // Then test the other icon.
-                                bIn = m_areaDeleteIcon.pointInArea(objectReference.contextRender,
+                                bIn = m_areaDeleteIcon && m_areaDeleteIcon.pointInArea(objectReference.contextRender,
                                     objectReference.pointCursor);
                                 if (bIn) {
 
@@ -633,21 +633,24 @@ define(["NextWave/source/utility/prototypes",
                                     throw exceptionRet;
                                 }
 
-                                // Draw the delete glyphs.
-                                m_areaDeleteIcon = new Area(
-                                    new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
-                                        m_areaOpenCloseIcon.location.y),
-                                    new Size(settings.glyphs.width, 
-                                        settings.glyphs.height));
+                                if (self.stowage.isSystemType || (!self.stowage.isSystemType && self.name !== "App")) {
 
-                                // Render glyph.
-                                exceptionRet = glyphs.render(contextRender,
-                                    m_areaDeleteIcon,
-                                    glyphs.remove, 
-                                    settings.manager.showIconBackgrounds);
-                                if (exceptionRet) {
+                                    // Draw the delete glyphs.
+                                    m_areaDeleteIcon = new Area(
+                                        new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
+                                            m_areaOpenCloseIcon.location.y),
+                                        new Size(settings.glyphs.width, 
+                                            settings.glyphs.height));
 
-                                    throw exceptionRet;
+                                    // Render glyph.
+                                    exceptionRet = glyphs.render(contextRender,
+                                        m_areaDeleteIcon,
+                                        glyphs.remove, 
+                                        settings.manager.showIconBackgrounds);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                 }
                             }
 
