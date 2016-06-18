@@ -673,7 +673,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 typeId: typeIth.id,
                                                                 propertyTypeId: 6,
                                                                 name: property.name,
-                                                                initialValue: property.initialValue,
+                                                                initialValue: property.initialValue || '',
                                                                 ordinal: property.ordinal,
                                                                 isHidden: 0
                                                                 };
@@ -698,7 +698,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 var scriptGuts = " SET typeId=" + typeIth.atid
                                                                             + ",propertyTypeId=" + property.propertyTypeId
                                                                             + ",name=" + connection.escape(property.name)
-                                                                            + ",initialValue=" + connection.escape(property.initialValue)
+                                                                            + ",initialValue=" + connection.escape(property.initialValue || '')
                                                                             + ",ordinal=" + property.ordinal
                                                                             + ",isHidden=" + (property.isHidden ? 1 : 0)
                                                                             ;
@@ -3310,7 +3310,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             typeId: typeIth.id,
                                             propertyTypeId: 6,
                                             name: property.name,
-                                            initialValue: property.initialValue,
+                                            initialValue: property.initialValue || '',
                                             ordinal: property.ordinal,
                                             isHidden: 0
                                             };
