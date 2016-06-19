@@ -633,7 +633,18 @@ define(["NextWave/source/utility/prototypes",
                                     throw exceptionRet;
                                 }
 
-                                if (self.stowage.isSystemType || (!self.stowage.isSystemType && self.name !== "App")) {
+                                // No one can delete the App type or the App type's base type.
+                                // Normal users cannot delete system types.
+                                var bCanDelete = true;
+                                if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.stowage.isSystemType) {
+                                    bCanDelete = false;
+                                } else if (!self.stowage.isSystemType && self.name === "App") {
+                                    bCanDelete = false;
+                                } else if (self.stowage.typeTypeId === 3) {
+                                    bCanDelete = false;
+                                }
+
+                                if (bCanDelete) {
 
                                     // Draw the delete glyphs.
                                     m_areaDeleteIcon = new Area(
