@@ -548,7 +548,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             } else {
 
-                                if ((window.draggingStatement || window.draggingExpression) &&
+                                if ((window.draggingObject) &&
                                     (self.collection)) {
 
                                     contextRender.fillStyle = settings.general.fillDrag;
@@ -644,7 +644,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Stroke the path.
-                            if (window.draggingStatement || window.draggingExpression) {
+                            if (window.draggingObject) {
 
                                 contextRender.strokeStyle = settings.general.strokeDrag;
                             } else if (self.highlight) {

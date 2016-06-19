@@ -686,7 +686,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name === typeToRemove.name) {
+                                if (self.types[i].name.payload === typeToRemove.name.payload) {
 
                                     // ...and remove.
                                     self.types.splice(i, 1);
@@ -712,7 +712,11 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.systemTypes.length; i++) {
 
                                 // Find match...
+<<<<<<< HEAD
+                                if (self.types[i].name === typeToRemove.name) {
+=======
                                 if (self.systemTypes[i].name.payload === typeToRemove.name.payload) {
+>>>>>>> 25845ea8ba04ceca27d9910600f53af5b7de7b30
 
                                     // ...and remove.
                                     self.systemTypes.splice(i, 1);
@@ -1551,7 +1555,6 @@ define(["NextWave/source/utility/prototypes",
                             // Only certain types can drag.
                             if (objectDrag instanceof Expression ||
                                 objectDrag instanceof Literal ||
-                                objectDrag instanceof Parameter ||
                                 objectDrag instanceof Statement ||
                                 objectDrag instanceof Name ||
                                 objectDrag instanceof CodeExpression ||
@@ -2259,7 +2262,7 @@ define(["NextWave/source/utility/prototypes",
                     var m_arrayReserved = [
 
                         "abstract", "alert", "all", "anchor", "anchors", "area", "Array", "assign",
-                        "Boolean", "break", "byte", "blur", "button", 
+                        "boolean", "break", "byte", "blur", "button", 
                         "case", "catch", "char", "class", "const", "continue", "checkbox", "clearInterval", "clearTimeout", "clientInformation", "close", "closed", "confirm", "constructor", "crypto",
                         "debugger", "default", "delete", "do", "double", "Date", "decodeURI", "decodeURIComponent", "defaultStatus", "document", 
                         "else", "enum", "export", "extends", "element", "elements", "embed", "encodeURI", "encodeURIComponent", "escape", "eval", "event",

@@ -27,8 +27,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionName",
-    "NextWave/source/methodBuilder/CodeName"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Statement, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName) {
+    "NextWave/source/methodBuilder/CodeName",
+    "NextWave/source/methodBuilder/Parameter"],
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Statement, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
 
         try {
 
@@ -55,10 +56,17 @@ define(["NextWave/source/utility/prototypes",
                     self.dragArea = null;
                     // Collection of drag targets.
                     self.dragTargets = [];
+                    // Parameter in the ParametersList which could become a
+                    // dropped object if a Type or Parameter is dragged into
+                    // it.  Notice this is not a collection as dragTargets
+                    // is misleadingly set up as a "double-ententre"....
+                    self.parameterDragTarget = null;
                     // The drag target the mouse was let up over.
                     self.upOver = null;
                     // Collection of placements for dragging Statements or CodeStatements.
                     self.placements = [];
+                    // Collection of placements for dragging Parameters.
+                    self.parameterPlacements = [];
 
                     ////////////////////////
                     // Public methods.
@@ -128,6 +136,10 @@ define(["NextWave/source/utility/prototypes",
 
                                     return m_functionStartDragCodeExpression(pointDown,
                                         pointMove);
+                                } else if (self.dragObject instanceof Parameter) {
+
+                                    return m_functionStartDragParameter(pointDown,
+                                        pointMove);
                                 } else if (self.dragObject instanceof Statement) {
 
                                     return m_functionStartDragStatement(pointDown,
@@ -168,21 +180,44 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
+                            // Purge parameter drag stubs if dragging a Type.
+                            if (self.dragObject instanceof Type ||
+                                self.dragObject instanceof Parameter) {
+
+                                var exceptionRet = window.methodBuilder.purgeParameterDragStubs();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
                             self.dragObject = null;
                             self.down = null;
                             self.move = null;
                             self.dragArea = null;
 
                             // Remove index and collection from drag target.
-                            self.dragTargets.index = undefined;
-                            self.dragTargets.dragCollection = undefined;
+                            if (self.dragTargets) {
 
+                                self.dragTargets.index = undefined;
+                                self.dragTargets.dragCollection = undefined;
+                            }
+
+                            // Parameter drag targets has no collection 
+                            // (because there is only one collection).
+                            if (self.parameterDragTarget) {
+
+                                self.parameterDragTarget.index = undefined;
+                            }
+
+                            self.placements = [];
+                            self.parameterPlacements = [];
                             self.dragTargets = [];
+                            self.parameterDragTarget = null;
                             self.upOver = null;
 
                             // Clear global drag variables.
-                            window.window.draggingStatement = null;
-                            window.window.draggingExpression = null;
+                            window.draggingObject = null;
                             return null;
                         } catch (e) {
 
@@ -190,12 +225,14 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Add to target and call cancel.
+                    // Add to target for expressions or just calcify 
+                    // out the statement/paramter and call cancel.
                     self.consumateDrag = function () {
 
                         try {
 
-                            // If mouse let up over a drag target.
+                            // If mouse let up over a drag target, be it an 
+                            // ExpressionStub or a CodeStatement or a Parameter.
                             if (self.upOver) {
 
                                 // Expressions must be integrated into their collection...
@@ -222,11 +259,31 @@ define(["NextWave/source/utility/prototypes",
                                             return e;
                                         }
                                     }
+                                } else if (self.upOver instanceof Parameter) {
+
+                                    if (self.parameterDragTarget.addNameInDragConsumate) {
+
+                                        self.parameterDragTarget.addNameInDragConsumate = false;
+                                        var exceptionRet = window.manager.addName(self.parameterDragTarget.consumateName);
+                                        if (exceptionRet) {
+
+                                            return e;
+                                        }
+                                    }
+
+                                    // ...CodeStatements or Parameter just 
+                                    // get turned back to non-dragStub, this
+                                    // is the calcification step completing
+                                    // the drag operation.  The target has
+                                    // already been added to its collection.
+                                    self.parameterDragTarget.parameterDragStub = false;
                                 } else {
 
                                     // If this is a drag from the TypeList,
                                     // or a new var statement drag, then
                                     // add a name on this consumate call.
+                                    // Both statements and parameters have 
+                                    // names which need to be maintained.
                                     if (self.dragTargets.addNameInDragConsumate) {
 
                                         self.dragTargets.addNameInDragConsumate = false;
@@ -237,7 +294,11 @@ define(["NextWave/source/utility/prototypes",
                                         }
                                     }
 
-                                    // ...CodeStatements just get turned back to non-dragStub.
+                                    // ...CodeStatements or Parameter just 
+                                    // get turned back to non-dragStub, this
+                                    // is the calcification step completing
+                                    // the drag operation.  The target has
+                                    // already been added to its collection.
                                     self.dragTargets.dragStub = false;
                                 }
                             }
@@ -263,7 +324,23 @@ define(["NextWave/source/utility/prototypes",
                                 self.move = new Size(pointCursor.x - self.down.x,
                                     pointCursor.y - self.down.y);
 
-                                // If dragging a statement-type, then need to place the stub.
+                                // If dragging a type or a Parameter, 
+                                // then need to place the ParameterStub.
+                                if (self.parameterDragTarget &&
+                                    (self.dragObject instanceof Type ||
+                                        self.dragObject instanceof Parameter)) {
+
+                                    // If drag object is a Type or a Parameter, 
+                                    // then find the location of the closest possible
+                                    // drag stub location and put the drag stub there.
+                                    var exceptionRet = m_functionPlaceParameterStub(pointCursor);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+
+                                // If dragging a statement or a type, then need to place the stub.
                                 if (self.dragTargets &&
                                     (self.dragObject instanceof Statement ||
                                         self.dragObject instanceof CodeStatement ||
@@ -288,10 +365,12 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // If dragging...
+                            self.upOver = null;
                             if (self.down) {
 
                                 // If dragTargets is a collection, then loop, else...
-                                if (self.dragTargets.length) {
+                                if (self.dragTargets && 
+                                    self.dragTargets.length) {
 
                                     // Loop over all drag targets, ask each if cursor in.
                                     for (var i = 0; i < self.dragTargets.length; i++) {
@@ -334,6 +413,32 @@ define(["NextWave/source/utility/prototypes",
                                         }
                                     }
                                 }
+
+                                // If no upOver, and if the dragObject is a Type or a Parameter, 
+                                // then there is still a chance that the operation was completed 
+                                // over a ParameterTarget.  Check here for coordination therewith.
+                                if (!self.upOver &&
+                                    self.parameterDragTarget &&
+                                    $.isFunction(self.parameterDragTarget.pointIn)) {
+
+                                    // ...just ask the one.
+                                    var bIn = self.parameterDragTarget.pointIn(objectReference.contextRender,
+                                        objectReference.pointCursor);
+                                    if (bIn) {
+
+                                        self.upOver = self.parameterDragTarget;
+                                    } else {
+
+                                        // Dragged to remove.
+
+                                        // ...remove it from names.
+                                        var exceptionRet = window.manager.removeName(self.parameterDragTarget.consumateName);
+                                        if (exceptionRet) {
+
+                                            return exceptionRet;
+                                        }
+                                    }
+                                }
                             }
                             return null;
                         } catch (e) {
@@ -370,6 +475,16 @@ define(["NextWave/source/utility/prototypes",
                                             contextRender.beginPath();
                                             contextRender.moveTo(0, self.placements[i].y);
                                             contextRender.lineTo(self.extent.width, self.placements[i].y);
+                                            contextRender.stroke();
+                                        }
+                                        // Render Parameter placements.
+                                        for (var i = 0; i < self.parameterPlacements.length; i++) {
+
+                                            contextRender.strokeStyle = (self.parameterPlacements[i].type ? "red" : "green");
+
+                                            contextRender.beginPath();
+                                            contextRender.moveTo(self.parameterPlacements[i].x, 0);
+                                            contextRender.lineTo(self.parameterPlacements[i].x, self.extent.height);
                                             contextRender.stroke();
                                         }
                                         contextRender.lineWidth = 1;
@@ -415,14 +530,8 @@ define(["NextWave/source/utility/prototypes",
                             self.dragTargets = csDragStub;
 
                             // Set global dragging variable.
-                            window.draggingStatement = self.dragObject;
+                            window.draggingObject = self.dragObject;
 
-                            /* Move the dragstub to the nearest to the cursor.
-                            var exceptionRet = m_functionPlaceStub(pointMove);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }*/
                             return null;
                         } catch (e) {
 
@@ -452,22 +561,25 @@ define(["NextWave/source/utility/prototypes",
                             csDragStub.dragStub = true;
 
                             // Store in dragTargets (normally a collection).
-                            // ToDo: replace with something just for statements.
                             self.dragTargets = csDragStub;
 
-                            // Need its new height to compare with 
-                            // the old height to adjust the grab point.
+                            // Also allocate a parameter drag target.
+                            self.parameterDragTarget = self.dragObject.allocateParameterInstance();
+                            self.parameterDragTarget.parameterDragStub = true;
+
+                            // Need the drag object's new height to compare 
+                            // with the old height to adjust the grab point.
                             var dClosedHeight = self.dragObject.getClosedHeight();
                             self.dragArea.extent.height = dClosedHeight;
 
-                            // If the statement is now above the grab point, move it down.
+                            // If the type is now above the grab point, move it down.
                             if (self.dragArea.location.y + self.dragArea.extent.height < pointMove.y) {
 
                                 self.dragArea.location.y = pointMove.y - self.dragArea.extent.height + settings.general.margin;
                             }
 
                             // Set global dragging variable.
-                            window.draggingStatement = self.dragObject;
+                            window.draggingObject = self.dragObject;
 
                             return null;
                         } catch (e) {
@@ -496,6 +608,30 @@ define(["NextWave/source/utility/prototypes",
                             // Set global dragging variable.
                             window.draggingExpression = self.dragObject;
 
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method handles dragging Parameters.
+                    var m_functionStartDragParameter = function (pointDown, pointMove) {
+
+                        try {
+
+                            // Save off the dragObject as the dragTargets object.
+                            // ToDo: make a different field for statement-types.
+                            self.parameterDragTarget = self.dragObject;
+                            self.parameterDragTarget.parameterDragStub = true;
+
+                            // Clone Parameter and set as the drag object, 
+                            // the original Parameter is now the "dragStub".
+                            self.dragObject = new Parameter(self.dragObject.name.text);
+                            self.dragObject.dragObject = true;
+
+                            // Set global dragging variable.
+                            window.draggingObject = self.dragObject;
                             return null;
                         } catch (e) {
 
@@ -536,7 +672,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Set global dragging variable.
-                            window.draggingStatement = self.dragObject;
+                            window.draggingObject = self.dragObject;
                             return null;
                         } catch (e) {
 
@@ -586,15 +722,17 @@ define(["NextWave/source/utility/prototypes",
                             // First, gather the collection/location/index/type array.
                             var arrayDragStubInsertionPoints = [];
                             var exceptionRet = window.methodBuilder.accumulateDragStubInsertionPoints(arrayDragStubInsertionPoints,
-                                self.dragTargets);
+                                self.dragTargets);  // Note: dragTargets is a horrible variable name, it is the drag object itself.
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
+                            // Save off the collection of placements so that they
+                            // may be rendered if this layer has that flag set.
                             self.placements = arrayDragStubInsertionPoints;
 
-                            // Process each, keeping nearest.
+                            // Process each insertion point, keeping nearest.
                             var objectClosest = null;
                             var iClosestDistance = Infinity;
                             for (var i = 0; i < arrayDragStubInsertionPoints.length; i++) {
@@ -625,6 +763,12 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Ensure no drop on the dragStub.
+                                // This is set where the drag stub
+                                // insertion points are accumulated.
+                                // It is set to true only when
+                                // the drag stub insertion point
+                                // is the drag stub itself.  This
+                                // avoids a circular reference.
                                 if (!objectClosest.type) {
 
                                     // Remove placed stub now.
@@ -635,6 +779,7 @@ define(["NextWave/source/utility/prototypes",
                                     }
 
                                     // Insert at the specified index to the specified collection.
+                                    // Note: the dragTargets variable is the dragObject itself.
                                     exceptionRet = objectClosest.collection.insertAt(self.dragTargets,
                                         objectClosest.index);
                                     if (exceptionRet) {
@@ -642,9 +787,96 @@ define(["NextWave/source/utility/prototypes",
                                         return exceptionRet;
                                     }
 
-                                    // Save index in drag target.
+                                    // Save index and the dragCollection in the drag target.
+                                    // This is used just above where the collection and index
+                                    // are checked to ensure slowest inter-collection movement.
+
+                                    // Note: the dragTargets variable 
+                                    // is the dragObject itself.
                                     self.dragTargets.index = objectClosest.index;
                                     self.dragTargets.dragCollection = objectClosest.collection;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Find the closest possible insertion point to the cursor.
+                    var m_functionPlaceParameterStub = function (pointCursor) {
+
+                        try {
+
+                            // First, gather the collection/location/index/type array.
+                            var arrayParameterDragStubInsertionPoints = [];
+                            var exceptionRet = window.methodBuilder.accumulateParameterDragStubInsertionPoints(arrayParameterDragStubInsertionPoints,
+                                self.parameterDragTarget);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Save off the collection of placements so that they
+                            // may be rendered if this layer has that flag set.
+                            self.parameterPlacements = arrayParameterDragStubInsertionPoints;
+
+                            // Process each insertion point, keeping nearest.
+                            var objectClosest = null;
+                            var iClosestDistance = Infinity;
+                            for (var i = 0; i < arrayParameterDragStubInsertionPoints.length; i++) {
+
+                                var objectIth = arrayParameterDragStubInsertionPoints[i];
+
+                                var iDistance = Math.abs(objectIth.x - pointCursor.x);
+                                if (iDistance < iClosestDistance) {
+
+                                    iClosestDistance = iDistance;
+                                    objectClosest = objectIth;
+                                }
+                            }
+
+                            // If placement has changed, remove the stub and add back in the new place.
+                            if (objectClosest) {
+
+                                if (objectClosest.index < self.parameterDragTarget.index) {
+
+                                    objectClosest.index = self.parameterDragTarget.index - 1;
+                                } else if (objectClosest.index > self.parameterDragTarget.index) {
+
+                                    objectClosest.index = self.parameterDragTarget.index + 1;
+                                }
+
+                                // Ensure no drop on the dragStub.
+                                // This is set where the drag stub
+                                // insertion points are accumulated.
+                                // It is set to true only when
+                                // the drag stub insertion point
+                                // is the drag stub itself.  This
+                                // avoids a circular reference.
+                                if (!objectClosest.type) {
+
+                                    // Remove placed stub now.
+                                    exceptionRet = window.methodBuilder.purgeParameterDragStubs();
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Insert at the specified index to the specified collection.
+                                    // Note: the dragTargets variable is the dragObject itself.
+                                    exceptionRet = objectClosest.collection.insertAt(self.parameterDragTarget,
+                                        objectClosest.index);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Save index in the parameter drag target.
+                                    // This is used just above where the index
+                                    // is checked to slowest collection movement.
+                                    self.parameterDragTarget.index = objectClosest.index;
                                 }
                             }
                             return null;

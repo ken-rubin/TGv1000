@@ -39,6 +39,100 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Add in parameters around all elements in the 
+                    // self.methodStatements list and all sub-blocks.
+                    self.accumulateParameterDragStubInsertionPoints = function (arrayAccumulator, parameterDragStub, areaMethodBuilder) {
+
+                        try {
+
+                            // First, check the "before all statements" location.
+                            if (self.scrollOffset() === 0) {
+
+                                // If the list is scrolled all the way to the top, then  
+                                // it is always OK to add the first spot as a potential.
+                                arrayAccumulator.push({
+
+                                    index: 0,
+                                    x: self.areaMaximal().location.x,
+                                    collection: self,
+                                    type: (self.items.length > 0 ? self.items[0].parameterDragStub : false)
+                                });
+                            }
+
+                            // Loop over each parameter.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // Extract the ith Parameter.
+                                var parameterIth = self.items[i];
+                                if (!parameterIth ||
+                                    !parameterIth.area) {
+
+                                    continue;
+                                }
+
+                                // Also check after each parameters.
+
+                                // Add after fully visible Parameters.
+                                var areaParameter = parameterIth.area();
+                                if (areaParameter) {
+
+                                    if (areaParameter.location.x + areaParameter.extent.width > 
+                                        self.areaMaximal().location.x) {
+
+                                        arrayAccumulator.push({
+
+                                            index: i + 1,
+                                            x: areaParameter.location.x + areaParameter.extent.width,
+                                            collection: self,
+                                            type: (parameterIth.parameterDragStub ||
+                                                ((self.items.length > i + 1) ? self.items[i + 1].parameterDragStub : false))
+                                        });
+                                    }
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove parameter stubs from around all elements.
+                    self.purgeParameterDragStubs = function () {
+
+                        try {
+
+                            // Loop over each Parameter.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // Extract the ith element.
+                                var itemIth = self.items[i];
+
+                                // If it is a SDS...
+                                if (itemIth.parameterDragStub) {
+
+                                    // ...then remove it (via splice, not removeItem)...
+                                    self.items.splice(i, 1);
+                                    // ...and adjust 'i'.
+                                    i--;
+                                }
+                            }
+                            
+                            // Possibly adjust scroll offset.
+                            var exceptionRet = self.possiblyAdjustScrollOffset();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Return a new instance of a Parameter.
                     self.clone = function () {
 

@@ -260,7 +260,7 @@ define(["NextWave/source/utility/prototypes",
                             self.possiblyEnsureCaretVisible();
                             self.lines = "requireFormat";
 
-                            // Always want to show the cursor after a character is typed.
+                            // Always want to show the cursor after mouse click.
                             m_bShowCursor = true;
 
                             // Cancel the blink timer so it is started again, but
@@ -270,7 +270,7 @@ define(["NextWave/source/utility/prototypes",
                                 clearInterval(m_cookieBlinkTimer);
                                 m_cookieBlinkTimer = null;
                             }
-                            // Do startup work.
+                            // Do timer startup work.
                             m_cookieBlinkTimer = setInterval(m_functionBlinkTimerTick,
                                 settings.general.blinkMS);
 
@@ -924,7 +924,8 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Determine if the focus element has focus.
-                            var bFocused = window.manager.hasFocus(self);
+                            var bFocused = window.manager.hasFocus(self) && 
+                                !window.draggingObject;
 
                             // Caret should always be visible if focused.
                             if (m_bPossiblyEnsureCaretVisible) {
@@ -962,8 +963,9 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Draw focus recangle if highlighted.
-                            if (self.highlight || bFocused) {
+                            // Draw focus recangle if highlighted and window is not dragging.
+                            if ((self.highlight || bFocused) &&
+                                (!window.draggingObject)) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.fill();

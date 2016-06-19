@@ -101,7 +101,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Fill and stroke the path.
-                            if ((window.draggingStatement || window.draggingExpression) &&
+                            if ((window.draggingObject) &&
                                 self.collection) {
 
                                 contextRender.fillStyle = settings.general.fillDrag;

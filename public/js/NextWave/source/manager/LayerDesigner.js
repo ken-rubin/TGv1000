@@ -169,8 +169,7 @@ define(["NextWave/source/utility/prototypes",
                             self.upOver = null;
 
                             // Clear global drag variables.
-                            window.window.draggingStatement = null;
-                            window.window.draggingExpression = null;
+                            window.draggingObject = null;
                             return null;
                         } catch (e) {
 
@@ -429,7 +428,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Set global dragging variable.
-                            window.draggingStatement = self.dragObject;
+                            window.draggingObject = self.dragObject;
 
                             // Move the dragstub to the nearest to the cursor.
                             /*exceptionRet = m_functionPlaceStub(pointMove);

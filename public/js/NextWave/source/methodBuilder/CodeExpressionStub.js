@@ -295,7 +295,7 @@ define(["NextWave/source/utility/prototypes",
                             var bConnectedToStatement = objectCollection;
 
                             // Fill and stroke the path.
-                            if ((window.draggingStatement || window.draggingExpression) &&
+                            if ((window.draggingObject) &&
                                 bConnectedToStatement) {
 
                                 if (window.draggingExpression) {

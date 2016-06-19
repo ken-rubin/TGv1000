@@ -31,9 +31,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/CodeType",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
-    "NextWave/source/methodBuilder/CodeExpressionInvocation",
-    "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation, Parameter) {
+    "NextWave/source/methodBuilder/CodeExpressionInvocation"],
+    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
 
         try {
 
@@ -210,17 +209,6 @@ define(["NextWave/source/utility/prototypes",
                         csvRet.addNameInDragConsumate = true;
                         csvRet.consumateName = strName;
                         return csvRet;
-                    };
-
-                    // Return a parameter instance
-                    self.allocateParameterInstance = function () {
-
-                        var strName = self.name.substring(0, 1).toLowerCase() + self.name.substring(1);
-                        strName = window.manager.getUniqueName(strName);
-                        var parameterRet = new Parameter(strName);
-                        parameterRet.addNameInDragConsumate = true;
-                        parameterRet.consumateName = strName;
-                        return parameterRet;
                     };
 
                     // Method closes up the type.
@@ -455,17 +443,26 @@ define(["NextWave/source/utility/prototypes",
                                     }
                                 } else if (m_objectHighlight === m_areaDeleteIcon) {
 
-                     				if (!self.stowage.isSystemType) {
-
+<<<<<<< HEAD
+                                    return window.manager.removeType(self);
+=======
+                                    if (!self.stowage.isSystemType) {
                                         return window.manager.removeType(self);
                                     } else {
-
                                         return window.manager.removeSystemType(self);
                                     }
+
+//                                } else if (m_objectHighlight === self.name) {
+
+//                                    return window.manager.selectType(self);
+>>>>>>> 25845ea8ba04ceca27d9910600f53af5b7de7b30
                                 } else if ($.isFunction(m_objectHighlight.mouseDown)) {
 
                                     return m_objectHighlight.mouseDown(objectReference);
                                 }
+                            } else {
+
+                                return window.manager.selectType(self);
                             }
                             return null;
                         } catch (e) {
@@ -523,9 +520,6 @@ define(["NextWave/source/utility/prototypes",
                                     // Pass down.
                                     return m_objectHighlight.click(objectReference);
                                 }
-                            } else {
-
-                                return window.manager.selectType(self);
                             }
 
                             return null;
