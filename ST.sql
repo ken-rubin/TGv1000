@@ -1,10 +1,6 @@
 delimiter //
 create procedure doSystemTypes()
 begin
-set @delId := (select id from types where typeTypeId=2 and name="MySystemType");
-if @delId is not null then
-   delete from types where id=@delId;
-end if;
 set @guts := "SET name='Array',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
 set @id1 := (select id from types where typeTypeId=2 and name="Array");
 if @id1 is not null then
@@ -53,7 +49,7 @@ else
    set @id3 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id3, to be used below for methods, properties and events. */
-set @guts := "SET name='Math',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
+set @guts := "SET name='Math',typeTypeId=2,imageId=0,altImagePath=,description='This is a test of the emergency broadcast system.  If this had been an actual emergency....',ownedByUserId=1,public=1,baseTypeId=0";
 set @id4 := (select id from types where typeTypeId=2 and name="Math");
 if @id4 is not null then
    /* Existing System Types are deleted and re-inserted with the same id they had before. */
@@ -117,13 +113,31 @@ else
    set @id7 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id7, to be used below for methods, properties and events. */
+set @guts := "SET name='VisualObject',typeTypeId=2,imageId=0,altImagePath=,description='',ownedByUserId=1,public=1,baseTypeId=0";
+set @id8 := (select id from types where typeTypeId=2 and name="VisualObject");
+if @id8 is not null then
+   /* Existing System Types are deleted and re-inserted with the same id they had before. */
+   delete from types where id=@id8;
+   set @s := (select concat("insert types ",@guts,",id=@id8;"));
+   prepare insstmt from @s;
+   execute insstmt;
+else
+   /* New System Types are inserted with a new id. */
+   set @s := (select concat("insert types ",@guts,";"));
+   prepare insstmt from @s;
+   execute insstmt;
+   set @id8 := (select LAST_INSERT_ID());
+end if;
+/* Whichever case, the System Type's id is in @id8, to be used below for methods, properties and events. */
 insert TGv1000.methods SET typeId=@id1,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 insert TGv1000.methods SET typeId=@id2,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 insert TGv1000.methods SET typeId=@id3,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 insert TGv1000.methods SET typeId=@id4,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
+insert TGv1000.propertys SET typeId=@id4,propertyTypeId=undefined,name='MyProperty',initialValue='',ordinal=0,isHidden=0;
 insert TGv1000.methods SET typeId=@id5,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 insert TGv1000.methods SET typeId=@id6,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 insert TGv1000.methods SET typeId=@id7,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
+insert TGv1000.methods SET typeId=@id8,name='construct',ordinal=0,workspace=NULL,imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,parameters=NULL;
 end;
 //
 delimiter ;

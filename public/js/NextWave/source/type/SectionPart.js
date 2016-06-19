@@ -170,21 +170,25 @@ define(["NextWave/source/utility/prototypes",
                                 m_area.location.y + settings.general.margin,
                                 m_area.extent.width - dHeight);
 
-                            // Render the delete icon.
-                            m_areaRemove = new Area(
-                                new Point(m_area.location.x + m_area.extent.width - (dHeight - settings.general.margin),
-                                    m_area.location.y),
-                                new Size(dHeight - 2 * settings.general.margin, 
-                                    dHeight - 2 * settings.general.margin));
 
-                            // Render glyph.
-                            exceptionRet = glyphs.render(contextRender,
-                                m_areaRemove,
-                                glyphs.remove, 
-                                settings.manager.showIconBackgrounds);
-                            if (exceptionRet) {
+                            if (!(self.settingsNode.fillBackground === settings.tree.method.fillBackground) || (self.settingsNode.fillBackground === settings.tree.method.fillBackground && self.name !== "initialize" && self.name !== "construct")) {
+                                
+                                // Render the delete icon.
+                                m_areaRemove = new Area(
+                                    new Point(m_area.location.x + m_area.extent.width - (dHeight - settings.general.margin),
+                                        m_area.location.y),
+                                    new Size(dHeight - 2 * settings.general.margin, 
+                                        dHeight - 2 * settings.general.margin));
 
-                                throw exceptionRet;
+                                // Render glyph.
+                                exceptionRet = glyphs.render(contextRender,
+                                    m_areaRemove,
+                                    glyphs.remove, 
+                                    settings.manager.showIconBackgrounds);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
                             }
 
                             return null;

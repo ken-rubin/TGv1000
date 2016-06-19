@@ -91,8 +91,7 @@ define(["NextWave/source/utility/prototypes",
                                                 var strPayload = localSelf.getText();
                                                 var exceptionRet = localSelf.setText(window.manager.getUniqueName(strPayload,
                                                     window.manager.types,
-                                                    "name",
-                                                    "payload"));
+                                                    "name"));
                                                 if (exceptionRet) {
 
                                                     return exceptionRet;

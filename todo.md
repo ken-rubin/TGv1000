@@ -2,7 +2,7 @@
 ## Ken's Issues
 
 - Just load Stripe when it's needed.
-- System Type in Type has to be a checkbox.
+- System Type in Type has to be a text string that is empty for normal types.
 - Base in Type has to be a combo.
 - We need a way to delete a Type, but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type.
 - Type field in Property has to become a combo.
@@ -13,6 +13,12 @@
 - If a System Type is renamed, that has to be propogated everywhere.
 
 ## Jerry's High Priority Issues
+- **Prohibit renaming App type or App.initialize method or any construct method.**
+- **In TypeBuilder exitFocus function of self.create, we need to know if we should be checking name uniqueness against types or systemTypes. Must be other places, too.**
+- **Prohibit a normal user from changing anything about a System Type or the App type's base type.**
+- **Should special users be allowed to delete system types? They may be in use by someone.**
+- **A normal user started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.**
+- **Ask Ken if there's a better way for me to test for deletion of initialize and construct methods.**
 - Do LayerDesigner.
 - John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.
 - From John:
