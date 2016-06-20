@@ -461,7 +461,8 @@ define(["NextWave/source/utility/prototypes",
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MyType",
                                 self.types,
-                                "name");
+                                "name",
+                                "payload");;
 
                             // Create type.
                             var typeNew = new Type();
@@ -498,7 +499,8 @@ define(["NextWave/source/utility/prototypes",
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MySystemType",
                                 self.systemTypes,
-                                "name");
+                                "name",
+                                "payload");;
 
                             // Create type.
                             var typeNew = new Type();
@@ -680,44 +682,21 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var indexRemoved;
-                            var nameRemoved = typeToRemove.name;
-
                             // Search for type.
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
-                                if (self.types[i].name === nameRemoved) {
+                                if (self.types[i].name.payload === typeToRemove.name.payload) {
 
                                     // ...and remove.
                                     self.types.splice(i, 1);
-                                    indexRemoved = i;
+
                                     break;
                                 }
                             }
 
                             // Also remove from panel layer.
-                            var exceptionRet = self.panelLayer.removeType(typeToRemove);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select a different system type if the deleted one was the one in the center panel.
-                            if (window.typeBuilder.typeContext.name === nameRemoved) {
-
-                                var newTypeIndex = m_functionGetNewIndex(self.types, indexRemoved);
-                                if (newTypeIndex > -1) {
-
-                                    return self.selectType(self.types[newTypeIndex]);
-                                }
-
-                                // Nothing left -- cannot happen in Types, actually, because no one can delete App type.
-                                // But can happen in similar code in system types panel.
-                                self.panelLayer.clearCenter("Type");
-                            }
-
-                            return null;
+                            return self.panelLayer.removeType(typeToRemove);
                         } catch (e) {
 
                             return e;
@@ -729,44 +708,25 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var indexRemoved;
-                            var nameRemoved = typeToRemove.name;
-
                             // Search for type.
                             for (var i = 0; i < self.systemTypes.length; i++) {
 
                                 // Find match...
-                                if (self.systemTypes[i].name === nameRemoved) {
+<<<<<<< HEAD
+                                if (self.types[i].name === typeToRemove.name) {
+=======
+                                if (self.systemTypes[i].name.payload === typeToRemove.name.payload) {
+>>>>>>> 25845ea8ba04ceca27d9910600f53af5b7de7b30
 
                                     // ...and remove.
                                     self.systemTypes.splice(i, 1);
-                                    indexRemoved = i;
+
                                     break;
                                 }
                             }
 
                             // Also remove from panel layer.
-                            var exceptionRet = self.panelLayer.removeSystemType(typeToRemove);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select a different system type if the deleted one was the one in the center panel.
-                            if (window.typeBuilder.typeContext.name === nameRemoved) {
-
-                                var newTypeIndex = m_functionGetNewIndex(self.systemTypes, indexRemoved);
-                                if (newTypeIndex > -1) {
-
-                                    return self.selectSystemType(self.systemTypes[newTypeIndex]);
-                                }
-
-                                // Nothing left -- cannot happen in Types, actually, because no one can delete App type.
-                                // But can happen in similar code in system types panel.
-                                self.panelLayer.clearCenter("Type");
-                            }
-
-                            return null;
+                            return self.panelLayer.removeSystemType(typeToRemove);
                         } catch (e) {
 
                             return e;
@@ -1595,7 +1555,6 @@ define(["NextWave/source/utility/prototypes",
                             // Only certain types can drag.
                             if (objectDrag instanceof Expression ||
                                 objectDrag instanceof Literal ||
-                                objectDrag instanceof Parameter ||
                                 objectDrag instanceof Statement ||
                                 objectDrag instanceof Name ||
                                 objectDrag instanceof CodeExpression ||
@@ -1617,24 +1576,6 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
-                    // Chooses type or systemType to display in center panel if one has been deleted.
-                    var m_functionGetNewIndex = function (typeArray, indexRemoved) {
-
-                        var len = typeArray.length;
-
-                        if (len === 0) {
-
-                            return -1;
-                        }
-
-                        if (len === indexRemoved) {
-
-                            return len - 1;
-                        }
-
-                        return indexRemoved;
-                    }
-
                     // Helper method.
                     var m_functionCallAlternateFocusEnter = function () {
 
@@ -1649,11 +1590,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Call event.
                                 self.alternateFocus.configuration.enterFocus(self.alternateFocus);
-                            } else if (self.alternateFocus &&
-                                $.isFunction(self.alternateFocus.enterFocus)) {
-
-                                // Call event.
-                                self.alternateFocus.enterFocus(self.alternateFocus);
                             }
 
                             return null;
@@ -1677,11 +1613,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Call event.
                                 self.alternateFocus.configuration.exitFocus(self.alternateFocus);
-                            } else if (self.alternateFocus &&
-                                $.isFunction(self.alternateFocus.exitFocus)) {
-
-                                // Call event.
-                                self.alternateFocus.exitFocus(self.alternateFocus);
                             }
 
                             return null;
@@ -2331,7 +2262,7 @@ define(["NextWave/source/utility/prototypes",
                     var m_arrayReserved = [
 
                         "abstract", "alert", "all", "anchor", "anchors", "area", "Array", "assign",
-                        "Boolean", "break", "byte", "blur", "button", 
+                        "boolean", "break", "byte", "blur", "button", 
                         "case", "catch", "char", "class", "const", "continue", "checkbox", "clearInterval", "clearTimeout", "clientInformation", "close", "closed", "confirm", "constructor", "crypto",
                         "debugger", "default", "delete", "do", "double", "Date", "decodeURI", "decodeURIComponent", "defaultStatus", "document", 
                         "else", "enum", "export", "extends", "element", "elements", "embed", "encodeURI", "encodeURIComponent", "escape", "eval", "event",

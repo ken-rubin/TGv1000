@@ -141,13 +141,13 @@ define(["NextWave/source/utility/prototypes",
                                     type: "ParameterListHost",
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth * 2,
-                                    y: 0,
+                                    y: -settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth * 2,
                                     height: settings.dialog.lineHeight + 
-                                    2 * settings.general.margin
+                                    4 * settings.general.margin
                                 },
                                 statementsStatementList: {
 
@@ -222,6 +222,27 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Look for all places where a Parameter drag stub could be inserted.
+                    self.accumulateParameterDragStubInsertionPoints = function (arrayAccumulator, parameterDragStub) {
+
+                        try {
+
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
+
+                            // Pass on down the line.
+                            return self.methodParameters.parameterList.accumulateParameterDragStubInsertionPoints(arrayAccumulator,
+                                parameterDragStub,
+                                self.dialog.position);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Look for all places where a statement drag stub could be inserted.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub) {
 
@@ -257,6 +278,26 @@ define(["NextWave/source/utility/prototypes",
 
                             // Pass on down the line.
                             return self.methodStatements.statementList.purgeStatementDragStubs();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove ParametersStubs from around all 
+                    // elements in self.methodParameterss list.
+                    self.purgeParameterDragStubs = function () {
+
+                        try {
+
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
+
+                            // Pass on down the line.
+                            return self.methodParameters.parameterList.purgeParameterDragStubs();
                         } catch (e) {
 
                             return e;

@@ -29,19 +29,43 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
-                    // Do nothing in base class.
-                    self.afterChange = function() {
+                    // Save the original name.
+                    self.payload.enterFocus = function(localSelf) {
 
                         try {
 
-                            // Ensure the value is unique.
-                            self.payload = window.manager.getUniqueName(self.payload);
+                            localSelf.originalName = localSelf.getText();
+                            return null;
+                        } catch (e) {
 
-                            // Update.
-                            if (m_strOriginalValue !== self.payload) {
+                            return e;
+                        }
+                    };
 
-                                return window.manager.editName(m_strOriginalValue,
-                                    self.payload);
+                    // Update name.
+                    self.payload.exitFocus = function(localSelf) {
+
+                        try {
+
+                            if (localSelf.originalName !== localSelf.getText()) {
+
+                                // Generate unique renamer.
+                                var strBetterName = window.manager.getUniqueName(localSelf.getText());
+
+                                // Store back in Edit.
+                                var exceptionRet = localSelf.setText(strBetterName);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+
+                                // Update.
+                                exceptionRet = window.manager.editName(localSelf.originalName,
+                                    strBetterName);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
                             }
                             return null;
                         } catch (e) {
@@ -49,24 +73,6 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
-
-                    // Do nothing in base class.
-                    self.beforeChange = function() {
-
-                        try {
-
-                            m_strOriginalValue = self.payload;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    /////////////////////////
-                    // Private methods.
-
-                    var m_strOriginalValue = null;
                 } catch (e) {
 
                     alert(e.message);

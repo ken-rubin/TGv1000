@@ -130,15 +130,16 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Also check after each statement.
 
-                                // If the bottom + the full drag statement is fully visible.
+                                // Add it if the bottom of the statement is fully visible.
                                 var areaStatement = statementIth.area();
                                 if (areaStatement) {
 
-                                    if (areaStatement.location.y + areaStatement.extent.height /* + min stub visible height? */ < areaMethodBuilder.location.y + areaMethodBuilder.extent.height) {
+                                    if (areaStatement.location.y + areaStatement.extent.height > 
+                                        self.areaMaximal().location.y) {
 
                                         arrayAccumulator.push({
 
-                                            index: i,
+                                            index: i + 1,
                                             y: areaStatement.location.y + areaStatement.extent.height,
                                             collection: self,
                                             type: (statementIth.dragStub ||

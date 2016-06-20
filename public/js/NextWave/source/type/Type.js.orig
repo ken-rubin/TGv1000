@@ -31,9 +31,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/CodeType",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
-    "NextWave/source/methodBuilder/CodeExpressionInvocation",
-    "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation, Parameter) {
+    "NextWave/source/methodBuilder/CodeExpressionInvocation"],
+    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation) {
 
         try {
 
@@ -212,17 +211,6 @@ define(["NextWave/source/utility/prototypes",
                         return csvRet;
                     };
 
-                    // Return a parameter instance
-                    self.allocateParameterInstance = function () {
-
-                        var strName = self.name.substring(0, 1).toLowerCase() + self.name.substring(1);
-                        strName = window.manager.getUniqueName(strName);
-                        var parameterRet = new Parameter(strName);
-                        parameterRet.addNameInDragConsumate = true;
-                        parameterRet.consumateName = strName;
-                        return parameterRet;
-                    };
-
                     // Method closes up the type.
                     self.close = function () {
 
@@ -397,7 +385,7 @@ define(["NextWave/source/utility/prototypes",
                             } else {
 
                                 // Then test the other icon.
-                                bIn = m_areaDeleteIcon && m_areaDeleteIcon.pointInArea(objectReference.contextRender,
+                                bIn = m_areaDeleteIcon.pointInArea(objectReference.contextRender,
                                     objectReference.pointCursor);
                                 if (bIn) {
 
@@ -455,17 +443,26 @@ define(["NextWave/source/utility/prototypes",
                                     }
                                 } else if (m_objectHighlight === m_areaDeleteIcon) {
 
-                     				if (!self.stowage.isSystemType) {
-
+<<<<<<< HEAD
+                                    return window.manager.removeType(self);
+=======
+                                    if (!self.stowage.isSystemType) {
                                         return window.manager.removeType(self);
                                     } else {
-
                                         return window.manager.removeSystemType(self);
                                     }
+
+//                                } else if (m_objectHighlight === self.name) {
+
+//                                    return window.manager.selectType(self);
+>>>>>>> 25845ea8ba04ceca27d9910600f53af5b7de7b30
                                 } else if ($.isFunction(m_objectHighlight.mouseDown)) {
 
                                     return m_objectHighlight.mouseDown(objectReference);
                                 }
+                            } else {
+
+                                return window.manager.selectType(self);
                             }
                             return null;
                         } catch (e) {
@@ -523,9 +520,6 @@ define(["NextWave/source/utility/prototypes",
                                     // Pass down.
                                     return m_objectHighlight.click(objectReference);
                                 }
-                            } else {
-
-                                return window.manager.selectType(self);
                             }
 
                             return null;
@@ -645,35 +639,21 @@ define(["NextWave/source/utility/prototypes",
                                     throw exceptionRet;
                                 }
 
-                                // No one can delete the App type or the App type's base type.
-                                // Normal users cannot delete system types.
-                                var bCanDelete = true;
-                                if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.stowage.isSystemType) {
-                                    bCanDelete = false;
-                                } else if (!self.stowage.isSystemType && self.name === "App") {
-                                    bCanDelete = false;
-                                } else if (self.stowage.typeTypeId === 3) {
-                                    bCanDelete = false;
-                                }
+                                // Draw the delete glyphs.
+                                m_areaDeleteIcon = new Area(
+                                    new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
+                                        m_areaOpenCloseIcon.location.y),
+                                    new Size(settings.glyphs.width, 
+                                        settings.glyphs.height));
 
-                                if (bCanDelete) {
+                                // Render glyph.
+                                exceptionRet = glyphs.render(contextRender,
+                                    m_areaDeleteIcon,
+                                    glyphs.remove, 
+                                    settings.manager.showIconBackgrounds);
+                                if (exceptionRet) {
 
-                                    // Draw the delete glyphs.
-                                    m_areaDeleteIcon = new Area(
-                                        new Point(m_areaOpenCloseIcon.location.x - settings.glyphs.width,
-                                            m_areaOpenCloseIcon.location.y),
-                                        new Size(settings.glyphs.width, 
-                                            settings.glyphs.height));
-
-                                    // Render glyph.
-                                    exceptionRet = glyphs.render(contextRender,
-                                        m_areaDeleteIcon,
-                                        glyphs.remove, 
-                                        settings.manager.showIconBackgrounds);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
+                                    throw exceptionRet;
                                 }
                             }
 
