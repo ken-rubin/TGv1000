@@ -55,24 +55,18 @@ define(["NextWave/source/utility/prototypes",
                             m_iRenderCount++;
                             var dFramesPerSecond = m_iRenderCount / dTotalNumberOfSeconds;
 
-                            // Output FPS.
-                            contextRender.fillStyle = settings.manager.debugBackgroundFill;
-                            contextRender.strokeStyle = settings.manager.debugBackgroundStroke;
-                            contextRender.fillRect(8,10,140,24);
-                            contextRender.strokeRect(8,10,140,24);
-                            contextRender.fillStyle = settings.manager.debugFill;
+                            // Output mouse coordinates and size and FPS.
                             contextRender.font = settings.manager.fontDebug;
-                            contextRender.fillText("FPS: " + dFramesPerSecond.toFixed(3),
-                                10,
-                                10);
-
-                            // Output mouse coordinates and size.
+                            contextRender.strokeStyle = settings.manager.debugBackgroundStroke;
                             contextRender.fillStyle = settings.manager.debugBackgroundFill;
-                            contextRender.fillRect(self.extent.width - 150, self.extent.height - 54,
-                                142, 50);
-                            contextRender.strokeRect(self.extent.width - 150, self.extent.height - 54,
-                                142, 50);
+                            contextRender.fillRect(self.extent.width - 150, self.extent.height - 78,
+                                142, 74);
+                            contextRender.strokeRect(self.extent.width - 150, self.extent.height - 78,
+                                142, 74);
                             contextRender.fillStyle = settings.manager.debugFill;
+                            contextRender.fillText("FPS: " + dFramesPerSecond.toFixed(3),
+                                self.extent.width - 148,
+                                self.extent.height - 74);
                             contextRender.fillText("(" + m_pointCursor.x.toFixed(0) + "," +
                                 m_pointCursor.y.toFixed(0) + ")",
                                 self.extent.width - 148,

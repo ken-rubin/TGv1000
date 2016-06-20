@@ -30,10 +30,57 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public fields.
 
-                    // Name of this type object.
+                    // Name of this Parameter object.
                     self.name = new Edit(strName || "default");
                     // Indicates the type is highlighted.
                     self.highlight = false;
+
+                    // Wire up the name enter focus to set the 
+                    // name of the parameter before it is changed.
+                    self.name.enterFocus = function (localSelf) {
+
+                        try {
+
+                            // Set the name in the field.
+                            localSelf.originalName = localSelf.getText();
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
+
+                    // Wire up the name exit focus to update the 
+                    // name of the parameter when it is changed.
+                    self.name.exitFocus = function (localSelf) {
+
+                        try {
+
+                            // If the name has changed, update it.
+                            if (localSelf.originalName !== localSelf.getText()) {
+
+                                // Generate unique renamer.
+                                var strBetterName = window.manager.getUniqueName(localSelf.getText());
+
+                                // Store back in Edit.
+                                var exceptionRet = localSelf.setText(strBetterName);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+
+                                // Update.
+                                exceptionRet = window.manager.editName(localSelf.originalName,
+                                    strBetterName);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+                            }
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
 
                     ////////////////////////
                     // Public methods.
@@ -98,14 +145,13 @@ define(["NextWave/source/utility/prototypes",
 
                         return self.name.mouseMove(objectReference);
                     };
-
                     self.mouseOut = function (objectReference) {
 
                         return self.name.mouseOut(objectReference);
                     };
-
                     self.mouseDown = function (objectReference) {
 
+                        // Set the focus to the Edit.
                         var exceptionRet = window.manager.setFocus(self.name);
                         if (exceptionRet) {
 
@@ -117,7 +163,8 @@ define(["NextWave/source/utility/prototypes",
                     // Returns the width of this type.
                     self.getWidth = function (contextRender) {
 
-                        return self.name.getWidth(contextRender) + 2 * settings.general.margin;
+                        return self.name.getWidth(contextRender) + 
+                            2 * settings.general.margin;
                     };
 
                     // Test if the point is in this Type.
@@ -196,14 +243,7 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.stroke();
                             }
 
-                            /* Render the name.
-                            contextRender.font = settings.parameter.font;
-                            contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.name,
-                                m_area.location.x + settings.general.margin,
-                                m_area.location.y,
-                                m_area.extent.width - 2 * settings.general.margin);*/
-
+                            // Let the name edit render itself.
                             return self.name.render(contextRender,
                                 false,
                                 m_area);

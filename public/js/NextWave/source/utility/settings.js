@@ -83,7 +83,7 @@ define(["NextWave/source/utility/prototypes"],
 
                         debugFill: "#000",
                         debugBackgroundStroke: "#000",
-                        debugBackgroundFill: "rgba(225, 225, 200, 0.75)",
+                        debugBackgroundFill: "rgba(225, 225, 200, 0.15)",
                         fontDebug: "20px Arial",
                         hostSelector: "#Palette",
                         showIconBackgrounds: false,

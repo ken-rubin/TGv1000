@@ -1649,6 +1649,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Call event.
                                 self.alternateFocus.configuration.enterFocus(self.alternateFocus);
+                            } else if (self.alternateFocus &&
+                                $.isFunction(self.alternateFocus.enterFocus)) {
+
+                                // Call event.
+                                self.alternateFocus.enterFocus(self.alternateFocus);
                             }
 
                             return null;
@@ -1672,6 +1677,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Call event.
                                 self.alternateFocus.configuration.exitFocus(self.alternateFocus);
+                            } else if (self.alternateFocus &&
+                                $.isFunction(self.alternateFocus.exitFocus)) {
+
+                                // Call event.
+                                self.alternateFocus.exitFocus(self.alternateFocus);
                             }
 
                             return null;

@@ -204,6 +204,54 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Process double click.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // First select the local word on a double click,
+                            // then select everything on a triple click.
+                            var iNow = (new Date()).getTime();
+                            if (iNow - m_iLast < 500) {
+
+                                // If the selection length is 
+                                // 0 then select the local word.
+                                if (m_iSelectionLength === 0) {
+
+                                    while ((m_iSelectionStart > 0) &&
+                                        ( self.text[m_iSelectionStart - 1].match(/\w/g) )) {
+
+                                        m_iSelectionStart--;
+                                        m_iSelectionLength++;
+                                    }
+                                    while ((m_iSelectionStart + m_iSelectionLength < self.text.length) &&
+                                        ( self.text[m_iSelectionStart + m_iSelectionLength].match(/\w/g) )) {
+
+                                        m_iSelectionLength++;
+                                    }
+                                    self.possiblyAdjustScrollOffset();
+                                    self.possiblyEnsureCaretVisible();
+                                    self.lines = "requireFormat";
+                                }
+                                if (iNow - m_iLastLast < 250) {
+
+                                    m_iSelectionStart = 0;
+                                    m_iSelectionLength = self.text.length;
+                                    self.possiblyAdjustScrollOffset();
+                                    self.possiblyEnsureCaretVisible();
+                                    self.lines = "requireFormat";
+                                }
+                                m_iLastLast = iNow;
+                            }
+                            m_iLast = iNow;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Set caret position on mouse down.
                     self.mouseDown = function (objectReference) {
 
@@ -496,6 +544,17 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Keep track of the command key.
+                    self.keyUp = function (e) {
+
+                        // Check if the key let up is the command key,
+                        // if so, mark the command-state as now up.
+                        if (e.which === 91 || e.which === 224) {
+
+                            m_bCommand = false;
+                        }
+                    };
+
                     // Handle key-down to pre-process for tab and backspace keys.
                     // Funnells other requests off to handleKeyPress to process.
                     self.keyDown = function (e) {
@@ -534,7 +593,12 @@ define(["NextWave/source/utility/prototypes",
                                 settings.general.blinkMS);
 
                             // Never change pages on a backspace and keep focus on tabs.
-                            if (e.which === 8) {
+                            if (e.which === 91 || e.which === 224) {
+
+                                m_bCommand = true;
+                                // Key is handled.
+                                e.stopPropagation();
+                            } else if (e.which === 8) {
 
                                 // Fix up the selection length if negative.
                                 if (m_iSelectionLength < 0) {
@@ -834,6 +898,48 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Call manually.
                                 return self.keyPressed(e);
+                            } else if (e.which === 67) {                    // c.
+
+                                if (bCtrl || m_bCommand) {
+
+                                    // Stop browser from doing what it might other wise so.
+                                    e.stopPropagation();
+
+                                    // Fix up the selection length if negative.
+                                    if (m_iSelectionLength < 0) {
+
+                                        m_iSelectionStart += m_iSelectionLength;
+                                        m_iSelectionLength *= -1;
+                                    }
+                                    // Copy to clipboard.
+                                    window.clipboardString = self.text.substr(m_iSelectionStart,
+                                        m_iSelectionLength);
+                                }
+                            } else if (e.which === 86) {                    // v.
+
+                                if (bCtrl || m_bCommand) {
+
+                                    // Stop browser from doing what it might other wise so.
+                                    e.stopPropagation();
+
+                                    // Fix up the selection length if negative.
+                                    if (m_iSelectionLength < 0) {
+
+                                        m_iSelectionStart += m_iSelectionLength;
+                                        m_iSelectionLength *= -1;
+                                    }
+                                    // Paste from clipboard.
+                                    self.text = self.text.substr(0, 
+                                            m_iSelectionStart) + 
+                                        window.clipboardString + 
+                                        self.text.substr(m_iSelectionStart +
+                                            m_iSelectionLength);
+                                    m_iSelectionStart += window.clipboardString.length;
+                                    m_iSelectionLength = 0;
+                                    self.possiblyAdjustScrollOffset();
+                                    self.possiblyEnsureCaretVisible();
+                                    self.lines = "requireFormat";
+                                }
                             } else if (e.which === " ".charCodeAt(0)) {
                
                                 // Intercept the dredded space key too!
@@ -1557,6 +1663,12 @@ define(["NextWave/source/utility/prototypes",
                     // Cached Area for Edits which are passed an Area 
                     // in render--to minimally call calculateLayout.
                     var m_areaLast = null;
+                    // Time of the previous last click--used to calculate triple-click.
+                    var m_iLastLast = 0;
+                    // Time of the last click--used to calculate double-click.
+                    var m_iLast = 0;
+                    // Indicates that the OSX command key is down.
+                    var m_bCommand = false;
                 } catch (e) {
 
                     alert(e.message);
