@@ -677,9 +677,17 @@ define(["NextWave/source/utility/prototypes",
                                     m_iSelectionLength *= -1;
                                 }
 
-                                // If there is a selection to clear out, then do so.
-                                if (m_iSelectionLength > 0) {
+                                if (m_iSelectionLength === 0) {
 
+                                    // If the caret is blinking between characters and not after the final character, delete the character to the right of the caret.
+                                    if (m_iSelectionStart < self.text.length) {
+
+                                        self.text = self.text.substr(0,
+                                            m_iSelectionStart) + self.text.substr(m_iSelectionStart + 1);
+                                    }
+                                } else if (m_iSelectionLength > 0) {
+
+                                    // If there is a selection to clear out, then do so.
                                     // Set the cell value to the un-selected ranges before and after the selection.
                                     self.text = self.text.substr(0,
                                         m_iSelectionStart) + self.text.substr(m_iSelectionStart + m_iSelectionLength);
