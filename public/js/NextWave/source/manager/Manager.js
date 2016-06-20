@@ -358,6 +358,11 @@ define(["NextWave/source/utility/prototypes",
                             exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
                             if (exceptionRet) { return exceptionRet; }
 
+                            // If a privileged (system type-wise) user, we open and pin all panels.
+                            if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
+                                self.panelLayer.openAndPinAllPanels();
+                            }
+
                             // Set loaded.
                             self.projectLoaded = true;
 
@@ -661,6 +666,33 @@ define(["NextWave/source/utility/prototypes",
 
                                     // ...and update.
                                     self.types[i].name = strNewName;
+
+                                    break;
+                                }
+                            }
+
+                            // TODO: Update every occurance of this type name everywhere.
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits a type name.
+                    self.editSystemTypeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                // Find match...
+                                if (self.systemTypes[i].name === strOriginalName) {
+
+                                    // ...and update.
+                                    self.systemTypes[i].name = strNewName;
 
                                     break;
                                 }
@@ -1220,6 +1252,11 @@ define(["NextWave/source/utility/prototypes",
                                 if (exceptionRet) {
 
                                     return exceptionRet;
+                                }
+
+                                if (!m_arrayReserved.includes(typeNew.name)) {
+
+                                    m_arrayReserved.push(typeNew.name);
                                 }
                             }
 

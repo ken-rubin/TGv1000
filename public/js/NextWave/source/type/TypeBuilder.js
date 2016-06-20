@@ -98,8 +98,15 @@ define(["NextWave/source/utility/prototypes",
                                                 }
 
                                                 // Update.
-                                                return window.manager.editTypeName(localSelf.saveTypeName,
-                                                    localSelf.getText());
+                                                if (self.typeContext.stowage.isSystemType === 0) {
+
+                                                    return window.manager.editTypeName(localSelf.saveTypeName,
+                                                        localSelf.getText());
+                                                } else {
+
+                                                    return window.manager.editSystemTypeName(localSelf.saveTypeName,
+                                                        localSelf.getText());
+                                                }
                                             }
                                         } catch (e) {
 
@@ -323,28 +330,70 @@ define(["NextWave/source/utility/prototypes",
                             self.typeContext = type;
 
                             // Update controls.
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name);
+                            var bProtected = false;
+                            // Protect against editing type name in these cases:
+                            //      App type (type.stowage.typeTypeId === 1 && type.name === "App")
+                            //      Any System type (type.stowage.typeTypeId === 2)
+                            //      Any App type's Base type (type.stowage.typeTypeId === 3)
+                            //      So, only types added in the types panel are editable.
+                            if ( 
+                                    (type.stowage.typeTypeId === 1 && type.name === "App") || 
+                                    (type.stowage.typeTypeId > 1)
+                                ) {
+
+                                bProtected = true;
+                            }
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name, bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName);
+
+                            bProtected = false;
+                            // Protect against editing Base type name in these cases:
+                            //      App type
+                            //      App type Base type
+                            //      For normal user: System type
+                            if (
+                                    (type.stowage.typeTypeId === 1 && type.name === "App") ||
+                                    (type.stowage.typeTypeId === 3) ||
+                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId === 2)
+                                ) {
+
+                                bProtected = true;
+                            }
+                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName, bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description);
+
+                            bProtected = false;
+                            // Protect against editing Description in these cases:
+                            //      For normal users: App type Base type; System type
+                            //      For manager.userAllowedToCreateEditPurchProjs: System type
+                            //      For manager.userCanWorkWithSystemTypesAndAppBaseTypes: no prohibition
+                            if (
+                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && !manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId > 1) ||
+                                    (manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId === 2)
+                                ) {
+                                
+                                bProtected = true;
+                            }
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description, bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            // Set the system type if present.
+                            // Set the system type to 0 or 1 if the field is present.
                             if (!self.dialog.controlObject["systemTypeEdit"]) {
 
                                 return null;
                             }
-                            return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
+
+                            // The System Type setting is always protected.
+                            return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString(), true);
                         } catch (e) {
 
                             return e;

@@ -52,6 +52,8 @@ define(["NextWave/source/utility/prototypes",
                         (self.multiline ? "s-resize" : "e-resize")];
                     // Width of a single character.
                     self.characterWidth = 20;
+                    // If protected, no editing is allowed.
+                    self.protected = false;
 
                     ///////////////////////
                     // Public methods.
@@ -63,9 +65,11 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Set the text in this control.
-                    self.setText = function (strText) {
+                    self.setText = function (strText, bProtected) {
 
                         try {
+
+                            self.protected = bProtected || false;
 
                             // Store the information.
                             self.text = strText;
@@ -209,6 +213,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (self.protected) {
+
+                                m_bShowCursor = false;
+                                return null;
+                            }
+
                             // First select the local word on a double click,
                             // then select everything on a triple click.
                             var iNow = (new Date()).getTime();
@@ -256,6 +266,12 @@ define(["NextWave/source/utility/prototypes",
                     self.mouseDown = function (objectReference) {
 
                         try {
+
+                            if (self.protected) {
+
+                                m_bShowCursor = false;
+                                return null;
+                            }
 
                             // Figure out the position as close to the mouse down as possible.
                             if (self.multiline) {
@@ -478,6 +494,11 @@ define(["NextWave/source/utility/prototypes",
                     // Set a flag so that the caret is checked for visibility on the next render.
                     self.possiblyEnsureCaretVisible = function () {
 
+                        if (self.protected) {
+
+                            return false;
+                        }
+
                         try {
 
                             m_bPossiblyEnsureCaretVisible = true;
@@ -499,6 +520,11 @@ define(["NextWave/source/utility/prototypes",
                     self.keyPressed = function (e) {
 
                         try {
+
+                            if (self.protected) {
+                                e.stopPropagation();
+                                return null;
+                            }
 
                             // Always want to show the cursor after a character is typed.
                             m_bShowCursor = true;
@@ -547,6 +573,11 @@ define(["NextWave/source/utility/prototypes",
                     // Keep track of the command key.
                     self.keyUp = function (e) {
 
+                        if (self.protected) {
+                            e.stopPropagation();
+                            return;
+                        }
+
                         // Check if the key let up is the command key,
                         // if so, mark the command-state as now up.
                         if (e.which === 91 || e.which === 224) {
@@ -560,6 +591,11 @@ define(["NextWave/source/utility/prototypes",
                     self.keyDown = function (e) {
 
                         try {
+
+                            if (self.protected) {
+                                e.stopPropagation();
+                                return null;
+                            }
 
                             // Let derived class do something  
                             // before handling the key press.
@@ -1482,6 +1518,11 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (self.protected) {
+
+                                return;
+                            }
+
                             // Invert the cursor.
                             if (m_bShowCursor) {
 
@@ -1516,7 +1557,7 @@ define(["NextWave/source/utility/prototypes",
                                 if (!m_cookieBlinkTimer) {
 
                                     // Start off showing.
-                                    m_bShowCursor = true;   
+                                    m_bShowCursor = true && (!self.protected);
 
                                     // Do startup work.
                                     m_cookieBlinkTimer = setInterval(m_functionBlinkTimerTick,

@@ -14,7 +14,7 @@
 
 ## Jerry's High Priority Issues
 - **Prohibit renaming App type or App.initialize method or any construct method.**
-- **In TypeBuilder exitFocus function of self.create, we need to know if we should be checking name uniqueness against types or systemTypes. Must be other places, too.**
+- In TypeBuilder exitFocus function of self.create, we need to know if we should be checking name uniqueness against types or systemTypes. Done. 2 questions: Is this in other places, too? Should we check both lists? We already check against reserved words in all cases.
 - **Prohibit a normal user from changing anything about a System Type or the App type's base type.**
 - **Should special users be allowed to delete system types? They may be in use by someone.**
 - **A normal user started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.**
