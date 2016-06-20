@@ -321,7 +321,20 @@ define(["NextWave/source/utility/prototypes",
                             self.typeLabel.text = objectContext.type.name;
 
                             // Set the method.
-                            return self.methodEdit.setText(objectContext.method.name);
+                            var bProtected = false;
+                            // Protect against editing method name in these cases:
+                            //      App type (type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize")
+                            //      objectContext.method.name === "construct"
+                            //      (system type or app base type) && !manager.userCanWorkWithSystemTypesAndAppBaseTypes
+                            if ( 
+                                    (objectContext.type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize") || 
+                                    (objectContext.method.name === "construct") ||
+                                    (objectContext.type.stowage.typeTypeId > 1 && !manager.userCanWorkWithSystemTypesAndAppBaseTypes)
+                                ) {
+
+                                bProtected = true;
+                            }
+                            return self.methodEdit.setText(objectContext.method.name, bProtected);
                         } catch (e) {
 
                             return e;

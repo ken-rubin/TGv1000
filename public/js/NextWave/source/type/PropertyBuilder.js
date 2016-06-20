@@ -264,18 +264,43 @@ define(["NextWave/source/utility/prototypes",
                             self.typeContext = type;
                             self.propertyContext = property;
 
+
                             // Update controls.
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
+
+                            var bProtected = false;
+                            // Protect against editing property name in these cases:
+                            //
+                            if (false) {
+
+                                bProtected = true;
+                            }
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name, bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName);
+
+                            var bProtected = false;
+                            // Protect against changing/editing type name in these cases:
+                            //
+                            if (false) {
+
+                                bProtected = true;
+                            }
+                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName, bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description);
+
+                            var bProtected = false;
+                            // Protect against editing property description in these cases:
+                            //
+                            if (false) {
+
+                                bProtected = true;
+                            }
+                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description, bProtected);
                         } catch (e) {
 
                             return e;

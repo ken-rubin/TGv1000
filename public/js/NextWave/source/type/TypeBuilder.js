@@ -330,6 +330,7 @@ define(["NextWave/source/utility/prototypes",
                             self.typeContext = type;
 
                             // Update controls.
+                            
                             var bProtected = false;
                             // Protect against editing type name in these cases:
                             //      App type (type.stowage.typeTypeId === 1 && type.name === "App")
@@ -338,7 +339,7 @@ define(["NextWave/source/utility/prototypes",
                             //      So, only types added in the types panel are editable.
                             if ( 
                                     (type.stowage.typeTypeId === 1 && type.name === "App") || 
-                                    (type.stowage.typeTypeId > 1)
+                                    (type.stowage.typeTypeId > 1 && type.stowage.id)
                                 ) {
 
                                 bProtected = true;

@@ -420,6 +420,31 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) { return e; }
                     }
 
+                    // Run and stop running buttons.
+                    self.runButtonClicked = function () {
+
+                        try {
+
+                            alert('You clicked run.');
+                            return null;
+
+                        } catch(e) {
+                            return e;
+                        }
+                    }
+
+                    self.stopButtonClicked = function () {
+
+                        try {
+
+                            alert('You clicked stop.');
+                            return null;
+
+                        } catch(e) {
+                            return e;
+                        }
+                    }
+
                     // Method adds a new name.
                     self.addName = function (strName) {
 

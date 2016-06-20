@@ -211,6 +211,38 @@ define(["Core/errorHelper"],
 								} catch (e) { errorHelper.show(e); }
 							});
 
+							$("#PlayBtn").click(function () {
+
+								if ($("#PlayBtn").hasClass('disabled')) { return false; }
+								try {
+
+									var exceptionRet = manager.runButtonClicked();
+									if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+									$("#StopBtn").removeClass("disabled");
+									$("#PlayBtn").addClass("disabled");
+
+								} catch(e) {
+									errorHelper.show(e);
+								}
+							});
+
+							$("#StopBtn").click(function () {
+
+								if ($("#StopBtn").hasClass('disabled')) { return false; }
+								try {
+
+									var exceptionRet = manager.stopButtonClicked();
+									if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+									$("#StopBtn").addClass("disabled");
+									$("#PlayBtn").removeClass("disabled");
+
+								} catch(e) {
+									errorHelper.show(e);
+								}
+							});
+
 							if (g_profile.can_visit_adminzone) {
 
 								// Show Adminzone button.
