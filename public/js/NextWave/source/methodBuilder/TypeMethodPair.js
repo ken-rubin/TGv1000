@@ -86,8 +86,7 @@ define(["NextWave/source/utility/prototypes",
                                     // Ensure the value is unique.
                                     self.type.payload = window.manager.getUniqueName(self.type.payload,
                                         window.manager.types,
-                                        "name",
-                                        "payload");
+                                        "name");
 
                                     // Update.
                                     if (m_strTypeBefore !== self.type.payload) {
