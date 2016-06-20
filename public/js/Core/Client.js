@@ -1044,9 +1044,11 @@ define(["Core/errorHelper",
 					// If user says to abandon, it empties and clears project and returns null.
 					// If user says not to abandon, it returns project.
 					// On exception, it also returns project, but state may be compromised (i.e., partially removed)--needs further work.
-					self.unloadProject = function (unloadedCallback, bShowAbandonDlg) {
+					self.unloadProject = function (unloadedCallback, bShowAbandonDlg, bFromCloseProjectMenuItem) {
 
 						try {
+
+							var closeProjectMenuItem = bFromCloseProjectMenuItem || false;
 
 							if (manager.projectLoaded || manager.systemTypesLoaded) {
 							
@@ -1055,7 +1057,15 @@ define(["Core/errorHelper",
 									// This callback will be called if the user wants to abandon the open project.
 									try {
 
-										var exceptionRet = manager.loadNoProject();
+										var exceptionRet;
+										if (bFromCloseProjectMenuItem || false) {
+
+											exceptionRet = manager.loadNoProject();
+
+										} else {
+
+											exceptionRet = manager.loadProject(null);
+										}
 										if (exceptionRet) { throw exceptionRet; }
 
 										self.setBrowserTabAndBtns();

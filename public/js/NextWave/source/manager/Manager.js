@@ -339,33 +339,36 @@ define(["NextWave/source/utility/prototypes",
                             // Save the project attributes.
                             self.projectData = objectProject;
 
-                            // Extract the comic.
-                            var objectComic = objectProject.comics[objectProject.currentComicIndex];
+                            if (objectProject) {
 
-                            // Load up panels.
-                            exceptionRet = self.loadLiterals(objectComic.literals);
-                            if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.loadExpressions(objectComic.expressions);
-                            if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.loadStatements(objectComic.statements);
-                            if (exceptionRet) { return exceptionRet; }
+                                // Extract the comic.
+                                var objectComic = objectProject.comics[objectProject.currentComicIndex];
 
-                            // Add the types from the comic into this instance.
-                            exceptionRet = self.loadTypes(objectComic.types);
-                            if (exceptionRet) { return exceptionRet; }
+                                // Load up panels.
+                                exceptionRet = self.loadLiterals(objectComic.literals);
+                                if (exceptionRet) { return exceptionRet; }
+                                exceptionRet = self.loadExpressions(objectComic.expressions);
+                                if (exceptionRet) { return exceptionRet; }
+                                exceptionRet = self.loadStatements(objectComic.statements);
+                                if (exceptionRet) { return exceptionRet; }
 
-                            // Add project's system types into their panel.
-                            exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
-                            if (exceptionRet) { return exceptionRet; }
+                                // Add the types from the comic into this instance.
+                                exceptionRet = self.loadTypes(objectComic.types);
+                                if (exceptionRet) { return exceptionRet; }
 
-                            // If a privileged (system type-wise) user, we open and pin all panels.
-                            if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
-                                self.panelLayer.openAndPinAllPanels();
+                                // Add project's system types into their panel.
+                                exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
+                                if (exceptionRet) { return exceptionRet; }
+
+                                // If a privileged (system type-wise) user, we open and pin all panels.
+                                if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
+                                    self.panelLayer.openAndPinAllPanels();
+                                }
+
+                                // Set loaded.
+                                self.projectLoaded = true;
                             }
-
-                            // Set loaded.
-                            self.projectLoaded = true;
-
+                            
                             // Start the rendering.
                             m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 

@@ -162,7 +162,7 @@ define(["Core/errorHelper"],
 												});
 											}
 										}, 1000);
-									}, true);
+									}, true, true);		// The final true is telling client.unloadProject that we're unloading due to user clicking the Close Project menu item and not because we're about to search for and open or new a project.
 
 								} else {	// system types m.b. loaded; else, this menu item would be disabled.
 
@@ -175,7 +175,7 @@ define(["Core/errorHelper"],
 													client.setBrowserTabAndBtns();
 											});
 										}, 1000);
-									}, true);
+									}, true, true);		// See comment above.
 								}
 							});
 
