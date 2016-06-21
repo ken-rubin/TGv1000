@@ -22,7 +22,6 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/manager/LayerBackground",
     "NextWave/source/manager/LayerPanels",
     "NextWave/source/manager/LayerDebug",
-    "NextWave/source/manager/LayerDesigner",
     "NextWave/source/manager/LayerDrag",
     "NextWave/source/manager/LayerAl",
     "NextWave/source/expression/Expression",
@@ -39,7 +38,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
     "NextWave/source/type/Property"],
-    function (prototypes, settings, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDesigner, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
+    function (prototypes, settings, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
 
         try {
 
@@ -58,7 +57,7 @@ define(["NextWave/source/utility/prototypes",
                     // Holds the active panelLayer.
                     self.panelLayer = null;
                     // Holds reference to the designer layer.
-                    self.designerLayer = null;
+                    // self.designerLayer = null;
                     // Object used to initialize this instance.
                     self.projectData = null;
                     // Directly set focus object, overrides dragObject.
@@ -147,12 +146,12 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Allocate and create the designer layer.
-                            self.designerLayer = new LayerDesigner();
-                            exceptionRet = self.designerLayer.create();
-                            if (exceptionRet) {
+                            // self.designerLayer = new LayerDesigner();
+                            // exceptionRet = self.designerLayer.create();
+                            // if (exceptionRet) {
 
-                                throw exceptionRet;
-                            }
+                            //     throw exceptionRet;
+                            // }
 
                             // Allocate and create the Al layer.
                             var la = new LayerAl();
@@ -171,7 +170,7 @@ define(["NextWave/source/utility/prototypes",
                             m_arrayLayers = 
                                 [
                                     lb,
-                                    self.designerLayer,
+                                    // self.designerLayer,
                                     self.panelLayer,
                                     ld,
                                     self.dragLayer

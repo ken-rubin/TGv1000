@@ -13,8 +13,8 @@
 - If a System Type is renamed, that has to be propogated everywhere.
 
 ## Jerry's High Priority Issues
+- **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
 - Test self.removeMethod and self.removeProperty in Manager.js.
-- **Prohibit a normal user from changing anything about a System Type or the App type's base type.**
 - **Should privileged users be allowed to delete system types? They may be in use by someone. Discuss with Ken.**
 - **As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.**
 - **Ask Ken if there's a better way for me to test for deletion of initialize and construct methods. This is in SectionPart.js around this code: self.settingsNode.fillBackground !== settings.tree.method.fillBackground.

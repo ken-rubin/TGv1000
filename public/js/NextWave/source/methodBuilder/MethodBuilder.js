@@ -320,6 +320,8 @@ define(["NextWave/source/utility/prototypes",
                             // Set the type.
                             self.typeLabel.text = objectContext.type.name;
 
+                            // TODO: add protection for argumentsParameterList and statementsStatementList.
+
                             // Set the method.
                             var bProtected = false;
                             // Protect against editing method name in these cases:
