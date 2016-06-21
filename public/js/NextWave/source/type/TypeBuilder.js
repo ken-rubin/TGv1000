@@ -90,23 +90,16 @@ define(["NextWave/source/utility/prototypes",
                                                 // Ensure the value is unique.
                                                 var strPayload = localSelf.getText();
                                                 var exceptionRet = localSelf.setText(window.manager.getUniqueName(strPayload,
-                                                    self.typeContext.stowage.isSystemType === 0 ? window.manager.types : window.manager.systemTypes,
+                                                    window.manager.types.concat(window.manager.systemTypes),
                                                     "name"));
                                                 if (exceptionRet) {
 
                                                     return exceptionRet;
                                                 }
 
-                                                // Update.
-                                                if (self.typeContext.stowage.isSystemType === 0) {
-
-                                                    return window.manager.editTypeName(localSelf.saveTypeName,
+                                                // Update. This will work with either types or system types.
+                                                return window.manager.editTypeName(localSelf.saveTypeName,
                                                         localSelf.getText());
-                                                } else {
-
-                                                    return window.manager.editSystemTypeName(localSelf.saveTypeName,
-                                                        localSelf.getText());
-                                                }
                                             }
                                         } catch (e) {
 

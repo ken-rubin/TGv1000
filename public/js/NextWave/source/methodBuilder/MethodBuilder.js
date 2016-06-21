@@ -109,7 +109,7 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.saveMethodName !== localSelf.getText()) {
 
-                                                // Lookup the type from its name.
+                                                // Lookup the type from its name. This may return a type, a system type or an App base type.
                                                 var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
                                                 if (!typeFromName) {
 

@@ -1385,6 +1385,19 @@ begin
 
     end if;
         
+    if @dbstate = 32 THEN
+
+    	set @id := (select id from `TGv1000`.`types` where name='VisualObject');
+    	INSERT `TGv1000`.`propertys` SET `name`='x', typeId=@id, ordinal=0, propertyTypeId=6, initialValue='Number';
+    	INSERT `TGv1000`.`propertys` SET `name`='y', typeId=@id, ordinal=1, propertyTypeId=6, initialValue='Number';
+    	INSERT `TGv1000`.`propertys` SET `name`='height', typeId=@id, ordinal=2, propertyTypeId=6, initialValue='Number';
+    	INSERT `TGv1000`.`propertys` SET `name`='width', typeId=@id, ordinal=3, propertyTypeId=6, initialValue='Number';
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
 end//
 
 

@@ -85,7 +85,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Ensure the value is unique.
                                     self.type.payload = window.manager.getUniqueName(self.type.payload,
-                                        window.manager.types,
+                                        window.manager.types.concat(window.manager.systemTypes),
                                         "name");
 
                                     // Update.
