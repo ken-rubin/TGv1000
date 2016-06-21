@@ -34,9 +34,17 @@ define(["NextWave/source/utility/prototypes",
                     self.configuration = null;
                     // The owner dialog.
                     self.dialog = null;
+                    // If protected, no editing, combo or checkbox changes, etc. allowed.
+                    self.protected = false;
 
                     ///////////////////////
                     // Public methods.
+
+                    // Set protected mode.
+                    self.setProtected = function(bProtected) {
+
+                        self.protected = bProtected;
+                    }
 
                     // Clear data.
                     self.clear = function () {

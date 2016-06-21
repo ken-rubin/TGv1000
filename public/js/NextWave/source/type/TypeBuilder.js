@@ -344,7 +344,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name, bProtected);
+                            self.dialog.controlObject["nameEdit"].setProtected(bProtected);
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -363,7 +364,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName, bProtected);
+                            self.dialog.controlObject["baseEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -381,7 +383,8 @@ define(["NextWave/source/utility/prototypes",
                                 
                                 bProtected = true;
                             }
-                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description, bProtected);
+                            self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -394,7 +397,8 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // The System Type setting is always protected.
-                            return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString(), true);
+                            self.dialog.controlObject["systemTypeEdit"].setProtected(true);
+                            return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
                         } catch (e) {
 
                             return e;

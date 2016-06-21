@@ -334,7 +334,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            return self.methodEdit.setText(objectContext.method.name, bProtected);
+                            self.methodEdit.setProtected(bProtected);
+                            return self.methodEdit.setText(objectContext.method.name);
                         } catch (e) {
 
                             return e;

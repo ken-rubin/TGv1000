@@ -52,8 +52,6 @@ define(["NextWave/source/utility/prototypes",
                         (self.multiline ? "s-resize" : "e-resize")];
                     // Width of a single character.
                     self.characterWidth = 20;
-                    // If protected, no editing is allowed.
-                    self.protected = false;
 
                     ///////////////////////
                     // Public methods.
@@ -65,11 +63,9 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Set the text in this control.
-                    self.setText = function (strText, bProtected) {
+                    self.setText = function (strText) {
 
                         try {
-
-                            self.protected = bProtected || false;
 
                             // Store the information.
                             self.text = strText;

@@ -274,7 +274,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name, bProtected);
+                            self.dialog.controlObject["nameEdit"].setProtected(bProtected);
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -287,7 +288,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName, bProtected);
+                            self.dialog.controlObject["typeEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -300,7 +302,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description, bProtected);
+                            self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description);
                         } catch (e) {
 
                             return e;
