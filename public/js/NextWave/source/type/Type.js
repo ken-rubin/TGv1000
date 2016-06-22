@@ -287,6 +287,10 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string module for this Type.
                     self.generateJavaScript = function () {
 
+                        // Fix base type name because it still has spaces?!
+                        // TODO: remove this and fix db.
+                        self.name = self.name.replace(/ /g, "");
+
                         // Build the constructor function for the type.
                         var strConstructorFunction = " window.tg." + self.name + 
                             " = function (app) { " + 
@@ -295,13 +299,17 @@ define(["NextWave/source/utility/prototypes",
                         // Call parent constructor.
                         if (self.stowage.baseTypeName) {
 
+                            // Fix base type name because it still has spaces?!
+                            // TODO: remove this and fix db.
+                            self.stowage.baseTypeName = self.stowage.baseTypeName.replace(/ /g, "");
+
                             strConstructorFunction += 
-                                " /* Inherit from Base. */ self.inherits(" + 
+                                " /* Inherit from Base. */ self.inherits(window.tg." + 
                                 self.stowage.baseTypeName + 
                                 ", app); ";                            
                         }
                         strConstructorFunction += 
-                            " /* Register with system. */ window.instances.push(self); " + 
+                            " /* Register with system. */ window.tg.instances.push(self); " + 
                             " /* Reference to the application object. */ self.app = app; ";
 
                         // Add properties.
@@ -322,9 +330,9 @@ define(["NextWave/source/utility/prototypes",
                         if (self.stowage.baseTypeName) {
 
                             strConstructorFunction += 
-                                " /* Complete inheritance from Base. */ window." +
+                                " /* Complete inheritance from Base. */ window.tg." +
                                 self.name +
-                                ".inheritsFrom(" + 
+                                ".inheritsFrom(window.tg." + 
                                 self.stowage.baseTypeName + 
                                 "); ";                            
                         }

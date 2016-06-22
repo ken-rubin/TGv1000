@@ -29,9 +29,12 @@ define(["NextWave/source/utility/prototypes",
 
     "NextWave/source/methodBuilder/CodeStatementBreak",
     "NextWave/source/methodBuilder/CodeStatementContinue",
+    "NextWave/source/methodBuilder/CodeStatementComment",
+    "NextWave/source/methodBuilder/CodeStatementDebugger",
     "NextWave/source/methodBuilder/CodeStatementExpression",
     "NextWave/source/methodBuilder/CodeStatementFor",
     "NextWave/source/methodBuilder/CodeStatementForIn",
+    "NextWave/source/methodBuilder/CodeStatementFreeform",
     "NextWave/source/methodBuilder/CodeStatementIf",
     "NextWave/source/methodBuilder/CodeStatementReturn",
     "NextWave/source/methodBuilder/CodeStatementThrow",
@@ -45,7 +48,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
 
     "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, attributeHelper, SectionPart, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
+    function (prototypes, attributeHelper, SectionPart, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
 
         try {
 

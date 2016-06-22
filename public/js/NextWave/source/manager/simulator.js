@@ -30,19 +30,43 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Load each module into the environment.
-                            for (var i = 0; i < objectModules.types.length; i++) {
+                            // Declare namespace.
+                            window.tg = {};
+                            window.tg.instances = [];
 
-                                var strTypeIth = objectModules.types[i];
-                                alert(strTypeIth);
-                            }
+                            // Ensure that types are instantiated
+                            // in reverse dependency order.
 
                             // Load each module into the environment.
                             for (var i = 0; i < objectModules.systemTypes.length; i++) {
 
                                 var strTypeIth = objectModules.systemTypes[i];
-                                alert(strTypeIth);
+                                eval(strTypeIth);
                             }
+
+                            // Load each module into the environment.
+                            for (var i = 0; i < objectModules.types.length; i++) {
+
+                                var strTypeIth = objectModules.types[i];
+                                eval(strTypeIth);
+                            }
+
+                            // Allocate app.
+                            window.tg.app = new window.tg.App();
+                            window.tg.app.initialize();
+
+                            /* Begin the rendering.
+                            print("Begin step-loop.");
+                            if (m_renderCookie) {
+
+                                var exceptionRet = self.stop();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            m_renderCookie = setInterval(m_functionAnimate,
+                                self.refreshInterval);*/
 
                             return null;
                         } catch (e) {
@@ -62,6 +86,15 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    ///////////////////////////
+                    // Private field.
+
+                    ///////////////////////////
+                    // Private field.
+
+                    // .
+                    var m_renderCookie = null;
 
                 } catch (e) {
 

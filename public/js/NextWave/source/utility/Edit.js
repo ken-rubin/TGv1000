@@ -111,6 +111,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Return the javascript for this object.
+                    self.generateJavaScript = function () {
+
+                        return self.text;
+                    };
+
                     // Reset format.
                     self.innerCalculateLayout = function (areaMaximal, contextRender) {
 
