@@ -23,7 +23,6 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/manager/LayerBackground",
     "NextWave/source/manager/LayerPanels",
     "NextWave/source/manager/LayerDebug",
-    "NextWave/source/manager/LayerDesigner",
     "NextWave/source/manager/LayerDrag",
     "NextWave/source/manager/LayerAl",
     "NextWave/source/expression/Expression",
@@ -40,7 +39,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
     "NextWave/source/type/Property"],
-    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDesigner, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
+    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
 
         try {
 
@@ -59,7 +58,7 @@ define(["NextWave/source/utility/prototypes",
                     // Holds the active panelLayer.
                     self.panelLayer = null;
                     // Holds reference to the designer layer.
-                    self.designerLayer = null;
+                    // self.designerLayer = null;
                     // Object used to initialize this instance.
                     self.projectData = null;
                     // Directly set focus object, overrides dragObject.
@@ -148,12 +147,12 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Allocate and create the designer layer.
-                            self.designerLayer = new LayerDesigner();
-                            exceptionRet = self.designerLayer.create();
-                            if (exceptionRet) {
+                            // self.designerLayer = new LayerDesigner();
+                            // exceptionRet = self.designerLayer.create();
+                            // if (exceptionRet) {
 
-                                throw exceptionRet;
-                            }
+                            //     throw exceptionRet;
+                            // }
 
                             // Allocate and create the Al layer.
                             var la = new LayerAl();
@@ -172,7 +171,7 @@ define(["NextWave/source/utility/prototypes",
                             m_arrayLayers = 
                                 [
                                     lb,
-                                    self.designerLayer,
+                                    // self.designerLayer,
                                     self.panelLayer,
                                     ld,
                                     self.dragLayer
@@ -497,7 +496,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MyType",
-                                self.types,
+                                self.types.concat(self.systemTypes),
                                 "name");
 
                             // Create type.
@@ -534,7 +533,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MySystemType",
-                                self.systemTypes,
+                                self.systemTypes.concat(self.types),
                                 "name");
 
                             // Create type.
@@ -663,18 +662,23 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method edits a type name.
+                    // Method returns a type or system type that matches name.
+                    // Since no overlap between system types and types exists, this
+                    // one function will check both arrays.
                     self.getTypeFromName = function (strTypeName) {
 
                         try {
 
                             // Find it.
-                            for (var i = 0; i < self.types.length; i++) {
+                            var allTypes = self.types.concat(self.systemTypes);
+                            for (var i = 0; i < allTypes.length; i++) {
 
-                                if (self.types[i].name === strTypeName) {
+                                var typeIth = allTypes[i];
+
+                                if (typeIth.name === strTypeName) {
 
                                     // ...and return it.
-                                    return self.types[i];
+                                    return typeIth;
                                 }
                             }
 
@@ -690,7 +694,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            var bFound = false;
+
                             // Update in place.
+                            // Cannot use the concat trick here because the concatenated array doesn't maintain reference.
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Find match...
@@ -698,36 +705,14 @@ define(["NextWave/source/utility/prototypes",
 
                                     // ...and update.
                                     self.types[i].name = strNewName;
-
+                                    bFound = true;
                                     break;
                                 }
                             }
 
-                            // TODO: Update every occurance of this type name everywhere.
+                            if (!bFound) {
 
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method edits a type name.
-                    self.editSystemTypeName = function (strOriginalName, strNewName) {
-
-                        try {
-
-                            // Update in place.
-                            for (var i = 0; i < self.systemTypes.length; i++) {
-
-                                // Find match...
-                                if (self.systemTypes[i].name === strOriginalName) {
-
-                                    // ...and update.
-                                    self.systemTypes[i].name = strNewName;
-
-                                    break;
-                                }
+                                return m_functionEditSystemTypeName(strOriginalName, strNewName);
                             }
 
                             // TODO: Update every occurance of this type name everywhere.
@@ -842,9 +827,10 @@ define(["NextWave/source/utility/prototypes",
 
                         // TODO: check base chain to avoid circular inheritance.
                         // For now, just ensure the provisional name is a valid type name.
-                        for (var i = 0; i < self.types.length; i++) {
+                        var allTypes = self.types.concat(self.systemTypes);
+                        for (var i = 0; i < allTypes.length; i++) {
 
-                            var typeIth = self.types[i];
+                            var typeIth = allTypes[i];
                             if (typeIth.name === strProvisionalBaseTypeName) {
 
                                 return true;
@@ -857,9 +843,10 @@ define(["NextWave/source/utility/prototypes",
                     self.isValidPropertyTypeName = function (strProvisionalPropertyTypeName) {
 
                         // Ensure the provisional name is a valid type name.
-                        for (var i = 0; i < self.types.length; i++) {
+                        var allTypes = self.types.concat(self.systemTypes);
+                        for (var i = 0; i < allTypes.length; i++) {
 
-                            var typeIth = self.types[i];
+                            var typeIth = allTypes[i];
                             if (typeIth.name === strProvisionalPropertyTypeName) {
 
                                 return true;
@@ -873,17 +860,22 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Commenting out Ken's way, because it looks like I'm passing in the type.
+
                             // Search for type.
-                            for (var i = 0; i < self.types.length; i++) {
+                            // for (var i = 0; i < self.types.length; i++) {
 
-                                // Find match...
-                                if (self.types[i].name === typeOwner.name) {
+                            //     // Find match...
+                            //     if (self.types[i].name === typeOwner.name) {
 
-                                    // ...and remove.
-                                    return self.types[i].methods.removePart(methodToRemove);
-                                }
-                            }
-                            return null
+                            //         // ...and remove.
+                            //         return self.types[i].methods.removePart(methodToRemove);
+                            //     }
+                            // }
+                            // return null
+
+                            // Will have to see if this way works.
+                            return typeOwner.methods.removePart(methodToRemove);
                         } catch (e) {
 
                             return e;
@@ -895,17 +887,22 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Commenting out Ken's way, because it looks like I'm passing in the type.
+                            
                             // Search for type.
-                            for (var i = 0; i < self.types.length; i++) {
+                            // for (var i = 0; i < self.types.length; i++) {
 
-                                // Find match...
-                                if (self.types[i].name === typeOwner.name) {
+                            //     // Find match...
+                            //     if (self.types[i].name === typeOwner.name) {
 
-                                    // ...and remove.
-                                    return self.types[i].properties.removePart(propertyToRemove);
-                                }
-                            }
-                            return null
+                            //         // ...and remove.
+                            //         return self.types[i].properties.removePart(propertyToRemove);
+                            //     }
+                            // }
+                            // return null
+
+                            // Will have to see if this way works.
+                            return typeOwner.properties.removePart(propertyToRemove);
                         } catch (e) {
 
                             return e;
@@ -1008,6 +1005,9 @@ define(["NextWave/source/utility/prototypes",
                     // arrayCollection -- the collection to iterate over and ensure uniqueness.  Defaults to self.names.
                     // strNameProperty -- the property-name-accessor on items in arrayCollection.
                     // strNameReferenceProperty -- the accessor property on the strNamePropety types as objects.
+                    //
+                    // New: when getting a unique type name we will be passing in manager.types.concat(manager.systemTypes).
+                    // Thus, uniqueness will be enforced across both sets ALONG WITH reserved words.
                     self.getUniqueName = function (strName, arrayCollection, strNameProperty, strNameRefinementProperty) {
 
                         // Default collection value to names.
@@ -1697,6 +1697,33 @@ define(["NextWave/source/utility/prototypes",
 
                     //////////////////////////
                     // Private methods.
+
+                    // Method changes a system type name. This is called only from self.editTypeName.
+                    var m_functionEditSystemTypeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                // Find match...
+                                if (self.systemTypes[i].name === strOriginalName) {
+
+                                    // ...and update.
+                                    self.systemTypes[i].name = strNewName;
+
+                                    break;
+                                }
+                            }
+
+                            // TODO: Update every occurance of this type name everywhere.
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Chooses type or systemType to display in center panel if one has been deleted.
                     var m_functionGetNewIndex = function (typeArray, indexRemoved) {

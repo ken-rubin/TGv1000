@@ -269,25 +269,36 @@ define(["NextWave/source/utility/prototypes",
 
                             var bProtected = false;
                             // Protect against editing property name in these cases:
-                            //
-                            if (false) {
+                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
+                            //      for all users: x, y, width, height of system type VisualObject.
+                            if (
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId > 1) ||
+                                (type.name === "VisualObject" && ['x','y','width','height'].indexOf(property.name) > -1 )
+                                ) {
 
                                 bProtected = true;
                             }
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name, bProtected);
+                            self.dialog.controlObject["nameEdit"].setProtected(bProtected);
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
                             var bProtected = false;
-                            // Protect against changing/editing type name in these cases:
-                            //
-                            if (false) {
+                            // Protect against changing/editing type name of property cases:
+                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
+                            //      for all users: the properties x, y, width, height of system type VisualObject.
+                            // Same code as above, but it mightneed tweaking some day.
+                            if (
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId > 1) ||
+                                (type.name === "VisualObject" && ['x','y','width','height'].indexOf(property.name) > -1 )
+                                ) {
 
                                 bProtected = true;
                             }
-                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName, bProtected);
+                            self.dialog.controlObject["typeEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -295,12 +306,13 @@ define(["NextWave/source/utility/prototypes",
 
                             var bProtected = false;
                             // Protect against editing property description in these cases:
-                            //
-                            if (false) {
+                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
+                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId > 1) {
 
                                 bProtected = true;
                             }
-                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description, bProtected);
+                            self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description);
                         } catch (e) {
 
                             return e;

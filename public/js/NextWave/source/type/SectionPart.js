@@ -171,7 +171,13 @@ define(["NextWave/source/utility/prototypes",
                                 m_area.extent.width - dHeight);
 
 
-                            if (!(self.settingsNode.fillBackground === settings.tree.method.fillBackground) || (self.settingsNode.fillBackground === settings.tree.method.fillBackground && self.name !== "initialize" && self.name !== "construct")) {
+                            // No delete icon in these cases (for SectionPart):
+                            //      properties x, y, width and height of system type Visual Object
+                            //      mothod named 'initialize' or 'construct'
+                            if (
+                                    ((self.settingsNode.fillBackground !== settings.tree.method.fillBackground) && (!['x','y','width','height'].indexOf(self.name) === -1)) || 
+                                    (self.settingsNode.fillBackground === settings.tree.method.fillBackground && self.name !== "initialize" && self.name !== "construct")
+                                ) {
                                 
                                 // Render the delete icon.
                                 m_areaRemove = new Area(

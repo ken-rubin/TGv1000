@@ -109,7 +109,7 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.saveMethodName !== localSelf.getText()) {
 
-                                                // Lookup the type from its name.
+                                                // Lookup the type from its name. This may return a type, a system type or an App base type.
                                                 var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
                                                 if (!typeFromName) {
 
@@ -320,6 +320,8 @@ define(["NextWave/source/utility/prototypes",
                             // Set the type.
                             self.typeLabel.text = objectContext.type.name;
 
+                            // TODO: add protection for argumentsParameterList and statementsStatementList.
+
                             // Set the method.
                             var bProtected = false;
                             // Protect against editing method name in these cases:
@@ -334,7 +336,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            return self.methodEdit.setText(objectContext.method.name, bProtected);
+                            self.methodEdit.setProtected(bProtected);
+                            return self.methodEdit.setText(objectContext.method.name);
                         } catch (e) {
 
                             return e;
