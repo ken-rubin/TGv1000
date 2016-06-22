@@ -367,12 +367,31 @@ define(["NextWave/source/utility/prototypes",
 
                             m_functionAddNamesFromStatements(method.statements, arrayNames);
 
-                            // Uniquify and sort.
+                            var uniqueArray = [];
 
+                            if (arrayNames.length) {
 
+                                // Uniquify (although duplicates wouldn't be allowed--or shouldn't).
+                                uniqueArray.push(arrayNames[0]);
+                                for (var i = 1; i < arrayNames.length; i++) {
+                                    var compIth = arrayNames[i];
+                                    var found = false;
+                                    for (var j = 0; j < uniqueArray.length; j++) {
+                                        if (uniqueArray[j] === compIth){
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!found) {
+                                        uniqueArray.push(compIth);
+                                    }
+                                }
 
+                                // And sort.
+                                uniqueArray.sort();
+                            }
 
-                            return window.manager.panelLayer.setNames(arrayNames);
+                            return window.manager.panelLayer.setNames(uniqueArray);
 
                         } catch (e) {
 
@@ -382,6 +401,24 @@ define(["NextWave/source/utility/prototypes",
 
                     //
                     var m_functionAddNamesFromStatements = function (statements, arrayNames) {
+
+                        // var k = 0;
+
+                        // var recurse = function(sl, j) {
+
+                        //     for (var i = 0; i < sl.items.length; i++) {
+
+                        //         var slItemsIth = sl.items[i];
+                        //         j++;
+                        //         if (typeof slItemsIth === "StatementList") {
+                        //             recurse(slItemsIth, j);
+                        //         }
+                        //     }
+                        // }
+
+                        // recurse(statements, k);
+
+                        // alert(k);
 
                         return;
                     }

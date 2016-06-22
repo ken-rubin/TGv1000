@@ -15,6 +15,7 @@
 ## Jerry's High Priority Issues
 - **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
 - **Do names panel and all renaming propagation. Ken: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes.  Or perhaps it is better to do the type tree passes and then reload the center panel.  Do you think you can do this today (Wednesday)?**
+- When adding a new argument to a method, insert it into names list in sorted order.
 - Test self.removeMethod and self.removeProperty in Manager.js.
 - Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken.
 - As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.
