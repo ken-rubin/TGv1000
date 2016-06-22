@@ -14,6 +14,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
+    "NextWave/source/manager/simulator",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
@@ -39,7 +40,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
     "NextWave/source/type/Property"],
-    function (prototypes, settings, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDesigner, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
+    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDesigner, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
 
         try {
 
@@ -298,7 +299,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-                    //
+                    // .
                     self.loadNoProject = function () {
 
                         try {
@@ -376,7 +377,7 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) { return e; }
                     }
 
-                    //
+                    // .
                     self.loadSystemTypesProject = function (objectData) {
 
                         try {
@@ -425,10 +426,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            alert('You clicked run.');
-                            return null;
+                            // Build all javascript code.
+                            var objectModules = self.generateJavaScript();
 
+                            return simulator.start(objectModules);
                         } catch(e) {
+
                             return e;
                         }
                     }
@@ -438,9 +441,10 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             alert('You clicked stop.');
-                            return null;
 
+                            return null;
                         } catch(e) {
+
                             return e;
                         }
                     }
@@ -1532,7 +1536,19 @@ define(["NextWave/source/utility/prototypes",
                         var objectRet = {};
 
                         // Allocate array which holds module strings.
-                        objectRet.modules = [];
+                        objectRet.systemTypes = [];
+                        objectRet.types = [];
+
+                        // Generate a module for each SystemType.
+                        for (var i = 0; i < self.systemTypes.length; i++) {
+
+                            // Extract and save the type.
+                            var typeIth = self.systemTypes[i];
+                            var strModule = typeIth.generateJavaScript();
+
+                            // Add it to the result object.
+                            objectRet.systemTypes.push(strModule);
+                        }
 
                         // Generate a module for each Type.
                         for (var i = 0; i < self.types.length; i++) {
@@ -1542,7 +1558,7 @@ define(["NextWave/source/utility/prototypes",
                             var strModule = typeIth.generateJavaScript();
 
                             // Add it to the result object.
-                            objectRet.modules.push(strModule);
+                            objectRet.types.push(strModule);
                         }
 
                         // Return all the modules.

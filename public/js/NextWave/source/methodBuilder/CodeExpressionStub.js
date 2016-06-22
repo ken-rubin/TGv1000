@@ -12,12 +12,11 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
+    "NextWave/source/utility/glyphs",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
-    "NextWave/source/utility/Area",
-    "NextWave/source/utility/glyphs",
-    "NextWave/source/methodBuilder/CodeExpression"],
-    function (prototypes, settings, Point, Size, Area, glyphs, CodeExpression) {
+    "NextWave/source/utility/Area"],
+    function (prototypes, settings, glyphs, Point, Size, Area) {
 
         try {
 
@@ -295,10 +294,10 @@ define(["NextWave/source/utility/prototypes",
                             var bConnectedToStatement = objectCollection;
 
                             // Fill and stroke the path.
-                            if ((window.draggingObject) &&
+                            if (window.draggingObject &&
                                 bConnectedToStatement) {
 
-                                if (window.draggingExpression) {
+                                if (window.draggingObject.expression) {
 
                                     if (self.highlight) {
 

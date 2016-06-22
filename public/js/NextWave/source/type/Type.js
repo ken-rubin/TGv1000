@@ -217,7 +217,8 @@ define(["NextWave/source/utility/prototypes",
 
                         var strName = self.name.substring(0, 1).toLowerCase() + self.name.substring(1);
                         strName = window.manager.getUniqueName(strName);
-                        var parameterRet = new Parameter(strName);
+                        var parameterRet = new Parameter(strName,
+                            self.name);
                         parameterRet.addNameInDragConsumate = true;
                         parameterRet.consumateName = strName;
                         return parameterRet;
@@ -287,7 +288,7 @@ define(["NextWave/source/utility/prototypes",
                     self.generateJavaScript = function () {
 
                         // Build the constructor function for the type.
-                        var strConstructorFunction = " window." + self.name + 
+                        var strConstructorFunction = " window.tg." + self.name + 
                             " = function (app) { " + 
                             " /* Closure. */ var self = this; ";
 

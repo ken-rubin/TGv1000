@@ -25,6 +25,16 @@ define(["NextWave/source/utility/prototypes",
                     // Inherit from CodeLiteral.
                     self.inherits(CodeLiteral,
                         strPayload);
+
+                    /////////////////////////
+                    // Public methods
+
+                    // Generate JavaScript for this literal.
+                    self.innerGenerateJavaScript = function () {
+
+                        // Prefix the type name with the namespace.
+                        return "window.tg." + self.payload.text;
+                    };
                 } catch (e) {
 
                     alert(e.message);

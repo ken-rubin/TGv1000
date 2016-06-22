@@ -56,10 +56,17 @@ define(["NextWave/source/utility/prototypes",
 
                         var strBlock = " ";
 
-                        strBlock += self.payload.text;
+                        // Call virtual, which defaults to the payload text.
+                        strBlock += self.innerGenerateJavaScript();
 
                         strBlock += " ";
                         return strBlock;
+                    };
+
+                    // Generate JavaScript for this literal.
+                    self.innerGenerateJavaScript = function () {
+
+                        return self.payload.text;
                     };
 
                     // Save constructor parameters.
@@ -163,6 +170,18 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             return self.payload.mouseWheel(objectReference);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass events to payload.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            return self.payload.click(objectReference);
                         } catch (e) {
 
                             return e;

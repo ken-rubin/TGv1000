@@ -273,6 +273,12 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
+                            // Don't reset the selection if just clicked.
+                            if ((new Date().getTime()) - m_iLast < 500) {
+
+                                return null;
+                            }
+
                             // Figure out the position as close to the mouse down as possible.
                             if (self.multiline) {
 

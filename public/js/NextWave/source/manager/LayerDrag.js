@@ -531,6 +531,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set global dragging variable.
                             window.draggingObject = self.dragObject;
+                            window.draggingObject.statement = true;
 
                             return null;
                         } catch (e) {
@@ -580,6 +581,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set global dragging variable.
                             window.draggingObject = self.dragObject;
+                            window.draggingObject.statement = true;
+                            window.draggingObject.parameter = true;
 
                             return null;
                         } catch (e) {
@@ -606,7 +609,8 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Set global dragging variable.
-                            window.draggingExpression = self.dragObject;
+                            window.draggingObject = self.dragObject;
+                            window.draggingObject.expression = true;
 
                             return null;
                         } catch (e) {
@@ -632,6 +636,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set global dragging variable.
                             window.draggingObject = self.dragObject;
+                            window.draggingObject.parameter = true;
+
                             return null;
                         } catch (e) {
 
@@ -673,6 +679,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set global dragging variable.
                             window.draggingObject = self.dragObject;
+                            window.draggingObject.statement = true;
+
                             return null;
                         } catch (e) {
 
@@ -706,7 +714,9 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Set global dragging variable.
-                            window.draggingExpression = self.dragObject;
+                            window.draggingObject = self.dragObject;
+                            window.draggingObject.expression = true;
+
                             return null;
                         } catch (e) {
 

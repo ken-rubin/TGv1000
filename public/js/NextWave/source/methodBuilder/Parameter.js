@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Parameter(strName) {
+        	var functionRet = function Parameter(strName, strTypeName) {
 
                 try {
 
@@ -32,6 +32,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Name of this Parameter object.
                     self.name = new Edit(strName || "default");
+                    // Name of the type of this Parameter object.
+                    self.typeName = strTypeName || "";
                     // Indicates the type is highlighted.
                     self.highlight = false;
 
@@ -94,7 +96,8 @@ define(["NextWave/source/utility/prototypes",
                     // Return a new instance of a Parameter.
                     self.clone = function () {
 
-                        return new self.constructor(strName);
+                        return new self.constructor(strName,
+                            strTypeName);
                     };
 
                     // Generates JavaScript string for this parameter.
@@ -122,7 +125,8 @@ define(["NextWave/source/utility/prototypes",
 
                         return {
 
-                            name: self.name.getText()
+                            name: self.name.getText(),
+                            typeName: self.typeName
                         };
                     };
 

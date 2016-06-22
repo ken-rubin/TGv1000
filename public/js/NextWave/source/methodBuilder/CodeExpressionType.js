@@ -63,7 +63,7 @@ define(["NextWave/source/utility/prototypes",
                         ];
                     };
 
-                    // Invoked when the keyboard is clicked whilest this item has focus.
+                    /* Invoked when the keyboard is clicked whilest this item has focus.
                     self.keyPressed = function (objectReference) {
 
                         try {
@@ -115,7 +115,7 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
-                    };
+                    };*/
                 } catch (e) {
 
                     alert(e.message);
