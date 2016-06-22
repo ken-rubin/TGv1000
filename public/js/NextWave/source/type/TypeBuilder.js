@@ -371,7 +371,7 @@ define(["NextWave/source/utility/prototypes",
                             //      For manager.userCanWorkWithSystemTypesAndAppBaseTypes: no prohibition
                             if (
                                     (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && !manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId > 1) ||
-                                    (manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId === 2)
+                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId === 2)
                                 ) {
                                 
                                 bProtected = true;

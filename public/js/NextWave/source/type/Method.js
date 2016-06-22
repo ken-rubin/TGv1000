@@ -132,7 +132,7 @@ define(["NextWave/source/utility/prototypes",
                                 for (var i = 0; i < arrayParameters.length; i++) {
 
                                     var objectParameterIth = arrayParameters[i];
-                                    var parameterNew = new Parameter(objectParameterIth.name);
+                                    var parameterNew = new Parameter(objectParameterIth.name, objectParameterIth.typeName);
                                     var exceptionRet = self.parameters.addItem(parameterNew);
                                     if (exceptionRet) {
 
