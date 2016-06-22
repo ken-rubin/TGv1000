@@ -64,6 +64,30 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Remove existing names and set to these names.
+                    self.setNames = function (arrayNames) {
+
+                        try {
+
+                            var exceptionRet;
+
+                            for (var i = 0; i < arrayNames.length; i++) {
+
+                                exceptionRet = self.addName(arrayNames[i]);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Method edits an existing name.
                     self.editName = function (strOriginalName, strNewName) {
 

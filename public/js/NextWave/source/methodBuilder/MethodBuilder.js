@@ -309,6 +309,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Call method that will clear the names panel and load all names for this method into it.
+                            var exceptionRet = m_functionLoadMethodNames(objectContext.method);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Set parameters.
                             self.dialog.controlObject["argumentsParameterList"].parameterList = objectContext.method.parameters;
                             //self.methodParameters = objectContext.method.parameters;
@@ -322,7 +329,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // TODO: add protection for argumentsParameterList and statementsStatementList.
 
-                            // Set the method.
+                            // Set the method name.
                             var bProtected = false;
                             // Protect against editing method name in these cases:
                             //      App type (type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize")
@@ -343,6 +350,41 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    ///////////////////////
+                    // Private methods.
+
+                    // Set up the names panel.
+                    var m_functionLoadMethodNames = function(method) {
+
+                        try {
+
+                            var arrayNames = [];
+
+                            for (var i = 0; i < method.parameters.items.length; i++) {
+                                arrayNames.push(method.parameters.items[i].name.text);
+                            }
+
+                            m_functionAddNamesFromStatements(method.statements, arrayNames);
+
+                            // Uniquify and sort.
+
+
+
+
+                            return window.manager.panelLayer.setNames(arrayNames);
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    //
+                    var m_functionAddNamesFromStatements = function (statements, arrayNames) {
+
+                        return;
+                    }
 
                     ///////////////////////
                     // Private fields.

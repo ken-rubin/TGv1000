@@ -375,6 +375,26 @@ define(["NextWave/source/utility/prototypes",
                         // self.iPanelConfiguration = null;
                     }
 
+                    // Method replaces what's in namesPanel with a whole new set of names.
+                    // arrayNames has been sorted and uniquified.
+                    self.setNames = function (arrayNames) {
+
+                        try {
+
+                            var exceptionRet = self.clearNames();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return self.namesPanel.payload.setNames(arrayNames);
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Method adds a new name.
                     self.addName = function (strName) {
 
