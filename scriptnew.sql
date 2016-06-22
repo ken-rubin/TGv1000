@@ -1398,6 +1398,45 @@ begin
 
     end if;
     
+    if @dbstate = 33 THEN
+
+		ALTER TABLE `tgv1000`.`methods` 
+			CHANGE COLUMN `parameters` `parameters` JSON NOT NULL ;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 34 THEN
+
+		UPDATE `TGv1000`.`methods` set parameters = '{"arguments": []}';
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 35 THEN
+    
+		ALTER TABLE `tgv1000`.`methods` 
+			CHANGE COLUMN `workspace` `statements` JSON NOT NULL ,
+			CHANGE COLUMN `parameters` `arguments` JSON NOT NULL ;
+    
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 36 THEN
+
+		UPDATE `TGv1000`.`methods` set statements = '{"statements": []}';
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
 end//
 
 

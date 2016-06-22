@@ -581,11 +581,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 method.typeId = typeIth.id;
                                                                 method.ordinal = ordinal++;
 
+                                                                if (!method.hasOwnProperty("arguments")) {
+                                                                    method.arguments = [];
+                                                                }
+                                                                if (!method.hasOwnProperty("statements")) {
+                                                                    method.statements = [];
+                                                                }
+
                                                                 var guts = {
                                                                             typeId: typeIth.id,
                                                                             name: method.name,
                                                                             ordinal: method.ordinal,
-                                                                            workspace: JSON.stringify({"statements": method.statements}),
+                                                                            statements: JSON.stringify({"statements": method.statements}),
                                                                             imageId: method.imageId || 0,
                                                                             description: method.description || '[No description provided]',
                                                                             parentMethodId: method.parentMethodId || 0,
@@ -595,7 +602,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             public: method.public || 1,
                                                                             quarantined: method.quarantined || 0,
                                                                             methodTypeId: method.methodTypeId || 4, // Not needed anymore
-                                                                            parameters: (method.arguments ? method.arguments.join(',') : '')
+                                                                            arguments: JSON.stringify({"arguments": method.arguments})
                                                                             };
 
                                                                 var exceptionRet = m_checkGutsForUndefined('method', guts);
@@ -619,7 +626,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                             var scriptGuts = " SET typeId=" + typeIth.atid
                                                                                         + ",name=" + connection.escape(method.name)
                                                                                         + ",ordinal=" + method.ordinal
-                                                                                        + ",workspace=" + connection.escape(method.workspace)
+                                                                                        + ",statements=" + connection.escape(JSON.stringify(method.statements))
                                                                                         + ",imageId=" + method.imageId
                                                                                         + ",description=" + connection.escape(method.description)
                                                                                         + ",parentMethodId=" + method.parentMethodId
@@ -629,7 +636,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                                         + ",public=" + method.public
                                                                                         + ",quarantined=" + method.quarantined
                                                                                         + ",methodTypeId=" + method.methodTypeId
-                                                                                        + ",parameters=" + connection.escape(method.parameters)
+                                                                                        + ",arguments=" + connection.escape(JSON.stringify(method.arguments))
                                                                                         ;
 
                                                                             if (typeIth.bNeedToDoAppBaseType) {
@@ -1426,20 +1433,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 if (!err) {
                                                     method.tags = tags;
 
-                                                    // Database gave me back parameters (string) and workspace (JSON: {statements: []}).
+                                                    // Database gave me back arguments (JSON: {arguments: []}) and statements (JSON: {statements: []}).
                                                     // Need to convert.
-                                                    var arsArray = method.parameters;
-                                                    if (arsArray.length) {
-
-                                                        method.arguments = arsArray.match(/([\w\-]+)/g);
-
-                                                    } else {
-
-                                                        method.arguments = [];
-                                                    }
-                                                    delete method.parameters;
-                                                    method.statements = JSON.parse(method.workspace).statements;
-                                                    delete method.workspace;
+                                                    method.arguments = JSON.parse(method.arguments).arguments;
+                                                    method.statements = JSON.parse(method.statements).statements;
                                                     typeIth.methods.push(method);
                                                 }
                                                 return cb(err);
@@ -1639,6 +1636,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     } else {
 
                         var row = rows[0];
+
+                        if (!row.hasOwnProperty("arguments")) {
+                            row.arguments = [];
+                        }
+                        if (!row.hasOwnProperty("statements")) {
+                            row.statements = [];
+                        }
+
                         var method = 
                         { 
                             id: row.id,
@@ -1648,7 +1653,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             public: row.public,
                             quarantined: row.quarantined,
                             ordinal: row.ordinal,
-                            workspace: row.workspace, 
+                            statements: JSON.parse(row.statements).statements, 
                             imageId: row.imageId,
                             description: row.description,
                             parentMethodId: row.parentMethodId,
@@ -1656,7 +1661,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             priceBump: row.priceBump,
                             tags: '',
                             methodTypeId: row.methodTypeId,
-                            parameters: row.parameters
+                            arguments: JSON.parse(row.arguments).arguments
                         };
 
                         // We don't know whose method this is (req.user.userId's or someone else's). So we're going to make like it's someone else's.
@@ -3235,11 +3240,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             method.typeId = typeIth.id;
                                             method.ordinal = ordinal++;
 
+                                            if (!method.hasOwnProperty("arguments")) {
+                                                method.arguments = [];
+                                            }
+                                            if (!method.hasOwnProperty("statements")) {
+                                                method.statements = [];
+                                            }
+
                                             var guts = {
                                                         typeId: typeIth.id,
                                                         name: method.name,
                                                         ordinal: method.ordinal,
-                                                        workspace: JSON.stringify({"statements": method.statements}),
+                                                        statements: JSON.stringify({"statements": method.statements}),
                                                         imageId: method.imageId || 0,
                                                         description: method.description || '[No description provided]',
                                                         parentMethodId: method.parentMethodId || 0,
@@ -3249,7 +3261,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         public: method.public || 0,
                                                         quarantined: method.quarantined || 1,
                                                         methodTypeId: method.methodTypeId || 2, // Not needed anymore
-                                                        parameters: method.arguments.join(',')
+                                                        arguments: JSON.stringify({"arguments": method.arguments})
                                                         };
 
                                             var exceptionRet = m_checkGutsForUndefined('method', guts);
