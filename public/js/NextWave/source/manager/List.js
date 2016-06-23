@@ -53,8 +53,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // TODO: Don't add a duplicate of one already there.
+
                             // Stow.
                             self.items.push(itemNew);
+
+                            // TODO: And sort.
 
                             // Identify parent.
                             itemNew.collection = self;

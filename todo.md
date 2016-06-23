@@ -14,10 +14,11 @@
 
 ## Jerry's High Priority Issues
 - **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
-- **Do names panel and all renaming propagation. Ken: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes.  Or perhaps it is better to do the type tree passes and then reload the center panel.  Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.**
+- **Do names panel and all renaming propagation. Ken: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.** So, when I add names to nameList, if they're parameters, they get a typeName, but if they're just from var statements, they get a null or empty typeName, right? And why the pass over the types tree(s)?
+- Figure out the miscorrespondance between manage's self.names and the NameList.
 - When saving (system types, but probably regular project), after reloading display the same exact center panel as before the save.
-- In, for example, a simple for statement, when renaming the var i, need to auto-change the 2 next occrruences of i. In fact, they should not be editable.
-- When adding a new argument to a method, insert it into names list in sorted order.
+- In, for example, a simple for statement, when renaming the var i, need to auto-change the 2 next occrruences of i. In fact, changing any of the 3 should change the other 2--and update namesPanel (which it does).
+- When adding a new argument to a method, insert it into names list in sorted order. Also, when dragging a new var-containing object. Note 2 TODOs in self.addItem in List.js. For the sorting case, possible scan externally and use insertAt in List.js
 - Test self.removeMethod and self.removeProperty in Manager.js.
 - Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken.
 - As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.
