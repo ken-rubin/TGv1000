@@ -365,16 +365,15 @@ define(["NextWave/source/utility/prototypes",
                                 arrayNames.push(method.parameters.items[i].name.text);
                             }
 
-                            m_functionAddNamesFromStatements(method.statements, arrayNames);
-
+                            var arrayBoth = arrayNames.concat(m_functionAddNamesFromStatements(method));
+                            
                             var uniqueArray = [];
-
-                            if (arrayNames.length) {
+                            if (arrayBoth.length) {
 
                                 // Uniquify (although duplicates wouldn't be allowed--or shouldn't).
-                                uniqueArray.push(arrayNames[0]);
-                                for (var i = 1; i < arrayNames.length; i++) {
-                                    var compIth = arrayNames[i];
+                                uniqueArray.push(arrayBoth[0]);
+                                for (var i = 1; i < arrayBoth.length; i++) {
+                                    var compIth = arrayBoth[i];
                                     var found = false;
                                     for (var j = 0; j < uniqueArray.length; j++) {
                                         if (uniqueArray[j] === compIth){
@@ -400,27 +399,46 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     //
-                    var m_functionAddNamesFromStatements = function (statements, arrayNames) {
+                    var m_functionAddNamesFromStatements = function (method) {
 
-                        // var k = 0;
+                        // Generate statements object from, e.g., method.save().
+                        // Stringify.
+                        // Use regexp to extract, e.g., "i" from all occurrences like: [{"type":"CodeName","parameters":[{"type":"String","value":"i"}]}]
+                        // Add them all to arrayNames. Duplicates will be removed above.
 
-                        // var recurse = function(sl, j) {
+                        var statements = method.statements.save();
+                        var JSONStatements = JSON.stringify(statements);
 
-                        //     for (var i = 0; i < sl.items.length; i++) {
-
-                        //         var slItemsIth = sl.items[i];
-                        //         j++;
-                        //         if (typeof slItemsIth === "StatementList") {
-                        //             recurse(slItemsIth, j);
-                        //         }
-                        //     }
+                        // var re = //g;
+                        // var found = JSONStatements.match(re);
+                        // if (found) {
+                        //     return found;
                         // }
+                        // return [];
 
-                        // recurse(statements, k);
+                        // Since I can't get the regExp to work:
 
-                        // alert(k);
+                        var found = [];
+                        while (JSONStatements.length) {
 
-                        return;
+                            var i = JSONStatements.indexOf('[{"type":"CodeName","parameters":[{"type":"String","value":"');
+                            if (i === -1) {
+
+                                JSONStatements = '';
+                            
+                            } else {
+
+                                JSONStatements = JSONStatements.substr(i + 60);
+                                i = JSONStatements.indexOf('"');
+                                if (i > -1) {
+
+                                    found.push(JSONStatements.substr(0, i));
+                                    JSONStatements = JSONStatements.substr(i + 1);
+                                }
+                            }
+                        }
+
+                        return found;
                     }
 
                     ///////////////////////

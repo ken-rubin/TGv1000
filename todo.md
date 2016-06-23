@@ -14,7 +14,9 @@
 
 ## Jerry's High Priority Issues
 - **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
-- **Do names panel and all renaming propagation. Ken: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes.  Or perhaps it is better to do the type tree passes and then reload the center panel.  Do you think you can do this today (Wednesday)?**
+- **Do names panel and all renaming propagation. Ken: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes.  Or perhaps it is better to do the type tree passes and then reload the center panel.  Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.**
+- When saving (system types, but probably regular project), after reloading display the same exact center panel as before the save.
+- In, for example, a simple for statement, when renaming the var i, need to auto-change the 2 next occrruences of i. In fact, they should not be editable.
 - When adding a new argument to a method, insert it into names list in sorted order.
 - Test self.removeMethod and self.removeProperty in Manager.js.
 - Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken.
