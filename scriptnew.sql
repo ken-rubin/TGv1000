@@ -1400,6 +1400,7 @@ begin
     
     if @dbstate = 33 THEN
 
+		UPDATE `tgv1000`.`methods` set parameters='{}';
 		ALTER TABLE `tgv1000`.`methods` 
 			CHANGE COLUMN `parameters` `parameters` JSON NOT NULL ;
 

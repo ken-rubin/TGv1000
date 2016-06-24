@@ -16,102 +16,118 @@ $(document).ready(function () {
 
 				try {
 
+					var callback = function () {
+
+						try {
+
+							// Allocate and initialize the client.
+							m_clientLogin = new ClientLogin();
+							var exceptionRet = m_clientLogin.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							// exceptionRet = m_functionLoadThreeLists(errorHelper);
+							// if (exceptionRet) { throw exceptionRet; }
+
+			                // Wire up the enroll button
+			                $("#enrollBtn").click(function () {
+			                    
+			                    m_functionEnrollButtonClk(errorHelper);
+
+			                });
+
+			                // Get the last signed in userName from profile in localStorage.
+		             		m_functionSetGProfileFromLS();
+			                var strUserName = null;
+			                if (g_profile && g_profile.hasOwnProperty("userName")) {
+			                	strUserName = g_profile["userName"];
+			                }
+			                if (strUserName && strUserName.length > 0) {
+
+			                    $("#inputName").val(strUserName);
+			                    $("#inputPassword").focus();
+
+			                } else {
+
+			                    $("#inputName").focus();
+			                }
+
+			                // Wire up the signIn button
+			                $("#signinBtn").click(function () {
+			                    
+			                    m_functionSignInButtonClick(errorHelper);
+
+			                });
+			                $("#signinBtn").keypress(function(event){
+
+			                    if (event.which == 13) {
+
+				                    m_functionSignInButtonClick(errorHelper);
+			                    }
+			                });
+			                $("#inputPassword").keypress(function(event){
+
+			                    if (event.which == 13) {
+
+				                    m_functionSignInButtonClick(errorHelper);
+			                    }
+			                });
+			                
+			                // Wire up the forgot link.
+			                $("#forgotLink").click(function () {
+			                    
+			                    m_functionForgotLinkClick(errorHelper);
+			                });
+
+							// Cause the code and designer panels to size themselves.
+							$(window).resize();
+
+							///////////////////////////////////////////////////////////
+							//
+							// Following are all of our handlers for URL-encoded launches due to users clicking on email-included links.
+							//
+							//////////////////////////////////////////////////////////
+
+							// Look for password reset token.
+							strFromURL = m_functionCheckForURLEncoding("reset");
+							if (strFromURL) {
+								
+								m_functionShowPasswordResetDialog(strFromURL, errorHelper);
+								return;
+							}
+
+							// Accept invitation to enroll in online class.
+							strFromURL = m_functionCheckForURLEncoding("accept");
+							if (strFromURL) {
+
+								m_functionHandleAcceptEmailClick();
+								return;
+							}
+
+							// Decline invitation to enroll in online class.
+							// strFromURL = m_functionCheckForURLEncoding("decline");
+							// if (strFromURL) {
+
+							// 	m_functionHandleDeclineEmailClick();
+							// 	return;
+							// }
+
+						} catch (e) {
+
+							errorHelper.show(e);
+						}
+					}
+
 					// Look for JWT redirect.
 					var strFromURL = m_functionCheckForURLEncoding("error");
 					if (strFromURL !== "") {
-						errorHelper.show(strFromURL + '. Please login again.');
+					
+						errorHelper.show(strFromURL + '. Please login again.', 500000, callback);
+					
+					} else {
+					
+						callback();
 					}
 
-					// Allocate and initialize the client.
-					m_clientLogin = new ClientLogin();
-					var exceptionRet = m_clientLogin.create();
-					if (exceptionRet) { throw exceptionRet; }
-
-					// exceptionRet = m_functionLoadThreeLists(errorHelper);
-					// if (exceptionRet) { throw exceptionRet; }
-
-	                // Wire up the enroll button
-	                $("#enrollBtn").click(function () {
-	                    
-	                    m_functionEnrollButtonClk(errorHelper);
-
-	                });
-
-	                // Get the last signed in userName from profile in localStorage.
-             		m_functionSetGProfileFromLS();
-	                var strUserName = null;
-	                if (g_profile && g_profile.hasOwnProperty("userName")) {
-	                	strUserName = g_profile["userName"];
-	                }
-	                if (strUserName && strUserName.length > 0) {
-
-	                    $("#inputName").val(strUserName);
-	                    $("#inputPassword").focus();
-
-	                } else {
-
-	                    $("#inputName").focus();
-	                }
-
-	                // Wire up the signIn button
-	                $("#signinBtn").click(function () {
-	                    
-	                    m_functionSignInButtonClick(errorHelper);
-
-	                });
-	                $("#signinBtn").keypress(function(event){
-
-	                    if (event.which == 13) {
-
-		                    m_functionSignInButtonClick(errorHelper);
-	                    }
-	                });
-	                $("#inputPassword").keypress(function(event){
-
-	                    if (event.which == 13) {
-
-		                    m_functionSignInButtonClick(errorHelper);
-	                    }
-	                });
-	                
-	                // Wire up the forgot link.
-	                $("#forgotLink").click(function () {
-	                    
-	                    m_functionForgotLinkClick(errorHelper);
-	                });
-
-					// Cause the code and designer panels to size themselves.
-					$(window).resize();
-
-					///////////////////////////////////////////////////////////
-					//
-					// Following are all of our handlers for URL-encoded launches due to users clicking on email-included links.
-					//
-					//////////////////////////////////////////////////////////
-
-					// Look for password reset token.
-					strFromURL = m_functionCheckForURLEncoding("reset");
-					if (strFromURL) {
-						
-						m_functionShowPasswordResetDialog(strFromURL, errorHelper);
-						return;
-					}
-
-					// Accept invitation to enroll in online class.
-					strFromURL = m_functionCheckForURLEncoding("accept");
-					if (strFromURL) {
-
-						m_functionHandleAcceptEmailClick();
-						return;
-					}
-
-					// Decline invitation to enroll in online class.
-					// strFromURL = m_functionCheckForURLEncoding("decline");
-					// if (strFromURL) {
-
-					// 	m_functionHandleDeclineEmailClick();
-					// 	return;
-					// }
 
 				} catch (e) {
 
