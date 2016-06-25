@@ -86,7 +86,7 @@ define(["NextWave/source/utility/prototypes",
                     self.getWidth = function (contextRender) {
 
                         contextRender.font = settings.general.monoSpaceFont;
-                        return contextRender.measureText(self.text).width + 4 * settings.general.margin;                            
+                        return contextRender.measureText(self.text).width + 2 * settings.general.margin;                            
                     }
 
                     self.getHeight = function () {

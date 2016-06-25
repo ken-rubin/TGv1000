@@ -11,13 +11,14 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/settings",
     "NextWave/source/manager/List"],
-    function (prototypes, List) {
+    function (prototypes, settings, List) {
 
         try {
 
             // Constructor function.
-        	var functionRet = function ParameterList(arrayParameters) {
+        	var functionRet = function ParameterList(arrayParameters, dWidth) {
 
                 try {
 
@@ -26,6 +27,10 @@ define(["NextWave/source/utility/prototypes",
                     // Inherit from List.
                     self.inherits(List,
                     	false);
+
+                    ////////////////////////
+                    // Store width, if set.
+                    self.width = dWidth || null;
 
                     // Play parameters, if specified.
                     if (arrayParameters) {
@@ -96,6 +101,14 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Return the width if specified, otherwise extent.
+                    self.getWidth = function (contextRender) {
+
+                        return Math.max(self.getTotalExtent(contextRender) +
+                            settings.general.margin * 2,
+                            10 * settings.general.margin);
                     };
 
                     // Remove parameter stubs from around all elements.

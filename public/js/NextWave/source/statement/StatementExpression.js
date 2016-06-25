@@ -14,8 +14,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeStatementExpression",
     "NextWave/source/methodBuilder/CodeExpressionInvocation",
     "NextWave/source/methodBuilder/CodeExpressionRefinement",
-    "NextWave/source/methodBuilder/CodeExpressionName"],
-    function (prototypes, Statement, CodeStatementExpression, CodeExpressionInvocation, CodeExpressionRefinement, CodeExpressionName) {
+    "NextWave/source/methodBuilder/CodeExpressionName",
+    "NextWave/source/methodBuilder/ParameterList",
+    "NextWave/source/methodBuilder/Parameter"],
+    function (prototypes, Statement, CodeStatementExpression, CodeExpressionInvocation, CodeExpressionRefinement, CodeExpressionName, ParameterList, Parameter) {
 
         try {
 
@@ -41,7 +43,13 @@ define(["NextWave/source/utility/prototypes",
                                     new CodeExpressionRefinement(
                                         new CodeExpressionName("instance"),
                                         new CodeExpressionName("method")
-                                        )
+                                        ),
+                                        new ParameterList(
+                                                [
+                                                    new Parameter("i", "Number"),
+                                                    new Parameter("code", "String")
+                                                ]
+                                            )
                                     )
                             );
                     };

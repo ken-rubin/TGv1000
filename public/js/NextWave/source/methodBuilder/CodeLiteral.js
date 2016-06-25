@@ -108,7 +108,7 @@ define(["NextWave/source/utility/prototypes",
                             return self.maxWidth;
                         }
 
-                        return self.payload.getWidth(contextRender);
+                        return self.payload.getWidth(contextRender) + 2 * settings.general.margin;
                     };
 
                     // Test if the point is in this Type.

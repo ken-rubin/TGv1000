@@ -216,6 +216,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Extract the property.
                                 var strProperty = strIth.substring(1, strIth.length - 1);
+
                                 // Ask it for its width....
                                 if ($.isFunction(self[strProperty].getWidth)) {
 
@@ -465,15 +466,25 @@ define(["NextWave/source/utility/prototypes",
                                 if (strIth[0] === '[') {
 
                                     // Extract the property.
-                                    var strProperty = strIth.substring(1, strIth.length - 1);
+                                    var strProperty = strIth.substring(1, 
+                                        strIth.length - 1);
+
+                                    // Get width, if specified.
+                                    var dWidthOfThisObject = 0;
+                                    if ($.isFunction(self[strProperty].getWidth)) {
+
+                                        dWidthOfThisObject = self[strProperty].getWidth(contextRender);
+                                    } else {
+
+                                        dWidthOfThisObject = self[strProperty].getTotalExtent(contextRender);
+                                    }
 
                                     // If calculateLayout is defined, call it before render.
                                     if ($.isFunction(self[strProperty].calculateLayout)) {
 
                                         var areaMaximal = new Area(new Point(areaRenderDisplay.location.x + dCursorX,
                                                 areaRenderDisplay.location.y),
-                                            new Size(Math.min(200,
-                                                    self[strProperty].getTotalExtent(contextRender)),
+                                            new Size(dWidthOfThisObject,
                                                 areaRenderDisplay.extent.height));
                                         exceptionRet = self[strProperty].calculateLayout(areaMaximal,
                                             contextRender);
@@ -494,14 +505,7 @@ define(["NextWave/source/utility/prototypes",
                                     }
 
                                     // Get width, if specified.
-                                    if ($.isFunction(self[strProperty].getWidth)) {
-
-                                        dCursorX += self[strProperty].getWidth(contextRender);
-                                    } else {
-
-                                        dCursorX += Math.min(200,
-                                            self[strProperty].getTotalExtent(contextRender));
-                                    }
+                                    dCursorX += dWidthOfThisObject;
                                 } else {
 
                                     // Else do a fill text.
