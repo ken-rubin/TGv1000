@@ -64,7 +64,7 @@ define(["NextWave/source/utility/prototypes",
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
                     // Collection of named object pertinent to the current context.
-                    self.names = [];
+                    // self.names = [];
                     // Collection of types available in the current context.
                     self.types = [];
                     // Collection of systemTypes available in the current context.
@@ -257,7 +257,7 @@ define(["NextWave/source/utility/prototypes",
                             m_arrayLayers[2] = self.panelLayer;
 
                             // Collection of named object pertinent to the current context.
-                            self.names = [];
+                            // self.names = [];
                             // Collection of types available in the current context.
                             self.types = [];
                             // Current type/method.
@@ -280,7 +280,7 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearExpressions();
                             if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearNames();
+                            exceptionRet = self.panelLayer.clearNameTypes();
                             if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearCenter();
                             if (exceptionRet) { return exceptionRet; }
@@ -463,25 +463,12 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method edits a new name.
-                    self.editName = function (strOriginalName, strNewName) {
+                    self.editNameType = function (strOriginalName, strNewName) {
 
                         try {
 
-                            // Update in place.
-                            for (var i = 0; i < self.names.length; i++) {
-
-                                // Find match...
-                                if (self.names[i] === strOriginalName) {
-
-                                    // ...and splice in place.
-                                    self.names.splice(i, 1, strNewName);
-
-                                    break;
-                                }
-                            }
-
-                            // Update the panel too.
-                            return self.panelLayer.editName(strOriginalName, 
+                            // Update in the panel.
+                            return self.panelLayer.editNameType(strOriginalName, 
                                 strNewName);
                         } catch (e) {
 
@@ -968,20 +955,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // // Remove in place.
-                            // for (var i = 0; i < self.names.length; i++) {
-
-                            //     // Find match...
-                            //     if (self.names[i] === strName) {
-
-                            //         // ...and splace in place.
-                            //         self.names.splice(i, 1);
-
-                            //         break;
-                            //     }
-                            // }
-
-                            // Update the panel too.
+                            // Update in the panel.
                             return self.panelLayer.removeNameType(strName);
                         } catch (e) {
 
@@ -1002,7 +976,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Build a unique name from the specified name.
                     // strName -- the initial proposed name.
-                    // arrayCollection -- the collection to iterate over and ensure uniqueness.  Defaults to self.names.
+                    // arrayCollection -- the collection to iterate over and ensure uniqueness.  Defaults to self.panelLayer.namesPanel.payload.items.
                     // strNameProperty -- the property-name-accessor on items in arrayCollection.
                     // strNameReferenceProperty -- the accessor property on the strNamePropety types as objects.
                     //
@@ -1013,7 +987,9 @@ define(["NextWave/source/utility/prototypes",
                         // Default collection value to names.
                         if (!arrayCollection) {
 
-                            arrayCollection = self.names;
+                            arrayCollection = self.panelLayer.namesPanel.payload.items;
+                            strNameProperty = "name";
+                            strNameRefinementProperty = "name";
                         }
 
                         // Make sure a good JS name.

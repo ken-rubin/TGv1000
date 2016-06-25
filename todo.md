@@ -5,7 +5,6 @@
 - Type field in Property has to become a combo.
 
 ## Jerry's Current Issues
-- **Dragging a type into the code statements that's already in the parameters list is not correctly uniquifying the name. They're both the same.**
 - **Do names panel and all renaming propagation. Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.**
 - **So, when I add names to nameList, if they're parameters, they get a typeName, but if they're just from var statements, they get a null or empty typeName, right? And why the pass over the types tree(s)?**
 - **Figure out the mis-correspondance between manage's self.names and the NameList. Answer: manager's self.names can go.**
