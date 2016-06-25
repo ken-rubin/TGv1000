@@ -4,19 +4,21 @@
 - Base in Type has to be a combo.
 - Type field in Property has to become a combo.
 
-## Jerry's Issues
-- The System Type field in Type mode of center panel should be a text string that is empty for normal types.
-- Load Stripe.js script when it's needed. Use $.getScript('https://js.stripe.com/v2/'); Remove from indexScripts.jade. Test for prior existence before loading.
-- **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
-- **Removing a var x = y; from the statements list, where the var was caused by dragging a type or dragging a var statement, doesn't remove the name from namesPanel.**
-- We need to be able delete a Type (done), but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type. Or something.
+## Jerry's Current Issues
 - **Dragging a type into the code statements that's already in the parameters list is not correctly uniquifying the name. They're both the same.**
 - **Do names panel and all renaming propagation. Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.**
 - **So, when I add names to nameList, if they're parameters, they get a typeName, but if they're just from var statements, they get a null or empty typeName, right? And why the pass over the types tree(s)?**
 - **Figure out the mis-correspondance between manage's self.names and the NameList. Answer: manager's self.names can go.**
+- **When adding a new argument to a method, insert it into names list in sorted order. Also, when dragging a new var-containing object. Note 2 TODOs in use insertAt in List.js.**
+- **Fix up statements pass (the one that's supposed to find var statements using regExps) so that instance.method(); doesn't add *instance* or *method* to panelNames.**
+- 
+## Jerry's Next Issues
+- The System Type field in Type mode of center panel should be a text string that is empty for normal types.
+- Load Stripe.js script when it's needed. Use $.getScript('https://js.stripe.com/v2/'); Remove from indexScripts.jade. Test for prior existence before loading.
+- **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
+- We need to be able delete a Type (done), but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type. Or something.
 - When saving (system types, but probably regular project), after reloading display the same exact center panel as before the save. I.e., retain a detailed context and re-play it.
 - **In, for example, a simple for statement, when renaming the var i, need to self.addItem in List.js. For the sorting case, possible scan externally and auto-change the 2 next occrruences of i. In fact, changing any of the 3 should change the other 2--and update namesPanel (which it does). And it also should change the name in any of the for statement's internal blocks.**
-- **When adding a new argument to a method, insert it into names list in sorted order. Also, when dragging a new var-containing object. Note 2 TODOs in use insertAt in List.js.**
 - **Test self.removeMethod and self.removeProperty in Manager.js.**
 - **Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken. He believes so. What steps do we have to take to make this work? Does the deletion go into ST.sql?**
 - **As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.**

@@ -425,13 +425,13 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeName = function (strName) {
+                    self.removeNameType = function (strName) {
 
                         try {
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
-                            return self.namesPanel.payload.removeName(strName);
+                            return self.namesPanel.payload.removeNameType(strName);
                         } catch (e) {
 
                             return e;

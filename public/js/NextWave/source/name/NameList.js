@@ -113,7 +113,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeName = function (strName) {
+                    self.removeNameType = function (strName) {
 
                         try {
 
@@ -121,7 +121,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Find match...
-                                if (self.items[i].name === strName) {
+                                if (self.items[i].name.name === strName) {
 
                                     // ...and splice in place.
                                     self.items.splice(i, 1);

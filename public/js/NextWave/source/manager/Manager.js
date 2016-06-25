@@ -964,25 +964,25 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeName = function (strName) {
+                    self.removeNameType = function (strName) {
 
                         try {
 
-                            // Remove in place.
-                            for (var i = 0; i < self.names.length; i++) {
+                            // // Remove in place.
+                            // for (var i = 0; i < self.names.length; i++) {
 
-                                // Find match...
-                                if (self.names[i] === strName) {
+                            //     // Find match...
+                            //     if (self.names[i] === strName) {
 
-                                    // ...and splace in place.
-                                    self.names.splice(i, 1);
+                            //         // ...and splace in place.
+                            //         self.names.splice(i, 1);
 
-                                    break;
-                                }
-                            }
+                            //         break;
+                            //     }
+                            // }
 
                             // Update the panel too.
-                            return self.panelLayer.removeName(strName);
+                            return self.panelLayer.removeNameType(strName);
                         } catch (e) {
 
                             return e;
