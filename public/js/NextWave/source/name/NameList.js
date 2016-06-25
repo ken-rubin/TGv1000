@@ -52,12 +52,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Add a name.
-                    self.addName = function (strName) {
+                    // Add a nameType object.
+                    self.addNameType = function (objNameType) {
 
                         try {
 
-                            return self.addItem(new Name(strName));
+                            return self.addItem(new Name(objNameType));
                         } catch (e) {
 
                             return e;
@@ -65,15 +65,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Remove existing names and set to these names.
-                    self.setNames = function (arrayNames) {
+                    self.setNames = function (arrayNameTypes) {
 
                         try {
 
                             var exceptionRet;
 
-                            for (var i = 0; i < arrayNames.length; i++) {
+                            for (var i = 0; i < arrayNameTypes.length; i++) {
 
-                                exceptionRet = self.addName(arrayNames[i]);
+                                exceptionRet = self.addNameType(arrayNameTypes[i]);
                                 if (exceptionRet) {
 
                                     return exceptionRet;

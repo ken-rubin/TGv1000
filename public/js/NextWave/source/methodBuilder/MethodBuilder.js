@@ -362,7 +362,13 @@ define(["NextWave/source/utility/prototypes",
                             var arrayNames = [];
 
                             for (var i = 0; i < method.parameters.items.length; i++) {
-                                arrayNames.push(method.parameters.items[i].name.text);
+
+                                var paramIth = method.parameters.items[i];
+                                arrayNames.push(
+                                {
+                                    name: paramIth.name.text,
+                                    typeName: paramIth.typeName
+                                });
                             }
 
                             var arrayBoth = arrayNames.concat(m_functionAddNamesFromStatements(method));
@@ -387,7 +393,14 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // And sort.
-                                uniqueArray.sort();
+                                uniqueArray.sort(function(a,b){
+
+                                    if (a.name > b.name)
+                                        return 1;
+                                    if (a.name < b.name)
+                                        return -1;
+                                    return 0;
+                                });
                             }
 
                             return window.manager.panelLayer.setNames(uniqueArray);
@@ -432,7 +445,11 @@ define(["NextWave/source/utility/prototypes",
                                 i = JSONStatements.indexOf('"');
                                 if (i > -1) {
 
-                                    found.push(JSONStatements.substr(0, i));
+                                    found.push(
+                                    {
+                                        name: JSONStatements.substr(0, i),
+                                        typeName: null
+                                    });
                                     JSONStatements = JSONStatements.substr(i + 1);
                                 }
                             }

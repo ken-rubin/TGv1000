@@ -449,13 +449,13 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Method adds a new name.
-                    self.addName = function (strName) {
+                    self.addNameType = function (objNameType) {
 
                         try {
 
-                            self.names.push(strName);
+                            // self.names.push(objNameType);
 
-                            return self.panelLayer.addName(strName);
+                            return self.panelLayer.addNameType(objNameType);
                         } catch (e) {
 
                             return e;

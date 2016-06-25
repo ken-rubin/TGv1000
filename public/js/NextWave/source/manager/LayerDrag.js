@@ -264,7 +264,11 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.parameterDragTarget.addNameInDragConsumate) {
 
                                         self.parameterDragTarget.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addName(self.parameterDragTarget.consumateName);
+                                        var exceptionRet = window.manager.addNameType(
+                                        {
+                                            name: self.parameterDragTarget.consumateName,
+                                            typeName: self.dragObject.name
+                                        });
                                         if (exceptionRet) {
 
                                             return e;
@@ -287,7 +291,11 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.dragTargets.addNameInDragConsumate) {
 
                                         self.dragTargets.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addName(self.dragTargets.consumateName);
+                                        var exceptionRet = window.manager.addNameType(
+                                        {
+                                            name: self.dragTargets.consumateName,
+                                            typeName: self.dragObject.name
+                                        });
                                         if (exceptionRet) {
 
                                             return e;

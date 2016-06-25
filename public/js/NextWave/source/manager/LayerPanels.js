@@ -377,7 +377,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Method replaces what's in namesPanel with a whole new set of names.
                     // arrayNames has been sorted and uniquified.
-                    self.setNames = function (arrayNames) {
+                    self.setNames = function (arrayNameTypes) {
 
                         try {
 
@@ -387,7 +387,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return self.namesPanel.payload.setNames(arrayNames);
+                            return self.namesPanel.payload.setNames(arrayNameTypes);
 
                         } catch (e) {
 
@@ -396,13 +396,13 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Method adds a new name.
-                    self.addName = function (strName) {
+                    self.addNameType = function (objNameType) {
 
                         try {
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
-                            return self.namesPanel.payload.addName(strName);
+                            return self.namesPanel.payload.addNameType(objNameType);
                         } catch (e) {
 
                             return e;

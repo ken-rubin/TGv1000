@@ -10,10 +10,14 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
+    "NextWave/source/utility/settings",
     "NextWave/source/manager/ListItem",
+    "NextWave/source/utility/Point",
+    "NextWave/source/utility/Size",
+    "NextWave/source/utility/Area",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeName"],
-    function (prototypes, ListItem, CodeExpressionName, CodeName) {
+    function (prototypes, settings, ListItem, Point, Size, Area, CodeExpressionName, CodeName) {
 
         try {
 
@@ -31,6 +35,13 @@ define(["NextWave/source/utility/prototypes",
 
                     ///////////////////////////
                     // Public methods.
+
+                    // Overridable method to get at name.
+                    // This is the default.
+                    self.getName = function () {
+
+                        return self.name.name;
+                    };
 
                     // Return a code instance
                     self.allocateCodeInstance = function () {

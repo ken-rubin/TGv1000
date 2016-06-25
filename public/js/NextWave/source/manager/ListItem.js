@@ -78,7 +78,14 @@ define(["NextWave/source/utility/prototypes",
                         // Return hit-test against generated path.
                         return m_area.pointInArea(contextRender,
                             point);
-                    }
+                    };
+
+                    // Overridable method to get at name.
+                    // This is the default.
+                    self.getName = function () {
+
+                        return self.name;
+                    };
 
                     // Render out this type.
                     self.render = function (contextRender, areaRender, dY) {
@@ -121,7 +128,7 @@ define(["NextWave/source/utility/prototypes",
                             // Render the name.
                             contextRender.font = self.settingsNode.font;
                             contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.name,
+                            contextRender.fillText(self.getName(),
                                 m_area.location.x + settings.general.margin,
                                 m_area.location.y,
                                 m_area.extent.width - 2 * settings.general.margin);

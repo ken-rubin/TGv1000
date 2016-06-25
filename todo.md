@@ -1,27 +1,25 @@
 
 ## Ken's Issues
 
-- Just load Stripe when it's needed.
-- System Type in Type has to be a text string that is empty for normal types.
 - Base in Type has to be a combo.
-- We need a way to delete a Type, but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type.
 - Type field in Property has to become a combo.
-- Methods named initialize or construct should not be renameable. 
-- If other methods are renamed, that has to propogate throughout comic. Unless in System Types: then everyplace.
-- App Type cannot be renamed.
-- If any non-system types are renamed, that has to propogate throughout the comic.
-- If a System Type is renamed, that has to be propogated everywhere.
 
-## Jerry's High Priority Issues
+## Jerry's Issues
+- The System Type field in Type mode of center panel should be a text string that is empty for normal types.
+- Load Stripe.js script when it's needed. Use $.getScript('https://js.stripe.com/v2/'); Remove from indexScripts.jade. Test for prior existence before loading.
 - **Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList.**
-- **Do names panel and all renaming propagation. Ken: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.** So, when I add names to nameList, if they're parameters, they get a typeName, but if they're just from var statements, they get a null or empty typeName, right? And why the pass over the types tree(s)?
-- Figure out the miscorrespondance between manage's self.names and the NameList.
-- When saving (system types, but probably regular project), after reloading display the same exact center panel as before the save.
-- In, for example, a simple for statement, when renaming the var i, need to auto-change the 2 next occrruences of i. In fact, changing any of the 3 should change the other 2--and update namesPanel (which it does).
-- When adding a new argument to a method, insert it into names list in sorted order. Also, when dragging a new var-containing object. Note 2 TODOs in self.addItem in List.js. For the sorting case, possible scan externally and use insertAt in List.js
-- Test self.removeMethod and self.removeProperty in Manager.js.
-- Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken.
-- As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.
+- **Removing a var x = y; from the statements list, where the var was caused by dragging a type or dragging a var statement, doesn't remove the name from namesPanel.**
+- We need to be able delete a Type (done), but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type. Or something.
+- **Dragging a type into the code statements that's already in the parameters list is not correctly uniquifying the name. They're both the same.**
+- **Do names panel and all renaming propagation. Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.**
+- **So, when I add names to nameList, if they're parameters, they get a typeName, but if they're just from var statements, they get a null or empty typeName, right? And why the pass over the types tree(s)?**
+- **Figure out the mis-correspondance between manage's self.names and the NameList. Answer: manager's self.names can go.**
+- When saving (system types, but probably regular project), after reloading display the same exact center panel as before the save. I.e., retain a detailed context and re-play it.
+- **In, for example, a simple for statement, when renaming the var i, need to self.addItem in List.js. For the sorting case, possible scan externally and auto-change the 2 next occrruences of i. In fact, changing any of the 3 should change the other 2--and update namesPanel (which it does). And it also should change the name in any of the for statement's internal blocks.**
+- **When adding a new argument to a method, insert it into names list in sorted order. Also, when dragging a new var-containing object. Note 2 TODOs in use insertAt in List.js.**
+- **Test self.removeMethod and self.removeProperty in Manager.js.**
+- **Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken. He believes so. What steps do we have to take to make this work? Does the deletion go into ST.sql?**
+- **As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.**
 - **Ask Ken if there's a better way for me to test for deletion of initialize and construct methods. This is in SectionPart.js around this code: self.settingsNode.fillBackground !== settings.tree.method.fillBackground.
 - Do LayerDesigner.
 - John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.
@@ -62,6 +60,7 @@
         - Added image to project owned by a@a.com. It has both public and quarantined set to false. This is correct.
 - Cron.js
     - Finish job2
+    - Reenable.
     - Add waitlist reminder emails
     - 1-minute cron job to remove invited user (with email) after 24 hours and automatically invite the next person on the waitlist.
     + Test the 1AM cron job that sends emails regarding upcoming classes, etc.
@@ -75,7 +74,7 @@
 - Token/cookie expiration: After over an hour without using but with the Search for project dialog open, I get a "null" error when I try to search. This is an incorrect handling of a JWT timeout. Actually, the cookie holding the token timed out and was deleted from the client side. So no token was delivered with the Search request. This was then handled poorly. I need to do something better. See [this Stackoverflow description](http://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration).
     + Session extension. Should I expire JWTs in, say, 15 minutes, but issue a new one with every request? I can't find any real help about expiresIn for JWT vs maxAge for its cookie, so we'll just have to figure it out.
     + Lengthen to like 2 weeks.
-    + Save project to DB with every change.
+    + **Save project to DB or at least to LocalStorage with every change.**
 
 ### To consider
 - AZUsersDialog 
