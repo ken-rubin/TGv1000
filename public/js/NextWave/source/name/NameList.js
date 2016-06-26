@@ -65,7 +65,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Remove existing names and set to these names.
-                    self.setNames = function (arrayNameTypes) {
+                    self.setNameTypes = function (arrayNameTypes) {
 
                         try {
 
@@ -89,7 +89,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Method edits an existing name.
-                    self.editName = function (strOriginalName, strNewName) {
+                    self.editNameType = function (strOriginalName, strNewName) {
 
                         try {
 
@@ -97,10 +97,10 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Find match...
-                                if (self.items[i].name === strOriginalName) {
+                                if (self.items[i].name.name === strOriginalName) {
 
                                     // ...and splace in place.
-                                    self.items[i].name = strNewName;
+                                    self.items[i].name.name = strNewName;
 
                                     break;
                                 }
@@ -113,7 +113,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeName = function (strName) {
+                    self.removeNameType = function (strName) {
 
                         try {
 
@@ -121,7 +121,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Find match...
-                                if (self.items[i].name === strName) {
+                                if (self.items[i].name.name === strName) {
 
                                     // ...and splice in place.
                                     self.items.splice(i, 1);

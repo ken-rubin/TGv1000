@@ -403,7 +403,7 @@ define(["NextWave/source/utility/prototypes",
                                 });
                             }
 
-                            return window.manager.panelLayer.setNames(uniqueArray);
+                            return window.manager.panelLayer.setNameTypes(uniqueArray);
 
                         } catch (e) {
 

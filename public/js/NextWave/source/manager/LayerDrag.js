@@ -413,7 +413,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dragTargets.assignment.payload.lHS.payload.payload instanceof CodeName) {
 
                                             // ...remove it from names.
-                                            var exceptionRet = window.manager.removeName(self.dragTargets.assignment.payload.lHS.payload.payload.payload);
+                                            var exceptionRet = window.manager.removeNameType(self.dragTargets.assignment.payload.lHS.payload.payload.payload.text);
                                             if (exceptionRet) {
 
                                                 return exceptionRet;
@@ -440,7 +440,8 @@ define(["NextWave/source/utility/prototypes",
                                         // Dragged to remove.
 
                                         // ...remove it from names.
-                                        var exceptionRet = window.manager.removeName(self.parameterDragTarget.consumateName);
+                                        // var exceptionRet = window.manager.removeName(self.parameterDragTarget.consumateName);
+                                        var exceptionRet = window.manager.removeNameType(self.parameterDragTarget.name.originalName);
                                         if (exceptionRet) {
 
                                             return exceptionRet;

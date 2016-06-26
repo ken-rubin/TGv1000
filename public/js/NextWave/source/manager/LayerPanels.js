@@ -377,17 +377,17 @@ define(["NextWave/source/utility/prototypes",
 
                     // Method replaces what's in namesPanel with a whole new set of names.
                     // arrayNames has been sorted and uniquified.
-                    self.setNames = function (arrayNameTypes) {
+                    self.setNameTypes = function (arrayNameTypes) {
 
                         try {
 
-                            var exceptionRet = self.clearNames();
+                            var exceptionRet = self.clearNameTypes();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            return self.namesPanel.payload.setNames(arrayNameTypes);
+                            return self.namesPanel.payload.setNameTypes(arrayNameTypes);
 
                         } catch (e) {
 
@@ -410,13 +410,13 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method edits an existing name.
-                    self.editName = function (strOriginalName, strNewName) {
+                    self.editNameType = function (strOriginalName, strNewName) {
 
                         try {
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
-                            return self.namesPanel.payload.editName(strOriginalName,
+                            return self.namesPanel.payload.editNameType(strOriginalName,
                                 strNewName);
                         } catch (e) {
 
@@ -425,13 +425,13 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeName = function (strName) {
+                    self.removeNameType = function (strName) {
 
                         try {
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
-                            return self.namesPanel.payload.removeName(strName);
+                            return self.namesPanel.payload.removeNameType(strName);
                         } catch (e) {
 
                             return e;
@@ -531,7 +531,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Clear the list of names.
-                    self.clearNames = function () {
+                    self.clearNameTypes = function () {
 
                         try {
 
