@@ -581,9 +581,21 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 method.typeId = typeIth.id;
                                                                 method.ordinal = ordinal++;
 
+                                                                // First if should never hit, because even no parameters now has method.arguments.
                                                                 if (!method.hasOwnProperty("arguments")) {
-                                                                    method.arguments = [];
+
+                                                                    method.arguments = {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]};
+
+                                                                } else {
+                                                                    // Here there was method.arguments, but there were no actual parameters, so
+                                                                    // we have to add parameters: [] to make everything work.
+
+                                                                    if (!method.arguments.parameters[0].hasOwnProperty('parameters')) {
+
+                                                                        method.arguments = {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]};
+                                                                    }
                                                                 }
+
                                                                 if (!method.hasOwnProperty("statements")) {
                                                                     method.statements = [];
                                                                 }

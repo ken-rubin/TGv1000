@@ -361,15 +361,17 @@ define(["NextWave/source/utility/prototypes",
 
                             var arrayNames = [];
 
-                            for (var i = 0; i < method.parameters.items.length; i++) {
+                            // if (method.parameters) {
+                                for (var i = 0; i < method.parameters.items.length; i++) {
 
-                                var paramIth = method.parameters.items[i];
-                                arrayNames.push(
-                                {
-                                    name: paramIth.name.text,
-                                    typeName: paramIth.typeName
-                                });
-                            }
+                                    var paramIth = method.parameters.items[i];
+                                    arrayNames.push(
+                                    {
+                                        name: paramIth.name.text,
+                                        typeName: paramIth.typeName
+                                    });
+                                }
+                            // }
 
                             var arrayBoth = arrayNames.concat(m_functionAddNamesFromStatements(method));
                             
