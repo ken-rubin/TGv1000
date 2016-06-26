@@ -7,10 +7,10 @@
 ## Jerry's Current Issues
 - **Do names panel and all renaming propagation. Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.**
 - **So, when I add names to nameList, if they're parameters, they get a typeName, but if they're just from var statements, they get a null or empty typeName, right? And why the pass over the types tree(s)?**
-- **Figure out the mis-correspondance between manage's self.names and the NameList. Answer: manager's self.names can go.**
-- **When adding a new argument to a method, insert it into names list in sorted order. Also, when dragging a new var-containing object. Note 2 TODOs in use insertAt in List.js.**
+- **When adding a new argument to a method, insert it into names list in sorted order. Also, do it when dragging a new var-containing object. Note 2 TODOs in use insertAt in List.js.**
 - **Fix up statements pass (the one that's supposed to find var statements using regExps) so that instance.method(); doesn't add *instance* or *method* to panelNames.**
-- 
+- **Statements like var date = new Date(); don't set up the Name date (as uniquified) with typeName="Date". It must.**
+ 
 ## Jerry's Next Issues
 - The System Type field in Type mode of center panel should be a text string that is empty for normal types.
 - Load Stripe.js script when it's needed. Use $.getScript('https://js.stripe.com/v2/'); Remove from indexScripts.jade. Test for prior existence before loading.
