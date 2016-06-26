@@ -221,11 +221,14 @@ define(["NextWave/source/utility/prototypes",
                                 if ($.isFunction(self[strProperty].getWidth)) {
 
                                     dWidth += self[strProperty].getWidth(contextRender);
-                                } else {
+                                } else if ($.isFunction(self[strProperty].getTotalExtent)) {
 
                                     // ...or do it for it.
                                     dWidth += Math.min(200,
                                         self[strProperty].getTotalExtent(contextRender));
+                                } else {
+
+                                    dWidth += 10;
                                 }
                             } else {
 
@@ -474,7 +477,7 @@ define(["NextWave/source/utility/prototypes",
                                     if ($.isFunction(self[strProperty].getWidth)) {
 
                                         dWidthOfThisObject = self[strProperty].getWidth(contextRender);
-                                    } else {
+                                    } else if ($.isFunction(self[strProperty].getTotalExtent)) {
 
                                         dWidthOfThisObject = self[strProperty].getTotalExtent(contextRender);
                                     }

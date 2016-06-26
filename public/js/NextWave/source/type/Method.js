@@ -124,13 +124,15 @@ define(["NextWave/source/utility/prototypes",
                             self.name = objectMethod.name;
 
                             // Three bits of data.
-                            var arrayParameters = objectMethod.arguments;
+                            var objectParameters = objectMethod.arguments;
                             var arrayStatements = objectMethod.statements;
 
                             // Set parameters.
-                            if (arrayParameters) {
+                            if (objectParameters) {
 
-                                for (var i = 0; i < arrayParameters.length; i++) {
+                                var strAllocationString = m_functionRecurseGenerateAllocationString(objectParameters);
+                                self.parameters = eval(strAllocationString);
+/*                                for (var i = 0; i < arrayParameters.length; i++) {
 
                                     var objectParameterIth = arrayParameters[i];
                                     var parameterNew = new Parameter(objectParameterIth.name, objectParameterIth.typeName);
@@ -139,7 +141,7 @@ define(["NextWave/source/utility/prototypes",
 
                                         return exceptionRet;
                                     }
-                                }
+                                }*/
                             }
 
                             // Set statements.
@@ -207,7 +209,7 @@ define(["NextWave/source/utility/prototypes",
                         objectRet.name = self.name;
 
                         // Parameters.
-                        objectRet.arguments = self.parameters.save(true);
+                        objectRet.arguments = self.parameters.save();
 
                         // Statements.
                         objectRet.statements = self.statements.save();

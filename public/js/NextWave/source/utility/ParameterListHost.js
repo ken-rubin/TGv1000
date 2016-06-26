@@ -38,7 +38,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicate if this object is highlighted.
                     self.highlight = false;
                     // The hosted object.
-                    self.parameterList = new ParameterList(false);
+                    self.parameterList = new ParameterList();
 
                     ///////////////////////
                     // Public methods.

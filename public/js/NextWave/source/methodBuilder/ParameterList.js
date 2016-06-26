@@ -18,7 +18,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function ParameterList(arrayParameters, dWidth) {
+        	var functionRet = function ParameterList(arrayParameters) {
 
                 try {
 
@@ -27,10 +27,6 @@ define(["NextWave/source/utility/prototypes",
                     // Inherit from List.
                     self.inherits(List,
                     	false);
-
-                    ////////////////////////
-                    // Store width, if set.
-                    self.width = dWidth || null;
 
                     // Play parameters, if specified.
                     if (arrayParameters) {
@@ -180,42 +176,30 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Save.
-                    self.save = function (bStraight) {
+                    self.save = function () {
 
-                        // Straight is for methods, ...
-                        if (bStraight) {
+                        // ...else return a normal, anonymously constructable 
+                        // object (array) with constructor arguments.
 
-                            var arrayRet = [];
+                        // Pre-allocate array of parameters for this Array.
+                        var arrayParameters = [];
 
-                            // Clone the parameters.
-                            for (var i = 0; i < self.items.length; i++) {
+                        // Add them all.
+                        for (var i = 0; i < self.items.length; i++) {
 
-                                arrayRet.push(self.items[i].save());
-                            }
-
-                            return arrayRet;
-                        } else {
-
-                            // ...else return a normal, anonymously constructable 
-                            // object (array) with constructor arguments.
-
-                            // Pre-allocate array of parameters for this Array.
-                            var arrayParameters = [];
-
-                            // Add them all.
-                            for (var i = 0; i < self.items.length; i++) {
-
-                                arrayParameters.push(self.items[i].save());
-                            }
-
-                            // Return array of the name and the Array of parameters.
-                            return [{
-
-                                    type: "Array",
-                                    parameters: arrayParameters
-                                }
-                            ];
+                            arrayParameters.push(self.items[i].save());
                         }
+
+                        // Return array of the name and the Array of parameters.
+                        var objectRet = {
+
+                            type: self.constructor.name,
+                            parameters: [{ 
+                                type: "Array",
+                                parameters: arrayParameters
+                            }]
+                        };
+                        return objectRet;
                     };
                 } catch (e) {
 
