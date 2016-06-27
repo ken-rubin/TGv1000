@@ -5,6 +5,7 @@
 - Type field in Property has to become a combo.
 
 ## Jerry's NamesPanel/CenterPanel work
+- In MethodBuilder I recurse in stmt.block.statements. Is that all the recursion checking that is needed?
 - Dragging into Parameters--adding to namesPanel--works in full.
 - Dragging into statements--adding to namesPanel
     - *for* doesn't work

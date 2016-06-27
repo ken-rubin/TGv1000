@@ -427,6 +427,18 @@ define(["NextWave/source/utility/prototypes",
                             var name = stmt.initialization.payload.lHS.payload.payload.payload.text;
                             arrNames.push({name: name, typeName: null});
                         }
+
+                        if (stmt.hasOwnProperty('block')) {
+
+                            if (stmt.block.hasOwnProperty('statements')) {
+
+                                for (var i = 0; i < stmt.block.statements.length; i++) {
+
+                                    // Recurse
+                                    m_functionDoStmt(stmt.block.statements[i], arrNames);
+                                }
+                            }
+                        }
                     }
 
                     ///////////////////////
