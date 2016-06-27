@@ -451,8 +451,11 @@ define(["NextWave/source/utility/prototypes",
                                 typeName = stmt.assignment.payload.rHS.payload.rHS.payload.reference.payload.payload.collection.payload.payload.text;
                             }
                             arrNames.push({name: name, typeName: typeName});
+
                         } else if (stmt instanceof CodeStatementFor) {
 
+                            var name = stmt.initialization.payload.lHS.payload.payload.payload.text;
+                            arrNames.push({name: name, typeName: null});
                         }
                     }
 
