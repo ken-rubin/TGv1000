@@ -301,6 +301,18 @@ define(["NextWave/source/utility/prototypes",
 
                                             return e;
                                         }
+                                    } else if (self.dragTargets instanceof CodeStatementFor) {
+
+                                        var exceptionRet = window.manager.addNameType(
+                                        {
+                                            name: self.dragTargets.initialization.payload.lHS.payload.payload.payload.text,
+                                            typeName: null
+                                        }
+                                        );
+                                        if (exceptionRet) {
+
+                                            return e;
+                                        }
                                     }
 
                                     // ...CodeStatements or Parameter just 

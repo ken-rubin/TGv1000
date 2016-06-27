@@ -7,8 +7,6 @@
 ## Jerry's NamesPanel/CenterPanel work
 - In MethodBuilder I recurse in stmt.block.statements to find more names to add to namesPanel. Is that all the recursion checking that is needed?
 - In LayerDrag I recurse into stmt.block.ststatements to find more names to remove from namesPanel. Is that all that is necessary?
-- Dragging into statements--adding to namesPanel
-    - *for* doesn't work--where the heck do I catch this???
 - Renaming--renaming throughout and in namesPanel:
     - Type
     - Method
