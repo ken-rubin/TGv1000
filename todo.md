@@ -5,12 +5,10 @@
 - Type field in Property has to become a combo.
 
 ## Jerry's NamesPanel/CenterPanel work
-- In MethodBuilder I recurse in stmt.block.statements. Is that all the recursion checking that is needed?
-- Dragging into Parameters--adding to namesPanel--works in full.
+- In MethodBuilder I recurse in stmt.block.statements to find more names to add to namesPanel. Is that all the recursion checking that is needed?
+- In LayerDrag I recurse into stmt.block.ststatements to find more names to remove from namesPanel. Is that all that is necessary?
 - Dragging into statements--adding to namesPanel
-    - *for* doesn't work
-- Dragging away--removing from namesPanel
-    - *for* doesn't work
+    - *for* doesn't work--where the heck do I catch this???
 - Renaming--renaming throughout and in namesPanel:
     - Type
     - Method

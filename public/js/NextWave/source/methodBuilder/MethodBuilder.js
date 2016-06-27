@@ -402,13 +402,13 @@ define(["NextWave/source/utility/prototypes",
                         for (var i = 0; i < method.statements.items.length; i++) {
 
                             var stmtIth = method.statements.items[i];
-                            m_functionDoStmt(stmtIth, arrNames);
+                            m_functionDoStmtRecursively(stmtIth, arrNames);
                         }
 
                         return arrNames;
                     }
 
-                    var m_functionDoStmt = function(stmt, arrNames) {
+                    var m_functionDoStmtRecursively = function(stmt, arrNames) {
 
                         if (stmt instanceof CodeStatementVar) {
 
@@ -435,7 +435,7 @@ define(["NextWave/source/utility/prototypes",
                                 for (var i = 0; i < stmt.block.statements.length; i++) {
 
                                     // Recurse
-                                    m_functionDoStmt(stmt.block.statements[i], arrNames);
+                                    m_functionDoStmtRecursively(stmt.block.statements[i], arrNames);
                                 }
                             }
                         }

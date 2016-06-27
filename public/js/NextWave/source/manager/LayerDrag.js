@@ -24,12 +24,13 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeStatement",
     "NextWave/source/methodBuilder/CodeExpression",
     "NextWave/source/methodBuilder/CodeExpressionStub",
+    "NextWave/source/methodBuilder/CodeStatementFor",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Statement, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Statement, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
 
         try {
 
@@ -405,20 +406,7 @@ define(["NextWave/source/utility/prototypes",
                                     } else {
 
                                         // Dragged to remove.
-
-                                        // If its a var with a name...
-                                        if (self.dragTargets instanceof CodeStatementVar &&
-                                            self.dragTargets.assignment.payload instanceof CodeExpressionInfix &&
-                                            self.dragTargets.assignment.payload.lHS.payload instanceof CodeExpressionName &&
-                                            self.dragTargets.assignment.payload.lHS.payload.payload instanceof CodeName) {
-
-                                            // ...remove it from names.
-                                            var exceptionRet = window.manager.removeNameType(self.dragTargets.assignment.payload.lHS.payload.payload.payload.text);
-                                            if (exceptionRet) {
-
-                                                return exceptionRet;
-                                            }
-                                        }
+                                        self.removeNamesRecursively(self.dragTargets);
                                     }
                                 }
 
@@ -455,6 +443,45 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    // A statement has been dragged to remove it from the statements list.
+                    // Recursively remove any disposed-of names from namesPanel.
+                    self.removeNamesRecursively = function (stmt) {
+
+                        // If its a var with a name...
+                        if (stmt instanceof CodeStatementVar &&
+                            stmt.assignment.payload instanceof CodeExpressionInfix &&
+                            stmt.assignment.payload.lHS.payload instanceof CodeExpressionName &&
+                            stmt.assignment.payload.lHS.payload.payload instanceof CodeName) {
+
+                            // ...remove it from names.
+                            var exceptionRet = window.manager.removeNameType(stmt.assignment.payload.lHS.payload.payload.payload.text);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        } else if (stmt instanceof CodeStatementFor /* add some more instanceof checking as above */) {
+
+                            // ...remove it from names.
+                            var exceptionRet = window.manager.removeNameType(stmt.initialization.payload.lHS.payload.payload.payload.text);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        }
+
+                        if (stmt.hasOwnProperty('block')) {
+
+                            if (stmt.block.hasOwnProperty('statements')) {
+
+                                for (var i = 0; i < stmt.block.statements.length; i++) {
+
+                                    // Recurse
+                                    self.removeNamesRecursively(stmt.block.statements[i]);
+                                }
+                            }
+                        }
+                    }
 
                     // Render out the layer.
                     self.render = function (contextRender, iMS) {
