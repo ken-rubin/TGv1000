@@ -71,7 +71,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Update.
-                                exceptionRet = window.manager.editNameType(localSelf.originalName,
+                                exceptionRet = window.manager.changeNameOfNameType(localSelf.originalName,
                                     strBetterName);
                                 if (exceptionRet) {
 

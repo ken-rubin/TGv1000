@@ -366,37 +366,7 @@ define(["NextWave/source/utility/prototypes",
                             var arrayNames = m_functionAddNamesFromParameters(method);
                             var arrayBoth = arrayNames.concat(m_functionAddNamesFromStatements(method));
                             
-                            var uniqueArray = [];
-                            if (arrayBoth.length) {
-
-                                // Uniquify (although duplicates wouldn't be allowed--or shouldn't).
-                                uniqueArray.push(arrayBoth[0]);
-                                for (var i = 1; i < arrayBoth.length; i++) {
-                                    var compIth = arrayBoth[i];
-                                    var found = false;
-                                    for (var j = 0; j < uniqueArray.length; j++) {
-                                        if (uniqueArray[j] === compIth){
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!found) {
-                                        uniqueArray.push(compIth);
-                                    }
-                                }
-
-                                // And sort.
-                                uniqueArray.sort(function(a,b){
-
-                                    if (a.name > b.name)
-                                        return 1;
-                                    if (a.name < b.name)
-                                        return -1;
-                                    return 0;
-                                });
-                            }
-
-                            return window.manager.panelLayer.setNameTypes(uniqueArray);
+                            return window.manager.panelLayer.setNameTypes(arrayBoth);
 
                         } catch (e) {
 

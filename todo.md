@@ -5,17 +5,11 @@
 - Type field in Property has to become a combo.
 
 ## Jerry's NamesPanel/CenterPanel work
-- Dragging into Parameters--adding to namesPanel
-    - Works (namesPanel needs sorting)
-- Dragging into statements--adding to namesPanel (namesPanel needs sorting)
-    - Type to statements works
-    - var to statements works
-    - for to statements doesn't work
+- Dragging into Parameters--adding to namesPanel--works in full.
+- Dragging into statements--adding to namesPanel
+    - *for* doesn't work
 - Dragging away--removing from namesPanel
-    - Parameter works
-    - var name = new Type() works
-    - var i = 1 works
-    - for doesn't work
+    - *for* doesn't work
 - Renaming--renaming throughout and in namesPanel:
     - Type
     - Method
@@ -25,14 +19,7 @@
     - Name in var name = 1;
     - Name in for statement
         - In a simple for statement, when renaming the var i, need to self.addItem in List.js. In fact, changing any of the 3 should change the other 2--and update namesPanel (which it does). And it also should change the name in any of the for statement's internal blocks.
-- When switching methods
-    - Clearing and creating new NamesList from:
-        - Parameters works
-        - var i - 0; works
-        - var name = new Name(); works
-        - for (var i = 0; ...) works
-- For help with inserting a single new nameType in namesPanel: Note the TODOs in List.js#self.insertAt.
-- Do names panel and all renaming propagation. 
+- Do namesPanel and all renaming propagation. 
     - Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.
 - Ken wants me to change MethodBuilder.js#m_functionAddNamesFromStatements to use a cascade of item calls instead of dot notation. This same wish would apply to single name additions and renames, too.
 - Test self.removeMethod and self.removeProperty in Manager.js.

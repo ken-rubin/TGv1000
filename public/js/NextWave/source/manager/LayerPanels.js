@@ -410,13 +410,13 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method edits an existing name.
-                    self.editNameType = function (strOriginalName, strNewName) {
+                    self.changeNameOfNameType = function (strOriginalName, strNewName) {
 
                         try {
 
                             // Skip Panel in this object-chain so all panels 
                             // can just be generic instances of the base class.
-                            return self.namesPanel.payload.editNameType(strOriginalName,
+                            return self.namesPanel.payload.changeNameOfNameType(strOriginalName,
                                 strNewName);
                         } catch (e) {
 
