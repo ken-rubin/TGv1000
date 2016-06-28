@@ -63,8 +63,6 @@ define(["NextWave/source/utility/prototypes",
                     self.projectData = null;
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
-                    // Collection of named object pertinent to the current context.
-                    // self.names = [];
                     // Collection of types available in the current context.
                     self.types = [];
                     // Collection of systemTypes available in the current context.
@@ -256,8 +254,6 @@ define(["NextWave/source/utility/prototypes",
                             self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
                             m_arrayLayers[2] = self.panelLayer;
 
-                            // Collection of named object pertinent to the current context.
-                            // self.names = [];
                             // Collection of types available in the current context.
                             self.types = [];
                             // Current type/method.
@@ -448,12 +444,10 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-                    // Method adds a new name.
+                    // Method adds a new name to NameList and to NamesPanel.
                     self.addNameType = function (objNameType) {
 
                         try {
-
-                            // self.names.push(objNameType);
 
                             return self.panelLayer.addNameType(objNameType);
                         } catch (e) {
@@ -463,12 +457,12 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method edits a new name.
-                    self.editNameType = function (strOriginalName, strNewName) {
+                    self.changeNameOfNameType = function (strOriginalName, strNewName) {
 
                         try {
 
                             // Update in the panel.
-                            return self.panelLayer.editNameType(strOriginalName, 
+                            return self.panelLayer.changeNameOfNameType(strOriginalName, 
                                 strNewName);
                         } catch (e) {
 

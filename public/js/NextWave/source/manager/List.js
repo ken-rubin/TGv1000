@@ -48,6 +48,58 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
+                    // Attach instance to DOM and initialize state.
+                    self.create = function (arrayItems) {
+
+                        try {
+
+                            // Can only create an uncreated instance.
+                            if (m_bCreated) {
+
+                                throw { message: "List: Instance already created!" };
+                            }
+
+                            // Call down inheritance chain.
+                            var exceptionRet = self.innerCreate(arrayItems || []);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Because it is!
+                            m_bCreated = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Default behavior in base class, override to build custom collection.
+                    self.innerCreate = function (arrayItems) {
+
+                        try {
+
+                            var exceptionRet;
+
+                            // Add the Expressions.
+                            for (var i = 0; i < arrayItems.length; i++) {
+
+                                exceptionRet = self.addItem(arrayItems[i]);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Add item to list of items.
                     self.addItem = function (itemNew) {
 
@@ -131,56 +183,6 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             self.items = [];
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Attach instance to DOM and initialize state.
-                    self.create = function (arrayItems) {
-
-                        try {
-
-                            // Can only create an uncreated instance.
-                            if (m_bCreated) {
-
-                                throw { message: "List: Instance already created!" };
-                            }
-
-                            // Call down inheritance chain.
-                            var exceptionRet = self.innerCreate(arrayItems || []);
-                            if (exceptionRet) {
-
-                            	throw exceptionRet;
-                            }
-
-                            // Because it is!
-                            m_bCreated = true;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Default behavior in base class, override to build custom collection.
-                    self.innerCreate = function (arrayItems) {
-
-                        try {
-
-                            // Add the Expressions.
-                            for (var i = 0; i < arrayItems.length; i++) {
-
-                                var exceptionRet = self.addItem(arrayItems[i]);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            }
-
                             return null;
                         } catch (e) {
 

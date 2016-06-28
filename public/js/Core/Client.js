@@ -268,7 +268,7 @@ define(["Core/errorHelper",
 								if (data.success) {
 
 									if (data.scriptSuccess) {
-										errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 5000);
+										errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 2000);
 									} else {
 										errorHelper.show("System types were saved to the database, but we could not save ST.sql to your drive. Error received: " + data.saveError);
 									}

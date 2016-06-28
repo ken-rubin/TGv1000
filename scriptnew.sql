@@ -1438,6 +1438,15 @@ begin
 
     end if;
     
+    if @dbstate = 37 THEN
+
+		update methods set arguments='{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}';
+    
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
 end//
 
 

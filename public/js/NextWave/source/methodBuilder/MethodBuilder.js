@@ -13,11 +13,15 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
+    "NextWave/source/methodBuilder/CodeStatementFor",
+    "NextWave/source/methodBuilder/CodeStatementVar",
+    "NextWave/source/methodBuilder/CodeExpressionInvocation",
+    "NextWave/source/methodBuilder/CodeExpressionPrefix",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/DialogHost"],
-    function (prototypes, settings, Point, Size, Area, DialogHost) {
+    function (prototypes, settings, CodeStatementFor, CodeStatementVar, CodeExpressionInvocation, CodeExpressionPrefix, Point, Size, Area, DialogHost) {
 
         try {
 
@@ -359,51 +363,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var arrayNames = [];
-
-                            for (var i = 0; i < method.parameters.items.length; i++) {
-
-                                var paramIth = method.parameters.items[i];
-                                arrayNames.push(
-                                {
-                                    name: paramIth.name.text,
-                                    typeName: paramIth.typeName
-                                });
-                            }
-
+                            var arrayNames = m_functionAddNamesFromParameters(method);
                             var arrayBoth = arrayNames.concat(m_functionAddNamesFromStatements(method));
                             
-                            var uniqueArray = [];
-                            if (arrayBoth.length) {
-
-                                // Uniquify (although duplicates wouldn't be allowed--or shouldn't).
-                                uniqueArray.push(arrayBoth[0]);
-                                for (var i = 1; i < arrayBoth.length; i++) {
-                                    var compIth = arrayBoth[i];
-                                    var found = false;
-                                    for (var j = 0; j < uniqueArray.length; j++) {
-                                        if (uniqueArray[j] === compIth){
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!found) {
-                                        uniqueArray.push(compIth);
-                                    }
-                                }
-
-                                // And sort.
-                                uniqueArray.sort(function(a,b){
-
-                                    if (a.name > b.name)
-                                        return 1;
-                                    if (a.name < b.name)
-                                        return -1;
-                                    return 0;
-                                });
-                            }
-
-                            return window.manager.panelLayer.setNameTypes(uniqueArray);
+                            return window.manager.panelLayer.setNameTypes(arrayBoth);
 
                         } catch (e) {
 
@@ -411,51 +374,71 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+                    var m_functionAddNamesFromParameters = function (method) {
+
+                        var arrayNames = [];
+
+                        for (var i = 0; i < method.parameters.items.length; i++) {
+
+                            var paramIth = method.parameters.items[i];
+                            arrayNames.push(
+                            {
+                                name: paramIth.name.text,
+                                typeName: paramIth.typeName
+                            });
+                        }
+
+                        return arrayNames;
+                    }
+
                     //
                     var m_functionAddNamesFromStatements = function (method) {
 
-                        // Generate statements object from, e.g., method.save().
-                        // Stringify.
-                        // Use regexp to extract, e.g., "i" from all occurrences like: [{"type":"CodeName","parameters":[{"type":"String","value":"i"}]}]
-                        // Add them all to arrayNames. Duplicates will be removed above.
+                        var arrNames = [];
 
-                        var statements = method.statements.save();
-                        var JSONStatements = JSON.stringify(statements);
+                        // Outermost level (and outermost only) is a StatementList.
+                        // All inner statements are simply arrays in arrays of block contained in statements themselves.
+                        // So recursion can start at the block level.
+                        for (var i = 0; i < method.statements.items.length; i++) {
 
-                        // var re = //g;
-                        // var found = JSONStatements.match(re);
-                        // if (found) {
-                        //     return found;
-                        // }
-                        // return [];
+                            var stmtIth = method.statements.items[i];
+                            m_functionDoStmtRecursively(stmtIth, arrNames);
+                        }
 
-                        // Since I can't get the regExp to work:
+                        return arrNames;
+                    }
 
-                        var found = [];
-                        while (JSONStatements.length) {
+                    var m_functionDoStmtRecursively = function(stmt, arrNames) {
 
-                            var i = JSONStatements.indexOf('[{"type":"CodeName","parameters":[{"type":"String","value":"');
-                            if (i === -1) {
+                        if (stmt instanceof CodeStatementVar) {
 
-                                JSONStatements = '';
-                            
-                            } else {
+                            // There are 2 types that we care about, because they yield different typeNames:
+                            // 1. var i = 0;                        typeName = null
+                            // 2. var string = new String();        typeName = "String"
+                            var name = stmt.assignment.payload.lHS.payload.payload.payload.text;
+                            var typeName = null;
+                            if (stmt.assignment.payload.rHS.payload instanceof CodeExpressionPrefix && stmt.assignment.payload.rHS.payload.operator === "new") {
+                                typeName = stmt.assignment.payload.rHS.payload.rHS.payload.reference.payload.payload.collection.payload.payload.text;
+                            }
+                            arrNames.push({name: name, typeName: typeName});
 
-                                JSONStatements = JSONStatements.substr(i + 60);
-                                i = JSONStatements.indexOf('"');
-                                if (i > -1) {
+                        } else if (stmt instanceof CodeStatementFor) {
 
-                                    found.push(
-                                    {
-                                        name: JSONStatements.substr(0, i),
-                                        typeName: null
-                                    });
-                                    JSONStatements = JSONStatements.substr(i + 1);
+                            var name = stmt.initialization.payload.lHS.payload.payload.payload.text;
+                            arrNames.push({name: name, typeName: null});
+                        }
+
+                        if (stmt.hasOwnProperty('block')) {
+
+                            if (stmt.block.hasOwnProperty('statements')) {
+
+                                for (var i = 0; i < stmt.block.statements.length; i++) {
+
+                                    // Recurse
+                                    m_functionDoStmtRecursively(stmt.block.statements[i], arrNames);
                                 }
                             }
                         }
-
-                        return found;
                     }
 
                     ///////////////////////
