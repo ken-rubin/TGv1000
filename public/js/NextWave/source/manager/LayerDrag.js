@@ -59,13 +59,15 @@ define(["NextWave/source/utility/prototypes",
                     // Parameter in the ParametersList which could become a
                     // dropped object if a Type or Parameter is dragged into
                     // it.  Notice this is not a collection as dragTargets
-                    // is misleadingly set up as a "double-ententre"....
+                    // is misleadingly set up as a "double-entendre"....
                     self.parameterDragTarget = null;
                     // The drag target the mouse was let up over.
                     self.upOver = null;
                     // Collection of placements for dragging Statements or CodeStatements.
+                    // Saved here just for debug rendering purposes.
                     self.placements = [];
                     // Collection of placements for dragging Parameters.
+                    // Saved here just for debug rendering purposes.
                     self.parameterPlacements = [];
 
                     ////////////////////////
@@ -128,27 +130,31 @@ define(["NextWave/source/utility/prototypes",
                                     pointMove.y - self.down.y);
 
                                 // Handle each drag-type differently.
+
+                                /* Statement types... */
                                 if (self.dragObject instanceof CodeStatement) {
 
                                     return m_functionStartDragCodeStatement(pointDown,
                                         pointMove);
-                                } else if (self.dragObject instanceof CodeExpression) {
-
-                                    return m_functionStartDragCodeExpression(pointDown,
-                                        pointMove);
-                                } else if (self.dragObject instanceof Parameter) {
-
-                                    return m_functionStartDragParameter(pointDown,
-                                        pointMove);
                                 } else if (self.dragObject instanceof Statement) {
 
                                     return m_functionStartDragStatement(pointDown,
+                                        pointMove);
+                                /* Expression types... */
+                                } else if (self.dragObject instanceof CodeExpression) {
+
+                                    return m_functionStartDragCodeExpression(pointDown,
                                         pointMove);
                                 } else if (self.dragObject instanceof ListItem ||
                                     self.dragObject instanceof Method ||
                                     self.dragObject instanceof Property)  {
 
                                     return m_functionStartDragNonStatementListItem(pointDown,
+                                        pointMove);
+                                /* Parameter types... */
+                                } else if (self.dragObject instanceof Parameter) {
+
+                                    return m_functionStartDragParameter(pointDown,
                                         pointMove);
                                 } else if (self.dragObject instanceof Type)  {
 

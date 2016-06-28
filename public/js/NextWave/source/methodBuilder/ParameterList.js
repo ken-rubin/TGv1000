@@ -178,7 +178,7 @@ define(["NextWave/source/utility/prototypes",
                     // Save.
                     self.save = function () {
 
-                        // ...else return a normal, anonymously constructable 
+                        // Return a normal, anonymously constructable 
                         // object (array) with constructor arguments.
 
                         // Pre-allocate array of parameters for this Array.

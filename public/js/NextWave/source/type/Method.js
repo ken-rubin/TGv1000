@@ -132,16 +132,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 var strAllocationString = m_functionRecurseGenerateAllocationString(objectParameters);
                                 self.parameters = eval(strAllocationString);
-/*                                for (var i = 0; i < arrayParameters.length; i++) {
-
-                                    var objectParameterIth = arrayParameters[i];
-                                    var parameterNew = new Parameter(objectParameterIth.name, objectParameterIth.typeName);
-                                    var exceptionRet = self.parameters.addItem(parameterNew);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-                                }*/
                             }
 
                             // Set statements.
