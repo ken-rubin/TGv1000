@@ -81,6 +81,44 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Get all nameTypes from all the children.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            // Loop over each child stub.
+                            for (var i = 0; i < self.children.length; i++) {
+
+                                var itemIth = self.children[i];
+
+                                // If stub, ...
+                                if (itemIth.constructor.name === "CodeExpressionStub") {
+
+                                    // ...and there is a payload (which is not a literal or name...
+                                    if (itemIth.payload &&
+                                        !(itemIth.payload instanceof CodeLiteral) &&
+                                        !(itemIth.payload instanceof CodeName)) {
+
+                                        // ...recurse.
+                                        var exceptionRet = itemIth.payload.accumulateNameTypes(arrayNameTypes);
+                                        if (exceptionRet) {
+
+                                            return exceptionRet;
+                                        }
+                                    } else {
+
+                                        // else, got one!
+                                        arrayNameTypes.push(itemIth);
+                                    }
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Add item to list of items.
                     self.addItem = function (itemNew) {
 

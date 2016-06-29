@@ -60,6 +60,26 @@ define(["NextWave/source/utility/prototypes",
                             self.block.save()
                         ];
                     };
+
+                    // self.initialization is of the form var i = 0;
+                    // Call down until we have 'i'.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            var exceptionRet = self.initialization.accumulateNameTypes(arrayNameTypes);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                 } catch (e) {
 
                     alert(e.message);

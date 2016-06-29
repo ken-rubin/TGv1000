@@ -374,7 +374,8 @@ define(["NextWave/source/utility/prototypes",
                             }
                             
                             var arraySNames = [];
-                            exceptionRet = m_functionAddNamesFromStatements(method.statements, arraySNames);
+                            // method.statements is a StatementList. Let's start there.
+                            exceptionRet = method.statements.accumulateNameTypes(arraySNames);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
@@ -409,76 +410,75 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     //
-                    var m_functionAddNamesFromStatements = function (methodStatements, arraySNames) {
+                    // var m_functionAddNamesFromStatements = function (methodStatements, arraySNames) {
 
-                        try {
+                    //     try {
 
-                            // Outermost level (and outermost only) is a StatementList.
-                            // All inner statements are simply arrays in arrays of block contained in statements themselves.
-                            // So recursion can start at the block level.
-                            for (var i = 0; i < methodStatements.items.length; i++) {
+                    //         // methodStatements is a StatementList.
+                    //         // All inner statements are in statement arrays in block arrays.
+                    //         for (var i = 0; i < methodStatements.items.length; i++) {
 
-                                var stmtIth = methodStatements.items[i];
-                                var exceptionRet = m_functionDoStmtRecursively(stmtIth, arraySNames);
-                                if (exceptionRet) {
+                    //             var stmtIth = methodStatements.items[i];
+                    //             var exceptionRet = m_functionDoStmtRecursively(stmtIth, arraySNames);
+                    //             if (exceptionRet) {
 
-                                    return exceptionRet;
-                                }
-                            }
+                    //                 return exceptionRet;
+                    //             }
+                    //         }
 
-                            return null;
+                    //         return null;
 
-                        } catch (e) {
+                    //     } catch (e) {
 
-                            return e;
-                        }
-                    }
+                    //         return e;
+                    //     }
+                    // }
 
-                    var m_functionDoStmtRecursively = function(stmt, arrNames) {
+                    // var m_functionDoStmtRecursively = function(stmt, arrNames) {
 
-                        try {
+                    //     try {
 
-                            if (stmt instanceof CodeStatementVar) {
+                    //         if (stmt instanceof CodeStatementVar) {
 
-                                // There are 2 types that we care about, because they yield different typeNames:
-                                // 1. var i = 0;                        typeName = null
-                                // 2. var string = new String();        typeName = "String"
-                                var name = stmt.assignment.payload.lHS.payload.payload.payload.text;
-                                var typeName = null;
-                                if (stmt.assignment.payload.rHS.payload instanceof CodeExpressionPrefix && stmt.assignment.payload.rHS.payload.operator === "new") {
-                                    typeName = stmt.assignment.payload.rHS.payload.rHS.payload.reference.payload.payload.collection.payload.payload.text;
-                                }
-                                arrNames.push({name: name, typeName: typeName});
+                    //             // There are 2 types that we care about, because they yield different typeNames:
+                    //             // 1. var i = 0;                        typeName = null
+                    //             // 2. var string = new String();        typeName = "String"
+                    //             var name = stmt.assignment.payload.lHS.payload.payload.payload.text;
+                    //             var typeName = null;
+                    //             if (stmt.assignment.payload.rHS.payload instanceof CodeExpressionPrefix && stmt.assignment.payload.rHS.payload.operator === "new") {
+                    //                 typeName = stmt.assignment.payload.rHS.payload.rHS.payload.reference.payload.payload.collection.payload.payload.text;
+                    //             }
+                    //             arrNames.push({name: name, typeName: typeName});
 
-                            } else if (stmt instanceof CodeStatementFor) {
+                    //         } else if (stmt instanceof CodeStatementFor) {
 
-                                var name = stmt.initialization.payload.lHS.payload.payload.payload.text;
-                                arrNames.push({name: name, typeName: null});
-                            }
+                    //             var name = stmt.initialization.payload.lHS.payload.payload.payload.text;
+                    //             arrNames.push({name: name, typeName: null});
+                    //         }
 
-                            if (stmt.hasOwnProperty('block')) {
+                    //         if (stmt.hasOwnProperty('block')) {
 
-                                if (stmt.block.hasOwnProperty('statements')) {
+                    //             if (stmt.block.hasOwnProperty('statements')) {
 
-                                    for (var i = 0; i < stmt.block.statements.length; i++) {
+                    //                 for (var i = 0; i < stmt.block.statements.length; i++) {
 
-                                        // Recurse
-                                        var exceptionRet = m_functionDoStmtRecursively(stmt.block.statements[i], arrNames);
-                                        if (exceptionRet) {
+                    //                     // Recurse
+                    //                     var exceptionRet = m_functionDoStmtRecursively(stmt.block.statements[i], arrNames);
+                    //                     if (exceptionRet) {
 
-                                            return exceptionRet;
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            return null;
+                    //                         return exceptionRet;
+                    //                     }
+                    //                 }
+                    //             }
+                    //         }
 
-                        } catch (e) {
+                    //         return null;
 
-                            return e;
-                        }
-                    }
+                    //     } catch (e) {
+
+                    //         return e;
+                    //     }
+                    // }
 
 
                     ///////////////////////

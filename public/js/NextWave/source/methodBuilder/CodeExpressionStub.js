@@ -63,6 +63,26 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    //
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            // self.payload is one of CodeExpressionXxx; all derived from CodeExpression
+                            // which will return null unless overridden.
+                            if (self.payload) {
+
+                                return self.payload.accumulateNameTypes(arrayNameTypes);
+
+                            } else {
+
+                                return null;
+                            }
+                        } catch (e) {
+                            return e;
+                        }
+                    }
+
                     // Remove item from list of items.
                     self.removeItem = function (itemRemove) {
 

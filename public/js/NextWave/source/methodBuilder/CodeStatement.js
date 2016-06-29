@@ -95,6 +95,49 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Get all nameTypes from self.expressionStubs and self.blocks.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            // Loop over each expression stub.
+                            for (var i = 0; i < self.expressionStubs.length; i++) {
+
+                                var itemIth = self.expressionStubs[i];
+
+                                // If no payload, add it, else recurse.
+                                if (itemIth.payload) {
+
+                                    var exceptionRet = itemIth.payload.accumulateNameTypes(arrayNameTypes);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                } else {
+
+                                    // Got one!
+                                    arrayNameTypes.push(itemIth);
+                                }
+                            }
+
+                            // Loop over all blocks, accumulate from each.
+                            for (var i = 0; i < self.blocks.length; i++) {
+
+                                var exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                            
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {

@@ -88,6 +88,28 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Retrieve nameTypes from all statements in self.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            // Loop over each statement.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                var exceptionRet = self.items[i].accumulateNameTypes(arrayNameTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {
