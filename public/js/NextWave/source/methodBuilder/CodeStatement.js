@@ -101,34 +101,34 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Loop over each expression stub.
-                            for (var i = 0; i < self.expressionStubs.length; i++) {
+                            // for (var i = 0; i < self.expressionStubs.length; i++) {
 
-                                var itemIth = self.expressionStubs[i];
+                            //     var itemIth = self.expressionStubs[i];
 
-                                // If no payload, add it, else recurse.
-                                if (itemIth.payload) {
+                            //     // If no payload, add it, else recurse.
+                            //     if (itemIth.payload) {
 
-                                    var exceptionRet = itemIth.payload.accumulateNameTypes(arrayNameTypes);
-                                    if (exceptionRet) {
+                            //         var exceptionRet = itemIth.payload.accumulateNameTypes(arrayNameTypes);
+                            //         if (exceptionRet) {
 
-                                        return exceptionRet;
-                                    }
-                                } else {
+                            //             return exceptionRet;
+                            //         }
+                            //     } else {
 
-                                    // Got one!
-                                    arrayNameTypes.push(itemIth);
-                                }
-                            }
+                            //         // Got one!
+                            //         arrayNameTypes.push(itemIth);
+                            //     }
+                            // }
 
-                            // Loop over all blocks, accumulate from each.
-                            for (var i = 0; i < self.blocks.length; i++) {
+                            // // Loop over all blocks, accumulate from each.
+                            // for (var i = 0; i < self.blocks.length; i++) {
 
-                                var exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
-                                if (exceptionRet) {
+                            //     var exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
+                            //     if (exceptionRet) {
 
-                                    return exceptionRet;
-                                }
-                            }
+                            //         return exceptionRet;
+                            //     }
+                            // }
 
                             return null;
                             

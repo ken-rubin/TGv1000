@@ -69,8 +69,25 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            return self.initialization.accumulateNameTypes(arrayNameTypes);
+                            var exceptionRet = self.initialization.accumulateNameTypes(arrayNameTypes);
+                            if (exceptionRet) {
 
+                                return exceptionRet;
+                            }
+
+                            // A for statement will most likely have its own blocks of statements.
+                            // Let's give them a go.
+                            // Loop over all blocks, accumulate from each.
+                            for (var i = 0; i < self.blocks.length; i++) {
+
+                                var exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
                         } catch (e) {
 
                             return e;
