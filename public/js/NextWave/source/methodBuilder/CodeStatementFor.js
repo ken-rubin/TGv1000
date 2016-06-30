@@ -61,7 +61,9 @@ define(["NextWave/source/utility/prototypes",
                         ];
                     };
 
-                    // self.initialization is of the form var i = 0;
+                    // self.initialization is a CodeExpressionStub holding a CodeExpression-derived class.
+                    // For example, for the for statement it is most likely a CodeExpressionInfix,
+                    // since it holds something of the form var i = 0;
                     // Call down until we have 'i'.
                     self.accumulateNameTypes = function (arrayNameTypes) {
 
