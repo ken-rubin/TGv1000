@@ -87,38 +87,36 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Loop over each child stub.
-                            // for (var i = 0; i < self.children.length; i++) {
+                            var exceptionRet = null;
 
-                            //     var itemIth = self.children[i];
+                            if (!self.parsed) {
 
-                            //     // If stub, ...
-                            //     if (itemIth.constructor.name === "CodeExpressionStub") {
+                                // Parse it.
+                                exceptionRet = m_functionParse();
+                                if (exceptionRet) {
 
-                            //         // ...and there is a payload (which is not a literal or name...
-                            //         if (itemIth.payload &&
-                            //             !(itemIth.payload instanceof CodeLiteral) &&
-                            //             !(itemIth.payload instanceof CodeName)) {
+                                    return exceptionRet;
+                                }
+                            }
 
-                            //             // ...recurse.
-                            //             var exceptionRet = itemIth.payload.accumulateNameTypes(arrayNameTypes);
-                            //             if (exceptionRet) {
+                            exceptionRet = self.innerAccumulateNameTypes(arrayNameTypes);
+                            if (exceptionRet) {
 
-                            //                 return exceptionRet;
-                            //             }
-                            //         } else {
+                                return exceptionRet;
+                            }
 
-                            //             // else, got one!
-                            //             arrayNameTypes.push(itemIth);
-                            //         }
-                            //     }
-                            // }
                             return null;
+
                         } catch (e) {
 
                             return e;
                         }
                     };
+
+                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+
+                        return null;
+                    }
 
                     // Add item to list of items.
                     self.addItem = function (itemNew) {
@@ -198,45 +196,18 @@ define(["NextWave/source/utility/prototypes",
                     // Returns the height of this type.
                     self.getWidth = function (contextRender) {
 
+                        var exceptionRet = null;
+
                         // No better place to do this....
                         if (!self.parsed) {
 
-                            // Scan for blocks and expressionStubs.
-                            var arrayKeys = Object.keys(self);
-                            for (var i = 0; i < arrayKeys.length; i++) {
+                            exceptionRet = m_functionParse();
+                            if (exceptionRet) {
 
-                                // Extract the key.
-                                var strKeyIth = arrayKeys[i];
-
-                                // Definately skip collection--it causes a circular reference.
-                                if (strKeyIth === "collection") {
-
-                                    continue;
-                                } 
-
-                                // Extract the object.
-                                var objectIth = self[strKeyIth];
-
-                                // Test object.
-                                if (objectIth &&
-                                    (objectIth instanceof CodeName ||
-                                    objectIth instanceof CodeLiteral ||
-                                    // Can't require CodeExpressionStub type because it 
-                                    // requires this type (cyclic reference), thus....
-                                    objectIth.constructor.name === "CodeExpressionStub" ||
-                                    // Also....
-                                    objectIth.constructor.name === "ParameterList")) {
-
-                                    // Add the item.
-                                    var exceptionRet = self.addItem(objectIth);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-                                }
+                                return exceptionRet;
                             }
 
-                            self.parsed = true;
+                            return null;
                         }
 
                         /////////
@@ -567,6 +538,50 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    //////////////////////////
+                    // Private methods.
+
+                    var m_functionParse = function () {
+
+                        // Scan for blocks and expressionStubs.
+                        var arrayKeys = Object.keys(self);
+                        for (var i = 0; i < arrayKeys.length; i++) {
+
+                            // Extract the key.
+                            var strKeyIth = arrayKeys[i];
+
+                            // Definately skip collection--it causes a circular reference.
+                            if (strKeyIth === "collection") {
+
+                                continue;
+                            } 
+
+                            // Extract the object.
+                            var objectIth = self[strKeyIth];
+
+                            // Test object.
+                            if (objectIth &&
+                                (objectIth instanceof CodeName ||
+                                objectIth instanceof CodeLiteral ||
+                                // Can't require CodeExpressionStub type because it 
+                                // requires this type (cyclic reference), thus....
+                                objectIth.constructor.name === "CodeExpressionStub" ||
+                                // Also....
+                                objectIth.constructor.name === "ParameterList")) {
+
+                                // Add the item.
+                                var exceptionRet = self.addItem(objectIth);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                        }
+
+                        self.parsed = true;
+                        return null;
+                    }
 
                     //////////////////////////
                     // Private fields.
