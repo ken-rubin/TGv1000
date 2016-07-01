@@ -55,7 +55,7 @@ define(["NextWave/source/utility/prototypes",
                     // self.assignment is of the form var i = 0;
                     // Call down until we have 'i'.
                     // self.assignment is a CodeExpressionStub. It has a payload that is one of the CodeExpressionXxx's.
-                    self.accumulateNameTypes = function (arrayNameTypes) {
+                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
 
                         try {
 
@@ -65,7 +65,7 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
-                    }
+                    };
                     
                 } catch (e) {
 

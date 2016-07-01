@@ -100,35 +100,33 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Loop over each expression stub.
-                            // for (var i = 0; i < self.expressionStubs.length; i++) {
+                            var exceptionRet = null;
 
-                            //     var itemIth = self.expressionStubs[i];
+                            if (!self.parsed) {
 
-                            //     // If no payload, add it, else recurse.
-                            //     if (itemIth.payload) {
+                                // Parse it.
+                                exceptionRet = m_functionParse();
+                                if (exceptionRet) {
 
-                            //         var exceptionRet = itemIth.payload.accumulateNameTypes(arrayNameTypes);
-                            //         if (exceptionRet) {
+                                    return exceptionRet;
+                                }
+                            }
 
-                            //             return exceptionRet;
-                            //         }
-                            //     } else {
+                            exceptionRet = self.innerAccumulateNameTypes(arrayNameTypes);
+                            if (exceptionRet) {
 
-                            //         // Got one!
-                            //         arrayNameTypes.push(itemIth);
-                            //     }
-                            // }
+                                return exceptionRet;
+                            }
 
-                            // // Loop over all blocks, accumulate from each.
-                            // for (var i = 0; i < self.blocks.length; i++) {
+                            // Loop over all blocks, accumulate from each.
+                            for (var i = 0; i < self.blocks.length; i++) {
 
-                            //     var exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
-                            //     if (exceptionRet) {
+                                exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
+                                if (exceptionRet) {
 
-                            //         return exceptionRet;
-                            //     }
-                            // }
+                                    return exceptionRet;
+                                }
+                            }
 
                             return null;
                             
@@ -137,6 +135,11 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+
+                        return null;
+                    }
 
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
