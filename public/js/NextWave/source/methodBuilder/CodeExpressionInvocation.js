@@ -12,13 +12,13 @@
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpression",
     "NextWave/source/methodBuilder/CodeExpressionStub",
-    "NextWave/source/methodBuilder/ParameterList"],
-    function (prototypes, CodeExpression, CodeExpressionStub, ParameterList) {
+    "NextWave/source/methodBuilder/ArgumentList"],
+    function (prototypes, CodeExpression, CodeExpressionStub, ArgumentList) {
 
         try {
 
             // Constructor function.
-            var functionRet = function CodeExpressionInvocation(ceReference, plArguments) {
+            var functionRet = function CodeExpressionInvocation(ceReference, alArguments) {
 
                 try {
 
@@ -27,7 +27,7 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public properties.
                     self.reference = new CodeExpressionStub(ceReference);
-                    self.argumentList = plArguments || new ParameterList();
+                    self.argumentList = alArguments || new ArgumentList();
 
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,

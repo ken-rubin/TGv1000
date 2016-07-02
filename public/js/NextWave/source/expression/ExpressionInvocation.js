@@ -14,9 +14,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpressionInvocation",
     "NextWave/source/methodBuilder/CodeExpressionRefinement",
     "NextWave/source/methodBuilder/CodeExpressionName",
-    "NextWave/source/methodBuilder/ParameterList",
-    "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, Expression, CodeExpressionInvocation, CodeExpressionRefinement, CodeExpressionName, ParameterList, Parameter) {
+    "NextWave/source/methodBuilder/CodeExpressionStub",
+    "NextWave/source/methodBuilder/ArgumentList"],
+    function (prototypes, Expression, CodeExpressionInvocation, CodeExpressionRefinement, CodeExpressionName, CodeExpressionStub, ArgumentList) {
 
         try {
 
@@ -42,8 +42,12 @@ define(["NextWave/source/utility/prototypes",
                                         new CodeExpressionName("instance"),
                                         new CodeExpressionName("method")
                                     ),
-                                new ParameterList(
-                                        [new Parameter("i", "Number")]
+                                new ArgumentList(
+                                        [
+                                            new CodeExpressionStub(
+                                                new CodeExpressionName("iSomeVariable")
+                                            )
+                                        ]
                                     )
                             );
                     };
