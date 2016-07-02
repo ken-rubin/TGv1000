@@ -57,6 +57,24 @@ define(["NextWave/source/utility/prototypes",
                             self.rHS.save()
                         ];
                     };
+
+                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            // Dummy:
+                            arrayNameTypes.push({
+                                name: "Hello",
+                                typeName: null
+                            });
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
                 } catch (e) {
 
                     alert(e.message);

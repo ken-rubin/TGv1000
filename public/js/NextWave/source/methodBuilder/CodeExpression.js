@@ -81,6 +81,43 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Get all nameTypes from all the children.
+                    // Or maybe just return null and let classes that inherit CodeExpression do their work.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            var exceptionRet = null;
+
+                            if (!self.parsed) {
+
+                                // Parse it.
+                                exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            exceptionRet = self.innerAccumulateNameTypes(arrayNameTypes);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+
+                        return null;
+                    }
+
                     // Add item to list of items.
                     self.addItem = function (itemNew) {
 
@@ -159,45 +196,18 @@ define(["NextWave/source/utility/prototypes",
                     // Returns the height of this type.
                     self.getWidth = function (contextRender) {
 
+                        var exceptionRet = null;
+
                         // No better place to do this....
                         if (!self.parsed) {
 
-                            // Scan for blocks and expressionStubs.
-                            var arrayKeys = Object.keys(self);
-                            for (var i = 0; i < arrayKeys.length; i++) {
+                            exceptionRet = m_functionParse();
+                            if (exceptionRet) {
 
-                                // Extract the key.
-                                var strKeyIth = arrayKeys[i];
-
-                                // Definately skip collection--it causes a circular reference.
-                                if (strKeyIth === "collection") {
-
-                                    continue;
-                                } 
-
-                                // Extract the object.
-                                var objectIth = self[strKeyIth];
-
-                                // Test object.
-                                if (objectIth &&
-                                    (objectIth instanceof CodeName ||
-                                    objectIth instanceof CodeLiteral ||
-                                    // Can't require CodeExpressionStub type because it 
-                                    // requires this type (cyclic reference), thus....
-                                    objectIth.constructor.name === "CodeExpressionStub" ||
-                                    // Also....
-                                    objectIth.constructor.name === "ParameterList")) {
-
-                                    // Add the item.
-                                    var exceptionRet = self.addItem(objectIth);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-                                }
+                                return exceptionRet;
                             }
 
-                            self.parsed = true;
+                            return null;
                         }
 
                         /////////
@@ -528,6 +538,50 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    //////////////////////////
+                    // Private methods.
+
+                    var m_functionParse = function () {
+
+                        // Scan for blocks and expressionStubs.
+                        var arrayKeys = Object.keys(self);
+                        for (var i = 0; i < arrayKeys.length; i++) {
+
+                            // Extract the key.
+                            var strKeyIth = arrayKeys[i];
+
+                            // Definately skip collection--it causes a circular reference.
+                            if (strKeyIth === "collection") {
+
+                                continue;
+                            } 
+
+                            // Extract the object.
+                            var objectIth = self[strKeyIth];
+
+                            // Test object.
+                            if (objectIth &&
+                                (objectIth instanceof CodeName ||
+                                objectIth instanceof CodeLiteral ||
+                                // Can't require CodeExpressionStub type because it 
+                                // requires this type (cyclic reference), thus....
+                                objectIth.constructor.name === "CodeExpressionStub" ||
+                                // Also....
+                                objectIth.constructor.name === "ParameterList")) {
+
+                                // Add the item.
+                                var exceptionRet = self.addItem(objectIth);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                        }
+
+                        self.parsed = true;
+                        return null;
+                    }
 
                     //////////////////////////
                     // Private fields.

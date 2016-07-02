@@ -347,7 +347,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            self.methodEdit.setProtected(bProtected);
+                            exceptionRet = self.methodEdit.setProtected(bProtected);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
+
                             return self.methodEdit.setText(objectContext.method.name);
                         } catch (e) {
 
@@ -363,10 +367,20 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var arrayNames = m_functionAddNamesFromParameters(method);
-                            var arrayBoth = arrayNames.concat(m_functionAddNamesFromStatements(method));
+                            var arrayPNames = [];
+                            var exceptionRet = m_functionAddNamesFromParameters(method.parameters, arrayPNames);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
                             
-                            return window.manager.panelLayer.setNameTypes(arrayBoth);
+                            var arraySNames = [];
+                            // method.statements is a StatementList. Let's start there.
+                            exceptionRet = method.statements.accumulateNameTypes(arraySNames);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
+                            
+                            return window.manager.panelLayer.setNameTypes(arrayPNames.concat(arraySNames));
 
                         } catch (e) {
 
@@ -374,70 +388,24 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-                    var m_functionAddNamesFromParameters = function (method) {
+                    var m_functionAddNamesFromParameters = function (methodParameters, arrayPNames) {
 
-                        var arrayNames = [];
+                        try {
+                            for (var i = 0; i < methodParameters.items.length; i++) {
 
-                        for (var i = 0; i < method.parameters.items.length; i++) {
-
-                            var paramIth = method.parameters.items[i];
-                            arrayNames.push(
-                            {
-                                name: paramIth.name.text,
-                                typeName: paramIth.typeName
-                            });
-                        }
-
-                        return arrayNames;
-                    }
-
-                    //
-                    var m_functionAddNamesFromStatements = function (method) {
-
-                        var arrNames = [];
-
-                        // Outermost level (and outermost only) is a StatementList.
-                        // All inner statements are simply arrays in arrays of block contained in statements themselves.
-                        // So recursion can start at the block level.
-                        for (var i = 0; i < method.statements.items.length; i++) {
-
-                            var stmtIth = method.statements.items[i];
-                            m_functionDoStmtRecursively(stmtIth, arrNames);
-                        }
-
-                        return arrNames;
-                    }
-
-                    var m_functionDoStmtRecursively = function(stmt, arrNames) {
-
-                        if (stmt instanceof CodeStatementVar) {
-
-                            // There are 2 types that we care about, because they yield different typeNames:
-                            // 1. var i = 0;                        typeName = null
-                            // 2. var string = new String();        typeName = "String"
-                            var name = stmt.assignment.payload.lHS.payload.payload.payload.text;
-                            var typeName = null;
-                            if (stmt.assignment.payload.rHS.payload instanceof CodeExpressionPrefix && stmt.assignment.payload.rHS.payload.operator === "new") {
-                                typeName = stmt.assignment.payload.rHS.payload.rHS.payload.reference.payload.payload.collection.payload.payload.text;
+                                var paramIth = methodParameters.items[i];
+                                arrayPNames.push(
+                                {
+                                    name: paramIth.name.text,
+                                    typeName: paramIth.typeName
+                                });
                             }
-                            arrNames.push({name: name, typeName: typeName});
 
-                        } else if (stmt instanceof CodeStatementFor) {
+                            return null;
 
-                            var name = stmt.initialization.payload.lHS.payload.payload.payload.text;
-                            arrNames.push({name: name, typeName: null});
-                        }
+                        } catch (e) {
 
-                        if (stmt.hasOwnProperty('block')) {
-
-                            if (stmt.block.hasOwnProperty('statements')) {
-
-                                for (var i = 0; i < stmt.block.statements.length; i++) {
-
-                                    // Recurse
-                                    m_functionDoStmtRecursively(stmt.block.statements[i], arrNames);
-                                }
-                            }
+                            return e;
                         }
                     }
 

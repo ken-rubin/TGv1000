@@ -43,7 +43,15 @@ define(["NextWave/source/utility/prototypes",
                     // Set protected mode.
                     self.setProtected = function(bProtected) {
 
-                        self.protected = bProtected;
+                        try {
+
+                            self.protected = bProtected;
+                            return null;
+                            
+                        } catch (e) {
+
+                            return e;
+                        }
                     }
 
                     // Clear data.

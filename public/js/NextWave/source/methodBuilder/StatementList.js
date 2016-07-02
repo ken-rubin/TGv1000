@@ -88,6 +88,30 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Retrieve nameTypes from all items in self.items. They are derived from CodeStatement.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            // Loop over each statement. Each item is inherited from CodeStatement; e.g., CodeStatementVar.
+                            // Code statement has self.accumulateNameTypes which does little, but it is overridden in
+                            // every derived class (like CodeStatementFor or CodeStatementVar) that holds a name declaration.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                var exceptionRet = self.items[i].accumulateNameTypes(arrayNameTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {

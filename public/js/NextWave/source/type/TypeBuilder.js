@@ -340,8 +340,12 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            self.dialog.controlObject["nameEdit"].setProtected(bProtected);
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name);
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -360,7 +364,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            self.dialog.controlObject["baseEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["baseEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
                             exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName);
                             if (exceptionRet) {
 
@@ -379,7 +387,11 @@ define(["NextWave/source/utility/prototypes",
                                 
                                 bProtected = true;
                             }
-                            self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
                             exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description);
                             if (exceptionRet) {
 
@@ -393,7 +405,11 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // The System Type setting is always protected.
-                            self.dialog.controlObject["systemTypeEdit"].setProtected(true);
+                            exceptionRet = self.dialog.controlObject["systemTypeEdit"].setProtected(true);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
                             return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
                         } catch (e) {
 

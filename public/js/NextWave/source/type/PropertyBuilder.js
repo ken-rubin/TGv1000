@@ -281,8 +281,12 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            self.dialog.controlObject["nameEdit"].setProtected(bProtected);
-                            var exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
+                            var exceptionRet = self.dialog.controlObject["nameEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -300,7 +304,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            self.dialog.controlObject["typeEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["typeEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
                             exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName);
                             if (exceptionRet) {
 
@@ -314,7 +322,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
+
                             return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description);
                         } catch (e) {
 

@@ -95,6 +95,52 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Get all nameTypes from self.expressionStubs and self.blocks.
+                    self.accumulateNameTypes = function (arrayNameTypes) {
+
+                        try {
+
+                            var exceptionRet = null;
+
+                            if (!self.parsed) {
+
+                                // Parse it.
+                                exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            exceptionRet = self.innerAccumulateNameTypes(arrayNameTypes);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Loop over all blocks, accumulate from each.
+                            for (var i = 0; i < self.blocks.length; i++) {
+
+                                exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                            
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+
+                        return null;
+                    }
+
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {
