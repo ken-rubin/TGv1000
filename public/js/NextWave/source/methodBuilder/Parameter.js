@@ -157,6 +157,10 @@ define(["NextWave/source/utility/prototypes",
 
                         return self.name.mouseOut(objectReference);
                     };
+                    self.click = function (objectReference) {
+
+                        return self.name.click(objectReference);
+                    };
                     self.mouseDown = function (objectReference) {
 
                         // Set the focus to the Edit.

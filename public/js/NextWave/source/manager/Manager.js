@@ -53,8 +53,12 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public fields.
 
+                    // Hold reference to the background layer.
+                    self.backgroundLayer = null;
                     // Hold reference to the drag layer.
                     self.dragLayer = null;
+                    // Hold reference to the debug layer.
+                    self.debugLayer = null;
                     // Holds the active panelLayer.
                     self.panelLayer = null;
                     // Holds reference to the designer layer.
@@ -109,16 +113,16 @@ define(["NextWave/source/utility/prototypes",
                             window.manager = self;
 
                             // Allocate and create the background layer.
-                            var lb = new LayerBackground();
-                            var exceptionRet = lb.create();
+                            self.backgroundLayer = new LayerBackground();
+                            var exceptionRet = self.backgroundLayer.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Allocate and create the debug layer.
-                            var ld = new LayerDebug();
-                            exceptionRet = ld.create();
+                            self.debugLayer = new LayerDebug();
+                            exceptionRet = self.debugLayer.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -168,10 +172,10 @@ define(["NextWave/source/utility/prototypes",
                             // next lower layer for possible handling.
                             m_arrayLayers = 
                                 [
-                                    lb,
+                                    self.backgroundLayer,
                                     // self.designerLayer,
                                     self.panelLayer,
-                                    ld,
+                                    self.debugLayer,
                                     self.dragLayer
                                     //, la
                                 ];
@@ -252,7 +256,15 @@ define(["NextWave/source/utility/prototypes",
 
                             self.iPanelArrangement = iPanelArrangement || 0;
                             self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
-                            m_arrayLayers[2] = self.panelLayer;
+                            m_arrayLayers = 
+                                [
+                                    self.backgroundLayer,
+                                    // self.designerLayer,
+                                    self.panelLayer,
+                                    self.debugLayer,
+                                    self.dragLayer
+                                    //, la
+                                ];
 
                             // Collection of types available in the current context.
                             self.types = [];
@@ -306,7 +318,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Start the rendering.
-                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
+                            //m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
 
@@ -366,7 +378,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             
                             // Start the rendering.
-                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
+                            //m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
                         } catch (e) { return e; }
@@ -409,7 +421,7 @@ define(["NextWave/source/utility/prototypes",
                             self.systemTypesLoaded = true;
 
                             // Start the rendering.
-                            m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
+                            //m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
 

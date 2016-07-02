@@ -70,6 +70,8 @@ define(["NextWave/source/utility/prototypes",
                     // Collection of placements for dragging Parameters.
                     // Saved here just for debug rendering purposes.
                     self.parameterPlacements = [];
+                    // Collection of argument lists and their stubs lists.
+                    self.expressionArgumentListStubs = [];
 
                     ////////////////////////
                     // Public methods.
@@ -661,6 +663,13 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
+
+                            /* Get the expression arguments list stub targets.
+                            exceptionRet = window.methodBuilder.accumulateExpressionArgumentListStubs(self.expressionArgumentListStubs);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }*/
 
                             // Set global dragging variable.
                             window.draggingObject = self.dragObject;

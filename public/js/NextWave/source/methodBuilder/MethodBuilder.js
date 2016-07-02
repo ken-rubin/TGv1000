@@ -226,6 +226,27 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Get list of all visible argument lists.
+                    self.accumulateExpressionArgumentListStubs = function (arrayAccumulator, parameterDragStub) {
+
+                        try {
+
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
+
+                            // Pass on down the line.
+                            return self.methodParameters.parameterList.accumulateParameterDragStubInsertionPoints(arrayAccumulator,
+                                parameterDragStub,
+                                self.dialog.position);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Look for all places where a Parameter drag stub could be inserted.
                     self.accumulateParameterDragStubInsertionPoints = function (arrayAccumulator, parameterDragStub) {
 

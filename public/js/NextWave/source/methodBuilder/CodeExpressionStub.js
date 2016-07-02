@@ -279,7 +279,7 @@ define(["NextWave/source/utility/prototypes",
                             point);
                     }
 
-                    // Render out this type.
+                    // Render out this stub.
                     self.render = function (contextRender, areaRender, dX) {
 
                         try {
@@ -316,17 +316,26 @@ define(["NextWave/source/utility/prototypes",
                             }
                             var bConnectedToStatement = objectCollection;
 
-                            // Fill and stroke the path.
+                            // Fill and stroke the path:
+
+                            // If dragging, display differently, unless this
+                            // stub is not connected to a statement (i.e it
+                            // is the thing being dragged, I think at least).
                             if (window.draggingObject &&
                                 bConnectedToStatement) {
 
+                                // If dragging an expression, then this is a possible
+                                // drop target, so render as an active drop target,
+                                // or as a potential drop target (e.g. blinking).
                                 if (window.draggingObject.expression) {
 
+                                    // Highlight means droppable.
                                     if (self.highlight) {
 
                                         contextRender.fillStyle = settings.statementDragStub.fillHighlight;
                                     } else {
 
+                                        // Potential means blinking.
                                         if (Math.floor(new Date().getTime() / settings.statementDragStub.blinkMS) % 2 === 0) {
 
                                             contextRender.fillStyle = settings.statementDragStub.fillEven;
@@ -338,6 +347,8 @@ define(["NextWave/source/utility/prototypes",
                                     contextRender.strokeStyle = settings.general.strokeBackground;
                                 } else {
 
+                                    // Dragging something other than an expression, 
+                                    // so just render this as a normal drag-dimmed.
                                     contextRender.fillStyle = settings.general.fillDrag;
                                     contextRender.strokeStyle = settings.general.strokeDrag;
                                 }
@@ -345,10 +356,12 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fill();
                             } else if (self.highlight) {
 
+                                // Non-dragging highlight.
                                 contextRender.fillStyle = settings.codeExpressionStub.fillBackgroundHighlight;
                                 contextRender.fill();
                             } else {
 
+                                // Non-dragging, non-highlight.
                                 contextRender.fillStyle = settings.codeExpressionStub.fillBackground;
                                 contextRender.fill();
                             }
@@ -359,6 +372,10 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    ///////////////////////
+                    // Private fields.
+
                     // Remember which object has the highlight.
                     var m_objectHighlight = null;
                 } catch (e) {
