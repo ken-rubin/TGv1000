@@ -821,7 +821,8 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // If placement has changed, remove the stub and add back in the new place.
-                            if (objectClosest) {
+                            if (objectClosest &&
+                                !objectClosest.type) {
 
                                 // If in the same collection, make so only ever moves by 1 index.
                                 if (objectClosest.collection === self.dragTargets.dragCollection) {
@@ -835,40 +836,30 @@ define(["NextWave/source/utility/prototypes",
                                     }
                                 }
 
-                                // Ensure no drop on the dragStub.
-                                // This is set where the drag stub
-                                // insertion points are accumulated.
-                                // It is set to true only when
-                                // the drag stub insertion point
-                                // is the drag stub itself.  This
-                                // avoids a circular reference.
-                                if (!objectClosest.type) {
+                                // Remove placed stub now.
+                                exceptionRet = window.methodBuilder.purgeStatementDragStubs();
+                                if (exceptionRet) {
 
-                                    // Remove placed stub now.
-                                    exceptionRet = window.methodBuilder.purgeStatementDragStubs();
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-
-                                    // Insert at the specified index to the specified collection.
-                                    // Note: the dragTargets variable is the dragObject itself.
-                                    exceptionRet = objectClosest.collection.insertAt(self.dragTargets,
-                                        objectClosest.index);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-
-                                    // Save index and the dragCollection in the drag target.
-                                    // This is used just above where the collection and index
-                                    // are checked to ensure slowest inter-collection movement.
-
-                                    // Note: the dragTargets variable 
-                                    // is the dragObject itself.
-                                    self.dragTargets.index = objectClosest.index;
-                                    self.dragTargets.dragCollection = objectClosest.collection;
+                                    return exceptionRet;
                                 }
+
+                                // Insert at the specified index to the specified collection.
+                                // Note: the dragTargets variable is the dragObject itself.
+                                exceptionRet = objectClosest.collection.insertAt(self.dragTargets,
+                                    objectClosest.index);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                                // Save index and the dragCollection in the drag target.
+                                // This is used just above where the collection and index
+                                // are checked to ensure slowest inter-collection movement.
+
+                                // Note: the dragTargets variable 
+                                // is the dragObject itself.
+                                self.dragTargets.index = objectClosest.index;
+                                self.dragTargets.dragCollection = objectClosest.collection;
                             }
                             return null;
                         } catch (e) {
@@ -911,7 +902,15 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // If placement has changed, remove the stub and add back in the new place.
-                            if (objectClosest) {
+                            // Ensure no drop on the dragStub.
+                            // This is set where the drag stub
+                            // insertion points are accumulated.
+                            // It is set to true only when
+                            // the drag stub insertion point
+                            // is the drag stub itself.  This
+                            // avoids a circular reference.
+                            if (objectClosest &&
+                                !objectClosest.type) {
 
                                 if (objectClosest.index < self.parameterDragTarget.index) {
 
@@ -921,36 +920,26 @@ define(["NextWave/source/utility/prototypes",
                                     objectClosest.index = self.parameterDragTarget.index + 1;
                                 }
 
-                                // Ensure no drop on the dragStub.
-                                // This is set where the drag stub
-                                // insertion points are accumulated.
-                                // It is set to true only when
-                                // the drag stub insertion point
-                                // is the drag stub itself.  This
-                                // avoids a circular reference.
-                                if (!objectClosest.type) {
+                                // Remove placed stub now.
+                                exceptionRet = window.methodBuilder.purgeParameterDragStubs();
+                                if (exceptionRet) {
 
-                                    // Remove placed stub now.
-                                    exceptionRet = window.methodBuilder.purgeParameterDragStubs();
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-
-                                    // Insert at the specified index to the specified collection.
-                                    // Note: the dragTargets variable is the dragObject itself.
-                                    exceptionRet = objectClosest.collection.insertAt(self.parameterDragTarget,
-                                        objectClosest.index);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-
-                                    // Save index in the parameter drag target.
-                                    // This is used just above where the index
-                                    // is checked to slowest collection movement.
-                                    self.parameterDragTarget.index = objectClosest.index;
+                                    return exceptionRet;
                                 }
+
+                                // Insert at the specified index to the specified collection.
+                                // Note: the dragTargets variable is the dragObject itself.
+                                exceptionRet = objectClosest.collection.insertAt(self.parameterDragTarget,
+                                    objectClosest.index);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+
+                                // Save index in the parameter drag target.
+                                // This is used just above where the index
+                                // is checked to slowest collection movement.
+                                self.parameterDragTarget.index = objectClosest.index;
                             }
                             return null;
                         } catch (e) {
