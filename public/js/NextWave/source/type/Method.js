@@ -254,17 +254,10 @@ define(["NextWave/source/utility/prototypes",
                     var m_functionRecurseAllocate = function (objectStatement) {
 
                         var strType = objectStatement.type;
-                        /*if (strType === "String") {
-
-                            if (!objectStatement.value) {
-
-                                return '""';
-                            }
-                            return '"' + objectStatement.value + '"';
-                        } else*/ if (strType) {
+                        if (strType) {
 
                             // Allocate constructor parameters.
-                            var arrayConstructorParameters = undefined;
+                            var arrayConstructorParameters = [];
                             if (objectStatement.parameters) {
 
                                 arrayConstructorParameters = [];
@@ -277,19 +270,6 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // Define local function, that allocates an instance.
-                            function functionAllocate(constructor, args) {
-                                
-                                function F() {
-
-                                    return constructor.apply(this, args);
-                                }
-                                F.prototype = constructor.prototype;
-                                var f = new F();
-                                f.constructor = constructor;
-                                return f;
-                            }
-
                             // Just allocate each possible type of thing:
                             var objectRet = null;
                             if (strType === "String") {
@@ -297,136 +277,103 @@ define(["NextWave/source/utility/prototypes",
                                 return objectStatement.value;
                             } else if (strType === "Array") {
 
-                                return functionAllocate(Array,
-                                    arrayConstructorParameters);
+                                return new Array(...arrayConstructorParameters);
                             } else if (strType === "ArgumentList") {
 
-                                return functionAllocate(ArgumentList,
-                                    arrayConstructorParameters);
+                                return new ArgumentList(...arrayConstructorParameters);
                             } else if (strType === "Block") {
 
-                                return functionAllocate(Block,
-                                    arrayConstructorParameters);
+                                return new Block(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionGroup") {
 
-                                return functionAllocate(CodeExpressionGroup, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionGroup(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionInfix") {
 
-                                return functionAllocate(CodeExpressionInfix, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionInfix(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionInvocation") {
 
-                                return functionAllocate(CodeExpressionInvocation, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionInvocation(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionLiteral") {
 
-                                return functionAllocate(CodeExpressionLiteral, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionLiteral(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionName") {
 
-                                return functionAllocate(CodeExpressionName, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionName(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionPostfix") {
 
-                                return functionAllocate(CodeExpressionPostfix, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionPostfix(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionPrefix") {
 
-                                return functionAllocate(CodeExpressionPrefix, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionPrefix(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionRefinement") {
 
-                                return functionAllocate(CodeExpressionRefinement, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionRefinement(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionTernary") {
 
-                                return functionAllocate(CodeExpressionTernary, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionTernary(...arrayConstructorParameters);
                             } else if (strType === "CodeExpressionType") {
 
-                                return functionAllocate(CodeExpressionType, 
-                                    arrayConstructorParameters);
+                                return new CodeExpressionType(...arrayConstructorParameters);
                             } else if (strType === "CodeLiteral") {
 
-                                return functionAllocate(CodeLiteral, 
-                                    arrayConstructorParameters);
+                                return new CodeLiteral(...arrayConstructorParameters);
                             } else if (strType === "CodeName") {
 
-                                return functionAllocate(CodeName, 
-                                    arrayConstructorParameters);
+                                return new CodeName(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementBreak") {
 
-                                return functionAllocate(CodeStatementBreak, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementBreak(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementContinue") {
 
-                                return functionAllocate(CodeStatementContinue, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementContinue(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementComment") {
 
-                                return functionAllocate(CodeStatementComment, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementComment(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementDebugger") {
 
-                                return functionAllocate(CodeStatementDebugger, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementDebugger(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementExpression") {
 
-                                return functionAllocate(CodeStatementExpression, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementExpression(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementFor") {
 
-                                return functionAllocate(CodeStatementFor, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementFor(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementForIn") {
 
-                                return functionAllocate(CodeStatementForIn, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementForIn(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementFreeform") {
 
-                                return functionAllocate(CodeStatementFreeform, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementFreeform(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementIf") {
 
-                                return functionAllocate(CodeStatementIf, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementIf(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementReturn") {
 
-                                return functionAllocate(CodeStatementReturn, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementReturn(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementThrow") {
 
-                                return functionAllocate(CodeStatementThrow, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementThrow(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementTry") {
 
-                                return functionAllocate(CodeStatementTry, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementTry(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementVar") {
 
-                                return functionAllocate(CodeStatementVar, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementVar(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementWhile") {
 
-                                return functionAllocate(CodeStatementWhile, 
-                                    arrayConstructorParameters);
+                                return new CodeStatementWhile(...arrayConstructorParameters);
                             } else if (strType === "CodeType") {
 
-                                return functionAllocate(CodeType, 
-                                    arrayConstructorParameters);
+                                return new CodeType(...arrayConstructorParameters);
                             } else if (strType === "Parameter") {
 
-                                return functionAllocate(Parameter, 
-                                    arrayConstructorParameters);
+                                return new Parameter(...arrayConstructorParameters);
                             } else if (strType === "ParameterList") {
 
-                                return functionAllocate(ParameterList, 
-                                    arrayConstructorParameters);
+                                return new ParameterList(...arrayConstructorParameters);
                             } else if (strType === "Edit") {
 
-                                return functionAllocate(Edit, 
-                                    arrayConstructorParameters);
+                                return new Edit(...arrayConstructorParameters);
                             } else {
 
                                 throw { 

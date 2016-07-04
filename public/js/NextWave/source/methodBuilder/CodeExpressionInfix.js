@@ -36,7 +36,7 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
-                    // Return a new instance of a infix expression.
+                    // Return a new instance of an infix expression.
                     self.clone = function () {
 
                         return new self.constructor(self.lHS.clone(),

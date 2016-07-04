@@ -186,7 +186,7 @@ define(["NextWave/source/utility/prototypes",
                     self.innerAccumulateNameTypes = function (arrayNameTypes) {
 
                         return null;
-                    }
+                    };
 
                     // Add item to list of items.
                     self.addItem = function (itemNew) {
