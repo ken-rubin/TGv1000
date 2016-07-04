@@ -62,6 +62,9 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            self = this;
+
+                            
                             // Dummy:
                             arrayNameTypes.push({
                                 name: "Hello",
