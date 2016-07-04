@@ -383,7 +383,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     // parentPrice: typeIth.parentPrice || 0, defaults to 0.00 and should be 0.00
                                     // priceBump: typeIth.priceBump || 0, defaults to 0.00 and should be 0.00
                                     ownedByUserId: 1, // defaults to NULL, but we want 1
-                                    public: typeIth.public || 1,
+                                    public: typeIth.public || 0,
                                     // quarantined: typeIth.quarantined || 1, defaults to 0 and should be 0
                                     baseTypeId: typeIth.baseTypeId || 0,
                                     // projectId: passObj.project.id defaults to NULL and should be NULL
@@ -437,7 +437,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     +",altImagePath=" + typeIth.altImagePath
                                     +",description='" + typeIth.description + "'"
                                     +",ownedByUserId=" + 1
-                                    +",public=" + 1
+                                    +",public=" + typeIth.public
                                     +",baseTypeId=" + typeIth.baseTypeId
                                     ;
 
@@ -889,6 +889,47 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //                  Return array of type ids available for New Project for a normal user
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    self.routeFetchNormalUserNewProjectTypes = function (req, res) {
+
+        try {
+
+            m_log("Entered ProjectBO/routeFetchNormalUserNewProjectTypes");
+
+            sql.execute("select id from " + self.dbname + "types where public=1;",
+                function(rows) {
+
+                    if (rows.length === 0) {
+
+                        return res.json({success: false, message: "Could find no available project types."});
+                    }
+
+                    var array = [];
+                    rows.forEach(
+                        function(row) {
+                            array.push(row.id);
+                        }
+                    );
+
+                    return res.json({
+                        success: true,
+                        arrayAvailProjTypes: array
+                    });
+                }
+            );
+        } catch (e) {
+
+            return res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -962,7 +1003,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
                                 //  2. Retrieve project's comics and their content.
                                 //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
-                                //  4. Retrieve all system types (fleshed out) and push them onto projects.systemTypes.
+                                //  4. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
                                 async.series(
                                     [
                                         // 1. PP data, potentially.
@@ -1102,11 +1143,22 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             try {
 
-                                                var strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc;";
+                                                var strQuery;
+                                                if (req.user.can_edit_system_types) {
+
+                                                    strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc;";
+
+                                                } else {
+
+                                                    strQuery = "select * from " + self.dbname + "types where typeTypeId=2 and public=1 order by name asc;";
+                                                }
+
                                                 sql.execute(strQuery,
+
                                                     function(rows) {
 
-                                                        if (rows.length === 0) { return cb(new Error("No system types could be retrieved."));}
+                                                        // The following doesn't apply until at least one system type becomes public. Then uncomment it.
+                                                        // if (rows.length === 0) { return cb(new Error("No system types could be retrieved."));}
 
                                                         rows.forEach(
                                                             function(row) {

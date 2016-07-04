@@ -219,7 +219,7 @@ define(["NextWave/source/utility/prototypes",
                             // If privileged...
                             if (window.manager.userAllowedToCreateEditPurchProjs) {
 
-                                // Add two new controls to the dialog.
+                                // Add four more controls to the dialog.
                                 objectConfiguration.systemTypeLabel = {
 
                                     type: "Label",
@@ -253,6 +253,46 @@ define(["NextWave/source/utility/prototypes",
 
                                             // Update its description.
                                             typeContext.stowage.isSystemType = localSelf.getText();
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                }
+
+                                objectConfiguration.publicLabel = {
+
+                                    type: "Label",
+                                    text: "Public",
+                                    x: settings.general.margin,
+                                    y: 8 * settings.dialog.lineHeight + 
+                                        5 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                };
+
+                                objectConfiguration.publicEdit = {
+
+                                    type: "Edit",
+                                    multiline: false,
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 8 * settings.dialog.lineHeight + 
+                                        5 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Get the current type.
+                                            var typeContext = localSelf.dialog.host.typeContext;
+
+                                            // Update its description.
+                                            typeContext.stowage.public = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -320,6 +360,10 @@ define(["NextWave/source/utility/prototypes",
                             if (!type.stowage.isSystemType) {
 
                                 type.stowage.isSystemType = 0;
+                            }
+                            if (!type.stowage.public) {
+
+                                type.stowage.public = 0;
                             }
 
                             // Store the context.
@@ -398,7 +442,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Set the system type to 0 or 1 if the field is present.
+                            // Set the system type and the public fields to 0 or 1 if the system type field is present.
                             if (!self.dialog.controlObject["systemTypeEdit"]) {
 
                                 return null;
@@ -410,7 +454,19 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            return self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
+                            exceptionRet = self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = self.dialog.controlObject["publicEdit"].setProtected(false);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.dialog.controlObject["publicEdit"].setText(type.stowage.public.toString());
+
                         } catch (e) {
 
                             return e;

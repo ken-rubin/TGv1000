@@ -32,8 +32,35 @@ define(["Core/errorHelper"],
 
 									client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
 
-										var exceptionRet = client.showNewProjectDialog();
-										if (exceptionRet) { throw exceptionRet; }
+										var exceptionRet = null;
+										if (manager.userAllowedToCreateEditPurchProjs || manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+
+											// A privileged user can work with all project types.
+											exceptionRet = client.showNewProjectDialog([1,2,3,4,5]);
+											if (exceptionRet) { throw exceptionRet; }
+
+										} else {
+
+											// For a normal user, we have to see what's available.
+											var posting = $.post("/BOL/ProjectBO/FetchNormalUserNewProjectTypes", 
+												{},
+												'json');
+											posting.done(function(data){
+
+												if (data.success) {
+
+													exceptionRet = client.showNewProjectDialog(data.arrayAvailProjTypes);
+													if (exceptionRet) { throw exceptionRet; }
+
+												} else {
+
+													// !data.success
+													errorHelper.show(data.message);
+												}
+											});
+
+
+										}
 									}, 
 									true);	// true means to show the Abandon dlg if applicable.
 								} catch (e) { errorHelper.show(e); }

@@ -159,12 +159,12 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.showNewProjectDialog = function () {
+					self.showNewProjectDialog = function (arrayAvailProjTypes) {
 
 						try {
 
 							m_openDialog = new NewProjectDialog();
-							var exceptionRet = m_openDialog.create();
+							var exceptionRet = m_openDialog.create(arrayAvailProjTypes);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;

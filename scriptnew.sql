@@ -1443,6 +1443,24 @@ begin
 		update methods set arguments='{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}';
     
 		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id<3;
+
+    end if;
+    
+    if @dbstate = 38 THEN
+
+		update types set public=1 where id=1;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 39 THEN
+
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchNormalUserNewProjectTypes','post','routeFetchNormalUserNewProjectTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
 
     end if;

@@ -21,10 +21,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Public methods.
 
 					// Create and show Bootstrap dialog.
-					self.create = function() {
+					self.create = function(arrayAvailProjTypes) {
 
 						try {
 
+							m_arrayAvailProjTypes = arrayAvailProjTypes;
 							m_projectType = null;	// If m_projectType === null then the dialog will display a project type chooser (newProjectDialog1).
 													// Otherwise, it will display the real New Project Dialog (newProjectDialog2).
 
@@ -116,20 +117,40 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							$(".tt-selector").powerTip({
-								smartPlacement: true
-							});
-							$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
-							$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
-							$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
-							$("#HoloLensImage").attr("src", resourceHelper.toURL("images", null, null, "hololensProject.png"));
-							$("#MappingImage").attr("src", resourceHelper.toURL("images", null, null, "mappingProject.png"));
+							if (m_arrayAvailProjTypes.includes(1)) {
+								$("#GameImage").attr("src", resourceHelper.toURL("images", null, null, "gameProject.png"));
+								$("#GameImage").click(function(){m_functionProjectTypeSelected("Game");});
+							} else {
+								$("#GameImage").css("display","none");
+							}
 
-							$("#GameImage").click(function(){m_functionProjectTypeSelected("Game");});
-							$("#ConsoleImage").click(function(){m_functionProjectTypeSelected("Console");});
-							$("#WebSiteImage").click(function(){m_functionProjectTypeSelected("Web Site");});
-							$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
-							$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
+							if (m_arrayAvailProjTypes.includes(2)) {
+								$("#ConsoleImage").attr("src", resourceHelper.toURL("images", null, null, "consoleProject.png"));
+								$("#ConsoleImage").click(function(){m_functionProjectTypeSelected("Console");});
+							} else {
+								$("#ConsoleImage").css("display","none");
+							}
+
+							if (m_arrayAvailProjTypes.includes(3)) {
+								$("#WebSiteImage").attr("src", resourceHelper.toURL("images", null, null, "websiteProject.png"));
+								$("#WebSiteImage").click(function(){m_functionProjectTypeSelected("Web Site");});
+							} else {
+								$("#WebSiteImage").css("display","none");
+							}
+
+							if (m_arrayAvailProjTypes.includes(4)) {
+								$("#HoloLensImage").attr("src", resourceHelper.toURL("images", null, null, "hololensProject.png"));
+								$("#HoloLensImage").click(function(){m_functionProjectTypeSelected("HoloLens");});
+							} else {
+								$("#HoloLensImage").css("display","none");
+							}
+
+							if (m_arrayAvailProjTypes.includes(5)) {
+								$("#MappingImage").attr("src", resourceHelper.toURL("images", null, null, "mappingProject.png"));
+								$("#MappingImage").click(function(){m_functionProjectTypeSelected("Mapping");});
+							} else {
+								$("#MappingImage").css("display","none");
+							}
 
 							if (manager.userAllowedToCreateEditPurchProjs) {
 								$("#PrivilegedUsersDiv").css("display", "block");
@@ -723,6 +744,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 				var m_bClassProject = false;
 				var m_bProductProject = false;
 				var m_bOnlineClassProject = false;
+				var m_arrayAvailProjTypes;
 			};
 
 			// Return the constructor function as the module object.
