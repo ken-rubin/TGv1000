@@ -1491,8 +1491,6 @@ define(["NextWave/source/utility/prototypes",
                                             self.endingColumn = 0;
                                         }
 
-                                        console.log("(" + self.startingLine + ", " + self.startingColumn + ") (" + self.endingLine + ", " + self.endingColumn + ")");
-
                                         break;
                                     } else {
 

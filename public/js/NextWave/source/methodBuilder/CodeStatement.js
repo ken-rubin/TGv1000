@@ -54,6 +54,47 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Get all argument lists.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // Ensure parsed.
+                            if (!self.parsed) {
+
+                                var exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            
+                            // Loop over all expressionStubs, accumulate from each.
+                            for (var i = 0; i < self.expressionStubs.length; i++) {
+
+                                var exceptionRet = self.expressionStubs[i].accumulateExpressionPlacements(arrayAccumulator);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // Loop over all blocks, accumulate from each.
+                            for (var i = 0; i < self.blocks.length; i++) {
+
+                                var exceptionRet = self.blocks[i].accumulateExpressionPlacements(arrayAccumulator);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Get all the drag targets from all the expressions.
                     self.accumulateDragTargets = function (arrayAccumulator) {
 

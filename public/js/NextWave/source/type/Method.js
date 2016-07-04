@@ -11,8 +11,10 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/attributeHelper",
+    "NextWave/source/utility/Edit",
     "NextWave/source/type/SectionPart",
 
+    "NextWave/source/methodBuilder/ArgumentList",
     "NextWave/source/methodBuilder/Block",
     "NextWave/source/methodBuilder/CodeExpressionGroup",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
@@ -49,7 +51,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
 
     "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, attributeHelper, SectionPart, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
+    function (prototypes, attributeHelper, Edit, SectionPart, ArgumentList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
 
         try {
 
@@ -130,8 +132,7 @@ define(["NextWave/source/utility/prototypes",
                             // Set parameters.
                             if (objectParameters) {
 
-                                var strAllocationString = m_functionRecurseGenerateAllocationString(objectParameters);
-                                self.parameters = eval(strAllocationString);
+                                self.parameters = m_functionRecurseAllocate(objectParameters);
                             }
 
                             // Set statements.
@@ -140,8 +141,8 @@ define(["NextWave/source/utility/prototypes",
                                 for (var i = 0; i < arrayStatements.length; i++) {
 
                                     var objectStatementIth = arrayStatements[i];
-                                    var strAllocationString = m_functionRecurseGenerateAllocationString(objectStatementIth);
-                                    var exceptionRet = self.statements.addItem(eval(strAllocationString));
+                                    var objectNew = m_functionRecurseAllocate(objectStatementIth);
+                                    var exceptionRet = self.statements.addItem(objectNew);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -243,6 +244,198 @@ define(["NextWave/source/utility/prototypes",
                             strRet += ")"
 
                             return strRet;
+                        } else {
+
+                            return "undefined";
+                        }
+                    };
+
+                    // Recursively allocate methods.
+                    var m_functionRecurseAllocate = function (objectStatement) {
+
+                        var strType = objectStatement.type;
+                        /*if (strType === "String") {
+
+                            if (!objectStatement.value) {
+
+                                return '""';
+                            }
+                            return '"' + objectStatement.value + '"';
+                        } else*/ if (strType) {
+
+                            // Allocate constructor parameters.
+                            var arrayConstructorParameters = undefined;
+                            if (objectStatement.parameters) {
+
+                                arrayConstructorParameters = [];
+                                var arrayChildren = objectStatement.parameters;
+                                for (var i = 0; i < arrayChildren.length; i++) {
+
+                                    var objectChild = arrayChildren[i];
+                                    var objectParameter = m_functionRecurseAllocate(objectChild);
+                                    arrayConstructorParameters.push(objectParameter);
+                                }
+                            }
+
+                            // Define local function, that allocates an instance.
+                            function functionAllocate(constructor, args) {
+                                
+                                function F() {
+
+                                    return constructor.apply(this, args);
+                                }
+                                F.prototype = constructor.prototype;
+                                var f = new F();
+                                f.constructor = constructor;
+                                return f;
+                            }
+
+                            // Just allocate each possible type of thing:
+                            var objectRet = null;
+                            if (strType === "String") {
+
+                                return objectStatement.value;
+                            } else if (strType === "Array") {
+
+                                return functionAllocate(Array,
+                                    arrayConstructorParameters);
+                            } else if (strType === "ArgumentList") {
+
+                                return functionAllocate(ArgumentList,
+                                    arrayConstructorParameters);
+                            } else if (strType === "Block") {
+
+                                return functionAllocate(Block,
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionGroup") {
+
+                                return functionAllocate(CodeExpressionGroup, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionInfix") {
+
+                                return functionAllocate(CodeExpressionInfix, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionInvocation") {
+
+                                return functionAllocate(CodeExpressionInvocation, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionLiteral") {
+
+                                return functionAllocate(CodeExpressionLiteral, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionName") {
+
+                                return functionAllocate(CodeExpressionName, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionPostfix") {
+
+                                return functionAllocate(CodeExpressionPostfix, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionPrefix") {
+
+                                return functionAllocate(CodeExpressionPrefix, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionRefinement") {
+
+                                return functionAllocate(CodeExpressionRefinement, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionTernary") {
+
+                                return functionAllocate(CodeExpressionTernary, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeExpressionType") {
+
+                                return functionAllocate(CodeExpressionType, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeLiteral") {
+
+                                return functionAllocate(CodeLiteral, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeName") {
+
+                                return functionAllocate(CodeName, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementBreak") {
+
+                                return functionAllocate(CodeStatementBreak, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementContinue") {
+
+                                return functionAllocate(CodeStatementContinue, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementComment") {
+
+                                return functionAllocate(CodeStatementComment, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementDebugger") {
+
+                                return functionAllocate(CodeStatementDebugger, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementExpression") {
+
+                                return functionAllocate(CodeStatementExpression, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementFor") {
+
+                                return functionAllocate(CodeStatementFor, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementForIn") {
+
+                                return functionAllocate(CodeStatementForIn, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementFreeform") {
+
+                                return functionAllocate(CodeStatementFreeform, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementIf") {
+
+                                return functionAllocate(CodeStatementIf, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementReturn") {
+
+                                return functionAllocate(CodeStatementReturn, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementThrow") {
+
+                                return functionAllocate(CodeStatementThrow, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementTry") {
+
+                                return functionAllocate(CodeStatementTry, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementVar") {
+
+                                return functionAllocate(CodeStatementVar, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeStatementWhile") {
+
+                                return functionAllocate(CodeStatementWhile, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "CodeType") {
+
+                                return functionAllocate(CodeType, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "Parameter") {
+
+                                return functionAllocate(Parameter, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "ParameterList") {
+
+                                return functionAllocate(ParameterList, 
+                                    arrayConstructorParameters);
+                            } else if (strType === "Edit") {
+
+                                return functionAllocate(Edit, 
+                                    arrayConstructorParameters);
+                            } else {
+
+                                throw { 
+
+                                    message: "Unrecognized type: " + strType
+                                };
+                            }
+
+                            return objectRet;
                         } else {
 
                             return "undefined";

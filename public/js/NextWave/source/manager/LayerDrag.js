@@ -19,7 +19,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Method",
     "NextWave/source/type/Property",
     "NextWave/source/name/Name",
+    "NextWave/source/expression/Expression",
+    "NextWave/source/literal/Literal",
     "NextWave/source/statement/Statement",
+    "NextWave/source/methodBuilder/ArgumentList",
     "NextWave/source/methodBuilder/Block",
     "NextWave/source/methodBuilder/CodeStatement",
     "NextWave/source/methodBuilder/CodeExpression",
@@ -30,7 +33,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Statement, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Expression, Literal, Statement, ArgumentList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
 
         try {
 
@@ -70,8 +73,9 @@ define(["NextWave/source/utility/prototypes",
                     // Collection of placements for dragging Parameters.
                     // Saved here just for debug rendering purposes.
                     self.parameterPlacements = [];
-                    // Collection of argument lists and their stubs lists.
-                    self.expressionArgumentListStubs = [];
+                    // Collection of placements for dragging Expressions.
+                    // Saved here just for debug rendering purposes.
+                    self.expressionPlacements = [];
 
                     ////////////////////////
                     // Public methods.
@@ -219,8 +223,16 @@ define(["NextWave/source/utility/prototypes",
                                 self.parameterDragTarget.index = undefined;
                             }
 
+                            // Clear out expression placements.
+                            var exceptionRet = m_functionClearExpressionPlacements();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             self.placements = [];
                             self.parameterPlacements = [];
+                            self.expressionPlacements = [];
                             self.dragTargets = [];
                             self.parameterDragTarget = null;
                             self.upOver = null;
@@ -268,6 +280,9 @@ define(["NextWave/source/utility/prototypes",
                                             return e;
                                         }
                                     }
+
+                                    // Clear out the placement state.
+                                    self.upOver.placement = false;
                                 } else if (self.upOver instanceof Parameter) {
 
                                     if (self.parameterDragTarget.addNameInDragConsumate) {
@@ -378,7 +393,28 @@ define(["NextWave/source/utility/prototypes",
                                     // If drag object is a Statement or a CodeStatement, 
                                     // then find the location of the closest possible
                                     // drag stub location and put the drag stub there.
-                                    return m_functionPlaceStub(pointCursor);
+                                    var exceptionRet = m_functionPlaceStub(pointCursor);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+
+                                // If dragging an expression, then possibly place
+                                // expression ArgumentList placements.
+                                if (self.dragObject instanceof CodeExpression ||
+                                    self.dragObject instanceof Expression ||
+                                    self.dragObject instanceof Literal ||
+                                    self.dragObject instanceof Name) {
+
+                                    var exceptionRet = m_functionPlaceExpressionPlacements(pointCursor);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Force a render.
+                                    return window.methodBuilder.forceRenderStatements(objectReference.contextRender);
                                 }
                             }
                             return null;
@@ -453,6 +489,29 @@ define(["NextWave/source/utility/prototypes",
                                         if (exceptionRet) {
 
                                             return exceptionRet;
+                                        }
+                                    }
+                                }
+
+                                // If nothing found yet, could be an 
+                                // expression placement in an ArgumentList.
+                                if (self.expressionPlacements &&
+                                    self.expressionPlacements.length > 0) {
+
+                                    // Loop over all expression placement objects.
+                                    for (var i = 0; i < self.expressionPlacements.length; i++) {
+
+                                        var objectExpressionPlacement = self.expressionPlacements[i];
+
+                                        // Get the dragTarget, which is a CES.
+                                        var cesDragTaget = objectExpressionPlacement.dragTarget;
+
+                                        // And ask it.
+                                        var bIn = cesDragTaget.pointIn(objectReference.contextRender,
+                                            objectReference.pointCursor);
+                                        if (bIn) {
+
+                                            self.upOver = cesDragTaget;
                                         }
                                     }
                                 }
@@ -542,6 +601,20 @@ define(["NextWave/source/utility/prototypes",
                                             contextRender.moveTo(self.parameterPlacements[i].x, 0);
                                             contextRender.lineTo(self.parameterPlacements[i].x, self.extent.height);
                                             contextRender.stroke();
+                                        }
+                                        // Render Parameter placements.
+                                        for (var i = 0; i < self.expressionPlacements.length; i++) {
+
+                                            var arraySubExpressionPlacements = self.expressionPlacements[i];
+                                            for (var j = 0; j < arraySubExpressionPlacements.length; j++) {
+
+                                                contextRender.strokeStyle = (arraySubExpressionPlacements[j].type ? "red" : "green");
+
+                                                contextRender.beginPath();
+                                                contextRender.moveTo(arraySubExpressionPlacements[j].x, 0);
+                                                contextRender.lineTo(arraySubExpressionPlacements[j].x, self.extent.height);
+                                                contextRender.stroke();
+                                            }
                                         }
                                         contextRender.lineWidth = 1;
                                     }
@@ -664,13 +737,6 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            /* Get the expression arguments list stub targets.
-                            exceptionRet = window.methodBuilder.accumulateExpressionArgumentListStubs(self.expressionArgumentListStubs);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }*/
-
                             // Set global dragging variable.
                             window.draggingObject = self.dragObject;
                             window.draggingObject.expression = true;
@@ -767,6 +833,19 @@ define(["NextWave/source/utility/prototypes",
 
                                     return exceptionRet;
                                 }
+
+                                // If the collectionOwner is a CodeExpressionStub which is 
+                                // immediately owned by an ArgumentList, then remove it too.
+                                var collectionOwnerCollection = collectionOwner.collection;
+                                if (collectionOwnerCollection &&
+                                    collectionOwnerCollection instanceof ArgumentList) {
+
+                                    var exceptionRet = collectionOwnerCollection.removeItem(collectionOwner);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
                             }
 
                             // Get the drag targets somehow else.
@@ -820,7 +899,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // If placement has changed, remove the stub and add back in the new place.
+                            // If placement has changed, remove the 
+                            // stub and add back in the new place.
                             if (objectClosest &&
                                 !objectClosest.type) {
 
@@ -901,7 +981,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // If placement has changed, remove the stub and add back in the new place.
+                            // If placement has changed, remove the 
+                            // stub and add back in the new place.
                             // Ensure no drop on the dragStub.
                             // This is set where the drag stub
                             // insertion points are accumulated.
@@ -941,6 +1022,152 @@ define(["NextWave/source/utility/prototypes",
                                 // is checked to slowest collection movement.
                                 self.parameterDragTarget.index = objectClosest.index;
                             }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear out the expression placements.
+                    var m_functionClearExpressionPlacements = function () {
+
+                        try {
+
+                            // Remove all existing expression stubs.
+                            if (self.expressionPlacements &&
+                                self.expressionPlacements.length > 0) {
+
+                                // Remove from each collection.
+                                for (var i = 0; i < self.expressionPlacements.length; i++) {
+
+                                    var objectExpressionPlacement = self.expressionPlacements[i];
+
+                                    // objectExpressionPlacement contains:
+                                    // 1) The collection (ArgumentList),
+                                    // 2) The insertted dragTarget.
+                                    var alCollection = objectExpressionPlacement.collection;
+                                    var exceptionRet = alCollection.purgeExpressionPlacements();
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                    objectExpressionPlacement.dragTarget = null;
+                                }
+
+                                // No longer need this collection of expression placements.
+                                self.expressionPlacements = null;
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Find the closest possible insertion points to the cursor
+                    // from one of the argument lists selected from the GUI.
+                    var m_functionPlaceExpressionPlacement = function (objectExpressionPlacement, pointCursor) {
+
+                        try {
+
+                            // objectExpressionPlacement contains:
+                            // 1) The collection (ArgumentList).
+                            // 2) The placement.
+                            var alCollection = objectExpressionPlacement.collection;
+                            var cesPlacement = objectExpressionPlacement.dragTarget;
+
+                            // Build the collection of insertions.
+                            var arrayInsertionPoints = [];
+                            var exceptionRet = alCollection.accumulateInsertionPoints(arrayInsertionPoints);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Process each insertion point, keeping nearest.
+                            var objectClosest = null;
+                            var iClosestDistance = Infinity;
+                            for (var i = 0; i < arrayInsertionPoints.length; i++) {
+
+                                var objectIth = arrayInsertionPoints[i];
+
+                                var iDistance = Math.abs(objectIth.x - pointCursor.x);
+                                if (iDistance < iClosestDistance) {
+
+                                    iClosestDistance = iDistance;
+                                    objectClosest = objectIth;
+                                }
+                            }
+
+                            // If placement has changed, remove the 
+                            // stub and add back in the new place.
+                            if (objectClosest) {
+
+                                // Insert at the specified index to the specified collection.
+                                exceptionRet = alCollection.insertAt(cesPlacement,
+                                    objectClosest.index);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Find the closest possible insertion points to the cursor
+                    // from each of the argument lists selected from the GUI.
+                    var m_functionPlaceExpressionPlacements = function (pointCursor) {
+
+                        try {
+
+                            // Clear out expression placements.
+                            var exceptionRet = m_functionClearExpressionPlacements();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Get the expression arguments list stub targets.
+                            var arrayExpressionPlacements = [];
+                            exceptionRet = window.methodBuilder.accumulateExpressionPlacements(arrayExpressionPlacements);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Save off the collection of placements so that they
+                            // may be rendered if this layer has that flag set,
+                            // and so that they may be cleaned up on the next call.
+                            self.expressionPlacements = arrayExpressionPlacements;
+
+                            // Loop over the collections, place a stub in each.
+                            for (var i = 0; i < arrayExpressionPlacements.length; i++) {
+
+                                var objectExpressionPlacement = arrayExpressionPlacements[i];
+
+                                // Allocate the stub.
+                                var cesPlacement = new CodeExpressionStub();
+
+                                // Mark as placement.
+                                cesPlacement.placement = true;
+
+                                // Store in the placement object.
+                                objectExpressionPlacement.dragTarget = cesPlacement;
+
+                                // Process each collection.
+                                exceptionRet = m_functionPlaceExpressionPlacement(objectExpressionPlacement,
+                                    pointCursor);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
                             return null;
                         } catch (e) {
 

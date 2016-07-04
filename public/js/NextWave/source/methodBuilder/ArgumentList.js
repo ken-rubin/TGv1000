@@ -12,8 +12,9 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
-    "NextWave/source/manager/List"],
-    function (prototypes, settings, List) {
+    "NextWave/source/manager/List",
+    "NextWave/source/methodBuilder/CodeExpressionStub"],
+    function (prototypes, settings, List, CodeExpressionStub) {
 
         try {
 
@@ -33,16 +34,38 @@ define(["NextWave/source/utility/prototypes",
 
                         for (var i = 0; i < arrayArguments.length; i++) {
 
-                            self.addItem(arrayArguments[i]);
+                            self.addItem(new CodeExpressionStub(arrayArguments[i]));
                         }
                     }
 
                     ////////////////////////
                     // Public methods.
 
-                    // Add in expressions around all 
-                    // elements in the argument list.
-                    self.accumulateExpressionDragStubInsertionPoints = function (arrayAccumulator, expressionDragStub, areaMethodBuilder) {
+                    // Get all argument lists of this argument list.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // Loop over each statement.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                var exceptionRet = self.items[i].accumulateExpressionPlacements(arrayAccumulator);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Add in all placements 
+                    // for this ArgumentList.
+                    self.accumulateInsertionPoints = function (arrayAccumulator) {
 
                         try {
 
@@ -54,9 +77,7 @@ define(["NextWave/source/utility/prototypes",
                                 arrayAccumulator.push({
 
                                     index: 0,
-                                    x: self.areaMaximal().location.x,
-                                    collection: self,
-                                    type: (self.items.length > 0 ? self.items[0].expressionDragStub : false)
+                                    x: self.areaMaximal().location.x
                                 });
                             }
 
@@ -71,10 +92,15 @@ define(["NextWave/source/utility/prototypes",
                                     continue;
                                 }
 
-                                // Also check after each Expression.
-
                                 // Add after fully visible Expression.
-                                var areaExpression = expressionIth.area();
+                                var areaExpression = null;
+                                if ($.isFunction(expressionIth.area)) {
+
+                                    areaExpression = expressionIth.area();
+                                } else {
+
+                                    areaExpression = expressionIth.area;
+                                }
                                 if (areaExpression) {
 
                                     if (areaExpression.location.x + areaExpression.extent.width > 
@@ -83,10 +109,7 @@ define(["NextWave/source/utility/prototypes",
                                         arrayAccumulator.push({
 
                                             index: i + 1,
-                                            x: areaExpression.location.x + areaExpression.extent.width,
-                                            collection: self,
-                                            type: (expressionIth.expressionDragStub ||
-                                                ((self.items.length > i + 1) ? self.items[i + 1].expressionDragStub : false))
+                                            x: areaExpression.location.x + areaExpression.extent.width
                                         });
                                     }
                                 }
@@ -99,16 +122,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Return the width if specified, otherwise extent.
-                    self.getWidth = function (contextRender) {
-
-                        return Math.max(self.getTotalExtent(contextRender) +
-                            settings.general.margin * 2,
-                            10 * settings.general.margin);
-                    };
-
                     // Remove Expression stubs from around all elements.
-                    self.purgeExpressionDragStubs = function () {
+                    self.purgeExpressionPlacements = function () {
 
                         try {
 
@@ -119,7 +134,7 @@ define(["NextWave/source/utility/prototypes",
                                 var itemIth = self.items[i];
 
                                 // If it is a SDS...
-                                if (itemIth.expressionDragStub) {
+                                if (itemIth.placement) {
 
                                     // ...then remove it (via splice, not removeItem)...
                                     self.items.splice(i, 1);
@@ -140,6 +155,47 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    // Get all the drag targets from all the statements.
+                    self.accumulateDragTargets = function (arrayAccumulator) {
+
+                        try {
+
+                            // Loop over each expression stub.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // Extract the ith Expression.
+                                var expressionStubIth = self.items[i];
+
+                                // If the expression stub does not have a payload, then add.
+                                if (!expressionStubIth.payload) {
+
+                                    arrayAccumulator.push(expressionStubIth);
+                                } else {
+
+                                    // Recurse.
+                                    var exceptionRet = expressionStubIth.payload.accumulateDragTargets(arrayAccumulator);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+
+                           return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Return the width if specified, otherwise extent.
+                    self.getWidth = function (contextRender) {
+
+                        return Math.max(self.getTotalExtent(contextRender) +
+                            settings.general.margin * 2,
+                            10 * settings.general.margin);
                     };
 
                     // Return a new instance of a Parameter.

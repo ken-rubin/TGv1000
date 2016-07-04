@@ -50,10 +50,46 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Get all argument lists.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // Must be open.
+                            if (!m_area ||
+                                !self.open) {
+
+                                return null;
+                            }
+
+                            // Loop over each statement.
+                            for (var i = 0; i < self.statements.length; i++) {
+
+                                var exceptionRet = self.statements[i].accumulateExpressionPlacements(arrayAccumulator);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Get all the drag targets from all the statements.
                     self.accumulateDragTargets = function (arrayAccumulator) {
 
                         try {
+
+                            // Must be open.
+                            if (!m_area ||
+                                !self.open) {
+
+                                return null;
+                            }
 
                             // Loop over each statement.
                             for (var i = 0; i < self.statements.length; i++) {
@@ -71,96 +107,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Add item to list of items.
-                    self.addItem = function (itemNew, itemReplace) {
-
-                        try {
-
-                            // If replace item is specified, then replace the item there.
-                            if (itemReplace) {
-
-                                // Loop away!
-                                for (var i = 0; i < self.statements.length; i++) {
-
-                                    // Test.
-                                    if (self.statements[i] === itemReplace) {
-
-                                        // Replace.
-                                        self.statements.splice(i, 1, itemNew);
-                                        break;
-                                    }
-                                }
-                            } else {
-
-                                // Just stow.
-                                self.statements.push(itemNew);
-                            }
-
-                            // Identify parent.
-                            itemNew.collection = self;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Add item to list of items.
-                    self.insertAt = function (itemNew, iIndex) {
-
-                        try {
-
-                            // Add...
-                            if (iIndex >= self.statements.length) {
-
-                                return self.addItem(itemNew);
-                            }
-
-                            // ...or insert.
-                            self.statements.splice(iIndex,
-                                0,
-                                itemNew);
-
-                            // Identify parent.
-                            itemNew.collection = self;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Remove item from list of items.
-                    self.removeItem = function (itemRemove) {
-
-                        try {
-
-                            for (var i = 0; i < self.statements.length; i++) {
-
-                                // Get the ith, to test.
-                                var itemIth = self.statements[i];
-
-                                // If find a match...
-                                if (itemIth === itemRemove) {
-
-                                    // ...remove it.
-                                    self.statements.splice(i, 1);
-
-                                    // And done.
-                                    break;
-                                }
-                            }
-
-                            // Identify parent.
-                            itemRemove.collection = null;
-                            itemRemove.highlight = false;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {
@@ -168,7 +114,8 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Drop out if no area.
-                            if (!m_area) {
+                            if (!m_area ||
+                                !self.open) {
 
                                 return null;
                             }
@@ -264,6 +211,96 @@ define(["NextWave/source/utility/prototypes",
                                     }
                                 }
                             }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Add item to list of items.
+                    self.addItem = function (itemNew, itemReplace) {
+
+                        try {
+
+                            // If replace item is specified, then replace the item there.
+                            if (itemReplace) {
+
+                                // Loop away!
+                                for (var i = 0; i < self.statements.length; i++) {
+
+                                    // Test.
+                                    if (self.statements[i] === itemReplace) {
+
+                                        // Replace.
+                                        self.statements.splice(i, 1, itemNew);
+                                        break;
+                                    }
+                                }
+                            } else {
+
+                                // Just stow.
+                                self.statements.push(itemNew);
+                            }
+
+                            // Identify parent.
+                            itemNew.collection = self;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Add item to list of items.
+                    self.insertAt = function (itemNew, iIndex) {
+
+                        try {
+
+                            // Add...
+                            if (iIndex >= self.statements.length) {
+
+                                return self.addItem(itemNew);
+                            }
+
+                            // ...or insert.
+                            self.statements.splice(iIndex,
+                                0,
+                                itemNew);
+
+                            // Identify parent.
+                            itemNew.collection = self;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove item from list of items.
+                    self.removeItem = function (itemRemove) {
+
+                        try {
+
+                            for (var i = 0; i < self.statements.length; i++) {
+
+                                // Get the ith, to test.
+                                var itemIth = self.statements[i];
+
+                                // If find a match...
+                                if (itemIth === itemRemove) {
+
+                                    // ...remove it.
+                                    self.statements.splice(i, 1);
+
+                                    // And done.
+                                    break;
+                                }
+                            }
+
+                            // Identify parent.
+                            itemRemove.collection = null;
+                            itemRemove.highlight = false;
                             return null;
                         } catch (e) {
 

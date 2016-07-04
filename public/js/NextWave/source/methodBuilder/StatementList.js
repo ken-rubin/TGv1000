@@ -88,6 +88,37 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Get all argument lists.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // Loop over each statement.
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                // Extract the ith statement.
+                                var statementIth = self.items[i];
+                                if (!statementIth ||
+                                    !statementIth.area) {
+
+                                    continue;
+                                }
+
+                                // Check in each statement.
+                                var exceptionRet = statementIth.accumulateExpressionPlacements(arrayAccumulator);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {

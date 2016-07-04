@@ -44,9 +44,6 @@ define(["NextWave/source/utility/prototypes",
                                     ),
                                 new ArgumentList(
                                         [
-                                            new CodeExpressionStub(
-                                                new CodeExpressionName("iSomeVariable")
-                                            )
                                         ]
                                     )
                             );
