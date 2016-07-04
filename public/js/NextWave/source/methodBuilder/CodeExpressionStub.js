@@ -36,6 +36,9 @@ define(["NextWave/source/utility/prototypes",
                     self.payload = cePayload;               // May be null.
                     // The render area.
                     self.area = null;
+                    // Indicates that this object is displayed as and  
+                    // functionsas an expression placement in an ArgumentList.
+                    self.placement = false;
 
                     // If payload is not null, then set collection.
                     if (self.payload) {
@@ -45,6 +48,24 @@ define(["NextWave/source/utility/prototypes",
 
                     ////////////////////////
                     // Public methods.
+
+                    // Pass onto payload, if set.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // If there is a payload, check it.
+                            if (self.payload) {
+
+                                return self.payload.accumulateExpressionPlacements(arrayAccumulator);
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Add payload.
                     self.addItem = function (itemNew) {

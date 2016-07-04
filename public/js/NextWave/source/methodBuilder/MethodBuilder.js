@@ -268,6 +268,25 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Look for all places where an expression placement could be inserted.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // Do nothing if not visible.
+                            if (!self.visible) {
+
+                                return null;
+                            }
+
+                            // Pass on down the line.
+                            return self.methodStatements.statementList.accumulateExpressionPlacements(arrayAccumulator);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Look for all places where a statement drag stub could be inserted.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub) {
 
@@ -323,6 +342,18 @@ define(["NextWave/source/utility/prototypes",
 
                             // Pass on down the line.
                             return self.methodParameters.parameterList.purgeParameterDragStubs();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Cause the statement list to render itself.
+                    self.forceRenderStatements = function (contextRender) {
+
+                        try {
+
+                            return self.methodStatements.statementList.render(contextRender);
                         } catch (e) {
 
                             return e;

@@ -428,6 +428,12 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) { return e; }
                     }
 
+                    // Force render.
+                    self.forceRender = function () {
+
+                        return m_functionRender();
+                    }
+
                     // Run and stop running buttons.
                     self.runButtonClicked = function () {
 

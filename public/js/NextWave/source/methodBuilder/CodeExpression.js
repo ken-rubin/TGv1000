@@ -43,10 +43,72 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Get all argument lists.
+                    self.accumulateExpressionPlacements = function (arrayAccumulator) {
+
+                        try {
+
+                            // Ensure parsed.
+                            if (!self.parsed) {
+
+                                var exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // Loop over each child.
+                            for (var i = 0; i < self.children.length; i++) {
+
+                                var itemIth = self.children[i];
+
+                                // If stub, ...
+                                if (itemIth.constructor.name === "ArgumentList") {
+
+                                    // ...add one, and...
+                                    arrayAccumulator.push({
+
+                                        collection: itemIth
+                                    });
+
+                                    // ...recurse.
+                                    var exceptionRet = itemIth.accumulateExpressionPlacements(arrayAccumulator);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                } else if (itemIth.constructor.name === "CodeExpressionStub") {
+
+                                    // ...recurse.
+                                    var exceptionRet = itemIth.accumulateExpressionPlacements(arrayAccumulator);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Get all the drag targets from all the statements.
                     self.accumulateDragTargets = function (arrayAccumulator) {
 
                         try {
+
+                            // Ensure parsed.
+                            if (!self.parsed) {
+
+                                var exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
 
                             // Loop over each child stub.
                             for (var i = 0; i < self.children.length; i++) {
@@ -71,6 +133,14 @@ define(["NextWave/source/utility/prototypes",
 
                                         // else, got one!
                                         arrayAccumulator.push(itemIth);
+                                    }
+                                } else if (itemIth.constructor.name === "ArgumentList") {
+
+                                    // Scan it as well.
+                                    var exceptionRet = itemIth.accumulateDragTargets(arrayAccumulator);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
                                     }
                                 }
                             }
@@ -542,46 +612,55 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
+                    // Scan for children.
                     var m_functionParse = function () {
 
-                        // Scan for blocks and expressionStubs.
-                        var arrayKeys = Object.keys(self);
-                        for (var i = 0; i < arrayKeys.length; i++) {
+                        try {
 
-                            // Extract the key.
-                            var strKeyIth = arrayKeys[i];
+                            // Scan for blocks and expressionStubs.
+                            var arrayKeys = Object.keys(self);
+                            for (var i = 0; i < arrayKeys.length; i++) {
 
-                            // Definately skip collection--it causes a circular reference.
-                            if (strKeyIth === "collection") {
+                                // Extract the key.
+                                var strKeyIth = arrayKeys[i];
 
-                                continue;
-                            } 
+                                // Definately skip collection--it causes a circular reference.
+                                if (strKeyIth === "collection") {
 
-                            // Extract the object.
-                            var objectIth = self[strKeyIth];
+                                    continue;
+                                } 
 
-                            // Test object.
-                            if (objectIth &&
-                                (objectIth instanceof CodeName ||
-                                objectIth instanceof CodeLiteral ||
-                                // Can't require CodeExpressionStub type because it 
-                                // requires this type (cyclic reference), thus....
-                                objectIth.constructor.name === "CodeExpressionStub" ||
-                                // Also....
-                                objectIth.constructor.name === "ParameterList")) {
+                                // Extract the object.
+                                var objectIth = self[strKeyIth];
 
-                                // Add the item.
-                                var exceptionRet = self.addItem(objectIth);
-                                if (exceptionRet) {
+                                // Test object.
+                                if (objectIth &&
+                                    (objectIth instanceof CodeName ||
+                                    objectIth instanceof CodeLiteral ||
+                                    // Can't require CodeExpressionStub type because it 
+                                    // requires this type (cyclic reference), thus....
+                                    objectIth.constructor.name === "CodeExpressionStub" ||
+                                    // Also....
+                                    objectIth.constructor.name === "ParameterList" ||
+                                    // Last....
+                                    objectIth.constructor.name === "ArgumentList")) {
 
-                                    return exceptionRet;
+                                    // Add the item.
+                                    var exceptionRet = self.addItem(objectIth);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
-                        }
 
-                        self.parsed = true;
-                        return null;
-                    }
+                            self.parsed = true;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     //////////////////////////
                     // Private fields.
