@@ -342,7 +342,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // With no method currently selected, clear out namesPanel.
-                            window.manager.panelLayer.clearNameTypes();
+                            window.manager.panelLayer.clearNames();
 
                             // Ensure the type has the requisit attributes.
                             if (!type.stowage) {

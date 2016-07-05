@@ -427,12 +427,12 @@ define(["NextWave/source/utility/prototypes",
                             
                             var arraySNames = [];
                             // method.statements is a StatementList. Let's start there.
-                            exceptionRet = method.statements.accumulateNameTypes(arraySNames);
+                            exceptionRet = method.statements.accumulateNames(arraySNames);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
                             
-                            return window.manager.panelLayer.setNameTypes(arrayPNames.concat(arraySNames));
+                            return window.manager.panelLayer.setNames(arrayPNames.concat(arraySNames));
 
                         } catch (e) {
 
@@ -446,11 +446,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < methodParameters.items.length; i++) {
 
                                 var paramIth = methodParameters.items[i];
-                                arrayPNames.push(
-                                {
-                                    name: paramIth.name.text,
-                                    typeName: paramIth.typeName
-                                });
+                                arrayPNames.push(paramIth.name.text);
                             }
 
                             return null;

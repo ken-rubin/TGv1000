@@ -136,8 +136,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Get all nameTypes from self.expressionStubs and self.blocks.
-                    self.accumulateNameTypes = function (arrayNameTypes) {
+                    // Get all names from self.expressionStubs and self.blocks.
+                    self.accumulateNames = function (arrayNames) {
 
                         try {
 
@@ -153,7 +153,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerAccumulateNameTypes(arrayNameTypes);
+                            exceptionRet = self.innerAccumulateNames(arrayNames);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -162,7 +162,7 @@ define(["NextWave/source/utility/prototypes",
                             // Loop over all blocks, accumulate from each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].accumulateNameTypes(arrayNameTypes);
+                                exceptionRet = self.blocks[i].accumulateNames(arrayNames);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -177,7 +177,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+                    self.innerAccumulateNames = function (arrayNames) {
 
                         return null;
                     }

@@ -58,7 +58,7 @@ define(["NextWave/source/utility/prototypes",
                         ];
                     };
 
-                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+                    self.innerAccumulateNames = function (arrayNames) {
 
                         try {
 
@@ -66,10 +66,7 @@ define(["NextWave/source/utility/prototypes",
 
                             
                             // Dummy:
-                            arrayNameTypes.push({
-                                name: "Hello",
-                                typeName: null
-                            });
+                            arrayNames.push("Hello_again");
 
                             return null;
 

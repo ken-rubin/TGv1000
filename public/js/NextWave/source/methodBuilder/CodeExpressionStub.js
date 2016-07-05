@@ -88,7 +88,7 @@ define(["NextWave/source/utility/prototypes",
                     // They all inherite CodeExpressioon, so there is a self.accumulateTypeNames there that returns null
                     // and is overridden in any CodeExpressionXxx that should produce a NameType object.
                     // For example, for something like var i = 0; self.payload will be a CodeExpressionInfix.
-                    self.accumulateNameTypes = function (arrayNameTypes) {
+                    self.accumulateNames = function (arrayNames) {
 
                         try {
 
@@ -96,7 +96,7 @@ define(["NextWave/source/utility/prototypes",
                             // which will return null unless overridden.
                             if (self.payload) {
 
-                                return self.payload.accumulateNameTypes(arrayNameTypes);
+                                return self.payload.accumulateNames(arrayNames);
 
                             } else {
 

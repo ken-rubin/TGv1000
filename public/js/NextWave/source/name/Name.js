@@ -40,7 +40,7 @@ define(["NextWave/source/utility/prototypes",
                     // This is the default.
                     self.getName = function () {
 
-                        return self.name.name;
+                        return self.name;
                     };
 
                     // Return a code instance

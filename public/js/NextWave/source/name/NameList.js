@@ -54,7 +54,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Uniquifies and sorts nameTypes stored in self.items in List.js.
+                    // Uniquifies and sorts names stored in self.items in List.js.
                     self.uAndS = function () {
 
                         var uniqueArray = [];
@@ -66,7 +66,7 @@ define(["NextWave/source/utility/prototypes",
                                 var compIth = self.items[i];
                                 var found = false;
                                 for (var j = 0; j < uniqueArray.length; j++) {
-                                    if (uniqueArray[j].name.name === compIth.name.name){
+                                    if (uniqueArray[j].name === compIth.name){
                                         found = true;
                                         break;
                                     }
@@ -76,28 +76,25 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            self.items = uniqueArray;
+                            self.items = uniqueArray.sort(function(a,b){
 
-                            // And sort.
-                            self.items.sort(function(a,b){
-
-                                if (a.name.name > b.name.name)
+                                if (a.name.toLowerCase() > b.name.toLowerCase())
                                     return 1;
-                                if (a.name.name < b.name.name)
+                                if (a.name.toLowerCase() < b.name.toLowerCase())
                                     return -1;
                                 return 0;
                             });
                         }
                     }
 
-                    // Add a nameType object in a manner that retains sorting by name.
-                    self.addNameType = function (objNameType, bDoNotSort) {
+                    // Add a name in a manner that retains sorting by name.
+                    self.addName = function (strName, bDoNotSort) {
 
                         try {
 
                             var doNotSort = bDoNotSort || false;
 
-                            var exceptionRet = self.addItem(new Name(objNameType));
+                            var exceptionRet = self.addItem(new Name(strName));
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -116,15 +113,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Remove existing names and set to these names. Then uniquify and sort.
-                    self.setNameTypes = function (arrayNameTypes) {
+                    self.setNames = function (arrayNames) {
 
                         try {
 
                             var exceptionRet;
 
-                            for (var i = 0; i < arrayNameTypes.length; i++) {
+                            for (var i = 0; i < arrayNames.length; i++) {
 
-                                exceptionRet = self.addNameType(arrayNameTypes[i], true);   // Tells self.addNameType to hold off on sorting. We'll do it at the end.
+                                exceptionRet = self.addName(arrayNames[i], true);   // Tells self.addName to hold off on sorting. We'll do it at the end.
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -141,7 +138,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Method changes an existing name in a manner that retains sorting by name.
-                    self.changeNameOfNameType = function (strOriginalName, strNewName) {
+                    self.changeName = function (strOriginalName, strNewName) {
 
                         try {
 
@@ -149,10 +146,10 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Find match...
-                                if (self.items[i].name.name === strOriginalName) {
+                                if (self.items[i].name === strOriginalName) {
 
                                     // ...and splace in place.
-                                    self.items[i].name.name = strNewName;
+                                    self.items[i].name = strNewName;
 
                                     break;
                                 }
@@ -168,7 +165,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeNameType = function (strName) {
+                    self.removeName = function (strName) {
 
                         try {
 
@@ -176,7 +173,7 @@ define(["NextWave/source/utility/prototypes",
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Find match...
-                                if (self.items[i].name.name === strName) {
+                                if (self.items[i].name === strName) {
 
                                     // ...and splice in place.
                                     self.items.splice(i, 1);

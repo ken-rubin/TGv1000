@@ -288,11 +288,7 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.parameterDragTarget.addNameInDragConsumate) {
 
                                         self.parameterDragTarget.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addNameType(
-                                        {
-                                            name: self.parameterDragTarget.consumateName,
-                                            typeName: self.dragObject.name
-                                        });
+                                        var exceptionRet = window.manager.addName(self.parameterDragTarget.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
@@ -315,23 +311,14 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.dragTargets.addNameInDragConsumate) {
 
                                         self.dragTargets.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addNameType(
-                                        {
-                                            name: self.dragTargets.consumateName,
-                                            typeName: self.dragObject.name
-                                        });
+                                        var exceptionRet = window.manager.addName(self.dragTargets.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
                                         }
                                     } else if (self.dragTargets instanceof CodeStatementFor) {
 
-                                        var exceptionRet = window.manager.addNameType(
-                                        {
-                                            name: self.dragTargets.initialization.payload.lHS.payload.payload.payload.text,
-                                            typeName: null
-                                        }
-                                        );
+                                        var exceptionRet = window.manager.addName(self.dragTargets.initialization.payload.lHS.payload.payload.payload.text);
                                         if (exceptionRet) {
 
                                             return e;
@@ -485,7 +472,7 @@ define(["NextWave/source/utility/prototypes",
 
                                         // ...remove it from names.
                                         // var exceptionRet = window.manager.removeName(self.parameterDragTarget.consumateName);
-                                        var exceptionRet = window.manager.removeNameType(self.parameterDragTarget.name.originalName);
+                                        var exceptionRet = window.manager.removeName(self.parameterDragTarget.name.originalName);
                                         if (exceptionRet) {
 
                                             return exceptionRet;
@@ -534,7 +521,7 @@ define(["NextWave/source/utility/prototypes",
                             stmt.assignment.payload.lHS.payload.payload instanceof CodeName) {
 
                             // ...remove it from names.
-                            var exceptionRet = window.manager.removeNameType(stmt.assignment.payload.lHS.payload.payload.payload.text);
+                            var exceptionRet = window.manager.removeName(stmt.assignment.payload.lHS.payload.payload.payload.text);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -542,7 +529,7 @@ define(["NextWave/source/utility/prototypes",
                         } else if (stmt instanceof CodeStatementFor /* add some more instanceof checking as above */) {
 
                             // ...remove it from names.
-                            var exceptionRet = window.manager.removeNameType(stmt.initialization.payload.lHS.payload.payload.payload.text);
+                            var exceptionRet = window.manager.removeName(stmt.initialization.payload.lHS.payload.payload.payload.text);
                             if (exceptionRet) {
 
                                 return exceptionRet;

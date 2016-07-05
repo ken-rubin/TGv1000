@@ -65,11 +65,11 @@ define(["NextWave/source/utility/prototypes",
                     // For example, for the for statement it is most likely a CodeExpressionInfix,
                     // since it holds something of the form var i = 0;
                     // Call down until we have 'i'.
-                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+                    self.innerAccumulateNames = function (arrayNames) {
 
                         try {
 
-                            var exceptionRet = self.initialization.accumulateNameTypes(arrayNameTypes);
+                            var exceptionRet = self.initialization.accumulateNames(arrayNames);
                             if (exceptionRet) {
 
                                 return exceptionRet;

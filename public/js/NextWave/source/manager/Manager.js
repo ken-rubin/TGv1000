@@ -288,7 +288,7 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearExpressions();
                             if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearNameTypes();
+                            exceptionRet = self.panelLayer.clearNames();
                             if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearCenter();
                             if (exceptionRet) { return exceptionRet; }
@@ -463,11 +463,11 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Method adds a new name to NameList and to NamesPanel.
-                    self.addNameType = function (objNameType) {
+                    self.addName = function (strName) {
 
                         try {
 
-                            return self.panelLayer.addNameType(objNameType);
+                            return self.panelLayer.addName(strName);
                         } catch (e) {
 
                             return e;
@@ -475,12 +475,12 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method edits a new name.
-                    self.changeNameOfNameType = function (strOriginalName, strNewName) {
+                    self.changeName = function (strOriginalName, strNewName) {
 
                         try {
 
                             // Update in the panel.
-                            return self.panelLayer.changeNameOfNameType(strOriginalName, 
+                            return self.panelLayer.changeName(strOriginalName, 
                                 strNewName);
                         } catch (e) {
 
@@ -963,12 +963,12 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method removes an existing name.
-                    self.removeNameType = function (strName) {
+                    self.removeName = function (strName) {
 
                         try {
 
                             // Update in the panel.
-                            return self.panelLayer.removeNameType(strName);
+                            return self.panelLayer.removeName(strName);
                         } catch (e) {
 
                             return e;
@@ -1001,7 +1001,7 @@ define(["NextWave/source/utility/prototypes",
 
                             arrayCollection = self.panelLayer.namesPanel.payload.items;
                             strNameProperty = "name";
-                            strNameRefinementProperty = "name";
+                            strNameRefinementProperty = null;
                         }
 
                         // Make sure a good JS name.

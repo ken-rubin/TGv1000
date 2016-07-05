@@ -79,15 +79,15 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Get all nameTypes from all the statements
-                    self.accumulateNameTypes = function (arrayNameTypes) {
+                    // Get all names from all the statements
+                    self.accumulateNames = function (arrayNames) {
 
                         try {
 
                             // Loop over each statement.
                             for (var i = 0; i < self.statements.length; i++) {
 
-                                var exceptionRet = self.statements[i].accumulateNameTypes(arrayNameTypes);
+                                var exceptionRet = self.statements[i].accumulateNames(arrayNames);
                                 if (exceptionRet) {
 
                                     return exceptionRet;

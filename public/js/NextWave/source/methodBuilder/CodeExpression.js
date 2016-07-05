@@ -151,9 +151,9 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Get all nameTypes from all the children.
+                    // Get all names from all the children.
                     // Or maybe just return null and let classes that inherit CodeExpression do their work.
-                    self.accumulateNameTypes = function (arrayNameTypes) {
+                    self.accumulateNames = function (arrayNames) {
 
                         try {
 
@@ -169,8 +169,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerAccumulateNameTypes.call(self,
-                                arrayNameTypes);
+                            exceptionRet = self.innerAccumulateNames.call(self,
+                                arrayNames);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -184,7 +184,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    self.innerAccumulateNameTypes = function (arrayNameTypes) {
+                    self.innerAccumulateNames = function (arrayNames) {
 
                         return null;
                     };
