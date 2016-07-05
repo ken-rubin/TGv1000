@@ -54,6 +54,23 @@ define(["NextWave/source/utility/prototypes",
                         return new self.constructor(self.payload.clone());
                     };
 
+                    // self.payload is a CodeName.
+                    self.innerAccumulateNames = function(arrayNames) {
+
+                        try {
+
+                            if (self.payload) {
+
+                                return self.payload.accumulateNames(arrayNames);
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Inner save.  Save constructor parameters.
                     self.innerSave = function () {
 

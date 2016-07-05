@@ -69,13 +69,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var exceptionRet = self.initialization.accumulateNames(arrayNames);
-                            if (exceptionRet) {
+                            return self.initialization.accumulateNames(arrayNames);
 
-                                return exceptionRet;
-                            }
-
-                            return null;
                         } catch (e) {
 
                             return e;

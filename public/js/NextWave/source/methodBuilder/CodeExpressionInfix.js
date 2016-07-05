@@ -64,9 +64,10 @@ define(["NextWave/source/utility/prototypes",
 
                             self = this;
 
+                            self.lHS.accumulateNames(arrayNames);
                             
                             // Dummy:
-                            arrayNames.push("Hello_again");
+                            // arrayNames.push("Hello_again");
 
                             return null;
 

@@ -73,6 +73,23 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    // self.payload is an Edit. It (finally) contains the name.
+                    self.accumulateNames = function (arrayNames) {
+
+                        try {
+
+                            if (self.payload) {
+
+                                arrayNames.push(self.payload.getText());
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
                 } catch (e) {
 
                     alert(e.message);
