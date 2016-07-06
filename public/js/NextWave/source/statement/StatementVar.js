@@ -43,7 +43,9 @@ define(["NextWave/source/utility/prototypes",
                             new CodeExpressionInfix(
                                 new CodeExpressionName(
                                     new CodeName(
-                                        strName
+                                        strName,
+                                        false,  // multiline
+                                        true    // inVarAssignment
                                     )
                                 ),
                                 "=",

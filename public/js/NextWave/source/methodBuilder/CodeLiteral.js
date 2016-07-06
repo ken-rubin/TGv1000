@@ -22,7 +22,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function CodeLiteral(strPayload, bMultiline) {
+        	var functionRet = function CodeLiteral(strPayload, bMultiline, bInVarAssignment) {
 
                 try {
 
@@ -35,9 +35,12 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // Indicates this is a multiline edit.
                     self.multiline = bMultiline || false;
+                    // Following is used in derived class CodeName.
+                    self.inVarAssignment = bInVarAssignment || false;
                     // For now, all literals are Edits.
                     self.payload = new Edit(strPayload || "",
-                        self.multiline);
+                        self.multiline,
+                        self.inVarAssignment);
                     // Set the maximum horizontal extent.
                     self.maxWidth = null;
 

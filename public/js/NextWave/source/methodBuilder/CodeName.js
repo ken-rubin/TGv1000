@@ -16,15 +16,19 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function CodeName(strPayload) {
+            var functionRet = function CodeName(strPayload, bMultiline, bInVarAssignment) {
 
                 try {
 
                     var self = this;                        // Uber closure.
 
+                    self.multiline = bMultiline || false;
+                    self.inVarAssignment = bInVarAssignment || false;
                     // Inherit from CodeLiteral.
                     self.inherits(CodeLiteral,
-                        strPayload);
+                        strPayload,
+                        self.multiline,
+                        self.inVarAssignment);
 
                     ////////////////////////
                     // Public methods.
@@ -47,31 +51,31 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (localSelf.originalName !== localSelf.getText()) {
+                            var exceptionRet = null;
+                            var strBetterName = localSelf.getText();
 
-                                // Generate unique renamer.
-                                //
-                                // I think I want to do this uniqueness only if I'm in a CodeStatementVar.
-                                // How do I know?
-                                //
-                                //
-                                var strBetterName = window.manager.getUniqueName(localSelf.getText());
+                            // We want to generate a unique name only if we're in the assignment of a CodeStatementVar
+                            // and, of course, if user changed the name.
+                            if ((localSelf.originalName !== strBetterName) && self.payload.inVarAssignment) {
+
+                                strBetterName = window.manager.getUniqueName(localSelf.getText());
 
                                 // Store back in Edit.
-                                var exceptionRet = localSelf.setText(strBetterName);
+                                exceptionRet = localSelf.setText(strBetterName);
                                 if (exceptionRet) {
 
                                     throw exceptionRet;
                                 }
+                            }                                
 
-                                // Update.
-                                exceptionRet = window.manager.changeName(localSelf.originalName,
-                                    strBetterName);
-                                if (exceptionRet) {
+                            // Update.
+                            exceptionRet = window.manager.changeName(localSelf.originalName,
+                                strBetterName);
+                            if (exceptionRet) {
 
-                                    throw exceptionRet;
-                                }
+                                throw exceptionRet;
                             }
+
                             return null;
                         } catch (e) {
 

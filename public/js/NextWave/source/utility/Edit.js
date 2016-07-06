@@ -20,7 +20,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Edit(strText, bMultiline) {
+        	var functionRet = function Edit(strText, bMultiline, bInVarAssignment) {
 
                 try {
 
@@ -52,9 +52,26 @@ define(["NextWave/source/utility/prototypes",
                         (self.multiline ? "s-resize" : "e-resize")];
                     // Width of a single character.
                     self.characterWidth = 20;
+                    // Field is used to tell CodeName.js's self.payload.exitFocus function
+                    // whether we're in the assignment property of an CodeStatementVar.
+                    self.inVarAssignment = bInVarAssignment || false;
 
                     ///////////////////////
                     // Public methods.
+
+                    // Set inVarAssignment to true.
+                    self.setInVarAssignment = function() {
+
+                        try {
+
+                            self.inVarAssignment = true;
+                            return null;
+                            
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
 
                     // Get the text in this control.
                     self.getText = function () {
