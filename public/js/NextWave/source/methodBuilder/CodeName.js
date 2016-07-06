@@ -50,6 +50,11 @@ define(["NextWave/source/utility/prototypes",
                             if (localSelf.originalName !== localSelf.getText()) {
 
                                 // Generate unique renamer.
+                                //
+                                // I think I want to do this uniqueness only if I'm in a CodeStatementVar.
+                                // How do I know?
+                                //
+                                //
                                 var strBetterName = window.manager.getUniqueName(localSelf.getText());
 
                                 // Store back in Edit.

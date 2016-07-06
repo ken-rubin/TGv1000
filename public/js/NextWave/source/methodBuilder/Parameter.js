@@ -60,7 +60,10 @@ define(["NextWave/source/utility/prototypes",
                             // If the name has changed, update it.
                             if (localSelf.originalName !== localSelf.getText()) {
 
-                                // Generate unique renamer.
+                                // Generate unique name.
+                                //
+                                // Unlike the similar call in CodeName.js, I believe this one whould always be called.
+                                //
                                 var strBetterName = window.manager.getUniqueName(localSelf.getText());
 
                                 // Store back in Edit.
