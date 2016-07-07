@@ -59,6 +59,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            self = this;
+
                             if (self.payload) {
 
                                 return self.payload.accumulateNames(arrayNames);

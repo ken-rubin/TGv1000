@@ -69,6 +69,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            self = this;
+
                             return self.initialization.accumulateNames(arrayNames);
 
                         } catch (e) {
@@ -76,6 +78,26 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    // Reach down into the Edits for self.condition and self.increment CodeNames
+                    // and setProtected(true);
+                    // self.condition is a CEStub whose payload is a CEInfix whose lHS is a CEStub whose payload is a CEName whose payload is a CodeName whose payload is an Edit.
+                    // self.increment is a CEStub whose payload is a CEPostfix whose lHS is a CEStub whose payload is a CEName whose payload is a CodeName whose payload is an Edit.
+                    self.protectConditionAndIncrementNames = function () {
+
+                        self.condition.payload.lHS.payload.payload.payload.setProtected(true);
+                        self.increment.payload.lHS.payload.payload.payload.setProtected(true);
+
+                    }
+
+                    // If self.initialization CodeName Edit.getText() is changed,
+                    // call this method to copy it two times to the right.
+                    self.copyInitNameToConditionAndIncrement = function () {
+
+                        var strName = initialization.payload.lHS.payload.payload.payload.getText();
+                        self.condition.payload.lHS.payload.payload.payload.setText(strName);
+                        self.increment.payload.lHS.payload.payload.payload.setText(strName);
+                    }
 
                 } catch (e) {
 

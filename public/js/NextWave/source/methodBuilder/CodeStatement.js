@@ -162,7 +162,8 @@ define(["NextWave/source/utility/prototypes",
                             // Loop over all blocks, accumulate from each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].accumulateNames(arrayNames);
+                                exceptionRet = self.blocks[i].accumulateNames.call(self,
+                                    arrayNames);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
