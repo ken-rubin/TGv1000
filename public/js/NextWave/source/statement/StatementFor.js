@@ -45,7 +45,7 @@ define(["NextWave/source/utility/prototypes",
                                 new CodeExpressionName(
                                     // "i"
                                     new CodeName(
-                                        "i",
+                                        strName,
                                         false,  // multiline
                                         true    // inVarAssignment
                                     )
@@ -57,7 +57,7 @@ define(["NextWave/source/utility/prototypes",
                                 new CodeExpressionName(
                                     // "i"
                                     new CodeName(
-                                        "i",
+                                        strName,
                                         false,  // multiline
                                         false    // inVarAssignment
                                     )
@@ -69,7 +69,7 @@ define(["NextWave/source/utility/prototypes",
                                 new CodeExpressionName(
                                     // "i"
                                     new CodeName(
-                                        "i",
+                                        strName,
                                         false,  // multiline
                                         false    // inVarAssignment
                                     )
@@ -78,7 +78,8 @@ define(["NextWave/source/utility/prototypes",
                             )
                         );
 
-                        csfRet.protectConditionAndIncrementNames();
+                        csfRet.addNameInDragConsumate = true;
+                        csfRet.consumateName = strName;
 
                         return csfRet;
                     };

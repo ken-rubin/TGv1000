@@ -90,6 +90,8 @@ define(["NextWave/source/utility/prototypes",
 
                     }
 
+                    self.protectConditionAndIncrementNames();
+
                     // If self.initialization CodeName Edit.getText() is changed,
                     // call this method to copy it two times to the right.
                     self.copyInitNameToConditionAndIncrement = function () {
