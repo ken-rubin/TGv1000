@@ -474,14 +474,39 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method edits a new name.
-                    self.changeName = function (strOriginalName, strNewName) {
+                    // Method edits a name.
+                    // If bPropagate, then change the name everyplace it's used in the current method.
+                    self.changeName = function (strOriginalName, strNewName, bPropagate) {
 
                         try {
 
                             // Update in the panel.
-                            return self.panelLayer.changeName(strOriginalName, 
+                            var exceptionRet = self.panelLayer.changeName(strOriginalName, 
                                 strNewName);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            if (bPropagate) {
+
+                                if (self.context.method.statements) {
+
+                                    for (var i = 0; i < self.context.method.statements.items.length; i++) {
+
+                                        var stmt = self.context.method.statements.items[i];
+
+                                        var expressionRet = stmt.changeName(strOriginalName, strNewName);
+                                        if (expressionRet) {
+
+                                            return expressionRet;
+                                        }
+                                    }
+                                }
+                            }
+
+                            return null;
+
                         } catch (e) {
 
                             return e;

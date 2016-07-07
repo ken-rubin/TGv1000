@@ -183,6 +183,53 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     }
 
+                    self.changeName = function(strOriginalName, strNewName) {
+
+                        try {
+
+                            var exceptionRet = null;
+
+                            if (!self.parsed) {
+
+                                // Parse it.
+                                exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            exceptionRet = self.innerChangeName(strOriginalName, strNewName);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Loop over all blocks, accumulate from each.
+                            for (var i = 0; i < self.blocks.length; i++) {
+
+                                exceptionRet = self.blocks[i].changeName.call(self,
+                                    strOriginalName, 
+                                    strNewName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                            
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    self.innerChangeName = function (strOriginalName, strNewName) {
+
+                        return null;
+                    }
+
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
                     self.accumulateDragStubInsertionPoints = function (arrayAccumulator, statementDragStub, areaMethodBuilder) {

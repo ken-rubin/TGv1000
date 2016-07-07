@@ -409,7 +409,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method edits an existing name.
+                    // Method changes an existing name.
                     self.changeName = function (strOriginalName, strNewName) {
 
                         try {

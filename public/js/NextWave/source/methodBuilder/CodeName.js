@@ -70,7 +70,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Update.
                             exceptionRet = window.manager.changeName(localSelf.originalName,
-                                strBetterName);
+                                strBetterName,
+                                self.payload.inVarAssignment);   // Propagate thru all statements in current method if a var name was changed.
                             if (exceptionRet) {
 
                                 throw exceptionRet;

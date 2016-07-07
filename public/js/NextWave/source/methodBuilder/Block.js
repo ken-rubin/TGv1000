@@ -100,6 +100,27 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Change name in all the statements
+                    self.changeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            // Loop over each statement.
+                            for (var i = 0; i < self.statements.length; i++) {
+
+                                var exceptionRet = self.statements[i].changeName(strOriginalName, strNewName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Add item to list of items.
                     self.addItem = function (itemNew, itemReplace) {
 
