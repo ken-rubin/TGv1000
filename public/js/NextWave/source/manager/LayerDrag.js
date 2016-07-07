@@ -316,6 +316,8 @@ define(["NextWave/source/utility/prototypes",
 
                                             return e;
                                         }
+                                    // I don't think the following is necessary any longer since I save a uniquified name in for statement initializations.
+                                    // But for now....
                                     } else if (self.dragTargets instanceof CodeStatementFor) {
 
                                         var exceptionRet = window.manager.addName(self.dragTargets.initialization.payload.lHS.payload.payload.payload.text);
