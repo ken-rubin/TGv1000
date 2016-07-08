@@ -153,7 +153,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerAccumulateNames(arrayNames);
+                            exceptionRet = self.innerAccumulateNames.call(self, arrayNames);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -162,7 +162,7 @@ define(["NextWave/source/utility/prototypes",
                             // Loop over all blocks, accumulate from each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].accumulateNames.call(self,
+                                exceptionRet = self.blocks[i].accumulateNames.call(self.blocks[i],
                                     arrayNames);
                                 if (exceptionRet) {
 
@@ -199,7 +199,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerChangeName(strOriginalName, strNewName);
+                            exceptionRet = self.innerChangeName.call(self, strOriginalName, strNewName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -208,7 +208,7 @@ define(["NextWave/source/utility/prototypes",
                             // Loop over all blocks, accumulate from each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].changeName.call(self,
+                                exceptionRet = self.blocks[i].changeName.call(self.blocks[i],
                                     strOriginalName, 
                                     strNewName);
                                 if (exceptionRet) {

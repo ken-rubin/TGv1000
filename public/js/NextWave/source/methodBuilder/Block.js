@@ -84,6 +84,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            self = this;
+
                             // Loop over each statement.
                             for (var i = 0; i < self.statements.length; i++) {
 
@@ -104,6 +106,8 @@ define(["NextWave/source/utility/prototypes",
                     self.changeName = function (strOriginalName, strNewName) {
 
                         try {
+
+                            self = this;
 
                             // Loop over each statement.
                             for (var i = 0; i < self.statements.length; i++) {

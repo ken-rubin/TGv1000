@@ -22,16 +22,24 @@ define(["NextWave/source/utility/prototypes",
 
                     var self = this;                        // Uber closure.
 
-                    self.multiline = bMultiline || false;
-                    self.inVarAssignment = bInVarAssignment || false;
+                    // self.multiline = bMultiline || false;
+                    // self.inVarAssignment = bInVarAssignment || false;
                     // Inherit from CodeLiteral.
                     self.inherits(CodeLiteral,
                         strPayload,
-                        self.multiline,
-                        self.inVarAssignment);
+                        bMultiline || false,
+                        bInVarAssignment || false);
 
                     ////////////////////////
                     // Public methods.
+
+                    // For statements loaded from the DB, it is sometimes necessary to
+                    // set payload's (Edit's) inVarAssignment manually.
+                    self.setInVarAssignment = function () {
+
+                        self.inVarAssignment = true;
+                        self.payload.inVarAssignment = true;
+                    }
 
                     // Save the original name.
                     self.payload.enterFocus = function(localSelf) {

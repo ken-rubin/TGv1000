@@ -83,14 +83,12 @@ define(["NextWave/source/utility/prototypes",
                     // and setProtected(true);
                     // self.condition is a CEStub whose payload is a CEInfix whose lHS is a CEStub whose payload is a CEName whose payload is a CodeName whose payload is an Edit.
                     // self.increment is a CEStub whose payload is a CEPostfix whose lHS is a CEStub whose payload is a CEName whose payload is a CodeName whose payload is an Edit.
-                    self.protectConditionAndIncrementNames = function () {
+                    self.condition.payload.lHS.payload.payload.payload.setProtected(true);
+                    self.increment.payload.lHS.payload.payload.payload.setProtected(true);
 
-                        self.condition.payload.lHS.payload.payload.payload.setProtected(true);
-                        self.increment.payload.lHS.payload.payload.payload.setProtected(true);
-
-                    }
-
-                    self.protectConditionAndIncrementNames();
+                    // Statements that are loaded from the DB don't have their CodeName initialized with
+                    // inVarAssignment set to true. This will remedy that.
+                    self.condition.payload.lHS.payload.payload.setInVarAssignment();
 
                     // If self.initialization CodeName Edit.getText() is changed,
                     // call this method to copy it two times to the right.
@@ -100,6 +98,23 @@ define(["NextWave/source/utility/prototypes",
                         self.condition.payload.lHS.payload.payload.payload.setText(strName);
                         self.increment.payload.lHS.payload.payload.payload.setText(strName);
                     }
+
+                    // If any names to chamge, do so.
+                    self.innerChangeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            self = this;
+
+                            
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                 } catch (e) {
 

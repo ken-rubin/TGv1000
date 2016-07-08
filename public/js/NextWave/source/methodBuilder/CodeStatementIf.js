@@ -58,6 +58,24 @@ define(["NextWave/source/utility/prototypes",
                             self.elseBlock.save()
                         ];
                     };
+
+                    // If any names to chamge, do so.
+                    self.innerChangeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            self = this;
+
+                            
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+                    
                 } catch (e) {
 
                     alert(e.message);
