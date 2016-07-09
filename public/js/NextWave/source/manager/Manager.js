@@ -439,6 +439,14 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Load up the method into the method builder.
+                            var exceptionRet = window.methodBuilder.loadTypeMethod(self.context);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return null;
+
                             // Build all javascript code.
                             var objectModules = self.generateJavaScript();
 

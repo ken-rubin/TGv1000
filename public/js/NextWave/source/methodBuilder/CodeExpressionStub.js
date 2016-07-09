@@ -96,7 +96,7 @@ define(["NextWave/source/utility/prototypes",
                             // which will return null unless overridden.
                             if (self.payload) {
 
-                                return self.payload.innerAccumulateNames(arrayNames);
+                                return self.payload.accumulateNames(arrayNames);
 
                             } else {
 

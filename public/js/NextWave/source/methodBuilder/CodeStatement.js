@@ -153,7 +153,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerAccumulateNames.call(self, arrayNames);
+                            exceptionRet = self.innerAccumulateNames(arrayNames);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -162,8 +162,7 @@ define(["NextWave/source/utility/prototypes",
                             // Loop over all blocks, accumulate from each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].accumulateNames.call(self.blocks[i],
-                                    arrayNames);
+                                exceptionRet = self.blocks[i].accumulateNames(arrayNames);
                                 if (exceptionRet) {
 
                                     return exceptionRet;

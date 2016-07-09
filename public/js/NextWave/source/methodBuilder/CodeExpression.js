@@ -169,8 +169,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerAccumulateNames.call(self,
-                                arrayNames);
+                            exceptionRet = self.innerAccumulateNames(arrayNames);
                             if (exceptionRet) {
 
                                 return exceptionRet;
