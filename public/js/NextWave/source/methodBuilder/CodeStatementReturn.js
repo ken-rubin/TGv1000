@@ -58,7 +58,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            self = this;
+                            // self = this;
 
                             
 
