@@ -30,6 +30,9 @@ define(["NextWave/source/utility/prototypes",
                         bMultiline || false,
                         bInVarAssignment || false);
 
+                    // Patch up the owner of the payload to self.
+                    self.payload.owner = self;
+
                     ////////////////////////
                     // Public methods.
 
@@ -64,7 +67,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // We want to generate a unique name only if we're in the assignment of a CodeStatementVar
                             // and, of course, if user changed the name.
-                            if ((localSelf.originalName !== strBetterName) && self.payload.inVarAssignment) {
+                            if ((localSelf.originalName !== strBetterName) && localSelf.owner.inVarAssignment) {
 
                                 strBetterName = window.manager.getUniqueName(localSelf.getText());
 
@@ -79,7 +82,7 @@ define(["NextWave/source/utility/prototypes",
                             // Update.
                             exceptionRet = window.manager.changeName(localSelf.originalName,
                                 strBetterName,
-                                self.payload.inVarAssignment);   // Propagate thru all statements in current method if a var name was changed.
+                                localSelf.owner.inVarAssignment);   // Propagate thru all statements in current method if a var name was changed.
                             if (exceptionRet) {
 
                                 throw exceptionRet;

@@ -222,6 +222,13 @@ define(["NextWave/source/utility/prototypes",
                                 return '""';
                             }
                             return '"' + objectStatement.value + '"';
+                        } else if (strType === "Boolean") {
+
+                            if (!objectStatement.value) {
+
+                                return false;
+                            }
+                            return (objectStatement.value === "true");
                         } else if (strType) {
 
                             var strRet = "new " + strType + "(";
@@ -273,6 +280,9 @@ define(["NextWave/source/utility/prototypes",
                             // Just allocate each possible type of thing:
                             var objectRet = null;
                             if (strType === "String") {
+
+                                return objectStatement.value;
+                            } else if (strType === "Boolean") {
 
                                 return objectStatement.value;
                             } else if (strType === "Array") {

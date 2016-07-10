@@ -36,6 +36,9 @@ define(["NextWave/source/utility/prototypes",
                     self.dialog = null;
                     // If protected, no editing, combo or checkbox changes, etc. allowed.
                     self.protected = false;
+                    // Condition specific owner object--really the 
+                    // container of this control outside of a dialog.
+                    self.owner = null;
 
                     ///////////////////////
                     // Public methods.

@@ -51,7 +51,8 @@ define(["NextWave/source/utility/prototypes",
                     self.clone = function () {
 
                         return new self.constructor(self.payload.text, 
-                            self.multiline);
+                            self.multiline,
+                            self.inVarAssignment);
                     };
 
                     // Generate JavaScript for this literal.
@@ -82,6 +83,14 @@ define(["NextWave/source/utility/prototypes",
 
                                 type: "String",
                                 value: self.payload.text
+                            }, {
+
+                                type: "Boolean",
+                                value: self.payload.multiline
+                            }, {
+
+                                type: "Boolean",
+                                value: self.payload.inVarAssignment
                             }
                         ];
 
