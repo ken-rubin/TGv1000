@@ -198,7 +198,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerChangeName.call(self, strOriginalName, strNewName);
+                            exceptionRet = self.innerChangeName(strOriginalName, strNewName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -207,8 +207,7 @@ define(["NextWave/source/utility/prototypes",
                             // Loop over all blocks, accumulate from each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].changeName.call(self.blocks[i],
-                                    strOriginalName, 
+                                exceptionRet = self.blocks[i].changeName(strOriginalName, 
                                     strNewName);
                                 if (exceptionRet) {
 
@@ -228,6 +227,14 @@ define(["NextWave/source/utility/prototypes",
 
                         return null;
                     }
+
+                    self.changeNameIfMatches = function (strMatchName, strOriginalName, strNewName) {
+
+                        if (strMatchName.getText() === strOriginalName) {
+
+                            strMatchName.setText(strNewName);
+                        }
+                    };
 
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.

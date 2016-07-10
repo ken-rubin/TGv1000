@@ -60,9 +60,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            self = this;
-
-                            
+                            self.changeNameIfMatches(self.condition.payload.lHS.payload.payload.payload, strOriginalName, strNewName);
+                            if (self.block) {
+                                self.block.changeName(strOriginalName, strNewName);
+                            }
 
                             return null;
 
