@@ -69,8 +69,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-//                            self = this;
-
                             return self.initialization.accumulateNames(arrayNames);
 
                         } catch (e) {

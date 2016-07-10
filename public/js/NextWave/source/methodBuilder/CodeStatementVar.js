@@ -59,8 +59,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            //self = this;
-
                             return self.assignment.accumulateNames(arrayNames);
 
                         } catch (e) {
@@ -70,11 +68,12 @@ define(["NextWave/source/utility/prototypes",
                     };
                     
                     // If any names to chamge, do so.
+                    // For exmple, if stmt is var i = j + 10;, the i wouldn't be changed
+                    // but the j might.
                     self.innerChangeName = function (strOriginalName, strNewName) {
 
                         try {
 
-                            // self = this;
 
                             
 
