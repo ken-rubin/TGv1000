@@ -38,8 +38,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Methods",
     "NextWave/source/type/Method",
     "NextWave/source/type/Properties",
-    "NextWave/source/type/Property"],
-    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property) {
+    "NextWave/source/type/Property",
+    "NextWave/source/type/Events",
+    "NextWave/source/type/Event"],
+    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property, Events, Event) {
 
         try {
 
@@ -439,14 +441,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Load up the method into the method builder.
-                            var exceptionRet = window.methodBuilder.loadTypeMethod(self.context);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            return null;
-
                             // Build all javascript code.
                             var objectModules = self.generateJavaScript();
 
@@ -694,6 +688,46 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Create a new, empty Event.
+                    self.createEvent = function (typeContaining) {
+
+                        try {
+
+                            // Generate a new Event-name.
+                            var strName = self.getUniqueName("MyEvent",
+                                typeContaining.events.parts,
+                                "name");
+
+                            // Create Event.
+                            var eventNew = new Event(typeContaining,
+                                strName);
+
+                            // Specify some default values...:
+                            var exceptionRet = eventNew.create({
+
+                                name: strName,
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = typeContaining.events.addPart(eventNew);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select it into the GUI.
+                            return self.selectEvent(typeContaining, 
+                                eventNew);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Method returns a type or system type that matches name.
                     // Since no overlap between system types and types exists, this
                     // one function will check both arrays.
@@ -892,20 +926,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Commenting out Ken's way, because it looks like I'm passing in the type.
-
-                            // Search for type.
-                            // for (var i = 0; i < self.types.length; i++) {
-
-                            //     // Find match...
-                            //     if (self.types[i].name === typeOwner.name) {
-
-                            //         // ...and remove.
-                            //         return self.types[i].methods.removePart(methodToRemove);
-                            //     }
-                            // }
-                            // return null
-
                             // Will have to see if this way works.
                             return typeOwner.methods.removePart(methodToRemove);
                         } catch (e) {
@@ -919,22 +939,21 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Commenting out Ken's way, because it looks like I'm passing in the type.
-                            
-                            // Search for type.
-                            // for (var i = 0; i < self.types.length; i++) {
-
-                            //     // Find match...
-                            //     if (self.types[i].name === typeOwner.name) {
-
-                            //         // ...and remove.
-                            //         return self.types[i].properties.removePart(propertyToRemove);
-                            //     }
-                            // }
-                            // return null
-
                             // Will have to see if this way works.
                             return typeOwner.properties.removePart(propertyToRemove);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Remove event from specified type.
+                    self.removeEvent = function (typeOwner, eventToRemove) {
+
+                        try {
+
+                            // Will have to see if this way works.
+                            return typeOwner.events.removePart(eventToRemove);
                         } catch (e) {
 
                             return e;
@@ -981,6 +1000,33 @@ define(["NextWave/source/utility/prototypes",
 
                                     // ...and update.
                                     type.properties.parts[i].name = strNewName;
+
+                                    break;
+                                }
+                            }
+
+                            // TODO: Update any allocation associated with this property.
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method edits an Event name.
+                    self.editEventName = function (type, strOriginalName, strNewName) {
+
+                        try {
+
+                            // Update in place.
+                            for (var i = 0; i < type.events.parts.length; i++) {
+
+                                // Find match...
+                                if (type.events.parts[i].name === strOriginalName) {
+
+                                    // ...and update.
+                                    type.events.parts[i].name = strNewName;
 
                                     break;
                                 }
@@ -1482,18 +1528,18 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-                    // Helper method clears out the center panel and sets it up for a Property.
-                    self.selectProperty = function (type, iIndex) {
+                    // Helper method clears out the center panel and sets it up for an Event.
+                    self.selectEvent = function (type, iIndex) {
 
                         try {
 
                             // If iIndex is a string, find its matching index.
                             if (iIndex.substring) {
 
-                                for (var i = 0; i < type.properties.parts.length; i++) {
+                                for (var i = 0; i < type.events.parts.length; i++) {
 
-                                    var propertyIth = type.properties.parts[i];
-                                    if (propertyIth.name === iIndex) {
+                                    var eventIth = type.events.parts[i];
+                                    if (eventIth.name === iIndex) {
 
                                         iIndex = i;
                                         break;
@@ -1507,25 +1553,25 @@ define(["NextWave/source/utility/prototypes",
                                 iIndex = 0;
                             }
 
-                            // Default to an actual property object.
-                            var property = iIndex;
+                            // Default to an actual event object.
+                            var eventPart = iIndex;
 
-                            // If it is not a property (it is an integer), load it from the type.
-                            if (!property.allocateCodeInstance) {
+                            // If it is not an event (it is an integer), load it from the type.
+                            if (!eventPart.allocateCodeInstance) {
 
-                                property = type.properties.parts[iIndex]
+                                eventPart = type.events.parts[iIndex]
                             }
 
                             // Clear data out from previous context.
-                            var exceptionRet = self.panelLayer.clearCenter("Property");
+                            var exceptionRet = self.panelLayer.clearCenter("Event");
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            // Load up the type into the type builder.
-                            exceptionRet = window.propertyBuilder.loadProperty(type,
-                                property);
+                            // Load up the Event into the type builder.
+                            exceptionRet = window.eventBuilder.loadEvent(type,
+                                eventPart);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1704,7 +1750,8 @@ define(["NextWave/source/utility/prototypes",
                                 objectDrag instanceof CodeStatement ||
                                 objectDrag instanceof Type ||
                                 objectDrag instanceof Method ||
-                                objectDrag instanceof Property) {
+                                objectDrag instanceof Property ||
+                                objectDrag instanceof Event) {
 
                                 // Pass to layer.
                                 return self.dragLayer.setDragObject(objectDrag);

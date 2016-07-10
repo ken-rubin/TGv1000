@@ -30,13 +30,14 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Event",
     "NextWave/source/type/TypeBuilder",
     "NextWave/source/type/PropertyBuilder",
+    "NextWave/source/type/EventBuilder",
     "NextWave/source/name/NameList",
     "NextWave/source/name/Name",
     "NextWave/source/statement/StatementList",
     "NextWave/source/expression/ExpressionList",
     "NextWave/source/literal/LiteralList",
     "NextWave/source/methodBuilder/MethodBuilder"],
-    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, TypeBuilder, PropertyBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
+    function (prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
 
         try {
 
@@ -218,6 +219,11 @@ define(["NextWave/source/utility/prototypes",
 
                                         throw exceptionRet;
                                     }
+                                    exceptionRet = m_functionAllocateEventBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
 
                                     // To be replaced by: load type/method.
                                     // Add the MethodBuilder to the center Panel.
@@ -325,6 +331,11 @@ define(["NextWave/source/utility/prototypes",
                                         throw exceptionRet;
                                     }
                                     exceptionRet = m_functionAllocatePropertyBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                    exceptionRet = m_functionAllocateEventBuilder();
                                     if (exceptionRet) {
 
                                         throw exceptionRet;
@@ -579,6 +590,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
+                            exceptionRet = m_functionAllocateEventBuilder();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             // Set the active section.
                             return self.switchCenterPanelMode(strActiveCenterPanel);
@@ -729,6 +745,9 @@ define(["NextWave/source/utility/prototypes",
                             } else if (strMode === "Property") {
 
                                 return m_functionSetPropertyBuilderInCenterPanel();
+                            } else if (strMode === "Event") {
+
+                                return m_functionSetEventBuilderInCenterPanel();
                             }
                             return null;
                         } catch (e) {
@@ -1041,6 +1060,33 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Allocate Event builder instance.
+                    var m_functionAllocateEventBuilder = function () {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.eventBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the Event builder.
+                            // Store globally.
+                            window.eventBuilder = new EventBuilder();
+                            var exceptionRet = window.eventBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Allocate method builder instance.
                     var m_functionAllocateMethodBuilder = function () {
 
@@ -1221,6 +1267,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Set visible to property builder.
+                            window.eventBuilder.visible = false;
                             window.propertyBuilder.visible = false;
                             window.methodBuilder.visible = true;
                             window.typeBuilder.visible = false;
@@ -1240,6 +1287,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Set visible to property builder.
+                            window.eventBuilder.visible = false;
                             window.propertyBuilder.visible = false;
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = true;
@@ -1259,6 +1307,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Set visible to property builder.
+                            window.eventBuilder.visible = false;
                             window.propertyBuilder.visible = true;
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = false;
@@ -1266,6 +1315,26 @@ define(["NextWave/source/utility/prototypes",
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Property",
                                 window.propertyBuilder);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method sets EventBuilder in the center panel.
+                    var m_functionSetEventBuilderInCenterPanel = function () {
+
+                        try {
+
+                            // Set visible to property builder.
+                            window.eventBuilder.visible = true;
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = false;
+
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Event",
+                                window.eventBuilder);
                         } catch (e) {
 
                             return e;

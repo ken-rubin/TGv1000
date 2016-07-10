@@ -78,7 +78,7 @@ define(["NextWave/source/utility/prototypes",
                         return "removeProperty";
                     }
 
-                    // Invoked when the mouse is clicked over this method.
+                    // Invoked when the mouse is clicked over this Property.
                     self.click = function (objectReference) {
 
                         try {

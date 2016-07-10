@@ -36,6 +36,36 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////////
                     // Public methods.
 
+                    // Virtual method, defaults to method, override if not desired.
+                    self.createMethod = function () {
+
+                        return "createEvent";
+                    };
+
+                    // Generates JavaScript string for the properties.
+                    self.generateJavaScript = function () {
+
+                        var strEvents = " ";
+
+                        // If there are properties, then build their JavaScript.
+                        if (self.parts) {
+
+                            for (var i = 0; i < self.parts.length; i++) {
+
+                                // Extract and save the property.
+                                var eventIth = self.parts[i];
+                                var strEvent = eventIth.generateJavaScript();
+
+                                // Add it to the result object.
+                                strEvents += strEvent;
+                            }
+                        }
+
+                        strEvents += " ";
+
+                        return strEvents;
+                    };
+
                     // Save.
                     self.save = function () {
 

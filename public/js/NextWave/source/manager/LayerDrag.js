@@ -18,6 +18,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Type",
     "NextWave/source/type/Method",
     "NextWave/source/type/Property",
+    "NextWave/source/type/Event",
     "NextWave/source/name/Name",
     "NextWave/source/expression/Expression",
     "NextWave/source/literal/Literal",
@@ -33,7 +34,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Name, Expression, Literal, Statement, ArgumentList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Event, Name, Expression, Literal, Statement, ArgumentList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
 
         try {
 
@@ -154,7 +155,8 @@ define(["NextWave/source/utility/prototypes",
                                         pointMove);
                                 } else if (self.dragObject instanceof ListItem ||
                                     self.dragObject instanceof Method ||
-                                    self.dragObject instanceof Property)  {
+                                    self.dragObject instanceof Property ||
+                                    self.dragObject instanceof Event)  {
 
                                     return m_functionStartDragNonStatementListItem(pointDown,
                                         pointMove);

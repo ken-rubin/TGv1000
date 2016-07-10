@@ -57,7 +57,8 @@ define(["NextWave/source/utility/prototypes",
                     self.events = new Events(self);
                     // Collection of contained method objects.
                     self.typeSections = [self.methods, 
-                        self.properties];
+                        self.properties, 
+                        self.events];
                     // Indicates the type is open.
                     self.open = false;
                     // Indicates the type is highlighted.
@@ -318,6 +319,12 @@ define(["NextWave/source/utility/prototypes",
                             strConstructorFunction += self.properties.generateJavaScript();
                         }
 
+                        // Add Events.
+                        if (self.events) {
+
+                            strConstructorFunction += self.events.generateJavaScript();
+                        }
+
                         // Add methods.
                         if (self.methods) {
 
@@ -425,7 +432,7 @@ define(["NextWave/source/utility/prototypes",
                                         return self.methods.mouseMove(objectReference);
                                     } else {
 
-                                        // Finally properties, (eventually events too)....
+                                        // Properties....
                                         bIn = self.properties.pointIn(objectReference.contextRender,
                                             objectReference.pointCursor);
                                         if (bIn) {
@@ -434,6 +441,18 @@ define(["NextWave/source/utility/prototypes",
                                             self.properties.highlight = true;
 
                                             return self.properties.mouseMove(objectReference);
+                                        } else {
+
+                                            // Finally Events....
+                                            bIn = self.events.pointIn(objectReference.contextRender,
+                                                objectReference.pointCursor);
+                                            if (bIn) {
+
+                                                m_objectHighlight = self.events;
+                                                self.events.highlight = true;
+
+                                                return self.events.mouseMove(objectReference);
+                                            }
                                         }
                                     }
                                 }

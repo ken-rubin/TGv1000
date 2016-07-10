@@ -11,8 +11,9 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/attributeHelper",
-    "NextWave/source/type/SectionPart"],
-    function (prototypes, attributeHelper, SectionPart) {
+    "NextWave/source/type/SectionPart",
+    "NextWave/source/methodBuilder/CodeExpressionName"],
+    function (prototypes, attributeHelper, SectionPart, CodeExpressionName) {
 
         try {
 
@@ -30,6 +31,9 @@ define(["NextWave/source/utility/prototypes",
 
                     // Keep track of the owning Type.
                     self.owner = typeOwner;
+                    // Object holds data members which are 
+                    // not differentiated by this client.
+                    self.stowage = {};
 
                     ////////////////////////////
                     // Public methods.
@@ -61,10 +65,55 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Virtual name of the method to remove this section.  Override if not satisfied with method.
+                    self.removeMethod = function () {
+
+                        return "removeEvent";
+                    }
+
+                    // Invoked when the mouse is clicked over this Event.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // Load new data into method builder.
+                            return window.manager.selectEvent(self.owner,
+                                self);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Generates JavaScript string for this property.
+                    self.generateJavaScript = function () {
+
+                        var strEvent = " ";
+
+                        // if (!window.tg.eventCollection.hasOwnProperty(self.name)) {
+                        //
+                        //      window.tg.eventCollection[self.name] = [];
+                        // }
+
+                        // Add the empty collection of subscribers.
+                        strEvent += "if (!window.tg.eventCollection.hasOwnProperty(" + 
+                            self.name + 
+                            ")) { window.tg.eventCollection[" + 
+                            self.name + 
+                            "] = []; }";
+
+                        strEvent += " ";
+
+                        return strEvent;
+                    };
+
                     // Save.
                     self.save = function () {
 
-                        var objectRet = { name: self.name };
+                        var objectRet = { 
+
+                            name: self.name 
+                        };
 
                         // Save the attributes along with this object.
                         var exceptionRet = attributeHelper.toJSON(self,
