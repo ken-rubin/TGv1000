@@ -772,7 +772,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                                 event.id = rows[0].insertId;
 
-                                                                var scriptGuts = " SET typeId=" + atid
+                                                                var scriptGuts = " SET typeId=" + typeIth.atid
                                                                             + ",name=" + connection.escape(event.name)
                                                                             + ",ordinal=" + event.ordinal
                                                                             ;
