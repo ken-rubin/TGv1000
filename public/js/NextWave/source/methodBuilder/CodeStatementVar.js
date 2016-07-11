@@ -74,7 +74,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-
+                            self.xyz = 1;
                             
 
                             return null;
