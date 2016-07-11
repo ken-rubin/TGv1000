@@ -11,13 +11,14 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/statement/Statement",
+    "NextWave/source/methodBuilder/CodeVar",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/CodeStatementFor",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeExpressionLiteral",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionPostfix"],
-    function (prototypes, Statement, CodeName, CodeStatementFor, CodeExpressionName, CodeExpressionLiteral, CodeExpressionInfix, CodeExpressionPostfix) {
+    function (prototypes, Statement, CodeVar, CodeName, CodeStatementFor, CodeExpressionName, CodeExpressionLiteral, CodeExpressionInfix, CodeExpressionPostfix) {
 
         try {
 
@@ -43,36 +44,21 @@ define(["NextWave/source/utility/prototypes",
                         var csfRet = new CodeStatementFor(
                             new CodeExpressionInfix(
                                 new CodeExpressionName(
-                                    // "i"
-                                    new CodeName(
-                                        strName,
-                                        false,  // multiline
-                                        true    // inVarAssignment
-                                    )
+                                    new CodeVar(strName)
                                 ),
                                 "=",
                                 new CodeExpressionLiteral("0")
                             ),
                             new CodeExpressionInfix(
                                 new CodeExpressionName(
-                                    // "i"
-                                    new CodeName(
-                                        strName,
-                                        false,  // multiline
-                                        false    // inVarAssignment
-                                    )
+                                    new CodeName(strName)
                                 ),
                                 "<",
                                 new CodeExpressionLiteral("10")
                             ),
                             new CodeExpressionPostfix(
                                 new CodeExpressionName(
-                                    // "i"
-                                    new CodeName(
-                                        strName,
-                                        false,  // multiline
-                                        false    // inVarAssignment
-                                    )
+                                    new CodeName(strName)
                                 ),
                                 "++"
                             )

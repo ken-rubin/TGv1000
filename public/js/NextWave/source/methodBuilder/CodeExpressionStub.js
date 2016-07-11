@@ -86,7 +86,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // If self.payload exists, it is one of the CodeExpressionXxx's.
                     // They all inherite CodeExpressioon, so there is a self.accumulateTypeNames there that returns null
-                    // and is overridden in any CodeExpressionXxx that should produce a NameType object.
+                    // and is overridden in any CodeExpressionXxx that should produce a Name.
                     // For example, for something like var i = 0; self.payload will be a CodeExpressionInfix.
                     self.accumulateNames = function (arrayNames) {
 

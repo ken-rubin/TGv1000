@@ -69,8 +69,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-//                            self = this;
-
                             return self.initialization.accumulateNames(arrayNames);
 
                         } catch (e) {
@@ -88,16 +86,16 @@ define(["NextWave/source/utility/prototypes",
 
                     // Statements that are loaded from the DB don't have their CodeName initialized with
                     // inVarAssignment set to true. This will remedy that.
-                    self.initialization.payload.lHS.payload.payload.setInVarAssignment();
+                    // self.initialization.payload.lHS.payload.payload.setInVarAssignment();
 
                     // If self.initialization CodeName Edit.getText() is changed,
                     // call this method to copy it two times to the right.
-                    self.copyInitNameToConditionAndIncrement = function () {
+                    // self.copyInitNameToConditionAndIncrement = function () {
 
-                        var strName = self.initialization.payload.lHS.payload.payload.payload.getText();
-                        self.condition.payload.lHS.payload.payload.payload.setText(strName);
-                        self.increment.payload.lHS.payload.payload.payload.setText(strName);
-                    }
+                    //     var strName = self.initialization.payload.lHS.payload.payload.payload.getText();
+                    //     self.condition.payload.lHS.payload.payload.payload.setText(strName);
+                    //     self.increment.payload.lHS.payload.payload.payload.setText(strName);
+                    // }
 
                     // If any names to chamge, do so.
                     self.innerChangeName = function (strOriginalName, strNewName) {

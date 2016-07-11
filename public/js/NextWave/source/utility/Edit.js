@@ -60,18 +60,18 @@ define(["NextWave/source/utility/prototypes",
                     // Public methods.
 
                     // Set inVarAssignment to true.
-                    self.setInVarAssignment = function() {
+                    // self.setInVarAssignment = function() {
 
-                        try {
+                    //     try {
 
-                            self.inVarAssignment = true;
-                            return null;
+                    //         self.inVarAssignment = true;
+                    //         return null;
                             
-                        } catch (e) {
+                    //     } catch (e) {
 
-                            return e;
-                        }
-                    }
+                    //         return e;
+                    //     }
+                    // }
 
                     // Get the text in this control.
                     self.getText = function () {

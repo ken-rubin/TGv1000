@@ -28,12 +28,12 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeExpressionType",
-    "NextWave/source/methodBuilder/CodeName",
+    "NextWave/source/methodBuilder/CodeVar",
     "NextWave/source/methodBuilder/CodeType",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
     "NextWave/source/methodBuilder/CodeExpressionInvocation",
     "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeName, CodeType, CodeExpressionPrefix, CodeExpressionInvocation, Parameter) {
+    function (prototypes, settings, Point, Size, Area, glyphs, attributeHelper, TypeSection, Methods, Method, Properties, Property, Events, Event, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionType, CodeVar, CodeType, CodeExpressionPrefix, CodeExpressionInvocation, Parameter) {
 
         try {
 
@@ -191,9 +191,7 @@ define(["NextWave/source/utility/prototypes",
                         var csvRet = new CodeStatementVar(
                             new CodeExpressionInfix(
                                 new CodeExpressionName(
-                                    new CodeName(
-                                        strName
-                                    )
+                                    new CodeVar(strName)
                                 ),
                                 "=",
                                 new CodeExpressionPrefix(

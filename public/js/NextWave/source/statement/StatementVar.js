@@ -11,12 +11,12 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/statement/Statement",
-    "NextWave/source/methodBuilder/CodeName",
+    "NextWave/source/methodBuilder/CodeVar",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeExpressionLiteral"],
-    function (prototypes, Statement, CodeName, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionLiteral) {
+    function (prototypes, Statement, CodeVar, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionLiteral) {
 
         try {
 
@@ -42,11 +42,7 @@ define(["NextWave/source/utility/prototypes",
                         var csvRet = new CodeStatementVar(
                             new CodeExpressionInfix(
                                 new CodeExpressionName(
-                                    new CodeName(
-                                        strName,
-                                        false,  // multiline
-                                        true    // inVarAssignment
-                                    )
+                                    new CodeVar(strName)
                                 ),
                                 "=",
                                 new CodeExpressionLiteral("1")

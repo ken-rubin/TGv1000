@@ -62,14 +62,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            //self = this;
-
-                            //alert(self === window);
-
                             self.lHS.accumulateNames(arrayNames);
-                            
-                            // Dummy:
-                            // arrayNames.push("Hello_again");
 
                             return null;
 

@@ -148,7 +148,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Find match...
                                 if (self.items[i].name === strOriginalName) {
 
-                                    // ...and splace in place.
+                                    // ...and replace in place.
                                     self.items[i].name = strNewName;
 
                                     break;
