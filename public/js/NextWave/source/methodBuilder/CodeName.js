@@ -63,11 +63,7 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = null;
                             var strBetterName = localSelf.getText();
 
-                            // We want to generate a unique name only if we're in the assignment of a CodeStatementVar
-                            // and, of course, if user changed the name.
                             if (localSelf.originalName !== strBetterName) {
-
-                                strBetterName = window.manager.getUniqueName(localSelf.getText());
 
                                 // Store back in Edit.
                                 exceptionRet = localSelf.setText(strBetterName);
@@ -76,15 +72,6 @@ define(["NextWave/source/utility/prototypes",
                                     throw exceptionRet;
                                 }
                             }                                
-
-                            // Update.
-                            exceptionRet = window.manager.changeName(localSelf.originalName,
-                                strBetterName,
-                                false);   // Prevent propagating thru all statements in current method if a var name was changed.
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
 
                             return null;
                         } catch (e) {
