@@ -33,9 +33,9 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates the type is highlighted.
                     self.highlight = false;
-                    // Indicates this is a multiline edit.
+                    // Indicates this is or is not a multiline edit.
                     self.multiline = bMultiline || false;
-                    // Following is used in derived class CodeName.
+                    // Following is used in derived class CodeName or CodeVar.
                     self.inVarAssignment = bInVarAssignment || false;
                     // For now, all literals are Edits.
                     self.payload = new Edit(strPayload || "",

@@ -1,5 +1,5 @@
 ///////////////////////////////////////
-// CodeName module.
+// CodeVar module.
 //
 // Name literals.
 //
@@ -16,7 +16,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function CodeName(strPayload) {
+            var functionRet = function CodeVar(strPayload) {
 
                 try {
 
@@ -26,7 +26,7 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(CodeLiteral,
                         strPayload,
                         false,
-                        false);
+                        true);
 
                     // Patch up the owner of the payload to self.
                     self.payload.owner = self;
@@ -80,7 +80,7 @@ define(["NextWave/source/utility/prototypes",
                             // Update.
                             exceptionRet = window.manager.changeName(localSelf.originalName,
                                 strBetterName,
-                                false);   // Prevent propagating thru all statements in current method if a var name was changed.
+                                true);   // Propagate thru all statements in current method if a var name was changed.
                             if (exceptionRet) {
 
                                 throw exceptionRet;

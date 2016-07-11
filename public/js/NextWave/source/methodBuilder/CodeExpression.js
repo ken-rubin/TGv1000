@@ -16,8 +16,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/glyphs",
     "NextWave/source/methodBuilder/CodeLiteral",
-    "NextWave/source/methodBuilder/CodeName"],
-    function (prototypes, settings, Point, Size, Area, glyphs, CodeLiteral, CodeName) {
+    "NextWave/source/methodBuilder/CodeName",
+    "NextWave/source/methodBuilder/CodeVar"
+    ],
+    function (prototypes, settings, Point, Size, Area, glyphs, CodeLiteral, CodeName, CodeVar) {
 
         try {
 
@@ -121,6 +123,7 @@ define(["NextWave/source/utility/prototypes",
                                     // ...and there is a payload (which is not a literal or name...
                                     if (itemIth.payload &&
                                         !(itemIth.payload instanceof CodeLiteral) &&
+                                        !(itemIth.payload instanceof CodeVar) &&
                                         !(itemIth.payload instanceof CodeName)) {
 
                                         // ...recurse.
@@ -636,6 +639,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Test object.
                                 if (objectIth &&
                                     (objectIth instanceof CodeName ||
+                                    objectIth instanceof CodeVar ||
                                     objectIth instanceof CodeLiteral ||
                                     // Can't require CodeExpressionStub type because it 
                                     // requires this type (cyclic reference), thus....

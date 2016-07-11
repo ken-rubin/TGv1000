@@ -33,8 +33,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeName",
+    "NextWave/source/methodBuilder/CodeVar",
     "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Event, Name, Expression, Literal, Statement, ArgumentList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, Parameter) {
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Event, Name, Expression, Literal, Statement, ArgumentList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, CodeVar, Parameter) {
 
         try {
 
@@ -522,7 +523,7 @@ define(["NextWave/source/utility/prototypes",
                         if (stmt instanceof CodeStatementVar &&
                             stmt.assignment.payload instanceof CodeExpressionInfix &&
                             stmt.assignment.payload.lHS.payload instanceof CodeExpressionName &&
-                            stmt.assignment.payload.lHS.payload.payload instanceof CodeName) {
+                            stmt.assignment.payload.lHS.payload.payload instanceof CodeVar) {
 
                             // ...remove it from names.
                             var exceptionRet = window.manager.removeName(stmt.assignment.payload.lHS.payload.payload.payload.text);

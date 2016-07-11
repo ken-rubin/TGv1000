@@ -29,6 +29,7 @@ define(["NextWave/source/utility/prototypes",
 
     "NextWave/source/methodBuilder/CodeLiteral",
     "NextWave/source/methodBuilder/CodeName",
+    "NextWave/source/methodBuilder/CodeVar",
 
     "NextWave/source/methodBuilder/CodeStatementBreak",
     "NextWave/source/methodBuilder/CodeStatementContinue",
@@ -51,7 +52,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
 
     "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, attributeHelper, Edit, SectionPart, ArgumentList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
+    function (prototypes, attributeHelper, Edit, SectionPart, ArgumentList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeVar, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
 
         try {
 
@@ -330,6 +331,9 @@ define(["NextWave/source/utility/prototypes",
                             } else if (strType === "CodeName") {
 
                                 return new CodeName(...arrayConstructorParameters);
+                            } else if (strType === "CodeVar") {
+
+                                return new CodeVar(...arrayConstructorParameters);
                             } else if (strType === "CodeStatementBreak") {
 
                                 return new CodeStatementBreak(...arrayConstructorParameters);
