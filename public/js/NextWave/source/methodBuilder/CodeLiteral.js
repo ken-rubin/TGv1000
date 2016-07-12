@@ -55,6 +55,12 @@ define(["NextWave/source/utility/prototypes",
                             self.inVarAssignment);
                     };
 
+                    //
+                    self.changeName = function (strOriginalName, strNewName) {
+
+                        return null;
+                    };
+
                     // Generate JavaScript for this literal.
                     self.generateJavaScript = function () {
 

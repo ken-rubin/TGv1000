@@ -96,6 +96,27 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+                    //
+                    self.changeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            if (self.payload) {
+
+                                if (self.payload.getText() === strOriginalName) {
+
+                                    return self.payload.setText(strNewName);
+                                }
+                            }
+
+                            return null;
+                        
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
                 } catch (e) {
 
                     alert(e.message);

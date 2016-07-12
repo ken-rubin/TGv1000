@@ -37,7 +37,7 @@ define(["NextWave/source/utility/prototypes",
                     // The render area.
                     self.area = null;
                     // Indicates that this object is displayed as and  
-                    // functionsas an expression placement in an ArgumentList.
+                    // functions as an expression placement in an ArgumentList.
                     self.placement = false;
 
                     // If payload is not null, then set collection.
@@ -85,7 +85,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // If self.payload exists, it is one of the CodeExpressionXxx's.
-                    // They all inherite CodeExpressioon, so there is a self.accumulateTypeNames there that returns null
+                    // They all inherit CodeExpression, so there is a self.accumulateTypeNames there that returns null
                     // and is overridden in any CodeExpressionXxx that should produce a Name.
                     // For example, for something like var i = 0; self.payload will be a CodeExpressionInfix.
                     self.accumulateNames = function (arrayNames) {
@@ -103,6 +103,24 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
                         } catch (e) {
+                            return e;
+                        }
+                    }
+
+                    //
+                    self.changeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            if (self.payload) {
+
+                                return self.payload.changeName(strOriginalName, strNewName);
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
                             return e;
                         }
                     }

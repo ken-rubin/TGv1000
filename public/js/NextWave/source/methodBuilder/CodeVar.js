@@ -60,31 +60,28 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var exceptionRet = null;
-                            var strBetterName = localSelf.getText();
-
                             // We want to generate a unique name only if we're in the assignment of a CodeStatementVar
+                            // which we are since CodeVar ensures that (and is different from CodeName),
                             // and, of course, if user changed the name.
-                            if (localSelf.originalName !== strBetterName) {
+                            if (localSelf.originalName !== localSelf.getText()) {
 
-                                strBetterName = window.manager.getUniqueName(localSelf.getText());
+                                var strBetterName = window.manager.getUniqueName(localSelf.getText());
 
                                 // Store back in Edit.
-                                exceptionRet = localSelf.setText(strBetterName);
+                                var exceptionRet = localSelf.setText(strBetterName);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+                                
+                                // Update in namesPanel and in CodeNames throughout method's statements.
+                                exceptionRet = window.manager.changeName(localSelf.originalName,
+                                    strBetterName);
                                 if (exceptionRet) {
 
                                     throw exceptionRet;
                                 }
                             }                                
-
-                            // Update.
-                            exceptionRet = window.manager.changeName(localSelf.originalName,
-                                strBetterName,
-                                true);   // Propagate thru all statements in current method if a var name was changed.
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
 
                             return null;
                         } catch (e) {
@@ -108,6 +105,12 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    //
+                    self.changeName = function (strOriginalName, strNewName) {
+
+                        return null;
                     };
                 } catch (e) {
 

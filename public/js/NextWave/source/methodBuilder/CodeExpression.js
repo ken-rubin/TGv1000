@@ -191,6 +191,31 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+                    //
+                    self.changeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+                            if (self.children) {
+
+                                for (var i = 0; i < self.children.length; i++) {
+
+                                    var exceptionRet = self.children[i].changeName(strOriginalName, strNewName);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Add item to list of items.
                     self.addItem = function (itemNew) {
 

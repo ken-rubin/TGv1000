@@ -476,9 +476,9 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method edits a name.
-                    // If bPropagate, then change the name everyplace it's used in the current method.
-                    self.changeName = function (strOriginalName, strNewName, bPropagate) {
+                    // Method changes a name of a CodeVar or a parameter.
+                    // In both of these cases change the name everyplace it's used in the current method.
+                    self.changeName = function (strOriginalName, strNewName) {
 
                         try {
 
@@ -490,22 +490,16 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            if (bPropagate) {
+                            // Propagate the name change throughout the current method.
+                            for (var i = 0; i < self.context.method.statements.items.length; i++) {
 
-                                // Next if is commented out because all methods have statements, even if statements.items.length === 0.
-                                // if (self.context.method.statements) {
+                                var stmt = self.context.method.statements.items[i];
 
-                                    for (var i = 0; i < self.context.method.statements.items.length; i++) {
+                                var expressionRet = stmt.changeName(strOriginalName, strNewName);
+                                if (expressionRet) {
 
-                                        var stmt = self.context.method.statements.items[i];
-
-                                        var expressionRet = stmt.changeName(strOriginalName, strNewName);
-                                        if (expressionRet) {
-
-                                            return expressionRet;
-                                        }
-                                    }
-                                // }
+                                    return expressionRet;
+                                }
                             }
 
                             return null;
@@ -1853,12 +1847,12 @@ define(["NextWave/source/utility/prototypes",
                                 $.isFunction(self.alternateFocus.configuration.exitFocus)) {
 
                                 // Call event.
-                                self.alternateFocus.configuration.exitFocus(self.alternateFocus);
+                                return self.alternateFocus.configuration.exitFocus(self.alternateFocus);
                             } else if (self.alternateFocus &&
                                 $.isFunction(self.alternateFocus.exitFocus)) {
 
                                 // Call event.
-                                self.alternateFocus.exitFocus(self.alternateFocus);
+                                return self.alternateFocus.exitFocus(self.alternateFocus);
                             }
 
                             return null;
