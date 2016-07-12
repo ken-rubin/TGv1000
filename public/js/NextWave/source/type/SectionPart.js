@@ -2,7 +2,7 @@
 // SectionPart module.
 //
 // Base class for all parts of a Type: 
-//      a method, aproperty, or an event.... 
+//      a method, a property, or an event.... 
 //
 // Return constructor function.
 //

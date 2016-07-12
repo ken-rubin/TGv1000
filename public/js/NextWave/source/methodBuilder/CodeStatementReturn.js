@@ -54,21 +54,21 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // If any names to chamge, do so.
-                    self.innerChangeName = function (strOriginalName, strNewName) {
+                    // self.innerChangeName = function (strOriginalName, strNewName) {
 
-                        try {
+                    //     try {
 
-                            // self = this;
+                    //         // self = this;
 
                             
 
-                            return null;
+                    //         return null;
 
-                        } catch (e) {
+                    //     } catch (e) {
 
-                            return e;
-                        }
-                    };
+                    //         return e;
+                    //     }
+                    // };
                     
                 } catch (e) {
 

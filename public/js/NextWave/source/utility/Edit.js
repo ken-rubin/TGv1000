@@ -59,19 +59,26 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
-                    // Set inVarAssignment to true.
-                    // self.setInVarAssignment = function() {
+                    // If a CodeVar name is changed, we will loop of all CodeStatements' others[].
+                    // This array holds Edits. If !self.inVarAssignment, potentially change the text.
+                    self.changeName = function (strOriginalName, strNewName) {
 
-                    //     try {
+                        try {
 
-                    //         self.inVarAssignment = true;
-                    //         return null;
-                            
-                    //     } catch (e) {
+                            if (!self.inVarAssignment) {
 
-                    //         return e;
-                    //     }
-                    // }
+                                if (self.text === strOriginalName) {
+
+                                    return self.setText(strNewName);
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Get the text in this control.
                     self.getText = function () {

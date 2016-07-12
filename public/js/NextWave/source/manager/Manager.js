@@ -492,7 +492,8 @@ define(["NextWave/source/utility/prototypes",
 
                             if (bPropagate) {
 
-                                if (self.context.method.statements) {
+                                // Next if is commented out because all methods have statements, even if statements.items.length === 0.
+                                // if (self.context.method.statements) {
 
                                     for (var i = 0; i < self.context.method.statements.items.length; i++) {
 
@@ -504,7 +505,7 @@ define(["NextWave/source/utility/prototypes",
                                             return expressionRet;
                                         }
                                     }
-                                }
+                                // }
                             }
 
                             return null;

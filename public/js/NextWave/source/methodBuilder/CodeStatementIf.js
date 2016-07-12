@@ -60,21 +60,21 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // If any names to chamge, do so.
-                    self.innerChangeName = function (strOriginalName, strNewName) {
+                    // self.innerChangeName = function (strOriginalName, strNewName) {
 
-                        try {
+                    //     try {
 
-                            self.changeNameIfMatches(self.condition.payload.lHS.payload.payload.payload, strOriginalName, strNewName);
-                            // self.thenBlock.changeName(strOriginalName, strNewName);
-                            // self.elseBlock.changeName(strOriginalName, strNewName);
+                    //         self.changeNameIfMatches(self.condition.payload.lHS.payload.payload.payload, strOriginalName, strNewName);
+                    //         // self.thenBlock.changeName(strOriginalName, strNewName);
+                    //         // self.elseBlock.changeName(strOriginalName, strNewName);
 
-                            return null;
+                    //         return null;
 
-                        } catch (e) {
+                    //     } catch (e) {
 
-                            return e;
-                        }
-                    };
+                    //         return e;
+                    //     }
+                    // };
                     
                 } catch (e) {
 

@@ -198,17 +198,32 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            exceptionRet = self.innerChangeName(strOriginalName, strNewName);
-                            if (exceptionRet) {
+                            // A CodeStatement derivee may have an array of CodeExpressionStubs in expressionStubs[].
+                            // Each CodeExpressionStub may contain a payload to which we have to pass the changeName call.
+                            for (var i = 0; i < self.expressionStubs.length; i++) {
 
-                                return exceptionRet;
+                                exceptionRet = self.expressionStubs[i].changeName(strOriginalName, strNewName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
                             }
 
-                            // Loop over all blocks, accumulate from each.
+                            // A CodeStatement derivee may have an array of Edits in others[].
+                            for (var i = 0; i < self.others.length; i++) {
+
+                                exceptionRet = self.others[i].changeName(strOriginalName, strNewName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // A CodeStatement may also contain its own array of blocks of CodeStatements.
+                            // Loop over all blocks; changeName in the CodeStatements of each.
                             for (var i = 0; i < self.blocks.length; i++) {
 
-                                exceptionRet = self.blocks[i].changeName(strOriginalName, 
-                                    strNewName);
+                                exceptionRet = self.blocks[i].changeName(strOriginalName, strNewName);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -223,18 +238,13 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-                    self.innerChangeName = function (strOriginalName, strNewName) {
+                    // self.changeNameIfMatches = function (strMatchName, strOriginalName, strNewName) {
 
-                        return null;
-                    }
+                    //     if (strMatchName.getText() === strOriginalName) {
 
-                    self.changeNameIfMatches = function (strMatchName, strOriginalName, strNewName) {
-
-                        if (strMatchName.getText() === strOriginalName) {
-
-                            strMatchName.setText(strNewName);
-                        }
-                    };
+                    //         strMatchName.setText(strNewName);
+                    //     }
+                    // };
 
                     // Add in statements around all elements in the 
                     // self.methodStatements list and all sub-blocks.
