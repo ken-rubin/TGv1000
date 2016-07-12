@@ -679,7 +679,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         // (2) properties
                                         function(cb) {
 
-                                            // m_log("Doing properties");
+                                            m_log("Doing properties");
                                             var ordinal = 0;
 
                                             async.eachSeries(typeIth.properties,
@@ -687,10 +687,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                     property.typeId = typeIth.id;
                                                     property.ordinal = ordinal++;
+                                                    property.propertyTypeId = 6;
 
                                                     var guts = {
                                                                 typeId: typeIth.id,
-                                                                propertyTypeId: 6,
+                                                                propertyTypeId: property.propertyTypeId,
                                                                 name: property.name,
                                                                 initialValue: property.initialValue || '',
                                                                 ordinal: property.ordinal,
@@ -703,7 +704,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     }
 
                                                     strQuery = "insert " + self.dbname + "propertys SET ?";
-                                                    // m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                                    m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                                                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                                         function(err, rows) {
 
