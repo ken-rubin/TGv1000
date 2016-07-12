@@ -719,7 +719,18 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clone the ListItem.
-                            self.dragObject = new self.dragObject.constructor(self.dragObject.name);
+                            if (self.dragObject instanceof Property) {
+
+                                self.dragObject = new Property(self.dragObject.owner,
+                                    self.dragObject.name);
+                            } else if (self.dragObject instanceof Event) {
+
+                                self.dragObject = new Event(self.dragObject.owner,
+                                    self.dragObject.name);
+                            } else {
+
+                                self.dragObject = new self.dragObject.constructor(self.dragObject.name);
+                            }
                             self.dragObject.highlight = false;
 
                             // Get the drag targets somehow else.
