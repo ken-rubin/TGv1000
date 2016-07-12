@@ -136,7 +136,7 @@ define(["NextWave/source/utility/prototypes",
                                     // Update.
                                     if (m_strMethodBefore !== self.method.payload) {
 
-                                        return window.manager.editMethodName(typeFromName,
+                                        return window.manager.changeMethodName(typeFromName,
                                             m_strMethodBefore,
                                             self.method.payload);
                                     }

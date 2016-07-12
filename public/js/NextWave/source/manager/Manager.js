@@ -482,7 +482,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Update in the panel.
+                            // Update in the names panel by getting panelLayer to do the work.
                             var exceptionRet = self.panelLayer.changeName(strOriginalName, 
                                 strNewName);
                             if (exceptionRet) {
@@ -613,7 +613,7 @@ define(["NextWave/source/utility/prototypes",
                                 typeContaining.methods.parts,
                                 "name");
 
-                            // Create type.
+                            // Create method.
                             var methodNew = new Method(typeContaining,
                                 strName);
 
@@ -955,25 +955,61 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method edits a Method name.
-                    self.editMethodName = function (type, strOriginalName, strNewName) {
+                    // Changes a Method name.
+                    // It then has to loop through all Types and SystemTypes (if Method is in a System type
+                    // or an App base type)
+                    // or through all types (if Method is in a user or App type) and update
+                    // uses throughout.
+                    self.changeMethodName = function (type, strOriginalMethodName, strNewMethodName) {
 
                         try {
+
+                            var bMethodNameChanged = false;
 
                             // Update in place.
                             for (var i = 0; i < type.methods.parts.length; i++) {
 
                                 // Find match...
-                                if (type.methods.parts[i].name === strOriginalName) {
+                                if (type.methods.parts[i].name === strOriginalMethodName) {
 
                                     // ...and update.
-                                    type.methods.parts[i].name = strNewName;
-
+                                    type.methods.parts[i].name = strNewMethodName;
+                                    bMethodNameChanged = true;
                                     break;
                                 }
                             }
 
-                            // TODO: Update any allocation associated with this method.
+                            if (bMethodNameChanged) {
+
+                                // Propagate the method name change.
+
+                                var j = type.stowage.typeTypeId;
+                                // 1 for App type or normal (user-added type)
+                                // 2 for System types
+                                // 3 for App base types
+                                // The construct and initialize methods cannot be renamed.
+
+                                var arrTypes = [];
+                                if (j > 1) {
+
+                                    arrTypes = self.types.concat(self.systemTypes);
+
+                                } else {
+
+                                    arrTypes = self.types;
+                                }
+
+                                for (var i = 0; i < arrTypes.length; i++) {
+
+                                    var exceptionRet = arrTypes[i].changeMethodName(type.name,
+                                        strOriginalMethodName,
+                                        strNewMethodName);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
 
                             return null;
                         } catch (e) {

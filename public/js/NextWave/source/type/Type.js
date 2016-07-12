@@ -211,6 +211,28 @@ define(["NextWave/source/utility/prototypes",
                         return csvRet;
                     };
 
+                    // A method name has been edited. Search this Type for all occurrences and update.
+                    self.changeMethodName = function(strTypeName, strOriginalMethodName, strNewMethodName) {
+
+                        try {
+
+                            for (var i = 0; i < self.methods.parts.length; i++) {
+
+                                var methodIth = self.methods.parts[i];
+                                var exceptionRet = methodIth.changeMethodName(strTypeName, strOriginalMethodName, strNewMethodName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Return a parameter instance
                     self.allocateParameterInstance = function () {
 

@@ -75,12 +75,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                                 
                                 // Update in namesPanel and in CodeNames throughout method's statements.
-                                exceptionRet = window.manager.changeName(localSelf.originalName,
+                                return window.manager.changeName(localSelf.originalName,
                                     strBetterName);
-                                if (exceptionRet) {
-
-                                    throw exceptionRet;
-                                }
                             }                                
 
                             return null;

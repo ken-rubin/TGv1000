@@ -117,6 +117,7 @@ define(["NextWave/source/utility/prototypes",
                                                 var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
                                                 if (!typeFromName) {
 
+                                                    // Why is this not an error?
                                                     return localSelf.setText(localSelf.saveMethodName);
                                                 }
 
@@ -129,8 +130,8 @@ define(["NextWave/source/utility/prototypes",
                                                     throw exceptionRet;
                                                 }
 
-                                                // Update.
-                                                window.manager.editMethodName(typeFromName,
+                                                // Update. This will initiate a recursive pass through Types, SystemTypes or both.
+                                                return window.manager.changeMethodName(typeFromName,
                                                     localSelf.saveMethodName,
                                                     localSelf.getText());
                                             }

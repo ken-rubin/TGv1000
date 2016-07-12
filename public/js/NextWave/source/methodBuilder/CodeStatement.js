@@ -236,6 +236,18 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
+                    };
+
+                    self.changeMethodName = function (strTypeName, strOriginalMethodName, strNewMethodName) {
+
+                        try {
+
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     }
 
                     // self.changeNameIfMatches = function (strMatchName, strOriginalName, strNewName) {

@@ -158,6 +158,32 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    //
+                    self.changeMethodName = function (strTypeName, 
+                        strOriginalMethodName, 
+                        strNewMethodName) {
+
+                        try {
+
+                            for (var i = 0; i < self.statements.items; i++) {
+
+                                var stmt = self.statements.items[i];
+                                var expressionRet = stmt.changeMethodName(strTypeName, 
+                                    strOriginalMethodName, 
+                                    strNewMethodName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Virtual method to determine selection.
                     self.getSelected = function () {
 

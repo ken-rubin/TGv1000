@@ -1,24 +1,16 @@
 
 ## Ken's Issues
 
-- Base in Type has to be a combo.
-- Type field in Property has to become a combo.
 
 ## Jerry's NamesPanel/CenterPanel work
-- In MethodBuilder I recurse in stmt.block.statements to find more names to add to namesPanel. Is that all the recursion checking that is needed?
-- In LayerDrag I recurse into stmt.block.ststatements to find more names to remove from namesPanel. Is that all that is necessary?
+- Discuss question in MethodBuilder around line 120 with Ken.
 - Renaming--renaming throughout and in namesPanel:
     - Type
     - Method
     - Parameter
-    - Name in var name = new Type()
     - Type in var name = new Type()
-    - Name in var name = 1;
-    - Name in for statement
-        - In a simple for statement, when renaming the var i, need to self.addItem in List.js. In fact, changing any of the 3 should change the other 2--and update namesPanel (which it does). And it also should change the name in any of the for statement's internal blocks.
 - Do namesPanel and all renaming propagation. 
     - Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.
-- Ken wants me to change MethodBuilder.js#m_functionAddNamesFromStatements to use a cascade of item calls instead of dot notation. This same wish would apply to single name additions and renames, too.
 - Test self.removeMethod and self.removeProperty in Manager.js.
 - Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken. He believes so. What steps do we have to take to make this work? Does the deletion go into ST.sql?
 - Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList. This protection should probably control drop targets.
