@@ -165,10 +165,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            for (var i = 0; i < self.statements.items; i++) {
+                            for (var i = 0; i < self.statements.items.length; i++) {
 
                                 var stmt = self.statements.items[i];
-                                var expressionRet = stmt.changeMethodName(strTypeName, 
+                                var exceptionRet = stmt.changeMethodName(strTypeName, 
                                     strOriginalMethodName, 
                                     strNewMethodName);
                                 if (exceptionRet) {
