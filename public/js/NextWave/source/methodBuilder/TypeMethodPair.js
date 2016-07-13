@@ -91,7 +91,7 @@ define(["NextWave/source/utility/prototypes",
                                     // Update.
                                     if (m_strTypeBefore !== self.type.payload) {
 
-                                        return window.manager.editTypeName(m_strTypeBefore,
+                                        return window.manager.changeTypeName(m_strTypeBefore,
                                             self.type.payload);
                                     }
                                     return null;
