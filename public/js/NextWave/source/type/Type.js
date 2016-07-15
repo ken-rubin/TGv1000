@@ -89,8 +89,8 @@ define(["NextWave/source/utility/prototypes",
                             // Set the name.
                             self.name = objectType.name;
 
-                            // Build the methods.
-                            if (objectType.methods && objectType.methods.length) {
+                            // Build the methods, if any.
+                            if (objectType.methods.length) {
 
                                 for (var j = 0; j < objectType.methods.length; j++) {
 
@@ -111,7 +111,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             } else {
 
-                                // This Type doesn't have a 'construct' method. It must be new, since all Types have a construct method.
+                                // This Type doesn't even have a 'construct' method. It must be new, since all Types have a construct method.
                                 // Let's add one.
                                 var methodContruct = new Method(self,
                                     'construct');   // No parameters; no statements.
@@ -132,47 +132,41 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // Build the properties.
-                            if (objectType.properties) {
+                            // Build the properties, if any.
+                            for (var j = 0; j < objectType.properties.length; j++) {
 
-                                for (var j = 0; j < objectType.properties.length; j++) {
+                                var objectPropertyIth = objectType.properties[j];
 
-                                    var objectPropertyIth = objectType.properties[j];
+                                var propertyNew = new Property(self,
+                                    objectPropertyIth.name);
+                                exceptionRet = propertyNew.create(objectPropertyIth);
+                                if (exceptionRet) {
 
-                                    var propertyNew = new Property(self,
-                                        objectPropertyIth.name);
-                                    exceptionRet = propertyNew.create(objectPropertyIth);
-                                    if (exceptionRet) {
+                                    return exceptionRet;
+                                }
+                                exceptionRet = self.properties.addPart(propertyNew);
+                                if (exceptionRet) {
 
-                                        return exceptionRet;
-                                    }
-                                    exceptionRet = self.properties.addPart(propertyNew);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
+                                    return exceptionRet;
                                 }
                             }
 
-                            // Build the events.
-                            if (objectType.events) {
+                            // Build the events, if any.
+                            for (var j = 0; j < objectType.events.length; j++) {
 
-                                for (var j = 0; j < objectType.events.length; j++) {
+                                var objectEventIth = objectType.events[j];
 
-                                    var objectEventIth = objectType.events[j];
+                                var eventNew = new Event(self,
+                                    objectEventIth.name);
+                                exceptionRet = eventNew.create(objectEventIth);
+                                if (exceptionRet) {
 
-                                    var eventNew = new Event(self,
-                                        objectEventIth.name);
-                                    exceptionRet = eventNew.create(objectEventIth);
-                                    if (exceptionRet) {
+                                    return exceptionRet;
+                                }
+                                exceptionRet = self.events.addPart(eventNew);
+                                if (exceptionRet) {
 
-                                        return exceptionRet;
-                                    }
-                                    exceptionRet = self.events.addPart(eventNew);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
+                                    return exceptionRet;
                                 }
                             }
 

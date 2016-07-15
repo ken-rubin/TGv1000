@@ -1,5 +1,5 @@
 ///////////////////////////////////////
-// CodeVar module.
+// CodeMember module.
 //
 // Name literals.
 //
@@ -16,7 +16,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function CodeVar(strPayload) {
+            var functionRet = function CodeMember(strPayload) {
 
                 try {
 
@@ -53,7 +53,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // We want to generate a unique name only if we're in the assignment of a CodeStatementVar
-                            // which we are since CodeVar ensures that (and is different from CodeName),
+                            // which we are since CodeMember ensures that (and is different from CodeName),
                             // and, of course, if user changed the name.
                             if (localSelf.originalName !== localSelf.getText()) {
 
