@@ -28,6 +28,11 @@ define(["NextWave/source/utility/prototypes",
                     self.base = new CodeExpressionStub(ceBase);
                     self.refinement = new CodeExpressionStub(ceRefinement);
 
+                    self.base.onPayloadSet = function() {
+
+                        return null;
+                    }
+
                     // Inherit from CodeExpression.
                     self.inherits(CodeExpression,
                         "[base] . [refinement]");
