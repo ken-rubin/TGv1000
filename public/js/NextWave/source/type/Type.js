@@ -233,6 +233,18 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    self.changeTypeName = function (strOriginalName, strNewName) {
+
+                        try {
+
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Return a parameter instance
                     self.allocateParameterInstance = function () {
 

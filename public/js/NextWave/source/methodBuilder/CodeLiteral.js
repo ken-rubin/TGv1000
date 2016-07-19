@@ -61,6 +61,12 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+                    //
+                    self.changeMethodName = function (strTypeName, strOriginalMethodName, strNewMethodName) {
+
+                        return null;
+                    }
+
                     // Generate JavaScript for this literal.
                     self.generateJavaScript = function () {
 

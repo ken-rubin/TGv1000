@@ -125,6 +125,24 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+                    //
+                    self.changeMethodName = function (strTypeName, strOriginalMethodName, strNewMethodName) {
+
+                        try {
+
+                            if (self.payload) {
+
+                                return self.payload.changeMethodName(strTypeName, strOriginalMethodName, strNewMethodName);
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Remove item from list of items.
                     self.removeItem = function (itemRemove) {
 

@@ -98,7 +98,7 @@ define(["NextWave/source/utility/prototypes",
                                                 }
 
                                                 // Update. This will work with either types or system types.
-                                                return window.manager.editTypeName(localSelf.saveTypeName,
+                                                return window.manager.changeTypeName(localSelf.saveTypeName,
                                                         localSelf.getText());
                                             }
                                         } catch (e) {
@@ -379,7 +379,7 @@ define(["NextWave/source/utility/prototypes",
                             //      So, only types added in the types panel are editable.
                             if ( 
                                     (type.stowage.typeTypeId === 1 && type.name === "App") || 
-                                    (type.stowage.typeTypeId > 1 && type.stowage.id)
+                                    (type.stowage.typeTypeId > 1 && type.stowage.id && type.stowage.public)
                                 ) {
 
                                 bProtected = true;

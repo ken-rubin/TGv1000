@@ -242,6 +242,39 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            var exceptionRet = null;
+
+                            if (!self.parsed) {
+
+                                // Parse it.
+                                exceptionRet = m_functionParse();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // A CodeStatement derivee may have an array of CodeExpressionStubs in expressionStubs[].
+                            // Each CodeExpressionStub may contain a payload to which we have to pass the changeMethodName call.
+                            for (var i = 0; i < self.expressionStubs.length; i++) {
+
+                                exceptionRet = self.expressionStubs[i].changeMethodName(strTypeName, strOriginalMethodName, strNewMethodName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // A CodeStatement may also contain its own array of blocks of CodeStatements.
+                            // Loop over all blocks; changeMethodName in the CodeStatements of each.
+                            for (var i = 0; i < self.blocks.length; i++) {
+
+                                exceptionRet = self.blocks[i].changeMethodName(strTypeName, strOriginalMethodName, strNewMethodName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
 
                             return null;
                         } catch (e) {

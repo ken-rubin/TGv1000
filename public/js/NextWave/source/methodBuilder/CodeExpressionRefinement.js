@@ -51,6 +51,27 @@ define(["NextWave/source/utility/prototypes",
                             self.refinement.save()
                         ];
                     };
+
+                    //
+                    self.changeMethodName = function (strTypeName, strOriginalMethodName, strNewMethodName) {
+
+                        try {
+
+                            if (self.base.payload.children[0].payload.text === strTypeName
+                                && self.refinement.payload.children[0].payload.text === strOriginalMethodName
+                            ) {
+
+                                return self.refinement.payload.children[0].payload.setText(strNewMethodName);
+                            }
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                 } catch (e) {
 
                     alert(e.message);

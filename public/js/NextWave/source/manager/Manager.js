@@ -597,7 +597,7 @@ define(["NextWave/source/utility/prototypes",
                                     ownedByUserId: parseInt(g_profile["userId"], 10),
                                     baseTypeName: "",
                                     baseTypeId: null,
-                                    public: 1,
+                                    public: 0,
                                     quarantined: 0,
                                     imageId: 0,
                                     altImagePath: "",
@@ -774,34 +774,84 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method edits a type name.
-                    self.editTypeName = function (strOriginalName, strNewName) {
+                    // Method changes a type name.
+                    // It has to be changed in the type or systemType that matches strOriginalName (there is no overlap).
+                    // Then we have to loop through self.types or self.types and self.systemTypes (depending on the changed type's stowage.typeTypeId)
+                    // and update it in every reference, ultimately just in CodeExpressionTypes.
+                    self.changeTypeName = function (strOriginalName, strNewName) {
 
                         try {
 
-                            var bFound = false;
+                            var type = null;
 
-                            // Update in place.
                             // Cannot use the concat trick here because the concatenated array doesn't maintain reference.
                             for (var i = 0; i < self.types.length; i++) {
+
+                                var typeIth = self.types[i];
 
                                 // Find match...
                                 if (self.types[i].name === strOriginalName) {
 
                                     // ...and update.
-                                    self.types[i].name = strNewName;
-                                    bFound = true;
+                                    typeIth.name = strNewName;
+                                    type = typeIth;
                                     break;
                                 }
                             }
 
-                            if (!bFound) {
+                            if (!type) {
 
-                                return m_functionEditSystemTypeName(strOriginalName, strNewName);
+                                for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                    var typeIth = self.systemTypes[i];
+
+                                    // Find match...
+                                    if (typeIth.name === strOriginalName) {
+
+                                        // ...and update.
+                                        typeIth.name = strNewName;
+                                        type = typeIth;
+                                        break;
+                                    }
+                                }
                             }
 
-                            // TODO: Update every occurance of this type name everywhere.
+                            if (!type) {
 
+                                return new Error("Strangely, could not locate type with name: " + strOriginalName + ".");
+                            }
+
+                            var j = type.stowage.typeTypeId;
+                            // 1 for App type or normal (user-added type)
+                            // 2 for System types
+                            // 3 for App base types
+                            // The construct and initialize methods cannot be renamed.
+                            // Cannot concat self.types and self.systemTypes because concat doesn't maintain reference.
+
+                            // Always do self.types.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                var exceptionRet = self.types[i].changeTypeName(strOriginalName, strNewName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // If changing the name of a system type or an App base type (that is not public),
+                            // also loop through self.systemTypes.
+                            if (type.stowage.typeTypeId > 1) {
+
+                                for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                    var exceptionRet = self.systemTypes[i].changeTypeName(strOriginalName, strNewName);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+                            
                             return null;
                         } catch (e) {
 
@@ -1012,25 +1062,33 @@ define(["NextWave/source/utility/prototypes",
                                 // 2 for System types
                                 // 3 for App base types
                                 // The construct and initialize methods cannot be renamed.
+                                // Cannot concat self.types and self.systemTypes because concat doesn't maintain reference.
 
-                                var arrTypes = [];
-                                if (j > 1) {
+                                // Always do self.types.
+                                for (var i = 0; i < self.types.length; i++) {
 
-                                    arrTypes = self.types.concat(self.systemTypes);
-
-                                } else {
-
-                                    arrTypes = self.types;
-                                }
-
-                                for (var i = 0; i < arrTypes.length; i++) {
-
-                                    var exceptionRet = arrTypes[i].changeMethodName(type.name,
+                                    var exceptionRet = self.types[i].changeMethodName(type.name,
                                         strOriginalMethodName,
                                         strNewMethodName);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
+                                    }
+                                }
+
+                                // If changing the name of a Method in a system type or App base type,
+                                // also loop through self.systemTypes.
+                                if (type.stowage.typeTypeId > 1) {
+
+                                    for (var i = 0; i < self.systemTypes.length; i++) {
+
+                                        var exceptionRet = self.systemTypes[i].changeMethodName(type.name,
+                                            strOriginalMethodName,
+                                            strNewMethodName);
+                                        if (exceptionRet) {
+
+                                            return exceptionRet;
+                                        }
                                     }
                                 }
                             }
@@ -1820,33 +1878,6 @@ define(["NextWave/source/utility/prototypes",
 
                     //////////////////////////
                     // Private methods.
-
-                    // Method changes a system type name. This is called only from self.editTypeName.
-                    var m_functionEditSystemTypeName = function (strOriginalName, strNewName) {
-
-                        try {
-
-                            // Update in place.
-                            for (var i = 0; i < self.systemTypes.length; i++) {
-
-                                // Find match...
-                                if (self.systemTypes[i].name === strOriginalName) {
-
-                                    // ...and update.
-                                    self.systemTypes[i].name = strNewName;
-
-                                    break;
-                                }
-                            }
-
-                            // TODO: Update every occurance of this type name everywhere.
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
 
                     // Chooses type or systemType to display in center panel if one has been deleted.
                     var m_functionGetNewIndex = function (typeArray, indexRemoved) {

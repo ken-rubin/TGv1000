@@ -52,6 +52,7 @@ define(["NextWave/source/utility/prototypes",
                             self.argumentList.save()
                         ];
                     };
+
                 } catch (e) {
 
                     alert(e.message);

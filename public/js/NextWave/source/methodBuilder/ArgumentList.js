@@ -190,6 +190,27 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    //
+                    self.changeMethodName = function (strTypeName, strOriginalMethodName, strNewMethodName) {
+
+                        try {
+
+                            for (var i = 0; i < self.items.length; i++) {
+
+                                var exceptionRet = self.items[i].changeMethodName(strTypeName, strOriginalMethodName, strNewMethodName);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Return the width if specified, otherwise extent.
                     self.getWidth = function (contextRender) {
 
