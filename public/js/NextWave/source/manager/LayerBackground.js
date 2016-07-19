@@ -57,7 +57,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out the layer.
-                    self.render = function (contextRender, iMS) {
+                    self.innerRender = function (contextRender, iMS) {
                         
                         try {
 

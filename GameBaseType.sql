@@ -17,7 +17,9 @@ else
    set @id1 := (select LAST_INSERT_ID());
 end if;
 /* Whichever case, the System Type's id is in @id1, to be used below for methods, properties and events. */
-insert TGv1000.methods SET typeId=@id1,name='construct',ordinal=0,statements='[]',imageId=0,description='',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,arguments='{\"type\":\"ParameterList\",\"parameters\":[{\"type\":\"Array\",\"parameters\":[]}]}';
+insert TGv1000.methods SET typeId=@id1,name='construct',ordinal=0,statements='[{\"type\":\"CodeStatementFreeform\",\"parameters\":[{\"type\":\"String\",\"value\":\"var exceptionRet = window.manager.startGame(self);\\nif (exceptionRet) {\\n\\n    window.alert(exceptionRet.message);\\n}\"}]}]',imageId=0,description='[No description provided]',parentMethodId=0,parentPrice=0,priceBump=0,ownedByUserId=1,public=1,quarantined=0,methodTypeId=4,arguments='{\"type\":\"ParameterList\",\"parameters\":[{\"type\":\"Array\",\"parameters\":[]}]}';
+insert TGv1000.propertys SET typeId=@id1,propertyTypeId=6,name='animateCookie',initialValue='',ordinal=0,isHidden=0;
+insert TGv1000.propertys SET typeId=@id1,propertyTypeId=6,name='animateFrequency',initialValue='',ordinal=1,isHidden=0;
 end;
 //
 delimiter ;

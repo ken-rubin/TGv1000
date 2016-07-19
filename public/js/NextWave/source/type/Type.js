@@ -319,9 +319,10 @@ define(["NextWave/source/utility/prototypes",
                         self.name = self.name.replace(/ /g, "");
 
                         // Build the constructor function for the type.
-                        var strConstructorFunction = " window.tg." + self.name + 
-                            " = function (app) { " + 
-                            " /* Closure. */ var self = this; ";
+                        var strConstructorFunction = //"debugger;\n\n" +
+                            "window.tg." + self.name + " = function () {\n\n" +
+                            "    // Closure.\n" +
+                            "    var self = this;\n\n";
 
                         // Call parent constructor.
                         if (self.stowage.baseTypeName) {
@@ -331,43 +332,53 @@ define(["NextWave/source/utility/prototypes",
                             self.stowage.baseTypeName = self.stowage.baseTypeName.replace(/ /g, "");
 
                             strConstructorFunction += 
-                                " /* Inherit from Base. */ self.inherits(window.tg." + 
-                                self.stowage.baseTypeName + 
-                                ", app); ";                            
+                                "    // Inherit from Base.\n" +
+                                "    self.inherits(window.tg." + self.stowage.baseTypeName + ");\n\n";                            
                         }
                         strConstructorFunction += 
-                            " /* Register with system. */ window.tg.instances.push(self); " + 
-                            " /* Reference to the application object. */ self.app = app; ";
+                            "    // Register with system.\n" +
+                            "    if (arguments.length) { window.tg.instances.push(self); }\n\n";
 
                         // Add properties.
                         if (self.properties) {
 
+                            strConstructorFunction += 
+                                "\n" +
+                                "    /* Properties */\n\n";
                             strConstructorFunction += self.properties.generateJavaScript();
                         }
 
                         // Add Events.
                         if (self.events) {
 
+                            strConstructorFunction += 
+                                "\n" +
+                                "    /* Events */\n\n";
                             strConstructorFunction += self.events.generateJavaScript();
                         }
 
                         // Add methods.
                         if (self.methods) {
 
+                            strConstructorFunction += 
+                                "\n" +
+                                "    /* Methods */\n\n";
                             strConstructorFunction += self.methods.generateJavaScript();
                         }
 
-                        strConstructorFunction += " };";
+                        // Invoke constructor--but only if this == the type and an argument is passed.
+                        strConstructorFunction += 
+                            "    // Invoke construct-chain.\n" +
+                            "    if ((this instanceof window.tg."+self.name+") && (arguments.length)) { this.construct(); }\n"
+
+                        strConstructorFunction += "};\n";
 
                         // Wire the prototype chain.
                         if (self.stowage.baseTypeName) {
 
                             strConstructorFunction += 
-                                " /* Complete inheritance from Base. */ window.tg." +
-                                self.name +
-                                ".inheritsFrom(window.tg." + 
-                                self.stowage.baseTypeName + 
-                                "); ";                            
+                                "// Complete inheritance from base.\n" +
+                                "window.tg." + self.name + ".inheritsFrom(window.tg." + self.stowage.baseTypeName + ");\n\n";                            
                         }
 
                         // Return the module.

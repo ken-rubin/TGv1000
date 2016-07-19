@@ -108,6 +108,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Only if active.
+                            if (!self.active) {
+
+                                return null;
+                            }
+
                             // Set the drag object in the drag layer, and ...
                             self.dragObject = objectDrag;
                             // ...stow its area.
@@ -127,6 +133,12 @@ define(["NextWave/source/utility/prototypes",
                     self.startDrag = function (pointDown, pointMove) {
 
                         try {
+
+                            // Only if active.
+                            if (!self.active) {
+
+                                return null;
+                            }
 
                             // Can only set a down (starting drag) if there is a dragObject.
                             if (self.dragObject) {
@@ -255,6 +267,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Only if active.
+                            if (!self.active) {
+
+                                return null;
+                            }
+
                             // If mouse let up over a drag target, be it an 
                             // ExpressionStub or a CodeStatement or a Parameter.
                             if (self.upOver) {
@@ -347,7 +365,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Take mouse move--set handled in reference object if handled.
-                    self.mouseMove = function (objectReference) {
+                    self.innerMouseMove = function (objectReference) {
 
                         try {
 
@@ -417,7 +435,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Take mouse up--possibly set success target.
-                    self.mouseUp = function (objectReference) {
+                    self.innerMouseUp = function (objectReference) {
 
                         try {
 
@@ -555,7 +573,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Render out the layer.
-                    self.render = function (contextRender, iMS) {
+                    self.innerRender = function (contextRender, iMS) {
                         
                         try {
 

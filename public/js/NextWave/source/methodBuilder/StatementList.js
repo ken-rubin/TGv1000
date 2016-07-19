@@ -254,14 +254,14 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for this statement list.
                     self.generateJavaScript = function () {
 
-                        var strStatements = " ";
+                        var strStatements = "\n";
 
                         for (var i = 0; i < self.items.length; i++) {
 
-                            strStatements += self.items[i].generateJavaScript();
+                            strStatements += self.items[i].generateJavaScript() + "\n";
                         }
 
-                        strStatements += " ";
+                        strStatements += "\n";
 
                         return strStatements;
                     };

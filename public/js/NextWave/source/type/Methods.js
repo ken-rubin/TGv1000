@@ -39,7 +39,7 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for the methods.
                     self.generateJavaScript = function () {
 
-                        var strMethods = " ";
+                        var strMethods = "\n";
 
                         // If there are method, then build their JavaScript.
                         if (self.parts) {
@@ -51,11 +51,11 @@ define(["NextWave/source/utility/prototypes",
                                 var strMethod = methodIth.generateJavaScript();
 
                                 // Add it to the result object.
-                                strMethods += strMethod;
+                                strMethods += strMethod + "\n";
                             }
                         }
 
-                        strMethods += " ";
+                        strMethods += "\n";
                         return strMethods;
                     };
 

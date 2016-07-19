@@ -781,15 +781,16 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Take mouse move--set handled in reference object if handled.
-                    self.mouseMove = function (objectReference) {
+                    self.innerMouseMove = function (objectReference) {
 
                         try {
 
-                            // Must be created to handle move.
+                            // Must be created.
                             if (!m_bCreated) {
 
                                 return null;
                             }
+
 
                             // Save off the current active panel, if.
                             var panelOriginal = m_panelActive;
@@ -837,9 +838,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle mouse down.
-                    self.mouseDown = function (objectReference) {
+                    self.innerMouseDown = function (objectReference) {
 
                         try {
+
+                            // Must be created to have panels.
+                            if (!m_bCreated) {
+
+                                return null;
+                            }
 
                             // If active panel, just pass to it.
                             if (m_panelActive) {
@@ -857,9 +864,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle mouse up.
-                    self.mouseUp = function (objectReference) {
+                    self.innerMouseUp = function (objectReference) {
 
                         try {
+
+                            // Must be created to have panels.
+                            if (!m_bCreated) {
+
+                                return null;
+                            }
 
                             // If active panel, just pass to it.
                             if (m_panelActive) {
@@ -877,9 +890,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle mouse wheel.
-                    self.mouseWheel = function (objectReference) {
+                    self.innerMouseWheel = function (objectReference) {
 
                         try {
+
+                            // Must be created to have panels.
+                            if (!m_bCreated) {
+
+                                return null;
+                            }
 
                             // If active panel, just pass to it.
                             if (m_panelActive) {
@@ -897,9 +916,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle mouse out.
-                    self.mouseOut = function (objectReference) {
+                    self.innerMouseOut = function (objectReference) {
 
                         try {
+
+                            // Must be created to have panels.
+                            if (!m_bCreated) {
+
+                                return null;
+                            }
 
                             // Deactivate the activation in  
                             // the current panel, if activated.
@@ -921,9 +946,15 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Handle click.
-                    self.click = function (objectReference) {
+                    self.innerClick = function (objectReference) {
 
                         try {
+
+                            // Must be created to have panels.
+                            if (!m_bCreated) {
+
+                                return null;
+                            }
 
                             // If active panel, just pass to it.
                             if (m_panelActive) {
@@ -942,7 +973,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Set the size of this layer and children.
                     // Also handle responsiveness of application.
-                    self.calculateLayout = function (sizeExtent, contextRender) {
+                    self.innerCalculateLayout = function (sizeExtent, contextRender) {
 
                         try {
 
@@ -973,7 +1004,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out the layer.
-                    self.render = function (contextRender, iMS) {
+                    self.innerRender = function (contextRender, iMS) {
                         
                         try {
 
