@@ -45,7 +45,7 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for the properties.
                     self.generateJavaScript = function () {
 
-                        var strEvents = " ";
+                        var strEvents = "\n";
 
                         // If there are properties, then build their JavaScript.
                         if (self.parts) {
@@ -57,11 +57,11 @@ define(["NextWave/source/utility/prototypes",
                                 var strEvent = eventIth.generateJavaScript();
 
                                 // Add it to the result object.
-                                strEvents += strEvent;
+                                strEvents += strEvent + "\n";
                             }
                         }
 
-                        strEvents += " ";
+                        strEvents += "\n";
 
                         return strEvents;
                     };

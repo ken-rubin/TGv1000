@@ -88,7 +88,7 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for this property.
                     self.generateJavaScript = function () {
 
-                        var strEvent = " ";
+                        var strEvent = "\n";
 
                         // if (!window.tg.eventCollection.hasOwnProperty(self.name)) {
                         //
@@ -96,13 +96,10 @@ define(["NextWave/source/utility/prototypes",
                         // }
 
                         // Add the empty collection of subscribers.
-                        strEvent += "if (!window.tg.eventCollection.hasOwnProperty(" + 
-                            self.name + 
-                            ")) { window.tg.eventCollection[" + 
-                            self.name + 
-                            "] = []; }";
+                        strEvent += "    if (!window.tg.eventCollection.hasOwnProperty('" + self.name + "')) {\n\n" +
+                            "        window.tg.eventCollection['" + self.name + "'] = []; }\n";
 
-                        strEvent += " ";
+                        strEvent += "\n";
 
                         return strEvent;
                     };

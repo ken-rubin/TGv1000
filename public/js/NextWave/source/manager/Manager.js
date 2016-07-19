@@ -21,6 +21,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/attributeHelper",
     "NextWave/source/manager/Layer",
     "NextWave/source/manager/LayerBackground",
+    "NextWave/source/manager/LayerCanvas",
     "NextWave/source/manager/LayerPanels",
     "NextWave/source/manager/LayerDebug",
     "NextWave/source/manager/LayerDrag",
@@ -41,7 +42,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Property",
     "NextWave/source/type/Events",
     "NextWave/source/type/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property, Events, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property, Events, Event) {
 
         try {
 
@@ -57,6 +58,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Hold reference to the background layer.
                     self.backgroundLayer = null;
+                    // Hold reference to the canvas layer.
+                    self.canvasLayer = null;
                     // Hold reference to the drag layer.
                     self.dragLayer = null;
                     // Hold reference to the debug layer.
@@ -97,6 +100,21 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     ////////////////////////
+                    // Code interface.
+
+                    // Method invoked by game base type.
+                    self.startGame = function () {
+
+                        try {
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    ////////////////////////
                     // Public methods.
 
                     // Initialze instance.
@@ -117,6 +135,14 @@ define(["NextWave/source/utility/prototypes",
                             // Allocate and create the background layer.
                             self.backgroundLayer = new LayerBackground();
                             var exceptionRet = self.backgroundLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Allocate and create the canvas layer.
+                            self.canvasLayer = new LayerCanvas();
+                            var exceptionRet = self.canvasLayer.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -175,11 +201,10 @@ define(["NextWave/source/utility/prototypes",
                             m_arrayLayers = 
                                 [
                                     self.backgroundLayer,
-                                    // self.designerLayer,
+                                    self.canvasLayer,
                                     self.panelLayer,
                                     self.debugLayer,
                                     self.dragLayer
-                                    //, la
                                 ];
 
                             // Get the parent references.
@@ -261,11 +286,10 @@ define(["NextWave/source/utility/prototypes",
                             m_arrayLayers = 
                                 [
                                     self.backgroundLayer,
-                                    // self.designerLayer,
+                                    self.canvasLayer,
                                     self.panelLayer,
                                     self.debugLayer,
                                     self.dragLayer
-                                    //, la
                                 ];
 
                             // Collection of types available in the current context.
@@ -297,9 +321,6 @@ define(["NextWave/source/utility/prototypes",
                             exceptionRet = self.panelLayer.clearLiterals();
                             if (exceptionRet) { return exceptionRet; }
 
-                            // // The following breaks a lot of things.                            
-                            // self.panelLayer.unpinAllPanels();
-
                             return null;
 
                         } catch (e) {
@@ -318,9 +339,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-
-                            // Start the rendering.
-                            //m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
 
@@ -378,9 +396,6 @@ define(["NextWave/source/utility/prototypes",
                                 // Set loaded.
                                 self.projectLoaded = true;
                             }
-                            
-                            // Start the rendering.
-                            //m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
 
                             return null;
                         } catch (e) { return e; }
@@ -422,9 +437,6 @@ define(["NextWave/source/utility/prototypes",
                             // Set loaded.
                             self.systemTypesLoaded = true;
 
-                            // Start the rendering.
-                            //m_iAnimationFrameSequence = requestAnimationFrame(m_functionRender);
-
                             return null;
 
                         } catch (e) { return e; }
@@ -441,21 +453,33 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Hide panels, ai, and drag.
+                            self.canvasLayer.active = true;
+                            self.panelLayer.active = false;
+                            self.dragLayer.active = false;
+
                             // Build all javascript code.
                             var objectModules = self.generateJavaScript();
-
                             return simulator.start(objectModules);
                         } catch(e) {
 
                             return e;
                         }
                     }
-
                     self.stopButtonClicked = function () {
 
                         try {
 
-                            alert('You clicked stop.');
+                            // Stop simulating.
+                            var exceptionRet = simulator.stop();
+
+                            // Re-enable panels and drag.
+                            self.canvasLayer.active = false;
+                            self.panelLayer.active = true;
+                            self.dragLayer.active = true;
+
+                            // Cause a resize.
+                            m_functionWindowResize();
 
                             return null;
                         } catch(e) {

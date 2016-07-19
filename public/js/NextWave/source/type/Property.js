@@ -95,11 +95,11 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for this property.
                     self.generateJavaScript = function () {
 
-                        var strProperty = " ";
+                        var strProperty = "\n";
 
-                        strProperty += "self." + self.name + " = null;";
+                        strProperty += "    self." + self.name + " = null;";
 
-                        strProperty += " ";
+                        strProperty += "\n";
 
                         return strProperty;
                     };

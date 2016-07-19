@@ -31,7 +31,7 @@ define(["NextWave/source/utility/prototypes",
                     // Public methods.
 
                     // Take mouse move--set handled in reference object if handled.
-                    self.mouseMove = function (objectReference) {
+                    self.innerMouseMove = function (objectReference) {
 
                         m_pointCursor = new Point(objectReference.event.offsetX,
                             objectReference.event.offsetY);
@@ -39,7 +39,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out the layer.
-                    self.render = function (contextRender, iMS) {
+                    self.innerRender = function (contextRender, iMS) {
                         
                         try {
 

@@ -49,7 +49,18 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out the layer.
-                    self.render = function (contextRender) {
+                    self.render = function (contextRender, iMS) {
+                        
+                        if (self.active) {
+
+                            return self.innerRender(contextRender, 
+                                iMS);
+                        }
+                        return null;
+                    };
+
+                    // Render out the layer.
+                    self.innerRender = function (contextRender) {
                         
                         return null;
                     };
@@ -58,11 +69,32 @@ define(["NextWave/source/utility/prototypes",
                     self.calculateLayout = function (sizeExtent, contextRender) {
 
                         self.extent = sizeExtent;
+                        if (self.active) {
+
+                            return self.innerCalculateLayout(sizeExtent, 
+                                contextRender);
+                        }
+                        return null;
+                    };
+
+                    // Render out the layer.
+                    self.innerCalculateLayout = function (sizeExtent, contextRender) {
+                        
                         return null;
                     };
 
                     // Handle mouse down.
                     self.mouseDown = function (objectReference) {
+
+                        if (self.active) {
+
+                            return self.innerMouseDown(objectReference);
+                        }
+                        return null;
+                    };
+
+                    // Handle mouse down.
+                    self.innerMouseDown = function (objectReference) {
 
                         return null;
                     };
@@ -70,11 +102,31 @@ define(["NextWave/source/utility/prototypes",
                     // Handle mouse up.
                     self.mouseUp = function (objectReference) {
 
+                        if (self.active) {
+
+                            return self.innerMouseUp(objectReference);
+                        }
+                        return null;
+                    };
+
+                    // Handle mouse up.
+                    self.innerMouseUp = function (objectReference) {
+
                         return null;
                     };
 
                     // Take mouse move--set handled in reference object if handled.
                     self.mouseMove = function (objectReference) {
+
+                        if (self.active) {
+
+                            return self.innerMouseMove(objectReference);
+                        }
+                        return null;
+                    };
+
+                    // Take mouse move--set handled in reference object if handled.
+                    self.innerMouseMove = function (objectReference) {
 
                         return null;
                     };
@@ -82,17 +134,47 @@ define(["NextWave/source/utility/prototypes",
                     // Handle mouse wheel.
                     self.mouseWheel = function (objectReference) {
 
+                        if (self.active) {
+
+                            return self.innerMouseWheel(objectReference);
+                        }
+                        return null;
+                    };
+
+                    // Handle mouse wheel.
+                    self.innerMouseWheel = function (objectReference) {
+
                         return null;
                     };
 
                     // Handle mouse out do nothing.
                     self.mouseOut = function (objectReference) {
 
+                        if (self.active) {
+
+                            return self.innerMouseOut(objectReference);
+                        }
+                        return null;
+                    };
+
+                    // Handle mouse out do nothing.
+                    self.innerMouseOut = function (objectReference) {
+
                         return null;
                     };
 
                     // Handle mouse up.
                     self.click = function (objectReference) {
+
+                        if (self.active) {
+
+                            return self.innerClick(objectReference);
+                        }
+                        return null;
+                    };
+
+                    // Handle mouse up.
+                    self.innerClick = function (objectReference) {
 
                         return null;
                     };

@@ -158,10 +158,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    //
-                    self.changeMethodName = function (strTypeName, 
-                        strOriginalMethodName, 
-                        strNewMethodName) {
+                    // .
+                    self.changeMethodName = function (strTypeName, strOriginalMethodName, strNewMethodName) {
 
                         try {
 
@@ -193,19 +191,20 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for this method.
                     self.generateJavaScript = function () {
 
-                        var strMethod = " ";
+                        var strMethod = "\n";
 
-                        strMethod += "self." + self.name + " = function ( ";
+                        // Save off base method, if extant.
+                        strMethod += "    var _"+self.name+" = ((this && this.hasOwnProperty('"+self.name+"')) ? this."+self.name+" : undefined);\n";
+                        strMethod += "    self." + self.name + " = function (" + self.parameters.generateJavaScript() + ") {\n\n";
 
-                        // Parameters.
-                        strMethod += self.parameters.generateJavaScript();
-
-                        strMethod += " ) { "
+                        // Call base, if specified.
+                        // TODO: only call if specified to do so.
+                        strMethod += "        if (_"+self.name+") { _"+self.name+"(...arguments); }\n"
 
                         // Statements.
-                        strMethod += self.statements.generateJavaScript();
+                        strMethod += self.statements.generateJavaScript() + "\n";
 
-                        strMethod += " }; ";
+                        strMethod += "    };\n";
 
                         return strMethod;
                     };

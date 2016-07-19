@@ -52,11 +52,10 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Allocate app.
-                            window.tg.app = new window.tg.App();
+                            window.tg.app = new window.tg.App(true);
                             window.tg.app.initialize();
 
-                            /* Begin the rendering.
-                            print("Begin step-loop.");
+                            // Begin the rendering.
                             if (m_renderCookie) {
 
                                 var exceptionRet = self.stop();
@@ -66,7 +65,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
                             m_renderCookie = setInterval(m_functionAnimate,
-                                self.refreshInterval);*/
+                                self.refreshInterval);
 
                             return null;
                         } catch (e) {
@@ -80,6 +79,16 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Stop rendering.
+                            if (m_renderCookie) {
+
+                                clearInterval(m_renderCookie);
+                                m_renderCookie = undefined;
+                            }
+
+                            // Clear namespace.
+                            window.tg = {};
+                            window.tg.instances = [];
                             return null;
                         } catch (e) {
 
@@ -90,12 +99,154 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////////
                     // Private field.
 
+                    // .
+                    var m_functionAnimate = function () {
+
+                        try {
+
+                            var exceptionRet = m_functionUpdate();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            /* Clear the surface before rendering everything.
+                            m_context.clearRect(0,0,800,600);
+
+                            exceptionRet = m_functionRender();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }*/
+
+                            /*exceptionRet = m_functionDoEvents();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }*/
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
+
+                    // .
+                    var m_functionDoEvents = function () {
+
+                        try {
+
+                            // Process each of the cached raise collection elements.
+                            var arrayKeys = Object.keys(window.tg.raiseCollection);
+                            for (var i = 0; i < arrayKeys.length; i++) {
+
+                                var strEvent = arrayKeys[i];
+
+                                // Get the correct collections.
+                                var objectContext = window.tg.raiseCollection[strEvent];
+                                var listCallbacks = window.tg.eventCollection[strEvent];
+
+                                // Process each callback.
+                                for (var i = 0; i < listCallbacks.length; i++) {
+
+                                    var callback = listCallbacks[i];
+                                    var target = callback.target;
+                                    var method = callback.method;
+                                    setTimeout(function (target, method) {
+
+                                        try {
+
+                                            target[method](objectContext);
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }(target, method), 10);
+                                }
+                            }
+
+                            // Clear collection.
+                            window.tg.raiseCollection = {};
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // .
+                    var m_functionUpdate = function () {
+
+                        try {
+
+                            // Update each of the objects that has an update.
+                            for (var i = 0; i < window.tg.instances.length; i++) {
+
+                                // Get the ith instance.
+                                var instanceIth = window.tg.instances[i];
+                                if (!instanceIth) {
+
+                                    continue;
+                                }
+
+                                // Check if it has an update.
+                                if (instanceIth.update) {
+
+                                    // Call update if it exists.
+                                    var exceptionRet = instanceIth.update();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    /* .
+                    var m_functionRender = function () {
+
+                        try {
+
+                            // Render each of the objects that has a render.
+                            for (var i = 0; i < window.instances.length; i++) {
+
+                                // Get the ith instance.
+                                var instanceIth = window.instances[i];
+                                if (!instanceIth) {
+
+                                    continue;
+                                }
+
+                                // Check if it has an render.
+                                if (instanceIth.render) {
+
+                                    // Call update if it exists.
+                                    var exceptionRet = instanceIth.render(m_context);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };*/
+
                     ///////////////////////////
                     // Private field.
 
                     // .
                     var m_renderCookie = null;
-
                 } catch (e) {
 
                     alert(e.message);
