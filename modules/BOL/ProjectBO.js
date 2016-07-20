@@ -1962,7 +1962,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                                 if (err) {
                                                                                     m_functionFinalCallback(err, req, res, null, null);
                                                                                 } else {
-                                                                                    m_log("***Full successm_function xxx***");
+                                                                                    m_log("***Full success***");
                                                                                     m_functionFinalCallback(null, req, res, connection, project);
                                                                                 }
                                                                             }
@@ -2158,6 +2158,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         }
                     }
                 ],
+                // The waterfall falls through to here.
                 // new properties in resultArray: editingCoreProject, savingPurchasableProjectThatsBeenBought
                 function(err, resultArray) {
 
@@ -3116,7 +3117,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     }
 
-                                    // Prepare for insert for new Types, including SystemTypes; update for existing SystemTypes.
                                     var guts = {
                                         name: typeIth.name,
                                         typeTypeId: typeIth.typeTypeId,
@@ -3141,32 +3141,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         return cb(exceptionRet);
                                     }
 
-                                    var strQuery;
-                                    var weInserted;
-                                    if (typeIth.id >= 0) {
+                                    // It's a Type that was deleted or never existed.
+                                    var strQuery = "insert " + self.dbname + "types SET ?";
+                                    weInserted = true;
 
-                                        // Update an existing Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
-
-                                        // First the update statement.
-                                        strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id + ";";
-                                        
-                                        // Then delete methods, properties and events which will be re-inserted.
-                                        strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
-                                        strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
-                                        strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
-                                        
-                                        // Then type_tags.
-                                        strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
-                                        weInserted = false;
-
-                                    } else {
-
-                                        // It's a non-System Type that was deleted or never existed.
-                                        strQuery = "insert " + self.dbname + "types SET ?";
-                                        weInserted = true;
-                                    }
-
-                                    m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                    m_log('Inserting type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
 
                                     sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
                                         function(err, rows) {
@@ -3175,13 +3154,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 if (err) { return cb(err); }
                                                 if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
 
-                                                if (weInserted) {
-                                                    passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
-                                                    typeIth.id = rows[0].insertId;
-                                                } else {
-                                                    // We updated.
-                                                    passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-                                                }
+                                                passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
+                                                typeIth.id = rows[0].insertId;
 
                                                 return cb(null);
 
