@@ -1415,7 +1415,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     function(cb) {  // expressions
 
-                        var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ");";
+                        var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ") order by name asc;";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -1433,7 +1433,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     function(cb) {  // statements
 
-                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ");";
+                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -1451,7 +1451,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     function(cb) {  // literals
 
-                        var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ");";
+                        var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ") order by name asc;";
                         sql.execute(
                             strQuery,
                             function(rows) {
