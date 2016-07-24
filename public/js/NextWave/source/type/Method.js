@@ -424,7 +424,7 @@ define(["NextWave/source/utility/prototypes",
                             return objectRet;
                         } else {
 
-                            return "undefined";
+                            return null;    //"undefined";
                         }
                     };
                 } catch (e) {
