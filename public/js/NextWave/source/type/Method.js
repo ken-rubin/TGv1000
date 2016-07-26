@@ -133,7 +133,9 @@ define(["NextWave/source/utility/prototypes",
                             // Set parameters.
                             if (objectParameters) {
 
-                                self.parameters = m_functionRecurseAllocate(objectParameters);
+                                var strAllocationString = m_functionRecurseGenerateAllocationString(objectParameters);
+                                strAllocationString = strAllocationString.replace(/\r?\n|\r/g, " ");
+                                self.parameters = eval(strAllocationString);
                             }
 
                             // Set statements.
@@ -142,8 +144,9 @@ define(["NextWave/source/utility/prototypes",
                                 for (var i = 0; i < arrayStatements.length; i++) {
 
                                     var objectStatementIth = arrayStatements[i];
-                                    var objectNew = m_functionRecurseAllocate(objectStatementIth);
-                                    var exceptionRet = self.statements.addItem(objectNew);
+                                    var strAllocationString = m_functionRecurseGenerateAllocationString(objectStatementIth);
+                                    strAllocationString = strAllocationString.replace(/\r?\n|\r/g, " ");
+                                    var exceptionRet = self.statements.addItem(eval(strAllocationString));
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -194,12 +197,12 @@ define(["NextWave/source/utility/prototypes",
                         var strMethod = "\n";
 
                         // Save off base method, if extant.
-                        strMethod += "    var _"+self.name+" = ((this && this.hasOwnProperty('"+self.name+"')) ? this."+self.name+" : undefined);\n";
+                        strMethod += "    var _" + self.name + " = ((this && this.hasOwnProperty('" + self.name + "')) ? this." + self.name + " : undefined);\n";
                         strMethod += "    self." + self.name + " = function (" + self.parameters.generateJavaScript() + ") {\n\n";
 
                         // Call base, if specified.
                         // TODO: only call if specified to do so.
-                        strMethod += "        if (_"+self.name+") { _"+self.name+"(...arguments); }\n"
+                        strMethod += "        if (_" + self.name + ") { _" + self.name + "(...arguments); }\n"
 
                         // Statements.
                         strMethod += self.statements.generateJavaScript() + "\n";
