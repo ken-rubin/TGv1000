@@ -199,6 +199,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     sql.commitCxn(connection,
                                         function(err) {
 
+                                            // Whatever happened, release the connection back to the pool.
+                                            connection.release();
+
                                             if (err) {
 
                                                 // Could not commit.
@@ -3543,6 +3546,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
        } else {
             sql.commitCxn(connection,
                 function(err){
+
+                    // Whatever happened, release the connection back to the pool.
+                    connection.release();
 
                     if (err) {
                         return res.json({
