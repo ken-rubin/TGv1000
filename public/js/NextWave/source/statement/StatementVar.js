@@ -14,9 +14,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeVar",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
+    "NextWave/source/methodBuilder/CodeExpressionVar",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeExpressionLiteral"],
-    function (prototypes, Statement, CodeVar, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeExpressionLiteral) {
+    function (prototypes, Statement, CodeVar, CodeStatementVar, CodeExpressionInfix, CodeExpressionVar, CodeExpressionName, CodeExpressionLiteral) {
 
         try {
 
@@ -61,7 +62,7 @@ define(["NextWave/source/utility/prototypes",
                         // );
                         // or
                         var csvRet = new CodeStatementVar(
-                            new CodeExpressionInfix(null, "=", null)
+                            new CodeExpressionVar(null, null)
                         );
 
                         csvRet.addNameInDragConsumate = true;
