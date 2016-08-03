@@ -37,19 +37,35 @@ define(["NextWave/source/utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        var strName = "i";
-                        strName = window.manager.getUniqueName(strName);
+                        // var strName = "i";
+                        // strName = window.manager.getUniqueName(strName);
+                        // var csvRet = new CodeStatementVar(
+                        //     new CodeExpressionInfix(
+                        //         new CodeExpressionName(
+                        //             new CodeVar(strName)
+                        //         ),
+                        //         "=",
+                        //         new CodeExpressionLiteral("1")
+                        //     )
+                        // );
+
+                        // Three varieties to run by Ken:
+                        // var csvRet = new CodeStatementVar();
+                        // or
+                        // var csvRet = new CodeStatementVar(
+                        //     new CodeExpressionInfix(
+                        //         new CodeExpressionName(),
+                        //         "=",
+                        //         new CodeExpressionLiteral()
+                        //     )
+                        // );
+                        // or
                         var csvRet = new CodeStatementVar(
-                            new CodeExpressionInfix(
-                                new CodeExpressionName(
-                                    new CodeVar(strName)
-                                ),
-                                "=",
-                                new CodeExpressionLiteral("1")
-                            )
+                            new CodeExpressionInfix(null, "=", null)
                         );
+
                         csvRet.addNameInDragConsumate = true;
-                        csvRet.consumateName = strName;
+                        // csvRet.consumateName = strName;
                         return csvRet;
                     };
                 } catch (e) {

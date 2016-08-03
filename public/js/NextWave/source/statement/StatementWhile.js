@@ -36,13 +36,14 @@ define(["NextWave/source/utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeStatementWhile(
-                                new CodeExpressionInfix(
-                                        new CodeExpressionName("i"),
-                                        "<",
-                                        new CodeExpressionLiteral("10")
-                                    )
-                            );
+                        // return new CodeStatementWhile(
+                        //         new CodeExpressionInfix(
+                                        // new CodeExpressionName("i"),
+                                        // "<",
+                                        // new CodeExpressionLiteral("10")
+                            //         )
+                            // );
+                        return new CodeStatementWhile();
                     };
                 } catch (e) {
 

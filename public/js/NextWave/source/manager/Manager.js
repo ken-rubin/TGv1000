@@ -312,14 +312,14 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearStatements();
                             if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearExpressions();
-                            if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearNames();
-                            if (exceptionRet) { return exceptionRet; }
+                            // exceptionRet = self.panelLayer.clearExpressions();
+                            // if (exceptionRet) { return exceptionRet; }
+                            // exceptionRet = self.panelLayer.clearNames();
+                            // if (exceptionRet) { return exceptionRet; }
                             exceptionRet = self.panelLayer.clearCenter();
                             if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearLiterals();
-                            if (exceptionRet) { return exceptionRet; }
+                            // exceptionRet = self.panelLayer.clearLiterals();
+                            // if (exceptionRet) { return exceptionRet; }
 
                             return null;
 
@@ -373,10 +373,10 @@ define(["NextWave/source/utility/prototypes",
                                 var objectComic = objectProject.comics[objectProject.currentComicIndex];
 
                                 // Load up panels.
-                                exceptionRet = self.loadLiterals(objectComic.literals);
-                                if (exceptionRet) { return exceptionRet; }
-                                exceptionRet = self.loadExpressions(objectComic.expressions);
-                                if (exceptionRet) { return exceptionRet; }
+                                // exceptionRet = self.loadLiterals(objectComic.literals);
+                                // if (exceptionRet) { return exceptionRet; }
+                                // exceptionRet = self.loadExpressions(objectComic.expressions);
+                                // if (exceptionRet) { return exceptionRet; }
                                 exceptionRet = self.loadStatements(objectComic.statements);
                                 if (exceptionRet) { return exceptionRet; }
 
@@ -420,16 +420,16 @@ define(["NextWave/source/utility/prototypes",
                                 self.clearPanels();
                                 return exceptionRet;
                             }
-                            exceptionRet = self.loadLiterals(objectData[2]);
-                            if (exceptionRet) { 
-                                self.clearPanels();
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.loadExpressions(objectData[3]);
-                            if (exceptionRet) { 
-                                self.clearPanels();
-                                return exceptionRet;
-                            }
+                            // exceptionRet = self.loadLiterals(objectData[2]);
+                            // if (exceptionRet) { 
+                            //     self.clearPanels();
+                            //     return exceptionRet;
+                            // }
+                            // exceptionRet = self.loadExpressions(objectData[3]);
+                            // if (exceptionRet) { 
+                            //     self.clearPanels();
+                            //     return exceptionRet;
+                            // }
 
                             // In this mode, we open and pin all panels, since there's no reason to access a lower layer.
                             self.panelLayer.openAndPinAllPanels();
@@ -1188,67 +1188,73 @@ define(["NextWave/source/utility/prototypes",
                     // Thus, uniqueness will be enforced across both sets ALONG WITH reserved words.
                     self.getUniqueName = function (strName, arrayCollection, strNameProperty, strNameRefinementProperty) {
 
-                        // Default collection value to names.
-                        if (!arrayCollection) {
+                        try {
 
-                            arrayCollection = self.panelLayer.namesPanel.payload.items;
-                            strNameProperty = "name";
-                            strNameRefinementProperty = null;
-                        }
+                            // Default collection value to names.
+                            if (!arrayCollection) {
 
-                        // Make sure a good JS name.
-                        if (!strName) {
-
-                            strName = "_";
-                        }
-
-                        // Check against variable name rules:
-
-                        // Cannot start with a number:
-                        strName = strName.replace(/^\d/, "_");
-
-                        // No only letters and number and _:
-                        strName = strName.replace(/[^A-Za-z0-9\_]/g, "_");
-
-                        // Define a simple method which 
-                        // searches for a matching name.
-                        var functionNameExists = function (strTest) {
-
-                            for (var i = 0; i < arrayCollection.length; i++) {
-
-                                var itemIth = arrayCollection[i];
-
-                                // Get the item in the collection.  It can be a string or an object.
-                                // If it is an object, then access its Name-Property to get the string.
-                                var strValue = ((strNameProperty) ? itemIth[strNameProperty] : itemIth);
-                                // However, the Name-Property of an object, itself, could be an object.
-                                // In which case, get the Name-Refinement-Property of that as a string!
-                                strValue = ((strNameRefinementProperty) ? strValue[strNameRefinementProperty] : strValue);
-                                if (strValue === strTest) {
-
-                                    return true;
-                                }
+                                arrayCollection = self.panelLayer.namesPanel.payload.items;
+                                strNameProperty = "name";
+                                strNameRefinementProperty = null;
                             }
 
-                            // Also test reserved words.
-                            for (var i = 0; i < m_arrayReserved.length; i++) {
+                            // Make sure a good JS name.
+                            if (!strName) {
 
-                                if (m_arrayReserved[i] === strTest) {
-
-                                    return true;
-                                }
+                                strName = "_";
                             }
-                            return false;
-                        };
 
-                        // Keep inc'ing the name until unique.
-                        var strBaseName = strName;
-                        var iCounter = 2;
-                        while (functionNameExists(strName)) {
+                            // Check against variable name rules:
 
-                            strName = strBaseName + (iCounter++).toString();
+                            // Cannot start with a number:
+                            strName = strName.replace(/^\d/, "_");
+
+                            // No only letters and number and _:
+                            strName = strName.replace(/[^A-Za-z0-9\_]/g, "_");
+
+                            // Define a simple method which 
+                            // searches for a matching name.
+                            var functionNameExists = function (strTest) {
+
+                                for (var i = 0; i < arrayCollection.length; i++) {
+
+                                    var itemIth = arrayCollection[i];
+
+                                    // Get the item in the collection.  It can be a string or an object.
+                                    // If it is an object, then access its Name-Property to get the string.
+                                    var strValue = ((strNameProperty) ? itemIth[strNameProperty] : itemIth);
+                                    // However, the Name-Property of an object, itself, could be an object.
+                                    // In which case, get the Name-Refinement-Property of that as a string!
+                                    strValue = ((strNameRefinementProperty) ? strValue[strNameRefinementProperty] : strValue);
+                                    if (strValue === strTest) {
+
+                                        return true;
+                                    }
+                                }
+
+                                // Also test reserved words.
+                                for (var i = 0; i < m_arrayReserved.length; i++) {
+
+                                    if (m_arrayReserved[i] === strTest) {
+
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            };
+
+                            // Keep inc'ing the name until unique.
+                            var strBaseName = strName;
+                            var iCounter = 2;
+                            while (functionNameExists(strName)) {
+
+                                strName = strBaseName + (iCounter++).toString();
+                            }
+                            return strName;
+                        } catch (e) {
+
+                            return strName;
                         }
-                        return strName;
                     };
 
                     // Set a new context.  A type and the index into its method collection, 

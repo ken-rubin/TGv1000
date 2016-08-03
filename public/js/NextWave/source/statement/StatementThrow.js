@@ -34,9 +34,10 @@ define(["NextWave/source/utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        return new CodeStatementThrow(
-                                new CodeExpressionLiteral("{}")
-                            );
+                        // return new CodeStatementThrow(
+                        //         new CodeExpressionLiteral("{}")
+                        //     );
+                        return new CodeStatementThrow();
                     };
                 } catch (e) {
 

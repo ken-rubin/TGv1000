@@ -39,33 +39,34 @@ define(["NextWave/source/utility/prototypes",
                     // Return a code instance
                     self.allocateCodeInstance = function () {
 
-                        var strName = "i";
-                        strName = window.manager.getUniqueName(strName);
-                        var csfRet = new CodeStatementFor(
-                            new CodeExpressionInfix(
-                                new CodeExpressionName(
-                                    new CodeVar(strName)
-                                ),
-                                "=",
-                                new CodeExpressionLiteral("0")
-                            ),
-                            new CodeExpressionInfix(
-                                new CodeExpressionName(
-                                    new CodeName(strName)
-                                ),
-                                "<",
-                                new CodeExpressionLiteral("10")
-                            ),
-                            new CodeExpressionPostfix(
-                                new CodeExpressionName(
-                                    new CodeName(strName)
-                                ),
-                                "++"
-                            )
-                        );
+                        // var strName = "i";
+                        // strName = window.manager.getUniqueName(strName);
+                        // var csfRet = new CodeStatementFor(
+                        //     new CodeExpressionInfix(
+                        //         new CodeExpressionName(
+                        //             new CodeVar(strName)
+                        //         ),
+                        //         "=",
+                        //         new CodeExpressionLiteral("0")
+                        //     ),
+                        //     new CodeExpressionInfix(
+                        //         new CodeExpressionName(
+                        //             new CodeName(strName)
+                        //         ),
+                        //         "<",
+                        //         new CodeExpressionLiteral("10")
+                        //     ),
+                        //     new CodeExpressionPostfix(
+                        //         new CodeExpressionName(
+                        //             new CodeName(strName)
+                        //         ),
+                        //         "++"
+                        //     )
+                        // );
+                        var csfRet = new CodeStatementFor();
 
                         csfRet.addNameInDragConsumate = true;
-                        csfRet.consumateName = strName;
+                        // csfRet.consumateName = strName;
 
                         return csfRet;
                     };

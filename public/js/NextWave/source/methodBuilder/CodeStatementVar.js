@@ -67,7 +67,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
                     
-                    // If any names to chamge, do so.
+                    // If any names to change, do so.
                     // For exmple, if stmt is var i = j + 10;, the i wouldn't be changed
                     // but the j might.
                     // self.innerChangeName = function (strOriginalName, strNewName) {

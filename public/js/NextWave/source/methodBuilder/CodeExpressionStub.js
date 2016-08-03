@@ -33,7 +33,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates the type is highlighted.
                     self.highlight = false;
                     // The contained CodeExpression.
-                    self.payload = cePayload;               // May be null.
+                    self.payload = cePayload || null;               // May be null or undefined--which is turned into null.
                     // The render area.
                     self.area = null;
                     // Indicates that this object is displayed as and  

@@ -537,39 +537,41 @@ define(["NextWave/source/utility/prototypes",
                     // Recursively remove any disposed-of names from namesPanel.
                     self.removeNamesRecursively = function (stmt) {
 
+                        return;
+
                         // If its a var with a name...
-                        if (stmt instanceof CodeStatementVar &&
-                            stmt.assignment.payload instanceof CodeExpressionInfix &&
-                            stmt.assignment.payload.lHS.payload instanceof CodeExpressionName &&
-                            stmt.assignment.payload.lHS.payload.payload instanceof CodeVar) {
+                        // if (stmt instanceof CodeStatementVar &&
+                        //     stmt.assignment.payload instanceof CodeExpressionInfix &&
+                        //     stmt.assignment.payload.lHS.payload instanceof CodeExpressionName &&
+                        //     stmt.assignment.payload.lHS.payload.payload instanceof CodeVar) {
 
-                            // ...remove it from names.
-                            var exceptionRet = window.manager.removeName(stmt.assignment.payload.lHS.payload.payload.payload.text);
-                            if (exceptionRet) {
+                        //     // ...remove it from names.
+                        //     var exceptionRet = window.manager.removeName(stmt.assignment.payload.lHS.payload.payload.payload.text);
+                        //     if (exceptionRet) {
 
-                                return exceptionRet;
-                            }
-                        } else if (stmt instanceof CodeStatementFor /* add some more instanceof checking as above */) {
+                        //         return exceptionRet;
+                        //     }
+                        // } else if (stmt instanceof CodeStatementFor /* add some more instanceof checking as above */) {
 
-                            // ...remove it from names.
-                            var exceptionRet = window.manager.removeName(stmt.initialization.payload.lHS.payload.payload.payload.text);
-                            if (exceptionRet) {
+                        //     // ...remove it from names.
+                        //     var exceptionRet = window.manager.removeName(stmt.initialization.payload.lHS.payload.payload.payload.text);
+                        //     if (exceptionRet) {
 
-                                return exceptionRet;
-                            }
-                        }
+                        //         return exceptionRet;
+                        //     }
+                        // }
 
-                        if (stmt.hasOwnProperty('block')) {
+                        // if (stmt.hasOwnProperty('block')) {
 
-                            if (stmt.block.hasOwnProperty('statements')) {
+                        //     if (stmt.block.hasOwnProperty('statements')) {
 
-                                for (var i = 0; i < stmt.block.statements.length; i++) {
+                        //         for (var i = 0; i < stmt.block.statements.length; i++) {
 
-                                    // Recurse
-                                    self.removeNamesRecursively(stmt.block.statements[i]);
-                                }
-                            }
-                        }
+                        //             // Recurse
+                        //             self.removeNamesRecursively(stmt.block.statements[i]);
+                        //         }
+                        //     }
+                        // }
                     }
 
                     // Render out the layer.
