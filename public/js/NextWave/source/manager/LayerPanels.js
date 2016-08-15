@@ -1176,12 +1176,9 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Some dummy data for now....
-                            var arrayTypes = [];
-
                             // Allocate and create the object tree, passing the initialization object.
                             var tt = new TypeTree();
-                            var exceptionRet = tt.create(arrayTypes);
+                            var exceptionRet = tt.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -1202,12 +1199,9 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Some dummy data for now....
-                            var arraySystemTypes = [];
-
                             // Allocate and create the object tree, passing the initialization object.
                             var tt = new TypeTree();
-                            var exceptionRet = tt.create(arraySystemTypes);
+                            var exceptionRet = tt.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;

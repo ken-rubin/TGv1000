@@ -345,6 +345,9 @@ define(["NextWave/source/utility/prototypes",
                 }
             };
 
+            // Inherit from List.
+            functionRet.inheritsFrom(DialogHost);
+
             return functionRet;
         } catch (e) {
 

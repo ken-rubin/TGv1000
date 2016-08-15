@@ -169,7 +169,7 @@ define(["NextWave/source/utility/prototypes"],
                         },
                         statementsPanel: {
 
-                            x: 0.25,
+                            x: 0.5,
                             width: 0.25,
                             height: 0.25
                         },
@@ -188,29 +188,29 @@ define(["NextWave/source/utility/prototypes"],
                         // For normal projects:
                         typesPanel: {
 
-                            y: 0.25,
+                            y: 0.0,
                             width: 0.3,
-                            height: 0.4
+                            height: 1
                         },
                         // For normal projects:
                         systemTypesPanel: {
 
-                            y: 0.65,
+                            y: 0.0,
                             width: 0.3,
-                            height: 0.35
+                            height: 1
                         },
                         // For system types projects:
                         systemTypesPanelSpecial: {
 
-                            y: 0.25,
+                            y: 0.0,
                             width: 0.3,
-                            height: 0.75
+                            height: 1
                         },
                         centerPanel: {
 
                             x: 0.3,
                             width: 0.7,
-                            height: 0.75
+                            height: 1
                         }
                     };
                     self.centerPanel = {

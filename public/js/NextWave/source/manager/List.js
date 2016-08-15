@@ -719,7 +719,8 @@ define(["NextWave/source/utility/prototypes",
                                 // Render out the item.
                                 exceptionRet = itemIth.render(contextRender,
                                     m_areaMaximal,
-                                    dCursor);
+                                    dCursor,
+                                    self.vertical);
                                 if (exceptionRet) {
 
                                     throw exceptionRet;

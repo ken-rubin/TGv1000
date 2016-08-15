@@ -59,14 +59,23 @@ define(["NextWave/source/utility/prototypes",
                         return m_area.clone();
                     };
 
-                    // Returns the height of this type.
+                    // Returns the height of this item.
                     self.getHeight = function () {
 
                         var dHeight = self.settingsNode.lineHeight + 2 * settings.general.margin;
                         return dHeight;
                     };
 
-                    // Test if the point is in this Type.
+                    // Returns the width of this item.
+                    self.getWidth = function (contextRender) {
+
+                        contextRender.font = self.settingsNode.font;
+                        var dWidth = contextRender.measureText(self.name).width + 
+                            2 * settings.general.margin;
+                        return dWidth;
+                    };
+
+                    // Test if the point is in this item.
                     self.pointIn = function (contextRender, point) {
 
                         // Return false if never rendered.
@@ -88,17 +97,34 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out this type.
-                    self.render = function (contextRender, areaRender, dY) {
+                    self.render = function (contextRender, areaRender, dOffset, bVertical) {
 
                         try {
 
+                            // Default vertical to true.
+                            if (bVertical === undefined) {
+
+                                bVertical = true;
+                            }
+
                             // Define the containing area.
-                            m_area = new Area(
-                                new Point(areaRender.location.x + settings.general.margin, 
-                                    areaRender.location.y + settings.general.margin + dY),
-                                new Size(areaRender.extent.width - 2 * settings.general.margin, 
-                                    self.getHeight() - 2 * settings.general.margin)
-                            );
+                            if (bVertical) {
+
+                                m_area = new Area(
+                                    new Point(areaRender.location.x + settings.general.margin, 
+                                        areaRender.location.y + settings.general.margin + dOffset),
+                                    new Size(areaRender.extent.width - 2 * settings.general.margin, 
+                                        self.getHeight() - 2 * settings.general.margin)
+                                );
+                            } else {
+
+                                m_area = new Area(
+                                    new Point(areaRender.location.x + settings.general.margin + dOffset, 
+                                        areaRender.location.y + settings.general.margin),
+                                    new Size(self.getWidth(contextRender) - 2 * settings.general.margin, 
+                                        areaRender.extent.height - 2 * settings.general.margin)
+                                );
+                            }
 
                             // Generate the path.
                             var exceptionRet = m_area.generateRoundedRectPath(contextRender);

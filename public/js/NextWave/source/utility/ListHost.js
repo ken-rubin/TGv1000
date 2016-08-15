@@ -1,7 +1,7 @@
 ﻿///////////////////////////////////////
-// ParameterListHost module.
+// ListHost module.
 //
-// Hosts a parameter list.
+// Hosts a list.
 //
 // Return constructor function.
 //
@@ -15,14 +15,13 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Control",
-    "NextWave/source/methodBuilder/ParameterList",
-    "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, Control, ParameterList, Parameter) {
+    "NextWave/source/manager/List"],
+    function (prototypes, settings, Point, Size, Area, Control, List) {
 
         try {
 
             // Constructor function.
-        	var functionRet = function ParameterListHost() {
+        	var functionRet = function ListHost(objectParameters) {
 
                 try {
 
@@ -38,7 +37,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicate if this object is highlighted.
                     self.highlight = false;
                     // The hosted object.
-                    self.parameterList = new ParameterList();
+                    self.list = new List(objectParameters);
 
                     ///////////////////////
                     // Public methods.
@@ -46,43 +45,43 @@ define(["NextWave/source/utility/prototypes",
                     // Render object.
                     self.render = function (contextRender) {
 
-                        return self.parameterList.render(contextRender);
+                        return self.list.render(contextRender);
                     };
 
                     // Pass to payload.
                     self.mouseMove = function (objectReference) {
 
-                        return self.parameterList.mouseMove(objectReference);
+                        return self.list.mouseMove(objectReference);
                     };
 
                     // Pass to payload.
                     self.mouseUp = function (objectReference) {
 
-                        return self.parameterList.mouseUp(objectReference);
+                        return self.list.mouseUp(objectReference);
                     };
 
                     // Pass to payload.
                     self.mouseDown = function (objectReference) {
 
-                        return self.parameterList.mouseDown(objectReference);
+                        return self.list.mouseDown(objectReference);
                     };
 
                     // Pass to payload.
                     self.mouseOut = function (objectReference) {
 
-                        return self.parameterList.mouseOut(objectReference);
+                        return self.list.mouseOut(objectReference);
                     };
 
                     // Pass to payload.
                     self.mouseWheel = function (objectReference) {
 
-                        return self.parameterList.mouseWheel(objectReference);
+                        return self.list.mouseWheel(objectReference);
                     };
 
                     // Pass to payload.
                     self.click = function (objectReference) {
 
-                        return self.parameterList.click(objectReference);
+                        return self.list.click(objectReference);
                     };
 
                     // Clear list.
@@ -91,7 +90,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear out list.
-                            return self.parameterList.self.clearItems();
+                            return self.list.clearItems();
                         } catch (e) {
 
                             return e;
@@ -101,13 +100,13 @@ define(["NextWave/source/utility/prototypes",
                     // Give derived modules a crack at the create pipeline.
                     self.innerCreate = function () {
 
-                        return self.parameterList.create();
+                        return self.list.create(self.configuration.items);
                     };
 
                     // Give derived modules a crack at the layout pipeline.
                     self.innerCalculateLayout = function (areaMaximal, contextRender) {
 
-                        return self.parameterList.calculateLayout(areaMaximal, contextRender);
+                        return self.list.calculateLayout(areaMaximal, contextRender);
                     };
                 } catch (e) {
 

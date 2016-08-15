@@ -16,9 +16,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Label",
     "NextWave/source/utility/Edit",
+    "NextWave/source/utility/ListHost",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, ParameterListHost, StatementListHost) {
+    function (prototypes, settings, Point, Size, Area, Label, Edit, ListHost, ParameterListHost, StatementListHost) {
 
         try {
 
@@ -108,12 +109,19 @@ define(["NextWave/source/utility/prototypes",
                                 var strType = objectControlIth.type;
 
                                 // Allocate and add.
-                                var controlIth = eval("new " + strType + "();");
+                                var strEval = "new " + strType + "(";
+                                if (objectControlIth.constructorParameterString) {
+
+                                    strEval += objectControlIth.constructorParameterString;
+                                }
+                                strEval += ");";
+
+                                var controlIth = eval(strEval);
 
                                 // Set self in control.
                                 controlIth.dialog = self;
 
-                                // Add controll to collection of controls.
+                                // Add control to collection of controls.
                                 self.controls.push(controlIth);
 
                                 // Also store in the control object.
@@ -310,16 +318,57 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Its configuration determines its location, 
                                 // given the dialog's current position.
-                                var dX = self.position.location.x + 
-                                    controlIth.configuration.x;
-                                var dY = self.position.location.y + 
-                                    controlIth.configuration.y;
+                                var dX = self.position.location.x;
+                                if (controlIth.configuration.xType === "configuration" ||
+                                    !controlIth.configuration.xType) {
+
+                                    dX += controlIth.configuration.x;
+                                } else if (controlIth.configuration.xType === "callback") {
+
+                                    dX += controlIth.configuration.x(areaMaximal);
+                                }
+
+                                var dY = self.position.location.y;
+                                if (controlIth.configuration.yType === "configuration" ||
+                                    !controlIth.configuration.yType) {
+
+                                    dY += controlIth.configuration.y;
+                                } else if (controlIth.configuration.yType === "callback") {
+
+                                    dY += controlIth.configuration.y(areaMaximal);
+                                }
+
+                                var dWidth = 0;
+                                if (controlIth.configuration.widthType === "configuration" ||
+                                    !controlIth.configuration.widthType) {
+
+                                    dWidth = controlIth.configuration.width;
+                                } else if (controlIth.configuration.widthType === "callback") {
+
+                                    dWidth = controlIth.configuration.width(areaMaximal);
+                                } else if (controlIth.configuration.widthType === "reserve") {
+
+                                    dWidth = areaMaximal.extent.width - controlIth.configuration.width;
+                                }
+
+                                var dHeight = 0;
+                                if (controlIth.configuration.heightType === "configuration" ||
+                                    !controlIth.configuration.heightType) {
+
+                                    dHeight = controlIth.configuration.height;
+                                } else if (controlIth.configuration.heightType === "callback") {
+
+                                    dHeight = controlIth.configuration.height(areaMaximal);
+                                } else if (controlIth.configuration.heightType === "reserve") {
+
+                                    dHeight = areaMaximal.extent.height - controlIth.configuration.height;
+                                }
 
                                 // Set the layout for the controls.
                                 var exceptionRet = controlIth.calculateLayout(new Area(new Point(dX, 
                                         dY),
-                                    new Size(controlIth.configuration.widthType === "reserve" ? areaMaximal.extent.width - controlIth.configuration.width: controlIth.configuration.width, 
-                                        controlIth.configuration.heightType === "reserve" ? Math.max(0,areaMaximal.extent.height - controlIth.configuration.height): controlIth.configuration.height)),
+                                    new Size(dWidth,
+                                        dHeight)),
                                     contextRender);
                                 if (exceptionRet) {
 
