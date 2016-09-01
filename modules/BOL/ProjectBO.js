@@ -1066,7 +1066,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 }
                                             } catch(e) { return cb(e); }
                                         },
-                                        // 2. Comics.
+                                        // 2. Comics. Since we now will have project and each comic, we can fetch libraries and then types in libraries and below.
                                         function(cb) {
 
                                             try {
@@ -1078,27 +1078,35 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     function(err) {
                                                         if (err) { return cb(err); }
 
-                                                        // Sucess. The project is filled.
+                                                        // Success. The project is filled.
 
                                                         // Sort comics by ordinal.
                                                         project.comics.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                        // Sort lists inside comics by their own ordinals.
+                                                        // Sort lists of types, methods, properties and events inside each comic's libraries by their own ordinals.
                                                         project.comics.forEach(
                                                             function(comic) {
 
-                                                                // Types. 
-                                                                comic.types.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                comic.types.forEach(
-                                                                    function(type) {
-                                                                        // Methods.
-                                                                        type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                        // Properties.
-                                                                        type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                        // Events.
-                                                                        type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                // Note that we're not sorting libraries at this time, planning for them to be retrieved in the correct order.
+                                                                comic.libraries.forEach(
+                                                                    function(library) {
+
+                                                                        // Types. 
+                                                                        library.types.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                        library.types.forEach(
+                                                                            function(type) {
+                                                                                // Methods.
+                                                                                type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                                // Properties.
+                                                                                type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                                // Events.
+                                                                                type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                                            }
+                                                                        );
                                                                     }
                                                                 );
+
+                                                                // Finally, sort the comic's comiccode.
                                                                 comic.comiccode.sort(function(a,b){return a.ordinal - b.ordinal;});
                                                             }
                                                         );
@@ -1107,88 +1115,88 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     }
                                                 );
                                             } catch(e) { return cb(e); }
-                                        },
-                                        // 3. App type's base type.
-                                        function(cb) {
+                                        // },
+                                        // // 3. App type's base type.
+                                        // function(cb) {
 
-                                            try {
+                                        //     try {
 
-                                                var baseTypeId = project.comics[0].types[0].baseTypeId;
-                                                var strQuery = "select * from " + self.dbname + "types where id=" + baseTypeId + ";";
-                                                sql.execute(strQuery,
-                                                    function(rows) {
+                                        //         var baseTypeId = project.comics[0].types[0].baseTypeId;
+                                        //         var strQuery = "select * from " + self.dbname + "types where id=" + baseTypeId + ";";
+                                        //         sql.execute(strQuery,
+                                        //             function(rows) {
 
-                                                        if (rows.length !== 1) { return cb(new Error("App type's base type could not be retrieved."));}
+                                        //                 if (rows.length !== 1) { return cb(new Error("App type's base type could not be retrieved."));}
 
-                                                        rows[0].originalTypeId = rows[0].id;
-                                                        rows[0].isApp = false;
-                                                        rows[0].methods = [];
-                                                        rows[0].properties = [];
-                                                        rows[0].events = [];
-                                                        rows[0].isSystemType = 0;
+                                        //                 rows[0].originalTypeId = rows[0].id;
+                                        //                 rows[0].isApp = false;
+                                        //                 rows[0].methods = [];
+                                        //                 rows[0].properties = [];
+                                        //                 rows[0].events = [];
+                                        //                 rows[0].isSystemType = 0;
 
-                                                        m_functionFillInTypes([rows[0]], function(err) {
+                                        //                 m_functionFillInTypes([rows[0]], function(err) {
 
-                                                            if (err) { return cb(err); }                                                    
-                                                            project.systemTypes.push(rows[0]);
-                                                            return cb(null);
-                                                        });
-                                                    },
-                                                    function(strError) {
-                                                        return cb(new Error(strError));
-                                                    }
-                                                );
-                                            } catch(e) {
-                                                return cb(e);
-                                            }
-                                        },
-                                        // 4. System types.
-                                        function(cb) {
+                                        //                     if (err) { return cb(err); }                                                    
+                                        //                     project.systemTypes.push(rows[0]);
+                                        //                     return cb(null);
+                                        //                 });
+                                        //             },
+                                        //             function(strError) {
+                                        //                 return cb(new Error(strError));
+                                        //             }
+                                        //         );
+                                        //     } catch(e) {
+                                        //         return cb(e);
+                                        //     }
+                                        // },
+                                        // // 4. System types.
+                                        // function(cb) {
 
-                                            try {
+                                        //     try {
 
-                                                var strQuery;
-                                                if (req.user.can_edit_system_types) {
+                                        //         var strQuery;
+                                        //         if (req.user.can_edit_system_types) {
 
-                                                    strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc;";
+                                        //             strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc;";
 
-                                                } else {
+                                        //         } else {
 
-                                                    strQuery = "select * from " + self.dbname + "types where typeTypeId=2 and public=1 order by name asc;";
-                                                }
+                                        //             strQuery = "select * from " + self.dbname + "types where typeTypeId=2 and public=1 order by name asc;";
+                                        //         }
 
-                                                sql.execute(strQuery,
+                                        //         sql.execute(strQuery,
 
-                                                    function(rows) {
+                                        //             function(rows) {
 
-                                                        // The following doesn't apply until at least one system type becomes public. Then uncomment it.
-                                                        // if (rows.length === 0) { return cb(new Error("No system types could be retrieved."));}
+                                        //                 // The following doesn't apply until at least one system type becomes public. Then uncomment it.
+                                        //                 // if (rows.length === 0) { return cb(new Error("No system types could be retrieved."));}
 
-                                                        rows.forEach(
-                                                            function(row) {
+                                        //                 rows.forEach(
+                                        //                     function(row) {
 
-                                                                row.originalTypeId = row.id;
-                                                                row.isApp = false;
-                                                                row.methods = [];
-                                                                row.properties = [];
-                                                                row.events = [];
-                                                                row.isSystemType = 1;
-                                                            }
-                                                        );
+                                        //                         row.originalTypeId = row.id;
+                                        //                         row.isApp = false;
+                                        //                         row.methods = [];
+                                        //                         row.properties = [];
+                                        //                         row.events = [];
+                                        //                         row.isSystemType = 1;
+                                        //                     }
+                                        //                 );
                                                                 
-                                                        m_functionFillInTypes(rows, function(err) {
+                                        //                 m_functionFillInTypes(rows, function(err) {
 
-                                                            if (err) { return cb(err); }
+                                        //                     if (err) { return cb(err); }
 
-                                                            Array.prototype.push.apply(project.systemTypes, rows);
-                                                            return cb(null);
-                                                        });
-                                                    },
-                                                    function(strError) {
-                                                        return cb(new Error(strError));
-                                                    }
-                                                );
-                                            } catch (e) { return cb(e); }
+                                        //                     Array.prototype.push.apply(project.systemTypes, rows);
+                                        //                     return cb(null);
+                                        //                 });
+                                        //             },
+                                        //             function(strError) {
+                                        //                 return cb(new Error(strError));
+                                        //             }
+                                        //         );
+                                        //     } catch (e) { return cb(e); }
                                         }
                                     ],
                                     function(err) {
@@ -1279,15 +1287,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // m_log('In m_functionRetProjDoComics');
 
-            // Note that we're using project.comicProjectId to fetch comics, since that's where they're attached and all derived projects
-            // retain their furthest ancestor's comics.
-            var exceptionRet = sql.execute("select * from " + self.dbname + "comics where projectId=" + project.comicProjectId + ";",
+            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + ");";
+            var exceptionRet = sql.execute(strSql,
                 function(rows) {
 
                     // Every project has to have at least 1 comic.
                     if (rows.length === 0) {
 
-                        return callback(new Error("Could not retrieve comics for project with id=" + req.body.id));
+                        return callback(new Error("Could not retrieve comics for project with id=" + project.id));
                     } 
 
                     // Use async to process each comic in the project and fetch their internals.
@@ -1297,10 +1304,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                             comicIth.originalComicId = comicIth.id;
                             comicIth.comiccode = [];
-                            comicIth.types = [];
-                            comicIth.expressions = [];
-                            comicIth.statements = [];
-                            comicIth.literals = [];
+                            comicIth.libraries = [];
+                            // comicIth.types = [];
+                            // comicIth.expressions = [];
+                            // comicIth.statements = [];
+                            // comicIth.literals = [];
 
                             // Fill comicIth's comiccode and types (including System Types).
                             m_functionRetProjDoComicInternals(  req, 
@@ -1338,49 +1346,36 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     ) {
         try {
 
-            // Using async.parallel, load comicIth's types, all System Types and comiccode.
-            // Non-System Types have both a projectId and a comicId.
+            // Using async.parallel, load comicIth's libraries and comiccode.
             async.parallel([
-                    function(cbp1) {    // comicIth's types
+                    function(cbp1) {    // libraries
 
-                        var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + " order by t1.ordinal asc;";
+                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from projects_comics_libraries where projectId=" + project.id + " and comicId=" + comicIth.id + ");";
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
                                 
-                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Failed because comic contained no types.")); }
+                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.id)); }
 
-                                // Use async to process each type and fetch its internals.
+                                // Use async to process each library and fetch its internals.
                                 // After review, could change eachSeries to each perhaps.
                                 async.eachSeries(rows,
-                                    function(typeIth, cbe1) {
+                                    function(libraryIth, cbe1) {
 
-                                        typeIth.originalTypeId = typeIth.id;
-                                        typeIth.isApp = (typeIth.isApp === 1 ? true : false);
-                                        typeIth.methods = [];
-                                        typeIth.properties = [];
-                                        typeIth.events = [];
-                                        typeIth.isSystemType = 0;
+                                        libraryIth.originalTypeId = libraryIth.id;
+                                        libraryIth.isSystemLibrary = (libraryIth.isSystemLibrary === 1 ? true : false);
+                                        libraryIth.isAppLibrary = (libraryIth.isAppLibrary === 1 ? true : false);
+                                        libraryIth.isNormalLibrary = !(libraryIth.isSystemLibrary || libraryIth.isAppLibrary);
+                                        libraryIth.types = [];
 
-                                        m_functionFetchTags(
-                                            typeIth.id,
-                                            'type',
-                                            function(err, tags) {
+                                        m_functionDoLibraryTypes(
+                                            libraryIth,
+                                            function(err) {
 
-                                                if (err) { return cbe1(err); }
-                                                typeIth.tags = tags;
+                                                if (!err) {
 
-                                                m_functionDoTypeArrays(
-                                                    typeIth,
-                                                    function(err) { 
-
-                                                        if (!err) {
-                                                            
-                                                            // Add the filled type to the comicIth.
-                                                            comicIth.types.push(typeIth);
-                                                        }
-                                                        return cbe1(err);
-                                                    }
-                                                );
+                                                    comicIth.libraries.push(libraryIth);
+                                                }
+                                                return cbe1(err);
                                             }
                                         );
                                     },
@@ -1395,7 +1390,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         );
                         if (exceptionRet) { return cbp1(exceptionRet); }
                     },
-                    function(cbp3) {    // comiccode rows
+                    function(cbp3) {    // comiccode
 
                         var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
                             function(rows) {
@@ -1415,60 +1410,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             function(strError) { return cbp3(new Error(strError)); }
                         );
                         if (exceptionRet) { return cbp3(exceptionRet); }
-                    },
-                    function(cb) {  // expressions
-
-                        var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ") order by name asc;";
-                        sql.execute(
-                            strQuery,
-                            function(rows) {
-                                rows.forEach(
-                                    function(rowIth) {
-                                        comicIth.expressions.push(rowIth.name);
-                                    }
-                                );
-                                return cb(null);
-                            },
-                            function(strError) {
-                                return cb(new Error(strError));
-                            }
-                        );
-                    },
-                    function(cb) {  // statements
-
-                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
-                        sql.execute(
-                            strQuery,
-                            function(rows) {
-                                rows.forEach(
-                                    function(rowIth) {
-                                        comicIth.statements.push(rowIth.name);
-                                    }
-                                );
-                                return cb(null);
-                            },
-                            function(strError) {
-                                return cb(new Error(strError));
-                            }
-                        );
-                    },
-                    function(cb) {  // literals
-
-                        var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ") order by name asc;";
-                        sql.execute(
-                            strQuery,
-                            function(rows) {
-                                rows.forEach(
-                                    function(rowIth) {
-                                        comicIth.literals.push(rowIth.name);
-                                    }
-                                );
-                                return cb(null);
-                            },
-                            function(strError) {
-                                return cb(new Error(strError));
-                            }
-                        );
                     }
                 ],
                 function(err) {
@@ -1477,6 +1418,215 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch(e) { return callback(e); }
     }
+
+    var m_functionDoLibraryTypes = function(libraryIth, callback) {
+
+        try {
+
+            var strSql = "select * from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";
+            var exceptionRet = sql.execute(strSql,
+                function(rows) {
+
+                    // For now we'll allow a library with 0 types. May not later.
+
+                    // Need to massage and fill typeIth and push to libraryIth.types [].
+                    // Use async to process each type and fetch its internals.
+                    // After review, could change eachSeries to each perhaps.
+                    async.eachSeries(rows,
+                        function(typeIth, cbe1) {
+
+                            typeIth.originalTypeId = typeIth.id;
+                            typeIth.isApp = (typeIth.isApp === 1 ? true : false);
+                            typeIth.methods = [];
+                            typeIth.properties = [];
+                            typeIth.events = [];
+                            typeIth.isSystemType = 0;
+
+                            m_functionFetchTags(
+                                typeIth.id,
+                                'type',
+                                function(err, tags) {
+
+                                    if (err) { return cbe1(err); }
+                                    typeIth.tags = tags;
+
+                                    m_functionDoTypeArrays(
+                                        typeIth,
+                                        function(err) { 
+
+                                            if (!err) {
+                                                
+                                                // Add the filled type to libraryIth.
+                                                libraryIth.types.push(typeIth);
+                                            }
+                                            return cbe1(err);
+                                        }
+                                    );
+                                }
+                            );
+                        },
+                        function(err) { // Main callback for inner async.eachSeries.
+
+                            // But return to callback.
+                            return callback(err);
+                        }
+                    );
+                },
+                function(strError) { return callback(new Error(strError)); }
+            );
+
+            if (exceptionRet) { return callback(exceptionRet); }
+
+        } catch (e) { return callback(e); }
+    }
+
+    // var m_functionRetProjDoComicInternals = function(   req, 
+    //                                                     res, 
+    //                                                     project, 
+    //                                                     comicIth,
+    //                                                     callback
+    //                                                 ) {
+    //     try {
+
+    //         // Using async.parallel, load comicIth's types, all System Types and comiccode.
+    //         // Non-System Types have both a projectId and a comicId.
+    //         async.parallel([
+    //                 function(cbp1) {    // comicIth's types
+
+    //                     var sqlQuery = "select t1.*, t2.name as baseTypeName from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.projectId=" + project.id + " and t1.comicId=" + comicIth.id + " order by t1.ordinal asc;";
+    //                     var exceptionRet = sql.execute(sqlQuery,
+    //                         function(rows) {
+                                
+    //                             if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Failed because comic contained no types.")); }
+
+    //                             // Use async to process each type and fetch its internals.
+    //                             // After review, could change eachSeries to each perhaps.
+    //                             async.eachSeries(rows,
+    //                                 function(typeIth, cbe1) {
+
+    //                                     typeIth.originalTypeId = typeIth.id;
+    //                                     typeIth.isApp = (typeIth.isApp === 1 ? true : false);
+    //                                     typeIth.methods = [];
+    //                                     typeIth.properties = [];
+    //                                     typeIth.events = [];
+    //                                     typeIth.isSystemType = 0;
+
+    //                                     m_functionFetchTags(
+    //                                         typeIth.id,
+    //                                         'type',
+    //                                         function(err, tags) {
+
+    //                                             if (err) { return cbe1(err); }
+    //                                             typeIth.tags = tags;
+
+    //                                             m_functionDoTypeArrays(
+    //                                                 typeIth,
+    //                                                 function(err) { 
+
+    //                                                     if (!err) {
+                                                            
+    //                                                         // Add the filled type to the comicIth.
+    //                                                         comicIth.types.push(typeIth);
+    //                                                     }
+    //                                                     return cbe1(err);
+    //                                                 }
+    //                                             );
+    //                                         }
+    //                                     );
+    //                                 },
+    //                                 function(err) { // Main callback for inner async.eachSeries.
+
+    //                                     // But return to outer async.parallel for next step or jump to ITS error function.
+    //                                     return cbp1(err);
+    //                                 }
+    //                             );
+    //                         },
+    //                         function(strError) { return cbp1(new Error(strError)); }
+    //                     );
+    //                     if (exceptionRet) { return cbp1(exceptionRet); }
+    //                 },
+    //                 function(cbp3) {    // comiccode rows
+
+    //                     var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
+    //                         function(rows) {
+
+    //                             // 0 rows is fine during project/comic development.
+    //                             async.eachSeries(rows,
+    //                                 function(comiccodeIth, cbe3) {
+
+    //                                     comicIth.comiccode.push(comiccodeIth);
+    //                                     return cbe3(null);
+    //                                 },
+    //                                 function(err) {
+    //                                     return cbp3(err);
+    //                                 }
+    //                             );
+    //                         },
+    //                         function(strError) { return cbp3(new Error(strError)); }
+    //                     );
+    //                     if (exceptionRet) { return cbp3(exceptionRet); }
+    //                 },
+    //                 function(cb) {  // expressions
+
+    //                     var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ") order by name asc;";
+    //                     sql.execute(
+    //                         strQuery,
+    //                         function(rows) {
+    //                             rows.forEach(
+    //                                 function(rowIth) {
+    //                                     comicIth.expressions.push(rowIth.name);
+    //                                 }
+    //                             );
+    //                             return cb(null);
+    //                         },
+    //                         function(strError) {
+    //                             return cb(new Error(strError));
+    //                         }
+    //                     );
+    //                 },
+    //                 function(cb) {  // statements
+
+    //                     var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
+    //                     sql.execute(
+    //                         strQuery,
+    //                         function(rows) {
+    //                             rows.forEach(
+    //                                 function(rowIth) {
+    //                                     comicIth.statements.push(rowIth.name);
+    //                                 }
+    //                             );
+    //                             return cb(null);
+    //                         },
+    //                         function(strError) {
+    //                             return cb(new Error(strError));
+    //                         }
+    //                     );
+    //                 },
+    //                 function(cb) {  // literals
+
+    //                     var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ") order by name asc;";
+    //                     sql.execute(
+    //                         strQuery,
+    //                         function(rows) {
+    //                             rows.forEach(
+    //                                 function(rowIth) {
+    //                                     comicIth.literals.push(rowIth.name);
+    //                                 }
+    //                             );
+    //                             return cb(null);
+    //                         },
+    //                         function(strError) {
+    //                             return cb(new Error(strError));
+    //                         }
+    //                     );
+    //                 }
+    //             ],
+    //             function(err) {
+    //                 return callback(err);
+    //             }
+    //         );
+    //     } catch(e) { return callback(e); }
+    // }
 
     var m_functionDoTypeArrays = function(typeIth, callback) {
 
