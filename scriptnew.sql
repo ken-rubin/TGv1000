@@ -1465,6 +1465,46 @@ begin
 
     end if;
     
+    if @dbstate = 40 THEN
+
+		CREATE TABLE `TGv1000`.`libraries` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` varchar(255) NOT NULL,
+          `createdByUserId` int(11) NULL,
+		  `isSystemLibrary` tinyint(1) NOT NULL DEFAULT '0',
+          `isAppLibrary` tinyint(1) NOT NULL DEFAULT '0',
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
+          `description` mediumtext NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`projects_comics_libraries` (
+		  `projectId` int(11) NOT NULL,
+		  `comicId` int(11) NOT NULL,
+		  `libraryId` int(11) NOT NULL,
+		  PRIMARY KEY (`projectId`,`comicId`, `libraryId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        ALTER TABLE `TGv1000`.`projects_comics_libraries`
+			ADD CONSTRAINT FK_projects_comics_libraries
+            FOREIGN KEY (projectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+        
+		ALTER TABLE `tgv1000`.`types` 
+			DROP FOREIGN KEY `FK_types`;
+		ALTER TABLE `tgv1000`.`types` 
+			DROP COLUMN `comicId`,
+			DROP COLUMN `projectId`,
+			CHANGE COLUMN `ordinal` `ordinal` INT(11) NULL DEFAULT NULL AFTER `name`,
+			ADD COLUMN `libraryId` INT(11) NOT NULL DEFAULT 0 AFTER `ordinal`,
+			DROP INDEX `idx_projectId` ;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
 end//
 
 
