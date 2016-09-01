@@ -6,10 +6,10 @@ delimiter //
 
 
 
-/* 
+/* */
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
- */
+/* */
 
 
 
@@ -19,7 +19,7 @@ SELECT database()//
 
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/*  
+/* */
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -54,11 +54,11 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
- */
+/* */
 
 
 -- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/* 
+/* */
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 
@@ -84,7 +84,7 @@ begin
     RETURN @uniqueName;
 end //
 
- */
+/* */
 
 create procedure maintainDB()
 begin
@@ -1499,6 +1499,40 @@ begin
 			CHANGE COLUMN `ordinal` `ordinal` INT(11) NULL DEFAULT NULL AFTER `name`,
 			ADD COLUMN `libraryId` INT(11) NOT NULL DEFAULT 0 AFTER `ordinal`,
 			DROP INDEX `idx_projectId` ;
+
+		ALTER TABLE `tgv1000`.`comics` 
+			DROP FOREIGN KEY `FK_comics`;
+		ALTER TABLE `tgv1000`.`comics` 
+			DROP COLUMN `projectId`,
+			DROP INDEX `FK_comics` ;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 41 THEN
+
+		INSERT INTO `libraries` VALUES (1,'Game Base Library',1,0,1,0,'',NULL),(2,'Console Base Library',1,0,1,0,'',NULL),(3,'Website Base Library',1,0,1,0,'',NULL),(4,'Hololens Base Library',1,0,1,0,'',NULL),(5,'Map Base Library',1,0,1,0,'',NULL),(6,'System Types Library',1,1,0,0,'',NULL);
+		INSERT INTO `projects_comics_libraries` VALUES (1,1,1),(1,1,6),(2,2,2),(2,2,6),(3,3,3),(3,3,6),(4,4,4),(4,4,6),(5,5,5),(5,5,6);
+		UPDATE `types` SET libraryId=1 WHERE id=1;
+		UPDATE `types` SET libraryId=2 WHERE id=2;
+		UPDATE `types` SET libraryId=3 WHERE id=3;
+		UPDATE `types` SET libraryId=4 WHERE id=4;
+		UPDATE `types` SET libraryId=5 WHERE id=5;
+		UPDATE `types` SET libraryId=1 WHERE id=6;
+		UPDATE `types` SET libraryId=2 WHERE id=7;
+		UPDATE `types` SET libraryId=3 WHERE id=8;
+		UPDATE `types` SET libraryId=4 WHERE id=9;
+		UPDATE `types` SET libraryId=5 WHERE id=10;
+		UPDATE `types` SET libraryId=6 WHERE id=11;
+		UPDATE `types` SET libraryId=6 WHERE id=12;
+		UPDATE `types` SET libraryId=6 WHERE id=13;
+		UPDATE `types` SET libraryId=6 WHERE id=14;
+		UPDATE `types` SET libraryId=6 WHERE id=15;
+		UPDATE `types` SET libraryId=6 WHERE id=16;
+		UPDATE `types` SET libraryId=6 WHERE id=17;
+		UPDATE `types` SET libraryId=6 WHERE id=18;
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
