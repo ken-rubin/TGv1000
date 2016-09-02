@@ -87,20 +87,16 @@ define(["Core/errorHelper",
 												draggable: true // <-- Default value is false
 											});
 
-											if ($.isFunction(callback)) {
-												callback();
-											}
+											if ($.isFunction(callback)) { callback(); }
 										}
 									);
 								} else {
 
-									manager.loadNoProject();
-
-									if ($.isFunction(callback)) {
-										callback();
-									}
+									// manager.loadNoProject();
+									if ($.isFunction(callback)) { callback(); }
 								}
 							} else {
+								// Privileged user.
 
 								self.loadSystemTypesAndPinPanels(callback);
 							}
@@ -125,7 +121,6 @@ define(["Core/errorHelper",
 								if (exceptionRet) {
 
 									errorHelper.show(exceptionRet);
-
 								} 
 
 								if ($.isFunction(callback)) {

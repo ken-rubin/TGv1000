@@ -407,14 +407,15 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             self.clearPanels(2);
+                            var exceptionRet = null;
 
                             // objectData is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
                             // Load them into the manager
-                            var exceptionRet = self.loadSystemTypes(objectData[0]);
-                            if (exceptionRet) { 
-                                self.clearPanels();
-                                return exceptionRet;
-                            }
+                            // exceptionRet = self.loadSystemTypes(objectData[0]);
+                            // if (exceptionRet) { 
+                            //     self.clearPanels();
+                            //     return exceptionRet;
+                            // }
                             exceptionRet = self.loadStatements(objectData[1]);
                             if (exceptionRet) { 
                                 self.clearPanels();
