@@ -436,127 +436,6 @@ begin
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0);        
 
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,comicProjectId,isCoreProject)
-			VALUES 
-				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,1,TRUE),
-				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,2,TRUE),
-				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,3,TRUE),
-				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,4,TRUE),
-				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,5,TRUE)
-                ;
-            
-		INSERT INTO TGv1000.comics (id, `name`,  projectId, ordinal, thumbnail)
-			VALUES 
-				(1,'TechGroms Game Project Help',1,0,'tn3.png'),
-				(2,'TechGroms Console Project Help',2,0,'tn3.png'),
-				(3,'TechGroms Website Project Help',3,0,'tn3.png'),
-				(4,'TechGroms Hololens Project Help',4,0,'tn3.png'),
-				(5,'TechGroms Map Project Help',5,0,'tn3.png')
-				;
-            
-		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
-		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal)
-			VALUES 
-				(1,'GameBaseType','media/images/gameProject.png',10000),
-				(2,'ConsoleBaseType','media/images/consoleProject.png',10000),
-				(3,'WebsiteBaseType','media/images/websiteProject.png',10000),
-				(4,'HololensBaseType','media/images/hololensProject.png',10000),
-				(5,'MapBaseType','media/images/mappingProject.png',10000)
-                ;
-            
-		insert into TGv1000.`types` (id,`name`,projectId,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
-			VALUES 
-				(6,'App',1,1,1,0,0,1,'',0,0.00,0.00,1,1,1),
-				(7,'App',2,1,1,0,0,2,'',0,0.00,0.00,1,2,1),
-				(8,'App',3,1,1,0,0,3,'',0,0.00,0.00,1,3,1),
-				(9,'App',4,1,1,0,0,4,'',0,0.00,0.00,1,4,1),
-				(10,'App',5,1,1,0,0,5,'',0,0.00,0.00,1,5,1)
-                ;
-                
-		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(1,6,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(2,7,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(3,8,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(4,9,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(5,10,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(6,1,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(7,2,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(8,3,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(9,4,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(10,5,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(11,6,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(12,7,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(13,8,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(14,9,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(15,10,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,'')
-			;
-           
-		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
-           because they can't be dragged onto the Designer.
-		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
-			VALUES
-				(1,1,'X','0',0),
-				(2,1,'Y','0',1),
-				(3,1,'Width','0',2),
-				(4,1,'Height','0',3)
-			;
-		*/
-            
-		/* need resources/tags for every project, type and method */            
-        insert TGv1000.tags (id,description)
-			VALUES
-				(1,'templates@techgroms.com'),
-				(2,'project'),
-				(3,'new_project'),
-                (4,'type'),
-                (5,'app'),
-                (6,'method'),
-                (7,'initialize')
-			;
-            
-		insert TGv1000.project_tags (projectId,tagId)
-			VALUES
-				(1,2),
-				(2,2),
-				(3,2),
-				(4,2),
-				(5,2)
-				;
-            
-		insert TGv1000.type_tags (typeId,tagId)
-			VALUES
-                (1,4),
-                (2,4),
-                (3,4),
-                (4,4),
-                (5,4),
-                (6,4),
-                (7,4),
-                (8,4),
-                (9,4),
-                (10,4)
-                ;
-            
-		insert TGv1000.method_tags (methodId,tagId)
-			VALUES
-                (1,6),
-                (2,6),
-                (3,6),
-                (4,6),
-                (5,6),
-                (6,6),
-                (7,6),
-                (8,6),
-                (9,6),
-                (10,6),
-                (11,6),
-                (12,6),
-                (13,6),
-                (14,6),
-                (15,6)
-                ;
-
 		CREATE TABLE TGv1000.usergroups (
 		  `id` int(11) NOT NULL,
 		  `name` varchar(255) NOT NULL,
@@ -1472,6 +1351,7 @@ begin
           `name` varchar(255) NOT NULL,
           `createdByUserId` int(11) NULL,
 		  `isSystemLibrary` tinyint(1) NOT NULL DEFAULT '0',
+          `isBaseLibrary` tinyint(1) NOT NULL DEFAULT '0',
           `isAppLibrary` tinyint(1) NOT NULL DEFAULT '0',
           `imageId` int(11) NOT NULL DEFAULT '0',
           `altImagePath` varchar(255) NOT NULL DEFAULT '',
@@ -1505,6 +1385,14 @@ begin
 		ALTER TABLE `tgv1000`.`comics` 
 			DROP COLUMN `projectId`,
 			DROP INDEX `FK_comics` ;
+            
+		ALTER TABLE `tgv1000`.`projects` 
+			DROP COLUMN `comicProjectId`;
+            
+		ALTER TABLE `tgv1000`.`types` 
+			DROP COLUMN `typeTypeId`;
+            
+		DROP TABLE `tgv1000`.`typetypes`;            
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
@@ -1513,26 +1401,159 @@ begin
     
     if @dbstate = 41 THEN
 
-		INSERT INTO `libraries` VALUES (1,'Game Base Library',1,0,1,0,'',NULL),(2,'Console Base Library',1,0,1,0,'',NULL),(3,'Website Base Library',1,0,1,0,'',NULL),(4,'Hololens Base Library',1,0,1,0,'',NULL),(5,'Map Base Library',1,0,1,0,'',NULL),(6,'System Types Library',1,1,0,0,'',NULL);
-		INSERT INTO `projects_comics_libraries` VALUES (1,1,1),(1,1,6),(2,2,2),(2,2,6),(3,3,3),(3,3,6),(4,4,4),(4,4,6),(5,5,5),(5,5,6);
-		UPDATE `types` SET libraryId=1 WHERE id=1;
-		UPDATE `types` SET libraryId=2 WHERE id=2;
-		UPDATE `types` SET libraryId=3 WHERE id=3;
-		UPDATE `types` SET libraryId=4 WHERE id=4;
-		UPDATE `types` SET libraryId=5 WHERE id=5;
-		UPDATE `types` SET libraryId=1 WHERE id=6;
-		UPDATE `types` SET libraryId=2 WHERE id=7;
-		UPDATE `types` SET libraryId=3 WHERE id=8;
-		UPDATE `types` SET libraryId=4 WHERE id=9;
-		UPDATE `types` SET libraryId=5 WHERE id=10;
-		UPDATE `types` SET libraryId=6 WHERE id=11;
-		UPDATE `types` SET libraryId=6 WHERE id=12;
-		UPDATE `types` SET libraryId=6 WHERE id=13;
-		UPDATE `types` SET libraryId=6 WHERE id=14;
-		UPDATE `types` SET libraryId=6 WHERE id=15;
-		UPDATE `types` SET libraryId=6 WHERE id=16;
-		UPDATE `types` SET libraryId=6 WHERE id=17;
-		UPDATE `types` SET libraryId=6 WHERE id=18;
+		INSERT INTO `libraries` VALUES 
+			(1,'Game App Library',1,0,1,0,'',NULL),
+            (2,'Console App Library',1,0,1,0,'',NULL),
+            (3,'Website App Library',1,0,1,0,'',NULL),
+            (4,'Hololens App Library',1,0,1,0,'',NULL),
+            (5,'Map App Library',1,0,1,0,'',NULL),
+			(6,'Game Base Library',1,0,1,0,'',NULL),
+            (7,'Console Base Library',1,0,1,0,'',NULL),
+            (8,'Website Base Library',1,0,1,0,'',NULL),
+            (9,'Hololens Base Library',1,0,1,0,'',NULL),
+            (10,'Map Base Library',1,0,1,0,'',NULL),
+            (11,'Array Library',1,1,0,0,'',NULL),
+            (12,'Boolean Library',1,1,0,0,'',NULL),
+            (13,'Date Library',1,1,0,0,'',NULL),
+            (14,'Math Library',1,1,0,0,'',NULL),
+            (15,'Number Library',1,1,0,0,'',NULL),
+            (16,'RegExp Library',1,1,0,0,'',NULL),
+            (17,'String Library',1,1,0,0,'',NULL),
+            (18,'VisualObject Library',1,1,0,0,'',NULL);
+		INSERT INTO `projects_comics_libraries` VALUES 
+			(1,1,1),
+            (1,1,6),
+            (2,2,2),
+            (2,2,6),
+            (3,3,3),
+            (3,3,6),
+            (4,4,4),
+            (4,4,6),
+            (5,5,5),
+            (5,5,6);
+            
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,comicProjectId,isCoreProject)
+			VALUES 
+				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,1,TRUE),
+				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,2,TRUE),
+				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,3,TRUE),
+				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,4,TRUE),
+				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,5,TRUE)
+                ;
+            
+		INSERT INTO TGv1000.comics (id, `name`,  projectId, ordinal, thumbnail)
+			VALUES 
+				(1,'TechGroms Game Project Help',1,0,'tn3.png'),
+				(2,'TechGroms Console Project Help',2,0,'tn3.png'),
+				(3,'TechGroms Website Project Help',3,0,'tn3.png'),
+				(4,'TechGroms Hololens Project Help',4,0,'tn3.png'),
+				(5,'TechGroms Map Project Help',5,0,'tn3.png')
+				;
+            
+		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
+		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal)
+			VALUES 
+				(1,'GameBaseType','media/images/gameProject.png',10000),
+				(2,'ConsoleBaseType','media/images/consoleProject.png',10000),
+				(3,'WebsiteBaseType','media/images/websiteProject.png',10000),
+				(4,'HololensBaseType','media/images/hololensProject.png',10000),
+				(5,'MapBaseType','media/images/mappingProject.png',10000)
+                ;
+            
+		insert into TGv1000.`types` (id,`name`,projectId,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
+			VALUES 
+				(6,'App',1,1,1,0,0,1,'',0,0.00,0.00,1,1,1),
+				(7,'App',2,1,1,0,0,2,'',0,0.00,0.00,1,2,1),
+				(8,'App',3,1,1,0,0,3,'',0,0.00,0.00,1,3,1),
+				(9,'App',4,1,1,0,0,4,'',0,0.00,0.00,1,4,1),
+				(10,'App',5,1,1,0,0,5,'',0,0.00,0.00,1,5,1)
+                ;
+                
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
+			VALUES
+				(1,6,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(2,7,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(3,8,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(4,9,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(5,10,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
+				(6,1,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(7,2,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(8,3,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(9,4,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(10,5,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(11,6,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(12,7,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(13,8,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(14,9,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
+				(15,10,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,'')
+			;
+           
+		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
+           because they can't be dragged onto the Designer.
+		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
+			VALUES
+				(1,1,'X','0',0),
+				(2,1,'Y','0',1),
+				(3,1,'Width','0',2),
+				(4,1,'Height','0',3)
+			;
+		*/
+            
+		/* need resources/tags for every project, type and method */            
+        insert TGv1000.tags (id,description)
+			VALUES
+				(1,'templates@techgroms.com'),
+				(2,'project'),
+				(3,'new_project'),
+                (4,'type'),
+                (5,'app'),
+                (6,'method'),
+                (7,'initialize')
+			;
+            
+		insert TGv1000.project_tags (projectId,tagId)
+			VALUES
+				(1,2),
+				(2,2),
+				(3,2),
+				(4,2),
+				(5,2)
+				;
+            
+		insert TGv1000.type_tags (typeId,tagId)
+			VALUES
+                (1,4),
+                (2,4),
+                (3,4),
+                (4,4),
+                (5,4),
+                (6,4),
+                (7,4),
+                (8,4),
+                (9,4),
+                (10,4)
+                ;
+            
+		insert TGv1000.method_tags (methodId,tagId)
+			VALUES
+                (1,6),
+                (2,6),
+                (3,6),
+                (4,6),
+                (5,6),
+                (6,6),
+                (7,6),
+                (8,6),
+                (9,6),
+                (10,6),
+                (11,6),
+                (12,6),
+                (13,6),
+                (14,6),
+                (15,6)
+                ;
+
+            
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
