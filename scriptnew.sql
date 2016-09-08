@@ -1524,11 +1524,11 @@ begin
 
 		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,statements,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,arguments)
 			VALUES
-				(1,1,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
-				(2,2,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
-				(3,3,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
-				(4,4,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
-				(5,5,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(1,6,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(2,7,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(3,8,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(4,9,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(5,10,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
 				(6,1,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
 				(7,2,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
 				(8,3,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
