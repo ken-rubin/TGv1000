@@ -65,61 +65,37 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
 
-            // Returns [4][] where [0] are all fully-loaded systemtypes; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
-            var strQuery = "select * from " + self.dbname + "types where typeTypeId=2 order by name asc; select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc;"
+            // Returns [4][] where [0] formerly held systemtypes and is now empty; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
+            var strQuery = "select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc; "
             sql.execute(strQuery,
                 function(rows) {
 
-                    if (rows.length !== 4) {
+                    if (rows.length !== 3) {
                         return res.json({
                             success: false,
-                            message: "Failed to retrieve 4 arrays in fetching system types."
+                            message: "Failed to retrieve 3 arrays in fetching system types."
                         });
                     }
 
                     var twodim = new Array(4);
-                    rows[0].forEach(
-                        function(row) {
+                    twodim[0] = [];
 
-                            row.originalTypeId = row.id;
-                            row.isApp = false;
-                            row.methods = [];
-                            row.properties = [];
-                            row.events = [];
-                            row.isSystemType = 1;
-                        }
-                    );
-                    m_functionFillInTypes(
-                        rows[0],
-                        function(err) {
+                    // Now the strings.
+                    for (i = 0; i < 3; i++) {
 
-                            if (err) {
-                                return res.json({
-                                    success: false,
-                                    message: "System Types fetch failed with error: " + err.message
-                                });
+                        var names = new Array();
+                        rows[i].forEach(
+                            function(itemIth) {
+                                names.push(itemIth.name);
                             }
+                        );
+                        twodim[i+1] = names;
+                    }
 
-                            twodim[0] = rows[0];
-
-                            // Now the strings.
-                            for (i = 1; i < 4; i++) {
-
-                                var names = new Array();
-                                rows[i].forEach(
-                                    function(itemIth) {
-                                        names.push(itemIth.name);
-                                    }
-                                );
-                                twodim[i] = names;
-                            }
-
-                            res.json({
-                                success: true,
-                                data: twodim
-                            });
-                        }
-                    );
+                    res.json({
+                        success: true,
+                        data: twodim
+                    });
                 },
                 function(strError) {
                     return res.json({
@@ -988,8 +964,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             chargeId: row.chargeId,
                             comics: [],
                             specialProjectData: {},
-                            currentComicIndex: row.currentComicIndex,
-                            systemTypes: []
+                            currentComicIndex: row.currentComicIndex
                         };
 
                         m_functionFetchTags(
@@ -1007,7 +982,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
                                 //  2. Retrieve project's comics and their content.
                                 //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
-                                //  4. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
+                                //  4. No more. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
                                 async.series(
                                     [
                                         // 1. PP data, potentially.
@@ -1306,9 +1281,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comicIth.comiccode = [];
                             comicIth.libraries = [];
                             // comicIth.types = [];
-                            // comicIth.expressions = [];
-                            // comicIth.statements = [];
-                            // comicIth.literals = [];
+                            comicIth.expressions = [];
+                            comicIth.statements = [];
+                            comicIth.literals = [];
 
                             // Fill comicIth's comiccode and types (including System Types).
                             m_functionRetProjDoComicInternals(  req, 

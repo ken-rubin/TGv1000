@@ -380,13 +380,13 @@ define(["NextWave/source/utility/prototypes",
                                 exceptionRet = self.loadStatements(objectComic.statements);
                                 if (exceptionRet) { return exceptionRet; }
 
-                                // Add the types from the comic into this instance.
-                                exceptionRet = self.loadTypes(objectComic.types);
+                                // Add the libraries from the comic into this instance.
+                                exceptionRet = self.loadLibraries(objectComic.libraries);
                                 if (exceptionRet) { return exceptionRet; }
 
                                 // Add project's system types into their panel.
-                                exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
-                                if (exceptionRet) { return exceptionRet; }
+                                // exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
+                                // if (exceptionRet) { return exceptionRet; }
 
                                 // If a privileged (system type-wise) user, we open and pin all panels.
                                 if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
@@ -401,6 +401,18 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) { return e; }
                     }
 
+                    self.loadLibraries = function(arrComicLibraries) {
+
+                        try {
+
+                            return null;
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // .
                     self.loadSystemTypesProject = function (objectData) {
 
@@ -409,7 +421,7 @@ define(["NextWave/source/utility/prototypes",
                             self.clearPanels(2);
                             var exceptionRet = null;
 
-                            // objectData is a 4xN ragged array of [0] systemtypes; [1] statements; [2] literals; [3] expressions.
+                            // objectData is a 4xN ragged array of [0] no longer used; [1] statements; [2] literals; [3] expressions.
                             // Load them into the manager
                             // exceptionRet = self.loadSystemTypes(objectData[0]);
                             // if (exceptionRet) { 
