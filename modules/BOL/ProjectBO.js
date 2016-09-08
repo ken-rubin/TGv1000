@@ -1398,7 +1398,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            var strSql = "select * from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";
+            var strSql = "select t1.*, concat(l.name, '.', t2.name) base from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId = t2.id left outer join " + self.dbname + "libraries l on l.id = t2.libraryId where t1.libraryId=" + libraryIth.id + ";";
             var exceptionRet = sql.execute(strSql,
                 function(rows) {
 
@@ -1415,7 +1415,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             typeIth.methods = [];
                             typeIth.properties = [];
                             typeIth.events = [];
-                            typeIth.isSystemType = 0;
 
                             m_functionFetchTags(
                                 typeIth.id,
