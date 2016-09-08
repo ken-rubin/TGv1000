@@ -1391,24 +1391,24 @@ begin
             
 		INSERT INTO `libraries` (id,name,createdByUserId,isSystemLibrary,isBaseLibrary,isAppLibrary,imageId,altImagePath,description)
 			VALUES 
-			(1,'Game App Library',1,0,0,1,0,'',NULL),
-            (2,'Console App Library',1,0,0,1,0,'',NULL),
-            (3,'Website App Library',1,0,0,1,0,'',NULL),
-            (4,'Hololens App Library',1,0,0,1,0,'',NULL),
-            (5,'Map App Library',1,0,0,1,0,'',NULL),
-			(6,'Game Base Library',1,0,1,0,0,'',NULL),
-            (7,'Console Base Library',1,0,1,0,0,'',NULL),
-            (8,'Website Base Library',1,0,1,0,0,'',NULL),
-            (9,'Hololens Base Library',1,0,1,0,0,'',NULL),
-            (10,'Map Base Library',1,0,1,0,0,'',NULL),
-            (11,'Array Library',1,1,0,0,0,'',NULL),
-            (12,'Boolean Library',1,1,0,0,0,'',NULL),
-            (13,'Date Library',1,1,0,0,0,'',NULL),
-            (14,'Math Library',1,1,0,0,0,'',NULL),
-            (15,'Number Library',1,1,0,0,0,'',NULL),
-            (16,'RegExp Library',1,1,0,0,0,'',NULL),
-            (17,'String Library',1,1,0,0,0,'',NULL),
-            (18,'VisualObject Library',1,1,0,0,0,'',NULL);
+			(1,'GameAppLibrary',1,0,0,1,0,'',NULL),
+            (2,'ConsoleAppLibrary',1,0,0,1,0,'',NULL),
+            (3,'WebsiteAppLibrary',1,0,0,1,0,'',NULL),
+            (4,'HololensAppLibrary',1,0,0,1,0,'',NULL),
+            (5,'MapAppLibrary',1,0,0,1,0,'',NULL),
+			(6,'GameBaseLibrary',1,0,1,0,0,'',NULL),
+            (7,'ConsoleBaseLibrary',1,0,1,0,0,'',NULL),
+            (8,'WebsiteBaseLibrary',1,0,1,0,0,'',NULL),
+            (9,'HololensBaseLibrary',1,0,1,0,0,'',NULL),
+            (10,'MapBaseLibrary',1,0,1,0,0,'',NULL),
+            (11,'ArrayLibrary',1,1,0,0,0,'',NULL),
+            (12,'BooleanLibrary',1,1,0,0,0,'',NULL),
+            (13,'DateLibrary',1,1,0,0,0,'',NULL),
+            (14,'MathLibrary',1,1,0,0,0,'',NULL),
+            (15,'NumberLibrary',1,1,0,0,0,'',NULL),
+            (16,'RegExpLibrary',1,1,0,0,0,'',NULL),
+            (17,'StringLibrary',1,1,0,0,0,'',NULL),
+            (18,'VisualObjectLibrary',1,1,0,0,0,'',NULL);
 
         insert into TGv1000.tags (id,description)
 			VALUES
