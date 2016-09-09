@@ -35,6 +35,10 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // Get a reference to the settings for this object.
                     self.settingsNode = settings.list[strSettingsNode || "expression"];
+                    // Callback to handle click event.
+                    // Callback must accept click-event-object 
+                    // reference and return an Exception.
+                    self.clickHandler = null;
 
                     ////////////////////////
                     // Public methods.
@@ -94,6 +98,25 @@ define(["NextWave/source/utility/prototypes",
                     self.getName = function () {
 
                         return self.name;
+                    };
+
+                    // Invoked when the mouse is clicked over the canvas.
+                    self.click = function (objectReference) {
+
+                        try {
+
+                            // If click is defined, call it.
+                            if ($.isFunction(self.clickHandler)) {
+
+                                // Pass the click event object reference.
+                                return self.clickHandler(objectReference);
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Render out this type.

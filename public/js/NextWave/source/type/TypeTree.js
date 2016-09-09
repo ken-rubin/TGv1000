@@ -111,12 +111,20 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "false",
-                                    x: 2 * settings.general.margin,
+                                    x: 4 * settings.general.margin,
                                     y: settings.general.margin + 1 * settings.dialog.lineHeight,
                                     width: 4 * settings.general.margin,
                                     widthType: "reserve",
                                     height: 1.25 * settings.dialog.lineHeight,
-                                    items:[new ListItem("James"), new ListItem("Everett"), new ListItem("Sammy"), new ListItem("Hagar"), new ListItem("Christoff"), new ListItem("Ellen")]
+                                    items:[
+
+                                        new ListItem("James"), 
+                                        new ListItem("Everett"), 
+                                        new ListItem("Sammy"), 
+                                        new ListItem("Hagar"), 
+                                        new ListItem("Christoff"), 
+                                        new ListItem("Ellen")
+                                    ]
                                 },
                                 typesLabel: {
 
@@ -132,7 +140,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "true",
-                                    x: 4 * settings.general.margin,
+                                    x: 8 * settings.general.margin,
                                     y: settings.general.margin + 3.25 * settings.dialog.lineHeight,
                                     width: 8 * settings.general.margin,
                                     widthType: "reserve",
@@ -141,7 +149,14 @@ define(["NextWave/source/utility/prototypes",
 
                                         return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
                                     },
-                                    items:[new ListItem("Fred"), new ListItem("Sally"), new ListItem("George"), new ListItem("Larry"), new ListItem("Bill")]
+                                    items:[
+
+                                        new ListItem("Fred"), 
+                                        new ListItem("Sally"), 
+                                        new ListItem("George"), 
+                                        new ListItem("Larry"), 
+                                        new ListItem("Bill")
+                                    ]
                                 },
                                 detailLabel: {
 
@@ -162,7 +177,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "Label",
                                     text: "Methods",
-                                    x: 4 * settings.general.margin,
+                                    x: 8 * settings.general.margin,
                                     widthType: "reserve",
                                     width: 8 * settings.general.margin,
                                     yType: "callback",
@@ -177,7 +192,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "true",
-                                    x: 6 * settings.general.margin,
+                                    x: 12 * settings.general.margin,
                                     widthType: "reserve",
                                     width: 12 * settings.general.margin,
                                     yType: "callback",
@@ -191,13 +206,20 @@ define(["NextWave/source/utility/prototypes",
 
                                         return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
                                     },
-                                    items:[new ListItem("Fred"), new ListItem("Sally"), new ListItem("George"), new ListItem("Larry"), new ListItem("Bill")]
+                                    items:[
+
+                                        new ListItem("Fred"), 
+                                        new ListItem("Sally"), 
+                                        new ListItem("George"), 
+                                        new ListItem("Larry"), 
+                                        new ListItem("Bill")
+                                    ]
                                 },
                                 propertiesLabel: {
 
                                     type: "Label",
                                     text: "Properties",
-                                    x: 4 * settings.general.margin,
+                                    x: 8 * settings.general.margin,
                                     widthType: "reserve",
                                     width: 8 * settings.general.margin,
                                     yType: "callback",
@@ -212,7 +234,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "true",
-                                    x: 6 * settings.general.margin,
+                                    x: 12 * settings.general.margin,
                                     widthType: "reserve",
                                     width: 12 * settings.general.margin,
                                     yType: "callback",
@@ -226,13 +248,20 @@ define(["NextWave/source/utility/prototypes",
 
                                         return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
                                     },
-                                    items:[new ListItem("Fred"), new ListItem("Sally"), new ListItem("George"), new ListItem("Larry"), new ListItem("Bill")]
+                                    items:[
+
+                                        new ListItem("Fred"), 
+                                        new ListItem("Sally"), 
+                                        new ListItem("George"), 
+                                        new ListItem("Larry"), 
+                                        new ListItem("Bill")
+                                    ]
                                 },
                                 eventsLabel: {
 
                                     type: "Label",
                                     text: "Events",
-                                    x: 4 * settings.general.margin,
+                                    x: 8 * settings.general.margin,
                                     widthType: "reserve",
                                     width: 8 * settings.general.margin,
                                     yType: "callback",
@@ -247,7 +276,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "true",
-                                    x: 6 * settings.general.margin,
+                                    x: 12 * settings.general.margin,
                                     widthType: "reserve",
                                     width: 12 * settings.general.margin,
                                     yType: "callback",
@@ -261,7 +290,14 @@ define(["NextWave/source/utility/prototypes",
 
                                         return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
                                     },
-                                    items:[new ListItem("Fred"), new ListItem("Sally"), new ListItem("George"), new ListItem("Larry"), new ListItem("Bill")]
+                                    items:[
+
+                                        new ListItem("Fred"), 
+                                        new ListItem("Sally"), 
+                                        new ListItem("George"), 
+                                        new ListItem("Larry"), 
+                                        new ListItem("Bill")
+                                    ]
                                 }
                             });
                             if (exceptionRet) {
@@ -290,7 +326,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
-                            window.PropertyBuilder = null;
+                            window.TypeTree = null;
                             m_bCreated = false;
 
                             return null;
