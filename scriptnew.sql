@@ -6,10 +6,10 @@ delimiter //
 
 
 
-/* 
+/* */
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
- */
+/* */
 
 
 
@@ -19,7 +19,7 @@ SELECT database()//
 
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/*  
+/* */
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -46,19 +46,21 @@ begin
 				insert project_tags values (itemIdVarName, @id);
 			elseif strItemType = 'type' THEN
 				insert type_tags values (itemIdVarName, @id);
-			else
+			elseif strItemType = 'method' THEN
 				insert method_tags values (itemIdVarName, @id);
+			else
+				insert librarys_tags values (itemIdVarName, @id);
 			end if;
 		END IF;
 		SET @inipos = @endpos + 1;
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
- */
+/* */
 
 
 -- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/* 
+/* */
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 
@@ -84,7 +86,7 @@ begin
     RETURN @uniqueName;
 end //
 
- */
+/* */
 
 create procedure maintainDB()
 begin
@@ -435,127 +437,6 @@ begin
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveMethod','post','routeRetrieveMethod',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0);        
 		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT) VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0);        
-
-		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,comicProjectId,isCoreProject)
-			VALUES 
-				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,1,TRUE),
-				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,2,TRUE),
-				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,3,TRUE),
-				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,4,TRUE),
-				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,5,TRUE)
-                ;
-            
-		INSERT INTO TGv1000.comics (id, `name`,  projectId, ordinal, thumbnail)
-			VALUES 
-				(1,'TechGroms Game Project Help',1,0,'tn3.png'),
-				(2,'TechGroms Console Project Help',2,0,'tn3.png'),
-				(3,'TechGroms Website Project Help',3,0,'tn3.png'),
-				(4,'TechGroms Hololens Project Help',4,0,'tn3.png'),
-				(5,'TechGroms Map Project Help',5,0,'tn3.png')
-				;
-            
-		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
-		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal)
-			VALUES 
-				(1,'GameBaseType','media/images/gameProject.png',10000),
-				(2,'ConsoleBaseType','media/images/consoleProject.png',10000),
-				(3,'WebsiteBaseType','media/images/websiteProject.png',10000),
-				(4,'HololensBaseType','media/images/hololensProject.png',10000),
-				(5,'MapBaseType','media/images/mappingProject.png',10000)
-                ;
-            
-		insert into TGv1000.`types` (id,`name`,projectId,ownedByUserId,isApp,imageId,ordinal,comicId,description,parentTypeId,parentPrice,priceBump,public,baseTypeId,isToolStrip)
-			VALUES 
-				(6,'App',1,1,1,0,0,1,'',0,0.00,0.00,1,1,1),
-				(7,'App',2,1,1,0,0,2,'',0,0.00,0.00,1,2,1),
-				(8,'App',3,1,1,0,0,3,'',0,0.00,0.00,1,3,1),
-				(9,'App',4,1,1,0,0,4,'',0,0.00,0.00,1,4,1),
-				(10,'App',5,1,1,0,0,5,'',0,0.00,0.00,1,5,1)
-                ;
-                
-		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(1,6,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(2,7,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(3,8,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(4,9,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(5,10,1,'initialize',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">initialize</field></block></xml>',0,'',0,0.00,0.00,1,3,''),
-				(6,1,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(7,2,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(8,3,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(9,4,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(10,5,1,'construct',0,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(11,6,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(12,7,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(13,8,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(14,9,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,''),
-				(15,10,1,'construct',1,'<xml xmlns="http://www.w3.org/1999/xhtml"><block type="procedures_defnoreturn"><mutation><arg name="self"></arg></mutation><field name="NAME">construct</field></block></xml>',0,'',0,0.00,0.00,1,4,'')
-			;
-           
-		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
-           because they can't be dragged onto the Designer.
-		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
-			VALUES
-				(1,1,'X','0',0),
-				(2,1,'Y','0',1),
-				(3,1,'Width','0',2),
-				(4,1,'Height','0',3)
-			;
-		*/
-            
-		/* need resources/tags for every project, type and method */            
-        insert TGv1000.tags (id,description)
-			VALUES
-				(1,'templates@techgroms.com'),
-				(2,'project'),
-				(3,'new_project'),
-                (4,'type'),
-                (5,'app'),
-                (6,'method'),
-                (7,'initialize')
-			;
-            
-		insert TGv1000.project_tags (projectId,tagId)
-			VALUES
-				(1,2),
-				(2,2),
-				(3,2),
-				(4,2),
-				(5,2)
-				;
-            
-		insert TGv1000.type_tags (typeId,tagId)
-			VALUES
-                (1,4),
-                (2,4),
-                (3,4),
-                (4,4),
-                (5,4),
-                (6,4),
-                (7,4),
-                (8,4),
-                (9,4),
-                (10,4)
-                ;
-            
-		insert TGv1000.method_tags (methodId,tagId)
-			VALUES
-                (1,6),
-                (2,6),
-                (3,6),
-                (4,6),
-                (5,6),
-                (6,6),
-                (7,6),
-                (8,6),
-                (9,6),
-                (10,6),
-                (11,6),
-                (12,6),
-                (13,6),
-                (14,6),
-                (15,6)
-                ;
 
 		CREATE TABLE TGv1000.usergroups (
 		  `id` int(11) NOT NULL,
@@ -917,6 +798,350 @@ begin
 		  PRIMARY KEY (`comicId`,`statementId`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         
+		CREATE TABLE `TGv1000`.`comics_expressions` (
+		  `comicId` int(11) NOT NULL,
+		  `expressionId` int(11) NOT NULL,
+		  PRIMARY KEY (`comicId`,`expressionId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`comics_literals` (
+		  `comicId` int(11) NOT NULL,
+		  `literalId` int(11) NOT NULL,
+		  PRIMARY KEY (`comicId`,`literalId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+		UPDATE `TGv1000`.`methods` set workspace = '{"statements": []}';
+            
+		ALTER TABLE `TGv1000`.`methods` 
+			CHANGE COLUMN `workspace` `workspace` JSON NOT NULL ;
+            
+		UPDATE control set dbstate=20 where id=1;
+        set @dbstate := 20;
+    end if;
+
+    if @dbstate = 20 THEN
+
+        ALTER TABLE `TGv1000`.`comics_expressions`
+			ADD CONSTRAINT FK_comicsexp
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+    
+        ALTER TABLE `TGv1000`.`comics_statements`
+			ADD CONSTRAINT FK_comicsstmt
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+    
+        ALTER TABLE `TGv1000`.`comics_literals`
+			ADD CONSTRAINT FK_comicslit
+            FOREIGN KEY (comicId) REFERENCES comics(id)
+            ON DELETE CASCADE;
+    
+		UPDATE control set dbstate=21 where id=1;
+        set @dbstate := 21;
+    end if;
+
+    if @dbstate = 21 THEN
+
+		ALTER TABLE `TGv1000`.`types` 
+			DROP FOREIGN KEY `FK_types`;
+
+        ALTER TABLE `TGv1000`.`types`
+			ADD CONSTRAINT FK_types
+            FOREIGN KEY (projectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+
+		delete from TGv1000.projects where id>5;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 22 THEN
+
+		ALTER TABLE `TGv1000`.`projects` 
+			ADD COLUMN `currentComicIndex` INT(11) NOT NULL DEFAULT '0' AFTER `chargeId`;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 23 THEN
+
+		ALTER TABLE `TGv1000`.`user` 
+			ADD COLUMN `lastProject` VARCHAR(255) NOT NULL DEFAULT '' AFTER `timezone`;
+		ALTER TABLE `TGv1000`.`user` 
+			ADD COLUMN `lastProjectId` INT(11) NOT NULL DEFAULT 0 AFTER `lastProject`;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 24 THEN
+
+		insert `TGv1000`.`usergroups` set name='site_teacher';
+        insert `TGv1000`.`permissions` set description='can_manage_site';
+        set @usergroupId := (select id from usergroups where name='site_teacher');
+        set @permissionId := (select id from permissions where description='can_manage_site');
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 25 THEN
+
+		insert `TGv1000`.`usergroups` set name='site_student';
+        insert `TGv1000`.`permissions` set description='can_register_for_sites';
+        set @usergroupId := (select id from usergroups where name='site_student');
+        set @permissionId := (select id from permissions where description='can_register_for_sites');
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+        set @permissionId := (select id from permissions where description='can_open_free_projects');
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+        set @permissionId := (select id from permissions where description='can_buy_projects');
+		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 26 THEN
+
+		update `TGv1000`.`projects` set quarantined=0 where id<6;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+    
+    if @dbstate = 27 THEN
+    
+		ALTER TABLE `TGv1000`.`waitlist` 
+			ADD COLUMN `fourHourWarningSent` TINYINT(1) NULL DEFAULT 0 AFTER `dtInvited`;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+
+    if @dbstate = 28 THEN
+    
+		CREATE TABLE `TGv1000`.`systemtypes` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` varchar(255) NOT NULL,
+          `ownedByUserId` int(11) NULL,
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
+          `description` mediumtext NULL,
+          `baseTypeId` int(11) NULL,
+          `isToolStrip` tinyint(1) NOT NULL DEFAULT '0',
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
+    if @dbstate = 29 THEN
+    
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchForPanels_S_L_E_ST','post','routeFetchForPanels_S_L_E_ST',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveSystemTypes','post','routeSaveSystemTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
+    if @dbstate = 30 THEN
+    
+		DELETE FROM `TGv1000`.`projects` where id>5;
+		UPDATE `TGv1000`.`types` SET ordinal=1 where ordinal=10000;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+    end if;
+        
+    if @dbstate = 31 THEN
+    
+		CREATE TABLE `TGv1000`.`typetypes` (
+		  `id` int(11) NOT NULL,
+		  `description` varchar(100) NOT NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		INSERT `TGv1000`.`typetypes` VALUES (1, 'normal'), (2, 'system'), (3, 'appbase');
+
+		ALTER TABLE `TGv1000`.`types` 
+		DROP COLUMN `isToolStrip`,
+		ADD COLUMN `typeTypeId` INT(11) NOT NULL DEFAULT 1 AFTER `name`;
+
+		DROP TABLE `TGv1000`.`systemtypes`;
+        
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+        
+    if @dbstate = 32 THEN
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 33 THEN
+
+		ALTER TABLE `TGv1000`.`methods` 
+			CHANGE COLUMN `parameters` `parameters` JSON NOT NULL ;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 34 THEN
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 35 THEN
+    
+		ALTER TABLE `TGv1000`.`methods` 
+			CHANGE COLUMN `workspace` `statements` JSON NOT NULL ,
+			CHANGE COLUMN `parameters` `arguments` JSON NOT NULL ;
+    
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 36 THEN
+
+		UPDATE `TGv1000`.`methods` set statements = '{"statements": []}';
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 37 THEN
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id<3;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 38 THEN
+
+		update types set public=1 where id=1;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 39 THEN
+
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchNormalUserNewProjectTypes','post','routeFetchNormalUserNewProjectTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 40 THEN
+
+		CREATE TABLE `TGv1000`.`libraries` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+          `name` varchar(255) NOT NULL,
+          `createdByUserId` int(11) NULL,
+		  `isSystemLibrary` tinyint(1) NOT NULL DEFAULT '0',
+          `isBaseLibrary` tinyint(1) NOT NULL DEFAULT '0',
+          `isAppLibrary` tinyint(1) NOT NULL DEFAULT '0',
+          `imageId` int(11) NOT NULL DEFAULT '0',
+          `altImagePath` varchar(255) NOT NULL DEFAULT '',
+          `description` mediumtext NULL,
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+        
+		CREATE TABLE `TGv1000`.`librarys_tags` (
+		  `libraryId` int(11) NOT NULL,
+		  `tagId` int(11) NOT NULL,
+		  PRIMARY KEY (`libraryId`,`tagId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+        ALTER TABLE `TGv1000`.`librarys_tags`
+			ADD CONSTRAINT FK_librarys_tags
+            FOREIGN KEY (libraryId) REFERENCES libraries(id)
+            ON DELETE CASCADE;
+        
+		CREATE TABLE `TGv1000`.`projects_comics_libraries` (
+		  `projectId` int(11) NOT NULL,
+		  `comicId` int(11) NOT NULL,
+		  `libraryId` int(11) NOT NULL,
+		  PRIMARY KEY (`projectId`,`comicId`, `libraryId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        
+        ALTER TABLE `TGv1000`.`projects_comics_libraries`
+			ADD CONSTRAINT FK_projects_comics_libraries
+            FOREIGN KEY (projectId) REFERENCES projects(id)
+            ON DELETE CASCADE;
+        
+		ALTER TABLE `TGv1000`.`types` 
+			DROP FOREIGN KEY `FK_types`;
+
+		ALTER TABLE `TGv1000`.`types` 
+			DROP COLUMN `comicId`,
+			DROP COLUMN `projectId`,
+			CHANGE COLUMN `ordinal` `ordinal` INT(11) NULL DEFAULT NULL AFTER `name`,
+			ADD COLUMN `libraryId` INT(11) NOT NULL DEFAULT 0 AFTER `ordinal`,
+			DROP INDEX `idx_projectId` ;
+
+		ALTER TABLE `TGv1000`.`comics` 
+			DROP FOREIGN KEY `FK_comics`;
+
+		ALTER TABLE `TGv1000`.`comics` 
+			DROP COLUMN `projectId`,
+			DROP INDEX `FK_comics` ;
+            
+		ALTER TABLE `TGv1000`.`projects` 
+			DROP COLUMN `comicProjectId`;
+            
+		ALTER TABLE `TGv1000`.`types` 
+			DROP COLUMN `typeTypeId`;
+            
+		DROP TABLE `TGv1000`.`typetypes`;            
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 41 THEN
+
+		insert TGv1000.projects (id,`name`,ownedByUserId,description,altImagePath,parentProjectId,parentPrice,priceBump,public,projectTypeId,isCoreProject)
+			VALUES 
+				(1,'New Game Project',1,'','media/images/gameProject.png',0,0.00,0.00,1,1,TRUE),
+				(2,'New Console Project',1,'','media/images/consoleProject.png',0,0.00,0.00,1,2,TRUE),
+				(3,'New Website Project',1,'','media/images/websiteProject.png',0,0.00,0.00,1,3,TRUE),
+				(4,'New Hololens Project',1,'','media/images/hololensProject.png',0,0.00,0.00,1,4,TRUE),
+				(5,'New Map Project',1,'','media/images/mappingProject.png',0,0.00,0.00,1,5,TRUE)
+                ;
+            
+		INSERT INTO TGv1000.comics (id, `name`, ordinal, thumbnail)
+			VALUES 
+				(1,'TechGroms Game Project Help',0,'tn3.png'),
+				(2,'TechGroms Console Project Help',0,'tn3.png'),
+				(3,'TechGroms Website Project Help',0,'tn3.png'),
+				(4,'TechGroms Hololens Project Help',0,'tn3.png'),
+				(5,'TechGroms Map Project Help',0,'tn3.png')
+				;
+            
         insert comics_statements
 			VALUES
 				(1,1),
@@ -991,12 +1216,6 @@ begin
                 (5,14)
 			;
             
-		CREATE TABLE `TGv1000`.`comics_expressions` (
-		  `comicId` int(11) NOT NULL,
-		  `expressionId` int(11) NOT NULL,
-		  PRIMARY KEY (`comicId`,`expressionId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        
         insert comics_expressions
 			VALUES
 				(1,1),
@@ -1121,12 +1340,6 @@ begin
                 (5,24)
 			;
             
-		CREATE TABLE `TGv1000`.`comics_literals` (
-		  `comicId` int(11) NOT NULL,
-		  `literalId` int(11) NOT NULL,
-		  PRIMARY KEY (`comicId`,`literalId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        
         insert comics_literals
 			VALUES
 				(1,1),
@@ -1176,216 +1389,132 @@ begin
                 (5,9)
 			;
             
-		UPDATE `TGv1000`.`methods` set workspace = '{"statements": []}';
+		INSERT INTO `libraries` (id,name,createdByUserId,isSystemLibrary,isBaseLibrary,isAppLibrary,imageId,altImagePath,description)
+			VALUES 
+			(1,'GameAppLibrary',1,0,0,1,0,'',NULL),
+            (2,'ConsoleAppLibrary',1,0,0,1,0,'',NULL),
+            (3,'WebsiteAppLibrary',1,0,0,1,0,'',NULL),
+            (4,'HololensAppLibrary',1,0,0,1,0,'',NULL),
+            (5,'MapAppLibrary',1,0,0,1,0,'',NULL),
+			(6,'GameBaseLibrary',1,0,1,0,0,'',NULL),
+            (7,'ConsoleBaseLibrary',1,0,1,0,0,'',NULL),
+            (8,'WebsiteBaseLibrary',1,0,1,0,0,'',NULL),
+            (9,'HololensBaseLibrary',1,0,1,0,0,'',NULL),
+            (10,'MapBaseLibrary',1,0,1,0,0,'',NULL),
+            (11,'ArrayLibrary',1,1,0,0,0,'',NULL),
+            (12,'BooleanLibrary',1,1,0,0,0,'',NULL),
+            (13,'DateLibrary',1,1,0,0,0,'',NULL),
+            (14,'MathLibrary',1,1,0,0,0,'',NULL),
+            (15,'NumberLibrary',1,1,0,0,0,'',NULL),
+            (16,'RegExpLibrary',1,1,0,0,0,'',NULL),
+            (17,'StringLibrary',1,1,0,0,0,'',NULL),
+            (18,'VisualObjectLibrary',1,1,0,0,0,'',NULL);
+
+        insert into TGv1000.tags (id,description)
+			VALUES
+                (8,'library')
+			;
+
+		insert TGv1000.librarys_tags VALUES
+			(1,8),
+			(2,8),
+			(3,8),
+			(4,8),
+			(5,8),
+			(6,8),
+			(7,8),
+			(8,8),
+			(9,8),
+			(10,8),
+			(11,8),
+			(12,8),
+			(13,8),
+			(14,8),
+			(15,8),
+			(16,8),
+			(17,8),
+			(18,8)
+			;
+
+		INSERT INTO `projects_comics_libraries` VALUES 
+			(1,1,1),
+            (1,1,6),
+            (1,1,11),
+            (1,1,12),
+            (1,1,13),
+            (1,1,14),
+            (1,1,15),
+            (1,1,16),
+            (1,1,17),
+            (1,1,18),
+            (2,2,2),
+            (2,2,7),
+            (2,2,11),
+            (2,2,12),
+            (2,2,13),
+            (2,2,14),
+            (2,2,15),
+            (2,2,16),
+            (2,2,17),
+            (2,2,18),
+            (3,3,3),
+            (3,3,8),
+            (3,3,11),
+            (3,3,12),
+            (3,3,13),
+            (3,3,14),
+            (3,3,15),
+            (3,3,16),
+            (3,3,17),
+            (3,3,18),
+            (4,4,4),
+            (4,4,9),
+            (4,4,11),
+            (4,4,12),
+            (4,4,13),
+            (4,4,14),
+            (4,4,15),
+            (4,4,16),
+            (4,4,17),
+            (4,4,18),
+            (5,5,5),
+            (5,5,10),
+            (5,5,11),
+            (5,5,12),
+            (5,5,13),
+            (5,5,14),
+            (5,5,15),
+            (5,5,16),
+            (5,5,17),
+            (5,5,18);
             
-		ALTER TABLE `TGv1000`.`methods` 
-			CHANGE COLUMN `workspace` `workspace` JSON NOT NULL ;
+		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
+		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal,libraryId)
+			VALUES 
+				(1,'GameBaseType','media/images/gameProject.png',10000,6),
+				(2,'ConsoleBaseType','media/images/consoleProject.png',10000,7),
+				(3,'WebsiteBaseType','media/images/websiteProject.png',10000,8),
+				(4,'HololensBaseType','media/images/hololensProject.png',10000,9),
+				(5,'MapBaseType','media/images/mappingProject.png',10000,10)
+                ;
             
-		UPDATE control set dbstate=20 where id=1;
-        set @dbstate := 20;
-    end if;
+		insert into TGv1000.`types` (id,`name`,libraryId,ownedByUserId,isApp,imageId,ordinal,description,parentTypeId,parentPrice,priceBump,public,baseTypeId)
+			VALUES 
+				(6,'App',1,1,1,0,0,'',0,0.00,0.00,1,1),
+				(7,'App',2,1,1,0,0,'',0,0.00,0.00,1,2),
+				(8,'App',3,1,1,0,0,'',0,0.00,0.00,1,3),
+				(9,'App',4,1,1,0,0,'',0,0.00,0.00,1,4),
+				(10,'App',5,1,1,0,0,'',0,0.00,0.00,1,5)
+                ;
 
-    if @dbstate = 20 THEN
-
-        ALTER TABLE `TGv1000`.`comics_expressions`
-			ADD CONSTRAINT FK_comicsexp
-            FOREIGN KEY (comicId) REFERENCES comics(id)
-            ON DELETE CASCADE;
-    
-        ALTER TABLE `TGv1000`.`comics_statements`
-			ADD CONSTRAINT FK_comicsstmt
-            FOREIGN KEY (comicId) REFERENCES comics(id)
-            ON DELETE CASCADE;
-    
-        ALTER TABLE `TGv1000`.`comics_literals`
-			ADD CONSTRAINT FK_comicslit
-            FOREIGN KEY (comicId) REFERENCES comics(id)
-            ON DELETE CASCADE;
-    
-		UPDATE control set dbstate=21 where id=1;
-        set @dbstate := 21;
-    end if;
-
-    if @dbstate = 21 THEN
-
-		ALTER TABLE `TGv1000`.`types` 
-			DROP FOREIGN KEY `FK_types`;
-        ALTER TABLE `TGv1000`.`types`
-			ADD CONSTRAINT FK_types
-            FOREIGN KEY (projectId) REFERENCES projects(id)
-            ON DELETE CASCADE;
-
-		delete from TGv1000.projects where id>5;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-
-    if @dbstate = 22 THEN
-
-		ALTER TABLE `TGv1000`.`projects` 
-			ADD COLUMN `currentComicIndex` INT(11) NOT NULL DEFAULT '0' AFTER `chargeId`;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-
-    if @dbstate = 23 THEN
-
-		ALTER TABLE `TGv1000`.`user` 
-			ADD COLUMN `lastProject` VARCHAR(255) NOT NULL DEFAULT '' AFTER `timezone`;
-		ALTER TABLE `TGv1000`.`user` 
-			ADD COLUMN `lastProjectId` INT(11) NOT NULL DEFAULT 0 AFTER `lastProject`;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-
-    if @dbstate = 24 THEN
-
-		insert `TGv1000`.`usergroups` set name='site_teacher';
-        insert `TGv1000`.`permissions` set description='can_manage_site';
-        set @usergroupId := (select id from usergroups where name='site_teacher');
-        set @permissionId := (select id from permissions where description='can_manage_site');
-		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-
-    if @dbstate = 25 THEN
-
-		insert `TGv1000`.`usergroups` set name='site_student';
-        insert `TGv1000`.`permissions` set description='can_register_for_sites';
-        set @usergroupId := (select id from usergroups where name='site_student');
-        set @permissionId := (select id from permissions where description='can_register_for_sites');
-		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
-        set @permissionId := (select id from permissions where description='can_open_free_projects');
-		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
-        set @permissionId := (select id from permissions where description='can_buy_projects');
-		insert `TGv1000`.`ug_permissions` set usergroupId=@usergroupId, permissionId=@permissionId;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-
-    if @dbstate = 26 THEN
-
-		update `TGv1000`.`projects` set quarantined=0 where id<6;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-    
-    if @dbstate = 27 THEN
-    
-		ALTER TABLE `tgv1000`.`waitlist` 
-			ADD COLUMN `fourHourWarningSent` TINYINT(1) NULL DEFAULT 0 AFTER `dtInvited`;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-
-    if @dbstate = 28 THEN
-    
-		CREATE TABLE `TGv1000`.`systemtypes` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-          `name` varchar(255) NOT NULL,
-          `ownedByUserId` int(11) NULL,
-          `imageId` int(11) NOT NULL DEFAULT '0',
-          `altImagePath` varchar(255) NOT NULL DEFAULT '',
-          `description` mediumtext NULL,
-          `baseTypeId` int(11) NULL,
-          `isToolStrip` tinyint(1) NOT NULL DEFAULT '0',
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-        
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-        
-    if @dbstate = 29 THEN
-    
-		INSERT `TGv1000`.`systemtypes` SET id=1,name='Array',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=2,name='Boolean',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=3,name='Date',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=4,name='Math',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=5,name='Number',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=6,name='RegExp',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=7,name='String',ownedByUserId=1;
-		INSERT `TGv1000`.`systemtypes` SET id=8,name='VisualObject',ownedByUserId=1;
-		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchForPanels_S_L_E_ST','post','routeFetchForPanels_S_L_E_ST',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
-		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveSystemTypes','post','routeSaveSystemTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-        
-    if @dbstate = 30 THEN
-    
-		DELETE FROM `TGv1000`.`projects` where id>5;
-		UPDATE `TGv1000`.`types` SET ordinal=1 where ordinal=10000;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-    end if;
-        
-    if @dbstate = 31 THEN
-    
-		CREATE TABLE `TGv1000`.`typetypes` (
-		  `id` int(11) NOT NULL,
-		  `description` varchar(100) NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-		INSERT `TGv1000`.`typetypes` VALUES (1, 'normal'), (2, 'system'), (3, 'appbase');
-
-		ALTER TABLE `tgv1000`.`types` 
-		DROP COLUMN `isToolStrip`,
-		ADD COLUMN `typeTypeId` INT(11) NOT NULL DEFAULT 1 AFTER `name`;
-
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Array',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Boolean',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Date',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Math',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='Number',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='RegExp',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='String',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		INSERT `TGv1000`.`types` SET typeTypeId=2,name='VisualObject',ownedByUserId=1;
-		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,workspace,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,parameters)
-			VALUES
-				(LAST_INSERT_ID(),1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'');
-		UPDATE `TGv1000`.`types` SET typeTypeId=3 WHERE id<6;
-
-		DROP TABLE `TGv1000`.`systemtypes`;
-        
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-        
-    if @dbstate = 32 THEN
+		INSERT `TGv1000`.`types` SET id=11,name='Array',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=12,name='Boolean',ownedByUserId=1,libraryId=12;
+		INSERT `TGv1000`.`types` SET id=13,name='Date',ownedByUserId=1,libraryId=13;
+		INSERT `TGv1000`.`types` SET id=14,name='Math',ownedByUserId=1,libraryId=14;
+		INSERT `TGv1000`.`types` SET id=15,name='Number',ownedByUserId=1,libraryId=15;
+		INSERT `TGv1000`.`types` SET id=16,name='RegExp',ownedByUserId=1,libraryId=16;
+		INSERT `TGv1000`.`types` SET id=17,name='String',ownedByUserId=1,libraryId=17;
+		INSERT `TGv1000`.`types` SET id=18,name='VisualObject',ownedByUserId=1,libraryId=18;
 
     	set @id := (select id from `TGv1000`.`types` where name='VisualObject');
     	INSERT `TGv1000`.`propertys` SET `name`='x', typeId=@id, ordinal=0, propertyTypeId=6, initialValue='Number';
@@ -1393,75 +1522,51 @@ begin
     	INSERT `TGv1000`.`propertys` SET `name`='height', typeId=@id, ordinal=2, propertyTypeId=6, initialValue='Number';
     	INSERT `TGv1000`.`propertys` SET `name`='width', typeId=@id, ordinal=3, propertyTypeId=6, initialValue='Number';
 
+		insert TGv1000.methods (id,typeId,ownedByUserId,`name`,ordinal,statements,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,arguments)
+			VALUES
+				(1,6,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(2,7,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(3,8,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(4,9,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(5,10,1,'initialize',0,'{"statements": []}',0,'',0,0.00,0.00,1,3,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(6,1,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(7,2,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(8,3,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(9,4,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(10,5,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(11,6,1,'construct',1,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(12,7,1,'construct',1,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(13,8,1,'construct',1,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(14,9,1,'construct',1,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(15,10,1,'construct',1,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}')
+			;
+           
+		insert TGv1000.methods (typeId,ownedByUserId,`name`,ordinal,statements,imageId,description,parentMethodId,parentPrice,priceBump,public,methodTypeId,arguments)
+			VALUES
+				(11,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(12,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(13,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(14,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(15,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(16,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(17,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}'),
+				(18,1,'construct',0,'{"statements": []}',0,'',0,0.00,0.00,1,4,'{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}');
+
+                
+		/* not going to add X,Y,Width,Height props to the 5+5 initial Types,
+           because they can't be dragged onto the Designer.
+		insert TGv1000.propertys (id,typeId,`name`,initialValue,ordinal)
+			VALUES
+				(1,1,'X','0',0),
+				(2,1,'Y','0',1),
+				(3,1,'Width','0',2),
+				(4,1,'Height','0',3)
+			;
+		*/
+            
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-    
-    if @dbstate = 33 THEN
-
-		UPDATE `tgv1000`.`methods` set parameters='{}';
-		ALTER TABLE `tgv1000`.`methods` 
-			CHANGE COLUMN `parameters` `parameters` JSON NOT NULL ;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-    
-    if @dbstate = 34 THEN
-
-		UPDATE `TGv1000`.`methods` set parameters = '{"arguments": []}';
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-    
-    if @dbstate = 35 THEN
-    
-		ALTER TABLE `tgv1000`.`methods` 
-			CHANGE COLUMN `workspace` `statements` JSON NOT NULL ,
-			CHANGE COLUMN `parameters` `arguments` JSON NOT NULL ;
-    
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-    
-    if @dbstate = 36 THEN
-
-		UPDATE `TGv1000`.`methods` set statements = '{"statements": []}';
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-    
-    if @dbstate = 37 THEN
-
-		update methods set arguments='{"arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]}}';
-    
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id<3;
-
-    end if;
-    
-    if @dbstate = 38 THEN
-
-		update types set public=1 where id=1;
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
-
-    end if;
-    
-    if @dbstate = 39 THEN
-
-		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchNormalUserNewProjectTypes','post','routeFetchNormalUserNewProjectTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
-
-		set @dbstate := @dbstate + 1;
-		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
 
     end if;
     
