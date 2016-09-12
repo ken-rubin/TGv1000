@@ -35,6 +35,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/Parameter",
     "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/StatementList",
+    "NextWave/source/project/Project",
     "NextWave/source/type/Type",
     "NextWave/source/type/Methods",
     "NextWave/source/type/Method",
@@ -42,7 +43,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/type/Property",
     "NextWave/source/type/Events",
     "NextWave/source/type/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Type, Methods, Method, Properties, Property, Events, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Type, Methods, Method, Properties, Property, Events, Event) {
 
         try {
 
@@ -74,24 +75,17 @@ define(["NextWave/source/utility/prototypes",
                     self.alternateFocus = null;
                     // Collection of types available in the current context.
                     self.types = [];
-                    // Collection of systemTypes available in the current context.
-                    self.systemTypes = [];
 
                     // Only one of the following can be true, but both can be false.
                     // Indicates there is a project which has been loaded up into this manager.
                     self.projectLoaded = false;
-                    // Indicates the manager is set to work on System Types.
-                    self.systemTypesLoaded = false;
                     // Holds currently displayed version of panelLayer.
                     // 0 means panelLayer has no panels at all.
                     // 1 means panels are set for normal projects with all panels present.
-                    // 2 means panels are set for system types projects with the types panel missing and the system types panel stretched upward to take up the space.
                     self.iPanelArrangement = 0;
                     
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
-                    // Special privilege allows editing and saving (creating sql script files) of System Types or App base types
-                    self.userCanWorkWithSystemTypesAndAppBaseTypes = false;
                     // Current type/method.
                     self.context = {
 
@@ -164,11 +158,10 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Allocate and create the 3 panel layers.
+                            // Allocate and create the 2 panel layers.
                             // [0]: No panels.
                             // [1]: Panels in the normal project configuration.
-                            // [2]: Panels in the system types project configuration.
-                            for (var i = 0; i < 3; i++) {
+                            for (var i = 0; i < 2; i++) {
 
                                 var pl = new LayerPanels();
                                 exceptionRet = pl.create(i);
@@ -258,7 +251,7 @@ define(["NextWave/source/utility/prototypes",
                                 m_functionKeyUp);
 
                             // Now activate the empty panelLayer.
-                            exceptionRet = self.clearPanels(self.userCanWorkWithSystemTypesAndAppBaseTypes ? 2 : 1);
+                            exceptionRet = self.clearPanels(1);
                             if (exceptionRet) { return exceptionRet; }
 
                             // Start the rendering.
@@ -274,7 +267,6 @@ define(["NextWave/source/utility/prototypes",
                     // Clear panels.
                     // iPanelArrangement = 0 for an empty panelLayer.
                     // iPanelArrangement = 1 for a normal project.
-                    // iPanelArrangement = 2 for a system types project.
                     self.clearPanels = function (iPanelArrangement) {
 
                         try {
@@ -303,15 +295,12 @@ define(["NextWave/source/utility/prototypes",
 
                             // Reset *Loaded.
                             self.projectLoaded = false;
-                            self.systemTypesLoaded = false;
 
                             // Clear panel data.
                             var exceptionRet = self.panelLayer.clearTypes();
                             if (exceptionRet) { return exceptionRet; }
-                            var exceptionRet = self.panelLayer.clearSystemTypes();
-                            if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearStatements();
-                            if (exceptionRet) { return exceptionRet; }
+                            // exceptionRet = self.panelLayer.clearStatements();
+                            // if (exceptionRet) { return exceptionRet; }
                             // exceptionRet = self.panelLayer.clearExpressions();
                             // if (exceptionRet) { return exceptionRet; }
                             // exceptionRet = self.panelLayer.clearNames();
@@ -380,18 +369,22 @@ define(["NextWave/source/utility/prototypes",
                                 exceptionRet = self.loadStatements(objectComic.statements);
                                 if (exceptionRet) { return exceptionRet; }
 
-                                // Add the libraries from the comic into this instance.
-                                exceptionRet = self.loadLibraries(objectComic.libraries);
-                                if (exceptionRet) { return exceptionRet; }
+                                // Build up an object hierarchy from the data.
+                                if (!window.tg) {
 
-                                // Add project's system types into their panel.
-                                // exceptionRet = self.loadSystemTypes(objectProject.systemTypes);
-                                // if (exceptionRet) { return exceptionRet; }
-
-                                // If a privileged (system type-wise) user, we open and pin all panels.
-                                if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
-                                    self.panelLayer.openAndPinAllPanels();
+                                    window.tg = {};
                                 }
+
+                                window.tg.project = new Project();
+                                exceptionRet = window.tg.project.create(objectProject);
+                                if (exceptionRet) { 
+
+                                    return exceptionRet; 
+                                }
+
+                                // Load up the project into the ProjectDialog.
+                                exceptionRet = window.projectDialog.loadProject(window.tg.project);
+                                if (exceptionRet) { return exceptionRet; }
 
                                 // Set loaded.
                                 self.projectLoaded = true;
@@ -418,7 +411,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            self.clearPanels(2);
+/*                            self.clearPanels(2);
                             var exceptionRet = null;
 
                             // objectData is a 4xN ragged array of [0] no longer used; [1] statements; [2] literals; [3] expressions.
@@ -449,7 +442,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set loaded.
                             self.systemTypesLoaded = true;
-
+*/
                             return null;
 
                         } catch (e) { return e; }
@@ -554,7 +547,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MyType",
-                                self.types.concat(self.systemTypes),
+                                self.types,
                                 "name");
 
                             // Create type.
@@ -588,7 +581,7 @@ define(["NextWave/source/utility/prototypes",
                     self.createSystemType = function () {
 
                         try {
-
+/*
                             // Generate a new type-name.
                             var strName = self.getUniqueName("MySystemType",
                                 self.systemTypes.concat(self.types),
@@ -634,6 +627,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Select it into the GUI.
                             return self.selectSystemType(typeNew);
+                            */
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -760,15 +755,13 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method returns a type or system type that matches name.
-                    // Since no overlap between system types and types exists, this
-                    // one function will check both arrays.
+                    // Method returns a type that matches name.
                     self.getTypeFromName = function (strTypeName) {
 
                         try {
 
                             // Find it.
-                            var allTypes = self.types.concat(self.systemTypes);
+                            var allTypes = self.types;
                             for (var i = 0; i < allTypes.length; i++) {
 
                                 var typeIth = allTypes[i];
@@ -788,9 +781,6 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method changes a type name.
-                    // It has to be changed in the type or systemType that matches strOriginalName (there is no overlap).
-                    // Then we have to loop through self.types or self.types and self.systemTypes (depending on the changed type's stowage.typeTypeId)
-                    // and update it in every reference, ultimately just in CodeExpressionTypes.
                     self.changeTypeName = function (strOriginalName, strNewName) {
 
                         try {
@@ -814,32 +804,13 @@ define(["NextWave/source/utility/prototypes",
 
                             if (!type) {
 
-                                for (var i = 0; i < self.systemTypes.length; i++) {
-
-                                    var typeIth = self.systemTypes[i];
-
-                                    // Find match...
-                                    if (typeIth.name === strOriginalName) {
-
-                                        // ...and update.
-                                        typeIth.name = strNewName;
-                                        type = typeIth;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (!type) {
-
                                 return new Error("Strangely, could not locate type with name: " + strOriginalName + ".");
                             }
 
                             var j = type.stowage.typeTypeId;
                             // 1 for App type or normal (user-added type)
-                            // 2 for System types
                             // 3 for App base types
                             // The construct and initialize methods cannot be renamed.
-                            // Cannot concat self.types and self.systemTypes because concat doesn't maintain reference.
 
                             // Always do self.types.
                             for (var i = 0; i < self.types.length; i++) {
@@ -851,20 +822,6 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // If changing the name of a system type or an App base type (that is not public),
-                            // also loop through self.systemTypes.
-                            if (type.stowage.typeTypeId > 1) {
-
-                                for (var i = 0; i < self.systemTypes.length; i++) {
-
-                                    var exceptionRet = self.systemTypes[i].changeTypeName(strOriginalName, strNewName);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-                                }
-                            }
-                            
                             return null;
                         } catch (e) {
 
@@ -900,7 +857,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Select a different system type if the deleted one was the one in the center panel.
+                            // Select a different type if the deleted one was the one in the center panel.
                             if (window.typeBuilder.typeContext.name === nameRemoved) {
 
                                 var newTypeIndex = m_functionGetNewIndex(self.types, indexRemoved);
@@ -910,7 +867,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Nothing left -- cannot happen in Types, actually, because no one can delete App type.
-                                // But can happen in similar code in system types panel.
+                                // But can happen in similar code in types panel.
                                 self.panelLayer.clearCenter("Type");
                             }
 
@@ -925,7 +882,7 @@ define(["NextWave/source/utility/prototypes",
                     self.removeSystemType = function (typeToRemove) {
 
                         try {
-
+/*
                             var indexRemoved;
                             var nameRemoved = typeToRemove.name;
 
@@ -962,7 +919,7 @@ define(["NextWave/source/utility/prototypes",
                                 // But can happen in similar code in system types panel.
                                 self.panelLayer.clearCenter("Type");
                             }
-
+*/
                             return null;
                         } catch (e) {
 
@@ -1043,8 +1000,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Changes a Method name.
-                    // It then has to loop through all Types and SystemTypes (if Method is in a System type
-                    // or an App base type)
+                    // It then has to loop through all Types
                     // or through all types (if Method is in a user or App type) and update
                     // uses throughout.
                     self.changeMethodName = function (type, strOriginalMethodName, strNewMethodName) {
@@ -1072,10 +1028,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 var j = type.stowage.typeTypeId;
                                 // 1 for App type or normal (user-added type)
-                                // 2 for System types
                                 // 3 for App base types
                                 // The construct and initialize methods cannot be renamed.
-                                // Cannot concat self.types and self.systemTypes because concat doesn't maintain reference.
 
                                 // Always do self.types.
                                 for (var i = 0; i < self.types.length; i++) {
@@ -1086,22 +1040,6 @@ define(["NextWave/source/utility/prototypes",
                                     if (exceptionRet) {
 
                                         return exceptionRet;
-                                    }
-                                }
-
-                                // If changing the name of a Method in a system type or App base type,
-                                // also loop through self.systemTypes.
-                                if (type.stowage.typeTypeId > 1) {
-
-                                    for (var i = 0; i < self.systemTypes.length; i++) {
-
-                                        var exceptionRet = self.systemTypes[i].changeMethodName(type.name,
-                                            strOriginalMethodName,
-                                            strNewMethodName);
-                                        if (exceptionRet) {
-
-                                            return exceptionRet;
-                                        }
                                     }
                                 }
                             }
@@ -1196,9 +1134,6 @@ define(["NextWave/source/utility/prototypes",
                     // arrayCollection -- the collection to iterate over and ensure uniqueness.  Defaults to self.panelLayer.namesPanel.payload.items.
                     // strNameProperty -- the property-name-accessor on items in arrayCollection.
                     // strNameReferenceProperty -- the accessor property on the strNamePropety types as objects.
-                    //
-                    // New: when getting a unique type name we will be passing in manager.types.concat(manager.systemTypes).
-                    // Thus, uniqueness will be enforced across both sets ALONG WITH reserved words.
                     self.getUniqueName = function (strName, arrayCollection, strNameProperty, strNameRefinementProperty) {
 
                         try {
@@ -1361,7 +1296,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // If there are no systemTypes, then set context to this systemType,
+/*                            // If there are no systemTypes, then set context to this systemType,
                             // unless this systemType has no methods, in which case, wait.
                             if (self.context.type === null &&
                                 typeNew &&
@@ -1379,6 +1314,8 @@ define(["NextWave/source/utility/prototypes",
                             self.systemTypes.push(typeNew);
 
                             return self.panelLayer.addSystemType(typeNew);
+                            */
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -1443,10 +1380,12 @@ define(["NextWave/source/utility/prototypes",
                     self.clearSystemTypes = function () {
 
                         try {
-
+/*
                             self.systemTypes = [];
 
                             return self.panelLayer.clearSystemTypes();
+                            */
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -1457,7 +1396,7 @@ define(["NextWave/source/utility/prototypes",
                     self.loadSystemTypes = function (arrayList) {
 
                         try {
-
+/*
                             // Start with a clean slate.
                             var exceptionRet = self.clearSystemTypes();
                             if (exceptionRet) {
@@ -1490,7 +1429,7 @@ define(["NextWave/source/utility/prototypes",
                                     m_arrayReserved.push(typeNew.name);
                                 }
                             }
-
+*/
                             return null;
                         } catch (e) {
 
@@ -1582,7 +1521,7 @@ define(["NextWave/source/utility/prototypes",
                     self.selectSystemType = function (type) {
 
                         try {
-
+/*
                             // Clear data out from previous context.
                             var exceptionRet = self.panelLayer.clearCenter("Type");
                             if (exceptionRet) {
@@ -1596,7 +1535,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-
+*/
                             return null;
                         } catch (e) {
 
@@ -1735,10 +1674,10 @@ define(["NextWave/source/utility/prototypes",
                         var objectRet = {};
 
                         // Allocate array which holds module strings.
-                        objectRet.systemTypes = [];
+//                        objectRet.systemTypes = [];
                         objectRet.types = [];
 
-                        // Generate a module for each SystemType.
+                        /* Generate a module for each SystemType.
                         for (var i = 0; i < self.systemTypes.length; i++) {
 
                             // Extract and save the type.
@@ -1747,7 +1686,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add it to the result object.
                             objectRet.systemTypes.push(strModule);
-                        }
+                        }*/
 
                         // Generate a module for each Type.
                         for (var i = 0; i < self.types.length; i++) {
@@ -1771,7 +1710,7 @@ define(["NextWave/source/utility/prototypes",
                         // Extract the saved off project.
                         var objectRet = self.projectData;
 
-                        // Get system types if user has permission to have worked with them.
+                        /* Get system types if user has permission to have worked with them.
                         objectRet.systemTypes = [];
                         if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
 
@@ -1782,7 +1721,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 objectRet.systemTypes.push(objectType);
                             }
-                        }
+                        }*/
 
                         // For now, only handling first comic.
                         var objectComic = objectRet.comics[objectRet.currentComicIndex];
@@ -1807,7 +1746,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Returns array of system types (including, maybe, app type's base type in [0]) to caller.
                     self.saveSystemTypes = function () {
-
+/*
                         var arraySystemTypes = [];
 
                         for (var i = 0; i < self.systemTypes.length; i++) {
@@ -1817,8 +1756,8 @@ define(["NextWave/source/utility/prototypes",
 
                             arraySystemTypes.push(objectType);
                         }
-
-                        return arraySystemTypes;
+*/
+                        return [];//arraySystemTypes;
                     }
 
                     // Test object for input focus.
@@ -1898,7 +1837,7 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
-                    // Chooses type or systemType to display in center panel if one has been deleted.
+                    // Chooses Type to display in center panel if one has been deleted.
                     var m_functionGetNewIndex = function (typeArray, indexRemoved) {
 
                         var len = typeArray.length;

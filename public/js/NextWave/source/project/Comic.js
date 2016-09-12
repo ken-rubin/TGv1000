@@ -10,8 +10,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["NextWave/source/project/Project"], 
-	function (Project) {
+define(["NextWave/source/project/Library"], 
+	function (Library) {
 	
 		try {
 
@@ -27,17 +27,37 @@ define(["NextWave/source/project/Project"],
 
                     // Immediate owning instance.
                     self.owner = projectOwner;
-                    // Name of this type object.
-                    self.name = "comic";
+                    // Backing data for this instance.
+                    self.data = null;
+                    // Libraries owned by this Comic.
+                    self.libraries = [];
 
                     ///////////////////////////
                     // Public methods.
 
                     // Create instance.
-                    self.create = function () {
+                    self.create = function (objectComic) {
 
                         try {
 
+                            // First, save off the data.
+                            self.data = objectComic;
+
+                            // Then loop over libraries and create children.
+                            for (var i = 0; i < objectComic.libraries.length; i++) {
+
+                                // Get the ith Library.
+                                var objectLibraryIth = objectComic.libraries[i];
+
+                                // Allocate and create a new Library and add to collection.
+                                var libraryIth = new Library(self);
+                                var exceptionRet = libraryIth.create(objectLibraryIth);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                                self.libraries.push(libraryIth);
+                            }
                             return null;
                         } catch (e) {
 
@@ -45,24 +65,30 @@ define(["NextWave/source/project/Project"],
                         }
                     };
 
-                    // Destroys instance.
-                    self.destroy = function () {
+                    // Clear out the selection in all the associated Libraries.
+                    self.unselectAllLibraries = function () {
 
                         try {
 
-                            // Close up type.
-                            self.open = false;
+                            // Then loop over libraries and unselect them.
+                            for (var i = 0; i < self.libraries.length; i++) {
 
+                                // Get the ith Library.
+                                var libraryIth = self.libraries[i];
+
+                                // Unselect it.
+                                var exceptionRet = libraryIth.unselect();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
                             return null;
                         } catch (e) {
 
                             return e;
                         }
                     };
-
-                    //////////////////////////
-                    // Private fields.
-
 				} catch (e) {
 
 					alert(e.message);

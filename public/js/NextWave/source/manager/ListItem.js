@@ -33,12 +33,20 @@ define(["NextWave/source/utility/prototypes",
                     self.name = strName || "default";
                     // Indicates the type is highlighted.
                     self.highlight = false;
+                    // Also provide a selected coloring.
+                    self.selected = false;
                     // Get a reference to the settings for this object.
                     self.settingsNode = settings.list[strSettingsNode || "expression"];
                     // Callback to handle click event.
                     // Callback must accept click-event-object 
                     // reference and return an Exception.
                     self.clickHandler = null;
+                    // Callback to handle delete event.
+                    // Callback must accept click-event-object 
+                    // reference and return an Exception.
+                    // Further, the icon is shown when this
+                    // event handler is truthy (e.g. is set).
+                    self.deleteHandler = null;
 
                     ////////////////////////
                     // Public methods.
@@ -60,7 +68,13 @@ define(["NextWave/source/utility/prototypes",
                     // Return the area for dragging rendering.
                     self.getDragArea = function () {
 
-                        return m_area.clone();
+                        if (m_area) {
+
+                            return m_area.clone();
+                        } else {
+
+                            return new Area();
+                        }
                     };
 
                     // Returns the height of this item.
@@ -76,6 +90,12 @@ define(["NextWave/source/utility/prototypes",
                         contextRender.font = self.settingsNode.font;
                         var dWidth = contextRender.measureText(self.name).width + 
                             2 * settings.general.margin;
+
+                        if ($.isFunction(self.deleteHandler)) {
+
+                            // Add room for glyph.
+                            dWidth += settings.glyphs.width;
+                        }
                         return dWidth;
                     };
 
@@ -110,6 +130,53 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Pass the click event object reference.
                                 return self.clickHandler(objectReference);
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Change cursor if over delete handler.
+                    self.mouseMove = function (objectReference) {
+
+                        try {
+
+                            // Delete handler is handled, then change cursor if over icon.
+                            if (self.deleteHandler) {
+
+                                if (m_areaDeleteIcon &&
+                                    m_areaDeleteIcon.pointInArea(objectReference.contextRender,
+                                        objectReference.pointCursor,
+                                        true)) {
+
+                                    // Set the cursor.
+                                    objectReference.cursor = "cell";
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Handle mouse down.
+                    self.mouseDown = function(objectReference) {
+
+                        try {
+
+                            // If inside the delete icon bounds, then raise delete event.
+                            if ($.isFunction(self.deleteHandler) && 
+                                m_areaDeleteIcon &&
+                                m_areaDeleteIcon.pointInArea(objectReference.contextRender,
+                                    objectReference.pointCursor,
+                                    true)) {
+
+                                return self.deleteHandler(objectReference);
                             }
 
                             return null;
@@ -162,6 +229,10 @@ define(["NextWave/source/utility/prototypes",
 
                                 contextRender.fillStyle = settings.general.fillDrag;
                                 contextRender.strokeStyle = settings.general.strokeDrag;
+                            } else if (self.selected) {
+
+                                contextRender.fillStyle = settings.general.fillBackgroundSelected;
+                                contextRender.strokeStyle = settings.general.strokeBackgroundSelected;
                             } else if (self.highlight) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
@@ -174,13 +245,37 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.fill();
                             contextRender.stroke();
 
+                            // Render the delete handler, if specified.
+                            var dSpaceForDeleteIcon = 0;
+                            if ($.isFunction(self.deleteHandler)) {
+
+                                // Calculate where the icon is, also used for hittesting.
+                                m_areaDeleteIcon = new Area(
+                                    new Point(m_area.location.x + m_area.extent.width - settings.glyphs.width,
+                                        m_area.location.y),
+                                    new Size(settings.glyphs.smallWidth,
+                                        settings.glyphs.smallHeight));
+
+                                dSpaceForDeleteIcon = settings.glyphs.width;
+
+                                // Render pushpin.
+                                exceptionRet = glyphs.render(contextRender,
+                                    m_areaDeleteIcon,
+                                    glyphs.remove,
+                                    settings.manager.showIconBackgrounds);
+                                if (exceptionRet) {
+
+                                    throw exceptionRet;
+                                }
+                            }
+
                             // Render the name.
                             contextRender.font = self.settingsNode.font;
                             contextRender.fillStyle = settings.general.fillText;
                             contextRender.fillText(self.getName(),
                                 m_area.location.x + settings.general.margin,
                                 m_area.location.y,
-                                m_area.extent.width - 2 * settings.general.margin);
+                                m_area.extent.width - 2 * settings.general.margin - dSpaceForDeleteIcon);
 
                             return null;
                         } catch (e) {
@@ -194,6 +289,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // The area, relative to the canvas, occupied by this instance.
                     var m_area = null;
+                    // Remember where the delete icon is--if delete handler is handled.
+                    var m_areaDeleteIcon = null;
                 } catch (e) {
 
                     alert(e.message);

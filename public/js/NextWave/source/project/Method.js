@@ -10,8 +10,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["NextWave/source/project/Type"], 
-	function (Type) {
+define(["NextWave/source/manager/ListItem"], 
+    function (ListItem) {
 	
 		try {
 
@@ -20,23 +20,34 @@ define(["NextWave/source/project/Type"],
 
 				try {
 
-            		var self = this;                        // Uber closure.
+                    var self = this;                        // Uber closure.
 
                     ///////////////////////
                     // Public fields.
 
-                    // Immediate owning type.
+                    // Immediate owning instance.
                     self.owner = typeOwner;
-                    // Name of this type object.
-                    self.name = "method";
+                    // Backing data for this instance.
+                    self.data = null;
+                    // Hold on to ListItem associated with this instance.
+                    self.listItem = null;
 
                     ///////////////////////////
                     // Public methods.
 
                     // Create instance.
-                    self.create = function () {
+                    self.create = function (objectMethod) {
 
                         try {
+
+                            // Save off the data.
+                            self.data = objectMethod;
+
+                            // Generate ListItem for this instance.
+                            self.listItem = new ListItem(self.data.name);
+                            self.listItem.clickHandler = m_functionClickHandler;
+                            self.listItem.deleteHandler = m_functionDeleteHandler;
+                            self.listItem.owner = self;
 
                             return null;
                         } catch (e) {
@@ -45,14 +56,49 @@ define(["NextWave/source/project/Type"],
                         }
                     };
 
-                    // Destroys instance.
-                    self.destroy = function () {
+                    // Select this Method.
+                    self.select = function () {
+
+                        // Set the ListItem to selected.
+                        self.listItem.selected = true;
+                        return m_functionClickHandler({});
+                    };
+
+                    // Unselect this Method.
+                    self.unselect = function () {
+
+                        // Set the ListItem to selected.
+                        self.listItem.selected = false;
+                        return null;
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
+
+                    // Invoked when the mouse is clicked over this instance.
+                    var m_functionClickHandler = function (objectReference) {
 
                         try {
 
-                            // Close up type.
-                            self.open = false;
+                            // Clear the highlight in all the 
+                            // other instances of the owner.
+                            var exceptionRet = self.owner.unselectAll();
+                            if (exceptionRet) {
 
+                                return exceptionRet;
+                            }
+
+                            // Set the ListItem to selected.
+                            self.listItem.selected = true;
+
+                            // Set the current Type.
+                            var exceptionRet = window.projectDialog.setCurrentMethod(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Set center panel to this instance.
                             return null;
                         } catch (e) {
 
@@ -60,9 +106,18 @@ define(["NextWave/source/project/Type"],
                         }
                     };
 
-                    //////////////////////////
-                    // Private fields.
+                    // Invoked when the mouse is clicked over this instance's delete icon.
+                    var m_functionDeleteHandler = function (objectReference) {
 
+                        try {
+
+                            // Delete this Type.
+                            return window.projectDialog.deleteMethod(self);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 				} catch (e) {
 
 					alert(e.message);

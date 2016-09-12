@@ -16,10 +16,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Label",
     "NextWave/source/utility/Edit",
+    "NextWave/source/utility/GlyphHost",
     "NextWave/source/utility/ListHost",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, ListHost, ParameterListHost, StatementListHost) {
+    function (prototypes, settings, Point, Size, Area, Label, Edit, GlyphHost, ListHost, ParameterListHost, StatementListHost) {
 
         try {
 

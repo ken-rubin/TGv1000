@@ -10,8 +10,8 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define([], 
-	function () {
+define(["NextWave/source/project/Comic"], 
+	function (Comic) {
 	
 		try {
 
@@ -25,38 +25,37 @@ define([],
                     ///////////////////////
                     // Public fields.
 
-                    // Name of this type object.
-                    self.name = "project";
+                    // Backing data for this instance.
+                    self.data = null;
+                    // Comics owned by this project.
+                    self.comics = [];
 
                     ///////////////////////////
                     // Public methods.
 
-                    // Return a code instance
-                    self.allocateCodeInstance = function () {
-
-                        return self.name;
-                    };
-
                     // Create instance.
-                    self.create = function () {
+                    self.create = function (objectProject) {
 
                         try {
 
-                            return null;
-                        } catch (e) {
+                            // First, save off the data.
+                            self.data = objectProject;
 
-                            return e;
-                        }
-                    };
+                            // Then loop over comics and create children.
+                            for (var i = 0; i < objectProject.comics.length; i++) {
 
-                    // Destroys instance.
-                    self.save = function () {
+                                // Get the ith Comic.
+                                var objectComicIth = objectProject.comics[i];
 
-                        try {
+                                // Allocate and create a new comic and add to collection.
+                                var comicIth = new Comic(self);
+                                var exceptionRet = comicIth.create(objectComicIth);
+                                if (exceptionRet) {
 
-                            // Close up type.
-                            self.open = false;
-
+                                    return exceptionRet;
+                                }
+                                self.comics.push(comicIth);
+                            }
                             return null;
                         } catch (e) {
 

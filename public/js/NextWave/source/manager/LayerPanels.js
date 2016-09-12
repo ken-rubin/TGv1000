@@ -18,19 +18,11 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/Size",
         "NextWave/source/manager/Layer",
         "NextWave/source/manager/Panel",
-        "NextWave/source/type/TypeTree",
-        "NextWave/source/type/Type",
-        "NextWave/source/type/TypeSection",
-        "NextWave/source/type/Methods",
-        "NextWave/source/type/Properties",
-        "NextWave/source/type/Events",
-        "NextWave/source/type/SectionPart",
-        "NextWave/source/type/Method",
-        "NextWave/source/type/Property",
-        "NextWave/source/type/Event",
-        "NextWave/source/type/TypeBuilder",
-        "NextWave/source/type/PropertyBuilder",
-        "NextWave/source/type/EventBuilder",
+        "NextWave/source/project/ProjectDialog",
+        "NextWave/source/project/Type",
+        "NextWave/source/project/TypeBuilder",
+        "NextWave/source/project/PropertyBuilder",
+        "NextWave/source/project/EventBuilder",
         "NextWave/source/name/NameList",
         "NextWave/source/name/Name",
         "NextWave/source/statement/StatementList",
@@ -38,7 +30,7 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/literal/LiteralList",
         "NextWave/source/methodBuilder/MethodBuilder"
     ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, TypeTree, Type, TypeSection, Methods, Properties, Events, SectionPart, Method, Property, Event, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
+    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
 
         try {
 
@@ -57,16 +49,14 @@ define(["NextWave/source/utility/prototypes",
 
                     // Panel of types.
                     self.typesPanel = null;
-                    // Panel of systemTypes.
-                    self.systemTypesPanel = null;
                     // Panel of names.
-                    self.namesPanel = null;
+                    //self.namesPanel = null;
                     // Panel of statements.
-                    self.statementsPanel = null;
+                    //self.statementsPanel = null;
                     // Panel of expressions.
-                    self.expressionsPanel = null;
+                    //self.expressionsPanel = null;
                     // Panel of literals.
-                    self.literalsPanel = null;
+                    //self.literalsPanel = null;
                     // Panel of centers.
                     self.centerPanel = null;
                     // Save configuration.
@@ -103,10 +93,10 @@ define(["NextWave/source/utility/prototypes",
                                     //     orientation.north, 
                                     //     new Point(settings.layerPanels.namesPanel.x, 0), 
                                     //     new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
-                                    self.statementsPanel = new Panel("Statements",
-                                        orientation.north,
-                                        new Point(settings.layerPanels.statementsPanel.x, 0),
-                                        new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
+                                    //self.statementsPanel = new Panel("Statements",
+                                    //    orientation.north,
+                                    //    new Point(settings.layerPanels.statementsPanel.x, 0),
+                                    //    new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
                                     // self.expressionsPanel = new Panel("Expressions", 
                                     //     orientation.north, 
                                     //     new Point(settings.layerPanels.expressionsPanel.x, 0), 
@@ -125,6 +115,8 @@ define(["NextWave/source/utility/prototypes",
                                         orientation.west,
                                         new Point(0, settings.layerPanels.typesPanel.y),
                                         new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
+        
+        /* add new is now moved to the specified Dialog areas (Library, type, method, ...)
                                     self.typesPanel.addNew = function() {
 
                                         try {
@@ -136,25 +128,9 @@ define(["NextWave/source/utility/prototypes",
                                             return e;
                                         }
                                     };
-                                    self.systemTypesPanel = new Panel("System Types",
-                                        orientation.west,
-                                        new Point(0, settings.layerPanels.systemTypesPanel.y),
-                                        new Size(settings.layerPanels.systemTypesPanel.width, settings.layerPanels.systemTypesPanel.height));
-                                    if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
-                                        self.systemTypesPanel.addNew = function() {
-
-                                            try {
-
-                                                // What to do when the icon is clicked....
-                                                return window.manager.createSystemType();
-                                            } catch (e) {
-
-                                                return e;
-                                            }
-                                        };
-                                    }
-                                    // Add the TypeTree to the types Panel.
-                                    var exceptionRet = m_functionAddTypeTreeToTypesPanel(self.typesPanel);
+        */
+                                    // Add the ProjectDialog to the types Panel.
+                                    var exceptionRet = m_functionAddProjectDialogToTypesPanel(self.typesPanel);
                                     if (exceptionRet) {
 
                                         throw exceptionRet;
@@ -163,20 +139,12 @@ define(["NextWave/source/utility/prototypes",
                                     // Compile to generic list of panels for looping operations.
                                     m_arrayPanels = [
                                         // self.namesPanel, 
-                                        self.statementsPanel,
+                                        //self.statementsPanel,
                                         // self.expressionsPanel, 
                                         // self.literalsPanel, 
                                         self.typesPanel,
-                                        self.systemTypesPanel,
                                         self.centerPanel
                                     ];
-
-                                    // Add the SystemTypeTree to the systemTypes Panel.
-                                    var exceptionRet = m_functionAddSystemTypeTreeToSystemTypesPanel(self.systemTypesPanel);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
 
                                     // Add the NameList to the names Panel.
                                     // exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
@@ -186,11 +154,11 @@ define(["NextWave/source/utility/prototypes",
                                     // }
 
                                     // Add the StatmentList to the statements Panel.
-                                    exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
-                                    if (exceptionRet) {
+                                    //exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
+                                    //if (exceptionRet) {
 
-                                        throw exceptionRet;
-                                    }
+                                    //    throw exceptionRet;
+                                    //}
 
                                     // Add the ExpressionList to the expressions Panel.
                                     // exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
@@ -243,10 +211,10 @@ define(["NextWave/source/utility/prototypes",
                                     //     orientation.north, 
                                     //     new Point(settings.layerPanels.namesPanel.x, 0), 
                                     //     new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
-                                    self.statementsPanel = new Panel("Statements",
-                                        orientation.north,
-                                        new Point(settings.layerPanels.statementsPanel.x, 0),
-                                        new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
+                                    //self.statementsPanel = new Panel("Statements",
+                                    //    orientation.north,
+                                    //    new Point(settings.layerPanels.statementsPanel.x, 0),
+                                    //    new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
                                     // self.expressionsPanel = new Panel("Expressions", 
                                     //     orientation.north, 
                                     //     new Point(settings.layerPanels.expressionsPanel.x, 0), 
@@ -260,39 +228,14 @@ define(["NextWave/source/utility/prototypes",
                                         new Point(settings.layerPanels.centerPanel.x, 0),
                                         new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
 
-                                    // Special for iPanelConfiguration 2
-                                    self.systemTypesPanel = new Panel("System Types",
-                                        orientation.west,
-                                        new Point(0, settings.layerPanels.systemTypesPanelSpecial.y),
-                                        new Size(settings.layerPanels.systemTypesPanelSpecial.width, settings.layerPanels.systemTypesPanelSpecial.height));
-                                    self.systemTypesPanel.addNew = function() {
-
-                                        try {
-
-                                            // What to do when the icon is clicked....
-                                            return window.manager.createSystemType();
-                                        } catch (e) {
-
-                                            return e;
-                                        }
-                                    };
-
                                     // Compile to generic list of panels for looping operations.
                                     m_arrayPanels = [
                                         // self.namesPanel, 
-                                        self.statementsPanel,
+                                        // self.statementsPanel,
                                         // self.expressionsPanel, 
                                         // self.literalsPanel, 
-                                        self.systemTypesPanel,
                                         self.centerPanel
                                     ];
-
-                                    // Add the SystemTypeTree to the systemTypes Panel.
-                                    var exceptionRet = m_functionAddSystemTypeTreeToSystemTypesPanel(self.systemTypesPanel);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
 
                                     // Add the NameList to the names Panel.
                                     // exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
@@ -302,11 +245,11 @@ define(["NextWave/source/utility/prototypes",
                                     // }
 
                                     // Add the StatmentList to the statements Panel.
-                                    exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
-                                    if (exceptionRet) {
+                                    //exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
+                                    //if (exceptionRet) {
 
-                                        throw exceptionRet;
-                                    }
+                                    //    throw exceptionRet;
+                                    //}
 
                                     // Add the ExpressionList to the expressions Panel.
                                     // exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
@@ -380,7 +323,6 @@ define(["NextWave/source/utility/prototypes",
                         window.propertyBuilder.destroy();
 
                         // self.typesPanel = null;
-                        // self.systemTypesPanel = null;
                         // self.namesPanel = null;
                         // self.statementsPanel = null;
                         // self.expressionsPanel = null;
@@ -510,52 +452,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Method adds a new SystemType.
-                    self.addSystemType = function(typeNew) {
-
-                        try {
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.systemTypesPanel.payload.addType(typeNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method removes an existing SystemType.
-                    self.removeSystemType = function(typeToRemove) {
-
-                        try {
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.systemTypesPanel.payload.removeType(typeToRemove);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear the list of systemTypes.
-                    self.clearSystemTypes = function() {
-
-                        try {
-
-                            if (!self.systemTypesPanel) {
-                                return null;
-                            }
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.systemTypesPanel.payload.clearItems();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Clear the list of names.
                     self.clearNames = function() {
 
@@ -645,7 +541,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Clear the old.
+                            /* Clear the old.
                             var exceptionRet = self.clearStatements();
                             if (exceptionRet) {
 
@@ -654,6 +550,8 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add the new.
                             return self.statementsPanel.payload.load(arrayList);
+                            */
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -1171,44 +1069,21 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Helper method adds typetree to types panel.
-                    var m_functionAddTypeTreeToTypesPanel = function(panelTypes) {
+                    // Helper method adds ProjectDialog to types panel.
+                    var m_functionAddProjectDialogToTypesPanel = function(panelTypes) {
 
                         try {
 
-                            // Allocate and create the object tree, passing the initialization object.
-                            var tt = new TypeTree();
-                            var exceptionRet = tt.create();
+                            // Allocate and create the Project Dialog, passing the initialization object.
+                            window.projectDialog = new ProjectDialog();
+                            var exceptionRet = window.projectDialog.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Set it.
-                            panelTypes.payload = tt;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method adds systemtypetree to systemTypes panel.
-                    var m_functionAddSystemTypeTreeToSystemTypesPanel = function(panelSystemTypes) {
-
-                        try {
-
-                            // Allocate and create the object tree, passing the initialization object.
-                            var tt = new TypeTree();
-                            var exceptionRet = tt.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Set it.
-                            panelSystemTypes.payload = tt;
+                            panelTypes.payload = window.projectDialog;
 
                             return null;
                         } catch (e) {

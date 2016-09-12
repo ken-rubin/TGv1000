@@ -566,6 +566,21 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Scroll to the end of the list.
+                    self.scrollToEndOfList = function () {
+
+                        try {
+
+                            m_dScrollOffset = 1000000000;   // Past any reasonable offset...
+                            m_bPossiblyAdjustScrollOffsets = true;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Expose private field.
                     self.scrollOffset = function () {
 
