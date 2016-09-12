@@ -6,10 +6,10 @@ delimiter //
 
 
 
-/* */
+/* 
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-/* */
+*/
 
 
 
@@ -19,7 +19,7 @@ SELECT database()//
 
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/* */
+/*
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -56,11 +56,11 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
-/* */
+*/
 
 
 -- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/* */
+/*
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 
@@ -86,7 +86,7 @@ begin
     RETURN @uniqueName;
 end //
 
-/* */
+ */
 
 create procedure maintainDB()
 begin
