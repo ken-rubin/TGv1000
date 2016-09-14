@@ -1750,6 +1750,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do image-wise.
 
+// Modify the following paragraph. for Libraries.
             // How to handle System Types if project.specialProjectData.systemTypesEdited === "1":
                 // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
                 // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
@@ -1764,6 +1765,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // All projects now have a specialProjectData property. From both normal and privileged users.
 
+
+// The next 2 paragraphs have to be changed to handle system or base Libraries. Similar rules that applied to SystemTypes apply to these special Libraries.
             // In all cases project contains a property called systemTypes which is an array with [0] being the base type of the project's App type and
             // [1]-[n] being all System Types. If project.specialProjectData.userCanWorkWithSystemTypesAndAppBaseTypes, we assume that these System Types
             // *have* been edited and we save them. If System Types have an id > 0 (and not undefined or null--whatever), then they are
@@ -1773,6 +1776,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // John did to a base type or to system types can be re-played into other databases, both on others' dev machines and on the server. There will be 1 sql script covering all 
             // system types and n more, one for each App base type that we decide to implement. For example, if a project is based on Game Base Type, 
             // we'll create game_base_type.sql in addition to ST.sql. These scripts are to be saved to GitHub iff any changes or additions were made.
+
+
 
             // If a privileged user is saving a Purchasable Project (whether new or opened for editing), 
             // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
@@ -1793,6 +1798,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                 // Updating without changing project id or comic id.
 
+
+// The following needs modification for Libraries and the types within them.
                 // Since there is only one copy in the DB for SystemTypes or App base types, they are treated differently from other new or edited Types.
                 // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
                 // Its methods, event and properties are deleted and re-inserted.
