@@ -1570,6 +1570,17 @@ begin
 
     end if;
     
+    if @dbstate = 42 THEN
+
+		delete from TGv1000.routes where method='routeFetchForPanels_S_L_E_ST';
+		delete from TGv1000.routes where method='routeSaveSystemTypes';
+    
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
 end//
 
 

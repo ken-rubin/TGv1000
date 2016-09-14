@@ -59,815 +59,815 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    self.routeFetchForPanels_S_L_E_ST = function (req, res) {
+    // self.routeFetchForPanels_S_L_E_ST = function (req, res) {
 
-        try {
+    //     try {
 
-            m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
+    //         m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
 
-            // Returns [4][] where [0] formerly held systemtypes and is now empty; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
-            var strQuery = "select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc; "
-            sql.execute(strQuery,
-                function(rows) {
+    //         // Returns [4][] where [0] formerly held systemtypes and is now empty; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
+    //         var strQuery = "select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc; "
+    //         sql.execute(strQuery,
+    //             function(rows) {
 
-                    if (rows.length !== 3) {
-                        return res.json({
-                            success: false,
-                            message: "Failed to retrieve 3 arrays in fetching system types."
-                        });
-                    }
+    //                 if (rows.length !== 3) {
+    //                     return res.json({
+    //                         success: false,
+    //                         message: "Failed to retrieve 3 arrays in fetching system types."
+    //                     });
+    //                 }
 
-                    var twodim = new Array(4);
-                    twodim[0] = [];
+    //                 var twodim = new Array(4);
+    //                 twodim[0] = [];
 
-                    // Now the strings.
-                    for (i = 0; i < 3; i++) {
+    //                 // Now the strings.
+    //                 for (i = 0; i < 3; i++) {
 
-                        var names = new Array();
-                        rows[i].forEach(
-                            function(itemIth) {
-                                names.push(itemIth.name);
-                            }
-                        );
-                        twodim[i+1] = names;
-                    }
+    //                     var names = new Array();
+    //                     rows[i].forEach(
+    //                         function(itemIth) {
+    //                             names.push(itemIth.name);
+    //                         }
+    //                     );
+    //                     twodim[i+1] = names;
+    //                 }
 
-                    res.json({
-                        success: true,
-                        data: twodim
-                    });
-                },
-                function(strError) {
-                    return res.json({
-                        success: false,
-                        message: "System Types fetch failed with error: " + strError
-                    });
-                }
-            );
-        } catch (e) {
+    //                 res.json({
+    //                     success: true,
+    //                     data: twodim
+    //                 });
+    //             },
+    //             function(strError) {
+    //                 return res.json({
+    //                     success: false,
+    //                     message: "System Types fetch failed with error: " + strError
+    //                 });
+    //             }
+    //         );
+    //     } catch (e) {
 
-            res.json({success: false, message: e.message});
-        }
-    }
+    //         res.json({success: false, message: e.message});
+    //     }
+    // }
 
-    var m_functionFillInTypes = function(arrTypes, callback) {
+    // var m_functionFillInTypes = function(arrTypes, callback) {
 
-        try {
+    //     try {
 
-            async.eachSeries(arrTypes,
-                function(typeIth, cb) {
+    //         async.eachSeries(arrTypes,
+    //             function(typeIth, cb) {
 
-                    m_functionDoTypeArrays(
-                        typeIth,
-                        function(err) { return cb(err); }
-                    );
-                },
-                function(err) {
-                    callback(err);
-                }
-            );
-        } catch (e) { callback(e); }
-    }
+    //                 m_functionDoTypeArrays(
+    //                     typeIth,
+    //                     function(err) { return cb(err); }
+    //                 );
+    //             },
+    //             function(err) {
+    //                 callback(err);
+    //             }
+    //         );
+    //     } catch (e) { callback(e); }
+    // }
 
-    self.routeSaveSystemTypes = function (req, res) {
+    // self.routeSaveSystemTypes = function (req, res) {
 
-        m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
-        // req.body.systemtypesarray
+    //     m_log("Entered ProjectBO/routeSaveSystemTypes with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
+    //     // req.body.systemtypesarray
 
-        var connection = null;
-        sql.getCxnFromPool(
-            function(err, cxn) {
+    //     var connection = null;
+    //     sql.getCxnFromPool(
+    //         function(err, cxn) {
 
-                if (err) {
+    //             if (err) {
 
-                    return res.json({
-                        success: false,
-                        message: "Could not get database connection."
-                    });
-                }
+    //                 return res.json({
+    //                     success: false,
+    //                     message: "Could not get database connection."
+    //                 });
+    //             }
 
-                connection = cxn;
-                connection.beginTransaction(
-                    function(err) {
+    //             connection = cxn;
+    //             connection.beginTransaction(
+    //                 function(err) {
 
-                        if (err) {
+    //                     if (err) {
 
-                            return res.json({
-                                success: false,
-                                message: "Could not begin transaction on connection."
-                            });
-                        }
+    //                         return res.json({
+    //                             success: false,
+    //                             message: "Could not begin transaction on connection."
+    //                         });
+    //                     }
 
-                        m_functionSaveSystemTypes(connection,
-                            true,   // indicate permission to edit system types (because, after all, that's their only reason for being here)
-                            req.body.systemtypesarray, 
-                            false, // this parameter says [0] is NOT an App base type.
-                            function(jsonResult) {
+    //                     m_functionSaveSystemTypes(connection,
+    //                         true,   // indicate permission to edit system types (because, after all, that's their only reason for being here)
+    //                         req.body.systemtypesarray, 
+    //                         false, // this parameter says [0] is NOT an App base type.
+    //                         function(jsonResult) {
 
-                                // jsonResult looks like:
-                                // {
-                                //      DB: "OK" or err.message,
-                                //      stScript: "OK" or message   -- if DB !== "OK", the stScript property won't exist, since we won't have tried to save the scripts.
-                                // }
-                                if (jsonResult.DB === "OK") {
+    //                             // jsonResult looks like:
+    //                             // {
+    //                             //      DB: "OK" or err.message,
+    //                             //      stScript: "OK" or message   -- if DB !== "OK", the stScript property won't exist, since we won't have tried to save the scripts.
+    //                             // }
+    //                             if (jsonResult.DB === "OK") {
 
-                                    // Commit the transaction.
-                                    sql.commitCxn(connection,
-                                        function(err) {
+    //                                 // Commit the transaction.
+    //                                 sql.commitCxn(connection,
+    //                                     function(err) {
 
-                                            // Whatever happened, release the connection back to the pool.
-                                            connection.release();
+    //                                         // Whatever happened, release the connection back to the pool.
+    //                                         connection.release();
 
-                                            if (err) {
+    //                                         if (err) {
 
-                                                // Could not commit.
-                                                var msg = "Could not commit database updates.";
+    //                                             // Could not commit.
+    //                                             var msg = "Could not commit database updates.";
 
-                                                return res.json({
-                                                    success: false,
-                                                    message: msg
-                                                });
-                                            }
+    //                                             return res.json({
+    //                                                 success: false,
+    //                                                 message: msg
+    //                                             });
+    //                                         }
 
-                                            if (jsonResult.stScript === "OK") {
+    //                                         if (jsonResult.stScript === "OK") {
 
-                                                return res.json({
-                                                    success: true,
-                                                    scriptSuccess: true
-                                                });
-                                            }
+    //                                             return res.json({
+    //                                                 success: true,
+    //                                                 scriptSuccess: true
+    //                                             });
+    //                                         }
 
-                                            return res.json({
-                                                success: true,
-                                                scriptSuccess: false,
-                                                saveError: jsonResult.stScript
-                                            });
-                                    });
-                                } else {
+    //                                         return res.json({
+    //                                             success: true,
+    //                                             scriptSuccess: false,
+    //                                             saveError: jsonResult.stScript
+    //                                         });
+    //                                 });
+    //                             } else {
 
-                                    return res.json({
-                                        success: false,
-                                        message: jsonResult.DB
-                                    });
-                                }
-                            }
-                        );
-                    }
-                );
-            }
-        );
-    }
+    //                                 return res.json({
+    //                                     success: false,
+    //                                     message: jsonResult.DB
+    //                                 });
+    //                             }
+    //                         }
+    //                     );
+    //                 }
+    //             );
+    //         }
+    //     );
+    // }
 
-    // connection exists and transaction is begun.
-    // Returns with connection still uncommitted, but 1 or 2 sql scripts have been written out.
-    // Actually, if we calling from routeSaveProject, we may not do anything here, but we'll need to call the callback to proceed with
-    // saving the project.
-    var m_functionSaveSystemTypes = function (  connection, 
-                                                bCanEditSystemTypesAndAppBaseTypes,
-                                                arrayTypes, 
-                                                bSub0IsAppBaseType, 
-                                                callback) {
+    // // connection exists and transaction is begun.
+    // // Returns with connection still uncommitted, but 1 or 2 sql scripts have been written out.
+    // // Actually, if we calling from routeSaveProject, we may not do anything here, but we'll need to call the callback to proceed with
+    // // saving the project.
+    // var m_functionSaveSystemTypes = function (  connection, 
+    //                                             bCanEditSystemTypesAndAppBaseTypes,
+    //                                             arrayTypes, 
+    //                                             bSub0IsAppBaseType, 
+    //                                             callback) {
 
-        try {
+    //     try {
 
-            if (!bCanEditSystemTypesAndAppBaseTypes) {
+    //         if (!bCanEditSystemTypesAndAppBaseTypes) {
 
-                // Not doing anything. Just call the callback appropriately.
-                return callback({
-                    DB: "Skipped"
-                });
-            }
+    //             // Not doing anything. Just call the callback appropriately.
+    //             return callback({
+    //                 DB: "Skipped"
+    //             });
+    //         }
 
-            // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
-            var typeIdTranslationArray = [];
-            var idnum = 0;
-            var stScript = [
-                "delimiter //",
-                "create procedure doSystemTypes()",
-                "begin"
-            ];
-            var baseScript = [];
-            var filenameBaseScript = '';
-            if (bSub0IsAppBaseType) {
+    //         // If any type's id=0 or is undefined, then INSERT it. Otherwise, UPDATE it.
+    //         var typeIdTranslationArray = [];
+    //         var idnum = 0;
+    //         var stScript = [
+    //             "delimiter //",
+    //             "create procedure doSystemTypes()",
+    //             "begin"
+    //         ];
+    //         var baseScript = [];
+    //         var filenameBaseScript = '';
+    //         if (bSub0IsAppBaseType) {
                 
-                baseScript = [
-                    "delimiter //",
-                    "create procedure doSystemTypes()",
-                    "begin"
-                ];
+    //             baseScript = [
+    //                 "delimiter //",
+    //                 "create procedure doSystemTypes()",
+    //                 "begin"
+    //             ];
 
-                filenameBaseScript = arrayTypes[0].name.replace(/\s/g, '_') + ".sql";
-            }
+    //             filenameBaseScript = arrayTypes[0].name.replace(/\s/g, '_') + ".sql";
+    //         }
 
-            // In async.series:
-            // 0. Delete any existing system types that are no longer in arrayTypes.
-            // 1. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
-            // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
-            // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
+    //         // In async.series:
+    //         // 0. Delete any existing system types that are no longer in arrayTypes.
+    //         // 1. In async.eachSeries loop #2: update or insert all types in arrayTypes. Delete sub-arrays for pre-existing types.
+    //         // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
+    //         // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
 
-            // If all the DB writing worked, write out ST.sql from scripts array and xxx_base_type.sql from btscript.
-            // If the DB stuff was rolled back, skip writing out the sql scripts and return the DB err.
+    //         // If all the DB writing worked, write out ST.sql from scripts array and xxx_base_type.sql from btscript.
+    //         // If the DB stuff was rolled back, skip writing out the sql scripts and return the DB err.
 
-            arrayTypes[0].bNeedToDoAppBaseType = bSub0IsAppBaseType;
+    //         arrayTypes[0].bNeedToDoAppBaseType = bSub0IsAppBaseType;
 
-            async.series(
-                [
-                    // 0. Delete any system types that aren't in arrayTypes.
-                    function (cb) {
+    //         async.series(
+    //             [
+    //                 // 0. Delete any system types that aren't in arrayTypes.
+    //                 function (cb) {
 
-                        m_log("Save system types func #0");
+    //                     m_log("Save system types func #0");
 
-                        sql.queryWithCxn(
-                            connection,
-                            "select id, name from " + self.dbname + "types where typeTypeId=2;",
-                            function (err, rows) {
+    //                     sql.queryWithCxn(
+    //                         connection,
+    //                         "select id, name from " + self.dbname + "types where typeTypeId=2;",
+    //                         function (err, rows) {
 
-                                if (err) { return cb(err); }
+    //                             if (err) { return cb(err); }
 
-                                async.eachSeries(rows,
-                                    function (row, cb) {
+    //                             async.eachSeries(rows,
+    //                                 function (row, cb) {
 
-                                        for (var i = 0; i < arrayTypes.length; i++) {
+    //                                     for (var i = 0; i < arrayTypes.length; i++) {
 
-                                            var bFound = false;
-                                            if (row.name === arrayTypes[i].name) {
+    //                                         var bFound = false;
+    //                                         if (row.name === arrayTypes[i].name) {
 
-                                                bFound = true;
-                                                break;
-                                            }
-                                        }
+    //                                             bFound = true;
+    //                                             break;
+    //                                         }
+    //                                     }
 
-                                        if (!bFound) {
+    //                                     if (!bFound) {
 
-                                            // Delete row.id from the DB. Add similar delete to stScript--but will need to discover its ID, too.
-                                            sql.queryWithCxn(
-                                                connection,
-                                                "delete from " + self.dbname + "types where id=" + row.id + ";",
-                                                function (err, rows) {
+    //                                         // Delete row.id from the DB. Add similar delete to stScript--but will need to discover its ID, too.
+    //                                         sql.queryWithCxn(
+    //                                             connection,
+    //                                             "delete from " + self.dbname + "types where id=" + row.id + ";",
+    //                                             function (err, rows) {
 
-                                                    if (err) { return cb(err); }
+    //                                                 if (err) { return cb(err); }
 
-                                                    stScript.push('set @delId := (select id from types where typeTypeId=2 and name="' + row.name + '");');
-                                                    stScript.push('if @delId is not null then');
-                                                    stScript.push('   delete from types where id=@delId;');
-                                                    stScript.push('end if;');
+    //                                                 stScript.push('set @delId := (select id from types where typeTypeId=2 and name="' + row.name + '");');
+    //                                                 stScript.push('if @delId is not null then');
+    //                                                 stScript.push('   delete from types where id=@delId;');
+    //                                                 stScript.push('end if;');
 
-                                                    return cb(null);
-                                                }
-                                            );
-                                        } else { return cb(null); }
-                                    },
-                                    function(err) {
-                                        return cb(err);
-                                    }
-                                );
-                            }
-                        );
-                    },
-                    // 1. Insert or update all types, deleting methods, properties and events of pre-existing ones.
-                    function(cb) {
+    //                                                 return cb(null);
+    //                                             }
+    //                                         );
+    //                                     } else { return cb(null); }
+    //                                 },
+    //                                 function(err) {
+    //                                     return cb(err);
+    //                                 }
+    //                             );
+    //                         }
+    //                     );
+    //                 },
+    //                 // 1. Insert or update all types, deleting methods, properties and events of pre-existing ones.
+    //                 function(cb) {
 
-                        m_log("Save system types func #1");
+    //                     m_log("Save system types func #1");
 
-                        async.eachSeries(
-                            arrayTypes,
-                            function(typeIth, cb) {
+    //                     async.eachSeries(
+    //                         arrayTypes,
+    //                         function(typeIth, cb) {
 
-                                // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in the types array,
-                                // since base types for system types must be system types, too.
-                                // If bSub0IsAppBaseType then arrayTypes[0] isn't a system type. It's an App type base type. But, still,
-                                // it can be based only on system types, so this loop still works.
-                                typeIth.baseTypeId = 0;
-                                if (typeIth.baseTypeName) {
-                                    for (var j = 0; j < arrayTypes.length; j++) {
+    //                             // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. It would be in the types array,
+    //                             // since base types for system types must be system types, too.
+    //                             // If bSub0IsAppBaseType then arrayTypes[0] isn't a system type. It's an App type base type. But, still,
+    //                             // it can be based only on system types, so this loop still works.
+    //                             typeIth.baseTypeId = 0;
+    //                             if (typeIth.baseTypeName) {
+    //                                 for (var j = 0; j < arrayTypes.length; j++) {
                                         
-                                        var typeJth = arrayTypes[j];
-                                        if (typeIth.baseTypeName === typeJth.name) {
-                                            typeIth.baseTypeId = typeJth.id;
-                                            break;
-                                        }
-                                    }
-                                }
+    //                                     var typeJth = arrayTypes[j];
+    //                                     if (typeIth.baseTypeName === typeJth.name) {
+    //                                         typeIth.baseTypeId = typeJth.id;
+    //                                         break;
+    //                                     }
+    //                                 }
+    //                             }
 
-                                var guts = {
-                                    name: typeIth.name,
-                                    typeTypeId: typeIth.typeTypeId,
-                                    // isApp: 0, defaults to 0 and should be 0
-                                    imageId: typeIth.imageId || 0,
-                                    altImagePath: typeIth.altImagePath || "",
-                                    // ordinal: typeIth.ordinal, defaults to NULL and should be NULL
-                                    // comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId), defaults to NULL and should be NULL
-                                    description: typeIth.description,
-                                    // parentTypeId: typeIth.parentTypeId || 0, defaults to NULL and should be NULL
-                                    // parentPrice: typeIth.parentPrice || 0, defaults to 0.00 and should be 0.00
-                                    // priceBump: typeIth.priceBump || 0, defaults to 0.00 and should be 0.00
-                                    ownedByUserId: 1, // defaults to NULL, but we want 1
-                                    public: typeIth.public || 0,
-                                    // quarantined: typeIth.quarantined || 1, defaults to 0 and should be 0
-                                    baseTypeId: typeIth.baseTypeId || 0,
-                                    // projectId: passObj.project.id defaults to NULL and should be NULL
-                                    };
+    //                             var guts = {
+    //                                 name: typeIth.name,
+    //                                 typeTypeId: typeIth.typeTypeId,
+    //                                 // isApp: 0, defaults to 0 and should be 0
+    //                                 imageId: typeIth.imageId || 0,
+    //                                 altImagePath: typeIth.altImagePath || "",
+    //                                 // ordinal: typeIth.ordinal, defaults to NULL and should be NULL
+    //                                 // comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId), defaults to NULL and should be NULL
+    //                                 description: typeIth.description,
+    //                                 // parentTypeId: typeIth.parentTypeId || 0, defaults to NULL and should be NULL
+    //                                 // parentPrice: typeIth.parentPrice || 0, defaults to 0.00 and should be 0.00
+    //                                 // priceBump: typeIth.priceBump || 0, defaults to 0.00 and should be 0.00
+    //                                 ownedByUserId: 1, // defaults to NULL, but we want 1
+    //                                 public: typeIth.public || 0,
+    //                                 // quarantined: typeIth.quarantined || 1, defaults to 0 and should be 0
+    //                                 baseTypeId: typeIth.baseTypeId || 0,
+    //                                 // projectId: passObj.project.id defaults to NULL and should be NULL
+    //                                 };
 
-                                var exceptionRet = m_checkGutsForUndefined('System type', guts);
-                                if (exceptionRet) {
-                                    return cb(exceptionRet);
-                                }
+    //                             var exceptionRet = m_checkGutsForUndefined('System type', guts);
+    //                             if (exceptionRet) {
+    //                                 return cb(exceptionRet);
+    //                             }
 
-                                var strQuery;
-                                var weInserted;
-                                if (typeIth.id) {
+    //                             var strQuery;
+    //                             var weInserted;
+    //                             if (typeIth.id) {
 
-                                    // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
+    //                                 // Update an existing System Type so as not to lose its id. But kill its arrays, etc. and add them later. No need to preserve their ids.
 
-                                    // First the update statement.
-                                    strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id + ";";
+    //                                 // First the update statement.
+    //                                 strQuery = "update " + self.dbname + "types SET ? where id=" + typeIth.id + ";";
                                     
-                                    // Then delete methods, properties and events which will be re-inserted.
-                                    strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
-                                    strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
-                                    strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
+    //                                 // Then delete methods, properties and events which will be re-inserted.
+    //                                 strQuery += "delete from " + self.dbname + "methods where typeId=" + typeIth.id + ";";  // This should delete from method_tags, too.
+    //                                 strQuery += "delete from " + self.dbname + "propertys where typeId=" + typeIth.id + ";";
+    //                                 strQuery += "delete from " + self.dbname + "events where typeId=" + typeIth.id + ";";
                                     
-                                    // Then type_tags.
-                                    strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
-                                    weInserted = false;
+    //                                 // Then type_tags.
+    //                                 strQuery += "delete from " + self.dbname + "type_tags where typeId=" + typeIth.id + ";";
+    //                                 weInserted = false;
 
-                                } else {
+    //                             } else {
 
-                                    // It's either a new System Type or a non-System Type that was deleted or never existed.
-                                    strQuery = "insert " + self.dbname + "types SET ?";
-                                    weInserted = true;
-                                }
+    //                                 // It's either a new System Type or a non-System Type that was deleted or never existed.
+    //                                 strQuery = "insert " + self.dbname + "types SET ?";
+    //                                 weInserted = true;
+    //                             }
 
-                                // m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                             // m_log('Inserting or updating type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
 
-                                // Since this is a System Type, push SQL statements onto script.
+    //                             // Since this is a System Type, push SQL statements onto script.
 
-                                // atid is to be used as a unique id in the doTags MySql procedure to
-                                // let subsequent steps insert according to a specific type's id.
-                                typeIth["atid"] = null;
+    //                             // atid is to be used as a unique id in the doTags MySql procedure to
+    //                             // let subsequent steps insert according to a specific type's id.
+    //                             typeIth["atid"] = null;
 
-                                idnum += 1;
-                                typeIth.atid = "@id" + idnum;
+    //                             idnum += 1;
+    //                             typeIth.atid = "@id" + idnum;
 
-                                var scriptGuts = 
-                                    "SET name='" + typeIth.name + "'"
-                                    +",typeTypeId=" + typeIth.typeTypeId
-                                    +",imageId=" + typeIth.imageId
-                                    +",altImagePath=" + typeIth.altImagePath
-                                    +",description='" + typeIth.description + "'"
-                                    +",ownedByUserId=" + 1
-                                    +",public=" + typeIth.public
-                                    +",baseTypeId=" + typeIth.baseTypeId
-                                    ;
+    //                             var scriptGuts = 
+    //                                 "SET name='" + typeIth.name + "'"
+    //                                 +",typeTypeId=" + typeIth.typeTypeId
+    //                                 +",imageId=" + typeIth.imageId
+    //                                 +",altImagePath=" + typeIth.altImagePath
+    //                                 +",description='" + typeIth.description + "'"
+    //                                 +",ownedByUserId=" + 1
+    //                                 +",public=" + typeIth.public
+    //                                 +",baseTypeId=" + typeIth.baseTypeId
+    //                                 ;
 
-                                if (typeIth.bNeedToDoAppBaseType) {
-                                    baseScript.push('set @guts := "' + scriptGuts + '";');
-                                    baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=3 and name="' + typeIth.name + '");');
-                                    baseScript.push('if ' + typeIth.atid + ' is not null then');
-                                    baseScript.push('   /* Existing Base Types are deleted and re-inserted with the same id they had before. */');
-                                    baseScript.push('   delete from types where id=' + typeIth.atid + ';');
-                                    baseScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
-                                    baseScript.push('   prepare insstmt from @s;');
-                                    baseScript.push('   execute insstmt;');
-                                    baseScript.push('else');
-                                    baseScript.push('   /* New Base Types are inserted with a new id. */');
-                                    baseScript.push('   set @s := (select concat("insert types ",@guts,";"));');
-                                    baseScript.push('   prepare insstmt from @s;');
-                                    baseScript.push('   execute insstmt;');
-                                    baseScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
-                                    baseScript.push('end if;');
-                                    baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
+    //                             if (typeIth.bNeedToDoAppBaseType) {
+    //                                 baseScript.push('set @guts := "' + scriptGuts + '";');
+    //                                 baseScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=3 and name="' + typeIth.name + '");');
+    //                                 baseScript.push('if ' + typeIth.atid + ' is not null then');
+    //                                 baseScript.push('   /* Existing Base Types are deleted and re-inserted with the same id they had before. */');
+    //                                 baseScript.push('   delete from types where id=' + typeIth.atid + ';');
+    //                                 baseScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+    //                                 baseScript.push('   prepare insstmt from @s;');
+    //                                 baseScript.push('   execute insstmt;');
+    //                                 baseScript.push('else');
+    //                                 baseScript.push('   /* New Base Types are inserted with a new id. */');
+    //                                 baseScript.push('   set @s := (select concat("insert types ",@guts,";"));');
+    //                                 baseScript.push('   prepare insstmt from @s;');
+    //                                 baseScript.push('   execute insstmt;');
+    //                                 baseScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+    //                                 baseScript.push('end if;');
+    //                                 baseScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
                                 
-                                } else {
+    //                             } else {
 
-                                    stScript.push('set @guts := "' + scriptGuts + '";');
-                                    stScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
-                                    stScript.push('if ' + typeIth.atid + ' is not null then');
-                                    stScript.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
-                                    stScript.push('   delete from types where id=' + typeIth.atid + ';');
-                                    stScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
-                                    stScript.push('   prepare insstmt from @s;');
-                                    stScript.push('   execute insstmt;');
-                                    stScript.push('else');
-                                    stScript.push('   /* New System Types are inserted with a new id. */');
-                                    stScript.push('   set @s := (select concat("insert types ",@guts,";"));');
-                                    stScript.push('   prepare insstmt from @s;');
-                                    stScript.push('   execute insstmt;');
-                                    stScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
-                                    stScript.push('end if;');
-                                    stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
-                                }
+    //                                 stScript.push('set @guts := "' + scriptGuts + '";');
+    //                                 stScript.push('set ' + typeIth.atid + ' := (select id from types where typeTypeId=2 and name="' + typeIth.name + '");');
+    //                                 stScript.push('if ' + typeIth.atid + ' is not null then');
+    //                                 stScript.push('   /* Existing System Types are deleted and re-inserted with the same id they had before. */');
+    //                                 stScript.push('   delete from types where id=' + typeIth.atid + ';');
+    //                                 stScript.push('   set @s := (select concat("insert types ",@guts,",id=' + typeIth.atid + ';"));');
+    //                                 stScript.push('   prepare insstmt from @s;');
+    //                                 stScript.push('   execute insstmt;');
+    //                                 stScript.push('else');
+    //                                 stScript.push('   /* New System Types are inserted with a new id. */');
+    //                                 stScript.push('   set @s := (select concat("insert types ",@guts,";"));');
+    //                                 stScript.push('   prepare insstmt from @s;');
+    //                                 stScript.push('   execute insstmt;');
+    //                                 stScript.push('   set ' + typeIth.atid + ' := (select LAST_INSERT_ID());');
+    //                                 stScript.push('end if;');
+    //                                 stScript.push("/* Whichever case, the System Type's id is in " + typeIth.atid + ", to be used below for methods, properties and events. */");
+    //                             }
 
-                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                    function(err, rows) {
+    //                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                 function(err, rows) {
 
-                                        if (err) {
-                                            return cb(err);
-                                        }
+    //                                     if (err) {
+    //                                         return cb(err);
+    //                                     }
 
-                                        if (rows.length === 0) { return cb(new Error("Error writing system types to database.")); }
+    //                                     if (rows.length === 0) { return cb(new Error("Error writing system types to database.")); }
 
-                                        if (weInserted) {
+    //                                     if (weInserted) {
 
-                                            typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
-                                            typeIth.id = rows[0].insertId;
+    //                                         typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
+    //                                         typeIth.id = rows[0].insertId;
 
-                                        } else {
+    //                                     } else {
 
-                                            // We updated.
-                                            typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
-                                        }
+    //                                         // We updated.
+    //                                         typeIdTranslationArray.push({origId:typeIth.id, newId:typeIth.id});
+    //                                     }
 
-                                        return cb(null);
-                                    }
-                                );
-                            },
-                            function(err) {
+    //                                     return cb(null);
+    //                                 }
+    //                             );
+    //                         },
+    //                         function(err) {
 
-                                return cb(err);
-                            }
-                        );
-                    },
-                    // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
-                    function(cb) {
+    //                             return cb(err);
+    //                         }
+    //                     );
+    //                 },
+    //                 // 2. Update baseTypeIds for any that were based on new system types, both in the DB and in arrayTypes.
+    //                 function(cb) {
 
-                        m_log("Save system types func #2");
+    //                     m_log("Save system types func #2");
 
-                        async.eachSeries(arrayTypes, 
-                            function(typeIth, cb) {
+    //                     async.eachSeries(arrayTypes, 
+    //                         function(typeIth, cb) {
 
-                                if (!typeIth.baseTypeId) { 
-                                    return cb(null); 
-                                }
+    //                             if (!typeIth.baseTypeId) { 
+    //                                 return cb(null); 
+    //                             }
 
-                                // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
-                                var didOne = false;
-                                for (var j = 0; j < typeIdTranslationArray.length; j++) {
+    //                             // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
+    //                             var didOne = false;
+    //                             for (var j = 0; j < typeIdTranslationArray.length; j++) {
 
-                                    var xlateIth = typeIdTranslationArray[j];
-                                    if (xlateIth.origId === typeIth.baseTypeId) {
-                                        if (xlateIth.newId !== xlateIth.origId) {
-                                            var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
-                                            didOne = true;
+    //                                 var xlateIth = typeIdTranslationArray[j];
+    //                                 if (xlateIth.origId === typeIth.baseTypeId) {
+    //                                     if (xlateIth.newId !== xlateIth.origId) {
+    //                                         var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+    //                                         didOne = true;
 
-                                            // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
-                                            typeIth.baseTypeId = xlateIth.newId;
-                                            sql.queryWithCxn(connection, 
-                                                strQuery,
-                                                function(err, rows) {
-                                                    if (err) { return cb(err); }
-                                                    return cb(null);
-                                                }
-                                            );
-                                        }
-                                    }
-                                };
-                                if (!didOne) { return cb(null); }
-                            },
-                            // final callback for eachSeries
-                            function(err) {
-                                return cb(err);
-                            }
-                        );
-                    },
-                    // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
-                    function(cb) {
+    //                                         // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
+    //                                         typeIth.baseTypeId = xlateIth.newId;
+    //                                         sql.queryWithCxn(connection, 
+    //                                             strQuery,
+    //                                             function(err, rows) {
+    //                                                 if (err) { return cb(err); }
+    //                                                 return cb(null);
+    //                                             }
+    //                                         );
+    //                                     }
+    //                                 }
+    //                             };
+    //                             if (!didOne) { return cb(null); }
+    //                         },
+    //                         // final callback for eachSeries
+    //                         function(err) {
+    //                             return cb(err);
+    //                         }
+    //                     );
+    //                 },
+    //                 // 3. In async.eachSeries loop #3: write each type's methods, properties and events to the database.
+    //                 function(cb) {
 
-                        m_log("Save system types func #3");
+    //                     m_log("Save system types func #3");
 
-                        async.eachSeries(arrayTypes, 
-                            function(typeIth, cb) {
+    //                     async.eachSeries(arrayTypes, 
+    //                         function(typeIth, cb) {
 
-                                // We use async.parallel here because methods, properties and events are totally independent.
-                                // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
+    //                             // We use async.parallel here because methods, properties and events are totally independent.
+    //                             // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
                                 
-                                async.series( // Keep this as series, not parallel.
-                                    [
-                                        // (1) methods
-                                        function(cb) {
+    //                             async.series( // Keep this as series, not parallel.
+    //                                 [
+    //                                     // (1) methods
+    //                                     function(cb) {
 
-                                            // m_log("Doing methods");
-                                            var ordinal = 0;
+    //                                         // m_log("Doing methods");
+    //                                         var ordinal = 0;
 
-                                            async.eachSeries(typeIth.methods,
-                                                function(method, cb) {
+    //                                         async.eachSeries(typeIth.methods,
+    //                                             function(method, cb) {
 
-                                                    async.series(
-                                                        [
-                                                            // (1a)
-                                                            function(cb) {
+    //                                                 async.series(
+    //                                                     [
+    //                                                         // (1a)
+    //                                                         function(cb) {
 
-                                                                method.typeId = typeIth.id;
-                                                                method.ordinal = ordinal++;
+    //                                                             method.typeId = typeIth.id;
+    //                                                             method.ordinal = ordinal++;
 
-                                                                // First if should never hit, because even no parameters now has method.arguments.
-                                                                if (!method.hasOwnProperty("arguments")) {
+    //                                                             // First if should never hit, because even no parameters now has method.arguments.
+    //                                                             if (!method.hasOwnProperty("arguments")) {
 
-                                                                    method.arguments = {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]};
+    //                                                                 method.arguments = {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]};
 
-                                                                } else {
-                                                                    // Here there was method.arguments, but there were no actual parameters, so
-                                                                    // we have to add parameters: [] to make everything work.
+    //                                                             } else {
+    //                                                                 // Here there was method.arguments, but there were no actual parameters, so
+    //                                                                 // we have to add parameters: [] to make everything work.
 
-                                                                    if (!method.arguments.parameters[0].hasOwnProperty('parameters')) {
+    //                                                                 if (!method.arguments.parameters[0].hasOwnProperty('parameters')) {
 
-                                                                        method.arguments = {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]};
-                                                                    }
-                                                                }
+    //                                                                     method.arguments = {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": []}]};
+    //                                                                 }
+    //                                                             }
 
-                                                                if (!method.hasOwnProperty("statements")) {
-                                                                    method.statements = [];
-                                                                }
+    //                                                             if (!method.hasOwnProperty("statements")) {
+    //                                                                 method.statements = [];
+    //                                                             }
 
-                                                                var guts = {
-                                                                            typeId: typeIth.id,
-                                                                            name: method.name,
-                                                                            ordinal: method.ordinal,
-                                                                            statements: JSON.stringify({"statements": method.statements}),
-                                                                            imageId: method.imageId || 0,
-                                                                            description: method.description || '[No description provided]',
-                                                                            parentMethodId: method.parentMethodId || 0,
-                                                                            parentPrice: method.parentPrice || 0,
-                                                                            priceBump: method.priceBump || 0,
-                                                                            ownedByUserId: method.ownedByUserId,
-                                                                            public: method.public || 1,
-                                                                            quarantined: method.quarantined || 0,
-                                                                            methodTypeId: method.methodTypeId || 4, // Not needed anymore
-                                                                            arguments: JSON.stringify({"arguments": method.arguments})
-                                                                            };
+    //                                                             var guts = {
+    //                                                                         typeId: typeIth.id,
+    //                                                                         name: method.name,
+    //                                                                         ordinal: method.ordinal,
+    //                                                                         statements: JSON.stringify({"statements": method.statements}),
+    //                                                                         imageId: method.imageId || 0,
+    //                                                                         description: method.description || '[No description provided]',
+    //                                                                         parentMethodId: method.parentMethodId || 0,
+    //                                                                         parentPrice: method.parentPrice || 0,
+    //                                                                         priceBump: method.priceBump || 0,
+    //                                                                         ownedByUserId: method.ownedByUserId,
+    //                                                                         public: method.public || 1,
+    //                                                                         quarantined: method.quarantined || 0,
+    //                                                                         methodTypeId: method.methodTypeId || 4, // Not needed anymore
+    //                                                                         arguments: JSON.stringify({"arguments": method.arguments})
+    //                                                                         };
 
-                                                                var exceptionRet = m_checkGutsForUndefined('method', guts);
-                                                                if (exceptionRet) {
-                                                                    return cb(exceptionRet);
-                                                                }
+    //                                                             var exceptionRet = m_checkGutsForUndefined('method', guts);
+    //                                                             if (exceptionRet) {
+    //                                                                 return cb(exceptionRet);
+    //                                                             }
 
-                                                                var strQuery = "insert " + self.dbname + "methods SET ?";
-                                                                // m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                                                    function(err, rows) {
+    //                                                             var strQuery = "insert " + self.dbname + "methods SET ?";
+    //                                                             // m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                                                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                                                 function(err, rows) {
 
-                                                                        try {
-                                                                            if (err) { return cb(err); }
-                                                                            if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+    //                                                                     try {
+    //                                                                         if (err) { return cb(err); }
+    //                                                                         if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
-                                                                            method.id = rows[0].insertId;
+    //                                                                         method.id = rows[0].insertId;
 
-                                                                            // Re-do guts for use in ST.sql.
-                                                                            // We could just patch the original guts, but....
-                                                                            var scriptGuts = " SET typeId=" + typeIth.atid
-                                                                                        + ",name=" + connection.escape(method.name)
-                                                                                        + ",ordinal=" + method.ordinal
-                                                                                        + ",statements=" + connection.escape(JSON.stringify(method.statements))
-                                                                                        + ",imageId=" + method.imageId
-                                                                                        + ",description=" + connection.escape(method.description)
-                                                                                        + ",parentMethodId=" + method.parentMethodId
-                                                                                        + ",parentPrice=" + method.parentPrice
-                                                                                        + ",priceBump=" + method.priceBump
-                                                                                        + ",ownedByUserId=" + method.ownedByUserId
-                                                                                        + ",public=" + method.public
-                                                                                        + ",quarantined=" + method.quarantined
-                                                                                        + ",methodTypeId=" + method.methodTypeId
-                                                                                        + ",arguments=" + connection.escape(JSON.stringify(method.arguments))
-                                                                                        ;
+    //                                                                         // Re-do guts for use in ST.sql.
+    //                                                                         // We could just patch the original guts, but....
+    //                                                                         var scriptGuts = " SET typeId=" + typeIth.atid
+    //                                                                                     + ",name=" + connection.escape(method.name)
+    //                                                                                     + ",ordinal=" + method.ordinal
+    //                                                                                     + ",statements=" + connection.escape(JSON.stringify(method.statements))
+    //                                                                                     + ",imageId=" + method.imageId
+    //                                                                                     + ",description=" + connection.escape(method.description)
+    //                                                                                     + ",parentMethodId=" + method.parentMethodId
+    //                                                                                     + ",parentPrice=" + method.parentPrice
+    //                                                                                     + ",priceBump=" + method.priceBump
+    //                                                                                     + ",ownedByUserId=" + method.ownedByUserId
+    //                                                                                     + ",public=" + method.public
+    //                                                                                     + ",quarantined=" + method.quarantined
+    //                                                                                     + ",methodTypeId=" + method.methodTypeId
+    //                                                                                     + ",arguments=" + connection.escape(JSON.stringify(method.arguments))
+    //                                                                                     ;
 
-                                                                            if (typeIth.bNeedToDoAppBaseType) {
-                                                                                baseScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                            } else {
-                                                                                stScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
-                                                                            }
+    //                                                                         if (typeIth.bNeedToDoAppBaseType) {
+    //                                                                             baseScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
+    //                                                                         } else {
+    //                                                                             stScript.push("insert " + self.dbname + "methods" + scriptGuts + ";");
+    //                                                                         }
 
-                                                                            return cb(null);
+    //                                                                         return cb(null);
 
-                                                                        } catch (em) { return cb(em); }
-                                                                    }
-                                                                );
-                                                            }
-                                                        ],
-                                                        // final callback for async.series in methods
-                                                        function(err) { 
-                                                            return cb(err); 
-                                                        }
-                                                    );
-                                                },
-                                                // final callback for async.eachSeries in methods
-                                                function(err) { 
-                                                    return cb(err); 
-                                                }
-                                            );
-                                        },
-                                        // (2) properties
-                                        function(cb) {
+    //                                                                     } catch (em) { return cb(em); }
+    //                                                                 }
+    //                                                             );
+    //                                                         }
+    //                                                     ],
+    //                                                     // final callback for async.series in methods
+    //                                                     function(err) { 
+    //                                                         return cb(err); 
+    //                                                     }
+    //                                                 );
+    //                                             },
+    //                                             // final callback for async.eachSeries in methods
+    //                                             function(err) { 
+    //                                                 return cb(err); 
+    //                                             }
+    //                                         );
+    //                                     },
+    //                                     // (2) properties
+    //                                     function(cb) {
 
-                                            m_log("Doing properties");
-                                            var ordinal = 0;
+    //                                         m_log("Doing properties");
+    //                                         var ordinal = 0;
 
-                                            async.eachSeries(typeIth.properties,
-                                                function(property, cb) {
+    //                                         async.eachSeries(typeIth.properties,
+    //                                             function(property, cb) {
 
-                                                    property.typeId = typeIth.id;
-                                                    property.ordinal = ordinal++;
-                                                    property.propertyTypeId = 6;
+    //                                                 property.typeId = typeIth.id;
+    //                                                 property.ordinal = ordinal++;
+    //                                                 property.propertyTypeId = 6;
 
-                                                    var guts = {
-                                                                typeId: typeIth.id,
-                                                                propertyTypeId: property.propertyTypeId,
-                                                                name: property.name,
-                                                                initialValue: property.initialValue || '',
-                                                                ordinal: property.ordinal,
-                                                                isHidden: 0
-                                                                };
+    //                                                 var guts = {
+    //                                                             typeId: typeIth.id,
+    //                                                             propertyTypeId: property.propertyTypeId,
+    //                                                             name: property.name,
+    //                                                             initialValue: property.initialValue || '',
+    //                                                             ordinal: property.ordinal,
+    //                                                             isHidden: 0
+    //                                                             };
 
-                                                    var exceptionRet = m_checkGutsForUndefined('property', guts);
-                                                    if (exceptionRet) {
-                                                        return cb(exceptionRet);
-                                                    }
+    //                                                 var exceptionRet = m_checkGutsForUndefined('property', guts);
+    //                                                 if (exceptionRet) {
+    //                                                     return cb(exceptionRet);
+    //                                                 }
 
-                                                    strQuery = "insert " + self.dbname + "propertys SET ?";
-                                                    m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                                        function(err, rows) {
+    //                                                 strQuery = "insert " + self.dbname + "propertys SET ?";
+    //                                                 m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                                     function(err, rows) {
 
-                                                            try {
-                                                                if (err) { return cb(err); }
-                                                                if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
+    //                                                         try {
+    //                                                             if (err) { return cb(err); }
+    //                                                             if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
 
-                                                                property.id = rows[0].insertId;
+    //                                                             property.id = rows[0].insertId;
 
-                                                                // If this is a System Type property, push onto passObj.project.script.
-                                                                var scriptGuts = " SET typeId=" + typeIth.atid
-                                                                            + ",propertyTypeId=" + property.propertyTypeId
-                                                                            + ",name=" + connection.escape(property.name)
-                                                                            + ",initialValue=" + connection.escape(property.initialValue || '')
-                                                                            + ",ordinal=" + property.ordinal
-                                                                            + ",isHidden=" + (property.isHidden ? 1 : 0)
-                                                                            ;
-                                                                 if (typeIth.bNeedToDoAppBaseType) {
-                                                                    baseScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
-                                                                } else {
-                                                                    stScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
-                                                                }
-                                                                return cb(null);
+    //                                                             // If this is a System Type property, push onto passObj.project.script.
+    //                                                             var scriptGuts = " SET typeId=" + typeIth.atid
+    //                                                                         + ",propertyTypeId=" + property.propertyTypeId
+    //                                                                         + ",name=" + connection.escape(property.name)
+    //                                                                         + ",initialValue=" + connection.escape(property.initialValue || '')
+    //                                                                         + ",ordinal=" + property.ordinal
+    //                                                                         + ",isHidden=" + (property.isHidden ? 1 : 0)
+    //                                                                         ;
+    //                                                              if (typeIth.bNeedToDoAppBaseType) {
+    //                                                                 baseScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+    //                                                             } else {
+    //                                                                 stScript.push("insert " + self.dbname + "propertys" + scriptGuts + ";");
+    //                                                             }
+    //                                                             return cb(null);
 
-                                                            } catch (ep) { return cb(ep); }
-                                                        }
-                                                    );
-                                                },
-                                                // final callback for async.eachSeries in properties
-                                                function(err) { 
-                                                    return cb(err); 
-                                                }
-                                            );
-                                        },
-                                        // (3) events
-                                        function(cb) {
+    //                                                         } catch (ep) { return cb(ep); }
+    //                                                     }
+    //                                                 );
+    //                                             },
+    //                                             // final callback for async.eachSeries in properties
+    //                                             function(err) { 
+    //                                                 return cb(err); 
+    //                                             }
+    //                                         );
+    //                                     },
+    //                                     // (3) events
+    //                                     function(cb) {
 
-                                            // m_log("Doing events");
-                                            var ordinal = 0;
+    //                                         // m_log("Doing events");
+    //                                         var ordinal = 0;
 
-                                            async.eachSeries(typeIth.events,
-                                                function(event, cb) {
+    //                                         async.eachSeries(typeIth.events,
+    //                                             function(event, cb) {
 
-                                                    event.typeId = typeIth.id;
-                                                    event.ordinal = ordinal++;
+    //                                                 event.typeId = typeIth.id;
+    //                                                 event.ordinal = ordinal++;
 
-                                                    var guts = {
-                                                                typeId: typeIth.id,
-                                                                name: event.name,
-                                                                ordinal: event.ordinal
-                                                                };
+    //                                                 var guts = {
+    //                                                             typeId: typeIth.id,
+    //                                                             name: event.name,
+    //                                                             ordinal: event.ordinal
+    //                                                             };
 
-                                                    var exceptionRet = m_checkGutsForUndefined('event', guts);
-                                                    if (exceptionRet) {
-                                                        return cb(exceptionRet);
-                                                    }
+    //                                                 var exceptionRet = m_checkGutsForUndefined('event', guts);
+    //                                                 if (exceptionRet) {
+    //                                                     return cb(exceptionRet);
+    //                                                 }
 
-                                                    strQuery = "insert " + self.dbname + "events SET ?";
-                                                    // m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                                        function(err, rows) {
+    //                                                 strQuery = "insert " + self.dbname + "events SET ?";
+    //                                                 // m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                                     function(err, rows) {
 
-                                                            try {
-                                                                if (err) { throw err; }
-                                                                if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+    //                                                         try {
+    //                                                             if (err) { throw err; }
+    //                                                             if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
-                                                                event.id = rows[0].insertId;
+    //                                                             event.id = rows[0].insertId;
 
-                                                                var scriptGuts = " SET typeId=" + typeIth.atid
-                                                                            + ",name=" + connection.escape(event.name)
-                                                                            + ",ordinal=" + event.ordinal
-                                                                            ;
-                                                                if (typeIth.bNeedToDoAppBaseType) {
-                                                                    baseScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
-                                                                    bNeedToDoAppBaseType = false;
-                                                                } else {
-                                                                    stScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
-                                                                }
+    //                                                             var scriptGuts = " SET typeId=" + typeIth.atid
+    //                                                                         + ",name=" + connection.escape(event.name)
+    //                                                                         + ",ordinal=" + event.ordinal
+    //                                                                         ;
+    //                                                             if (typeIth.bNeedToDoAppBaseType) {
+    //                                                                 baseScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
+    //                                                                 bNeedToDoAppBaseType = false;
+    //                                                             } else {
+    //                                                                 stScript.push("insert " + self.dbname + "events" + scriptGuts + ";");
+    //                                                             }
 
-                                                                return cb(null);
+    //                                                             return cb(null);
 
-                                                            } catch (ee) { return cb(ee); }
-                                                        }
-                                                    );
-                                                },
-                                                // final callback for async.eachSeries in events
-                                                function(err) { 
-                                                    return cb(err); 
-                                                }
-                                            );
-                                        }
-                                    ],
-                                    // final callback for async.series for methods, properties and events.
-                                    function(err) { 
-                                        return cb(err); 
-                                    }
-                                );
-                            },
-                            // final callback for eachSeries
-                            function(err) {
-                                return cb(err);
-                            }
-                        );
-                    }
-                ],
-                function(err) {
+    //                                                         } catch (ee) { return cb(ee); }
+    //                                                     }
+    //                                                 );
+    //                                             },
+    //                                             // final callback for async.eachSeries in events
+    //                                             function(err) { 
+    //                                                 return cb(err); 
+    //                                             }
+    //                                         );
+    //                                     }
+    //                                 ],
+    //                                 // final callback for async.series for methods, properties and events.
+    //                                 function(err) { 
+    //                                     return cb(err); 
+    //                                 }
+    //                             );
+    //                         },
+    //                         // final callback for eachSeries
+    //                         function(err) {
+    //                             return cb(err);
+    //                         }
+    //                     );
+    //                 }
+    //             ],
+    //             function(err) {
                     
-                    // return:
-                    // {
-                    //      DB: "OK" or err.message,
-                    //      stScript: "OK" or message   -- if DB !== "OK", stScript and baseScript won't exist, since we won't have tried to save the scripts.
-                    //      baseScript: "OK" or message -- if stScript !== "OK", baseScript won't exist, since we won't have tried to write it out.
-                    //                                      also, there won't be a baseScript property at all if we're being called by routeSaveSystemTypes.
-                    // }
-                    if (err) {
+    //                 // return:
+    //                 // {
+    //                 //      DB: "OK" or err.message,
+    //                 //      stScript: "OK" or message   -- if DB !== "OK", stScript and baseScript won't exist, since we won't have tried to save the scripts.
+    //                 //      baseScript: "OK" or message -- if stScript !== "OK", baseScript won't exist, since we won't have tried to write it out.
+    //                 //                                      also, there won't be a baseScript property at all if we're being called by routeSaveSystemTypes.
+    //                 // }
+    //                 if (err) {
 
-                        return callback({DB: err.message});
-                    }
+    //                     return callback({DB: err.message});
+    //                 }
 
-                    // We always write out ST.sql. If that write fails, we don't even try to write out baseScript.
-                    m_functionWriteSqlScript(stScript, "ST.sql", function(err) {
+    //                 // We always write out ST.sql. If that write fails, we don't even try to write out baseScript.
+    //                 m_functionWriteSqlScript(stScript, "ST.sql", function(err) {
 
-                        if (err) {
-                            return callback({
-                                DB: "OK",
-                                stScript: err.message
-                            });
-                        }
+    //                     if (err) {
+    //                         return callback({
+    //                             DB: "OK",
+    //                             stScript: err.message
+    //                         });
+    //                     }
 
-                        // We write out baseScript only if we're called from routeSaveProject; not if we're called from routeSaveSystemTypes.
-                        if (baseScript.length) {
+    //                     // We write out baseScript only if we're called from routeSaveProject; not if we're called from routeSaveSystemTypes.
+    //                     if (baseScript.length) {
 
-                            m_functionWriteSqlScript(baseScript, filenameBaseScript, function(err) {
+    //                         m_functionWriteSqlScript(baseScript, filenameBaseScript, function(err) {
 
-                                if (err) {
-                                    return callback({
-                                        DB: "OK",
-                                        stScript: "OK",
-                                        baseScript: err.message
-                                    });
-                                }
+    //                             if (err) {
+    //                                 return callback({
+    //                                     DB: "OK",
+    //                                     stScript: "OK",
+    //                                     baseScript: err.message
+    //                                 });
+    //                             }
 
-                                return callback({
-                                    DB: "OK",
-                                    stScript: "OK",
-                                    baseScript: "OK"
-                                });
-                            });
-                        } else {
+    //                             return callback({
+    //                                 DB: "OK",
+    //                                 stScript: "OK",
+    //                                 baseScript: "OK"
+    //                             });
+    //                         });
+    //                     } else {
 
-                            return callback({
-                                DB: "OK",
-                                stScript: "OK"
-                            });
-                        }
-                    });
-                }
-            );
-        } catch (e) {
+    //                         return callback({
+    //                             DB: "OK",
+    //                             stScript: "OK"
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //         );
+    //     } catch (e) {
 
-            return callback({DB: e.message});
-        }
-    }
+    //         return callback({DB: e.message});
+    //     }
+    // }
 
-    var m_functionWriteSqlScript = function(script, filename, callback) {
+    // var m_functionWriteSqlScript = function(script, filename, callback) {
 
-        try {
+    //     try {
 
-            // Finalize the procedure.
-            script.push("end;");
-            script.push("//");
-            script.push("delimiter ;");
-            script.push("call doSystemTypes();");
-            script.push("drop procedure doSystemTypes;");
+    //         // Finalize the procedure.
+    //         script.push("end;");
+    //         script.push("//");
+    //         script.push("delimiter ;");
+    //         script.push("call doSystemTypes();");
+    //         script.push("drop procedure doSystemTypes;");
 
-            fs.writeFile(filename, script.join(os.EOL), 
-                function (err) {
-                    callback(err);
-                }
-            );
-        } catch(e) {
-            callback(e);
-        }
-    }
+    //         fs.writeFile(filename, script.join(os.EOL), 
+    //             function (err) {
+    //                 callback(err);
+    //             }
+    //         );
+    //     } catch(e) {
+    //         callback(e);
+    //     }
+    // }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -1843,14 +1843,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-                                            m_functionSaveSystemTypes(  
-                                                connection,
-                                                project.specialProjectData.userCanWorkWithSystemLibsAndTypes,
-                                                project.systemTypes,
-                                                true,   // Says that project.systemTypes[0] is and App base type
-                                                function(jsonResult) {
+// THIS FUNCTION DOESNT EXIST ANY MORE.
+// IT NEEDS TO BE REPLACED, cause now this does nothing.
+                                            // m_functionSaveSystemTypes(  
+                                            //     connection,
+                                            //     project.specialProjectData.userCanWorkWithSystemLibsAndTypes,
+                                            //     project.systemTypes,
+                                            //     true,   // Says that project.systemTypes[0] is and App base type
+                                            //     function(jsonResult) {
 
-                                                    if (jsonResult.DB === "Skipped" || jsonResult.DB === "OK") {
+                                            //         if (jsonResult.DB === "Skipped" || jsonResult.DB === "OK") {
 
                                                         m_functionDetermineSaveOrSaveAs(connection, req, res,
                                                             function(err, typeOfSave) {
@@ -1900,13 +1902,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 }
                                                             }
                                                         );
-                                                    } else {
+                                            //         } else {
 
-                                                        // Something went wrong saving system types array.
-                                                        m_functionFinalCallback(new Error(jsonResult.DB), req, res, null, null);
-                                                    }
-                                                }
-                                            );
+                                            //             // Something went wrong saving system types array.
+                                            //             m_functionFinalCallback(new Error(jsonResult.DB), req, res, null, null);
+                                            //         }
+                                            //     }
+                                            // );
                                         }
                                     } catch(e1) { 
                                         return res.json({

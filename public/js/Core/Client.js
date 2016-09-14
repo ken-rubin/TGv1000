@@ -247,39 +247,39 @@ define(["Core/errorHelper",
 					}
 
 					// This is done without a pre-save dialog.
-					self.saveSystemTypes = function (callback) {
+					// self.saveSystemTypes = function (callback) {
 
-						try {
+					// 	try {
 
-							var arraySystemTypes = manager.saveSystemTypes();
+					// 		var arraySystemTypes = manager.saveSystemTypes();
 
-							var posting = $.post("/BOL/ProjectBO/SaveSystemTypes", 
-								{
-									systemtypesarray: arraySystemTypes
-								},
-								'json');
-							posting.done(function(data){
+					// 		var posting = $.post("/BOL/ProjectBO/SaveSystemTypes", 
+					// 			{
+					// 				systemtypesarray: arraySystemTypes
+					// 			},
+					// 			'json');
+					// 		posting.done(function(data){
 
-								if (data.success) {
+					// 			if (data.success) {
 
-									if (data.scriptSuccess) {
-										errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 2000);
-									} else {
-										errorHelper.show("System types were saved to the database, but we could not save ST.sql to your drive. Error received: " + data.saveError);
-									}
-								} else {
+					// 				if (data.scriptSuccess) {
+					// 					errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 2000);
+					// 				} else {
+					// 					errorHelper.show("System types were saved to the database, but we could not save ST.sql to your drive. Error received: " + data.saveError);
+					// 				}
+					// 			} else {
 
-									// !data.success
-									errorHelper.show(data.message);
-								}
+					// 				// !data.success
+					// 				errorHelper.show(data.message);
+					// 			}
 
-								callback();
-							});
-						} catch (e) {
+					// 			callback();
+					// 		});
+					// 	} catch (e) {
 
-							errorHelper.show("System types failed to save to the database with error: " + e.message);
-						}
-					}
+					// 		errorHelper.show("System types failed to save to the database with error: " + e.message);
+					// 	}
+					// }
 
 					self.showEditTypeDialog = function (index) {
 

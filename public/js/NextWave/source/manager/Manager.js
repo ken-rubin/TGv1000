@@ -1746,20 +1746,20 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Returns array of system types (including, maybe, app type's base type in [0]) to caller.
-                    self.saveSystemTypes = function () {
-/*
-                        var arraySystemTypes = [];
+                    // self.saveSystemTypes = function () {
 
-                        for (var i = 0; i < self.systemTypes.length; i++) {
+                    //     var arraySystemTypes = [];
 
-                            var typeIth = self.systemTypes[i];
-                            var objectType = typeIth.save();
+                    //     for (var i = 0; i < self.systemTypes.length; i++) {
 
-                            arraySystemTypes.push(objectType);
-                        }
-*/
-                        return [];//arraySystemTypes;
-                    }
+                    //         var typeIth = self.systemTypes[i];
+                    //         var objectType = typeIth.save();
+
+                    //         arraySystemTypes.push(objectType);
+                    //     }
+
+                    //     arraySystemTypes;
+                    // }
 
                     // Test object for input focus.
                     self.hasFocus = function (objectTest) {
