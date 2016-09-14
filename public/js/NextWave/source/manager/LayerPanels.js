@@ -521,19 +521,19 @@ define(["NextWave/source/utility/prototypes",
                     // Clear the list of Statements.
                     self.clearStatements = function() {
 
-                        try {
+                        // try {
 
-                            if (!self.statementsPanel) {
+                        //     if (!self.statementsPanel) {
                                 return null;
-                            }
+                        //     }
 
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.statementsPanel.payload.clearItems();
-                        } catch (e) {
+                        //     // Skip Panel in this object-chain so all panels 
+                        //     // can just be generic instances of the base class.
+                        //     return self.statementsPanel.payload.clearItems();
+                        // } catch (e) {
 
-                            return e;
-                        }
+                        //     return e;
+                        // }
                     };
 
                     // Load up statements from list of statement constructor names.

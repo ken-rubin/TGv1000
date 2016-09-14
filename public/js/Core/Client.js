@@ -63,10 +63,9 @@ define(["Core/errorHelper",
 						try {
 
 							// "Normal" users get their last project loaded automatically.
-							if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+							if (!manager.userCanWorkWithSystemLibsAndTypes) {
 
-								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
-								// At least it didn't work at the bottom of the callback in main.js.
+								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but it acts like asynchronous.
 								var lastProject = g_profile["lastProject"];
 								var lastProjectId = 0;
 								if (g_profile["lastProjectId"]) {
@@ -98,7 +97,8 @@ define(["Core/errorHelper",
 							} else {
 								// Privileged user.
 
-								self.loadSystemTypesAndPinPanels(callback);
+								// self.loadSystemTypesAndPinPanels(callback);
+								if ($.isFunction(callback)) { callback(); }
 							}
 
 							return null;
@@ -107,36 +107,36 @@ define(["Core/errorHelper",
 					}
 
 					// Called here in client, but also by navbar.
-					self.loadSystemTypesAndPinPanels = function (callback) {
+					// self.loadSystemTypesAndPinPanels = function (callback) {
 
-						// While others get all system types, statements, literals and expressions loaded.
-						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
-							{},
-							'json');
-						posting.done(function(data){
+					// 	// While others get all system types, statements, literals and expressions loaded.
+					// 	var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+					// 		{},
+					// 		'json');
+					// 	posting.done(function(data){
 
-							if (data.success) {
+					// 		if (data.success) {
 
-								var exceptionRet = manager.loadSystemTypesProject(data.data);
-								if (exceptionRet) {
+					// 			var exceptionRet = manager.loadSystemTypesProject(data.data);
+					// 			if (exceptionRet) {
 
-									errorHelper.show(exceptionRet);
-								} 
+					// 				errorHelper.show(exceptionRet);
+					// 			} 
 
-								if ($.isFunction(callback)) {
-									callback();
-								}
-							} else {
+					// 			if ($.isFunction(callback)) {
+					// 				callback();
+					// 			}
+					// 		} else {
 
-								// !data.success
-								errorHelper.show(data.message);
+					// 			// !data.success
+					// 			errorHelper.show(data.message);
 
-								if ($.isFunction(callback)) {
-									callback();
-								}
-							}
-						});
-					}
+					// 			if ($.isFunction(callback)) {
+					// 				callback();
+					// 			}
+					// 		}
+					// 	});
+					// }
 
 					//////////////////////////////
 					// Dialog creators/openers

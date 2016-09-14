@@ -366,8 +366,8 @@ define(["NextWave/source/utility/prototypes",
                                 // if (exceptionRet) { return exceptionRet; }
                                 // exceptionRet = self.loadExpressions(objectComic.expressions);
                                 // if (exceptionRet) { return exceptionRet; }
-                                exceptionRet = self.loadStatements(objectComic.statements);
-                                if (exceptionRet) { return exceptionRet; }
+                                // exceptionRet = self.loadStatements(objectComic.statements);
+                                // if (exceptionRet) { return exceptionRet; }
 
                                 // Build up an object hierarchy from the data.
                                 if (!window.tg) {
@@ -388,6 +388,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Set loaded.
                                 self.projectLoaded = true;
+
+                                self.panelLayer.openAndPinAllPanels();
                             }
 
                             return null;
@@ -407,46 +409,45 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // .
-                    self.loadSystemTypesProject = function (objectData) {
+                    // self.loadSystemTypesProject = function (objectData) {
 
-                        try {
+                    //     try {
 
-/*                            self.clearPanels(2);
-                            var exceptionRet = null;
+                    //         self.clearPanels(2);
+                    //         var exceptionRet = null;
 
-                            // objectData is a 4xN ragged array of [0] no longer used; [1] statements; [2] literals; [3] expressions.
-                            // Load them into the manager
-                            // exceptionRet = self.loadSystemTypes(objectData[0]);
-                            // if (exceptionRet) { 
-                            //     self.clearPanels();
-                            //     return exceptionRet;
-                            // }
-                            exceptionRet = self.loadStatements(objectData[1]);
-                            if (exceptionRet) { 
-                                self.clearPanels();
-                                return exceptionRet;
-                            }
-                            // exceptionRet = self.loadLiterals(objectData[2]);
-                            // if (exceptionRet) { 
-                            //     self.clearPanels();
-                            //     return exceptionRet;
-                            // }
-                            // exceptionRet = self.loadExpressions(objectData[3]);
-                            // if (exceptionRet) { 
-                            //     self.clearPanels();
-                            //     return exceptionRet;
-                            // }
+                    //         // objectData is a 4xN ragged array of [0] no longer used; [1] statements; [2] literals; [3] expressions.
+                    //         // Load them into the manager
+                    //         // exceptionRet = self.loadSystemTypes(objectData[0]);
+                    //         // if (exceptionRet) { 
+                    //         //     self.clearPanels();
+                    //         //     return exceptionRet;
+                    //         // }
+                    //         exceptionRet = self.loadStatements(objectData[1]);
+                    //         if (exceptionRet) { 
+                    //             self.clearPanels();
+                    //             return exceptionRet;
+                    //         }
+                    //         // exceptionRet = self.loadLiterals(objectData[2]);
+                    //         // if (exceptionRet) { 
+                    //         //     self.clearPanels();
+                    //         //     return exceptionRet;
+                    //         // }
+                    //         // exceptionRet = self.loadExpressions(objectData[3]);
+                    //         // if (exceptionRet) { 
+                    //         //     self.clearPanels();
+                    //         //     return exceptionRet;
+                    //         // }
 
-                            // In this mode, we open and pin all panels, since there's no reason to access a lower layer.
-                            self.panelLayer.openAndPinAllPanels();
+                    //         // In this mode, we open and pin all panels, since there's no reason to access a lower layer.
+                    //         self.panelLayer.openAndPinAllPanels();
 
-                            // Set loaded.
-                            self.systemTypesLoaded = true;
-*/
-                            return null;
+                    //         // Set loaded.
+                    //         self.systemTypesLoaded = true;
+                    //         return null;
 
-                        } catch (e) { return e; }
-                    }
+                    //     } catch (e) { return e; }
+                    // }
 
                     // Force render.
                     self.forceRender = function () {
@@ -1712,7 +1713,7 @@ define(["NextWave/source/utility/prototypes",
 
                         /* Get system types if user has permission to have worked with them.
                         objectRet.systemTypes = [];
-                        if (self.userCanWorkWithSystemTypesAndAppBaseTypes) {
+                        if (self.userCanWorkWithSystemLibsAndTypes) {
 
                             for (var i = 0; i < self.systemTypes.length; i++) {
 

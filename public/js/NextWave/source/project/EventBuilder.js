@@ -205,9 +205,9 @@ define(["NextWave/source/utility/prototypes",
 
                             var bProtected = false;
                             // Protect against editing Event name in these cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
+                            //      if in system types or App base types and !manager.userCanWorkWithSystemLibsAndTypes.
                             //      for all users: x, y, width, height of system type VisualObject.
-                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
+                            if (!manager.userCanWorkWithSystemLibsAndTypes && 
                                 type.stowage.typeTypeId > 1) {
 
                                 bProtected = true;
@@ -225,8 +225,8 @@ define(["NextWave/source/utility/prototypes",
 
                             bProtected = false;
                             // Protect against editing property description in these cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
+                            //      if in system types or App base types and !manager.userCanWorkWithSystemLibsAndTypes.
+                            if (!manager.userCanWorkWithSystemLibsAndTypes && 
                                 type.stowage.typeTypeId > 1) {
 
                                 bProtected = true;

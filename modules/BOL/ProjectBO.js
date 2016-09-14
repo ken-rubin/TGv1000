@@ -881,7 +881,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("Entered ProjectBO/routeFetchNormalUserNewProjectTypes");
 
-            sql.execute("select id from " + self.dbname + "types where public=1;",
+            sql.execute("select projectTypeId from " + self.dbname + "projects where public=1;",
                 function(rows) {
 
                     if (rows.length === 0) {
@@ -892,7 +892,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     var array = [];
                     rows.forEach(
                         function(row) {
-                            array.push(row.id);
+                            array.push(row.projectTypeId);
                         }
                     );
 
@@ -1768,7 +1768,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
 // The next 2 paragraphs have to be changed to handle system or base Libraries. Similar rules that applied to SystemTypes apply to these special Libraries.
             // In all cases project contains a property called systemTypes which is an array with [0] being the base type of the project's App type and
-            // [1]-[n] being all System Types. If project.specialProjectData.userCanWorkWithSystemTypesAndAppBaseTypes, we assume that these System Types
+            // [1]-[n] being all System Types. If project.specialProjectData.userCanWorkWithSystemLibsAndTypes, we assume that these System Types
             // *have* been edited and we save them. If System Types have an id > 0 (and not undefined or null--whatever), then they are
             // updted so that they retain the same id; while if one is new, it is inserted and it gets the id it will always have.
 
@@ -1845,7 +1845,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_functionSaveSystemTypes(  
                                                 connection,
-                                                project.specialProjectData.userCanWorkWithSystemTypesAndAppBaseTypes,
+                                                project.specialProjectData.userCanWorkWithSystemLibsAndTypes,
                                                 project.systemTypes,
                                                 true,   // Says that project.systemTypes[0] is and App base type
                                                 function(jsonResult) {

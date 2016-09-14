@@ -391,11 +391,11 @@ define(["NextWave/source/utility/prototypes",
                             // Protect against editing method name in these cases:
                             //      App type (type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize")
                             //      objectContext.method.name === "construct"
-                            //      (system type or app base type) && !manager.userCanWorkWithSystemTypesAndAppBaseTypes
+                            //      (system type or app base type) && !manager.userCanWorkWithSystemLibsAndTypes
                             if ( 
                                     (objectContext.type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize") || 
                                     (objectContext.method.name === "construct") ||
-                                    (objectContext.type.stowage.typeTypeId > 1 && !manager.userCanWorkWithSystemTypesAndAppBaseTypes)
+                                    (objectContext.type.stowage.typeTypeId > 1 && !manager.userCanWorkWithSystemLibsAndTypes)
                                 ) {
 
                                 bProtected = true;
