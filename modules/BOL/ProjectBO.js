@@ -2676,7 +2676,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     
                                     comicIth.id = rows[0].insertId;
 
-                                    // Do content of comic: comiccode and types (and all their content) in parallel.
+                                    // Do content of comic: comiccode, libraries (and all their content) and the 3 juntion tables for literals, expressions and statements in parallel.
 
                                     async.parallel(
                                         [
@@ -2693,6 +2693,36 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                 m_log("Going to m_saveComiccodeInComicIthToDB");
                                                 m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComics_XInComicIthToDB for statements");
+                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    'statements',
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComics_XInComicIthToDB for expressions");
+                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    'expressions',
+                                                    function(err) {
+                                                        return cb(err); 
+                                                    }
+                                                );
+                                            },
+                                            function(cb){
+
+                                                m_log("Going to m_saveComics_XInComicIthToDB for literals");
+                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    'literals',
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -2726,6 +2756,86 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch (e) { callback(e); }
     }
 
+    var m_saveComics_XInComicIthToDB = function (connection, req, res, project, comicIth, 
+        which,
+        callback) {
+
+        try {
+
+            m_log("***In m_saveComics_XInComicIthToDB for " + which + "***");
+
+            var items = [];
+
+            async.series(
+                [
+                    // Fill items array.
+                    function(cb) {
+
+                        var strQuery = "select * from " + self.dbname + which + ";";
+                        sql.queryWithCxn(connection,
+                            strQuery,
+                            function(err, rows) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                items = rows;
+                                return cb(null);
+                            }
+                        );
+                    },
+                    // Save to comics_statements, using items array to look up statementId.
+                    function(cb) {
+
+                        async.eachSeries(comicIth[which],
+                            function(lIth, cb) {
+
+                                var lIthId = 0;
+                                for (var i = 0; i < items.length; i++) {
+                                    if (lIth === items[i].name) {
+                                        lIthId = items[i].id;
+                                        break;
+                                    }
+                                }
+
+                                if (lIthId > 0) {
+
+                                    var guts = {
+                                        comicId: comicIth.id
+                                    };
+                                    if (which === 'statements') {
+                                        guts.statementId = lIthId
+                                    } else if (which === 'expressions') {
+                                        guts.expressionId = lIthId
+                                    } else {
+                                        guts.literalId = lIthId;
+                                    }
+
+                                    var strQuery = "INSERT " + self.dbname + "comics_" + which + " SET ?";
+                                    sql.queryWithCxnWithPlaceholders(connection,
+                                        strQuery,
+                                        guts,
+                                        function(err, rows) {
+                                            return cb(err);
+                                        }
+                                    );
+                                } else {
+
+                                    return cb(null);
+                                }
+                            },
+                            // final callback
+                            function(err) { return cb(err); }
+                        );
+                    }
+                ],
+                //final callback of async.series
+                function(err) {
+                    return callback(err);
+                }
+            );
+        } catch(e) { callback(e); }
+    }
+            
     var m_saveComiccodeInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
         try {
