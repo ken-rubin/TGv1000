@@ -2756,9 +2756,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch (e) { callback(e); }
     }
 
-    var m_saveComics_XInComicIthToDB = function (connection, req, res, project, comicIth, 
-        which,
-        callback) {
+    // The 'X' in the name of this function means 'expressions', 'literals' or 'statements'.
+    // The function saves all three via three junction tables whose names it constructs.
+    var m_saveComics_XInComicIthToDB = function (connection, req, res, project, comicIth, which, callback) {
 
         try {
 
@@ -2889,9 +2889,95 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 comicIth.libraries,
                 function(libraryIth, cb) {
 
+                    // The are lots of options for the set of libraries in a comic:
+                    // (1) A library can be a system or a base type library and the saving user may be a normal user. 
+                    //     These libraries are not written (since they couldn't have been modified) but they do have to be
+                    //     joined to the project and comic in projects_comics_libraries.
+                    // (2) A library can be an app type library. This is inserted in full into the database and an entry is made in projects_comics_libraries.
+                    // (3) A library can be a "normal" (i.e., not system, not base and not app) library. This is handled just like in case (2).
+                    // (4) For a user with permission 'can_edit_base_and_system_libraries_and_types_therein' saving a not-normal project (i.e., a core project or a product),
+                    //     we will update pre-existing libraries and insert new ones.
+
+                    if (libraryIth.isNormalLibrary || libraryIth.id === 0) {
+
+                        // Insert this library.
+                        var guts = {
+                            name: libraryIth.name,
+                            createdByUserId: req.user.userId,
+                            isSystemLibrary: libraryIth.isSystemLibrary,
+                            isBaseLibrary: libraryIth.isBaseLibrary,
+                            isAppLibrary: libraryIth.isAppLibrary,
+                            imageId: 0,
+                            altImagePath: '',
+                            description: ''
+                        };
+
+                        var exceptionRet = m_checkGutsForUndefined('Library', guts);
+                        if (exceptionRet) { return cb(exceptionRet); }
+
+                        var strQuery;
+                        var weInserted;
+                        if (libraryIth.id) {
+
+                            // Assuming for now that library wasn't deleted by cascading delete of the project.
+                            strQuery = "update " + self.dbname + "libraries SET ? where id=" + libraryIth.id + ";";
+                            strQuery += "delete from " + self.dbname + "library_tags where typeId=" + libraryIth.id + ";";
+                            strQuery += "delete from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";  // This should delete from type_tags, methods, method_tags, propertys, events, too.
+
+                            weInserted = false;
+
+                        } else {
+
+                            strQuery = "insert " + self.dbname + "libraries SET ?";
+                            weInserted = true;
+                        }
+
+                        sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                            function(err, rows) {
+
+                                if (err) { return cb(err); }
+                                if (rows.length === 0) { return cb(new Error("Error writing library to the database.")); }
+
+                                if (weInserted) {
+
+                                    libraryIth.id = rows[0].insertId;
+                                }
+
+                                // Now do library_tags and the types within the library. Finally, return cb(null);
+                                async.parallel(
+                                    [
+                                        function(cb) {
+                                            m_log("Going to write library tags");
+                                            m_setUpAndWriteTags(connection, res, libraryIth.id, 'library', req.user.userName, libraryIth.tags, libraryIth.name, 
+                                                function(err) {
+                                                    return cb(err);
+                                                }
+                                            );
+                                        },
+                                        function(cb) {
+                                            m_log("Going to m_saveTypesInLibraryIthToDB");
+                                            m_saveTypesInLibraryIthToDB(connection, req, res, project, comicIth, libraryIth,
+                                                function(err) {
+
+                                                }
+                                            );
+                                        },
+                                        function(cb) {
+                                            // Write record to projects_comics_libraries.
+
+                                        }
+                                    ],
+                                    function(err) { return cb(err); }
+                                );
+
+                            }
+                        );
+
+                    } else {
 
 
 
+                    }
                 },
                 function(err) { return callback(err); }
             );
@@ -2945,7 +3031,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //     }
     // }
 
-    var m_saveTypesInLibraryIthToDB = function(passObj, callback) {
+    var m_saveTypesInLibraryIthToDB = function(connection, req, res, project, comicIth, libraryIth, callback) {
 
         try {
 

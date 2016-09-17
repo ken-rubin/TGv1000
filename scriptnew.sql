@@ -1538,9 +1538,28 @@ begin
 
     end if;
     
-    if @dbstate = 143 THEN
+    if @dbstate = 43 THEN
 
+		update TGv1000.permissions set description='can_edit_base_and_system_libraries_and_types_therein' where id=2;
 
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 44 THEN
+
+		ALTER TABLE `tgv1000`.`librarys_tags` 
+			RENAME TO  `tgv1000`.`library_tags` ;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 945 THEN
 
 
 		set @dbstate := @dbstate + 1;
