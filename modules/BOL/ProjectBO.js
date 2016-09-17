@@ -1285,6 +1285,60 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         );
                         if (exceptionRet) { return cbp1(exceptionRet); }
                     },
+                    function(cb) {  // expressions
+
+                        var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ") order by name asc;";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+                                rows.forEach(
+                                    function(rowIth) {
+                                        comicIth.expressions.push(rowIth.name);
+                                    }
+                                );
+                                return cb(null);
+                            },
+                            function(strError) {
+                                return cb(new Error(strError));
+                            }
+                        );
+                    },
+                    function(cb) {  // statements
+
+                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+                                rows.forEach(
+                                    function(rowIth) {
+                                        comicIth.statements.push(rowIth.name);
+                                    }
+                                );
+                                return cb(null);
+                            },
+                            function(strError) {
+                                return cb(new Error(strError));
+                            }
+                        );
+                    },
+                    function(cb) {  // literals
+
+                        var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ") order by name asc;";
+                        sql.execute(
+                            strQuery,
+                            function(rows) {
+                                rows.forEach(
+                                    function(rowIth) {
+                                        comicIth.literals.push(rowIth.name);
+                                    }
+                                );
+                                return cb(null);
+                            },
+                            function(strError) {
+                                return cb(new Error(strError));
+                            }
+                        );
+                    },
                     function(cbp3) {    // comiccode
 
                         var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
@@ -2726,7 +2780,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 function(libraryIth, cb) {
 
 
-                    
+
 
                 },
                 function(err) { return callback(err); }
