@@ -6,10 +6,10 @@ delimiter //
 
 
 
-/* 
+/* */
 	DROP SCHEMA IF EXISTS `TGv1000`//
 	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-*/
+/* */
 
 
 
@@ -19,7 +19,7 @@ SELECT database()//
 
 
 -- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/*
+/* */
 
 DROP PROCEDURE IF EXISTS doTags//
 
@@ -56,11 +56,11 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
-*/
+/* */
 
 
 -- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/*
+/* */
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 
@@ -86,7 +86,7 @@ begin
     RETURN @uniqueName;
 end //
 
- */
+/* */
 
 create procedure maintainDB()
 begin
@@ -1401,14 +1401,8 @@ begin
             (8,'WebsiteBaseLibrary',1,0,1,0,0,'',NULL),
             (9,'HololensBaseLibrary',1,0,1,0,0,'',NULL),
             (10,'MapBaseLibrary',1,0,1,0,0,'',NULL),
-            (11,'ArrayLibrary',1,1,0,0,0,'',NULL),
-            (12,'BooleanLibrary',1,1,0,0,0,'',NULL),
-            (13,'DateLibrary',1,1,0,0,0,'',NULL),
-            (14,'MathLibrary',1,1,0,0,0,'',NULL),
-            (15,'NumberLibrary',1,1,0,0,0,'',NULL),
-            (16,'RegExpLibrary',1,1,0,0,0,'',NULL),
-            (17,'StringLibrary',1,1,0,0,0,'',NULL),
-            (18,'VisualObjectLibrary',1,1,0,0,0,'',NULL);
+            (11,'KernelTypesLibrary',1,1,0,0,0,'',NULL),
+            (12,'VisualObjectLibrary',1,1,0,0,0,'',NULL);
 
         insert into TGv1000.tags (id,description)
 			VALUES
@@ -1427,13 +1421,7 @@ begin
 			(9,8),
 			(10,8),
 			(11,8),
-			(12,8),
-			(13,8),
-			(14,8),
-			(15,8),
-			(16,8),
-			(17,8),
-			(18,8)
+			(12,8)
 			;
 
 		INSERT INTO `projects_comics_libraries` VALUES 
@@ -1441,54 +1429,23 @@ begin
             (1,1,6),
             (1,1,11),
             (1,1,12),
-            (1,1,13),
-            (1,1,14),
-            (1,1,15),
-            (1,1,16),
-            (1,1,17),
-            (1,1,18),
             (2,2,2),
             (2,2,7),
             (2,2,11),
             (2,2,12),
-            (2,2,13),
-            (2,2,14),
-            (2,2,15),
-            (2,2,16),
-            (2,2,17),
-            (2,2,18),
             (3,3,3),
             (3,3,8),
             (3,3,11),
             (3,3,12),
-            (3,3,13),
-            (3,3,14),
-            (3,3,15),
-            (3,3,16),
-            (3,3,17),
-            (3,3,18),
             (4,4,4),
             (4,4,9),
             (4,4,11),
             (4,4,12),
-            (4,4,13),
-            (4,4,14),
-            (4,4,15),
-            (4,4,16),
-            (4,4,17),
-            (4,4,18),
             (5,5,5),
             (5,5,10),
             (5,5,11),
-            (5,5,12),
-            (5,5,13),
-            (5,5,14),
-            (5,5,15),
-            (5,5,16),
-            (5,5,17),
-            (5,5,18);
+            (5,5,12);
             
-		/* These system Types will be skipped in initial loads by comicId being null; after being retrieved, they will be recognized by having ordinal set to 10000. */
 		insert into TGv1000.`types` (id,`name`,altImagePath,ordinal,libraryId)
 			VALUES 
 				(1,'GameBaseType','media/images/gameProject.png',10000,6),
@@ -1508,13 +1465,13 @@ begin
                 ;
 
 		INSERT `TGv1000`.`types` SET id=11,name='Array',ownedByUserId=1,libraryId=11;
-		INSERT `TGv1000`.`types` SET id=12,name='Boolean',ownedByUserId=1,libraryId=12;
-		INSERT `TGv1000`.`types` SET id=13,name='Date',ownedByUserId=1,libraryId=13;
-		INSERT `TGv1000`.`types` SET id=14,name='Math',ownedByUserId=1,libraryId=14;
-		INSERT `TGv1000`.`types` SET id=15,name='Number',ownedByUserId=1,libraryId=15;
-		INSERT `TGv1000`.`types` SET id=16,name='RegExp',ownedByUserId=1,libraryId=16;
-		INSERT `TGv1000`.`types` SET id=17,name='String',ownedByUserId=1,libraryId=17;
-		INSERT `TGv1000`.`types` SET id=18,name='VisualObject',ownedByUserId=1,libraryId=18;
+		INSERT `TGv1000`.`types` SET id=12,name='Boolean',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=13,name='Date',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=14,name='Math',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=15,name='Number',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=16,name='RegExp',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=17,name='String',ownedByUserId=1,libraryId=11;
+		INSERT `TGv1000`.`types` SET id=18,name='VisualObject',ownedByUserId=1,libraryId=12;
 
     	set @id := (select id from `TGv1000`.`types` where name='VisualObject');
     	INSERT `TGv1000`.`propertys` SET `name`='x', typeId=@id, ordinal=0, propertyTypeId=6, initialValue='Number';
@@ -1575,6 +1532,17 @@ begin
 		delete from TGv1000.routes where method='routeFetchForPanels_S_L_E_ST';
 		delete from TGv1000.routes where method='routeSaveSystemTypes';
     
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 143 THEN
+
+
+
+
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
 		select * from control;

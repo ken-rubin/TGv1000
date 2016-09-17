@@ -1256,7 +1256,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         libraryIth.originalTypeId = libraryIth.id;
                                         libraryIth.isSystemLibrary = (libraryIth.isSystemLibrary === 1 ? true : false);
                                         libraryIth.isAppLibrary = (libraryIth.isAppLibrary === 1 ? true : false);
-                                        libraryIth.isNormalLibrary = !(libraryIth.isSystemLibrary || libraryIth.isAppLibrary);
+                                        libraryIth.isBaseLibrary = (libraryIth.isBaseLibrary === 1 ? true : false);
+
+                                        // If not a "special" library, then it's normal. Set it for ease of processing later.
+                                        libraryIth.isNormalLibrary = !(libraryIth.isSystemLibrary || libraryIth.isAppLibrary || libraryIth.isBaseLibrary);
                                         libraryIth.types = [];
 
                                         m_functionDoLibraryTypes(
@@ -1843,8 +1846,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-// THIS FUNCTION DOESNT EXIST ANY MORE.
-// IT NEEDS TO BE REPLACED, cause now this does nothing.
+// m_functionSaveSystemTypes DOESNT EXIST ANY MORE.
+// IT NEEDS TO BE REPLACED.
                                             // m_functionSaveSystemTypes(  
                                             //     connection,
                                             //     project.specialProjectData.userCanWorkWithSystemLibsAndTypes,
@@ -1958,7 +1961,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
             // 'new' projects are always INSERTed into the database.
-            // 'searched' projects may be INSERTed or UPDATEd. More on this below in m_functionDetermineSaveOrSaveAs.
+            // 'searched' projects may be INSERTed or UPDATEd. More on this below.
 
             // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
             // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
@@ -2212,19 +2215,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             name: project.name,
                             ownedByUserId: req.user.userId,
                             public: project.public,
-                            projectTypeId: project.projectTypeId,
                             quarantined: project.quarantined,
-                            parentPrice: project.parentPrice,
-                            parentProjectId: project.parentProjectId,
-                            priceBump: project.priceBump,
+                            description: project.description,
                             imageId: project.imageId,
                             altImagePath: project.altImagePath,
-                            description: project.description,
+                            parentProjectId: project.parentProjectId,
+                            parentPrice: project.parentPrice,
+                            priceBump: project.priceBump,
+                            projectTypeId: project.projectTypeId,
+                            isCoreProject: (project.isCoreProject ? 1 : 0),
                             isProduct: (project.isProduct || project.specialProjectData.productProject ? 1 : 0),
                             isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
                             isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
-                            isCoreProject: (project.isCoreProject ? 1 : 0),
-                            comicProjectId: project.comicProjectId,
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
                             currentComicIndex: project.currentComicIndex
@@ -2358,19 +2360,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             name: project.name,
                             ownedByUserId: req.user.userId,
                             public: project.public,
-                            projectTypeId: project.projectTypeId,
                             quarantined: project.quarantined,
-                            parentPrice: project.parentPrice,
-                            parentProjectId: project.parentProjectId,
-                            priceBump: project.priceBump,
+                            description: project.description,
                             imageId: project.imageId,
                             altImagePath: project.altImagePath,
-                            description: project.description,
+                            parentProjectId: project.parentProjectId,
+                            parentPrice: project.parentPrice,
+                            priceBump: project.priceBump,
+                            projectTypeId: project.projectTypeId,
+                            isCoreProject: (project.isCoreProject ? 1 : 0),
                             isProduct: (project.isProduct || project.specialProjectData.productProject ? 1 : 0),
                             isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
                             isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
-                            isCoreProject: (project.isCoreProject ? 1 : 0),
-                            comicProjectId: project.comicProjectId,
                             firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
@@ -2584,9 +2585,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         // Now the project has been inserted into the DB and its id is in project.id.
         // A row has been added to resource and tags have been handled for the project, too.
 
-        // This routine will iterate through the project's comics, possibly saving (inserting) each and processing its types, etc.
-        // We use the word 'possibly', because comics themselves are saved only when a privileged user is working on a purchasable product or a core project.
-        // Otherwise, only the comics' types and lower are saved.
+        // This routine will iterate through the project's comics, possibly saving (inserting) each, possibly saving its libraries, but always saving the libraries' types, etc.
+        // We use the word 'possibly', because comics and libraries themselves are saved only when a privileged user is working on a purchasable product or a core project.
+        // Otherwise, only the comics' libraries' types and lower are saved.
         try {
 
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.length);
@@ -2596,12 +2597,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             async.eachSeries(project.comics, 
                 function(comicIth, cb) {
 
-                    comicIth.projectId = project.comicProjectId;
+                    // comic no longer has a projectId. All links are handled by the 3-way junction table projects_comics_libraries.
+                    // comicIth.projectId = project.comicProjectId;
 
                     if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
                         
                         var guts = {
-                            projectId: comicIth.projectId,
+                            // projectId: comicIth.projectId,
                             ordinal: comicIth.ordinal,
                             thumbnail: comicIth.thumbnail,
                             name: comicIth.name
@@ -2621,14 +2623,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     comicIth.id = rows[0].insertId;
 
                                     // Do content of comic: comiccode and types (and all their content) in parallel.
-                                    // Also do the juntion tables comics_statements, comics_Expressions and comics_literals.
 
                                     async.parallel(
                                         [
                                             function(cb){
 
-                                                m_log("Going to m_saveTypesInComicIthToDB");
-                                                m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
+                                                m_log("Going to m_saveLibrariesInComicIthToDB");
+                                                m_saveLibrariesInComicIthToDB(connection, req, res, project, comicIth, 
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -2638,36 +2639,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                                 m_log("Going to m_saveComiccodeInComicIthToDB");
                                                 m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComics_XInComicIthToDB for statements");
-                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    'statements',
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComics_XInComicIthToDB for expressions");
-                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    'expressions',
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComics_XInComicIthToDB for literals");
-                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    'literals',
                                                     function(err) {
                                                         return cb(err); 
                                                     }
@@ -2685,8 +2656,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         );
                     } else {
 
-                        m_log("Going to m_saveTypesInComicIthToDB");
-                        m_saveTypesInComicIthToDB(connection, req, res, project, comicIth, 
+                        m_log("Going to m_saveLibrariesInComicIthToDB");
+                        m_saveLibrariesInComicIthToDB(connection, req, res, project, comicIth, 
                             function(err) {
                                 return cb(err); 
                             }
@@ -2701,86 +2672,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch (e) { callback(e); }
     }
 
-    var m_saveComics_XInComicIthToDB = function (connection, req, res, project, comicIth, 
-        which,
-        callback) {
-
-        try {
-
-            m_log("***In m_saveComics_XInComicIthToDB for " + which + "***");
-
-            var items = [];
-
-            async.series(
-                [
-                    // Fill items array.
-                    function(cb) {
-
-                        var strQuery = "select * from " + self.dbname + which + ";";
-                        sql.queryWithCxn(connection,
-                            strQuery,
-                            function(err, rows) {
-                                if (err) {
-                                    return cb(err);
-                                }
-                                items = rows;
-                                return cb(null);
-                            }
-                        );
-                    },
-                    // Save to comics_statements, using items array to look up statementId.
-                    function(cb) {
-
-                        async.eachSeries(comicIth[which],
-                            function(lIth, cb) {
-
-                                var lIthId = 0;
-                                for (var i = 0; i < items.length; i++) {
-                                    if (lIth === items[i].name) {
-                                        lIthId = items[i].id;
-                                        break;
-                                    }
-                                }
-
-                                if (lIthId > 0) {
-
-                                    var guts = {
-                                        comicId: comicIth.id
-                                    };
-                                    if (which === 'statements') {
-                                        guts.statementId = lIthId
-                                    } else if (which === 'expressions') {
-                                        guts.expressionId = lIthId
-                                    } else {
-                                        guts.literalId = lIthId;
-                                    }
-
-                                    var strQuery = "INSERT " + self.dbname + "comics_" + which + " SET ?";
-                                    sql.queryWithCxnWithPlaceholders(connection,
-                                        strQuery,
-                                        guts,
-                                        function(err, rows) {
-                                            return cb(err);
-                                        }
-                                    );
-                                } else {
-
-                                    return cb(null);
-                                }
-                            },
-                            // final callback
-                            function(err) { return cb(err); }
-                        );
-                    }
-                ],
-                //final callback of async.series
-                function(err) {
-                    return callback(err);
-                }
-            );
-        } catch(e) { callback(e); }
-    }
-            
     var m_saveComiccodeInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
         try {
@@ -2823,60 +2714,80 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { callback(e); }
     }
 
-    var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+
+    var m_saveLibrariesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
         try {
 
-            m_log("***In m_saveTypesInComicIthToDB***");
-            // Using passObj to (1) easily pass the many values needed in multiple places; and
-            // (2) to allow for passing by reference (which scalars don't do) where needed--like ordinal.
-            var passObj = {
-                ordinal: 1,     // App type will get ordinal 0; all others in comic count up from 1.
-                typeIdTranslationArray: [],
-                comicIth: comicIth,
-                connection: connection,
-                req: req,
-                res: res,
-                project: project
-            };
+            m_log("***In m_saveLibrariesInComicIthToDB***");
 
-            // async.series runs each of an array of functions in order, waiting for each to finish in turn.
-            async.series(
-                [
-                    // (1)
-                    function(cb) {
-                        m_saveAllTypesInComicIthToDB(passObj, 
-                            function(err) {
-                                return cb(err); 
-                            }
-                        );
-                    },
-                    // (3)
-                    function(cb) {
-                        m_fixUpBaseTypeIdsInComicIth(passObj, 
-                            function(err) {
-                                return cb(err); 
-                            }
-                        );
-                    }
-                ], 
-                // final callback
-                function(err){
-                    return callback(err);
-                }
+            async.eachSeries(
+                comicIth.libraries,
+                function(libraryIth, cb) {
+
+
+                    
+
+                },
+                function(err) { return callback(err); }
             );
-        } catch (e) {
-            callback(e);
-        }
+        } catch(e) { callback(e); }
     }
 
-    var m_saveAllTypesInComicIthToDB = function(passObj, callback) {
+    // var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+
+    //     try {
+
+    //         m_log("***In m_saveTypesInComicIthToDB***");
+    //         // Using passObj to (1) easily pass the many values needed in multiple places; and
+    //         // (2) to allow for passing by reference (which scalars don't do) where needed--like ordinal.
+    //         var passObj = {
+    //             ordinal: 1,     // App type will get ordinal 0; all others in comic count up from 1.
+    //             typeIdTranslationArray: [],
+    //             comicIth: comicIth,
+    //             connection: connection,
+    //             req: req,
+    //             res: res,
+    //             project: project
+    //         };
+
+    //         // async.series runs each of an array of functions in order, waiting for each to finish in turn.
+    //         async.series(
+    //             [
+    //                 // (1)
+    //                 function(cb) {
+    //                     m_saveAllTypesInComicIthToDB(passObj, 
+    //                         function(err) {
+    //                             return cb(err); 
+    //                         }
+    //                     );
+    //                 },
+    //                 // (3)
+    //                 function(cb) {
+    //                     m_fixUpBaseTypeIdsInComicIth(passObj, 
+    //                         function(err) {
+    //                             return cb(err); 
+    //                         }
+    //                     );
+    //                 }
+    //             ], 
+    //             // final callback
+    //             function(err){
+    //                 return callback(err);
+    //             }
+    //         );
+    //     } catch (e) {
+    //         callback(e);
+    //     }
+    // }
+
+    var m_saveTypesInLibraryIthToDB = function(passObj, callback) {
 
         try {
 
-            m_log("***In m_saveAllTypesInComicIthToDB***");
+            m_log("***In m_saveTypesInLibraryIthToDB***");
 
-            async.eachSeries(passObj.comicIth.types,
+            async.eachSeries(passObj.libraryIth.types,
                 function(typeIth, cb) {
 
                     if (typeIth.isApp || 0) {
@@ -3114,6 +3025,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
+// Change to m_fixUpBaseTypeIdsInLibraryIth.
     var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
 
         try {
