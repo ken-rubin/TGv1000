@@ -1901,7 +1901,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             m_log('Connection has a transaction');
 
 // m_functionSaveSystemTypes DOESNT EXIST ANY MORE.
-// IT NEEDS TO BE REPLACED.
+// IT NEEDS TO BE REPLACED if only because it starts off the sql scripts that are saved.
+
                                             // m_functionSaveSystemTypes(  
                                             //     connection,
                                             //     project.specialProjectData.userCanWorkWithSystemLibsAndTypes,
@@ -2325,7 +2326,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (2)
                     function(cb) {
 
-                        // Use async.parallel to save the project's tags and start doing its comics in parallel.
+                        // Use async.parallel to save the project's tags, possible purchasable project info and its comics in parallel.
                         async.parallel(
                             [
                                 // (2a)
@@ -2652,103 +2653,109 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 function(comicIth, cb) {
 
                     // comic no longer has a projectId. All links are handled by the 3-way junction table projects_comics_libraries.
-                    // comicIth.projectId = project.comicProjectId;
 
-                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
-                        
-                        var guts = {
-                            // projectId: comicIth.projectId,
-                            ordinal: comicIth.ordinal,
-                            thumbnail: comicIth.thumbnail,
-                            name: comicIth.name
-                        };
-                        var strQuery = "insert " + self.dbname + "comics SET ?";
+                    // Use async.series with 2 functions: (1) for writting comics to the database; (2) for handling comic internals.
+                    async.series([
+                        // (1)
+                        function(cb) {
 
-                        m_log("Writing comicIth with " + strQuery + '; fields: ' + JSON.stringify(guts));
-                        // Turn these into a series?
-                        sql.queryWithCxnWithPlaceholders(connection,
-                            strQuery,
-                            guts,
-                            function(err, rows) {
-                                try {
-                                    if (err) { return cb(err); }
-                                    if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
-                                    
-                                    comicIth.id = rows[0].insertId;
+                            // comics themselves are saved only for core projects and purchasable projects.
+                            if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
+                                
+                                var guts = {
+                                    ordinal: comicIth.ordinal,
+                                    thumbnail: comicIth.thumbnail,
+                                    name: comicIth.name
+                                };
+                                var strQuery = "insert " + self.dbname + "comics SET ?";
 
-                                    // Do content of comic: comiccode, libraries (and all their content) and the 3 juntion tables for literals, expressions and statements in parallel.
+                                m_log("Writing comicIth with " + strQuery + '; fields: ' + JSON.stringify(guts));
+                                // Turn these into a series?
+                                sql.queryWithCxnWithPlaceholders(connection,
+                                    strQuery,
+                                    guts,
+                                    function(err, rows) {
+                                        try {
+                                            if (err) { return cb(err); }
+                                            if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
+                                            
+                                            comicIth.id = rows[0].insertId;
 
-                                    async.parallel(
-                                        [
-                                            function(cb){
+                                            // Do content of comic: comiccode, libraries (and all their content) and the 3 junction tables for literals, expressions and statements in parallel.
 
-                                                m_log("Going to m_saveLibrariesInComicIthToDB");
-                                                m_saveLibrariesInComicIthToDB(connection, req, res, project, comicIth, 
-                                                    function(err) {
-                                                        return cb(err); 
+                                            async.parallel(
+                                                [
+                                                    function(cb){
+
+                                                        m_log("Going to m_saveComiccodeInComicIthToDB");
+                                                        m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                            function(err) {
+                                                                return cb(err); 
+                                                            }
+                                                        );
+                                                    },
+                                                    function(cb){
+
+                                                        m_log("Going to m_saveComics_XInComicIthToDB for statements");
+                                                        m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                            'statements',
+                                                            function(err) {
+                                                                return cb(err); 
+                                                            }
+                                                        );
+                                                    },
+                                                    function(cb){
+
+                                                        m_log("Going to m_saveComics_XInComicIthToDB for expressions");
+                                                        m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                            'expressions',
+                                                            function(err) {
+                                                                return cb(err); 
+                                                            }
+                                                        );
+                                                    },
+                                                    function(cb){
+
+                                                        m_log("Going to m_saveComics_XInComicIthToDB for literals");
+                                                        m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                            'literals',
+                                                            function(err) {
+                                                                return cb(err); 
+                                                            }
+                                                        );
                                                     }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComiccodeInComicIthToDB");
-                                                m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComics_XInComicIthToDB for statements");
-                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    'statements',
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComics_XInComicIthToDB for expressions");
-                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    'expressions',
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            },
-                                            function(cb){
-
-                                                m_log("Going to m_saveComics_XInComicIthToDB for literals");
-                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    'literals',
-                                                    function(err) {
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            }
-                                        ],
-                                        function(err) {
-                                            return cb(err);
+                                                ],
+                                                function(err) {
+                                                    return cb(err);
+                                                }
+                                            );
+                                        } catch (eq) {
+                                            return cb(eq);
                                         }
-                                    );
-                                } catch (eq) {
-                                    return cb(eq);
-                                }
+                                    }
+                                );
+                            } else {
+                                return cb(null);
                             }
-                        );
-                    } else {
+                        },
+                        // (2)
+                        function(cb) {
 
-                        m_log("Going to m_saveLibrariesInComicIthToDB");
-                        m_saveLibrariesInComicIthToDB(connection, req, res, project, comicIth, 
-                            function(err) {
-                                return cb(err); 
-                            }
-                        );
-                    }
+                            m_log("Going to m_saveLibrariesInComicIthToDB");
+                            m_saveLibrariesInComicIthToDB(connection, req, res, project, comicIth, 
+                                function(err) {
+                                    return cb(err); 
+                                }
+                            );
+                        }
+                    ],
+                    // final callback for async.series
+                    function(err) {
+                        return cb(err);
+                    });
+
                 },
-                // final callback for series
+                // final callback for async.seriesEach
                 function(err) {
                     return callback(err);
                 }

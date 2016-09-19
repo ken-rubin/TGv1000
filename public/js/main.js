@@ -57,7 +57,7 @@ $(document).ready(function() {
                             manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
                                 g_profile["can_create_products"] || 
                                 g_profile["can_create_onlineClasses"]) || false;
-                            manager.userCanWorkWithSystemLibsAndTypes = g_profile["can_edit_system_types"] || false;
+                            manager.userCanWorkWithSystemLibsAndTypes = g_profile["can_edit_base_and_system_libraries_and_types_therein"] || false;
 
 		                    var exceptionRet = manager.create();
 		                    if (exceptionRet) { throw exceptionRet; }
