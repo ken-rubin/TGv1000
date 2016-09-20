@@ -2099,16 +2099,17 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         );
                     },
                     // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
+                    // We'll do this by looking for any projects other than resultArray.project that have the same comicID in
+                    // projects_comics_libraries as resultArray.project.comics[0].id.
                     function(resultArray, cb) {
 
                         if (resultArray.project.specialProjectData.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
 
-// THIS MUST BE CHANGED since comicProjectId no longer exists:
-                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + resultArray.project.id + ";";
+                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects_comics_libraries where comicId=" + resultArray.project.comic[0].id + " and projectId<>" + resultArray.project.id + ";";
                             sql.queryWithCxn(connection, strQuery,
                                 function(err, rows) {
                                     if (err) { return cb(err, null); }
-                                    resultArray["savingPurchasableProjectThatsBeenBought"] = (rows[0]['cnt'] > 0);
+                                    resultArray["savingPurchasableProjectThatsBeenBought"] = (rows[0]['cnt'] > 1);
                                     return cb(null, resultArray);
                                 }
                             );
@@ -2177,11 +2178,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     //                      Save processing
     //
-    // Saving consists of deleting the old project (cascaded throughout) then then inserting it
+    // Saving consists of deleting the old project then then re-inserting it
     // using saveAs processing. It WILL change the project's id along with ids of every part of the project.
     //
-    // If saving project with same id as another of user's project with same name, then save.
-    // A fallthrough case: If saving own project with same id and name then save.
+    // When saving a project with same id as another of user's project with same name, we'll save.
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2196,8 +2196,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 [
                     // (1)
                     function(cb) {
-                        // The following will delete the former project completely from the database using cascading delete.
-                        var strQuery = "delete from " + self.dbname + "projects where id=" + project.id + ";";
+                        // The following will delete the former project completely from the database.
+                        var strQuery = "delete from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + "); ";
+                        strQuery += "delete from " + self.dbname + "types where libraryId in (select pcl.libraryId from " + self.dbname + "projects_comics_libraries pcl inner join " + self.dbname + "libraries l on l.id=pcl.libraryId where isSystemLibrary=0 and isBaseLibrary=0 and projectId=" + project.id + "); ";
+                        strQuery += "delete from " + self.dbname + "libraries where isSystemLibrary=0 and isBaseLibrary=0 and id in (select libraryId from " + self.dbname + "projects_comics_libraries where projectId=" + project.id + "); ";
+                        strQuery += "delete from " + self.dbname + "projects where id=" + project.id + "; ";
                         m_log('Doing save project step 1: deleting old version with ' + strQuery);
                         
                         // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
