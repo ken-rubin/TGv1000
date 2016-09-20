@@ -59,56 +59,53 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // self.routeFetchForPanels_S_L_E_ST = function (req, res) {
+    self.routeFetchStrings_E_L_S = function (req, res) {
 
-    //     try {
+        try {
 
-    //         m_log("Entered ProjectBO/routeFetchForPanels_S_L_E_ST");
+            m_log("Entered ProjectBO/routeFetchStrings_E_L_S");
 
-    //         // Returns [4][] where [0] formerly held systemtypes and is now empty; [1] is the full list of statements; [2] is the full list of literals; [3] is the full list of expressions
-    //         var strQuery = "select name from " + self.dbname + "statements order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "expressions order by name asc; "
-    //         sql.execute(strQuery,
-    //             function(rows) {
+            // Returns [3][] where [0] is the full list of expressions; [1] is the full list of literals; [2] is the full list of statements.
+            var strQuery = "select name from " + self.dbname + "expressions order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "statements order by name asc; "
+            sql.execute(strQuery,
+                function(rows) {
 
-    //                 if (rows.length !== 3) {
-    //                     return res.json({
-    //                         success: false,
-    //                         message: "Failed to retrieve 3 arrays in fetching system types."
-    //                     });
-    //                 }
+                    if (rows.length !== 3) {
+                        return res.json({
+                            success: false,
+                            message: "Failed to retrieve 3 arrays in fetching system strings."
+                        });
+                    }
 
-    //                 var twodim = new Array(4);
-    //                 twodim[0] = [];
+                    var twodim = new Array(3);
+                    for (i = 0; i < 3; i++) {
 
-    //                 // Now the strings.
-    //                 for (i = 0; i < 3; i++) {
+                        var names = new Array();
+                        rows[i].forEach(
+                            function(itemIth) {
+                                names.push(itemIth.name);
+                            }
+                        );
+                        twodim[i] = names;
+                    }
 
-    //                     var names = new Array();
-    //                     rows[i].forEach(
-    //                         function(itemIth) {
-    //                             names.push(itemIth.name);
-    //                         }
-    //                     );
-    //                     twodim[i+1] = names;
-    //                 }
+                    res.json({
+                        success: true,
+                        data: twodim
+                    });
+                },
+                function(strError) {
+                    return res.json({
+                        success: false,
+                        message: "Strings fetch failed with error: " + strError
+                    });
+                }
+            );
+        } catch (e) {
 
-    //                 res.json({
-    //                     success: true,
-    //                     data: twodim
-    //                 });
-    //             },
-    //             function(strError) {
-    //                 return res.json({
-    //                     success: false,
-    //                     message: "System Types fetch failed with error: " + strError
-    //                 });
-    //             }
-    //         );
-    //     } catch (e) {
-
-    //         res.json({success: false, message: e.message});
-    //     }
-    // }
+            res.json({success: false, message: e.message});
+        }
+    }
 
     // var m_functionFillInTypes = function(arrTypes, callback) {
 
@@ -219,8 +216,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     // }
 
     // // connection exists and transaction is begun.
-    // // Returns with connection still uncommitted, but 1 or 2 sql scripts have been written out.
-    // // Actually, if we calling from routeSaveProject, we may not do anything here, but we'll need to call the callback to proceed with
+    // // Returns with transaction still uncommitted, but 1 or 2 sql scripts have been written out.
+    // // Actually, if we are calling from routeSaveProject, we may not do anything here, but we'll need to call the callback to proceed with
     // // saving the project.
     // var m_functionSaveSystemTypes = function (  connection, 
     //                                             bCanEditSystemTypesAndAppBaseTypes,
@@ -954,7 +951,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             priceBump: row.priceBump,
                             tags: '',
                             projectTypeId: row.projectTypeId,
-                            comicProjectId: row.comicProjectId,
                             isCoreProject: (row.isCoreProject === 1 ? true : false),
                             isProduct: (row.isProduct === 1 ? true : false),
                             isClass: (row.isClass === 1 ? true : false),
@@ -1805,17 +1801,17 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // req.body.changeableName - if true, in case of a name conflict within the user's projects, keep appending until a unique name is found and do a saveAs, not a save.
 
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
-            // So nothing to do image-wise.
+            // So nothing to do resource-wise.
 
 // Modify the following paragraph. for Libraries.
             // How to handle System Types if project.specialProjectData.systemTypesEdited === "1":
                 // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
                 // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
-                // Its methods, event and properties are deleted and re-inserted.
+                // Its methods, events and properties, however, are deleted and re-inserted.
                 // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
-                // Methods, events and properties are inserted.
+                // Methods, events and properties are always inserted.
 
-            // Similar approach need if project.specialProjectData.comicsEdited === "1"
+            // Similar approach needed if project.specialProjectData.comicsEdited === "1"
 
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
@@ -1827,7 +1823,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // In all cases project contains a property called systemTypes which is an array with [0] being the base type of the project's App type and
             // [1]-[n] being all System Types. If project.specialProjectData.userCanWorkWithSystemLibsAndTypes, we assume that these System Types
             // *have* been edited and we save them. If System Types have an id > 0 (and not undefined or null--whatever), then they are
-            // updted so that they retain the same id; while if one is new, it is inserted and it gets the id it will always have.
+            // updated so that they retain the same id; while if one is new, it is inserted and it gets the id it will have forever more.
 
             // While we're writing the system types to the DB, we're also creating a sql script string array (or actually two of them) so that the stuff Ken, Jerry or
             // John did to a base type or to system types can be re-played into other databases, both on others' dev machines and on the server. There will be 1 sql script covering all 
@@ -1840,16 +1836,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
             // These three properties contain the info that has to be saved to classes, onlineclasses or products, respectively.
 
-            // A privileged user can also edit and save a core project as such. In this case project.isCoreProject And
+            // A privileged user can also edit and save a core project, keeping it a core project with id=1-5. In this case project.isCoreProject and
             // project.specialProjectData.coreProject will both be true. Take your pick.
 
-            // project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
+            // project.specialProjectData.openMode === 'new' for new projects and === 'searched' for projects opened with OpenProjectDialog.
             // 'new' projects are always INSERTed into the database.
-            // 'searched' projects may be INSERTed or UPDATEd. More on this below in m_functionDetermineSaveOrSaveAs.
+            // 'searched' projects may be INSERTed or UPDATEd. More on this below in m_functionDetermineTypeOfSave.
 
             // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
             // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
-            // its project.specialProjectData.openMode will have been changed to 'bought'.
+            // its project.specialProjectData.openMode will have been changed to 'bought' by ??? (on the client side).
 
                 // Saving data to table products, classes or onlineclasses if this is a Purchasable Project (as opposed to an edited core project).
 
@@ -1900,73 +1896,59 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-// m_functionSaveSystemTypes DOESNT EXIST ANY MORE.
-// IT NEEDS TO BE REPLACED if only because it starts off the sql scripts that are saved.
+                                            // There is no longer a project type that contains on SystemTypes (and potentially a base type in [0].)
+                                            // A privileged user (project.specialProjectData.userCanWorkWithSystemLibsAndTypes) can edit, create or delete Base and System libraries
+                                            // and their types either by editing a Core project or by creating a project based on a Core project (as all are, of course) and then 
+                                            // doing whatever to the special libraries and types therein. A privileged user will be assumed to have edited these parts of the project.
+                                            // They will be saved below in the normal course of processing, but we have to write sql scripts in order to duplicate changes to base or system
+                                            // libraries and their types in others' database and on the server. We'll call m_functionPotentiallyDoScripts and continue saving the project in
+                                            // its callback.
 
-                                            // m_functionSaveSystemTypes(  
-                                            //     connection,
-                                            //     project.specialProjectData.userCanWorkWithSystemLibsAndTypes,
-                                            //     project.systemTypes,
-                                            //     true,   // Says that project.systemTypes[0] is and App base type
-                                            //     function(jsonResult) {
+                                            // This function will do no database work. It will just write out the script files if the user is privileged.
+                                            // We will not let an error in writing the scripts keep us from saving the project to the DB.
+                                            m_functionPotentiallyDoScripts(project,
+                                                function(err) {
 
-                                            //         if (jsonResult.DB === "Skipped" || jsonResult.DB === "OK") {
+                                                    // Add err (probably null) to project to be returned to client side for message to user.
+                                                    project.scriptsResult = err;
 
-                                                        m_functionDetermineSaveOrSaveAs(connection, req, res,
-                                                            function(err, typeOfSave) {
-                                                                if (err) {
-                                                                    m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
-                                                                } else {
-                                                                    if (typeOfSave === 'save') {
+                                                    m_functionDetermineTypeOfSave(connection, req, res,
+                                                        function(err, typeOfSave) {
 
-                                                                        m_log('Going into m_functionSaveProject');
-                                                                        m_functionSaveProject(connection, req, res, project, 
-                                                                            function(err) {
-                                                                                if (err) {
-                                                                                    m_functionFinalCallback(err, req, res, null, null);
-                                                                                } else {
-                                                                                    m_log("***Full success***");
-                                                                                    m_functionFinalCallback(null, req, res, connection, project);
-                                                                                }
-                                                                            }
-                                                                        );
-                                                                    } else if (typeOfSave === 'saveWithSameId') {
+                                                            if (err) {
+                                                                m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
+                                                            
+                                                            } else {
+                                                                if (typeOfSave === 'save') {
 
-                                                                        m_log('Going into m_functionSaveProjectWithSameId');
-                                                                        m_functionSaveProjectWithSameId(connection, req, res, project, 
-                                                                            function(err) {
-                                                                                if (err) {
-                                                                                    m_functionFinalCallback(err, req, res, null, null);
-                                                                                } else {
-                                                                                    m_log("***Full success***");
-                                                                                    m_functionFinalCallback(null, req, res, connection, project);
-                                                                                }
-                                                                            }
-                                                                        );
-                                                                    } else {    // 'saveAs'
+                                                                    m_log('Going into m_functionSaveProject');
+                                                                    m_functionSaveProject(connection, req, res, project, 
+                                                                        function(err) {
+                                                                            m_functionFinalCallback(err, req, res, null, null);
+                                                                        }
+                                                                    );
+                                                                } else if (typeOfSave === 'saveWithSameId') {
 
-                                                                        m_log('Going into m_functionSaveProjectAs');
-                                                                        m_functionSaveProjectAs(connection, req, res, project, 
-                                                                            function(err) {
-                                                                                if (err) {
-                                                                                    m_functionFinalCallback(err, req, res, null, null);
-                                                                                } else {
-                                                                                    m_log("***Full success***");
-                                                                                    m_functionFinalCallback(null, req, res, connection, project);
-                                                                                }
-                                                                            }
-                                                                        );
-                                                                    }
+                                                                    m_log('Going into m_functionSaveProjectWithSameId');
+                                                                    m_functionSaveProjectWithSameId(connection, req, res, project, 
+                                                                        function(err) {
+                                                                            m_functionFinalCallback(err, req, res, null, null);
+                                                                        }
+                                                                    );
+                                                                } else {    // 'saveAs'
+
+                                                                    m_log('Going into m_functionSaveProjectAs');
+                                                                    m_functionSaveProjectAs(connection, req, res, project, 
+                                                                        function(err) {
+                                                                            m_functionFinalCallback(err, req, res, null, null);
+                                                                        }
+                                                                    );
                                                                 }
                                                             }
-                                                        );
-                                            //         } else {
-
-                                            //             // Something went wrong saving system types array.
-                                            //             m_functionFinalCallback(new Error(jsonResult.DB), req, res, null, null);
-                                            //         }
-                                            //     }
-                                            // );
+                                                        }
+                                                    );
+                                                }
+                                            );
                                         }
                                     } catch(e1) { 
                                         return res.json({
@@ -1993,26 +1975,46 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
-    var m_functionDetermineSaveOrSaveAs = function(connection, req, res, callback) {
+    var m_functionPotentiallyDoScripts = function (project, callback) {
 
         try {
 
-            m_log("***In m_functionDetermineSaveOrSaveAs***");
+            if (project.specialProjectData.userCanWorkWithSystemLibsAndTypes) {
+
+
+
+
+
+            }
+
+            return callback(null);
+
+        } catch (e) {
+
+            return callback(e);
+        }
+    }
+
+    var m_functionDetermineTypeOfSave = function(connection, req, res, callback) {
+
+        try {
+
+            m_log("***In m_functionDetermineTypeOfSave***");
             // return with callback(err, typeOfSave);
             // typeOfSave:
             //  'saveAs' INSERTs new rows for everything.
             //  'save' DELETES (cascading the project from the database) and then calls SaveAs to insert it.
-            //  'saveWithSameId' ....
+            //  'saveWithSameId' UPDATEs.
 
-            // Muis importante: the project's name must be unique to the user's projects, but can be the same as another user's project name.
-            // This doesn't have to be checked for a typeOfSave === 'save', but this is the time to check it for 'new' or 'save as' saves.
-            // One or two buts here: a save will be changed to a saveAs if it's a new project or the user is saving a project gotten from another user;
-            // a saveAs will be changed to a save if the name and id are the same as one of the user's existing projects.
-            // And one more thing: if req.body.changeableName is true, then a name conflict will be resolved until there is no conflict
-            // within the user's projects and a SaveAs can be done. This will only happen on a project with project.specialProjectData.openMode === "bought".
+            // The project's name must be unique to the user's projects, but can be the same as another user's project name.
+            // This doesn't have to be checked for a typeOfSave === 'save', but it will be checked for 'new' or 'save as' saves.
+            // What would normally result in a 'save' will be changed to a 'saveAs' if it's a new project or the user is saving a project gotten from another user.
+            // What would normally result in a 'saveAs' will be changed to a 'save' if the name and id are the same as one of the user's existing projects.
+            // Also, if req.body.changeableName is true, then a name conflict will be resolved (without user intervention) by appending an incremented integer until there is no conflict
+            // within the user's projects and a 'SaveAs' can be done. This will only happen on a project with project.specialProjectData.openMode === "bought".
 
-            // A privileged user can also edit and save a core project as such. In this case project.isCoreProject And
-            // project.specialProjectData.coreProject will both be true. Take your pick.
+            // A privileged user can also edit and save a core project with the same id. In this case project.isCoreProject And
+            // project.specialProjectData.coreProject will both be true. Take your pick regarding which to check.
 
             // project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
             // 'new' projects are always INSERTed into the database.
@@ -2046,15 +2048,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             var strQuery = "select " + self.dbname + "getUniqueProjNameForUser(" + connection.escape(resultArray.project.name) + "," + req.user.userId + ") as uniqueName;";
                             sql.queryWithCxn(connection, strQuery,
                                 function(err, rows) {
-                                    if (err) {
+                                    
+                                    if (err) { return cb(err, null); }
 
-                                        return cb(err, null);
-                                    }
-
-                                    if (rows.length !== 1) {
-
-                                        return cb(new Error("Error checking/getting unique name for purchase."), null);
-                                    }
+                                    if (rows.length !== 1) { return cb(new Error("Error checking/getting unique name for purchase."), null); }
 
                                     resultArray.project.name = rows[0].uniqueName;
                                     resultArray["idOfUsersProjWithThisName"] = -1;
@@ -2066,11 +2063,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             var strQuery = "select id from " + self.dbname + "projects where name=" + connection.escape(resultArray.project.name) + " and ownedByUserId=" + req.user.userId + ";";
                             sql.queryWithCxn(connection, strQuery,
                                 function(err, rows) {
-                                    if (err) { 
-
-                                        return cb(err, null); 
                                     
-                                    } 
+                                    if (err) { return cb(err, null); } 
                                     
                                     if (rows.length === 1) {
 
@@ -2092,7 +2086,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         var strQuery = "select name from " + self.dbname + "projects where id=" + resultArray.project.id + " and ownedByUserId=" + req.user.userId + ";";
                         sql.queryWithCxn(connection, strQuery,
                             function(err, rows) {
+
                                 if (err) { return cb(err, null); }
+                                
                                 var nameOfUsersProjWithThisId = null;   // null if none exists 
                                 if (rows.length === 1) {
                                     nameOfUsersProjWithThisId = rows[0].name;
@@ -2107,6 +2103,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         if (resultArray.project.specialProjectData.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
 
+// THIS MUST BE CHANGED since comicProjectId no longer exists:
                             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + resultArray.project.id + ";";
                             sql.queryWithCxn(connection, strQuery,
                                 function(err, rows) {
@@ -2115,10 +2112,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     return cb(null, resultArray);
                                 }
                             );
-                        } else {
-
-                            return cb(null, resultArray);
-                        }
+                        } else { return cb(null, resultArray); }
                     }
                 ],
                 // The waterfall falls through to here.
@@ -2140,6 +2134,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         // New project or saving someone else's project must have a unique name for current user.
                         if (resultArray.newProj || resultArray.notMine ) {
+                            
                             if (resultArray.idOfUsersProjWithThisName > -1) {
 
                                 return callback(new Error("You already have a project with this name."));
@@ -2183,7 +2178,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //                      Save processing
     //
     // Saving consists of deleting the old project (cascaded throughout) then then inserting it
-    // using saveAs processing. It WILL change the project's id aong with ids of every part of the project.
+    // using saveAs processing. It WILL change the project's id along with ids of every part of the project.
     //
     // If saving project with same id as another of user's project with same name, then save.
     // A fallthrough case: If saving own project with same id and name then save.
@@ -2259,12 +2254,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (1)
                     function(cb) {
 
-                        if (project.specialProjectData.openMode === 'new' && (project.isProduct || project.isClass || project.isOnlineClass)) {
+                        // if (project.specialProjectData.openMode === 'new' && (project.isProduct || project.isClass || project.isOnlineClass)) {
 
-                            // project.id is going to be set below after INSERT. Since we want project.comicProjectId to point to this project, we
-                            // will zero it out so we can set it after we know this project's new id.
-                            project.comicProjectId = 0;
-                        }
+                        //     // project.id is going to be set below after INSERT. Since we want project.comicProjectId to point to this project, we
+                        //     // will zero it out so we can set it after we know this project's new id.
+                        //     project.comicProjectId = 0;
+                        // }
 
                         var guts = {
                             name: project.name,
@@ -2308,6 +2303,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 project.id = rows[0].insertId;
 
+// MUST CHANGE comicProjectId no longer exists.
                                 // Check if necessary to and then, if so, update project.comicProjectId
                                 if (project.comicProjectId === 0) {
 
@@ -2406,10 +2402,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (1)
                     function(cb) {
 
-                        if (project.comicProjectId === 0) {
+                        // if (project.comicProjectId === 0) {
 
-                            project.comicProjectId = project.id;
-                        }
+                        //     project.comicProjectId = project.id;
+                        // }
 
                         var guts = {
                             name: project.name,
@@ -3623,11 +3619,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         // m_log('Reached m_functionFinalCallback. err is ' + (err ? 'non-null--bad.' : 'null--good--committing transaction.'));
 
         if (err) {
+
+            m_log("Error saving: " + err.message);
             return res.json({
                 success: false,
                 message: 'Save Project failed with error: ' + err.message
             });
-       } else {
+        } else {
+
+            m_log("***Full Success***");
             sql.commitCxn(connection,
                 function(err){
 
@@ -3761,6 +3761,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 async.eachSeries(arIth,
                                     function(arIthJth, cb) {
 
+// MUST BE CHANGED projects.comicProjectId no longer exists.
                                         var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
                                         sql.execute(strQuery,
                                             function(rows){

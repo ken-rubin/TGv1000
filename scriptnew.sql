@@ -1559,7 +1559,17 @@ begin
 
     end if;
     
-    if @dbstate = 945 THEN
+    if @dbstate = 45 THEN
+
+		INSERT INTO TGv1000.routes (path,moduleName,route,verb,method,requiresJWT,JWTerrorMsg) VALUES ('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchStrings_E_L_S','post','routeFetchStrings_E_L_S',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 946 THEN
 
 
 		set @dbstate := @dbstate + 1;
