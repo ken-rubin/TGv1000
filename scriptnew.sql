@@ -1,28 +1,24 @@
-delimiter //
+SET @dropTheDB = 1;	/* Use 1 to drop and recreate TGv1000. Use 0 to preserve the DB and just run updates. That's all that needs to be done. */
 
--- This file should also be saved to git with the commented out sections commented out.
--- If necessary to start TGv1000 from scratch, uncomment the 3 sections below. But don't push it that way to git.
+DELIMITER //
 
+-- Using this sort-of convoluted approach because if statements can exist only inside procedures, functions, etc.
+USE sys//
 
+DROP PROCEDURE IF EXISTS drop_create_tgv1000//
+CREATE PROCEDURE drop_create_tgv1000(doit TINYINT(1))
+begin
+	if doit=1 then
+		DROP SCHEMA IF EXISTS `TGv1000`;
+		CREATE DATABASE IF NOT EXISTS `TGv1000`;
+	end if;
+end//
 
-
-/* */
-	DROP SCHEMA IF EXISTS `TGv1000`//
-	CREATE DATABASE IF NOT EXISTS `TGv1000`//
-/* */
-
-
+call drop_create_tgv1000(@dropTheDB)//
 
 USE TGv1000//
-SELECT database()//
-
-
-
--- If necessary to change doTags or if re-creating the DB, uncomment the following:
-/* */
 
 DROP PROCEDURE IF EXISTS doTags//
-
 create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
 begin
 
@@ -56,14 +52,7 @@ begin
 	UNTIL @inipos >= @maxlen END REPEAT;
 end //
 
-/* */
-
-
--- If necessary to change getUniqueProjNameForUser or if re-creating the DB, uncomment the following:
-/* */
-
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
-
 create FUNCTION getUniqueProjNameForUser(checkName varchar(255), userId int(11))
 	RETURNS TEXT
 begin
@@ -86,8 +75,7 @@ begin
     RETURN @uniqueName;
 end //
 
-/* */
-
+drop procedure if exists maintainDB//
 create procedure maintainDB()
 begin
 
@@ -999,7 +987,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1011,7 +998,6 @@ begin
     
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1021,7 +1007,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1029,7 +1014,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id<3;
-		select * from control;
 
     end if;
     
@@ -1039,7 +1023,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1049,7 +1032,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1118,7 +1100,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1523,7 +1504,6 @@ begin
             
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1534,7 +1514,6 @@ begin
     
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1544,7 +1523,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1555,7 +1533,6 @@ begin
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
-		select * from control;
 
     end if;
     
@@ -1583,9 +1560,6 @@ end//
 
 -- Execute the procedure
 call maintainDB()//
-
--- Drop the procedure.
-drop procedure maintainDB;//
 
 delimiter ;
 select * from control;
