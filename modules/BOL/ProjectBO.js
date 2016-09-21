@@ -2900,7 +2900,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     //     These libraries are not written (since they couldn't have been modified and cannot be new), but they do have to be
                     //     joined to the project and comic in projects_comics_libraries.
                     // (2) A library can be an app type library. This is inserted in full into the database and an entry is made in projects_comics_libraries.
-                    // (3) A library can be a "normal" (i.e., not system, not base and not app) library. This is handled just like in case (2).
+                    // (3) A library can be a "normal" (i.e., not system, not base and not app--but very similar to app) library. This is handled just like in case (2).
                     // (4) For a user with permission 'can_edit_base_and_system_libraries_and_types_therein' saving a not-normal project (i.e., a core project or a product),
                     //     we will update pre-existing libraries and insert new ones.
 
@@ -2908,14 +2908,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (1) If libraryIth.id === 0, then, of course, we insert.
                     // (2) However, existing libraries (id > 0) may be
                     //      (a) skipped over: normal user and base library or system library;
-                    //      (b) updated: libraryIth.id > 0
+                    //      (b) updated: libraryIth.id > 0;
                     //      (c) inserted: libraryIth.id = 0.
                     // 
                     var whatToDo = '';
 
                     if (!project.specialProjectData.userCanWorkWithSystemLibsAndTypes && (libraryIth.isBaseLibrary || libraryIth.isSystemLibrary)) {
 
-                        whatToDo = "skipEverything";
+                        whatToDo = "skipLibButDoJuncTbl";
 
                     } else if (libraryIth.id) {
 
@@ -2983,18 +2983,27 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         m_log("Going to m_saveTypesInLibraryIthToDB");
                                         m_saveTypesInLibraryIthToDB(connection, req, res, project, comicIth, libraryIth,
                                             function(err) {
-
+                                                return cb(err);
                                             }
                                         );
                                     },
                                     function(cb) {
                                         // Write record to projects_comics_libraries.
-
+                                        var juncguts = {
+                                            projectId: project.id,
+                                            comicId: comicIth.id,
+                                            libraryId: libraryIth.id
+                                        };
+                                        var juncquery = "insert " + self.dbname + "projects_comics_libraries SET ?";
+                                        sql.queryWithCxnWithPlaceholders(connection, juncquery, juncguts,
+                                            function(err, rows) {
+                                                return cb(err);
+                                            }
+                                        );
                                     }
                                 ],
                                 function(err) { return cb(err); }
                             );
-
                         }
                     );
                 },
