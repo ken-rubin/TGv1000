@@ -2448,7 +2448,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     // (2)
                     function(cb) {
-
+// HERE DOWN HAS TO CHANGE
                         async.parallel(
                             [
                                 // (2a)
@@ -2636,7 +2636,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
 
-        // Now the project has been inserted into the DB and its id is in project.id.
+        // Now the project has been inserted or updated in the DB and its id is in project.id.
         // A row has been added to resource and tags have been handled for the project, too.
 
         // This routine will iterate through the project's comics, possibly saving (inserting) each, possibly saving its libraries, but always saving the libraries' types, etc.
