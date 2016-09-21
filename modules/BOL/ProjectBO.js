@@ -2909,7 +2909,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (2) However, existing libraries (id > 0) may be
                     //      (a) skipped over: normal user and base library or system library;
                     //      (b) updated: libraryIth.id > 0;
-                    //      (c) inserted: libraryIth.id = 0.
                     // 
                     var whatToDo = '';
 
@@ -3064,8 +3063,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         try {
 
             m_log("***In m_saveTypesInLibraryIthToDB***");
-
-            async.eachSeries(passObj.libraryIth.types,
+            var ordinal = 1;
+            async.eachSeries(libraryIth.types,
                 function(typeIth, cb) {
 
                     if (typeIth.isApp || 0) {
@@ -3080,21 +3079,33 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 // (1)
                                 function(cb) {
 
-                                    typeIth.comicId = passObj.comicIth.id;
+                                    typeIth.libraryId = libraryIth.id;
                                     typeIth.ordinal = 0;
 
                                     // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
-                                    // Since this is the app type, it would be in the project's systemTypes.
+                                    // baseTypeName looks like 'library.type'.
+                                    // Since this is the app type, the base type would be in a different library with isBaseLibrary === true.
+                                    // So we have to loop and find it.
                                     // TODO: Handle id re-numbering problems.
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
                                     if (typeIth.baseTypeName) {
-                                        for (var j = 0; j < passObj.project.systemTypes.length; j++) {
+
+                                        loop1:
+                                        for (var j = 0; j < comicIth.libraries.length; j++) {
                                             
-                                            var typeJth = passObj.project.systemTypes[j];
-                                            if (typeIth.baseTypeName === typeJth.name) {
-                                                typeIth.baseTypeId = typeJth.id;
-                                                break;
+                                            var libraryJth = comicIth.libraries[j];
+                                            if (libraryJth.isBaseLibrary) {
+
+                                                for (var k = 0; k < libraryJth.types.length; k++) {
+
+                                                    var typeKth = libraryJth.types[k];
+                                                    if (typeIth.baseTypeName === libraryJth.name + '.' + typeKth.name) {
+
+                                                        typeIth.baseTypeId = typeKth.id;    // What if this is a new type?????????????????????????????
+                                                        break loop1;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -3105,17 +3116,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         isApp: 1,
                                         imageId: typeIth.imageId,
                                         altImagePath: typeIth.altImagePath,
-                                        ordinal: typeIth.ordinal,
-                                        comicId: typeIth.comicId,
+                                        ordinal: 0,
+                                        libraryId: typeIth.libraryId,
                                         description: typeIth.description,
                                         parentTypeId: typeIth.parentTypeId,
                                         parentPrice: typeIth.parentPrice,
                                         priceBump: typeIth.priceBump,
-                                        ownedByUserId: passObj.req.user.userId,
+                                        ownedByUserId: req.user.userId,
                                         public: typeIth.public,
                                         quarantined: typeIth.quarantined,
-                                        baseTypeId: typeIth.baseTypeId,
-                                        projectId: passObj.project.id
+                                        baseTypeId: typeIth.baseTypeId
                                     };
 
                                     var exceptionRet = m_checkGutsForUndefined('app type', guts);
@@ -3125,7 +3135,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     var strQuery = "insert " + self.dbname + "types SET ?";
                                     m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                    sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
+                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                         function(err, rows) {
 
                                             try {
@@ -3147,13 +3157,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         [
                                             // (2a)
                                             function(cb) {
-                                                m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.user.userName, typeIth.tags, typeIth.name, 
+                                                m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
                                                     function(err) { return cb(err); }
                                                 );
                                             },
                                             // (2b)
                                             function(cb) {
-                                                m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
+                                                m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
                                                     function(err) { return cb(err) }
                                                 );
                                             }
@@ -3169,8 +3179,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     } else {
                         // non-App type
 
-                        typeIth.comicId = passObj.comicIth.id;
-                        typeIth.ordinal = passObj.ordinal++;
+                        typeIth.libraryId = libraryIth.id;
+                        typeIth.ordinal = ordinal++;
 
                         // Again, we can use nested async calls here to do (1) and (2) serially:
                         // (1) insert the App type
@@ -3184,28 +3194,23 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 function(cb) {
 
                                     // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
-                                    // The base type could either be in this comic's types or in project.systemTypes.
+                                    // The base type could be in library's types.
                                     // TODO: Handle id re-numbering problems.
                                     // TODO: Go do type loading in project and type.
                                     typeIth.baseTypeId = 0;
                                     if (typeIth.baseTypeName) {
-                                        for (var j = 0; j < passObj.comicIth.types.length; j++) {
+
+                                        loop1:
+                                        for (var j = 0; j < comicIth.libraries.length; j++) {
                                             
-                                            var typeJth = passObj.comicIth.types[j];
-                                            if (typeIth.baseTypeName === typeJth.name) {
-                                                typeIth.baseTypeId = typeJth.id;
-                                                break;
-                                            }
-                                        }
+                                            var libraryJth = comicIth.libraries[j];
+                                            for (var k = 0; k < libraryJth.types.length; k++) {
 
-                                        if (typeIth.baseTypeId === 0) {
+                                                var typeKth = libraryJth.types[k];
+                                                if (typeIth.baseTypeName === libraryJth.name + '.' + typeKth.name) {
 
-                                            for (var j = 0; j < passObj.project.systemTypes.length; j++) {
-                                                
-                                                var typeJth = passObj.project.systemTypes[j];
-                                                if (typeIth.baseTypeName === typeJth.name) {
-                                                    typeIth.baseTypeId = typeJth.id;
-                                                    break;
+                                                    typeIth.baseTypeId = typeKth.id;    // What if this is a new type?????????????????????????????
+                                                    break loop1;
                                                 }
                                             }
                                         }
@@ -3218,7 +3223,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         imageId: typeIth.imageId || 0,
                                         altImagePath: typeIth.altImagePath || "",
                                         ordinal: typeIth.ordinal,
-                                        comicId: (typeIth.ordinal === 10000 ? null : typeIth.comicId),
+                                        libraryId: typeIth.libraryId,
                                         description: typeIth.description,
                                         parentTypeId: typeIth.parentTypeId || 0,
                                         parentPrice: typeIth.parentPrice || 0,
@@ -3226,9 +3231,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         ownedByUserId: typeIth.ownedByUserId,
                                         public: typeIth.public || 0,
                                         quarantined: typeIth.quarantined || 1,
-                                        baseTypeId: typeIth.baseTypeId || 0,
-                                        projectId: passObj.project.id
-                                        };
+                                        baseTypeId: typeIth.baseTypeId || 0
+                                    };
 
                                     var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
                                     if (exceptionRet) {
@@ -3266,14 +3270,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             // (2a)
                                             function(cb) {
 
-                                                m_setUpAndWriteTags(passObj.connection, passObj.res, typeIth.id, 'type', passObj.req.user.userName, typeIth.tags, typeIth.name, 
+                                                m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
                                                     function(err) { return cb(err); }
                                                 );
                                             },
                                             // (2b)
                                             function(cb) {
 
-                                                m_saveArraysInTypeIthToDB(passObj.connection, passObj.project, typeIth, passObj.req, passObj.res, 
+                                                m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
                                                     function(err) { 
                                                         return cb(err); 
                                                     }
