@@ -1368,7 +1368,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            var strSql = "select t1.*, concat(l.name, '.', t2.name) base from " + self.dbname + "types t1 left outer join " + self.dbname + "types t2 on t1.baseTypeId = t2.id left outer join " + self.dbname + "libraries l on l.id = t2.libraryId where t1.libraryId=" + libraryIth.id + ";";
+            var strSql = "select * from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";
             var exceptionRet = sql.execute(strSql,
                 function(rows) {
 
@@ -1530,7 +1530,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            var exceptionRet = sql.execute("select t1.*, t2.name as baseTypeName from " + self.dbname + "types left outer join " + self.dbname + "types t2 on t1.baseTypeId=t2.id where t1.id=" + req.body.typeId + ";",
+            var exceptionRet = sql.execute("select * from " + self.dbname + "types where id=" + req.body.typeId + ";",
                 function(rows){
 
                     if (rows.length !== 1) {
@@ -1559,7 +1559,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             tags: '',
-                            baseTypeId: row.baseTypeId,
+                            baseLibraryName: row.baseLibraryName,
                             baseTypeName: row.baseTypeName,
                             isSystemType: 0,
                             properties: [],
@@ -3082,34 +3082,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     typeIth.libraryId = libraryIth.id;
                                     typeIth.ordinal = 0;
 
-                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
-                                    // baseTypeName looks like 'library.type'.
-                                    // Since this is the app type, the base type would be in a different library with isBaseLibrary === true.
-                                    // So we have to loop and find it.
-                                    // TODO: Handle id re-numbering problems.
-                                    // TODO: Go do type loading in project and type.
-                                    typeIth.baseTypeId = 0;
-                                    if (typeIth.baseTypeName) {
-
-                                        loop1:
-                                        for (var j = 0; j < comicIth.libraries.length; j++) {
-                                            
-                                            var libraryJth = comicIth.libraries[j];
-                                            if (libraryJth.isBaseLibrary) {
-
-                                                for (var k = 0; k < libraryJth.types.length; k++) {
-
-                                                    var typeKth = libraryJth.types[k];
-                                                    if (typeIth.baseTypeName === libraryJth.name + '.' + typeKth.name) {
-
-                                                        typeIth.baseTypeId = typeKth.id;    // What if this is a new type?????????????????????????????
-                                                        break loop1;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
                                     var guts = {
                                         name: typeIth.name,
                                         typeTypeId: typeIth.typeTypeId,
@@ -3125,7 +3097,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         ownedByUserId: req.user.userId,
                                         public: typeIth.public,
                                         quarantined: typeIth.quarantined,
-                                        baseTypeId: typeIth.baseTypeId
+                                        baseLibraryName: typeIth.baseLibraryName,
+                                        baseTypeName: typeIth.baseTypeName
                                     };
 
                                     var exceptionRet = m_checkGutsForUndefined('app type', guts);
@@ -3193,29 +3166,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 // (1)
                                 function(cb) {
 
-                                    // If typeIth.baseTypeName then look it up and set baseTypeId; else 0. 
-                                    // The base type could be in library's types.
-                                    // TODO: Handle id re-numbering problems.
-                                    // TODO: Go do type loading in project and type.
-                                    typeIth.baseTypeId = 0;
-                                    if (typeIth.baseTypeName) {
-
-                                        loop1:
-                                        for (var j = 0; j < comicIth.libraries.length; j++) {
-                                            
-                                            var libraryJth = comicIth.libraries[j];
-                                            for (var k = 0; k < libraryJth.types.length; k++) {
-
-                                                var typeKth = libraryJth.types[k];
-                                                if (typeIth.baseTypeName === libraryJth.name + '.' + typeKth.name) {
-
-                                                    typeIth.baseTypeId = typeKth.id;    // What if this is a new type?????????????????????????????
-                                                    break loop1;
-                                                }
-                                            }
-                                        }
-                                    }
-
                                     var guts = {
                                         name: typeIth.name,
                                         typeTypeId: typeIth.typeTypeId,
@@ -3231,7 +3181,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         ownedByUserId: typeIth.ownedByUserId,
                                         public: typeIth.public || 0,
                                         quarantined: typeIth.quarantined || 1,
-                                        baseTypeId: typeIth.baseTypeId || 0
+                                        baseLibraryName: typeIth.baseLibraryName || '',
+                                        vaseTypeName: typeIth.baseTypeName || ''
                                     };
 
                                     var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
@@ -3308,48 +3259,48 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     }
 
 // Change to m_fixUpBaseTypeIdsInLibraryIth.
-    var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
+    // var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
 
-        try {
-            // m_log("***In m_fixUpBaseTypeIdsInComicIth*** with passObj.typeIdTranslationArray=" + JSON.stringify(passObj.typeIdTranslationArray));
+    //     try {
+    //         // m_log("***In m_fixUpBaseTypeIdsInComicIth*** with passObj.typeIdTranslationArray=" + JSON.stringify(passObj.typeIdTranslationArray));
 
-            async.eachSeries(passObj.comicIth.types, 
-                function(typeIth, cb) {
+    //         async.eachSeries(passObj.comicIth.types, 
+    //             function(typeIth, cb) {
 
-                    if (!typeIth.baseTypeId) { 
-                        return cb(null); 
-                    }
+    //                 if (!typeIth.baseTypeId) { 
+    //                     return cb(null); 
+    //                 }
 
-                    // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
-                    var didOne = false;
-                    for (var j = 0; j < passObj.typeIdTranslationArray.length; j++) {
+    //                 // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
+    //                 var didOne = false;
+    //                 for (var j = 0; j < passObj.typeIdTranslationArray.length; j++) {
 
-                        var xlateIth = passObj.typeIdTranslationArray[j];
-                        if (xlateIth.origId === typeIth.baseTypeId) {
-                            if (xlateIth.newId !== xlateIth.origId) {
-                                var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
-                                didOne = true;
+    //                     var xlateIth = passObj.typeIdTranslationArray[j];
+    //                     if (xlateIth.origId === typeIth.baseTypeId) {
+    //                         if (xlateIth.newId !== xlateIth.origId) {
+    //                             var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
+    //                             didOne = true;
 
-                                // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
-                                typeIth.baseTypeId = xlateIth.newId;
-                                sql.queryWithCxn(passObj.connection, strQuery,
-                                    function(err, rows) {
-                                        if (err) { return cb(err); }
-                                        return cb(null);
-                                    }
-                                );
-                            }
-                        }
-                    };
-                    if (!didOne) { return cb(null); }
-                },
-                // final callback for eachSeries
-                function(err) {
-                    return callback(err);
-                }
-            );
-        } catch (e) { callback(e); }
-    }
+    //                             // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
+    //                             typeIth.baseTypeId = xlateIth.newId;
+    //                             sql.queryWithCxn(passObj.connection, strQuery,
+    //                                 function(err, rows) {
+    //                                     if (err) { return cb(err); }
+    //                                     return cb(null);
+    //                                 }
+    //                             );
+    //                         }
+    //                     }
+    //                 };
+    //                 if (!didOne) { return cb(null); }
+    //             },
+    //             // final callback for eachSeries
+    //             function(err) {
+    //                 return callback(err);
+    //             }
+    //         );
+    //     } catch (e) { callback(e); }
+    // }
 
     var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
 

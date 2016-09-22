@@ -5,8 +5,8 @@ DELIMITER //
 -- Using this sort-of convoluted approach because if statements can exist only inside procedures, functions, etc.
 USE sys//
 
-DROP PROCEDURE IF EXISTS drop_create_tgv1000//
-CREATE PROCEDURE drop_create_tgv1000(doit TINYINT(1))
+DROP PROCEDURE IF EXISTS drop_create_TGv1000//
+CREATE PROCEDURE drop_create_TGv1000(doit TINYINT(1))
 begin
 	if doit=1 then
 		DROP SCHEMA IF EXISTS `TGv1000`;
@@ -14,7 +14,7 @@ begin
 	end if;
 end//
 
-call drop_create_tgv1000(@dropTheDB)//
+call drop_create_TGv1000(@dropTheDB)//
 
 USE TGv1000//
 
@@ -1528,8 +1528,8 @@ begin
     
     if @dbstate = 44 THEN
 
-		ALTER TABLE `tgv1000`.`librarys_tags` 
-			RENAME TO  `tgv1000`.`library_tags` ;
+		ALTER TABLE `TGv1000`.`librarys_tags` 
+			RENAME TO  `TGv1000`.`library_tags` ;
 
 		set @dbstate := @dbstate + 1;
 		UPDATE control set dbstate=@dbstate where id=1;
@@ -1546,7 +1546,25 @@ begin
 
     end if;
     
-    if @dbstate = 946 THEN
+    if @dbstate = 46 THEN
+
+		ALTER TABLE `TGv1000`.`types` 
+			DROP COLUMN `baseTypeId`,
+			ADD COLUMN `baseLibraryName` VARCHAR(255) NOT NULL DEFAULT '' AFTER `priceBump`,
+			ADD COLUMN `baseTypeName` VARCHAR(255) NOT NULL DEFAULT '' AFTER `baseLibraryName`;
+		UPDATE `TGv1000`.`types` SET baseLibraryName='GameBaseLibrary', baseTypeName='GameBaseType' WHERE id=6;
+		UPDATE `TGv1000`.`types` SET baseLibraryName='ConsoleBaseLibrary', baseTypeName='ConsoleBaseType' WHERE id=7;
+		UPDATE `TGv1000`.`types` SET baseLibraryName='WebsiteBaseLibrary', baseTypeName='WebsiteBaseType' WHERE id=8;
+		UPDATE `TGv1000`.`types` SET baseLibraryName='HololensBaseLibrary', baseTypeName='HololensBaseType' WHERE id=9;
+		UPDATE `TGv1000`.`types` SET baseLibraryName='MapBaseLibrary', baseTypeName='MapBaseType' WHERE id=10;
+
+		set @dbstate := @dbstate + 1;
+		UPDATE control set dbstate=@dbstate where id=1;
+		select * from control;
+
+    end if;
+    
+    if @dbstate = 947 THEN
 
 
 		set @dbstate := @dbstate + 1;
