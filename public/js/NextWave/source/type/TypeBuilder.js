@@ -403,7 +403,7 @@ define(["NextWave/source/utility/prototypes",
                             if (
                                     (type.stowage.typeTypeId === 1 && type.name === "App") ||
                                     (type.stowage.typeTypeId === 3) ||
-                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId === 2)
+                                    (!manager.userCanWorkWithSystemLibsAndTypes && type.stowage.typeTypeId === 2)
                                 ) {
 
                                 bProtected = true;
@@ -423,10 +423,10 @@ define(["NextWave/source/utility/prototypes",
                             // Protect against editing Description in these cases:
                             //      For normal users: App type Base type; System type
                             //      For manager.userAllowedToCreateEditPurchProjs: System type
-                            //      For manager.userCanWorkWithSystemTypesAndAppBaseTypes: no prohibition
+                            //      For manager.userCanWorkWithSystemLibsAndTypes: no prohibition
                             if (
-                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && !manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId > 1) ||
-                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId === 2)
+                                    (!manager.userCanWorkWithSystemLibsAndTypes && !manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId > 1) ||
+                                    (!manager.userCanWorkWithSystemLibsAndTypes && manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId === 2)
                                 ) {
                                 
                                 bProtected = true;

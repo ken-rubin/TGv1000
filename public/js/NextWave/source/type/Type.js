@@ -713,7 +713,7 @@ define(["NextWave/source/utility/prototypes",
                                 // No one can delete the App type or the App type's base type.
                                 // Normal users cannot delete system types.
                                 var bCanDelete = true;
-                                if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.stowage.isSystemType) {
+                                if (!manager.userCanWorkWithSystemLibsAndTypes && self.stowage.isSystemType) {
                                     bCanDelete = false;
                                 } else if (!self.stowage.isSystemType && self.name === "App") {
                                     bCanDelete = false;

@@ -199,7 +199,7 @@
         ```
                 clProject.data.specialProjectData = {
                     userAllowedToCreateEditPurchProjs: [bool],
-                    userCanWorkWithSystemTypesAndAppBaseTypes: [bool],
+                    userCanWorkWithSystemLibsAndTypes: [bool],
                     ownedByUser: [bool],
                     othersProject: [bool],
                     normalProject: [bool],
@@ -254,7 +254,7 @@
         ```
                 clProject.data.specialProjectData = {
                     userAllowedToCreateEditPurchProjs: true,
-                    userCanWorkWithSystemTypesAndAppBaseTypes: true,
+                    userCanWorkWithSystemLibsAndTypes: true,
                     ownedByUser: [bool],
                     othersProject: [bool],
                     normalProject: false,

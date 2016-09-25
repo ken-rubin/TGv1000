@@ -33,7 +33,7 @@ define(["Core/errorHelper"],
 									client.unloadProject(function() {		// callback is executed if client decided to abandon or if there was no project to begin with.
 
 										var exceptionRet = null;
-										if (manager.userAllowedToCreateEditPurchProjs || manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+										if (manager.userAllowedToCreateEditPurchProjs || manager.userCanWorkWithSystemLibsAndTypes) {
 
 											// A privileged user can work with all project types.
 											exceptionRet = client.showNewProjectDialog([1,2,3,4,5]);
@@ -110,7 +110,7 @@ define(["Core/errorHelper"],
 																				// Create and merge rest of specialProjectData in.
 																				var specialProjectData = {
 																					userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
-																					userCanWorkWithSystemTypesAndAppBaseTypes: manager.userCanWorkWithSystemTypesAndAppBaseTypes,
+																					userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
 																					ownedByUser: bOnlyOwnedByUser,
 																					othersProjects: bOnlyOthersProjects,
 																					normalProject: (objProject.isCoreProject+objProject.isClass+objProject.isProduct+objProject.isOnlineClass === 0),
@@ -157,17 +157,18 @@ define(["Core/errorHelper"],
 										var exceptionRet = client.showSaveProjectDialog();
 										if (exceptionRet) { throw exceptionRet; }
 
-									} else if (manager.systemTypesLoaded) {
-
-										// No exceptionRet--it handles its own error or success display.
-										client.saveSystemTypes(
-											function() {
-
-												// Reload system types so the new ids are in memory.
-												client.loadSystemTypesAndPinPanels();
-											}
-										);
 									}
+									//  else if (manager.systemTypesLoaded) {
+
+									// 	// No exceptionRet--it handles its own error or success display.
+									// 	client.saveSystemTypes(
+									// 		function() {
+
+									// 			// Reload system types so the new ids are in memory.
+									// 			client.loadSystemTypesAndPinPanels();
+									// 		}
+									// 	);
+									// }
 								} catch (e) { errorHelper.show(e); }
 							});
 
@@ -181,7 +182,7 @@ define(["Core/errorHelper"],
 
 										setTimeout(function() {
 
-											if (manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+											if (manager.userCanWorkWithSystemLibsAndTypes) {
 
 												client.loadSystemTypesAndPinPanels(function() {
 
@@ -191,19 +192,20 @@ define(["Core/errorHelper"],
 										}, 1000);
 									}, true, true);		// The final true is telling client.unloadProject that we're unloading due to user clicking the Close Project menu item and not because we're about to search for and open or new a project.
 
-								} else {	// system types m.b. loaded; else, this menu item would be disabled.
-
-									client.unloadProject(function(){
-										
-										setTimeout(function() {
-
-											client.loadSystemTypesAndPinPanels(function() {
-
-													client.setBrowserTabAndBtns();
-											});
-										}, 1000);
-									}, true, true);		// See comment above.
 								}
+								//  else {	// system types m.b. loaded; else, this menu item would be disabled.
+
+								// 	client.unloadProject(function(){
+										
+								// 		setTimeout(function() {
+
+								// 			client.loadSystemTypesAndPinPanels(function() {
+
+								// 					client.setBrowserTabAndBtns();
+								// 			});
+								// 		}, 1000);
+								// 	}, true, true);		// See comment above.
+								// }
 							});
 
 							$("#SearchTypeButton").click(function() {

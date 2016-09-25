@@ -57,36 +57,54 @@ $(document).ready(function() {
                             manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
                                 g_profile["can_create_products"] || 
                                 g_profile["can_create_onlineClasses"]) || false;
-                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
+                            manager.userCanWorkWithSystemLibsAndTypes = g_profile["can_edit_base_and_system_libraries_and_types_therein"] || false;
 
-		                    var exceptionRet = manager.create();
-		                    if (exceptionRet) { throw exceptionRet; }
+                            // Want to fetch complete lists of expressions, literals and statements (now only statements are used) and pass them into
+                            // manager.create in the callback. Although each project's comics comes with its own lists of these strings, they might be pruned,
+                            // so this is the only way for manager to have complete lists.
 
-							// Allocate and initialize the client.
-							// For a normal user this will load last accessed project, if any or create an empty designer if not.
-							// For a user who can edit system types, this will load all system types into manager.
-							client = new Client();
-							exceptionRet = client.create(
-								function() {
+							var posting = $.post("/BOL/ProjectBO/FetchStrings_E_L_S", 
+								{},
+								'json');
+							posting.done(function(data){
 
-									// Allocate and attach the navbar module.
-									navbar = new Navbar();
-									exceptionRet = navbar.create();
-									if (exceptionRet) { 
-										alert(exceptionRet.message);
-										return;
-									}
+								if (data.success) {
 
-									client.setBrowserTabAndBtns();
+				                    var exceptionRet = manager.create(data.data);
+									if (exceptionRet) {
+
+										errorHelper.show(exceptionRet);
+									} 
+
+									// Allocate and initialize the client.
+									// For a normal user this will load last accessed project, if any or create an empty designer if not.
+									// For a user who can edit system types, this will load all system types into manager.
+									client = new Client();
+									exceptionRet = client.create(
+										function() {
+
+											// Allocate and attach the navbar module.
+											navbar = new Navbar();
+											exceptionRet = navbar.create();
+											if (exceptionRet) { 
+												errorHelper.show(exceptionRet);
+												return;
+											}
+
+											client.setBrowserTabAndBtns();
+										}
+									);
+								} else {
+
+									// !data.success
+									errorHelper.show(data.message);
 								}
-							);
-							if (exceptionRet) { throw exceptionRet; }
-
-		                } catch (e) { alert(e.message); }
+							});
+		                } catch (e) { errorHelper.show(e); }
 		            });
 				} catch(e) { errorHelper.show(e); }
 			});
-	} catch(e) { alert(e.message);}
+	} catch(e) { errorHelper.show(e); }
 });
 
 var m_functionCheckForURLEncoding = function( name ) {
