@@ -248,29 +248,26 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // With no method currently selected, clear out namesPanel.
-                            //window.manager.panelLayer.clearNames();
-
-                            // Ensure the type has the requisit attributes.
-                            if (!property.data) {
-
-                                property.data = {};
-                            }
-                            if (!property.data.name) {
-
-                                property.data.name = "[name goes here]";
-                            }
-                            if (!property.data.typeName) {
-
-                                property.data.typeName = "Number";
-                            }
-                            if (!property.data.description) {
-
-                                property.data.description = "[description goes here]";
-                            }
-
                             // Store the context.
                             self.currentProperty = property;
+
+                            // Ensure the type has the requisit attributes.
+                            if (!self.currentProperty.data) {
+
+                                self.currentProperty.data = {};
+                            }
+                            if (!self.currentProperty.data.name) {
+
+                                self.currentProperty.data.name = "[name]";
+                            }
+                            if (!self.currentProperty.data.typeName) {
+
+                                self.currentProperty.data.typeName = "Number";
+                            }
+                            if (!self.currentProperty.data.description) {
+
+                                self.currentProperty.data.description = "[description]";
+                            }
 
                             // Update controls.
 
@@ -279,7 +276,7 @@ define(["NextWave/source/utility/prototypes",
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
                             //      for all users: x, y, width, height of system type VisualObject.
                             if (
-                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.data.typeTypeId > 1) ||
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) ||
                                 (self.currentProperty.owner.data.name === "VisualObject" && ['x','y','width','height'].indexOf(self.currentProperty.data.name) > -1 )
                                 ) {
 
