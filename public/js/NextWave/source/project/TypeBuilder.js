@@ -32,6 +32,12 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(DialogHost);
 
                     ///////////////////////
+                    // Public fields.
+
+                    // The type being edited.
+                    self.currentType = null;
+
+                    ///////////////////////
                     // Public methods.
 
                     // Attach instance to DOM and initialize state.
@@ -87,19 +93,24 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.saveTypeName !== localSelf.text) {
 
-                                                // Ensure the value is unique.
-                                                var strPayload = localSelf.getText();
-                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(strPayload,
-                                                    window.manager.types.concat(window.manager.systemTypes),
-                                                    "name"));
+                                                // Generate an unique name.
+                                                var strUnique = window.manager.getUniqueName(localSelf.getText(),
+                                                    self.currentType.owner.types,
+                                                    "data",
+                                                    "name");
+
+                                                // Update GUI.
+                                                var exceptionRet = localSelf.setText(strUnique);
                                                 if (exceptionRet) {
 
-                                                    return exceptionRet;
+                                                    throw exceptionRet;
                                                 }
 
-                                                // Update. This will work with either types or system types.
-                                                return window.manager.changeTypeName(localSelf.saveTypeName,
-                                                        localSelf.getText());
+                                                // Update the other GUI (in the project dialog).
+                                                self.currentType.listItem.name = strUnique;
+
+                                                // Update data too.
+                                                self.currentType.data.name = strUnique;
                                             }
                                         } catch (e) {
 
@@ -164,11 +175,9 @@ define(["NextWave/source/utility/prototypes",
                                                 }
                                             } else {
 
-                                                // Save value.                                                                                            // Get the current type.
-                                                var typeContext = localSelf.dialog.host.typeContext;
-
-                                                // Update it description.
-                                                typeContext.stowage.baseTypeName = localSelf.getText();
+                                                // Update its baseTypeName.
+                                                self.currentType.data.baseTypeName = 
+                                                    localSelf.getText();
                                             }
                                         } catch (e) {
 
@@ -203,11 +212,8 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Get the current type.
-                                            var typeContext = localSelf.dialog.host.typeContext;
-
                                             // Update it description.
-                                            typeContext.stowage.description = localSelf.getText();
+                                            self.currentType.data.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -248,11 +254,8 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Get the current type.
-                                            var typeContext = localSelf.dialog.host.typeContext;
-
                                             // Update its description.
-                                            typeContext.stowage.isSystemType = localSelf.getText();
+                                            self.currentType.data.isSystemType = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -288,11 +291,8 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Get the current type.
-                                            var typeContext = localSelf.dialog.host.typeContext;
-
                                             // Update its description.
-                                            typeContext.stowage.public = localSelf.getText();
+                                            self.currentType.data.public = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -341,46 +341,46 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // With no method currently selected, clear out namesPanel.
-                            window.manager.panelLayer.clearNames();
+                            // Save off state.
+                            self.currentType = type;
 
                             // Ensure the type has the requisit attributes.
-                            if (!type.stowage) {
+                            if (!self.currentType.data) {
 
-                                type.stowage = {};
+                                self.currentType.data = {};
                             }
-                            if (!type.stowage.baseTypeName) {
+                            if (!self.currentType.data.name) {
 
-                                type.stowage.baseTypeName = "";
+                                self.currentType.data.name = "[name]";
                             }
-                            if (!type.stowage.description) {
+                            if (!self.currentType.data.baseTypeName) {
 
-                                type.stowage.description = "This is a test of the emergency broadcast system.  If this had been an actual emergency....";
+                                self.currentType.data.baseTypeName = "";
                             }
-                            if (!type.stowage.isSystemType) {
+                            if (!self.currentType.data.description) {
 
-                                type.stowage.isSystemType = 0;
+                                self.currentType.data.description = "[description]";
                             }
-                            if (!type.stowage.public) {
+                            if (!self.currentType.data.isSystemType) {
 
-                                type.stowage.public = 0;
+                                self.currentType.data.isSystemType = 0;
+                            }
+                            if (!self.currentType.data.public) {
+
+                                self.currentType.data.public = 0;
                             }
 
-                            // Store the context.
-                            self.typeContext = type;
-
-                            // Update controls.
+                            // Update controls:
                             
+                            // Name edit.
                             var bProtected = false;
-                            // Protect against editing type name in these cases:
-                            //      App type (type.stowage.typeTypeId === 1 && type.name === "App")
-                            //      Any System type (type.stowage.typeTypeId === 2)
-                            //      Any App type's Base type (type.stowage.typeTypeId === 3)
-                            //      So, only types added in the types panel are editable.
-                            if ( 
-                                    (type.stowage.typeTypeId === 1 && type.name === "App") || 
-                                    (type.stowage.typeTypeId > 1 && type.stowage.id && type.stowage.public)
-                                ) {
+                            // Protect against editing Base type name in these cases:
+                            //      Dad, pleae re-comment, I accidentally removed....
+                            if ((self.currentType.data.typeTypeId === 1 && 
+                                    self.currentType.data.name === "App") || 
+                                (self.currentType.data.typeTypeId > 1 && 
+                                    self.currentType.data.id && 
+                                    self.currentType.data.public)) {
 
                                 bProtected = true;
                             }
@@ -389,22 +389,23 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(type.name);
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentType.data.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
+                            // Base edit (baseTypeName).
                             bProtected = false;
                             // Protect against editing Base type name in these cases:
                             //      App type
                             //      App type Base type
                             //      For normal user: System type
-                            if (
-                                    (type.stowage.typeTypeId === 1 && type.name === "App") ||
-                                    (type.stowage.typeTypeId === 3) ||
-                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId === 2)
-                                ) {
+                            if ((self.currentType.data.typeTypeId === 1 && 
+                                    self.currentType.data.name === "App") ||
+                                (self.currentType.data.typeTypeId === 3) ||
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
+                                    self.currentType.data.typeTypeId === 2)) {
 
                                 bProtected = true;
                             }
@@ -413,21 +414,24 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(type.stowage.baseTypeName);
+                            exceptionRet = self.dialog.controlObject["baseEdit"].setText(self.currentType.data.baseTypeName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
+                            // Description edit.
                             bProtected = false;
                             // Protect against editing Description in these cases:
                             //      For normal users: App type Base type; System type
                             //      For manager.userAllowedToCreateEditPurchProjs: System type
                             //      For manager.userCanWorkWithSystemTypesAndAppBaseTypes: no prohibition
-                            if (
-                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && !manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId > 1) ||
-                                    (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && manager.userAllowedToCreateEditPurchProjs && type.stowage.typeTypeId === 2)
-                                ) {
+                            if ((!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
+                                    !manager.userAllowedToCreateEditPurchProjs && 
+                                    type.data.typeTypeId > 1) ||
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
+                                    manager.userAllowedToCreateEditPurchProjs && 
+                                    type.data.typeTypeId === 2)) {
                                 
                                 bProtected = true;
                             }
@@ -436,7 +440,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(type.stowage.description);
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(self.currentType.data.description);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -454,7 +458,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["systemTypeEdit"].setText(type.stowage.isSystemType.toString());
+                            exceptionRet = self.dialog.controlObject["systemTypeEdit"].setText(self.currentType.data.isSystemType.toString());
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -465,7 +469,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            return self.dialog.controlObject["publicEdit"].setText(type.stowage.public.toString());
+                            return self.dialog.controlObject["publicEdit"].setText(self.currentType.data.public.toString());
 
                         } catch (e) {
 

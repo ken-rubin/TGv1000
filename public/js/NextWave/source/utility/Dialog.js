@@ -337,6 +337,9 @@ define(["NextWave/source/utility/prototypes",
                                 } else if (controlIth.configuration.yType === "callback") {
 
                                     dY += controlIth.configuration.y(areaMaximal);
+                                } else if (controlIth.configuration.yType === "reserve") {
+
+                                    dY += areaMaximal.extent.height - controlIth.configuration.y;
                                 }
 
                                 var dWidth = 0;

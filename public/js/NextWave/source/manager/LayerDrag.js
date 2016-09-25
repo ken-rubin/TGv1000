@@ -309,7 +309,7 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.parameterDragTarget.addNameInDragConsumate) {
 
                                         self.parameterDragTarget.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addName(self.parameterDragTarget.consumateName);
+                                        var exceptionRet = null//window.manager.addName(self.parameterDragTarget.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
@@ -332,7 +332,7 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.dragTargets.addNameInDragConsumate) {
 
                                         self.dragTargets.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addName(self.dragTargets.consumateName);
+                                        var exceptionRet = null;//window.manager.addName(self.dragTargets.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
@@ -341,7 +341,7 @@ define(["NextWave/source/utility/prototypes",
                                     // But for now....
                                     } else if (self.dragTargets instanceof CodeStatementFor) {
 
-                                        var exceptionRet = window.manager.addName(self.dragTargets.initialization.payload.lHS.payload.payload.payload.text);
+                                        var exceptionRet = null;//window.manager.addName(self.dragTargets.initialization.payload.lHS.payload.payload.payload.text);
                                         if (exceptionRet) {
 
                                             return e;

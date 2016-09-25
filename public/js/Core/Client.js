@@ -117,7 +117,7 @@ define(["Core/errorHelper",
 
 							if (data.success) {
 
-								var exceptionRet = manager.loadSystemTypesProject(data.data);
+								var exceptionRet = null;//manager.loadSystemTypesProject(data.data);
 								if (exceptionRet) {
 
 									errorHelper.show(exceptionRet);

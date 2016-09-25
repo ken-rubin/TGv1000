@@ -89,6 +89,56 @@ define(["NextWave/source/project/Library"],
                             return e;
                         }
                     };
+
+                    // Build and return a collection of types.
+                    self.generateJavaScript = function (arrayTypes) {
+
+                        try {
+
+                            // Loop over libraries and generate their types.
+                            for (var i = 0; i < self.libraries.length; i++) {
+
+                                // Get the ith Library.
+                                var libraryIth = self.libraries[i];
+
+                                // Generate it.
+                                var exceptionRet = libraryIth.generateJavaScript(arrayTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Loop down to save each method of each type.
+                    self.save = function () {
+
+                        try {
+
+                            // Loop over libraries and generate their types.
+                            for (var i = 0; i < self.libraries.length; i++) {
+
+                                // Get the ith Library.
+                                var libraryIth = self.libraries[i];
+
+                                // Generate it.
+                                var exceptionRet = libraryIth.save();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 				} catch (e) {
 
 					alert(e.message);

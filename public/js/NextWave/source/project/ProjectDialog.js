@@ -237,7 +237,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // If there is at least one Library, then select it.
+                            // If there is at least one Type, then select it.
                             if (typeFirst) {
 
                                 return typeFirst.select();
@@ -576,6 +576,38 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Build and return a collection of types.
+                    self.generateJavaScript = function () {
+
+                        // Allocate an object to return.
+                        var objectRet = {};
+
+                        // Allocate array which holds module strings.
+                        objectRet.types = [];
+
+                        // Always just relative to a comic.
+                        var exceptionRet = self.currentComic.generateJavaScript(objectRet.types);
+                        if (exceptionRet) {
+
+                            throw exceptionRet;
+                        }
+
+                        return objectRet;
+                    };
+
+                    // Loop down to save each method of each type.
+                    self.save = function () {
+
+                        try {
+
+                            // Always relative to the current comic (for now...).
+                            return self.currentComic.save();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Attach instance to DOM and initialize state.
                     self.create = function () {
 
@@ -623,7 +655,8 @@ define(["NextWave/source/utility/prototypes",
                                     type: "ListHost",
                                     constructorParameterString: "false",
                                     x: 4 * settings.general.margin,
-                                    y: settings.general.margin + 1 * settings.dialog.lineHeight,
+                                    y: settings.general.margin + 
+                                        settings.dialog.lineHeight,
                                     width: 4 * settings.general.margin,
                                     widthType: "reserve",
                                     height: 1.25 * settings.dialog.lineHeight,
@@ -911,7 +944,8 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = libraryNew.create({
 
                                 name: strUnique,
-                                types: []
+                                types: [],
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -966,7 +1000,8 @@ define(["NextWave/source/utility/prototypes",
                                 name: strUnique,
                                 methods: [],
                                 properties: [],
-                                events: []
+                                events: [],
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -1018,7 +1053,10 @@ define(["NextWave/source/utility/prototypes",
                             var methodNew = new Method(self.currentType);
                             var exceptionRet = methodNew.create({
 
-                                name: strUnique
+                                name: strUnique,
+                                ownedByUserId: parseInt(g_profile["userId"], 10),
+                                parameters: [],
+                                statements: []
                             });
                             if (exceptionRet) {
 
@@ -1070,7 +1108,8 @@ define(["NextWave/source/utility/prototypes",
                             var propertyNew = new Property(self.currentType);
                             var exceptionRet = propertyNew.create({
 
-                                name: strUnique
+                                name: strUnique,
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -1122,7 +1161,8 @@ define(["NextWave/source/utility/prototypes",
                             var eventNew = new Event(self.currentType);
                             var exceptionRet = eventNew.create({
 
-                                name: strUnique
+                                name: strUnique,
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 

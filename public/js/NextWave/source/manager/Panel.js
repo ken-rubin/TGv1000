@@ -43,6 +43,8 @@ define(["NextWave/source/utility/prototypes",
                     self.opening = false;
                     // Indicates the panel is closing.
                     self.closing = false;
+                    // Initial state and when closed....
+                    self.closed = true;
                     // Indicates the panel is open and pinned thus.
                     self.pinned = false;
                     // Percentage for responsive design.
@@ -730,7 +732,7 @@ define(["NextWave/source/utility/prototypes",
                                 try {
 
                                     // Fade in/out if opening or closing.
-                                    if (self.opening || self.closing) {
+                                    if (self.opening || self.closing || self.closed) {
 
                                         contextRender.globalAlpha = m_dPercentOpen * m_dPercentOpen;
                                     }
@@ -738,7 +740,7 @@ define(["NextWave/source/utility/prototypes",
                                 } finally {
 
                                     // Always back to normal.
-                                    if (self.opening || self.closing) {
+                                    if (self.opening || self.closing || self.closed) {
 
                                         contextRender.globalAlpha = 1.0;
                                     }

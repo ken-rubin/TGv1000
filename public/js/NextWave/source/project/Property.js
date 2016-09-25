@@ -45,7 +45,7 @@ define(["NextWave/source/manager/ListItem"],
 
                             // Generate ListItem for this instance.
                             self.listItem = new ListItem(self.data.name);
-                            self.listItem.clickHandler = m_functionClickHandler;
+                            self.listItem.clickHandler = self.select;
                             self.listItem.deleteHandler = m_functionDeleteHandler;
                             self.listItem.owner = self;
 
@@ -57,26 +57,7 @@ define(["NextWave/source/manager/ListItem"],
                     };
 
                     // Select this Property.
-                    self.select = function () {
-
-                        // Set the ListItem to selected.
-                        self.listItem.selected = true;
-                        return m_functionClickHandler({});
-                    };
-
-                    // Unselect this Property.
-                    self.unselect = function () {
-
-                        // Set the ListItem to selected.
-                        self.listItem.selected = false;
-                        return null;
-                    };
-
-                    ////////////////////////////
-                    // Private methods.
-
-                    // Invoked when the mouse is clicked over this instance.
-                    var m_functionClickHandler = function (objectReference) {
+                    self.select = function (objectReference) {
 
                         try {
 
@@ -99,12 +80,35 @@ define(["NextWave/source/manager/ListItem"],
                             }
 
                             // Set center panel to this instance.
-                            return null;
+                            return window.manager.selectProperty(self);
                         } catch (e) {
 
                             return e;
                         }
                     };
+
+                    // Unselect this Property.
+                    self.unselect = function () {
+
+                        // Set the ListItem to selected.
+                        self.listItem.selected = false;
+                        return null;
+                    };
+
+                    // Generates JavaScript string for this property.
+                    self.generateJavaScript = function () {
+
+                        var strProperty = "\n";
+
+                        strProperty += "    self." + self.data.name + " = null;";
+
+                        strProperty += "\n";
+
+                        return strProperty;
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
 
                     // Invoked when the mouse is clicked over this instance's delete icon.
                     var m_functionDeleteHandler = function (objectReference) {

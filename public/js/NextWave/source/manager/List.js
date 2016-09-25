@@ -56,7 +56,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "List: Instance already created!" };
+                                self.clearItems();
                             }
 
                             // Call down inheritance chain.

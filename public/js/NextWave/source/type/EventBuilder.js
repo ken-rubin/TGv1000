@@ -139,7 +139,7 @@ define(["NextWave/source/utility/prototypes",
                                             var eventContext = localSelf.dialog.host.eventContext;
 
                                             // Update it description.
-                                            eventContext.stowage.description = localSelf.getText();
+                                            eventContext.data.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -188,13 +188,13 @@ define(["NextWave/source/utility/prototypes",
                             window.manager.panelLayer.clearNames();
 
                             // Ensure the event has the requisit attributes.
-                            if (!eventPart.stowage) {
+                            if (!eventPart.data) {
 
-                                eventPart.stowage = {};
+                                eventPart.data = {};
                             }
-                            if (!eventPart.stowage.description) {
+                            if (!eventPart.data.description) {
 
-                                eventPart.stowage.description = "[description goes here]";
+                                eventPart.data.description = "[description goes here]";
                             }
 
                             // Store the context.
@@ -208,7 +208,7 @@ define(["NextWave/source/utility/prototypes",
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
                             //      for all users: x, y, width, height of system type VisualObject.
                             if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
-                                type.stowage.typeTypeId > 1) {
+                                type.data.typeTypeId > 1) {
 
                                 bProtected = true;
                             }
@@ -217,7 +217,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(eventPart.name);
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(eventPart.data.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -227,7 +227,7 @@ define(["NextWave/source/utility/prototypes",
                             // Protect against editing property description in these cases:
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
                             if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
-                                type.stowage.typeTypeId > 1) {
+                                type.data.typeTypeId > 1) {
 
                                 bProtected = true;
                             }
@@ -236,7 +236,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return self.dialog.controlObject["descriptionEdit"].setText(eventPart.stowage.description);
+                            return self.dialog.controlObject["descriptionEdit"].setText(eventPart.data.description);
                         } catch (e) {
 
                             return e;

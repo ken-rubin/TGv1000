@@ -43,6 +43,17 @@ define(["NextWave/source/utility/prototypes",
                         
                         try {
 
+                            // Set to partially transparency if cursor near lower right.
+                            var dXDisplayBlockCenter = self.extent.width - 75;
+                            var dYDisplayBlockCenter = self.extent.height - 39;
+                            var dXDelta = m_pointCursor.x - dXDisplayBlockCenter;
+                            var dYDelta = m_pointCursor.y - dYDisplayBlockCenter;
+
+                            var dNormaizedDistanceBetwenCursorAndDisplayBlockCenter = 
+                                Math.sqrt(Math.pow(dXDelta , 2) + 
+                                    Math.pow(dYDelta, 2)) / 1000;
+                            contextRender.globalAlpha = Math.min(1, dNormaizedDistanceBetwenCursorAndDisplayBlockCenter);
+
                         	// Calculate FPS.
                             var dTotalNumberOfSeconds = 0.0;
                             if (m_iFirstRender == -1) {
@@ -80,6 +91,10 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) {
                             
                             return e;
+                        } finally {
+
+                            // Restore rendering opacity.
+                            contextRender.globalAlpha = 1;
                         }
                     };
 

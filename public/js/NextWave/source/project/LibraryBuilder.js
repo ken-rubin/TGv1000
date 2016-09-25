@@ -1,8 +1,8 @@
 ///////////////////////////////////////
-// EventBuilder module.
+// LibraryBuilder module.
 //
 // Gui component responsible for showing 
-// an Event and all its parts and
+// a Library and all its parts and also 
 // allowing for their modification.
 //
 // Return constructor function.
@@ -22,7 +22,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function EventBuilder() {
+            var functionRet = function LibraryBuilder() {
 
                 try {
 
@@ -34,8 +34,8 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public fields.
 
-                    // Event being edited.
-                    self.currentEvent = null;
+                    // The Library being edited.
+                    self.currentLibrary = null;
 
                     ///////////////////////
                     // Public methods.
@@ -48,11 +48,11 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "EventBuilder: Instance already created!" };
+                                throw { message: "LibraryBuilder: instance already created!" };
                             }
 
-                            // Create the dialog.
-                            var exceptionRet = self.dialog.create({
+                            // Create the configuration object with which to initialize the type builder dialog.
+                            var objectConfiguration = {
 
                                 nameLabel: {
 
@@ -66,6 +66,7 @@ define(["NextWave/source/utility/prototypes",
                                 nameEdit: {
 
                                     type: "Edit",
+                                    multiline: false,
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: settings.general.margin,
@@ -79,7 +80,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Store the current value for comparison after.
-                                            localSelf.saveEventName = localSelf.getText();
+                                            localSelf.saveTypeName = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -90,11 +91,11 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // If the name has changed, update the name.
-                                            if (localSelf.saveEventName !== localSelf.getText()) {
+                                            if (localSelf.saveTypeName !== localSelf.text) {
 
                                                 // Generate an unique name.
                                                 var strUnique = window.manager.getUniqueName(localSelf.getText(),
-                                                    self.currentEvent.owner.events,
+                                                    self.currentLibrary.owner.libraries,
                                                     "data",
                                                     "name");
 
@@ -106,10 +107,10 @@ define(["NextWave/source/utility/prototypes",
                                                 }
 
                                                 // Update the other GUI (in the project dialog).
-                                                self.currentEvent.listItem.name = strUnique;
+                                                self.currentLibrary.listItem.name = strUnique;
 
                                                 // Update data too.
-                                                self.currentEvent.data.name = strUnique;
+                                                self.currentLibrary.data.name = strUnique;
                                             }
                                         } catch (e) {
 
@@ -143,15 +144,18 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Update Event's description.
-                                            self.currentEvent.data.description = localSelf.getText();
+                                            // Update Library's description.
+                                            self.currentLibrary.data.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
                                         }
                                     }
                                 }
-                            });
+                            };
+
+                            // Create the dialog.
+                            var exceptionRet = self.dialog.create(objectConfiguration);
 
                             // Because it is!
                             m_bCreated = true;
@@ -174,7 +178,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
-                            window.EventBuilder = null;
+                            window.LibraryBuilder = null;
                             m_bCreated = false;
 
                             return null;
@@ -184,64 +188,50 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Load Event into Event builder.
-                    self.loadEvent = function (eventPart) {
+                    // Load Library into type builder.
+                    self.loadLibrary = function (library) {
 
                         try {
 
-                            // Store the context.
-                            self.currentEvent = eventPart;
+                            self.currentLibrary = library;
 
-                            // Ensure the event has the requisit attributes.
-                            if (!self.currentEvent.data) {
+                            // Ensure the type has the requisit attributes.
+                            if (!self.currentLibrary.data) {
 
-                                self.currentEvent.data = {};
+                                self.currentLibrary.data = {};
                             }
-                            if (!self.currentEvent.data.name) {
+                            if (!self.currentLibrary.data.name) {
 
-                                self.currentEvent.data.name = "[name goes here]";
+                                self.currentLibrary.data.name = "[Name]";
                             }
-                            if (!self.currentEvent.data.description) {
+                            if (!self.currentLibrary.data.description) {
 
-                                self.currentEvent.data.description = "[description goes here]";
+                                self.currentLibrary.data.description = "[Description]";
                             }
 
-                            // Update controls.
-
+                            // Update controls:
+                            
+                            // Name edit.
                             var bProtected = false;
-                            // Protect against editing Event name in these cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            //      for all users: x, y, width, height of system type VisualObject.
-                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
-                                self.currentEvent.owner.data.typeTypeId > 1) {
-
-                                bProtected = true;
-                            }
                             var exceptionRet = self.dialog.controlObject["nameEdit"].setProtected(bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentEvent.data.name);
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentLibrary.data.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
+                            // Description.
                             bProtected = false;
-                            // Protect against editing property description in these cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
-                                self.currentEvent.owner.data.typeTypeId > 1) {
-
-                                bProtected = true;
-                            }
                             exceptionRet = self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
                             if (exceptionRet) {
+
                                 return exceptionRet;
                             }
-
-                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentEvent.data.description);
+                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentLibrary.data.description);
                         } catch (e) {
 
                             return e;
@@ -258,6 +248,10 @@ define(["NextWave/source/utility/prototypes",
                     alert(e.message);
                 }
             };
+
+            // Inherit from Control.  Wire 
+            // up prototype chain to Control.
+            functionRet.inheritsFrom(DialogHost);
 
             return functionRet;
         } catch (e) {
