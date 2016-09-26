@@ -97,16 +97,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							m_holdProjName = manager.projectData.name;
+							m_holdProjName = client.project.name;
 
 							// Set project image.
-							if (manager.projectData.altImagePath.length) {
+							if (client.project.altImagePath.length) {
 
-								$("#ProjectImage").attr("src", manager.projectData.altImagePath);
+								$("#ProjectImage").attr("src", client.project.altImagePath);
 							
 							} else {
 
-								m_functionSetImageSrc(manager.projectData.imageId);
+								m_functionSetImageSrc(client.project.imageId);
 							}
 							$("#ImageSearchLink").click(m_functionSearchClick);
 							$("#NewImageURLLink").click(m_functionURLClick);
@@ -115,10 +115,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#SaveProjectBtn").click(m_functionSaveProject);
 
 							$("#ProjectName").keyup(m_functionNameBlur);
-							$("#ProjectName").val(manager.projectData.name);
+							$("#ProjectName").val(client.project.name);
 
-							$("#ProjectDescription").val(manager.projectData.description);
-							$("#ProjectTags").val(manager.projectData.tags);
+							$("#ProjectDescription").val(client.project.description);
+							$("#ProjectTags").val(client.project.tags);
 
 							$("#ProjectDescription").blur(m_functionDescriptionBlur);
 							$("#ProjectTags").blur(m_functionTagsBlur);
@@ -127,15 +127,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// If this new project is a Class or Product, fetch the specific jade/html template to insert into the dialog.
 							var templateToGet = null;
-							if (manager.projectData.isClass) {
+							if (client.project.isClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/classDetails.jade';
 
-							} else if (manager.projectData.isProduct) {
+							} else if (client.project.isProduct) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
 
-							} else if (manager.projectData.isOnlineClass) {
+							} else if (client.project.isOnlineClass) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
 							}
@@ -173,16 +173,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						$("#DescriptionDiv").html(htmlData);
 						$("#ProjectName").focus();
 						$("#ProjectName").keyup(m_functionNameBlur);
-						$("#ProjectName").val(manager.projectData.name);
+						$("#ProjectName").val(client.project.name);
 						$("#ProjectName")[0].setSelectionRange(0, 0);	// The [0] changes jQuery object to DOM element.
 
-						$("#ProjectDescription").val(manager.projectData.description);
-						$("#ProjectTags").val(manager.projectData.tags);
+						$("#ProjectDescription").val(client.project.description);
+						$("#ProjectTags").val(client.project.tags);
 
 						$("#ProjectDescription").blur(m_functionDescriptionBlur);
 						$("#ProjectTags").blur(m_functionTagsBlur);
 
-						if (manager.projectData.specialProjectData.classProject) {
+						if (client.project.specialProjectData.classProject) {
 							jQuery(function($){
 								$("#Phone").mask("(999) 999-9999? x99999");
 								$("#Zip").mask("99999");
@@ -192,123 +192,123 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
-							$("#ProjectDescription").val(manager.projectData.specialProjectData.classData.classDescription);
-							$("#InstructorFirst").val(manager.projectData.specialProjectData.classData.instructorFirstName);
-							$("#InstructorLast").val(manager.projectData.specialProjectData.classData.instructorLastName);
-							$("#Phone").val(manager.projectData.specialProjectData.classData.instructorPhone);
-							$("#Facility").val(manager.projectData.specialProjectData.classData.facility);
-							$("#Address").val(manager.projectData.specialProjectData.classData.address);
-							$("#Room").val(manager.projectData.specialProjectData.classData.room);
-							$("#City").val(manager.projectData.specialProjectData.classData.city);
+							$("#ProjectDescription").val(client.project.specialProjectData.classData.classDescription);
+							$("#InstructorFirst").val(client.project.specialProjectData.classData.instructorFirstName);
+							$("#InstructorLast").val(client.project.specialProjectData.classData.instructorLastName);
+							$("#Phone").val(client.project.specialProjectData.classData.instructorPhone);
+							$("#Facility").val(client.project.specialProjectData.classData.facility);
+							$("#Address").val(client.project.specialProjectData.classData.address);
+							$("#Room").val(client.project.specialProjectData.classData.room);
+							$("#City").val(client.project.specialProjectData.classData.city);
 							// state combo
-							if(manager.projectData.specialProjectData.classData.state.length > 0) {
+							if(client.project.specialProjectData.classData.state.length > 0) {
 								$('#USState > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.classData.state)
+ 										if ($(this).text() === client.project.specialProjectData.classData.state)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
-							$("#Zip").val(manager.projectData.specialProjectData.classData.zip);
+							$("#Zip").val(client.project.specialProjectData.classData.zip);
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = manager.projectData.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = client.project.specialProjectData.classData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
-							if(manager.projectData.specialProjectData.classData.level.length > 0) {
+							if(client.project.specialProjectData.classData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.classData.level)
+ 										if ($(this).text() === client.project.specialProjectData.classData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(manager.projectData.specialProjectData.classData.difficulty.length > 0) {
+							if(client.project.specialProjectData.classData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.classData.difficulty)
+ 										if ($(this).text() === client.project.specialProjectData.classData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// formatted price
-							$("#Price").val(manager.projectData.specialProjectData.classData.price.dollarFormat());
-							$("#Notes").val(manager.projectData.specialProjectData.classData.classNotes);
-							var iMax = manager.projectData.specialProjectData.classData.maxClassSize;
+							$("#Price").val(client.project.specialProjectData.classData.price.dollarFormat());
+							$("#Notes").val(client.project.specialProjectData.classData.classNotes);
+							var iMax = client.project.specialProjectData.classData.maxClassSize;
 							if (iMax) {
 
 								var strMax100 = (iMax + 100).toString();
 								$("#MaxClassSize").val(strMax100.substr(1));
 							}
-							$("#cb1").prop("checked", manager.projectData.specialProjectData.classData.loanComputersAvailable);
+							$("#cb1").prop("checked", client.project.specialProjectData.classData.loanComputersAvailable);
 						
-						} else if (manager.projectData.specialProjectData.productProject) {
+						} else if (client.project.specialProjectData.productProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 							});
-							$("#ProjectDescription").val(manager.projectData.specialProjectData.productData.productDescription);
+							$("#ProjectDescription").val(client.project.specialProjectData.productData.productDescription);
 							// level combo
-							if(manager.projectData.specialProjectData.productData.level.length > 0) {
+							if(client.project.specialProjectData.productData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.productData.level)
+ 										if ($(this).text() === client.project.specialProjectData.productData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(manager.projectData.specialProjectData.productData.difficulty.length > 0) {
+							if(client.project.specialProjectData.productData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.productData.difficulty)
+ 										if ($(this).text() === client.project.specialProjectData.productData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// formatted price
-							$("#Price").val(manager.projectData.specialProjectData.productData.price.dollarFormat());
+							$("#Price").val(client.project.specialProjectData.productData.price.dollarFormat());
 						
-						} else if (manager.projectData.specialProjectData.onlineClassProject) {
+						} else if (client.project.specialProjectData.onlineClassProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
 								for (var i=1; i<=8; i++) {
 									$("#When" + i).mask("9999-99-99         99:99 - 99:99")
 								}
 							});
-							$("#ProjectDescription").val(manager.projectData.specialProjectData.onlineClassData.classDescription);
-							$("#InstructorFirst").val(manager.projectData.specialProjectData.onlineClassData.instructorFirstName);
-							$("#InstructorLast").val(manager.projectData.specialProjectData.onlineClassData.instructorLastName);
-							$("#Email").val(manager.projectData.specialProjectData.onlineClassData.instructorEmail);
+							$("#ProjectDescription").val(client.project.specialProjectData.onlineClassData.classDescription);
+							$("#InstructorFirst").val(client.project.specialProjectData.onlineClassData.instructorFirstName);
+							$("#InstructorLast").val(client.project.specialProjectData.onlineClassData.instructorLastName);
+							$("#Email").val(client.project.specialProjectData.onlineClassData.instructorEmail);
 							// when array
 							for (var i = 1; i <= 8; i++) {
 								$("#When" + i).val('');
-								var whenIth = manager.projectData.specialProjectData.onlineClassData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
+								var whenIth = client.project.specialProjectData.onlineClassData.schedule[i-1];	// {date: 'UTC datetime including from', duration: in ms}
 								$("#When" + i).val(m_getWhenString(whenIth));
 							}
 							// level combo
-							if(manager.projectData.specialProjectData.onlineClassData.level.length > 0) {
+							if(client.project.specialProjectData.onlineClassData.level.length > 0) {
 								$('#Level > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.onlineClassData.level)
+ 										if ($(this).text() === client.project.specialProjectData.onlineClassData.level)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// difficulty combo
-							if(manager.projectData.specialProjectData.onlineClassData.difficulty.length > 0) {
+							if(client.project.specialProjectData.onlineClassData.difficulty.length > 0) {
 								$('#Difficulty > option').each(
 									function() {
- 										if ($(this).text() === manager.projectData.specialProjectData.onlineClassData.difficulty)
+ 										if ($(this).text() === client.project.specialProjectData.onlineClassData.difficulty)
  											$(this).parent('select').val($(this).val());
 									}
 								);
 							}
 							// formatted price
-							$("#Price").val(manager.projectData.specialProjectData.onlineClassData.price.dollarFormat());
-							$("#Notes").val(manager.projectData.specialProjectData.onlineClassData.classNotes);
+							$("#Price").val(client.project.specialProjectData.onlineClassData.price.dollarFormat());
+							$("#Notes").val(client.project.specialProjectData.onlineClassData.classNotes);
 						}
 
 						m_setStateSaveAsBtn();
@@ -343,7 +343,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionNameBlur = function() {
 
 						var txt = $("#ProjectName").val().trim();
-						if (txt !== manager.projectData.name) {
+						if (txt !== client.project.name) {
 
 							m_holdProjName = txt;
 							m_setStateSaveAsBtn();
@@ -353,9 +353,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionDescriptionBlur = function() {
 
 						var txt = $("#ProjectDescription").val().trim();
-						if (txt !== manager.projectData.description) {
+						if (txt !== client.project.description) {
 
-							manager.projectData.description = txt;
+							client.project.description = txt;
 							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
@@ -364,9 +364,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					var m_functionTagsBlur = function() {
 
 						var txt = $("#ProjectTags").val().trim();
-						if (txt !== manager.projectData.tags) {
+						if (txt !== client.project.tags) {
 
-							manager.projectData.tags = txt;
+							client.project.tags = txt;
 							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
@@ -378,11 +378,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Set the project name that we hold in a method scope var in order to prevent saving a 2nd project
 							// with same name due to user typing it in and closing the dialog once; then coming back.
-							manager.projectData.name = m_holdProjName;
+							client.project.name = m_holdProjName;
 							var strProjectDescription = $("#ProjectDescription").val().trim();
 
 							// If there was a class or product or online class snippet in the dialog, capture that info into the project.
-							if (manager.projectData.isClass) {
+							if (client.project.isClass) {
 
 								// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
 								var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -414,7 +414,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
 								var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
-								manager.projectData.specialProjectData.classData = {
+								client.project.specialProjectData.classData = {
 									active: false,
 									classDescription: strProjectDescription,
 									instructorFirstName: strInstructorFirst,
@@ -431,11 +431,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									difficulty: strDifficulty,
 									price: dPrice,
 									classNotes: strNotes,
-									imageId: manager.projectData.imageId,
+									imageId: client.project.imageId,
 									maxClassSize: iMaxClassSize,
 									loanComputersAvailable: iLoanComputersAvailable
 								};
-							} else if (manager.projectData.isProduct) {
+							} else if (client.project.isProduct) {
 
 								// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
 								var strLevel = $("#Level option:selected").text();
@@ -446,15 +446,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 								}
 
-								manager.projectData.specialProjectData.productData = {
+								client.project.specialProjectData.productData = {
 									active: false,
 									productDescription: strProjectDescription,
 									level: strLevel,
 									difficulty: strDifficulty,
 									price: dPrice,
-									imageId: manager.projectData.imageId
+									imageId: client.project.imageId
 								};
-							} else if (manager.projectData.isOnlineClass) {
+							} else if (client.project.isOnlineClass) {
 
 								// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
 								var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -478,7 +478,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								}
 								var strNotes = $("#Notes").val().trim();
 
-								manager.projectData.specialProjectData.onlineClassData = {
+								client.project.specialProjectData.onlineClassData = {
 									active: false,
 									classDescription: strProjectDescription,
 									instructorFirstName: strInstructorFirst,
@@ -489,7 +489,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									difficulty: strDifficulty,
 									price: dPrice,
 									classNotes: strNotes,
-									imageId: manager.projectData.imageId
+									imageId: client.project.imageId
 								};
 							}
 
@@ -564,8 +564,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
-						manager.projectData.imageId = imageId;
-						manager.projectData.altImagePath = '';
+						client.project.imageId = imageId;
+						client.project.altImagePath = '';
 						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", imageId, "image"));
 						m_setStateSaveAsBtn();
 					}

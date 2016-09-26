@@ -54,6 +54,9 @@ define(["Core/errorHelper",
 					// Initialize, steadystate, closing.
 					self.state = "initialize";
 
+					// This is the official repo for a project. Manager holds a reference to it, and we'll save this.
+					self.project = null;
+
 					//////////////////////////////
 					// Public methods.
 
@@ -77,7 +80,7 @@ define(["Core/errorHelper",
 								if (lastProjectId) {
 
 									self.openProjectFromDB(lastProjectId,
-										function(project) {
+										function() {
 
 											BootstrapDialog.show({
 												type: BootstrapDialog.TYPE_INFO,
@@ -475,13 +478,16 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Retrieve content of manager: the whole project.
-							var objProject = manager.save();
+							// Call manager.save(). Manager will use its reference to slef.project (self = Client.js) to
+							// update the project in client so we can go forward with the save.
+							var exceptionRet = manager.save();
+
+							if (exceptionRet) { return exceptionRet; }
 
 							var data = {
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
-									projectJson: objProject,
+									projectJson: self.project,
 									changeableName: false
 							};
 
@@ -531,7 +537,8 @@ define(["Core/errorHelper",
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
-										self.loadProjectIntoManager(objectData.project);
+										self.project = objectData.project;
+										self.loadProjectIntoManager();
 										self.setBrowserTabAndBtns();
 
 										return null;
@@ -558,14 +565,14 @@ define(["Core/errorHelper",
 					}
 
 					// Called by BuyDialog.
-					self.saveProjectToDBNoGetFromManager = function (project, callback) {
+					self.saveProjectToDBNoGetFromManager = function (callback) {
 
 						try {
 
 							var data = {
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
-									projectJson: project,
+									projectJson: self.project,
 									changeableName: true
 							};
 
@@ -599,7 +606,8 @@ define(["Core/errorHelper",
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
-										self.loadProjectIntoManager(objectData.project);
+										self.project = objectData.project;
+										self.loadProjectIntoManager();
 										self.setBrowserTabAndBtns();
 
 										callback(null);
@@ -632,7 +640,8 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var exceptionRet = self.loadProjectIntoManager(data.project, callback);
+									self.project = data.project;
+									var exceptionRet = self.loadProjectIntoManager(callback);
 									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
 									self.setBrowserTabAndBtns();
@@ -651,7 +660,7 @@ define(["Core/errorHelper",
 
 					// This one is used in BuyDialog after a purchase is completed.
 					// It is also used when client is created to load latest project.
-					// callback is always present to return the project.
+					// callback is always present to complete the process.
 					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
 
 						try {
@@ -666,7 +675,8 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									callback(data.project);
+									self.project = data.project;
+									callback();
 
 								} else {
 
@@ -680,18 +690,18 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.loadProjectIntoManager = function (project, callback) {
+					self.loadProjectIntoManager = function (callback) {
 
 						try {
 
-							// Send the passed-in project into manager.
-				    		var exceptionRet = manager.loadProject(project);
+							// Send the project into manager.
+				    		var exceptionRet = manager.loadProject(self.project);
 				    		if (exceptionRet) { return exceptionRet; }
 
 							if ($.isFunction(callback)) {
 
 								// For some reason the callback is calling client.setBrowserTabAndBtns().
-								callback(project);
+								callback();
 							
 							} else {
 
@@ -709,12 +719,12 @@ define(["Core/errorHelper",
 						var nih = nameInHolding || '';
 						return {
 
-							inDBAlready: (manager.projectData.id > 0),
-							userOwnsProject: (manager.projectData.ownedByUserId === test),
+							inDBAlready: (client.project.id > 0),
+							userOwnsProject: (client.project.ownedByUserId === test),
 							allRequiredFieldsFilled: (	nih.trim().length > 0
-											&& (manager.projectData.imageId > 0 || manager.projectData.altImagePath.length > 0)
+											&& (client.project.imageId > 0 || client.project.altImagePath.length > 0)
 										),
-							projectNameIsFilled: (manager.projectData.name.trim().length > 0)
+							projectNameIsFilled: (client.project.name.trim().length > 0)
 						};
 					};
 
@@ -1098,7 +1108,7 @@ define(["Core/errorHelper",
 						document.title = "NWC";
 						if (manager.projectLoaded) {
 
-							if (manager.projectData.name.length > 0) { document.title += " / " + manager.projectData.name; }
+							if (client.project.name.length > 0) { document.title += " / " + client.project.name; }
 							navbar.setSaveBtnText("Save Project");
 						
 						} else if (manager.systemTypesLoaded) {

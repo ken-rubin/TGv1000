@@ -179,7 +179,7 @@ define(["NextWave/source/project/Type",
                             for (var i = 0; i < self.types.length; i++) {
 
                                 // Get the ith Type.
-                                var typesIth = self.types[i];
+                                var typeIth = self.types[i];
 
                                 // Generate it.
                                 var exceptionRet = typeIth.save();

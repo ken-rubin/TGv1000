@@ -442,37 +442,37 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 														// m_ppData doesn't have a full project. We have to go get the correct project so that we can convert it into a "bought" project with suitable data changes.
 														var exceptionRet = client.openProjectFromDBNoLoadIntoManager(m_ppData.projectId,
-															function(project) {
+															function() {
 
-																project.ownedByUserId = parseInt(g_profile['userId'], 10);
-																project.chargeId = chargeId;
+																client.project.ownedByUserId = parseInt(g_profile['userId'], 10);
+																client.project.chargeId = chargeId;
 
-																if (project.specialProjectData.hasOwnProperty('classData')) {
-																	delete project.specialProjectData.classData;
-																	project.isClass = false;
-																	project.specialProjectData.classProject = false;
-																} else if (project.specialProjectData.hasOwnProperty('onlineClassData')) {
-																	delete project.specialProjectData.onlineClassData;
-																	project.isOnlineClass = false;
-																	project.specialProjectData.onlineClassProject = false;
-																} else if (project.specialProjectData.hasOwnProperty('productData')) {
-																	delete project.specialProjectData.productData;
-																	project.isProduct = false;
-																	project.specialProjectData.productProject = false;
+																if (client.project.specialProjectData.hasOwnProperty('classData')) {
+																	delete client.project.specialProjectData.classData;
+																	client.project.isClass = false;
+																	client.project.specialProjectData.classProject = false;
+																} else if (client.project.specialProjectData.hasOwnProperty('onlineClassData')) {
+																	delete client.project.specialProjectData.onlineClassData;
+																	client.project.isOnlineClass = false;
+																	client.project.specialProjectData.onlineClassProject = false;
+																} else if (client.project.specialProjectData.hasOwnProperty('productData')) {
+																	delete client.project.specialProjectData.productData;
+																	client.project.isProduct = false;
+																	client.project.specialProjectData.productProject = false;
 																}
-																project.specialProjectData.userAllowedToCreateEditPurchProjs = false;
-																project.specialProjectData.ownedByUser = true;
-																project.specialProjectData.normalProject = true;
-																project.specialProjectData.openMode = 'bought';
+																client.project.specialProjectData.userAllowedToCreateEditPurchProjs = false;
+																client.project.specialProjectData.ownedByUser = true;
+																client.project.specialProjectData.normalProject = true;
+																client.project.specialProjectData.openMode = 'bought';
 
 																// Generate a unique-ish name.
 																var momNow = new moment();
-																project.name += "_" + momNow.format("MM-DD-YYYY");
+																client.project.name += "_" + momNow.format("MM-DD-YYYY");
 
 																// Now we need to save the project to the DB and load it into manager.
 																// We can't use client.saveProjectToDB because it doesn't take a project object, but instead it gets the project via manager.save().
 																// After the save, the project is returned to saveProjectToDBNoGetFromManager. That function will load it into manager.
-																var exceptionRet = client.saveProjectToDBNoGetFromManager(project,
+																var exceptionRet = client.saveProjectToDBNoGetFromManager(
 																	function(err) {
 
 																		if (err) {
@@ -482,7 +482,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 																		} else {
 
 																			self.closeYourself();
-																			errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + manager.projectData.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
+																			errorHelper.show("Your purchase is complete, and your project has been saved with the unique name <b>" + client.project.name + "</b>.<br><br>You may wish to save it again (use the menu item Projects/Save Project) and choose a name more to your liking, maybe some search tags, a description and even a new project image.<br><br>Whatever you like. It's yours now!",
 																				250000);	// The purpose of the large autoclose number (250 seconds) is not really to autoclose errorHelper. It's used so the dialog title is "Note" instead of "Error".
 																		}
 																	}

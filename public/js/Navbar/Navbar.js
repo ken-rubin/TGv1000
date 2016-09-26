@@ -101,11 +101,11 @@ define(["Core/errorHelper"],
 																		// This callback is called from client.loadProjectIntoManager to add specialProjectData to the project.
 																		// Note: if the project is a Product, Class or Online Class, then that extra information is already
 																		// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.
-																		function(objProject) {
+																		function() {
 
 																			try {
 
-																				// objProject.specialProjectData exists, but it's empty unless its a Purchasable Project in
+																				// client.project.specialProjectData exists, but it's empty unless its a Purchasable Project in
 																				// which case is contains a property holding class, product or onlineClass data.
 																				// Create and merge rest of specialProjectData in.
 																				var specialProjectData = {
@@ -113,17 +113,17 @@ define(["Core/errorHelper"],
 																					userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
 																					ownedByUser: bOnlyOwnedByUser,
 																					othersProjects: bOnlyOthersProjects,
-																					normalProject: (objProject.isCoreProject+objProject.isClass+objProject.isProduct+objProject.isOnlineClass === 0),
-																					coreProject: objProject.isCoreProject,
-																					classProject: objProject.isClass,
-																					productProject: objProject.isProduct,
-																					onlineClassProject: objProject.isOnlineClass,
+																					normalProject: (client.project.isCoreProject+client.project.isClass+client.project.isProduct+client.project.isOnlineClass === 0),
+																					coreProject: client.project.isCoreProject,
+																					classProject: client.project.isClass,
+																					productProject: client.project.isProduct,
+																					onlineClassProject: client.project.isOnlineClass,
 																					comicsEdited: false,
 																					systemTypesEdited: false,
 																					openMode: 'searched'
 																				};
 
-																				$.extend(true, objProject.specialProjectData, specialProjectData);
+																				$.extend(true, client.project.specialProjectData, specialProjectData);
 
 																			} catch (e) { errorHelper.show(e); }
 																		}
