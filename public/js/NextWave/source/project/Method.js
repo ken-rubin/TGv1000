@@ -195,15 +195,22 @@ define(["NextWave/source/utility/prototypes",
                     // Save.
                     self.save = function () {
 
-                        var objectRet = self.data;
+                        try {
 
-                        // Parameters.
-                        objectRet.arguments = self.parameters.save();
+                            var objectRet = self.data;
 
-                        // Statements.
-                        objectRet.statements = self.statements.save();
+                            // Parameters.
+                            objectRet.arguments = self.parameters.save();
 
-                        return objectRet;
+                            // Statements.
+                            objectRet.statements = self.statements.save();
+
+                            return null;
+
+                        } catch(e) {
+
+                            return e;
+                        }
                     };
 
                     ////////////////////////////
