@@ -1,4 +1,4 @@
-SET @dropTheDB = 1;	/* Use 1 to drop and recreate TGv1000. Use 0 to preserve the DB and just run updates. That's all that needs to be done. */
+SET @dropTheDB = 0;	/* Use 1 to drop and recreate TGv1000. Use 0 to preserve the DB and just run updates. That's all that needs to be done. */
 
 DELIMITER //
 

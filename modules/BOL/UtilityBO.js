@@ -144,7 +144,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                 var chargeId = null;
                 var id = null;
-                var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
+/* TOXXX */     var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
                 sql.execute(
                     strQuery,
                     function(rows) {
@@ -251,7 +251,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                 // Just do cascading delete of the project.
                 var id = null;
-                var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
+/* TOXXX */     var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
                 sql.execute(
                     strQuery,
                     function(rows) {
@@ -390,7 +390,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains this property: project.
                         // This function adds passOn.project.numEnrollees
 
-                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";";
+/* TOXXX */             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";";
 
                         sql.execute(strQuery,
                             function(rows){
@@ -436,7 +436,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata.
                         // This function adds passOn.buyers.
 
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
+/* TOXXX */             var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -1015,7 +1015,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                         if (passOn.idString.length) {
                             // Owned by user. Same for both priv and non-priv.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+/* TOXXX */                 strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
@@ -1245,7 +1245,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
                                     var pJth = passOn.projects[1][j];
-                                    if (pJth.comicProjectId === pIth.projectId) {
+/* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
 
                                         pIth.alreadyBought = true;
                                         break;
@@ -1271,7 +1271,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
                                     var pJth = passOn.projects[1][j];
-                                    if (pJth.comicProjectId === pIth.projectId) {
+/* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
 
                                         pIth.alreadyEnrolled = true;
                                         break;
@@ -1297,7 +1297,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
                                     var pJth = passOn.projects[1][j];
-                                    if (pJth.comicProjectId === pIth.projectId) {
+/* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
 
                                         pIth.alreadyEnrolled = true;
                                         break;
@@ -1315,7 +1315,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         async.eachSeries(passOn.projects[4],
                             function(projectIth, cb) {
 
-                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
+/* TOXXX */                     var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
                                 sql.execute(strQuery,
                                     function(rows){
