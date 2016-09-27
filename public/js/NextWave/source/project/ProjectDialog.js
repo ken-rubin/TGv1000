@@ -961,6 +961,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the library to the current comic.
                             self.currentComic.libraries.push(libraryNew);
+                            self.currentComic.data.libraries.push(libraryNew.data);
 
                             // Scroll to the end of the list.
                             exceptionRet = self.dialog.controlObject["librariesList"].list.scrollToEndOfList();
@@ -1017,6 +1018,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Type to the current Library.
                             self.currentLibrary.types.push(typeNew);
+                            self.currentLibrary.data.types.push(typeNew.data);
 
                             // Scroll to the end of the list.
                             exceptionRet = self.dialog.controlObject["typesList"].list.scrollToEndOfList();
@@ -1025,6 +1027,21 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
+                            // Select the Type, but only to allow the method to be added to it.
+                            exceptionRet = typeNew.select();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add constructor (construct).
+                            exceptionRet = m_functionAddMethod("constuct");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select the Type, this time for the GUI.
                             return typeNew.select();
                         } catch (e) {
 
@@ -1033,7 +1050,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Invoked when the add Method icon is clicked.
-                    var m_functionAddMethod = function () {
+                    var m_functionAddMethod = function (strName) {
 
                         try {
 
@@ -1043,11 +1060,23 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
-                            // Generate an unique name.
-                            var strUnique = window.manager.getUniqueName("NewMethod",
-                                self.currentType.methods,
-                                "data",
-                                "name");
+                            // If substr is not defined, then undefined out the parameter.
+                            if (!strName.substr) {
+
+                                strName = undefined;
+                            }
+
+                            // Set unique to name.
+                            var strUnique = strName;
+
+                            // If no name specified, generate an unique sequencial one.
+                            if (strUnique === undefined) {
+
+                                strUnique = window.manager.getUniqueName("NewMethod",
+                                    self.currentType.methods,
+                                    "data",
+                                    "name");
+                            }
 
                             // Create the new Method.
                             var methodNew = new Method(self.currentType);
@@ -1072,6 +1101,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Method to the current Type.
                             self.currentType.methods.push(methodNew);
+                            self.currentType.data.methods.push(methodNew.data);
 
                             // Scroll to the end of the list.
                             exceptionRet = self.dialog.controlObject["methodsList"].list.scrollToEndOfList();
@@ -1080,7 +1110,14 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return methodNew.select();
+                            // If no name specified, select the method.
+                            if (strName === undefined) {
+
+                                return methodNew.select();
+                            } else {
+
+                                return null;
+                            }
                         } catch (e) {
 
                             return e;
@@ -1125,6 +1162,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Property to the current Type.
                             self.currentType.properties.push(propertyNew);
+                            self.currentType.data.properties.push(propertyNew.data);
 
                             // Scroll to the end of the list.
                             exceptionRet = self.dialog.controlObject["propertiesList"].list.scrollToEndOfList();
@@ -1178,6 +1216,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Event to the current Type.
                             self.currentType.events.push(eventNew);
+                            self.currentType.data.events.push(eventNew.data);
 
                             // Scroll to the end of the list.
                             exceptionRet = self.dialog.controlObject["eventsList"].list.scrollToEndOfList();
