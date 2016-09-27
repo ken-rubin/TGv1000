@@ -1916,7 +1916,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         function(err, typeOfSave) {
 
                                                             if (err) {
-                                                                m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, null, null);
+                                                                m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, connection, null);
                                                             
                                                             } else {
                                                                 if (typeOfSave === 'save') {
@@ -1924,7 +1924,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                     m_log('Going into m_functionSaveProject');
                                                                     m_functionSaveProject(connection, req, res, project, 
                                                                         function(err) {
-                                                                            m_functionFinalCallback(err, req, res, null, null);
+                                                                            m_functionFinalCallback(err, req, res, connection, project);
                                                                         }
                                                                     );
                                                                 } else if (typeOfSave === 'saveWithSameId') {
@@ -1932,7 +1932,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                     m_log('Going into m_functionSaveProjectWithSameId');
                                                                     m_functionSaveProjectWithSameId(connection, req, res, project, 
                                                                         function(err) {
-                                                                            m_functionFinalCallback(err, req, res, null, null);
+                                                                            m_functionFinalCallback(err, req, res, connection, project);
                                                                         }
                                                                     );
                                                                 } else {    // 'saveAs'
@@ -1940,7 +1940,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                     m_log('Going into m_functionSaveProjectAs');
                                                                     m_functionSaveProjectAs(connection, req, res, project, 
                                                                         function(err) {
-                                                                            m_functionFinalCallback(err, req, res, null, null);
+                                                                            m_functionFinalCallback(err, req, res, connection, project);
                                                                         }
                                                                     );
                                                                 }
@@ -2928,9 +2928,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     var guts = {
                         name: libraryIth.name,
                         createdByUserId: req.user.userId,
-                        isSystemLibrary: libraryIth.isSystemLibrary,
-                        isBaseLibrary: libraryIth.isBaseLibrary,
-                        isAppLibrary: libraryIth.isAppLibrary,
+                        isSystemLibrary: (libraryIth.isSystemLibrary ? 1 : 0),
+                        isBaseLibrary: (libraryIth.isBaseLibrary ? 1 : 0),
+                        isAppLibrary: (libraryIth.isAppLibrary ? 1 : 0),
                         imageId: 0,
                         altImagePath: '',
                         description: ''
@@ -2945,7 +2945,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         // Assuming for now that library wasn't deleted by cascading delete of the project.
                         strQuery = "update " + self.dbname + "libraries SET ? where id=" + libraryIth.id + ";";
-                        strQuery += "delete from " + self.dbname + "library_tags where typeId=" + libraryIth.id + ";";
+                        strQuery += "delete from " + self.dbname + "library_tags where libraryId=" + libraryIth.id + ";";
                         strQuery += "delete from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";  // This should delete from type_tags, methods, method_tags, propertys, events, too.
 
                         weInserted = false;
@@ -3084,7 +3084,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     var guts = {
                                         name: typeIth.name,
-                                        typeTypeId: typeIth.typeTypeId,
                                         isApp: 1,
                                         imageId: typeIth.imageId,
                                         altImagePath: typeIth.altImagePath,
@@ -3168,7 +3167,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     var guts = {
                                         name: typeIth.name,
-                                        typeTypeId: typeIth.typeTypeId,
                                         isApp: 0,
                                         imageId: typeIth.imageId || 0,
                                         altImagePath: typeIth.altImagePath || "",
@@ -3182,7 +3180,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         public: typeIth.public || 0,
                                         quarantined: typeIth.quarantined || 1,
                                         baseLibraryName: typeIth.baseLibraryName || '',
-                                        vaseTypeName: typeIth.baseTypeName || ''
+                                        baseTypeName: typeIth.baseTypeName || ''
                                     };
 
                                     var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
@@ -3196,14 +3194,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     m_log('Inserting type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
 
-                                    sql.queryWithCxnWithPlaceholders(passObj.connection, strQuery, guts,
+                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                                         function(err, rows) {
 
                                             try {
                                                 if (err) { return cb(err); }
                                                 if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
 
-                                                passObj.typeIdTranslationArray.push({origId:typeIth.id, newId:rows[0].insertId});
                                                 typeIth.id = rows[0].insertId;
 
                                                 return cb(null);
@@ -3509,6 +3506,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             if (typeof guts[key] === 'undefined') {
 
                 strError += 'undefined value found in a "' + ident + '" for property "' + key + '"; ';
+                strError += JSON.stringify(guts);
             }
         });
 

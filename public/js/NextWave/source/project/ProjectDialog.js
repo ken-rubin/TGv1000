@@ -945,7 +945,10 @@ define(["NextWave/source/utility/prototypes",
 
                                 name: strUnique,
                                 types: [],
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                                ownedByUserId: parseInt(g_profile["userId"], 10),
+                                isSystemLibrary: false,
+                                isBaseLibrary: false,
+                                isAppLibrary: false
                             });
                             if (exceptionRet) {
 

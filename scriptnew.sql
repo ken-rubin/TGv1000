@@ -45,7 +45,7 @@ begin
 			elseif strItemType = 'method' THEN
 				insert method_tags values (itemIdVarName, @id);
 			else
-				insert librarys_tags values (itemIdVarName, @id);
+				insert library_tags values (itemIdVarName, @id);
 			end if;
 		END IF;
 		SET @inipos = @endpos + 1;
