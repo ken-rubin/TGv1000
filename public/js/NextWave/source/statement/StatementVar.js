@@ -60,7 +60,7 @@ define(["NextWave/source/utility/prototypes",
                         //     )
                         // );
                         // or
-                        var csvRet = new CodeStatementVar(null);
+                        var csvRet = new CodeStatementVar(new CodeExpressionLiteral("..."));
 
                         csvRet.addNameInDragConsumate = true;
                         // csvRet.consumateName = strName;
