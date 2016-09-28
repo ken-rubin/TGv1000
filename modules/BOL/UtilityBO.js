@@ -136,15 +136,16 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // Processes a Stripe refund and upon success delete the purchased project (cascading).
 
             console.log("Entered UtilityBO/routeUndoPurchase with req.body = " + JSON.stringify(req.body));
-            // req.body.projectId: product project id -- NOT USER'S PROJECT TO DELETE
-            // req.body.userid: iUserid of owner of project
+            // req.body.projectId: product project id -- NOT THE ID OF THE USER'S PROJECT WE'RE DELETING.
+            // req.body.userid: Userid of owner of project
             // req.body.refund: bRefund
 
             if (req.body.refund === '1') {
 
                 var chargeId = null;
                 var id = null;
-/* TOXXX */     var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
+/* TOXXX DONE   var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";"; */
+                var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and id in (" + self.dbname + "getProjectsLinkedToComic0OfProject(" + req.body.projectId + "));";
                 sql.execute(
                     strQuery,
                     function(rows) {
@@ -249,9 +250,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                 );
             } else {
 
+// TODO Cascading delete has become more complicated so this will need to change:
+
                 // Just do cascading delete of the project.
-                var id = null;
-/* TOXXX */     var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";
+                var projectIds = null;
+/* TOXXX DONE   var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";                */
+                var strQuery = "select " + self.dbname + "getProjectsLinkedToComic0OfProject(" + req.body.projectId + ") as projectIds;"; // userId check has been moved below.
                 sql.execute(
                     strQuery,
                     function(rows) {
@@ -264,10 +268,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             });
                         }
 
-                        id = rows[0].id;
+                        projectIds = rows[0].projectIds;
 
                         // Now do the cascading deletion of the project.
-                        var strQuery = "delete from " + self.dbname + "projects where id=" + id + ";";
+                        var strQuery = "delete from " + self.dbname + "projects where id in (" + projectIds + ") and ownedByUserId=" + req.body.userId + ";";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -354,7 +358,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         try {
 
             console.log("Entered UtilityBO/routeGetPPBuyers w/req.body = " + JSON.stringify(req.body));
-            // req.body.projectId
+            // req.body.projectId  purch. project id
 
             // Retrieve and build a response containing: 
             // (1) the project with numEnrollees property added; 
@@ -390,14 +394,17 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains this property: project.
                         // This function adds passOn.project.numEnrollees
 
-/* TOXXX */             var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";";
+/* TOXXX DONE           var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";"; */
+                        var strQuery = "select " + self.dbname + "getProjectsLinkedToComic0OfProject(" + passOn.project.id + ") as idstring";
 
                         sql.execute(strQuery,
                             function(rows){
 
                                 var numEnrollees = 0;
                                 if (rows.length) {
-                                    numEnrollees = rows[0].cnt;
+
+                                    var arr = rows[0].idstring.split(',');
+                                    numEnrollees = arr.length;
                                 }
                                 passOn.project["numEnrollees"] = numEnrollees;
                                 return cb(null, passOn);
@@ -436,7 +443,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // So far passOn contains these properties: project; one of classesdata, productsdata, onlineclassesdata.
                         // This function adds passOn.buyers.
 
-/* TOXXX */             var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");";
+/* TOXXX DONE           var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");"; */
+                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id in (select " + self.dbname + "getProjectsLinkedToComic0OfProject(" + req.body.projectId + ")));";
                         sql.execute(
                             strQuery,
                             function(rows) {
