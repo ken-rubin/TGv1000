@@ -1023,7 +1023,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                         if (passOn.idString.length) {
                             // Owned by user. Same for both priv and non-priv.
-/* TOXXX */                 strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
+/* TOXXX STARTED            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));"; */
+                            // TODO: for now I've just removed the selection of comicProjectId--or rather I return 0 so there's a field there.
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, 0 as comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
@@ -1245,21 +1248,22 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through products left in passOn.projects[3] and add property alreadyBought by comparing to all projects in passOn.projects[1].
 
-                            for (var i = 0; i < passOn.projects[3].length; i++) {
+// TODO punting for now
+//                             for (var i = 0; i < passOn.projects[3].length; i++) {
 
-                                var pIth = passOn.projects[3][i];
-                                pIth.alreadyBought = false;
+//                                 var pIth = passOn.projects[3][i];
+//                                 pIth.alreadyBought = false;
 
-                                for (var j = 0; j < passOn.projects[1].length; j++) {
+//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
-                                    var pJth = passOn.projects[1][j];
-/* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+//                                     var pJth = passOn.projects[1][j];
+// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
 
-                                        pIth.alreadyBought = true;
-                                        break;
-                                    }
-                                }
-                            }
+//                                         pIth.alreadyBought = true;
+//                                         break;
+//                                     }
+//                                 }
+//                             }
 
                             return cb(null, passOn);
 
@@ -1271,21 +1275,22 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through online classes left in passOn.projects[5] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-                            for (var i = 0; i < passOn.projects[5].length; i++) {
+// TODO punting for now
+//                             for (var i = 0; i < passOn.projects[5].length; i++) {
 
-                                var pIth = passOn.projects[5][i];
-                                pIth.alreadyEnrolled = false;
+//                                 var pIth = passOn.projects[5][i];
+//                                 pIth.alreadyEnrolled = false;
 
-                                for (var j = 0; j < passOn.projects[1].length; j++) {
+//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
-                                    var pJth = passOn.projects[1][j];
-/* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+//                                     var pJth = passOn.projects[1][j];
+// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
 
-                                        pIth.alreadyEnrolled = true;
-                                        break;
-                                    }
-                                }
-                            }
+//                                         pIth.alreadyEnrolled = true;
+//                                         break;
+//                                     }
+//                                 }
+//                             }
 
                             return cb(null, passOn);
 
@@ -1297,21 +1302,22 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through classes left in passOn.projects[2] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-                            for (var i = 0; i < passOn.projects[4].length; i++) {
+// TODO punting for now
+//                             for (var i = 0; i < passOn.projects[4].length; i++) {
 
-                                var pIth = passOn.projects[4][i];
-                                pIth.alreadyEnrolled = false;
+//                                 var pIth = passOn.projects[4][i];
+//                                 pIth.alreadyEnrolled = false;
 
-                                for (var j = 0; j < passOn.projects[1].length; j++) {
+//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
 
-                                    var pJth = passOn.projects[1][j];
-/* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+//                                     var pJth = passOn.projects[1][j];
+// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
 
-                                        pIth.alreadyEnrolled = true;
-                                        break;
-                                    }
-                                }
-                            }
+//                                         pIth.alreadyEnrolled = true;
+//                                         break;
+//                                     }
+//                                 }
+//                             }
 
                             return cb(null, passOn);
 
@@ -1323,20 +1329,23 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         async.eachSeries(passOn.projects[4],
                             function(projectIth, cb) {
 
-/* TOXXX */                     var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
+// TODO punting for now
+// /* TOXXX */                     var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
-                                sql.execute(strQuery,
-                                    function(rows){
+//                                 sql.execute(strQuery,
+//                                     function(rows){
 
-                                        if (rows.length === 0) {
-                                            projectIth.numEnrollees = 0;
-                                        } else {
-                                            projectIth.numEnrollees = rows[0].cnt;
-                                        }
+//                                         if (rows.length === 0) {
+//                                             projectIth.numEnrollees = 0;
+//                                         } else {
+//                                             projectIth.numEnrollees = rows[0].cnt;
+//                                         }
+// TEMP:
+                                        projectIth.numEnrollees = 0;
                                         return cb(null);
-                                    },
-                                    function(strError) { return cb(new Error(strError)); }
-                                );
+                                    // },
+                                    // function(strError) { return cb(new Error(strError)); }
+                                // );
                             },
                             function(err) {
                                 return cb(err, passOn);
