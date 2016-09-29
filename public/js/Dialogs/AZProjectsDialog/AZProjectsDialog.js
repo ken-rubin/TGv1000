@@ -141,21 +141,39 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						} else {
 
-							var parts = files[0].name.split('.');
+							var file = files[0];
+							var parts = file.name.split('.');
 							if (parts.length !== 2 || parts[1] !== 'json') {
 
 								errorHelper.show("You are allowed to drop only a json type file, created in this app.");
 
 							} else {
 
-								$("#DropDiv").append("So, how do we read " + files[0].name + "?\n\nI have no path.");
+								// $("#DropDiv").append("So, how do we read " + files[0].name + "?\n\nI have no path.");
+
+								var reader = new FileReader();
+								reader.onload = function(e) {
+
+									var JSONtext = reader.result;
+									var project = JSON.parse(JSONtext);
+
+									client.unloadProject(null, false);
+									
+									// cause whichever dialog was open to close. Like this one.
+									client.closeCurrentDialog();
+
+									// Set up the modified project.
+									// specialProjectData.openMode might be "new". Change to "loaded". It's no longer new.
+									// This will get saving to work correctly down the road.
+									project.specialProjectData.openMode = "loaded";
+									client.project = project;
+									client.loadProjectIntoManager();
+									client.setBrowserTabAndBtns();
+								}
+
+								reader.readAsText(file);
 							}
 						}
-						// $("#DropDiv").append("File Count: " + count + "\n");
-
-						// for (var i = 0; i < files.length; i++) {
-						//   $("#DropDiv").append(" File " + i + ":\n(" + (typeof files[i]) + ") : <" + files[i] + " > " + files[i].name + " " + files[i].size + "\n");
-						// }
 					}
 				} catch (e) {
 
