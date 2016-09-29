@@ -103,11 +103,60 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
+							// Wire up drag/drop events.
+							$("#DropDiv").on("dragenter", function(event){m_functionDragenter(event);});
+							$("#DropDiv").on("dragover", function(event){m_functionDragover(event);});
+							$("#DropDiv").on("drop", function(event){m_functionDodrop(event);});
+
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionDragenter = function(event) {
+
+						$("#DropDiv").text('');
+						event.stopPropagation();
+					}
+
+					var m_functionDragover = function(event) {
+
+						event.stopPropagation();
+						event.preventDefault();
+					}
+
+					var m_functionDodrop = function(event) {
+
+						event.stopPropagation();
+						event.preventDefault();
+					
+						var dt = event.originalEvent.dataTransfer;
+						var files = dt.files;
+
+						var count = files.length;
+						if (count !== 1) {
+
+							errorHelper.show("You dropped " + count + ' files. We want only one.');
+
+						} else {
+
+							var parts = files[0].name.split('.');
+							if (parts.length !== 2 || parts[1] !== 'json') {
+
+								errorHelper.show("You are allowed to drop only a json type file, created in this app.");
+
+							} else {
+
+								$("#DropDiv").append("So, how do we read " + files[0].name + "?\n\nI have no path.");
+							}
+						}
+						// $("#DropDiv").append("File Count: " + count + "\n");
+
+						// for (var i = 0; i < files.length; i++) {
+						//   $("#DropDiv").append(" File " + i + ":\n(" + (typeof files[i]) + ") : <" + files[i] + " > " + files[i].name + " " + files[i].size + "\n");
+						// }
+					}
 				} catch (e) {
 
 					errorHelper.show(e.message);
