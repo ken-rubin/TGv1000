@@ -2005,6 +2005,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             //  'saveAs' INSERTs new rows for everything.
             //  'save' DELETES (cascading the project from the database) and then calls SaveAs to insert it.
             //  'saveWithSameId' UPDATEs.
+            //  'loaded' a privileged user has loaded the project from a saved JSON file.
 
             // The project's name must be unique to the user's projects, but can be the same as another user's project name.
             // This doesn't have to be checked for a typeOfSave === 'save', but it will be checked for 'new' or 'save as' saves.
@@ -2023,6 +2024,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
             // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
             // its project.specialProjectData.openMode will have been changed to 'bought'.
+
+
+// TODO: handle 'loaded'
 
             async.waterfall(
                 [
