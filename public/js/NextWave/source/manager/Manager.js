@@ -18,7 +18,6 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
-    "NextWave/source/utility/attributeHelper",
     "NextWave/source/manager/Layer",
     "NextWave/source/manager/LayerBackground",
     "NextWave/source/manager/LayerCanvas",
@@ -36,14 +35,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/StatementList",
     "NextWave/source/project/Project",
-    "NextWave/source/type/Type",
-    "NextWave/source/type/Methods",
-    "NextWave/source/type/Method",
-    "NextWave/source/type/Properties",
-    "NextWave/source/type/Property",
-    "NextWave/source/type/Events",
-    "NextWave/source/type/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, attributeHelper, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Type, Methods, Method, Properties, Property, Events, Event) {
+    "NextWave/source/project/Type",
+    "NextWave/source/project/Method",
+    "NextWave/source/project/Property",
+    "NextWave/source/project/Event"],
+    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Type, Method, Property, Event) {
 
         try {
 

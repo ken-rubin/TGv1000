@@ -131,24 +131,35 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.saveMethodName !== localSelf.getText()) {
 
-                                                // Generate an unique name.
-                                                var strUnique = window.manager.getUniqueName(localSelf.getText(),
-                                                    self.currentMethod.owner.methods,
-                                                    "data",
-                                                    "name");
+                                                if (self.currentMethod) {
 
-                                                // Update GUI.
-                                                var exceptionRet = localSelf.setText(strUnique);
-                                                if (exceptionRet) {
+                                                    // Generate an unique name.
+                                                    var strUnique = window.manager.getUniqueName(localSelf.getText(),
+                                                        self.currentMethod.owner.methods,
+                                                        "data",
+                                                        "name");
 
-                                                    throw exceptionRet;
+                                                    // Update GUI.
+                                                    var exceptionRet = localSelf.setText(strUnique);
+                                                    if (exceptionRet) {
+
+                                                        throw exceptionRet;
+                                                    }
+
+                                                    // Update the other GUI.
+                                                    self.currentMethod.listItem.name = strUnique;
+
+                                                    // Update data too.
+                                                    self.currentMethod.data.name = strUnique;
+                                                } else {
+
+                                                    // Update GUI.
+                                                    var exceptionRet = localSelf.setText("");
+                                                    if (exceptionRet) {
+
+                                                        throw exceptionRet;
+                                                    }
                                                 }
-
-                                                // Update the other GUI.
-                                                self.currentMethod.listItem.name = strUnique;
-
-                                                // Update data too.
-                                                self.currentMethod.data.name = strUnique;
                                             }
                                         } catch (e) {
 
@@ -195,8 +206,19 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Update Event's description.
-                                            self.currentMethod.data.comment = localSelf.getText();
+                                            // Update Method's description.
+                                            if (self.currentMethod) {
+
+                                                self.currentMethod.data.comment = localSelf.getText();
+                                            } else {
+
+                                                // Update GUI.
+                                                var exceptionRet = localSelf.setText("");
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
+                                            }
                                         } catch (e) {
 
                                             alert(e.message);

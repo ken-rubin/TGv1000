@@ -10,7 +10,7 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["NextWave/source/manager/ListItem"], 
+define(["NextWave/source/utility/ListItem"], 
     function (ListItem) {
 	
 		try {

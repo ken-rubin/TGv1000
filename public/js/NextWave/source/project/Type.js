@@ -13,7 +13,7 @@
 define(["NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event",
-    "NextWave/source/manager/ListItem"], 
+    "NextWave/source/utility/ListItem"], 
 	function (Method, Property, Event, ListItem) {
 	
 		try {
