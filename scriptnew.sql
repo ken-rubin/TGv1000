@@ -1,4 +1,4 @@
-SET @dropTheDB = 1;	/* Use 1 to drop and recreate TGv1000. Use 0 to preserve the DB and just run updates. That's all that needs to be done. */
+SET @dropTheDB = 0;	/* Use 1 to drop and recreate TGv1000. Use 0 to preserve the DB and just run updates. That's all that needs to be done. */
 
 DELIMITER //
 
@@ -73,6 +73,20 @@ begin
 	END LOOP;
     
     RETURN @uniqueName;
+end //
+
+DROP FUNCTION IF EXISTS getProjectsLinkedToComic0OfProject//
+CREATE FUNCTION getProjectsLinkedToComic0OfProject(projectIdIn int(11))
+	RETURNS TEXT
+begin
+
+	-- Note: this returns projectIdIn, too.
+	-- set @projectId := (select distinct pcl.projectId from projects_comics_libraries pcl inner join comics c on c.id=pcl.comicId where pcl.projectId=projectIdIn AND c.ordinal=0);
+    set @comicId = (select comicId from projects_comics_libraries where projectId=projectIdIn LIMIT 1);
+	set @projectIds := (select group_concat(distinct projectId separator ',') from projects_comics_libraries where comicId=@comicId AND projectId<>projectIdIn);
+    
+    RETURN @projectIds;
+
 end //
 
 drop procedure if exists maintainDB//

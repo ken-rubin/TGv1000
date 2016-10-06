@@ -65,6 +65,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 					            message: $(htmlData),
 					            buttons: [
 					            	{
+					            		id: "SaveLocallyBtn",
+					            		icon: 'glyphicon glyphicon-download-alt',
+					            		label: "Save Project Locally",
+					            		cssClass: "hidden"
+					            	},
+					            	{
 					            		id: "SaveProjectBtn",
 					            		label: "Save Project",
 					            		hotkey: 13,
@@ -113,6 +119,12 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$("#NewImageDiskLink").click(m_functionDiskClick);
 
 							$("#SaveProjectBtn").click(m_functionSaveProject);
+
+							if (g_profile.can_edit_base_and_system_libraries_and_types_therein) {
+
+								$("#SaveLocallyBtn").click(m_functionSaveLocally);
+								$("#SaveLocallyBtn").removeClass('hidden');
+							}
 
 							$("#ProjectName").keyup(m_functionNameBlur);
 							$("#ProjectName").val(client.project.name);
@@ -369,6 +381,26 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							client.project.tags = txt;
 							client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
+						}
+					}
+
+					var m_functionSaveLocally = function () {
+
+						try {
+
+							var exceptionRet = manager.save();
+							if (exceptionRet) {
+								errorHelper.show(exceptionRet);
+								return;
+							}
+
+							var jsonProjectArray = JSON.stringify(client.project, undefined, 4).split('\r\n');
+							var file = new File(jsonProjectArray, m_holdProjName + ".json", {type: "text/plain;charset=utf-8"});
+							saveAs(file);
+
+						} catch (e) {
+
+							errorHelper.show(e);
 						}
 					}
 

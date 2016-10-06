@@ -103,11 +103,78 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
+							// Wire up drag/drop events.
+							$("#DropDiv").on("dragenter", function(event){m_functionDragenter(event);});
+							$("#DropDiv").on("dragover", function(event){m_functionDragover(event);});
+							$("#DropDiv").on("drop", function(event){m_functionDodrop(event);});
+
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionDragenter = function(event) {
+
+						$("#DropDiv").text('');
+						event.stopPropagation();
+					}
+
+					var m_functionDragover = function(event) {
+
+						event.stopPropagation();
+						event.preventDefault();
+					}
+
+					var m_functionDodrop = function(event) {
+
+						event.stopPropagation();
+						event.preventDefault();
+					
+						var dt = event.originalEvent.dataTransfer;
+						var files = dt.files;
+
+						var count = files.length;
+						if (count !== 1) {
+
+							errorHelper.show("You dropped " + count + ' files. We want only one.');
+
+						} else {
+
+							var file = files[0];
+							var parts = file.name.split('.');
+							if (parts.length !== 2 || parts[1] !== 'json') {
+
+								errorHelper.show("You are allowed to drop only a json type file, created in this app.");
+
+							} else {
+
+								// $("#DropDiv").append("So, how do we read " + files[0].name + "?\n\nI have no path.");
+
+								var reader = new FileReader();
+								reader.onload = function(e) {
+
+									var JSONtext = reader.result;
+									var project = JSON.parse(JSONtext);
+
+									client.unloadProject(null, false);
+									
+									// cause whichever dialog was open to close. Like this one.
+									client.closeCurrentDialog();
+
+									// Set up the modified project.
+									// specialProjectData.openMode might be "new". Change to "loaded". It's no longer new.
+									// This will get saving to work correctly down the road.
+									project.specialProjectData.openMode = "loaded";
+									client.project = project;
+									client.loadProjectIntoManager();
+									client.setBrowserTabAndBtns();
+								}
+
+								reader.readAsText(file);
+							}
+						}
+					}
 				} catch (e) {
 
 					errorHelper.show(e.message);

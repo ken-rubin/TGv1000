@@ -2257,13 +2257,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (1)
                     function(cb) {
 
-                        // if (project.specialProjectData.openMode === 'new' && (project.isProduct || project.isClass || project.isOnlineClass)) {
-
-                        //     // project.id is going to be set below after INSERT. Since we want project.comicProjectId to point to this project, we
-                        //     // will zero it out so we can set it after we know this project's new id.
-                        //     project.comicProjectId = 0;
-                        // }
-
                         var guts = {
                             name: project.name,
                             ownedByUserId: req.user.userId,
@@ -2306,7 +2299,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                 project.id = rows[0].insertId;
 
-// MUST CHANGE comicProjectId no longer exists.
+//  TOXXX MUST CHANGE comicProjectId no longer exists.
                                 // Check if necessary to and then, if so, update project.comicProjectId
                                 if (project.comicProjectId === 0) {
 
@@ -2405,11 +2398,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (1)
                     function(cb) {
 
-                        // if (project.comicProjectId === 0) {
-
-                        //     project.comicProjectId = project.id;
-                        // }
-
                         var guts = {
                             name: project.name,
                             ownedByUserId: req.user.userId,
@@ -2448,7 +2436,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     // (2)
                     function(cb) {
-// HERE DOWN HAS TO CHANGE
+// TOXXX HERE DOWN HAS TO CHANGE
                         async.parallel(
                             [
                                 // (2a)
