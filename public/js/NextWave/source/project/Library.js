@@ -11,7 +11,7 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/project/Type",
-    "NextWave/source/manager/ListItem"], 
+    "NextWave/source/utility/ListItem"], 
 	function (Type, ListItem) {
 	
 		try {

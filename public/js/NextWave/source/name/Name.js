@@ -11,7 +11,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
-    "NextWave/source/manager/ListItem",
+    "NextWave/source/utility/ListItem",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",

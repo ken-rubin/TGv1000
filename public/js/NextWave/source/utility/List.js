@@ -14,7 +14,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
-    "NextWave/source/manager/ListItem"],
+    "NextWave/source/utility/ListItem"],
     function (prototypes, settings, Point, Size, Area, ListItem) {
 
         try {

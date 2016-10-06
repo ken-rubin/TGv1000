@@ -12,7 +12,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
-    "NextWave/source/manager/List"],
+    "NextWave/source/utility/List"],
     function (prototypes, settings, List) {
 
         try {
