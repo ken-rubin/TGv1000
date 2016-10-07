@@ -1,5 +1,5 @@
 /////////////////////////////////////
-// TGv1000 applicaiton translation unit.
+// TGv1001 applicaiton translation unit.
 //
 
 /////////////////////////////////////
@@ -72,7 +72,7 @@ if (app.get("development")) {
 }
 
 /////////////////////////////////////
-app.set("dbname","TGv1000.");
+app.set("dbname","TGv1001.");
 console.log("dbname is " +  app.get("dbname"));
 
 /////////////////////////////////////
@@ -136,7 +136,7 @@ app.get("/", function (req, res) {
 
     try {
         res.render("Login/login", { 
-            title : "TGv1000" 
+            title : "TGv1001" 
         });
     } catch (e) { res.send(e.message); }
 });
@@ -172,7 +172,7 @@ app.get('/index',
                 // Render the jade file to the client.
                 res.render("Index/index", { 
                     // Pass in jade context property just for the hell of it.
-                    title : "TGv1000" 
+                    title : "TGv1001" 
                 });
             } catch (e) { res.send(e.message); }
         }

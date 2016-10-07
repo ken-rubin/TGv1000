@@ -59,53 +59,53 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    self.routeFetchStrings_E_L_S = function (req, res) {
+    // self.routeFetchStrings_E_L_S = function (req, res) {
 
-        try {
+    //     try {
 
-            m_log("Entered ProjectBO/routeFetchStrings_E_L_S");
+    //         m_log("Entered ProjectBO/routeFetchStrings_E_L_S");
 
-            // Returns [3][] where [0] is the full list of expressions; [1] is the full list of literals; [2] is the full list of statements.
-            var strQuery = "select name from " + self.dbname + "expressions order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "statements order by name asc; "
-            sql.execute(strQuery,
-                function(rows) {
+    //         // Returns [3][] where [0] is the full list of expressions; [1] is the full list of literals; [2] is the full list of statements.
+    //         var strQuery = "select name from " + self.dbname + "expressions order by name asc; select name from " + self.dbname + "literals order by name asc; select name from " + self.dbname + "statements order by name asc; "
+    //         sql.execute(strQuery,
+    //             function(rows) {
 
-                    if (rows.length !== 3) {
-                        return res.json({
-                            success: false,
-                            message: "Failed to retrieve 3 arrays in fetching system strings."
-                        });
-                    }
+    //                 if (rows.length !== 3) {
+    //                     return res.json({
+    //                         success: false,
+    //                         message: "Failed to retrieve 3 arrays in fetching system strings."
+    //                     });
+    //                 }
 
-                    var twodim = new Array(3);
-                    for (i = 0; i < 3; i++) {
+    //                 var twodim = new Array(3);
+    //                 for (i = 0; i < 3; i++) {
 
-                        var names = new Array();
-                        rows[i].forEach(
-                            function(itemIth) {
-                                names.push(itemIth.name);
-                            }
-                        );
-                        twodim[i] = names;
-                    }
+    //                     var names = new Array();
+    //                     rows[i].forEach(
+    //                         function(itemIth) {
+    //                             names.push(itemIth.name);
+    //                         }
+    //                     );
+    //                     twodim[i] = names;
+    //                 }
 
-                    res.json({
-                        success: true,
-                        data: twodim
-                    });
-                },
-                function(strError) {
-                    return res.json({
-                        success: false,
-                        message: "Strings fetch failed with error: " + strError
-                    });
-                }
-            );
-        } catch (e) {
+    //                 res.json({
+    //                     success: true,
+    //                     data: twodim
+    //                 });
+    //             },
+    //             function(strError) {
+    //                 return res.json({
+    //                     success: false,
+    //                     message: "Strings fetch failed with error: " + strError
+    //                 });
+    //             }
+    //         );
+    //     } catch (e) {
 
-            res.json({success: false, message: e.message});
-        }
-    }
+    //         res.json({success: false, message: e.message});
+    //     }
+    // }
 
     // var m_functionFillInTypes = function(arrTypes, callback) {
 
@@ -1054,28 +1054,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         // Sort comics by ordinal.
                                                         project.comics.sort(function(a,b){return a.ordinal - b.ordinal;});
 
-                                                        // Sort lists of types, methods, properties and events inside each comic's libraries by their own ordinals.
+                                                        // Sort comiccode according to its ordinals.
                                                         project.comics.forEach(
                                                             function(comic) {
-
-                                                                // Note that we're not sorting libraries at this time, planning for them to be retrieved in the correct order.
-                                                                comic.libraries.forEach(
-                                                                    function(library) {
-
-                                                                        // Types. 
-                                                                        library.types.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                        library.types.forEach(
-                                                                            function(type) {
-                                                                                // Methods.
-                                                                                type.methods.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                                // Properties.
-                                                                                type.properties.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                                // Events.
-                                                                                type.events.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                                            }
-                                                                        );
-                                                                    }
-                                                                );
 
                                                                 // Finally, sort the comic's comiccode.
                                                                 comic.comiccode.sort(function(a,b){return a.ordinal - b.ordinal;});
@@ -1194,9 +1175,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comicIth.originalComicId = comicIth.id;
                             comicIth.comiccode = [];
                             comicIth.libraries = [];
-                            comicIth.expressions = [];
                             comicIth.statements = [];
-                            comicIth.literals = [];
 
                             // Fill comicIth's comiccode and libraries.
                             m_functionRetProjDoComicInternals(  req, 
@@ -1247,28 +1226,24 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 // Use async to process each library and fetch its internals.
                                 // After review, could change eachSeries to each perhaps.
                                 async.eachSeries(rows,
-                                    function(libraryIth, cbe1) {
+                                    function(rowIth, cbe1) {
 
-                                        libraryIth.originalTypeId = libraryIth.id;
-                                        libraryIth.isSystemLibrary = (libraryIth.isSystemLibrary === 1 ? true : false);
-                                        libraryIth.isAppLibrary = (libraryIth.isAppLibrary === 1 ? true : false);
-                                        libraryIth.isBaseLibrary = (libraryIth.isBaseLibrary === 1 ? true : false);
+                                        var libraryIth = {
+                                            id: rowIth.id,
+                                            originalLibraryId: rowIth.id,
+                                            isSystemLibrary: (rowIth.isSystemLibrary === 1 ? true : false),
+                                            isAppLibrary: (rowIth.isAppLibrary === 1 ? true : false),
+                                            isBaseLibrary: (rowIth.isBaseLibrary === 1 ? true : false),
+                                            // If not a "special" library, then it's normal. Set it for ease of processing later.
+                                            isNormalLibrary: !(rowIth.isSystemLibrary || rowIth.isAppLibrary || rowIth.isBaseLibrary),
+                                            imageId: rowIth.imageId,
+                                            altImagePath: rowIth.altImagePath
+                                        };
 
-                                        // If not a "special" library, then it's normal. Set it for ease of processing later.
-                                        libraryIth.isNormalLibrary = !(libraryIth.isSystemLibrary || libraryIth.isAppLibrary || libraryIth.isBaseLibrary);
-                                        libraryIth.types = [];
+                                        libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
 
-                                        m_functionDoLibraryTypes(
-                                            libraryIth,
-                                            function(err) {
-
-                                                if (!err) {
-
-                                                    comicIth.libraries.push(libraryIth);
-                                                }
-                                                return cbe1(err);
-                                            }
-                                        );
+                                        comicIth.libraries.push(libraryIth);
+                                        return cbe1(null);
                                     },
                                     function(err) { // Main callback for inner async.eachSeries.
 
@@ -1281,24 +1256,24 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         );
                         if (exceptionRet) { return cbp1(exceptionRet); }
                     },
-                    function(cb) {  // expressions
+                    // function(cb) {  // expressions
 
-                        var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ") order by name asc;";
-                        sql.execute(
-                            strQuery,
-                            function(rows) {
-                                rows.forEach(
-                                    function(rowIth) {
-                                        comicIth.expressions.push(rowIth.name);
-                                    }
-                                );
-                                return cb(null);
-                            },
-                            function(strError) {
-                                return cb(new Error(strError));
-                            }
-                        );
-                    },
+                    //     var strQuery = "select name from " + self.dbname + "expressions where id in (select expressionId from " + self.dbname + "comics_expressions where comicId=" + comicIth.id + ") order by name asc;";
+                    //     sql.execute(
+                    //         strQuery,
+                    //         function(rows) {
+                    //             rows.forEach(
+                    //                 function(rowIth) {
+                    //                     comicIth.expressions.push(rowIth.name);
+                    //                 }
+                    //             );
+                    //             return cb(null);
+                    //         },
+                    //         function(strError) {
+                    //             return cb(new Error(strError));
+                    //         }
+                    //     );
+                    // },
                     function(cb) {  // statements
 
                         var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
@@ -1317,24 +1292,24 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
                         );
                     },
-                    function(cb) {  // literals
+                    // function(cb) {  // literals
 
-                        var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ") order by name asc;";
-                        sql.execute(
-                            strQuery,
-                            function(rows) {
-                                rows.forEach(
-                                    function(rowIth) {
-                                        comicIth.literals.push(rowIth.name);
-                                    }
-                                );
-                                return cb(null);
-                            },
-                            function(strError) {
-                                return cb(new Error(strError));
-                            }
-                        );
-                    },
+                    //     var strQuery = "select name from " + self.dbname + "literals where id in (select literalId from " + self.dbname + "comics_literals where comicId=" + comicIth.id + ") order by name asc;";
+                    //     sql.execute(
+                    //         strQuery,
+                    //         function(rows) {
+                    //             rows.forEach(
+                    //                 function(rowIth) {
+                    //                     comicIth.literals.push(rowIth.name);
+                    //                 }
+                    //             );
+                    //             return cb(null);
+                    //         },
+                    //         function(strError) {
+                    //             return cb(new Error(strError));
+                    //         }
+                    //     );
+                    // },
                     function(cbp3) {    // comiccode
 
                         var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
@@ -1364,158 +1339,158 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { return callback(e); }
     }
 
-    var m_functionDoLibraryTypes = function(libraryIth, callback) {
+    // var m_functionDoLibraryTypes = function(libraryIth, callback) {
 
-        try {
+    //     try {
 
-            var strSql = "select * from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";
-            var exceptionRet = sql.execute(strSql,
-                function(rows) {
+    //         var strSql = "select * from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";
+    //         var exceptionRet = sql.execute(strSql,
+    //             function(rows) {
 
-                    // For now we'll allow a library with 0 types. May not later.
+    //                 // For now we'll allow a library with 0 types. May not later.
 
-                    // Need to massage and fill typeIth and push to libraryIth.types [].
-                    // Use async to process each type and fetch its internals.
-                    // After review, could change eachSeries to each perhaps.
-                    async.eachSeries(rows,
-                        function(typeIth, cbe1) {
+    //                 // Need to massage and fill typeIth and push to libraryIth.types [].
+    //                 // Use async to process each type and fetch its internals.
+    //                 // After review, could change eachSeries to each perhaps.
+    //                 async.eachSeries(rows,
+    //                     function(typeIth, cbe1) {
 
-                            typeIth.originalTypeId = typeIth.id;
-                            typeIth.isApp = (typeIth.isApp === 1 ? true : false);
-                            typeIth.methods = [];
-                            typeIth.properties = [];
-                            typeIth.events = [];
+    //                         typeIth.originalTypeId = typeIth.id;
+    //                         typeIth.isApp = (typeIth.isApp === 1 ? true : false);
+    //                         typeIth.methods = [];
+    //                         typeIth.properties = [];
+    //                         typeIth.events = [];
 
-                            m_functionFetchTags(
-                                typeIth.id,
-                                'type',
-                                function(err, tags) {
+    //                         m_functionFetchTags(
+    //                             typeIth.id,
+    //                             'type',
+    //                             function(err, tags) {
 
-                                    if (err) { return cbe1(err); }
-                                    typeIth.tags = tags;
+    //                                 if (err) { return cbe1(err); }
+    //                                 typeIth.tags = tags;
 
-                                    m_functionDoTypeArrays(
-                                        typeIth,
-                                        function(err) { 
+    //                                 m_functionDoTypeArrays(
+    //                                     typeIth,
+    //                                     function(err) { 
 
-                                            if (!err) {
+    //                                         if (!err) {
                                                 
-                                                // Add the filled type to libraryIth.
-                                                libraryIth.types.push(typeIth);
-                                            }
-                                            return cbe1(err);
-                                        }
-                                    );
-                                }
-                            );
-                        },
-                        function(err) { // Main callback for inner async.eachSeries.
+    //                                             // Add the filled type to libraryIth.
+    //                                             libraryIth.types.push(typeIth);
+    //                                         }
+    //                                         return cbe1(err);
+    //                                     }
+    //                                 );
+    //                             }
+    //                         );
+    //                     },
+    //                     function(err) { // Main callback for inner async.eachSeries.
 
-                            // But return to callback.
-                            return callback(err);
-                        }
-                    );
-                },
-                function(strError) { return callback(new Error(strError)); }
-            );
+    //                         // But return to callback.
+    //                         return callback(err);
+    //                     }
+    //                 );
+    //             },
+    //             function(strError) { return callback(new Error(strError)); }
+    //         );
 
-            if (exceptionRet) { return callback(exceptionRet); }
+    //         if (exceptionRet) { return callback(exceptionRet); }
 
-        } catch (e) { return callback(e); }
-    }
+    //     } catch (e) { return callback(e); }
+    // }
 
-    var m_functionDoTypeArrays = function(typeIth, callback) {
+    // var m_functionDoTypeArrays = function(typeIth, callback) {
 
-        try {
+    //     try {
 
-            async.parallel(
-                [
-                    function(callbackMethods) {
+    //         async.parallel(
+    //             [
+    //                 function(callbackMethods) {
 
-                        var ex = sql.execute("select * from " + self.dbname + "methods where typeId=" + typeIth.id + ";",
-                            function(rows) {
+    //                     var ex = sql.execute("select * from " + self.dbname + "methods where typeId=" + typeIth.id + ";",
+    //                         function(rows) {
 
-                                async.eachSeries(rows,
-                                    function(method, cb) {
-                                        method.originalMethodId = method.id;
-                                        method.tags = '';
+    //                             async.eachSeries(rows,
+    //                                 function(method, cb) {
+    //                                     method.originalMethodId = method.id;
+    //                                     method.tags = '';
 
-                                        m_functionFetchTags(
-                                            method.id,
-                                            'method',
-                                            function(err, tags) {
-                                                if (!err) {
-                                                    method.tags = tags;
+    //                                     m_functionFetchTags(
+    //                                         method.id,
+    //                                         'method',
+    //                                         function(err, tags) {
+    //                                             if (!err) {
+    //                                                 method.tags = tags;
 
-                                                    // Database gave me back arguments (JSON: {arguments: []}) and statements (JSON: {statements: []}).
-                                                    // Need to convert.
-                                                    method.arguments = JSON.parse(method.arguments).arguments;
-                                                    method.statements = JSON.parse(method.statements).statements;
-                                                    typeIth.methods.push(method);
-                                                }
-                                                return cb(err);
-                                            }
-                                        );
-                                    },
-                                    function(err) { return callbackMethods(err); }                               );
-                            },
-                            function(strError) {
-                                return callbackMethods(new Error(strError));
-                            }
-                        );
-                        if (ex) { return callbackMethods(ex); }
-                    },
-                    function(callbackProperties) {
+    //                                                 // Database gave me back arguments (JSON: {arguments: []}) and statements (JSON: {statements: []}).
+    //                                                 // Need to convert.
+    //                                                 method.arguments = JSON.parse(method.arguments).arguments;
+    //                                                 method.statements = JSON.parse(method.statements).statements;
+    //                                                 typeIth.methods.push(method);
+    //                                             }
+    //                                             return cb(err);
+    //                                         }
+    //                                     );
+    //                                 },
+    //                                 function(err) { return callbackMethods(err); }                               );
+    //                         },
+    //                         function(strError) {
+    //                             return callbackMethods(new Error(strError));
+    //                         }
+    //                     );
+    //                     if (ex) { return callbackMethods(ex); }
+    //                 },
+    //                 function(callbackProperties) {
 
-                        var ex = sql.execute("select * from " + self.dbname + "propertys where typeId=" + typeIth.id + ";",
-                            function(rows){
+    //                     var ex = sql.execute("select * from " + self.dbname + "propertys where typeId=" + typeIth.id + ";",
+    //                         function(rows){
 
-                                async.eachSeries(rows,
-                                    function(property, cb) {
+    //                             async.eachSeries(rows,
+    //                                 function(property, cb) {
 
-                                        property.originalPropertyId = property.id,
+    //                                     property.originalPropertyId = property.id,
 
-                                        typeIth.properties.push(property);
-                                        return cb(null);
-                                    },
-                                    function(err) { return callbackProperties(err); }
-                                );
-                            },
-                            function(strError){
-                                return callbackProperties(new Error(strError));
-                            }
-                        );
-                        if (ex) { return callbackProperties(ex); }
-                    },
-                    function(callbackEvents) {
+    //                                     typeIth.properties.push(property);
+    //                                     return cb(null);
+    //                                 },
+    //                                 function(err) { return callbackProperties(err); }
+    //                             );
+    //                         },
+    //                         function(strError){
+    //                             return callbackProperties(new Error(strError));
+    //                         }
+    //                     );
+    //                     if (ex) { return callbackProperties(ex); }
+    //                 },
+    //                 function(callbackEvents) {
 
-                        var ex = sql.execute("select * from " + self.dbname + "events where typeId=" + typeIth.id + ";",
-                            function(rows){
+    //                     var ex = sql.execute("select * from " + self.dbname + "events where typeId=" + typeIth.id + ";",
+    //                         function(rows){
 
-                                async.eachSeries(rows,
-                                    function(event, cb) {
+    //                             async.eachSeries(rows,
+    //                                 function(event, cb) {
 
-                                        event.originalEventId = event.id;
+    //                                     event.originalEventId = event.id;
 
-                                        typeIth.events.push(event);
-                                        return cb(null);
-                                    },
-                                    function(err) { return callbackEvents(err); }
-                                );
-                            },
-                            function(strError){
-                                return callbackEvents(new Error(strError));
-                            }
-                        );
-                        if (ex) { return callbackEvents(ex); }
-                    }
-                ],
-                function(err) { return callback(err); }
-            );
-        } catch(e) {
-            return callback(e);
-        }
-    }
+    //                                     typeIth.events.push(event);
+    //                                     return cb(null);
+    //                                 },
+    //                                 function(err) { return callbackEvents(err); }
+    //                             );
+    //                         },
+    //                         function(strError){
+    //                             return callbackEvents(new Error(strError));
+    //                         }
+    //                     );
+    //                     if (ex) { return callbackEvents(ex); }
+    //                 }
+    //             ],
+    //             function(err) { return callback(err); }
+    //         );
+    //     } catch(e) {
+    //         return callback(e);
+    //     }
+    // }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //

@@ -641,11 +641,19 @@ define(["Core/errorHelper",
 								if (data.success) {
 
 									self.project = data.project;
-									var exceptionRet = self.loadProjectIntoManager(callback);
-									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
-									self.setBrowserTabAndBtns();
+									// This might be a temporary work-around.
+									if (iProjectId < 6) {
 
+										callback();
+
+									} else {
+
+										var exceptionRet = self.loadProjectIntoManager(callback);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+										self.setBrowserTabAndBtns();
+									}
 								} else {
 
 									// !data.success
