@@ -386,21 +386,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 					var m_functionSaveLocally = function () {
 
-						try {
+						var exceptionRet = client.saveAsJSON('project', m_holdProjName);
+						if (exceptionRet) {
 
-							var exceptionRet = manager.save();
-							if (exceptionRet) {
-								errorHelper.show(exceptionRet);
-								return;
-							}
-
-							var jsonProjectArray = JSON.stringify(client.project, undefined, 4).split('\r\n');
-							var file = new File(jsonProjectArray, m_holdProjName + ".json", {type: "text/plain;charset=utf-8"});
-							saveAs(file);
-
-						} catch (e) {
-
-							errorHelper.show(e);
+							errorHelper.show(exceptionRet);
 						}
 					}
 

@@ -149,26 +149,38 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							} else {
 
-								// $("#DropDiv").append("So, how do we read " + files[0].name + "?\n\nI have no path.");
-
 								var reader = new FileReader();
 								reader.onload = function(e) {
 
 									var JSONtext = reader.result;
-									var project = JSON.parse(JSONtext);
+									var objectData = JSON.parse(JSONtext);
 
-									client.unloadProject(null, false);
-									
-									// cause whichever dialog was open to close. Like this one.
-									client.closeCurrentDialog();
+									// user dragged and dropped a JSON file that can be a project or a library.
+									if (objectData.hasOwnProperty('originalProjectId')) {
 
-									// Set up the modified project.
-									// specialProjectData.openMode might be "new". Change to "loaded". It's no longer new.
-									// This will get saving to work correctly down the road.
-									project.specialProjectData.openMode = "loaded";
-									client.project = project;
-									client.loadProjectIntoManager();
-									client.setBrowserTabAndBtns();
+										client.unloadProject(null, false);
+										
+										// cause whichever dialog was open to close. Like this one.
+										client.closeCurrentDialog();
+
+										// Set up the modified project.
+										// specialProjectData.openMode might be "new". Change to "loaded". It's no longer new.
+										// This will get saving to work correctly down the road.
+										objectData.specialProjectData.openMode = "loaded";
+										client.project = objectData;
+										client.loadProjectIntoManager();
+										client.setBrowserTabAndBtns();
+
+									} else if (objectData.hasOwnProperty('originalLibraryId')) {
+
+										// Load the library into manager.
+										// Look for and replace one with similar name?
+										// ???
+
+									} else {
+
+										errorHelper.show('Could not discern project or library.')
+									}
 								}
 
 								reader.readAsText(file);
