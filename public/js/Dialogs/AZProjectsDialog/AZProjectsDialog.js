@@ -174,9 +174,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									} else if (objectData.hasOwnProperty('originalLibraryId')) {
 
 										// Load the library into manager.
-										// Look for and replace one with similar name?
-										// ???
+										var exceptionRet = manager.loadLibrary(objectData);
+										if (exceptionRet) {
 
+											errorHelper.show(exceptionRet);
+										}
 									} else {
 
 										errorHelper.show('Could not discern project or library.')

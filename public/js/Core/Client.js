@@ -584,7 +584,7 @@ define(["Core/errorHelper",
 
 							} else {
 
-								var arrInts = $.map(strWhatToSave.split(,), function(val){ return parseInt(val, 10)});
+								var arrInts = $.map(strWhatToSave.split(','), function(val){ return parseInt(val, 10)});
 								objectData = self.project.comics[arrInts[0]].libraries[arrInts[1]];
 							}
 
