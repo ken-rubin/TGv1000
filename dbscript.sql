@@ -386,7 +386,7 @@ begin
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
 		ALTER TABLE `libraries` DISABLE KEYS;
-		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',3,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": [], "references": [], "description": ""}}'),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": [], "references": [], "description": ""}}'),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": [], "references": [], "description": ""}}'),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": [], "references": [], "description": ""}}'),(5,'MapAppLibrary',2,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": [], "references": [], "description": ""}}'),(6,'GameBaseLibrary',3,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": [], "references": [], "description": ""}}'),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": [], "references": [], "description": ""}}'),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": [], "references": [], "description": ""}}'),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": [], "references": [], "description": ""}}'),(10,'MapBaseLibrary',2,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": [], "references": [], "description": ""}}'),(11,'KernelTypesLibrary',3,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": [], "references": [], "description": ""}}'),(12,'VisualObjectLibrary',3,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": [], "references": [], "description": ""}}');
+		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": [], "references": [], "description": ""}}'),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": [], "references": [], "description": ""}}'),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": [], "references": [], "description": ""}}'),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": [], "references": [], "description": ""}}'),(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": [], "references": [], "description": ""}}'),(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": [], "references": [], "description": ""}}'),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": [], "references": [], "description": ""}}'),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": [], "references": [], "description": ""}}'),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": [], "references": [], "description": ""}}'),(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": [], "references": [], "description": ""}}'),(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": [], "references": [], "description": ""}}'),(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": [], "references": [], "description": ""}}');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
 		ALTER TABLE `permissions` DISABLE KEYS;
@@ -437,10 +437,34 @@ begin
 		INSERT INTO `usergroups` VALUES (1,'developer'),(2,'instructor'),(3,'registered_user'),(4,'unregistered_user'),(5,'site_teacher'),(6,'site_student');
 		ALTER TABLE `usergroups` ENABLE KEYS;
 
-
-
     	set FOREIGN_KEY_CHECKS = 1;
 		set @dbstate := @dbstate + 1;	-- @dbstate = 2
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
+    if @dbstate = 2 THEN
+
+    	-- Create an "empty" core project.
+    	-- Add library_users table to denote "owners".
+
+		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
+		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
+		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": [], "references": [], "description": ""}}');
+		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0);
+		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
+		INSERT INTO `projecttypes` VALUES (6,'empty');
+		INSERT INTO `tags` VALUES (36,'empty');
+
+		CREATE TABLE `library_users` (
+		  `libraryId` int(11) NOT NULL,
+		  `userId` int(11) NOT NULL,
+		  PRIMARY KEY (`libraryId`,`userId`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+		INSERT INTO `library_users` VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);
+
+		set @dbstate := @dbstate + 1;	-- @dbstate = 3
 		UPDATE control set dbstate=@dbstate where id=1;
 
     end if;

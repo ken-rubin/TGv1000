@@ -36,7 +36,7 @@ define(["Core/errorHelper"],
 										if (manager.userAllowedToCreateEditPurchProjs || manager.userCanWorkWithSystemLibsAndTypes) {
 
 											// A privileged user can work with all project types.
-											exceptionRet = client.showNewProjectDialog([1,2,3,4,5]);
+											exceptionRet = client.showNewProjectDialog([1,2,3,4,5,6]);
 											if (exceptionRet) { throw exceptionRet; }
 
 										} else {
