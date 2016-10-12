@@ -564,6 +564,42 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					// strWhatToSave = 'project' saves self.project.
+					//				 = '0,2' saves self.project.comics[0].libraries[2].
+					// nameToUse is required.
+					self.saveAsJSON = function (strWhatToSave, nameToUse) {
+
+						try {
+
+							var exceptionRet = manager.save();
+							if (exceptionRet) {
+
+								return exceptionRet;
+							}
+
+							var objectData = null;
+							if (strWhatToSave === 'project') {
+
+								objectData = self.project;
+
+							} else {
+
+								var arrInts = $.map(strWhatToSave.split(','), function(val){ return parseInt(val, 10)});
+								objectData = self.project.comics[arrInts[0]].libraries[arrInts[1]];
+							}
+
+							var jsonArray = JSON.stringify(objectData, undefined, 4).split('\r\n');
+							var file = new File(jsonArray, nameToUse + ".json", {type: "text/plain;charset=utf-8"});
+							saveAs(file);
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Called by BuyDialog.
 					self.saveProjectToDBNoGetFromManager = function (callback) {
 
@@ -641,11 +677,19 @@ define(["Core/errorHelper",
 								if (data.success) {
 
 									self.project = data.project;
-									var exceptionRet = self.loadProjectIntoManager(callback);
-									if (exceptionRet) { errorHelper.show(exceptionRet); }
 
-									self.setBrowserTabAndBtns();
+									// This might be a temporary work-around.
+									if (iProjectId < 6) {
 
+										callback();
+
+									} else {
+
+										var exceptionRet = self.loadProjectIntoManager(callback);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+										self.setBrowserTabAndBtns();
+									}
 								} else {
 
 									// !data.success

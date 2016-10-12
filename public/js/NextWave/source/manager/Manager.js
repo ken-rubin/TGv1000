@@ -73,8 +73,6 @@ define(["NextWave/source/utility/prototypes",
                     self.alternateFocus = null;
                     // Collection of types available in the current context.
                     self.types = [];
-                    // 3xn jagged array of expressions, literals and statements.
-                    self.arrStrings = null;
 
                     // Only one of the following can be true, but both can be false.
                     // Indicates there is a project which has been loaded up into this manager.
@@ -112,9 +110,7 @@ define(["NextWave/source/utility/prototypes",
                     // Public methods.
 
                     // Initialze instance.
-                    // Called with jagged array containing full list of expression, literal and statement strings.
-                    // These will be set aside potentially to be used later
-                    self.create = function (arrStrings) {
+                    self.create = function () {
 
                         try {
 
@@ -123,8 +119,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "Manager: Instance already created!" };
                             }
-
-                            self.arrStrings = arrStrings;
 
                             // Store the manager in window, 
                             // so it is universally accessible.
