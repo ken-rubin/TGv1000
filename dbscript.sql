@@ -469,6 +469,15 @@ begin
 
     end if;
     
+    if @dbstate = 3 THEN
+
+		delete from `routes` where method in ('routeSearchTypes', 'routeSearchMethods', 'routeRetrieveType', 'routeRetrieveMethod');
+    
+		set @dbstate := @dbstate + 1;	-- @dbstate = 4
+		UPDATE control set dbstate=@dbstate where id=1;
+
+    end if;
+    
 end//
 
 -- Execute the procedure

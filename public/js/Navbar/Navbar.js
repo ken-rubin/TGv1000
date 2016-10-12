@@ -158,17 +158,6 @@ define(["Core/errorHelper"],
 										if (exceptionRet) { throw exceptionRet; }
 
 									}
-									//  else if (manager.systemTypesLoaded) {
-
-									// 	// No exceptionRet--it handles its own error or success display.
-									// 	client.saveSystemTypes(
-									// 		function() {
-
-									// 			// Reload system types so the new ids are in memory.
-									// 			client.loadSystemTypesAndPinPanels();
-									// 		}
-									// 	);
-									// }
 								} catch (e) { errorHelper.show(e); }
 							});
 
@@ -193,51 +182,6 @@ define(["Core/errorHelper"],
 									}, true, true);		// The final true is telling client.unloadProject that we're unloading due to user clicking the Close Project menu item and not because we're about to search for and open or new a project.
 
 								}
-								//  else {	// system types m.b. loaded; else, this menu item would be disabled.
-
-								// 	client.unloadProject(function(){
-										
-								// 		setTimeout(function() {
-
-								// 			client.loadSystemTypesAndPinPanels(function() {
-
-								// 					client.setBrowserTabAndBtns();
-								// 			});
-								// 		}, 1000);
-								// 	}, true, true);		// See comment above.
-								// }
-							});
-
-							$("#SearchTypeButton").click(function() {
-
-								if ($("#SearchTypeLI").hasClass('disabled')) { return false; }
-								try {
-									var exceptionRet = client.showTypeSearchDialog(function(iTypeId) {
-										try {
-											if (iTypeId > 0) {
-												exceptionRet = client.addTypeToProjectFromDB(iTypeId);
-												if (exceptionRet) { throw exceptionRet; }
-											} else { throw new Error("Invalid type id returned."); }
-										} catch(e) { errorHelper.show(e); }
-									});
-									if (exceptionRet) { throw exceptionRet; }
-								} catch (e) { errorHelper.show(e); }
-							});
-
-							$("#SearchMethodButton").click(function() {
-
-								if ($("#SearchMethodLI").hasClass('disabled')) { return false; }
-								try {
-									var exceptionRet = client.showMethodSearchDialog(function(iMethodId) {
-										try {
-											if (iMethodId > 0) {
-												exceptionRet = client.addMethodToTypeFromDB(iMethodId);
-												if (exceptionRet) { throw exceptionRet; }
-											} else { throw new Error("Invalid method id returned."); }
-										} catch(e) { errorHelper.show(e); }
-									});
-									if (exceptionRet) { throw exceptionRet; }
-								} catch (e) { errorHelper.show(e); }
 							});
 
 							$("#PlayBtn").click(function () {
@@ -426,16 +370,12 @@ define(["Core/errorHelper"],
 						m_functionEnable("OpenProject");
 						m_functionDisable("SaveProject");
 						m_functionDisable("CloseProject");
-						m_functionDisable("SearchType");
-						m_functionDisable("SearchMethod");
 
 						if (manager.projectLoaded) {
 
 							// Any open project can be closed (with appropriate warning, if warranted.)
 							m_functionEnable("CloseProject");
 							m_functionEnable("SaveProject");
-							m_functionEnable("SearchType");
-							m_functionEnable("SearchMethod");
 
 						} else if (manager.systemTypesLoaded) {
 
