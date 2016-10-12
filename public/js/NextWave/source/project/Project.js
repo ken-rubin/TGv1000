@@ -10,8 +10,9 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["NextWave/source/project/Comic"], 
-	function (Comic) {
+define(["NextWave/source/project/Comic",
+    "NextWave/source/utility/ListItem"], 
+	function (Comic, ListItem) {
 	
 		try {
 
@@ -29,6 +30,8 @@ define(["NextWave/source/project/Comic"],
                     self.data = null;
                     // Comics owned by this project.
                     self.comics = [];
+                    // Hold on to ListItem associated with this instance.
+                    self.listItem = null;
 
                     ///////////////////////////
                     // Public methods.
@@ -42,6 +45,7 @@ define(["NextWave/source/project/Comic"],
                             self.data = objectProject;
 
                             // Then loop over comics and create children.
+                            self.comics = [];
                             for (var i = 0; i < objectProject.comics.length; i++) {
 
                                 // Get the ith Comic.
@@ -56,6 +60,13 @@ define(["NextWave/source/project/Comic"],
                                 }
                                 self.comics.push(comicIth);
                             }
+
+                            // Generate ListItem for this instance.
+                            self.listItem = new ListItem(self.data.name);
+                            self.listItem.clickHandler = self.select;
+                            self.listItem.deleteHandler = m_functionDeleteHandler;
+                            self.listItem.owner = self;
+
                             return null;
                         } catch (e) {
 
@@ -63,9 +74,116 @@ define(["NextWave/source/project/Comic"],
                         }
                     };
 
-                    //////////////////////////
-                    // Private fields.
+                    // Select this Project.
+                    self.select = function (objectReference) {
 
+                        try {
+
+                            /* Clear the highlight in all the 
+                            // other Project of the owner.
+                            var exceptionRet = self.owner.unselectAllComics();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }*/
+
+                            // Set the ListItem to selected.
+                            self.listItem.selected = true;
+
+                            // Set the current Project.
+                            var exceptionRet = window.projectDialog.setCurrentProject(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up this Project into the ProjectDialog.
+                            exceptionRet = window.projectDialog.loadProject(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select into gui.
+                            return window.manager.selectProject(self);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // De-select this Comic.
+                    self.unselect = function () {
+
+                        self.listItem.selected = false;
+                        return null;
+                    };
+
+                    // Clear out the selection in all the associated Comics.
+                    self.unselectAllComics = function () {
+
+                        try {
+
+                            // Then loop over Comics and unselect them.
+                            for (var i = 0; i < self.comics.length; i++) {
+
+                                // Get the ith Comic.
+                                var comicIth = self.comics[i];
+
+                                // Unselect it.
+                                var exceptionRet = comicIth.unselect();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Loop down to save each method of each type.
+                    self.save = function () {
+
+                        try {
+
+                            // Loop over Comics and save them.
+                            for (var i = 0; i < self.comics.length; i++) {
+
+                                // Get the ith Comic.
+                                var comicIth = self.comics[i];
+
+                                // Generate it.
+                                var exceptionRet = comicIth.save();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
+
+                    // Invoked when the mouse is clicked over this instance's delete icon.
+                    var m_functionDeleteHandler = function (objectReference) {
+
+                        try {
+
+                            // Delete this library.
+                            return window.projectDialog.deleteProject(self);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 				} catch (e) {
 
 					alert(e.message);

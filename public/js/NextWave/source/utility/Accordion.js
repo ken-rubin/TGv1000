@@ -113,6 +113,19 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Generate the path.
+                            var exceptionRet = m_area.generateRoundedRectPath(contextRender);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Fill and stroke the path.
+                            contextRender.fillStyle = "rgba(255,100,100,0.3)";
+                            contextRender.strokeStyle = settings.general.strokeBackground;
+                            contextRender.fill();
+                            contextRender.stroke();
+
                             // Render the sections:
 
                             // Start at the top.

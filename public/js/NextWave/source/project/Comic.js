@@ -10,8 +10,9 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["NextWave/source/project/Library"], 
-	function (Library) {
+define(["NextWave/source/project/Library",
+    "NextWave/source/utility/ListItem"], 
+	function (Library, ListItem) {
 	
 		try {
 
@@ -31,6 +32,8 @@ define(["NextWave/source/project/Library"],
                     self.data = null;
                     // Libraries owned by this Comic.
                     self.libraries = [];
+                    // Hold on to ListItem associated with this instance.
+                    self.listItem = null;
 
                     ///////////////////////////
                     // Public methods.
@@ -44,6 +47,7 @@ define(["NextWave/source/project/Library"],
                             self.data = objectComic;
 
                             // Then loop over libraries and create children.
+                            self.libraries = [];
                             for (var i = 0; i < objectComic.libraries.length; i++) {
 
                                 // Get the ith Library.
@@ -58,11 +62,63 @@ define(["NextWave/source/project/Library"],
                                 }
                                 self.libraries.push(libraryIth);
                             }
+
+                            // Generate ListItem for this instance.
+                            self.listItem = new ListItem(self.data.name);
+                            self.listItem.clickHandler = self.select;
+                            self.listItem.deleteHandler = m_functionDeleteHandler;
+                            self.listItem.owner = self;
+
                             return null;
                         } catch (e) {
 
                             return e;
                         }
+                    };
+
+                    // Select this Comic.
+                    self.select = function (objectReference) {
+
+                        try {
+
+                            // Clear the highlight in all the 
+                            // other Comcis of the owner.
+                            var exceptionRet = self.owner.unselectAllComics();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Set the ListItem to selected.
+                            self.listItem.selected = true;
+
+                            // Set the current Comic.
+                            var exceptionRet = window.projectDialog.setCurrentComic(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up this Comic into the ProjectDialog.
+                            exceptionRet = window.projectDialog.loadComic(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select into gui.
+                            return window.manager.selectComic(self);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // De-select this Comic.
+                    self.unselect = function () {
+
+                        self.listItem.selected = false;
+                        return null;
                     };
 
                     // Clear out the selection in all the associated Libraries.
@@ -120,7 +176,7 @@ define(["NextWave/source/project/Library"],
 
                         try {
 
-                            // Loop over libraries and generate their types.
+                            // Loop over libraries and save.
                             for (var i = 0; i < self.libraries.length; i++) {
 
                                 // Get the ith Library.
@@ -134,6 +190,22 @@ define(["NextWave/source/project/Library"],
                                 }
                             }
                             return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
+
+                    // Invoked when the mouse is clicked over this instance's delete icon.
+                    var m_functionDeleteHandler = function (objectReference) {
+
+                        try {
+
+                            // Delete this library.
+                            return window.projectDialog.deleteComic(self);
                         } catch (e) {
 
                             return e;

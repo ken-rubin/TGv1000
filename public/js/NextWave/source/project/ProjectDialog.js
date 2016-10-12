@@ -21,12 +21,14 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/List",
     "NextWave/source/utility/ListHost",
     "NextWave/source/utility/ListItem",
+    "NextWave/source/project/Project",
+    "NextWave/source/project/Comic",
     "NextWave/source/project/Library",
     "NextWave/source/project/Type",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, Point, Size, Area, DialogHost, Accordion, List, ListHost, ListItem, Library, Type, Method, Property, Event) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, Accordion, List, ListHost, ListItem, Project, Comic, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -60,6 +62,43 @@ define(["NextWave/source/utility/prototypes",
 
                     ////////////////////////
                     // Public methods.
+
+                    // Set current Project.
+                    self.setCurrentProject = function (project) {
+
+                        try {
+
+                            self.currentProject = project;
+                            self.currentComic = null;
+                            self.currentLibrary = null;
+                            self.currentType = null;
+                            self.currentMethod = null;
+                            self.currentProperty = null;
+                            self.currentEvent = null;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set current Comic.
+                    self.setCurrentComic = function (comic) {
+
+                        try {
+
+                            self.currentComic = comic;
+                            self.currentLibrary = null;
+                            self.currentType = null;
+                            self.currentMethod = null;
+                            self.currentProperty = null;
+                            self.currentEvent = null;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Set current Library.
                     self.setCurrentLibrary = function (library) {
@@ -144,31 +183,46 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Clear all lists.
-                            var exceptionRet = self.clearProject();
+                            // Clear all comics.
+                            var exceptionRet = self.clearComics();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            // Save off Project.
+                            // Loop over Comics in this Project.
+                            for (var i = 0; i < project.comics.length; i++) {
+
+                                // Extract ith Comics.
+                                var comicIth = project.comics[i];
+
+                                // Add the Comic's ListItem to the Comics list.
+                                exceptionRet = m_listComics.addItem(comicIth.listItem);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
                             self.currentProject = project;
 
-                            // Extract the currnet Comic.
+                            // Extract the current Comic.
                             var comicCurrent = project.comics[project.data.currentComicIndex];
 
-                            // Save off Comic.
-                            self.currentComic = comicCurrent;
+                            // If there is at least one Library, then select it.
+                            if (comicCurrent) {
 
-                            // Call down.
-                            return self.loadLibraries(comicCurrent.libraries);
+                                return comicCurrent.select();
+                            }
+
+                            return null;
                         } catch (e) {
 
                             return e;
                         }
                     };
 
-                    // Load libraries into dialog.
+                    /* Load libraries into dialog.
                     self.loadLibraries = function (arrayLibraries) {
 
                         try {
@@ -200,6 +254,76 @@ define(["NextWave/source/utility/prototypes",
                                 return libraryFirst.select();
                             }
                             return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };*/
+
+                    // Load the specified Comic into dialog.
+                    self.loadComic = function (comic) {
+
+                        try {
+
+                            // Clear out existing types.
+                            var exceptionRet = self.clearLibraries();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Loop over Libraries in this Comic.
+                            var libraryFirst = null;
+                            for (var i = 0; i < comic.libraries.length; i++) {
+
+                                // Extract ith Library.
+                                var libraryIth = comic.libraries[i];
+
+                                // Save the first Type.
+                                if (!libraryFirst) {
+
+                                    libraryFirst = libraryIth;
+                                }
+
+                                // Add the Library's ListItem to the Library list.
+                                exceptionRet = m_listLibraries.addItem(libraryIth.listItem);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+
+                            // If there is at least one Library, then select it.
+                            if (libraryFirst) {
+
+                                return libraryFirst.select();
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Delete the specified Comic.
+                    self.deleteComic = function (comic) {
+
+                        try {
+
+                            // Remove from current Project Comic list.
+                            for (var i = 0; i < self.currentProject.comics.length; i++) {
+
+                                var comicIth = self.currentProject.comics[i];
+                                if (comicIth === comic) {
+
+                                    self.currentProject.comics.splice(i, 1);
+                                    break;
+                                }
+                            }
+
+                            // Reload libraries.
+                            return self.loadLibrary(self.currentLibrary);
                         } catch (e) {
 
                             return e;
@@ -482,6 +606,19 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear dependent lists.
+                            return self.clearComics();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear list of Comics.
+                    self.clearComics = function () {
+
+                        try {
+
+                            // Clear dependent lists.
                             return self.clearLibraries();
                         } catch (e) {
 
@@ -624,90 +761,61 @@ define(["NextWave/source/utility/prototypes",
                             // Create the dialog.
                             var exceptionRet = self.dialog.create({
 
-                                librariesLabel: {
+                                projectAccordion: {
 
-                                    type: "Label",
-                                    text: "Libraries",
+                                    type: "Accordion",
                                     x: settings.general.margin,
-                                    y: settings.general.margin,
-                                    width: 3 * settings.general.margin + settings.glyphs.smallWidth,
-                                    widthType: "reserve",
-                                    height: settings.dialog.lineHeight
-                                },
-                                addLibraryGlyph: {
-
-                                    type: "GlyphHost",
-                                    constructorParameterString: "'addNew'",
-                                    clickHandler: m_functionAddLibrary,
-                                    xType: "reserve",
-                                    x: settings.general.margin + settings.glyphs.smallWidth,
                                     y: 2 * settings.general.margin,
-                                    width: settings.glyphs.smallWidth,
-                                    height: settings.glyphs.smallHeight
-                                },
-                                librariesList: {
-
-                                    type: "ListHost",
-                                    constructorParameterString: "false",
-                                    x: 2 * settings.general.margin,
-                                    y: settings.general.margin + 
-                                        settings.dialog.lineHeight,
-                                    width: 2 * settings.general.margin,
                                     widthType: "reserve",
-                                    height: settings.dialog.lineHeight + 2 * settings.general.margin,
-                                    items:[]
-                                },
-                                typesLabel: {
+                                    width: settings.general.margin,
+                                    heightType: "callback",
+                                    height: function (areaMaximal) {
 
-                                    type: "Label",
-                                    text: "Types",
-                                    x: settings.general.margin,
-                                    y: 4 * settings.general.margin + 2 * settings.dialog.lineHeight,
-                                    widthType: "reserve",
-                                    width: 3 * settings.general.margin + settings.glyphs.smallWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                addTypeGlyph: {
+                                        return (areaMaximal.extent.height - 
+                                            6 * settings.general.margin) / 2;
+                                    },
+                                    title: "Project",
+                                    sections: [/*{
 
-                                    type: "GlyphHost",
-                                    constructorParameterString: "'addNew'",
-                                    clickHandler: m_functionAddType,
-                                    xType: "reserve",
-                                    x: settings.general.margin + settings.glyphs.smallWidth,
-                                    y: 5 * settings.general.margin + 2 * settings.dialog.lineHeight,
-                                    width: settings.glyphs.smallWidth,
-                                    height: settings.glyphs.smallHeight
-                                },
-                                typesList: {
+                                        name: "projects",
+                                        title: "Projects",
+                                        addGlyphClickHandler: m_functionAddProject
+                                    }, {
 
-                                    type: "ListHost",
-                                    constructorParameterString: "true",
-                                    x: 2 * settings.general.margin,
-                                    y: 4 * settings.general.margin + 3 * settings.dialog.lineHeight,
-                                    widthType: "reserve",
-                                    width: 2 * settings.general.margin,
-                                    height: 3 * settings.dialog.lineHeight + 2 * settings.general.margin,
-                                    items:[]
-                                },
-                                detailLabel: {
+                                        name: "comics",
+                                        title: "Comics",
+                                        addGlyphClickHandler: m_functionAddComic
+                                    }, */{
 
-                                    type: "Label",
-                                    text: "Details",
-                                    x: settings.general.margin,
-                                    y: 6 * settings.general.margin + 6 * settings.dialog.lineHeight,
-                                    widthType: "reserve",
-                                    width: 2 * settings.general.margin,
-                                    height: settings.dialog.lineHeight
+                                        name: "libraries",
+                                        title: "Libraries",
+                                        addGlyphClickHandler: m_functionAddLibrary
+                                    }, {
+
+                                        name: "types",
+                                        title: "Types",
+                                        addGlyphClickHandler: m_functionAddType
+                                    }]
                                 },
                                 typeAccordion: {
 
                                     type: "Accordion",
-                                    x: 3 * settings.general.margin,
-                                    y: 7 * settings.general.margin + 7 * settings.dialog.lineHeight,
+                                    x: settings.general.margin,
+                                    yType: "callback",
+                                    y: function (areaMaximal) {
+
+                                        return 4 * settings.general.margin +
+                                            (areaMaximal.extent.height - 
+                                            6 * settings.general.margin) / 2;
+                                    },
                                     widthType: "reserve",
-                                    width: 4 * settings.general.margin,
-                                    heightType: "reserve",
-                                    height: 8 * settings.general.margin + 7 * settings.dialog.lineHeight,
+                                    width: settings.general.margin,
+                                    heightType: "callback",
+                                    height: function (areaMaximal) {
+
+                                        return (areaMaximal.extent.height - 
+                                            6 * settings.general.margin) / 2;
+                                    },
                                     title: "Details",
                                     sections: [{
 
@@ -726,184 +834,6 @@ define(["NextWave/source/utility/prototypes",
                                         addGlyphClickHandler: m_functionAddEvent
                                     }]
                                 }
-                                /*,
-                                detailLabel: {
-
-                                    type: "Label",
-                                    text: "Detail",
-                                    x: settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 2 * settings.general.margin,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 3.25 * settings.dialog.lineHeight + 
-                                            (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    height: settings.dialog.lineHeight
-                                },
-                                methodsLabel: {
-
-                                    type: "Label",
-                                    text: "Methods",
-                                    x: 8 * settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 10 * settings.general.margin + settings.glyphs.smallWidth,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 4.25 * settings.dialog.lineHeight + 
-                                            (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    height: settings.dialog.lineHeight
-                                },
-                                addMethodGlyph: {
-
-                                    type: "GlyphHost",
-                                    constructorParameterString: "'addNew'",
-                                    clickHandler: m_functionAddMethod,
-                                    xType: "callback",
-                                    x: function (areaMaximal) {
-
-                                        return areaMaximal.extent.width - settings.general.margin - settings.glyphs.smallWidth;
-                                    },
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return 2 * settings.general.margin + 4.25 * settings.dialog.lineHeight + 
-                                            (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    width: settings.glyphs.smallWidth,
-                                    height: settings.glyphs.smallHeight
-                                },
-                                methodsList: {
-
-                                    type: "ListHost",
-                                    constructorParameterString: "true",
-                                    x: 12 * settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 12 * settings.general.margin,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 5.25 * settings.dialog.lineHeight + 
-                                            (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    heightType: "callback",
-                                    height: function (areaMaximal) {
-
-                                        return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    items:[]
-                                },
-                                propertiesLabel: {
-
-                                    type: "Label",
-                                    text: "Properties",
-                                    x: 8 * settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 10 * settings.general.margin + settings.glyphs.smallWidth,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 5.25 * settings.dialog.lineHeight + 
-                                            2 * (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    height: settings.dialog.lineHeight
-                                },
-                                addPropertyGlyph: {
-
-                                    type: "GlyphHost",
-                                    constructorParameterString: "'addNew'",
-                                    clickHandler: m_functionAddProperty,
-                                    xType: "callback",
-                                    x: function (areaMaximal) {
-
-                                        return areaMaximal.extent.width - settings.general.margin - settings.glyphs.smallWidth;
-                                    },
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return 2 * settings.general.margin + 5.25 * settings.dialog.lineHeight + 
-                                            2 * (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    width: settings.glyphs.smallWidth,
-                                    height: settings.glyphs.smallHeight
-                                },
-                                propertiesList: {
-
-                                    type: "ListHost",
-                                    constructorParameterString: "true",
-                                    x: 12 * settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 12 * settings.general.margin,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 6.25 * settings.dialog.lineHeight + 
-                                            2 * (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    heightType: "callback",
-                                    height: function (areaMaximal) {
-
-                                        return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    items:[]
-                                },
-                                eventsLabel: {
-
-                                    type: "Label",
-                                    text: "Events",
-                                    x: 8 * settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 10 * settings.general.margin + settings.glyphs.smallWidth,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 6.25 * settings.dialog.lineHeight + 
-                                            3 * (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    height: settings.dialog.lineHeight
-                                },
-                                addEventGlyph: {
-
-                                    type: "GlyphHost",
-                                    constructorParameterString: "'addNew'",
-                                    clickHandler: m_functionAddEvent,
-                                    xType: "callback",
-                                    x: function (areaMaximal) {
-
-                                        return areaMaximal.extent.width - settings.general.margin - settings.glyphs.smallWidth;
-                                    },
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return 2 * settings.general.margin + 6.25 * settings.dialog.lineHeight + 
-                                            3 * (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    width: settings.glyphs.smallWidth,
-                                    height: settings.glyphs.smallHeight
-                                },
-                                eventsList: {
-
-                                    type: "ListHost",
-                                    constructorParameterString: "true",
-                                    x: 12 * settings.general.margin,
-                                    widthType: "reserve",
-                                    width: 12 * settings.general.margin,
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return settings.general.margin + 7.25 * settings.dialog.lineHeight + 
-                                            3 * (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    heightType: "callback",
-                                    height: function (areaMaximal) {
-
-                                        return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
-                                    items:[]
-                                }*/
                             });
                             if (exceptionRet) {
 
@@ -911,8 +841,20 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Save controls:
-                            m_listLibraries = self.dialog.controlObject["librariesList"].list || new List();
-                            m_listTypes = self.dialog.controlObject["typesList"].list || new List();
+                            var accordianProject = self.dialog.controlObject["projectAccordion"];
+                            if (accordianProject) {
+
+                                m_listProjects = accordianProject.projects || new List();
+                                m_listComics = accordianProject.comics || new List();
+                                m_listLibraries = accordianProject.libraries || new List();
+                                m_listTypes = accordianProject.types || new List();
+                            } else {
+
+                                m_listProjects = new List();
+                                m_listComics = new List();
+                                m_listLibraries = new List();
+                                m_listTypes = new List();
+                            }
                             var accordianType = self.dialog.controlObject["typeAccordion"];
                             if (accordianType) {
 
@@ -959,6 +901,118 @@ define(["NextWave/source/utility/prototypes",
 
                     ///////////////////////
                     // Private methods.
+
+                    // Invoked when the add Project icon is clicked.
+                    var m_functionAddProject = function () {
+
+                        try {
+
+// Not sure what to do....
+                            /* Must have a Project to add a Comic to it.
+                            if (!self.currentProject) {
+
+                                return null;
+                            }
+
+                            // Generate an unique name.
+                            var strUnique = window.manager.getUniqueName("NewComic",
+                                self.currentProject.comics,
+                                "data",
+                                "name");
+
+                            // Create the new Comic.
+                            var comicNew = new Comic(self.currentProject);
+                            var exceptionRet = comicNew.create({
+
+                                name: strUnique,
+                                libraries: [],
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the Comic's ListItem to the Comic list.
+                            exceptionRet = m_listComics.addItem(comicNew.listItem);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the comic to the current Project.
+                            self.currentProject.comics.push(comicNew);
+                            self.currentProject.data.comics.push(comicNew.data);
+
+                            // Scroll to the end of the list.
+                            exceptionRet = m_listComics.scrollToEndOfList();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return comicNew.select();
+                            */
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the add Comic icon is clicked.
+                    var m_functionAddComic = function () {
+
+                        try {
+
+                            // Must have a Project to add a Comic to it.
+                            if (!self.currentProject) {
+
+                                return null;
+                            }
+
+                            // Generate an unique name.
+                            var strUnique = window.manager.getUniqueName("NewComic",
+                                self.currentProject.comics,
+                                "data",
+                                "name");
+
+                            // Create the new Comic.
+                            var comicNew = new Comic(self.currentProject);
+                            var exceptionRet = comicNew.create({
+
+                                name: strUnique,
+                                libraries: [],
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                            });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the Comic's ListItem to the Comic list.
+                            exceptionRet = m_listComics.addItem(comicNew.listItem);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add the comic to the current Project.
+                            self.currentProject.comics.push(comicNew);
+                            self.currentProject.data.comics.push(comicNew.data);
+
+                            // Scroll to the end of the list.
+                            exceptionRet = m_listComics.scrollToEndOfList();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            return comicNew.select();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
 
                     // Invoked when the add Library icon is clicked.
                     var m_functionAddLibrary = function () {
@@ -1279,6 +1333,8 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates this instance is already created.
                     var m_bCreated = false;
                     // Lists from dialog.
+                    var m_listProjects = null;
+                    var m_listComics = null;
                     var m_listLibraries = null;
                     var m_listTypes = null;
                     var m_listMethods = null;

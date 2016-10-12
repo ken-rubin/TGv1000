@@ -35,11 +35,13 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/StatementList",
     "NextWave/source/project/Project",
+    "NextWave/source/project/Comic",
+    "NextWave/source/project/Library",
     "NextWave/source/project/Type",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Type, Method, Property, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -291,21 +293,7 @@ define(["NextWave/source/utility/prototypes",
                             self.projectLoaded = false;
 
                             // Clear panel data.
-                            var exceptionRet = self.panelLayer.clearTypes();
-                            if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearStatements();
-                            // if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearExpressions();
-                            // if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearNames();
-                            // if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearCenter();
-                            if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearLiterals();
-                            // if (exceptionRet) { return exceptionRet; }
-
-                            return null;
-
+                            return self.panelLayer.clearCenter();
                         } catch (e) {
 
                             return e;
@@ -592,6 +580,46 @@ define(["NextWave/source/utility/prototypes",
 
                         return self.panelLayer.saveLiterals();
                     };
+
+                    // Helper method clears out the center panel and sets it up for a Project.
+                    self.selectProject = function (project) {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Project");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the Project into the Project builder.
+                            return window.projectBuilder.loadProject(project);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for a Comic.
+                    self.selectComic = function (comic) {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Comic");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the Comic into the Comic builder.
+                            return window.comicBuilder.loadComic(comic);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
 
                     // Helper method clears out the center panel and sets it up for a Library.
                     self.selectLibrary = function (library) {

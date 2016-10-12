@@ -122,6 +122,13 @@ define(["NextWave/source/utility/prototypes"],
                         height: 32,
                         smallWidth: 28,
                         smallHeight: 28,
+                        //
+                        // To get an initial estimate of where the icons are:
+                        // 1) Find the row, col of the icon.
+                        // 2) The average icon size is: 60.833 pixels high and 57.333 pixels wide.
+                        // 3) Do the math.
+                        // 4) Adjust....
+                        //
                         pushpin: {
                             
                             x: 708,
@@ -161,6 +168,16 @@ define(["NextWave/source/utility/prototypes"],
 
                             x: 707,
                             y: 316
+                        },
+                        save: {
+
+                            x: 184,
+                            y: 252
+                        },
+                        search: {
+
+                            x: 1526,
+                            y: 6
                         }
                     };
                     self.layerPanels = {

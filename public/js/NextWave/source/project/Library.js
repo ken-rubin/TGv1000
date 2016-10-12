@@ -47,6 +47,7 @@ define(["NextWave/source/project/Type",
                             self.data = objectLibrary;
 
                             // Then loop over Types and create children.
+                            self.types = [];
                             for (var i = 0; i < objectLibrary.types.length; i++) {
 
                                 // Get the ith Type.
