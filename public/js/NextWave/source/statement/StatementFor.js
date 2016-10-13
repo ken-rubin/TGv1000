@@ -63,7 +63,11 @@ define(["NextWave/source/utility/prototypes",
                         //         "++"
                         //     )
                         // );
-                        var csfRet = new CodeStatementFor();
+                        var csfRet = new CodeStatementFor(
+                            new CodeExpressionLiteral("..."),
+                            new CodeExpressionLiteral("..."),
+                            new CodeExpressionLiteral("...")
+                        );
 
                         csfRet.addNameInDragConsumate = true;
                         // csfRet.consumateName = strName;

@@ -17,9 +17,10 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/Point",
         "NextWave/source/utility/Size",
         "NextWave/source/manager/Layer",
-        "NextWave/source/manager/Panel",
+        "NextWave/source/utility/Panel",
         "NextWave/source/project/ProjectDialog",
         "NextWave/source/project/Type",
+        "NextWave/source/project/LibraryBuilder",
         "NextWave/source/project/TypeBuilder",
         "NextWave/source/project/PropertyBuilder",
         "NextWave/source/project/EventBuilder",
@@ -30,7 +31,7 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/literal/LiteralList",
         "NextWave/source/methodBuilder/MethodBuilder"
     ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
+    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
 
         try {
 
@@ -180,6 +181,11 @@ define(["NextWave/source/utility/prototypes",
 
                                         throw exceptionRet;
                                     }
+                                    exceptionRet = m_functionAllocateLibraryBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                     exceptionRet = m_functionAllocateTypeBuilder();
                                     if (exceptionRet) {
 
@@ -271,6 +277,11 @@ define(["NextWave/source/utility/prototypes",
 
                                         throw exceptionRet;
                                     }
+                                    exceptionRet = m_functionAllocateLibraryBuilder();
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
                                     exceptionRet = m_functionAllocateTypeBuilder();
                                     if (exceptionRet) {
 
@@ -319,6 +330,7 @@ define(["NextWave/source/utility/prototypes",
                         );
 
                         window.methodBuilder.destroy();
+                        window.libraryBuilder.destroy();
                         window.typeBuilder.destroy();
                         window.propertyBuilder.destroy();
 
@@ -484,12 +496,18 @@ define(["NextWave/source/utility/prototypes",
                                 strActiveCenterPanel = "Method";
                             }
                             window.methodBuilder = null;
+                            window.libraryBuilder = null;
                             window.typeBuilder = null;
                             window.propertyBuilder = null;
 
                             // Clear out the three possible 
                             // payloads for the center panel.
                             var exceptionRet = m_functionAllocateMethodBuilder();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateLibraryBuilder();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -521,19 +539,19 @@ define(["NextWave/source/utility/prototypes",
                     // Clear the list of Statements.
                     self.clearStatements = function() {
 
-                        try {
+                        // try {
 
-                            if (!self.statementsPanel) {
+                        //     if (!self.statementsPanel) {
                                 return null;
-                            }
+                        //     }
 
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.statementsPanel.payload.clearItems();
-                        } catch (e) {
+                        //     // Skip Panel in this object-chain so all panels 
+                        //     // can just be generic instances of the base class.
+                        //     return self.statementsPanel.payload.clearItems();
+                        // } catch (e) {
 
-                            return e;
-                        }
+                        //     return e;
+                        // }
                     };
 
                     // Load up statements from list of statement constructor names.
@@ -663,6 +681,9 @@ define(["NextWave/source/utility/prototypes",
                             if (strMode === "Type") {
 
                                 return m_functionSetTypeBuilderInCenterPanel();
+                            } else if (strMode === "Library") {
+
+                                return m_functionSetLibraryBuilderInCenterPanel();
                             } else if (strMode === "Method") {
 
                                 return m_functionSetMethodBuilderInCenterPanel();
@@ -961,6 +982,33 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
+                    // Allocate LibraryBuilder instance.
+                    var m_functionAllocateLibraryBuilder = function() {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.libraryBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the type builder.
+                            // Store globally.
+                            window.libraryBuilder = new LibraryBuilder();
+                            var exceptionRet = window.libraryBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Allocate type builder instance.
                     var m_functionAllocateTypeBuilder = function() {
 
@@ -1197,6 +1245,7 @@ define(["NextWave/source/utility/prototypes",
                             window.propertyBuilder.visible = false;
                             window.methodBuilder.visible = true;
                             window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Method",
@@ -1217,10 +1266,32 @@ define(["NextWave/source/utility/prototypes",
                             window.propertyBuilder.visible = false;
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = true;
+                            window.libraryBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Type",
                                 window.typeBuilder);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method sets LibraryBuilder in the method panel.
+                    var m_functionSetLibraryBuilderInCenterPanel = function() {
+
+                        try {
+
+                            // Set visible to property builder.
+                            window.eventBuilder.visible = false;
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = true;
+
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Library",
+                                window.libraryBuilder);
                         } catch (e) {
 
                             return e;
@@ -1237,6 +1308,7 @@ define(["NextWave/source/utility/prototypes",
                             window.propertyBuilder.visible = true;
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Property",
@@ -1257,6 +1329,7 @@ define(["NextWave/source/utility/prototypes",
                             window.propertyBuilder.visible = false;
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Event",

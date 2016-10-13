@@ -17,14 +17,16 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/DialogHost",
+    "NextWave/source/utility/Accordion",
+    "NextWave/source/utility/List",
     "NextWave/source/utility/ListHost",
-    "NextWave/source/manager/ListItem",
+    "NextWave/source/utility/ListItem",
     "NextWave/source/project/Library",
     "NextWave/source/project/Type",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, Point, Size, Area, DialogHost, ListHost, ListItem, Library, Type, Method, Property, Event) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, Accordion, List, ListHost, ListItem, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -185,7 +187,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Add the Library's ListItem to the library list.
-                                var exceptionRet = self.dialog.controlObject["librariesList"].list.addItem(libraryIth.listItem);
+                                var exceptionRet = m_listLibraries.addItem(libraryIth.listItem);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -230,14 +232,14 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Add the Type's ListItem to the type list.
-                                exceptionRet = self.dialog.controlObject["typesList"].list.addItem(typeIth.listItem);
+                                exceptionRet = m_listTypes.addItem(typeIth.listItem);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
                                 }
                             }
 
-                            // If there is at least one Library, then select it.
+                            // If there is at least one Type, then select it.
                             if (typeFirst) {
 
                                 return typeFirst.select();
@@ -310,7 +312,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Add the Method's ListItem to the type list.
-                                exceptionRet = self.dialog.controlObject["methodsList"].list.addItem(methodIth.listItem);
+                                exceptionRet = m_listMethods.addItem(methodIth.listItem);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -331,7 +333,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Add the Method's ListItem to the type list.
-                                exceptionRet = self.dialog.controlObject["propertiesList"].list.addItem(propertyIth.listItem);
+                                exceptionRet = m_listProperties.addItem(propertyIth.listItem);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -352,7 +354,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Add the Event's ListItem to the Event list.
-                                exceptionRet = self.dialog.controlObject["eventsList"].list.addItem(eventIth.listItem);
+                                exceptionRet = m_listEvents.addItem(eventIth.listItem);
                                 if (exceptionRet) {
 
                                     return exceptionRet;
@@ -493,7 +495,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear the libraries list.
-                            var exceptionRet = self.dialog.controlObject["librariesList"].list.clearItems();
+                            var exceptionRet = m_listLibraries.clearItems();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -513,7 +515,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear the types List.
-                            var exceptionRet = self.dialog.controlObject["typesList"].list.clearItems();
+                            var exceptionRet = m_listTypes.clearItems();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -543,7 +545,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear the methods List.
-                            return self.dialog.controlObject["methodsList"].list.clearItems();
+                            return m_listMethods.clearItems();
                         } catch (e) {
 
                             return e;
@@ -556,7 +558,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear the properties List.
-                            return self.dialog.controlObject["propertiesList"].list.clearItems();
+                            return m_listProperties.clearItems();
                         } catch (e) {
 
                             return e;
@@ -569,7 +571,39 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Clear the events List.
-                            return self.dialog.controlObject["eventsList"].list.clearItems();
+                            return m_listEvents.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Build and return a collection of types.
+                    self.generateJavaScript = function () {
+
+                        // Allocate an object to return.
+                        var objectRet = {};
+
+                        // Allocate array which holds module strings.
+                        objectRet.types = [];
+
+                        // Always just relative to a comic.
+                        var exceptionRet = self.currentComic.generateJavaScript(objectRet.types);
+                        if (exceptionRet) {
+
+                            throw exceptionRet;
+                        }
+
+                        return objectRet;
+                    };
+
+                    // Loop down to save each method of each type.
+                    self.save = function () {
+
+                        try {
+
+                            // Always relative to the current comic (for now...).
+                            return self.currentComic.save();
                         } catch (e) {
 
                             return e;
@@ -605,16 +639,9 @@ define(["NextWave/source/utility/prototypes",
                                     type: "GlyphHost",
                                     constructorParameterString: "'addNew'",
                                     clickHandler: m_functionAddLibrary,
-                                    xType: "callback",
-                                    x: function (areaMaximal) {
-
-                                        return areaMaximal.extent.width - settings.general.margin - settings.glyphs.smallWidth;
-                                    },
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return 2 * settings.general.margin;
-                                    },
+                                    xType: "reserve",
+                                    x: settings.general.margin + settings.glyphs.smallWidth,
+                                    y: 2 * settings.general.margin,
                                     width: settings.glyphs.smallWidth,
                                     height: settings.glyphs.smallHeight
                                 },
@@ -622,11 +649,12 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "false",
-                                    x: 4 * settings.general.margin,
-                                    y: settings.general.margin + 1 * settings.dialog.lineHeight,
-                                    width: 4 * settings.general.margin,
+                                    x: 2 * settings.general.margin,
+                                    y: settings.general.margin + 
+                                        settings.dialog.lineHeight,
+                                    width: 2 * settings.general.margin,
                                     widthType: "reserve",
-                                    height: 1.25 * settings.dialog.lineHeight,
+                                    height: settings.dialog.lineHeight + 2 * settings.general.margin,
                                     items:[]
                                 },
                                 typesLabel: {
@@ -634,9 +662,9 @@ define(["NextWave/source/utility/prototypes",
                                     type: "Label",
                                     text: "Types",
                                     x: settings.general.margin,
-                                    y: settings.general.margin + 2.25 * settings.dialog.lineHeight,
-                                    width: 3 * settings.general.margin + settings.glyphs.smallWidth,
+                                    y: 4 * settings.general.margin + 2 * settings.dialog.lineHeight,
                                     widthType: "reserve",
+                                    width: 3 * settings.general.margin + settings.glyphs.smallWidth,
                                     height: settings.dialog.lineHeight
                                 },
                                 addTypeGlyph: {
@@ -644,16 +672,9 @@ define(["NextWave/source/utility/prototypes",
                                     type: "GlyphHost",
                                     constructorParameterString: "'addNew'",
                                     clickHandler: m_functionAddType,
-                                    xType: "callback",
-                                    x: function (areaMaximal) {
-
-                                        return areaMaximal.extent.width - settings.general.margin - settings.glyphs.smallWidth;
-                                    },
-                                    yType: "callback",
-                                    y: function (areaMaximal) {
-
-                                        return 2 * settings.general.margin + 2.25 * settings.dialog.lineHeight;
-                                    },
+                                    xType: "reserve",
+                                    x: settings.general.margin + settings.glyphs.smallWidth,
+                                    y: 5 * settings.general.margin + 2 * settings.dialog.lineHeight,
                                     width: settings.glyphs.smallWidth,
                                     height: settings.glyphs.smallHeight
                                 },
@@ -661,17 +682,51 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "true",
-                                    x: 8 * settings.general.margin,
-                                    y: settings.general.margin + 3.25 * settings.dialog.lineHeight,
-                                    width: 8 * settings.general.margin,
+                                    x: 2 * settings.general.margin,
+                                    y: 4 * settings.general.margin + 3 * settings.dialog.lineHeight,
                                     widthType: "reserve",
-                                    heightType: "callback",
-                                    height: function (areaMaximal) {
-
-                                        return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
-                                    },
+                                    width: 2 * settings.general.margin,
+                                    height: 3 * settings.dialog.lineHeight + 2 * settings.general.margin,
                                     items:[]
                                 },
+                                detailLabel: {
+
+                                    type: "Label",
+                                    text: "Details",
+                                    x: settings.general.margin,
+                                    y: 6 * settings.general.margin + 6 * settings.dialog.lineHeight,
+                                    widthType: "reserve",
+                                    width: 2 * settings.general.margin,
+                                    height: settings.dialog.lineHeight
+                                },
+                                typeAccordion: {
+
+                                    type: "Accordion",
+                                    x: 3 * settings.general.margin,
+                                    y: 7 * settings.general.margin + 7 * settings.dialog.lineHeight,
+                                    widthType: "reserve",
+                                    width: 4 * settings.general.margin,
+                                    heightType: "reserve",
+                                    height: 8 * settings.general.margin + 7 * settings.dialog.lineHeight,
+                                    title: "Details",
+                                    sections: [{
+
+                                        name: "methods",
+                                        title: "Methods",
+                                        addGlyphClickHandler: m_functionAddMethod
+                                    }, {
+
+                                        name: "properties",
+                                        title: "Properties",
+                                        addGlyphClickHandler: m_functionAddProperty
+                                    }, {
+
+                                        name: "events",
+                                        title: "Events",
+                                        addGlyphClickHandler: m_functionAddEvent
+                                    }]
+                                }
+                                /*,
                                 detailLabel: {
 
                                     type: "Label",
@@ -848,11 +903,27 @@ define(["NextWave/source/utility/prototypes",
                                         return (areaMaximal.extent.height - 7.25 * settings.dialog.lineHeight - 2 * settings.general.margin) / 4;
                                     },
                                     items:[]
-                                }
+                                }*/
                             });
                             if (exceptionRet) {
 
                                 return exceptionRet;
+                            }
+
+                            // Save controls:
+                            m_listLibraries = self.dialog.controlObject["librariesList"].list || new List();
+                            m_listTypes = self.dialog.controlObject["typesList"].list || new List();
+                            var accordianType = self.dialog.controlObject["typeAccordion"];
+                            if (accordianType) {
+
+                                m_listMethods = accordianType.methods || new List();
+                                m_listProperties = accordianType.properties || new List();
+                                m_listEvents = accordianType.events || new List();
+                            } else {
+
+                                m_listMethods = new List();
+                                m_listProperties = new List();
+                                m_listEvents = new List();
                             }
 
                             // Because it is!
@@ -911,7 +982,11 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = libraryNew.create({
 
                                 name: strUnique,
-                                types: []
+                                types: [],
+                                ownedByUserId: parseInt(g_profile["userId"], 10),
+                                isSystemLibrary: false,
+                                isBaseLibrary: false,
+                                isAppLibrary: false
                             });
                             if (exceptionRet) {
 
@@ -919,7 +994,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add the Library's ListItem to the library list.
-                            exceptionRet = self.dialog.controlObject["librariesList"].list.addItem(libraryNew.listItem);
+                            exceptionRet = m_listLibraries.addItem(libraryNew.listItem);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -927,9 +1002,10 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the library to the current comic.
                             self.currentComic.libraries.push(libraryNew);
+                            self.currentComic.data.libraries.push(libraryNew.data);
 
                             // Scroll to the end of the list.
-                            exceptionRet = self.dialog.controlObject["librariesList"].list.scrollToEndOfList();
+                            exceptionRet = m_listLibraries.scrollToEndOfList();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -966,7 +1042,8 @@ define(["NextWave/source/utility/prototypes",
                                 name: strUnique,
                                 methods: [],
                                 properties: [],
-                                events: []
+                                events: [],
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -974,7 +1051,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add the Type's ListItem to the type list.
-                            exceptionRet = self.dialog.controlObject["typesList"].list.addItem(typeNew.listItem);
+                            exceptionRet = m_listTypes.addItem(typeNew.listItem);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -982,14 +1059,30 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Type to the current Library.
                             self.currentLibrary.types.push(typeNew);
+                            self.currentLibrary.data.types.push(typeNew.data);
 
                             // Scroll to the end of the list.
-                            exceptionRet = self.dialog.controlObject["typesList"].list.scrollToEndOfList();
+                            exceptionRet = m_listTypes.scrollToEndOfList();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
+                            // Select the Type, but only to allow the method to be added to it.
+                            exceptionRet = typeNew.select();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Add constructor (construct).
+                            exceptionRet = m_functionAddMethod("constuct");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select the Type, this time for the GUI.
                             return typeNew.select();
                         } catch (e) {
 
@@ -998,7 +1091,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Invoked when the add Method icon is clicked.
-                    var m_functionAddMethod = function () {
+                    var m_functionAddMethod = function (strName) {
 
                         try {
 
@@ -1008,17 +1101,32 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
-                            // Generate an unique name.
-                            var strUnique = window.manager.getUniqueName("NewMethod",
-                                self.currentType.methods,
-                                "data",
-                                "name");
+                            // If substr is not defined, then undefined out the parameter.
+                            if (!strName.substr) {
+
+                                strName = undefined;
+                            }
+
+                            // Set unique to name.
+                            var strUnique = strName;
+
+                            // If no name specified, generate an unique sequencial one.
+                            if (strUnique === undefined) {
+
+                                strUnique = window.manager.getUniqueName("NewMethod",
+                                    self.currentType.methods,
+                                    "data",
+                                    "name");
+                            }
 
                             // Create the new Method.
                             var methodNew = new Method(self.currentType);
                             var exceptionRet = methodNew.create({
 
-                                name: strUnique
+                                name: strUnique,
+                                ownedByUserId: parseInt(g_profile["userId"], 10),
+                                parameters: [],
+                                statements: []
                             });
                             if (exceptionRet) {
 
@@ -1026,7 +1134,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add the Method's ListItem to the method list.
-                            exceptionRet = self.dialog.controlObject["methodsList"].list.addItem(methodNew.listItem);
+                            exceptionRet = m_listMethods.addItem(methodNew.listItem);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1034,15 +1142,23 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Method to the current Type.
                             self.currentType.methods.push(methodNew);
+                            self.currentType.data.methods.push(methodNew.data);
 
                             // Scroll to the end of the list.
-                            exceptionRet = self.dialog.controlObject["methodsList"].list.scrollToEndOfList();
+                            exceptionRet = m_listMethods.scrollToEndOfList();
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            return methodNew.select();
+                            // If no name specified, select the method.
+                            if (strName === undefined) {
+
+                                return methodNew.select();
+                            } else {
+
+                                return null;
+                            }
                         } catch (e) {
 
                             return e;
@@ -1070,7 +1186,8 @@ define(["NextWave/source/utility/prototypes",
                             var propertyNew = new Property(self.currentType);
                             var exceptionRet = propertyNew.create({
 
-                                name: strUnique
+                                name: strUnique,
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -1078,7 +1195,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add the Property's ListItem to the property list.
-                            exceptionRet = self.dialog.controlObject["propertiesList"].list.addItem(propertyNew.listItem);
+                            exceptionRet = m_listProperties.addItem(propertyNew.listItem);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1086,9 +1203,10 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Property to the current Type.
                             self.currentType.properties.push(propertyNew);
+                            self.currentType.data.properties.push(propertyNew.data);
 
                             // Scroll to the end of the list.
-                            exceptionRet = self.dialog.controlObject["propertiesList"].list.scrollToEndOfList();
+                            exceptionRet = m_listProperties.scrollToEndOfList();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1122,7 +1240,8 @@ define(["NextWave/source/utility/prototypes",
                             var eventNew = new Event(self.currentType);
                             var exceptionRet = eventNew.create({
 
-                                name: strUnique
+                                name: strUnique,
+                                ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {
 
@@ -1130,7 +1249,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add the Event's ListItem to the event list.
-                            exceptionRet = self.dialog.controlObject["eventsList"].list.addItem(eventNew.listItem);
+                            exceptionRet = m_listEvents.addItem(eventNew.listItem);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1138,9 +1257,10 @@ define(["NextWave/source/utility/prototypes",
 
                             // Add to the Event to the current Type.
                             self.currentType.events.push(eventNew);
+                            self.currentType.data.events.push(eventNew.data);
 
                             // Scroll to the end of the list.
-                            exceptionRet = self.dialog.controlObject["eventsList"].list.scrollToEndOfList();
+                            exceptionRet = m_listEvents.scrollToEndOfList();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1158,6 +1278,12 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
+                    // Lists from dialog.
+                    var m_listLibraries = null;
+                    var m_listTypes = null;
+                    var m_listMethods = null;
+                    var m_listProperties = null;
+                    var m_listEvents = null;
                 } catch (e) {
 
                     alert(e.message);

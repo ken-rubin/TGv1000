@@ -152,6 +152,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#MappingImage").css("display","none");
 							}
 
+							if (m_arrayAvailProjTypes.includes(6)) {
+								$("#EmptyImage").attr("src", resourceHelper.toURL("images", null, null, "emptyProject.png"));
+								$("#EmptyImage").click(function(){m_functionProjectTypeSelected("Empty");});
+							} else {
+								$("#EmptyImage").css("display","none");
+							}
+
 							if (manager.userAllowedToCreateEditPurchProjs) {
 								$("#PrivilegedUsersDiv").css("display", "block");
 								$("#ContinueBtn").prop('disabled', true);
@@ -412,6 +419,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										case "Mapping":
 											jq = $("#MappingImage");
 											break;
+										case "Empty":
+											jq = $("#EmptyImage");
+											break;
 									}
 									jq.css("border", "");
 								}
@@ -436,6 +446,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										break;
 									case "Mapping":
 										jq = $("#MappingImage");
+										break;
+									case "Empty":
+										jq = $("#EmptyImage");
 										break;
 								}
 								jq.css("border", "5px solid red");
@@ -479,29 +492,29 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var exceptionRet = client.openProjectFromDB(
 								// 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
-								["Game", "Console", "Web Site", "HoloLens", "Mapping"].indexOf(m_projectType) + 1, 
-								function(projectData){	// callback is used to set fields after async fetch of empty-ish core project from db.
+								["Game", "Console", "Web Site", "HoloLens", "Mapping", "Empty"].indexOf(m_projectType) + 1, 
+								function(){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
-									projectData.id = 0;	// just to be sure it doesn't overwrite a core project
-									projectData.isCoreProject = false;
+									client.project.id = 0;	// just to be sure it doesn't overwrite a core project
+									client.project.isCoreProject = false;
 
 									// We could also do these things that used to be done in the BO, but we aren't--at least for now.
 					                        //     comicIth.id = 0; 
 	                                        //     method.id = 0; AND property.id = 0; AND event.id = 0;
 
-									projectData.name = strProjectName;
-									projectData.tags = strProjectTags;
-									projectData.description = strProjectDescription;
-									projectData.imageId = m_imageId;
+									client.project.name = strProjectName;
+									client.project.tags = strProjectTags;
+									client.project.description = strProjectDescription;
+									client.project.imageId = m_imageId;
 									if (m_imageId) {
-										projectData.altImagePath = '';
+										client.project.altImagePath = '';
 									}
-									projectData.ownedByUserId = parseInt(g_profile["userId"], 10);
+									client.project.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-									projectData.specialProjectData = {
+									client.project.specialProjectData = {
 										userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
-										userCanWorkWithSystemTypesAndAppBaseTypes: manager.userCanWorkWithSystemTypesAndAppBaseTypes,
+										userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
 										ownedByUser: false,
 										othersProjects: false,
 										normalProject: m_bNormalProject,
@@ -516,7 +529,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									if (m_bClassProject) {
 
-										projectData.isClass = true;
+										client.project.isClass = true;
 
 										// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -548,7 +561,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
 										var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
-										projectData.specialProjectData.classData = {
+										client.project.specialProjectData.classData = {
 											id: 0,
 											active: false,
 											classDescription: strProjectDescription,
@@ -573,7 +586,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 									} else if (m_bProductProject) {
 
-										projectData.isProduct = true;
+										client.project.isProduct = true;
 
 										// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
 										var strLevel = $("#Level option:selected").text();
@@ -584,7 +597,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 											dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
 										}
 
-										projectData.specialProjectData.productData = {
+										client.project.specialProjectData.productData = {
 											id: 0,
 											active: false,
 											productDescription: strProjectDescription,
@@ -595,7 +608,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										};
 									} else if (m_bOnlineClassProject) {
 
-										projectData.isOnlineClass = true;
+										client.project.isOnlineClass = true;
 
 										// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
 										var strInstructorFirst = $("#InstructorFirst").val().trim();
@@ -619,7 +632,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										}
 										var strNotes = $("#Notes").val().trim();
 
-										projectData.specialProjectData.onlineClassData = {
+										client.project.specialProjectData.onlineClassData = {
 											id: 0,
 											active: false,
 											classDescription: strProjectDescription,
@@ -635,7 +648,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										};
 									}
 
-						    		exceptionRet = manager.loadProject(projectData);
+						    		exceptionRet = manager.loadProject(client.project);
 						    		if (exceptionRet) { throw exceptionRet; }
 
 									client.setBrowserTabAndBtns();

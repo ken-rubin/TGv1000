@@ -32,6 +32,12 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(DialogHost);
 
                     ///////////////////////
+                    // Public fields.
+
+                    // Event being edited.
+                    self.currentEvent = null;
+
+                    ///////////////////////
                     // Public methods.
 
                     // Attach instance to DOM and initialize state.
@@ -86,22 +92,24 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.saveEventName !== localSelf.getText()) {
 
-                                                // Extract the context type from the host.
-                                                var typeContext = localSelf.dialog.host.typeContext;
+                                                // Generate an unique name.
+                                                var strUnique = window.manager.getUniqueName(localSelf.getText(),
+                                                    self.currentEvent.owner.events,
+                                                    "data",
+                                                    "name");
 
-                                                // Ensure the value is unique.
-                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.getText(),
-                                                    typeContext.events.parts,
-                                                    "name"));
+                                                // Update GUI.
+                                                var exceptionRet = localSelf.setText(strUnique);
                                                 if (exceptionRet) {
 
                                                     throw exceptionRet;
                                                 }
 
-                                                // Update.
-                                                window.manager.editEventName(typeContext,
-                                                    localSelf.saveEventName,
-                                                    localSelf.getText());
+                                                // Update the other GUI (in the project dialog).
+                                                self.currentEvent.listItem.name = strUnique;
+
+                                                // Update data too.
+                                                self.currentEvent.data.name = strUnique;
                                             }
                                         } catch (e) {
 
@@ -135,11 +143,8 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Get the current type.
-                                            var eventContext = localSelf.dialog.host.eventContext;
-
-                                            // Update it description.
-                                            eventContext.stowage.description = localSelf.getText();
+                                            // Update Event's description.
+                                            self.currentEvent.data.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -180,26 +185,26 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Load Event into Event builder.
-                    self.loadEvent = function (type, eventPart) {
+                    self.loadEvent = function (eventPart) {
 
                         try {
 
-                            // With no method currently selected, clear out namesPanel.
-                            //window.manager.panelLayer.clearNames();
+                            // Store the context.
+                            self.currentEvent = eventPart;
 
                             // Ensure the event has the requisit attributes.
-                            if (!eventPart.stowage) {
+                            if (!self.currentEvent.data) {
 
-                                eventPart.stowage = {};
+                                self.currentEvent.data = {};
                             }
-                            if (!eventPart.stowage.description) {
+                            if (!self.currentEvent.data.name) {
 
-                                eventPart.stowage.description = "[description goes here]";
+                                self.currentEvent.data.name = "[name goes here]";
                             }
+                            if (!self.currentEvent.data.description) {
 
-                            // Store the context.
-                            self.typeContext = type;
-                            self.eventContext = eventPart;
+                                self.currentEvent.data.description = "[description goes here]";
+                            }
 
                             // Update controls.
 
@@ -208,7 +213,7 @@ define(["NextWave/source/utility/prototypes",
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
                             //      for all users: x, y, width, height of system type VisualObject.
                             if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
-                                type.stowage.typeTypeId > 1) {
+                                self.currentEvent.owner.data.typeTypeId > 1) {
 
                                 bProtected = true;
                             }
@@ -217,7 +222,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(eventPart.name);
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentEvent.data.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -227,7 +232,7 @@ define(["NextWave/source/utility/prototypes",
                             // Protect against editing property description in these cases:
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
                             if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && 
-                                type.stowage.typeTypeId > 1) {
+                                self.currentEvent.owner.data.typeTypeId > 1) {
 
                                 bProtected = true;
                             }
@@ -236,7 +241,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return self.dialog.controlObject["descriptionEdit"].setText(eventPart.stowage.description);
+                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentEvent.data.description);
                         } catch (e) {
 
                             return e;

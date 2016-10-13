@@ -14,11 +14,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
     "NextWave/source/manager/Layer",
-    "NextWave/source/manager/ListItem",
-    "NextWave/source/type/Type",
-    "NextWave/source/type/Method",
-    "NextWave/source/type/Property",
-    "NextWave/source/type/Event",
+    "NextWave/source/utility/ListItem",
+    "NextWave/source/project/Type",
+    "NextWave/source/project/Method",
+    "NextWave/source/project/Property",
+    "NextWave/source/project/Event",
     "NextWave/source/name/Name",
     "NextWave/source/expression/Expression",
     "NextWave/source/literal/Literal",
@@ -309,7 +309,7 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.parameterDragTarget.addNameInDragConsumate) {
 
                                         self.parameterDragTarget.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addName(self.parameterDragTarget.consumateName);
+                                        var exceptionRet = null//window.manager.addName(self.parameterDragTarget.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
@@ -332,7 +332,7 @@ define(["NextWave/source/utility/prototypes",
                                     if (self.dragTargets.addNameInDragConsumate) {
 
                                         self.dragTargets.addNameInDragConsumate = false;
-                                        var exceptionRet = window.manager.addName(self.dragTargets.consumateName);
+                                        var exceptionRet = null;//window.manager.addName(self.dragTargets.consumateName);
                                         if (exceptionRet) {
 
                                             return e;
@@ -341,7 +341,7 @@ define(["NextWave/source/utility/prototypes",
                                     // But for now....
                                     } else if (self.dragTargets instanceof CodeStatementFor) {
 
-                                        var exceptionRet = window.manager.addName(self.dragTargets.initialization.payload.lHS.payload.payload.payload.text);
+                                        var exceptionRet = null;//window.manager.addName(self.dragTargets.initialization.payload.lHS.payload.payload.payload.text);
                                         if (exceptionRet) {
 
                                             return e;

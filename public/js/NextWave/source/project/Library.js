@@ -11,7 +11,7 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/project/Type",
-    "NextWave/source/manager/ListItem"], 
+    "NextWave/source/utility/ListItem"], 
 	function (Type, ListItem) {
 	
 		try {
@@ -64,7 +64,7 @@ define(["NextWave/source/project/Type",
 
                             // Generate ListItem for this instance.
                             self.listItem = new ListItem(self.data.name);
-                            self.listItem.clickHandler = m_functionClickHandler;
+                            self.listItem.clickHandler = self.select;
                             self.listItem.deleteHandler = m_functionDeleteHandler;
                             self.listItem.owner = self;
 
@@ -76,11 +76,41 @@ define(["NextWave/source/project/Type",
                     };
 
                     // Select this Library.
-                    self.select = function () {
+                    self.select = function (objectReference) {
 
-                        // Set the ListItem to selected.
-                        self.listItem.selected = true;
-                        return m_functionClickHandler({});
+                        try {
+
+                            // Clear the highlight in all the 
+                            // other Libraries of the owner.
+                            var exceptionRet = self.owner.unselectAllLibraries();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Set the ListItem to selected.
+                            self.listItem.selected = true;
+
+                            // Set the current library.
+                            var exceptionRet = window.projectDialog.setCurrentLibrary(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up this library into the ProjectDialog.
+                            exceptionRet = window.projectDialog.loadLibrary(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select into gui.
+                            return window.manager.selectLibrary(self);
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // De-select this Library.
@@ -115,39 +145,58 @@ define(["NextWave/source/project/Type",
                         }
                     };
 
-                    ////////////////////////////
-                    // Private methods.
-
-                    // Invoked when the mouse is clicked over this instance.
-                    var m_functionClickHandler = function (objectReference) {
+                    // Build and return a collection of types.
+                    self.generateJavaScript = function (arrayTypes) {
 
                         try {
 
-                            // Clear the highlight in all the 
-                            // other Libraries of the owner.
-                            var exceptionRet = self.owner.unselectAllLibraries();
-                            if (exceptionRet) {
+                            // Loop over types and generate their module-strings.
+                            for (var i = 0; i < self.types.length; i++) {
 
-                                return exceptionRet;
+                                // Get the ith Type.
+                                var typeIth = self.types[i];
+
+                                // Generate it.
+                                var exceptionRet = typeIth.generateJavaScript(arrayTypes);
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
                             }
-
-                            // Set the ListItem to selected.
-                            self.listItem.selected = true;
-
-                            // Set the current library.
-                            var exceptionRet = window.projectDialog.setCurrentLibrary(self);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Load up this library into the ProjectDialog.
-                            return window.projectDialog.loadLibrary(self);
+                            return null;
                         } catch (e) {
 
                             return e;
                         }
                     };
+
+                    // Loop down to save each method of each type.
+                    self.save = function () {
+
+                        try {
+
+                            // Loop over types and save their methods.
+                            for (var i = 0; i < self.types.length; i++) {
+
+                                // Get the ith Type.
+                                var typeIth = self.types[i];
+
+                                // Generate it.
+                                var exceptionRet = typeIth.save();
+                                if (exceptionRet) {
+
+                                    return exceptionRet;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
 
                     // Invoked when the mouse is clicked over this instance's delete icon.
                     var m_functionDeleteHandler = function (objectReference) {

@@ -14,7 +14,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
-    "NextWave/source/manager/ListItem"],
+    "NextWave/source/utility/ListItem"],
     function (prototypes, settings, Point, Size, Area, ListItem) {
 
         try {
@@ -56,7 +56,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "List: Instance already created!" };
+                                self.clearItems();
                             }
 
                             // Call down inheritance chain.

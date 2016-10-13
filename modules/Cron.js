@@ -85,7 +85,14 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 												async.eachSeries(passOn.classes,
 													function(classIth, cb) {
 
-														var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.comicProjectId=" + classIth.baseProjectId + " and p.isClass=0;";
+														// classIth has these fields:
+														// From project: id.
+														// From classes: baseProjectId, schedule, active, facility, address, room, city, state, zip, instructorPhone.
+
+														// Find users owning projects that are linked to classIth.
+
+/* TOXXX DONE											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.comicProjectId=" + classIth.baseProjectId + " and p.isClass=0;";*/
+            											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.id in (" + self.dbname + "getProjectsLinkedToComic0OfProject(" + classIth.baseProjectId + ")) and p.isClass=0;";
 														sql.execute(strQuery,
 															function(rows) {
 
@@ -208,7 +215,8 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 												async.eachSeries(passOn.classes,
 													function(classIth, cb) {
 
-														var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.comicProjectId=" + classIth.baseProjectId + " and p.isClass=0;";
+/* TOXXX DONE */										var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.comicProjectId=" + classIth.baseProjectId + " and p.isClass=0;";
+            											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.id in (" + self.dbname + "getProjectsLinkedToComic0OfProject(" + classIth.baseProjectId + ")) and p.isClass=0;";
 														sql.execute(strQuery,
 															function(rows) {
 

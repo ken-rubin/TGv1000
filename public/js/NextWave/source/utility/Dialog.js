@@ -18,9 +18,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Edit",
     "NextWave/source/utility/GlyphHost",
     "NextWave/source/utility/ListHost",
+    "NextWave/source/utility/Accordion",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, GlyphHost, ListHost, ParameterListHost, StatementListHost) {
+    function (prototypes, settings, Point, Size, Area, Label, Edit, GlyphHost, ListHost, Accordion, ParameterListHost, StatementListHost) {
 
         try {
 
@@ -327,6 +328,9 @@ define(["NextWave/source/utility/prototypes",
                                 } else if (controlIth.configuration.xType === "callback") {
 
                                     dX += controlIth.configuration.x(areaMaximal);
+                                } else if (controlIth.configuration.xType === "reserve") {
+
+                                    dX += areaMaximal.extent.width - controlIth.configuration.x;
                                 }
 
                                 var dY = self.position.location.y;
@@ -337,6 +341,9 @@ define(["NextWave/source/utility/prototypes",
                                 } else if (controlIth.configuration.yType === "callback") {
 
                                     dY += controlIth.configuration.y(areaMaximal);
+                                } else if (controlIth.configuration.yType === "reserve") {
+
+                                    dY += areaMaximal.extent.height - controlIth.configuration.y;
                                 }
 
                                 var dWidth = 0;

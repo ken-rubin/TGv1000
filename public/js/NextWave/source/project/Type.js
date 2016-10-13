@@ -13,7 +13,7 @@
 define(["NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event",
-    "NextWave/source/manager/ListItem"], 
+    "NextWave/source/utility/ListItem"], 
 	function (Method, Property, Event, ListItem) {
 	
 		try {
@@ -102,7 +102,7 @@ define(["NextWave/source/project/Method",
 
                             // Generate ListItem for this instance.
                             self.listItem = new ListItem(self.data.name);
-                            self.listItem.clickHandler = m_functionClickHandler;
+                            self.listItem.clickHandler = self.select;
                             self.listItem.deleteHandler = m_functionDeleteHandler;
                             self.listItem.owner = self;
 
@@ -114,11 +114,41 @@ define(["NextWave/source/project/Method",
                     };
 
                     // Select this Type.
-                    self.select = function () {
+                    self.select = function (objectReference) {
 
-                        // Set the ListItem to selected.
-                        self.listItem.selected = true;
-                        return m_functionClickHandler({});
+                        try {
+
+                            // Clear the highlight in all the 
+                            // other Types of the owner.
+                            var exceptionRet = self.owner.unselectAllTypes();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Set the ListItem to selected.
+                            self.listItem.selected = true;
+
+                            // Set the current Type.
+                            var exceptionRet = window.projectDialog.setCurrentType(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up this library into the ProjectDialog.
+                            exceptionRet = window.projectDialog.loadType(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Select into gui.
+                            return window.manager.selectType(self);
+                        } catch (e) {
+
+                            return e;
+                        }
                     };
 
                     // Unselect this Type.
@@ -182,39 +212,139 @@ define(["NextWave/source/project/Method",
                         }
                     };
 
-                    ////////////////////////////
-                    // Private methods.
-
-                    // Invoked when the mouse is clicked over this instance.
-                    var m_functionClickHandler = function (objectReference) {
+                    // Generates JavaScript string module for this Type.
+                    self.generateJavaScript = function (arrayTypes) {
 
                         try {
 
-                            // Clear the highlight in all the 
-                            // other Types of the owner.
-                            var exceptionRet = self.owner.unselectAllTypes();
-                            if (exceptionRet) {
+                            // Fix base type name because it still has spaces?!
+                            // TODO: remove this and fix db.
+                            self.data.name = self.data.name.replace(/ /g, "");
 
-                                return exceptionRet;
+                            // Build the constructor function for the type.
+                            var strConstructorFunction = //"debugger;\n\n" +
+                                "window.tg." + self.owner.data.name + "." + self.data.name + " = function () {\n\n" +
+                                "    // Closure.\n" +
+                                "    var self = this;\n\n";
+
+                            // Call parent constructor.
+                            if (self.data.baseTypeName) {
+
+                                // Fix base type name because it still has spaces?!
+                                // TODO: remove this and fix db.
+                                self.data.baseTypeName = self.data.baseTypeName.replace(/ /g, "");
+
+                                strConstructorFunction += 
+                                    "    // Inherit from Base.\n" +
+                                    "    self.inherits(window.tg." + self.data.baseTypeLibraryName + "." + self.data.baseTypeName + ");\n\n";                            
+                            }
+                            strConstructorFunction += 
+                                "    // Register with system.\n" +
+                                "    if (arguments.length) { window.tg.instances.push(self); }\n\n";
+
+                            // Add Properties.
+                            if (self.properties &&
+                                self.properties.legnth > 0) {
+
+                                strConstructorFunction += 
+                                    "\n" +
+                                    "    /* Properties */\n\n";
+
+                                // Loop over all Properties
+                                for (var i = 0; i < self.properties.length; i++) {
+
+                                    // Add it to the result object.
+                                    strConstructorFunction += self.properties[i].generateJavaScript() + "\n";
+                                }
                             }
 
-                            // Set the ListItem to selected.
-                            self.listItem.selected = true;
+                            // Add Events.
+                            if (self.events &&
+                                self.events.length > 0) {
 
-                            // Set the current Type.
-                            var exceptionRet = window.projectDialog.setCurrentType(self);
-                            if (exceptionRet) {
+                                strConstructorFunction += 
+                                    "\n" +
+                                    "    /* Events */\n\n";
 
-                                return exceptionRet;
+                                // Loop over all Events
+                                for (var i = 0; i < self.events.length; i++) {
+
+                                    // Add it to the result object.
+                                    strConstructorFunction += self.events[i].generateJavaScript() + "\n";
+                                }
                             }
 
-                            // Load up this library into the ProjectDialog.
-                            return window.projectDialog.loadType(self);
+                            // Add Methods.
+                            if (self.methods &&
+                                self.methods.length > 0) {
+
+                                strConstructorFunction += 
+                                    "\n" +
+                                    "    /* Methods */\n\n";
+
+                                // Loop over all Methods
+                                for (var i = 0; i < self.methods.length; i++) {
+
+                                    // Add it to the result object.
+                                    strConstructorFunction += self.methods[i].generateJavaScript() + "\n";
+                                }
+                            }
+
+                            // Invoke constructor--but only if this == the type and an argument is passed.
+                            strConstructorFunction += 
+                                "    // Invoke construct-chain.\n" +
+                                "    if ((this instanceof window.tg." + self.owner.data.name + "." + self.data.name + ") && (arguments.length)) { this.construct(); }\n"
+
+                            strConstructorFunction += "};\n";
+
+                            // Wire the prototype chain.
+                            if (self.data.baseTypeName) {
+
+                                strConstructorFunction += 
+                                    "// Complete inheritance from base.\n" +
+                                    "window.tg." + self.owner.data.name + "." + self.data.name + ".inheritsFrom(window.tg." + self.data.baseTypeLibraryName + "." + self.data.baseTypeName + ");\n\n";                            
+                            }
+
+                            // Stow.
+                            arrayTypes.push(strConstructorFunction);
+
+                            return null;
                         } catch (e) {
 
                             return e;
                         }
                     };
+
+                    // Update all methods--other "types" update "in-place".
+                    self.save = function () {
+
+                        try {
+
+                            // If there are methods, then save them up.
+                            if (self.methods &&
+                                self.methods.length > 0) {
+
+                                // Loop over each method and caue it to save itself.
+                                for (var i = 0; i < self.methods.length; i++) {
+
+                                    // Add it to the result object.
+                                    var exceptionRet = self.methods[i].save();
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                }
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
 
                     // Invoked when the mouse is clicked over this instance's delete icon.
                     var m_functionDeleteHandler = function (objectReference) {

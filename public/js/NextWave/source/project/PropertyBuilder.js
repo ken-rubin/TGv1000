@@ -32,6 +32,12 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(DialogHost);
 
                     ///////////////////////
+                    // Public fields.
+
+                    // Property being edited.
+                    self.currentProperty = null;
+
+                    ///////////////////////
                     // Public methods.
 
                     // Attach instance to DOM and initialize state.
@@ -86,22 +92,24 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.savePropertyName !== localSelf.getText()) {
 
-                                                // Extract the context type from the host.
-                                                var typeContext = localSelf.dialog.host.typeContext;
+                                                // Generate an unique name.
+                                                var strUnique = window.manager.getUniqueName(localSelf.getText(),
+                                                    self.currentProperty.owner.properties,
+                                                    "data",
+                                                    "name");
 
-                                                // Ensure the value is unique.
-                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.getText(),
-                                                    typeContext.properties.parts,
-                                                    "name"));
+                                                // Update GUI.
+                                                var exceptionRet = localSelf.setText(strUnique);
                                                 if (exceptionRet) {
 
                                                     throw exceptionRet;
                                                 }
 
-                                                // Update.
-                                                window.manager.editPropertyName(typeContext,
-                                                    localSelf.savePropertyName,
-                                                    localSelf.getText());
+                                                // Update the other GUI.
+                                                self.currentProperty.listItem.name = strUnique;
+
+                                                // Update data too.
+                                                self.currentProperty.data.name = strUnique;
                                             }
                                         } catch (e) {
 
@@ -159,11 +167,8 @@ define(["NextWave/source/utility/prototypes",
                                                 }
                                             } else {
 
-                                                // Save value.                                                                                            // Get the current type.
-                                                var propertyContext = localSelf.dialog.host.propertyContext;
-
                                                 // Update it description.
-                                                propertyContext.stowage.typeName = localSelf.getText();
+                                                self.currentProperty.data.typeName = localSelf.getText();
                                             }
                                         } catch (e) {
 
@@ -197,11 +202,8 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Get the current type.
-                                            var propertyContext = localSelf.dialog.host.propertyContext;
-
                                             // Update it description.
-                                            propertyContext.stowage.description = localSelf.getText();
+                                            self.currentProperty.data.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -242,31 +244,30 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Load Property into property builder.
-                    self.loadProperty = function (type, property) {
+                    self.loadProperty = function (property) {
 
                         try {
 
-                            // With no method currently selected, clear out namesPanel.
-                            window.manager.panelLayer.clearNames();
+                            // Store the context.
+                            self.currentProperty = property;
 
                             // Ensure the type has the requisit attributes.
-                            if (!property.stowage) {
+                            if (!self.currentProperty.data) {
 
-                                property.stowage = {};
+                                self.currentProperty.data = {};
                             }
-                            if (!property.stowage.typeName) {
+                            if (!self.currentProperty.data.name) {
 
-                                property.stowage.typeName = "Number";
+                                self.currentProperty.data.name = "[name]";
                             }
-                            if (!property.stowage.description) {
+                            if (!self.currentProperty.data.typeName) {
 
-                                property.stowage.description = "[description goes here]";
+                                self.currentProperty.data.typeName = "Number";
                             }
+                            if (!self.currentProperty.data.description) {
 
-                            // Store the context.
-                            self.typeContext = type;
-                            self.propertyContext = property;
-
+                                self.currentProperty.data.description = "[description]";
+                            }
 
                             // Update controls.
 
@@ -275,8 +276,8 @@ define(["NextWave/source/utility/prototypes",
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
                             //      for all users: x, y, width, height of system type VisualObject.
                             if (
-                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId > 1) ||
-                                (type.name === "VisualObject" && ['x','y','width','height'].indexOf(property.name) > -1 )
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) ||
+                                (self.currentProperty.owner.data.name === "VisualObject" && ['x','y','width','height'].indexOf(self.currentProperty.data.name) > -1 )
                                 ) {
 
                                 bProtected = true;
@@ -286,7 +287,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(property.name);
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentProperty.data.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -298,8 +299,8 @@ define(["NextWave/source/utility/prototypes",
                             //      for all users: the properties x, y, width, height of system type VisualObject.
                             // Same code as above, but it mightneed tweaking some day.
                             if (
-                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId > 1) ||
-                                (type.name === "VisualObject" && ['x','y','width','height'].indexOf(property.name) > -1 )
+                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) ||
+                                (self.currentProperty.owner.data.name === "VisualObject" && ['x','y','width','height'].indexOf(self.currentProperty.data.name) > -1 )
                                 ) {
 
                                 bProtected = true;
@@ -309,7 +310,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(property.stowage.typeName);
+                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(self.currentProperty.data.typeName);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -318,7 +319,7 @@ define(["NextWave/source/utility/prototypes",
                             var bProtected = false;
                             // Protect against editing property description in these cases:
                             //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && type.stowage.typeTypeId > 1) {
+                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) {
 
                                 bProtected = true;
                             }
@@ -327,7 +328,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            return self.dialog.controlObject["descriptionEdit"].setText(property.stowage.description);
+                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentProperty.data.description);
                         } catch (e) {
 
                             return e;

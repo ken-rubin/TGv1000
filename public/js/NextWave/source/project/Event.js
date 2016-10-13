@@ -10,7 +10,7 @@
 "use strict";
 
 // Require-AMD, and dependencies.
-define(["NextWave/source/manager/ListItem"], 
+define(["NextWave/source/utility/ListItem"], 
 	function (ListItem) {
 	
 		try {
@@ -45,7 +45,7 @@ define(["NextWave/source/manager/ListItem"],
 
                             // Generate ListItem for this instance.
                             self.listItem = new ListItem(self.data.name);
-                            self.listItem.clickHandler = m_functionClickHandler;
+                            self.listItem.clickHandler = self.select;
                             self.listItem.deleteHandler = m_functionDeleteHandler;
                             self.listItem.owner = self;
 
@@ -57,24 +57,7 @@ define(["NextWave/source/manager/ListItem"],
                     };
 
                     // Select this Event.
-                    self.select = function () {
-
-                        self.listItem.selected = true;
-                        return m_functionClickHandler({});
-                    };
-
-                    // Unselect this Event.
-                    self.unselect = function () {
-
-                        self.listItem.selected = false;
-                        return null;
-                    };
-
-                    ////////////////////////////
-                    // Private methods.
-
-                    // Invoked when the mouse is clicked over this instance.
-                    var m_functionClickHandler = function (objectReference) {
+                    self.select = function (objectReference) {
 
                         try {
 
@@ -97,12 +80,41 @@ define(["NextWave/source/manager/ListItem"],
                             }
 
                             // Set center panel to this instance.
-                            return null;
+                            return window.manager.selectEvent(self);
                         } catch (e) {
 
                             return e;
                         }
                     };
+
+                    // Unselect this Event.
+                    self.unselect = function () {
+
+                        self.listItem.selected = false;
+                        return null;
+                    };
+
+                    // Generates JavaScript string for this property.
+                    self.generateJavaScript = function () {
+
+                        var strEvent = "\n";
+
+                        // if (!window.tg.eventCollection.hasOwnProperty(self.name)) {
+                        //
+                        //      window.tg.eventCollection[self.name] = [];
+                        // }
+
+                        // Add the empty collection of subscribers.
+                        strEvent += "    if (!window.tg.eventCollection.hasOwnProperty('" + self.data.name + "')) {\n\n" +
+                            "        window.tg.eventCollection['" + self.data.name + "'] = []; }\n";
+
+                        strEvent += "\n";
+
+                        return strEvent;
+                    };
+
+                    ////////////////////////////
+                    // Private methods.
 
                     // Invoked when the mouse is clicked over this instance's delete icon.
                     var m_functionDeleteHandler = function (objectReference) {

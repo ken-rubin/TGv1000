@@ -12,8 +12,9 @@
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/statement/Statement",
     "NextWave/source/methodBuilder/CodeStatementForIn",
+    "NextWave/source/methodBuilder/CodeExpressionLiteral",
     "NextWave/source/methodBuilder/CodeExpressionName"],
-    function (prototypes, Statement, CodeStatementForIn, CodeExpressionName) {
+    function (prototypes, Statement, CodeStatementForIn, CodeExpressionLiteral, CodeExpressionName) {
 
         try {
 
@@ -36,7 +37,10 @@ define(["NextWave/source/utility/prototypes",
 
                         // return new CodeStatementForIn(new CodeExpressionName("strKey"),
                         //     new CodeExpressionName("objectInstance"));
-                        return new CodeStatementForIn();
+                        return new CodeStatementForIn(
+                            new CodeExpressionLiteral("..."),
+                            new CodeExpressionLiteral("...")
+                        );
                     };
                 } catch (e) {
 

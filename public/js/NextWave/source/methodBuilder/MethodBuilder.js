@@ -17,11 +17,28 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeExpressionInvocation",
     "NextWave/source/methodBuilder/CodeExpressionPrefix",
+    "NextWave/source/statement/StatementFor",
+    "NextWave/source/statement/StatementForIn",
+    "NextWave/source/statement/StatementWhile",
+    "NextWave/source/statement/StatementIf",
+    "NextWave/source/statement/StatementReturn",
+    "NextWave/source/statement/StatementTry",
+    "NextWave/source/statement/StatementThrow",
+    "NextWave/source/statement/StatementVar",
+    "NextWave/source/statement/StatementExpression",
+    "NextWave/source/statement/StatementBreak",
+    "NextWave/source/statement/StatementContinue",
+    "NextWave/source/statement/StatementDebugger",
+    "NextWave/source/statement/StatementComment",
+    "NextWave/source/statement/StatementFreeform",
+    "NextWave/source/utility/ListHost",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
-    "NextWave/source/utility/DialogHost"],
-    function (prototypes, settings, CodeStatementFor, CodeStatementVar, CodeExpressionInvocation, CodeExpressionPrefix, Point, Size, Area, DialogHost) {
+    "NextWave/source/utility/DialogHost",
+    "NextWave/source/project/Type",
+    "NextWave/source/project/Method"],
+    function (prototypes, settings, CodeStatementFor, CodeStatementVar, CodeExpressionInvocation, CodeExpressionPrefix, StatementFor, StatementForIn, StatementWhile, StatementIf, StatementReturn, StatementTry, StatementThrow, StatementVar, StatementExpression, StatementBreak, StatementContinue, StatementDebugger, StatementComment, StatementFreeform, ListHost, Point, Size, Area, DialogHost, Type, Method) {
 
         try {
 
@@ -43,9 +60,13 @@ define(["NextWave/source/utility/prototypes",
                     // .
                     self.methodEdit = null;
                     // .
+                    self.commentEdit = null;
+                    // .
                     self.methodParameters = null;
                     // .
                     self.methodStatements = null;
+                    // .
+                    self.currentMethod = null;
 
                     ///////////////////////
                     // Public methods.
@@ -98,9 +119,6 @@ define(["NextWave/source/utility/prototypes",
 
                                             // Store the current value for comparison after.
                                             localSelf.saveMethodName = localSelf.getText();
-
-                                            // Also store the value of the type label.
-                                            localSelf.saveTypeName = localSelf.dialog.controlObject["typeLabel"].text;
                                         } catch (e) {
 
                                             alert(e.message);
@@ -113,27 +131,35 @@ define(["NextWave/source/utility/prototypes",
                                             // If the name has changed, update the name.
                                             if (localSelf.saveMethodName !== localSelf.getText()) {
 
-                                                // Lookup the type from its name. This may return a type, a system type or an App base type.
-                                                var typeFromName = window.manager.getTypeFromName(localSelf.saveTypeName);
-                                                if (!typeFromName) {
+                                                if (self.currentMethod) {
 
-                                                    // Why is this not an error?
-                                                    return localSelf.setText(localSelf.saveMethodName);
+                                                    // Generate an unique name.
+                                                    var strUnique = window.manager.getUniqueName(localSelf.getText(),
+                                                        self.currentMethod.owner.methods,
+                                                        "data",
+                                                        "name");
+
+                                                    // Update GUI.
+                                                    var exceptionRet = localSelf.setText(strUnique);
+                                                    if (exceptionRet) {
+
+                                                        throw exceptionRet;
+                                                    }
+
+                                                    // Update the other GUI.
+                                                    self.currentMethod.listItem.name = strUnique;
+
+                                                    // Update data too.
+                                                    self.currentMethod.data.name = strUnique;
+                                                } else {
+
+                                                    // Update GUI.
+                                                    var exceptionRet = localSelf.setText("");
+                                                    if (exceptionRet) {
+
+                                                        throw exceptionRet;
+                                                    }
                                                 }
-
-                                                // Ensure the value is unique.
-                                                var exceptionRet = localSelf.setText(window.manager.getUniqueName(localSelf.text,
-                                                    typeFromName.methods.parts,
-                                                    "name"));
-                                                if (exceptionRet) {
-
-                                                    throw exceptionRet;
-                                                }
-
-                                                // Update. This will initiate a recursive pass through Types, SystemTypes or both.
-                                                return window.manager.changeMethodName(typeFromName,
-                                                    localSelf.saveMethodName,
-                                                    localSelf.getText());
                                             }
                                         } catch (e) {
 
@@ -152,27 +178,103 @@ define(["NextWave/source/utility/prototypes",
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth * 2,
                                     height: settings.dialog.lineHeight + 
-                                    4 * settings.general.margin
+                                        4 * settings.general.margin
+                                },
+                                commentLabel: {
+
+                                    type: "Label",
+                                    text: "Comment",
+                                    x: settings.general.margin,
+                                    y: settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                commentEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    widthType: "reserve",           // Reserve means: subtract the width from
+                                                                    //  the total width on calculateLayout.
+                                    width: 4 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    height: 3 * settings.dialog.lineHeight,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Update Method's description.
+                                            if (self.currentMethod) {
+
+                                                self.currentMethod.data.comment = localSelf.getText();
+                                            } else {
+
+                                                // Update GUI.
+                                                var exceptionRet = localSelf.setText("");
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
+                                            }
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
                                 },
                                 statementsStatementList: {
 
                                     type: "StatementListHost",
                                     x: settings.general.margin,
-                                    y: settings.dialog.lineHeight + 
-                                        2 * settings.general.margin,
+                                    y: 4 * settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
                                     width: 2 * settings.general.margin,
                                     heightType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
-                                    height: settings.dialog.lineHeight + 
-                                        3 * settings.general.margin
+                                    height: 5 * settings.dialog.lineHeight + 
+                                        4 * settings.general.margin
+                                },
+                                statementsLabel: {
+
+                                    type: "Label",
+                                    text: "Statements",
+                                    x: settings.general.margin,
+                                    yType: "reserve",
+                                    y: settings.dialog.lineHeight + 
+                                        1 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                statementsList: {
+
+                                    type: "ListHost",
+                                    constructorParameterString: "false",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    yType: "reserve",
+                                    y: settings.dialog.lineHeight + 
+                                        2 * settings.general.margin,
+                                    width: 3 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    widthType: "reserve",
+                                    height: 1.25 * settings.dialog.lineHeight,
+                                    items:[]
                                 }
                             });
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
 
                             // Save the parameters.
                             self.typeLabel = self.dialog.controlObject["typeLabel"];
                             self.methodEdit = self.dialog.controlObject["nameEdit"];
+                            self.commentEdit = self.dialog.controlObject["commentEdit"];
                             self.methodParameters = self.dialog.controlObject["argumentsParameterList"];
                             self.methodStatements = self.dialog.controlObject["statementsStatementList"];
 
@@ -362,50 +464,105 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Method loads type into method builder.
-                    self.loadTypeMethod = function (objectContext) {
+                    self.loadMethod = function (method) {
 
                         try {
 
-                            // Call method that will clear the names panel and load all names for this method into it.
-                            var exceptionRet = m_functionLoadMethodNames(objectContext.method);
-                            if (exceptionRet) {
+                            // Hold on to current method.
+                            self.currentMethod = method;
 
-                                return exceptionRet;
+                            // Ensure the type has the requisit attributes.
+                            if (!self.currentMethod.data) {
+
+                                self.currentMethod.data = {};
+                            }
+                            if (!self.currentMethod.data.name) {
+
+                                self.currentMethod.data.name = "[name]";
+                            }
+                            if (!self.currentMethod.data.comment) {
+
+                                self.currentMethod.data.comment = "[comment]";
+                            }
+                            if (!self.currentMethod.owner.data) {
+
+                                self.currentMethod.owner.data = {};
+                            }
+                            if (!self.currentMethod.owner.data.name) {
+
+                                self.currentMethod.owner.data.name = "[name]";
                             }
 
                             // Set parameters.
-                            self.dialog.controlObject["argumentsParameterList"].parameterList = objectContext.method.parameters;
-                            //self.methodParameters = objectContext.method.parameters;
+                            self.dialog.controlObject["argumentsParameterList"].parameterList = self.currentMethod.parameters;
 
                             // Set statements.
-                            self.dialog.controlObject["statementsStatementList"].statementList = objectContext.method.statements;
-                            //self.methodStatements = objectContext.method.statements;
+                            self.dialog.controlObject["statementsStatementList"].statementList = self.currentMethod.statements;
 
                             // Set the type.
-                            self.typeLabel.text = objectContext.type.name;
+                            self.typeLabel.text = self.currentMethod.owner.data.name;
 
                             // TODO: add protection for argumentsParameterList and statementsStatementList.
 
                             // Set the method name.
                             var bProtected = false;
                             // Protect against editing method name in these cases:
-                            //      App type (type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize")
-                            //      objectContext.method.name === "construct"
+                            //      App type (type.data.typeTypeId === 1 && objectContext.method.data.name === "initialize")
+                            //      objectContext.method.data.name === "construct"
                             //      (system type or app base type) && !manager.userCanWorkWithSystemTypesAndAppBaseTypes
                             if ( 
-                                    (objectContext.type.stowage.typeTypeId === 1 && objectContext.method.name === "initialize") || 
-                                    (objectContext.method.name === "construct") ||
-                                    (objectContext.type.stowage.typeTypeId > 1 && !manager.userCanWorkWithSystemTypesAndAppBaseTypes)
+                                    (self.currentMethod.owner.data.typeTypeId === 1 && self.currentMethod.data.name === "initialize") || 
+                                    (self.currentMethod.data.name === "construct") ||
+                                    (self.currentMethod.owner.data.typeTypeId > 1 && !manager.userCanWorkWithSystemTypesAndAppBaseTypes)
                                 ) {
 
                                 bProtected = true;
                             }
-                            exceptionRet = self.methodEdit.setProtected(bProtected);
+                            var exceptionRet = self.methodEdit.setProtected(bProtected);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
 
-                            return self.methodEdit.setText(objectContext.method.name);
+                            exceptionRet = self.methodEdit.setText(self.currentMethod.data.name);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            exceptionRet = self.commentEdit.setText(self.currentMethod.data.comment);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Dynamically load up statements into the statement list.
+                            var lhStatements = self.dialog.controlObject["statementsList"];
+                            var listStatements = lhStatements.list;
+
+                            // Ensure there are statements.
+                            if (!window.projectDialog.currentComic.statements ||
+                                !window.projectDialog.currentComic.statements.length) {
+
+                                window.projectDialog.currentComic.statements = [
+
+                                    new StatementBreak(),
+                                    new StatementComment(),
+                                    new StatementContinue(),
+                                    new StatementDebugger(),
+                                    new StatementExpression(),
+                                    new StatementFor(),
+                                    new StatementForIn(),
+                                    new StatementFreeform(),
+                                    new StatementIf(),
+                                    new StatementReturn(),
+                                    new StatementThrow(),
+                                    new StatementTry(),
+                                    new StatementVar(),
+                                    new StatementWhile()];
+                            }
+
+                            // Get the statments from the current comic.
+                            return listStatements.create(window.projectDialog.currentComic.statements);
                         } catch (e) {
 
                             return e;
@@ -444,6 +601,7 @@ define(["NextWave/source/utility/prototypes",
                     var m_functionAddNamesFromParameters = function (methodParameters, arrayPNames) {
 
                         try {
+
                             for (var i = 0; i < methodParameters.items.length; i++) {
 
                                 var paramIth = methodParameters.items[i];

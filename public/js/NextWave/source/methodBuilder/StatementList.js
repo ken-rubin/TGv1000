@@ -11,7 +11,7 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
-    "NextWave/source/manager/List",
+    "NextWave/source/utility/List",
     "NextWave/source/methodBuilder/StatementDragStub"],
     function (prototypes, List, StatementDragStub) {
 

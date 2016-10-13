@@ -9,11 +9,9 @@ define(["Core/errorHelper",
 		"Dialogs/NewProjectDialog/NewProjectDialog", 
 		"Dialogs/OpenProjectDialog/OpenProjectDialog", 
 		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
-		"Dialogs/TypeSearchDialog/TypeSearchDialog", 
 		"Dialogs/ImageDiskDialog/ImageDiskDialog", 
 		"Dialogs/ImageURLDialog/ImageURLDialog", 
 		"Dialogs/ImageSearchDialog/ImageSearchDialog",
-		"Dialogs/MethodSearchDialog/MethodSearchDialog",
 		"Dialogs/BuyDialog/BuyDialog",
 		"Dialogs/AZActivatePPDialog/AZActivatePPDialog",
 		"Dialogs/AZUsersDialog/AZUsersDialog",
@@ -25,11 +23,9 @@ define(["Core/errorHelper",
 				NewProjectDialog, 
 				OpenProjectDialog,
 				SaveProjectAsDialog,
-				TypeSearchDialog, 
 				ImageDiskDialog, 
 				ImageURLDialog, 
 				ImageSearchDialog, 
-				MethodSearchDialog,
 				BuyDialog,
 				AZActivatePPDialog,
 				AZUsersDialog,
@@ -54,6 +50,9 @@ define(["Core/errorHelper",
 					// Initialize, steadystate, closing.
 					self.state = "initialize";
 
+					// This is the official repo for a project. Manager holds a reference to it, and we'll save this.
+					self.project = null;
+
 					//////////////////////////////
 					// Public methods.
 
@@ -63,10 +62,9 @@ define(["Core/errorHelper",
 						try {
 
 							// "Normal" users get their last project loaded automatically.
-							if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes) {
+							if (!manager.userCanWorkWithSystemLibsAndTypes) {
 
-								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but asynchronous-like. I think.
-								// At least it didn't work at the bottom of the callback in main.js.
+								// The following code is here, not in main.js, because localStorage.getItem is synchronous, but it acts like asynchronous.
 								var lastProject = g_profile["lastProject"];
 								var lastProjectId = 0;
 								if (g_profile["lastProjectId"]) {
@@ -78,7 +76,7 @@ define(["Core/errorHelper",
 								if (lastProjectId) {
 
 									self.openProjectFromDB(lastProjectId,
-										function(project) {
+										function() {
 
 											BootstrapDialog.show({
 												type: BootstrapDialog.TYPE_INFO,
@@ -98,7 +96,8 @@ define(["Core/errorHelper",
 							} else {
 								// Privileged user.
 
-								self.loadSystemTypesAndPinPanels(callback);
+								// self.loadSystemTypesAndPinPanels(callback);
+								if ($.isFunction(callback)) { callback(); }
 							}
 
 							return null;
@@ -107,36 +106,36 @@ define(["Core/errorHelper",
 					}
 
 					// Called here in client, but also by navbar.
-					self.loadSystemTypesAndPinPanels = function (callback) {
+					// self.loadSystemTypesAndPinPanels = function (callback) {
 
-						// While others get all system types, statements, literals and expressions loaded.
-						var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
-							{},
-							'json');
-						posting.done(function(data){
+					// 	// While others get all system types, statements, literals and expressions loaded.
+					// 	var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+					// 		{},
+					// 		'json');
+					// 	posting.done(function(data){
 
-							if (data.success) {
+					// 		if (data.success) {
 
-								var exceptionRet = manager.loadSystemTypesProject(data.data);
-								if (exceptionRet) {
+					// 			var exceptionRet = manager.loadSystemTypesProject(data.data);
+					// 			if (exceptionRet) {
 
-									errorHelper.show(exceptionRet);
-								} 
+					// 				errorHelper.show(exceptionRet);
+					// 			} 
 
-								if ($.isFunction(callback)) {
-									callback();
-								}
-							} else {
+					// 			if ($.isFunction(callback)) {
+					// 				callback();
+					// 			}
+					// 		} else {
 
-								// !data.success
-								errorHelper.show(data.message);
+					// 			// !data.success
+					// 			errorHelper.show(data.message);
 
-								if ($.isFunction(callback)) {
-									callback();
-								}
-							}
-						});
-					}
+					// 			if ($.isFunction(callback)) {
+					// 				callback();
+					// 			}
+					// 		}
+					// 	});
+					// }
 
 					//////////////////////////////
 					// Dialog creators/openers
@@ -239,93 +238,6 @@ define(["Core/errorHelper",
 
 							m_openDialog = new SaveProjectAsDialog();
 							var exceptionRet = m_openDialog.create();
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					// This is done without a pre-save dialog.
-					self.saveSystemTypes = function (callback) {
-
-						try {
-
-							var arraySystemTypes = manager.saveSystemTypes();
-
-							var posting = $.post("/BOL/ProjectBO/SaveSystemTypes", 
-								{
-									systemtypesarray: arraySystemTypes
-								},
-								'json');
-							posting.done(function(data){
-
-								if (data.success) {
-
-									if (data.scriptSuccess) {
-										errorHelper.show("System types were saved to the database, and ST.sql was saved to your drive.", 2000);
-									} else {
-										errorHelper.show("System types were saved to the database, but we could not save ST.sql to your drive. Error received: " + data.saveError);
-									}
-								} else {
-
-									// !data.success
-									errorHelper.show(data.message);
-								}
-
-								callback();
-							});
-						} catch (e) {
-
-							errorHelper.show("System types failed to save to the database with error: " + e.message);
-						}
-					}
-
-					self.showEditTypeDialog = function (index) {
-
-						try {
-
-							m_openDialog = new NewTypeDialog();
-							var exceptionRet = m_openDialog.create("Edit", index);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showTypeSearchDialog = function (functionOK) {
-
-						try {
-
-							m_openDialog = new TypeSearchDialog();
-							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showMethodSearchDialog = function (functionOK) {
-
-						try {
-
-							m_openDialog = new MethodSearchDialog();
-							var exceptionRet = m_openDialog.create(functionOK);
-							if (exceptionRet) { throw exceptionRet; }
-
-							return null;
-
-						} catch (e) { return e; }
-					}
-
-					self.showEditPropertyDialog = function (index) {
-
-						try {
-
-							m_openDialog = new NewPropertyDialog();
-							var exceptionRet = m_openDialog.create('Edit', index);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
@@ -475,13 +387,16 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Retrieve content of manager: the whole project.
-							var objProject = manager.save();
+							// Call manager.save(). Manager will use its reference to slef.project (self = Client.js) to
+							// update the project in client so we can go forward with the save.
+							var exceptionRet = manager.save();
+
+							if (exceptionRet) { return exceptionRet; }
 
 							var data = {
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
-									projectJson: objProject,
+									projectJson: self.project,
 									changeableName: false
 							};
 
@@ -531,7 +446,8 @@ define(["Core/errorHelper",
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
-										self.loadProjectIntoManager(objectData.project);
+										self.project = objectData.project;
+										self.loadProjectIntoManager();
 										self.setBrowserTabAndBtns();
 
 										return null;
@@ -557,15 +473,51 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
+					// strWhatToSave = 'project' saves self.project.
+					//				 = '0,2' saves self.project.comics[0].libraries[2].
+					// nameToUse is required.
+					self.saveAsJSON = function (strWhatToSave, nameToUse) {
+
+						try {
+
+							var exceptionRet = manager.save();
+							if (exceptionRet) {
+
+								return exceptionRet;
+							}
+
+							var objectData = null;
+							if (strWhatToSave === 'project') {
+
+								objectData = self.project;
+
+							} else {
+
+								var arrInts = $.map(strWhatToSave.split(','), function(val){ return parseInt(val, 10)});
+								objectData = self.project.comics[arrInts[0]].libraries[arrInts[1]];
+							}
+
+							var jsonArray = JSON.stringify(objectData, undefined, 4).split('\r\n');
+							var file = new File(jsonArray, nameToUse + ".json", {type: "text/plain;charset=utf-8"});
+							saveAs(file);
+
+							return null;
+
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Called by BuyDialog.
-					self.saveProjectToDBNoGetFromManager = function (project, callback) {
+					self.saveProjectToDBNoGetFromManager = function (callback) {
 
 						try {
 
 							var data = {
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
-									projectJson: project,
+									projectJson: self.project,
 									changeableName: true
 							};
 
@@ -599,7 +551,8 @@ define(["Core/errorHelper",
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
 										objectData.project.specialProjectData.openMode = "searched";
-										self.loadProjectIntoManager(objectData.project);
+										self.project = objectData.project;
+										self.loadProjectIntoManager();
 										self.setBrowserTabAndBtns();
 
 										callback(null);
@@ -632,11 +585,20 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									var exceptionRet = self.loadProjectIntoManager(data.project, callback);
-									if (exceptionRet) { errorHelper.show(exceptionRet); }
+									self.project = data.project;
 
-									self.setBrowserTabAndBtns();
+									// This might be a temporary work-around.
+									if (iProjectId < 6) {
 
+										callback();
+
+									} else {
+
+										var exceptionRet = self.loadProjectIntoManager(callback);
+										if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+										self.setBrowserTabAndBtns();
+									}
 								} else {
 
 									// !data.success
@@ -651,7 +613,7 @@ define(["Core/errorHelper",
 
 					// This one is used in BuyDialog after a purchase is completed.
 					// It is also used when client is created to load latest project.
-					// callback is always present to return the project.
+					// callback is always present to complete the process.
 					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
 
 						try {
@@ -666,7 +628,8 @@ define(["Core/errorHelper",
 
 								if (data.success) {
 
-									callback(data.project);
+									self.project = data.project;
+									callback();
 
 								} else {
 
@@ -680,18 +643,18 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					self.loadProjectIntoManager = function (project, callback) {
+					self.loadProjectIntoManager = function (callback) {
 
 						try {
 
-							// Send the passed-in project into manager.
-				    		var exceptionRet = manager.loadProject(project);
+							// Send the project into manager.
+				    		var exceptionRet = manager.loadProject(self.project);
 				    		if (exceptionRet) { return exceptionRet; }
 
 							if ($.isFunction(callback)) {
 
 								// For some reason the callback is calling client.setBrowserTabAndBtns().
-								callback(project);
+								callback();
 							
 							} else {
 
@@ -709,330 +672,14 @@ define(["Core/errorHelper",
 						var nih = nameInHolding || '';
 						return {
 
-							inDBAlready: (manager.projectData.id > 0),
-							userOwnsProject: (manager.projectData.ownedByUserId === test),
+							inDBAlready: (client.project.id > 0),
+							userOwnsProject: (client.project.ownedByUserId === test),
 							allRequiredFieldsFilled: (	nih.trim().length > 0
-											&& (manager.projectData.imageId > 0 || manager.projectData.altImagePath.length > 0)
+											&& (client.project.imageId > 0 || client.project.altImagePath.length > 0)
 										),
-							projectNameIsFilled: (manager.projectData.name.trim().length > 0)
+							projectNameIsFilled: (client.project.name.trim().length > 0)
 						};
 					};
-
-
-// //used
-// 					self.addTypeToProject = function(clType) {
-
-// 						try {
-
-// 							return m_clProject.addType(clType);
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					// Note: updateClType has .data; origType doesn't.
-// 					self.updateTypeInProject = function(updatedClType, activeClComic, origType, iTypeIndex) {
-
-// 						try {
-
-// 							activeClComic.data.types.items[iTypeIndex] = updatedClType.data;
-
-// 							var origClType = new Type();
-// 							origClType.load(origType);
-// 							exceptionRet = code.replaceType(updatedClType, origClType);
-// 							if (exceptionRet) { throw exceptionRet; }
-							
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					self.addTypeToProjectFromDB = function (iTypeId) {
-
-// 						try {
-
-// 							var posting = $.post("/BOL/ProjectBO/RetrieveType", 
-// 								{
-// 									typeId: iTypeId
-// 								},
-// 								'json');
-// 							posting.done(function(data){
-
-// 								if (data.success) {
-
-// 									var clType = new Type();
-// 									clType.load(data.type);
-// 									return m_clProject.addType(clType);
-
-// 								} else {
-
-// 									// !data.success
-// 									return new Error(data.message);
-// 								}
-// 							});
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					// We are going to add the method to the bottom of the methods array
-// 					// of the active Type; then add requisite info to code's schema info;
-// 					// then rebuild the TypeWell methods grid;
-// 					// then we'll hand-click the method in the grid.
-// 					self.addMethodToActiveType = function (method) {
-
-// 						try {
-
-// 							var activeClType = types.getActiveClType();
-// 							activeClType.data.methods.push(method);
-
-// 							var iMethodIndex = activeClType.data.methods.length - 1;
-
-// 							// var exceptionRet = types.functionSetActiveMethodIndex(iMethodIndex);
-// 							// if (exceptionRet) { throw exceptionRet; }
-
-// 							// Add the method to code.
-// 							var exceptionRet = code.addMethod(activeClType, 
-// 								method);
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							// exceptionRet = code.load(method.workspace);
-// 							// if (exceptionRet) { throw exceptionRet; }
-
-// 							exceptionRet = types.regenTWMethodsTable();
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							// Scroll the methods grid to the bottom.
-// 							$("#methodrename_" + iMethodIndex.toString()).scrollintoview();
-
-// 							// Now click the new method in the grid to load the code pane.
-// 							$("#method_" + iMethodIndex.toString()).click();
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-// // used
-// 					self.updateMethodInActiveType = function(updatedMethod, origMethod, iMethodIndex, activeClType) {
-
-// 						try {
-
-// 							activeClType.data.methods[iMethodIndex] = updatedMethod;
-
-// 							var exceptionRet = types.regenTWMethodsTable();
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							exceptionRet = code.replaceMethod(updatedMethod, origMethod, activeClType);
-// 							if (exceptionRet) { throw exceptionRet; }
-							
-// 							// Now click the updated method in the grid to load the code pane.
-// 							$("#method_" + iMethodIndex.toString()).click();
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					self.addEventToActiveType = function (event) {
-
-// 						try {
-
-// 							var activeClType = types.getActiveClType();
-// 							activeClType.data.events.push(event);
-
-// 							// Add the method to code.
-// 							var exceptionRet = code.addEvent(activeClType, 
-// 								event);
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							exceptionRet = types.regenTWEventsTable();
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							// Now do something to scroll the events grid to the bottom.
-// 							$("#eventrename_" + (activeClType.data.events.length - 1).toString()).scrollintoview();
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					self.addPropertyToActiveType = function (property) {
-
-// 						try {
-
-// 							var activeClType = types.getActiveClType();
-// 							return self.addPropertyToType(property,
-// 								activeClType);
-
-// 						} catch (e) { return e; }
-// 					}
-
-// 					self.addPropertyToType = function (property, clType) {
-
-// 						try {
-
-// 							clType.data.properties.push(property);
-
-// 							// Add the property to code.
-// 							var exceptionRet = code.addProperty(clType, 
-// 								property);
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							exceptionRet = types.regenTWPropertiesTable();
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							// Now do something to scroll the props grid to the bottom.
-// 							$("#propertyedit_" + (clType.data.properties.length - 1).toString()).scrollintoview();
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					self.updatePropertyInActiveType	= function (property, index, strOriginalName) {
-
-// 						try {
-
-// 							var activeClType = types.getActiveClType();
-// 							activeClType.data.properties[index] = property;
-
-// 							// Add the property to code.
-// 							var exceptionRet = code.replaceProperty(activeClType, 
-// 								property,
-// 								strOriginalName);
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							exceptionRet = types.regenTWPropertiesTable();
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					self.renameEventInActiveType = function (strNewName, index, strOriginalName) {
-
-// 						try {
-
-// 							var activeClType = types.getActiveClType();
-// 							var oldEvent = activeClType.data.events[index];
-// 							oldEvent.name = strNewName;
-// 							activeClType.data.events[index] = oldEvent;
-
-// 							// Call Code.js#renameEvent(clType, event, strOriginalName).
-// 							var exceptionRet = code.renameEvent(activeClType, oldEvent, strOriginalName);
-// 							if (exceptionRet) { throw exceptionRet; }
-
-// 							return types.regenTWEventsTable();
-
-// 						} catch (e) { return e; }
-// 					}
-
-// //used
-// 					self.addMethodToTypeFromDB = function (iMethodId) {
-
-// 						try {
-
-// 							var posting = $.post("/BOL/ProjectBO/RetrieveMethod", 
-// 								{
-// 									methodId: iMethodId
-// 								},
-// 								'json');
-// 							posting.done(function(data){
-
-// 								if (data.success) {
-
-// 									return self.addMethodToActiveType(data.method);
-
-// 								} else {
-
-// 									// !data.success
-// 									return new Error(data.message);
-// 								}
-// 							});
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// 					// Delete types.getActiveClType() from ???
-// 					// Remove from code, toolstrip, designer, etc.
-// //used					
-// 					self.deleteType = function() {
-
-// 						try {
-
-// 							var clType = types.getActiveClType(true);	// Param true tells method we're removing so a new active type needs assigning.
-
-// 							var exceptionRet = comics.removeType(clType);
-// 							if (exceptionRet) { return exceptionRet; }
-
-// 							exceptionRet = code.removeType(clType);
-// 							if (exceptionRet) { return exceptionRet; }
-
-// 							// clType has been returned so we can now remove it from tools. It has already been spliced out of project.comic.types.
-// 							// This will remove it from the tools strip and tidy that up (height of Slider, etc.).
-// 							exceptionRet = tools.removeItem(clType);
-// 							if (exceptionRet) { return exceptionRet; }
-
-// 							return null;
-
-// 						} catch (e) { return e; }
-// 					}
-
-// 					// Delete types.getActiveClType().data.methods[index].
-// 					// Remove from code.
-// //used					
-// 					self.deleteMethod = function(index) {
-
-// 						try {
-
-// 							return types.deleteMethod(index);
-
-// 						} catch (e) { return e; }
-// 					}
-
-// 					// Delete types.getActiveClType().data.properties[index].
-// 					// Remove from code.
-// //used					
-// 					self.deleteProperty = function(index) {
-
-// 						try {
-
-// 							return types.deleteProperty(index);
-
-// 						} catch (e) { return e; }
-// 					}
-
-// 					// Delete types.getActiveClType().data.events[index].
-// 					// Remove from code.
-// //used					
-// 					self.deleteEvent = function(index) {
-						
-// 						try {
-
-// 							return types.deleteEvent(index);
-
-// 						} catch (e) { return e; }
-// 					}
-
-// 					//////////////////////////////
-// 					// Miscellaneous helpers.
-// 					self.getNumberOfTypesInActiveComic = function () {
-
-// 						try {
-
-// 							return types.getLength();
-
-// 						} catch (e) { throw e; }
-// 					}
 
 					// If no active project, returns call unloadedCallback in order to proceed to New Project or whatever.
 					// If active project, displays BootstrapDialog asking user.
@@ -1098,7 +745,7 @@ define(["Core/errorHelper",
 						document.title = "NWC";
 						if (manager.projectLoaded) {
 
-							if (manager.projectData.name.length > 0) { document.title += " / " + manager.projectData.name; }
+							if (client.project.name.length > 0) { document.title += " / " + client.project.name; }
 							navbar.setSaveBtnText("Save Project");
 						
 						} else if (manager.systemTypesLoaded) {

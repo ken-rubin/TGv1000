@@ -10,7 +10,7 @@
 
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
-    "NextWave/source/manager/ListItem"],
+    "NextWave/source/utility/ListItem"],
     function (prototypes, ListItem) {
 
         try {

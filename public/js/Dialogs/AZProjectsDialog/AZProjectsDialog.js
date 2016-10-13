@@ -103,11 +103,92 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
+							// Wire up drag/drop events.
+							$("#DropDiv").on("dragenter", function(event){m_functionDragenter(event);});
+							$("#DropDiv").on("dragover", function(event){m_functionDragover(event);});
+							$("#DropDiv").on("drop", function(event){m_functionDodrop(event);});
+
 						} catch (e) {
 
 							errorHelper.show(e);
 						}
 					};
+
+					var m_functionDragenter = function(event) {
+
+						$("#DropDiv").text('');
+						event.stopPropagation();
+					}
+
+					var m_functionDragover = function(event) {
+
+						event.stopPropagation();
+						event.preventDefault();
+					}
+
+					var m_functionDodrop = function(event) {
+
+						event.stopPropagation();
+						event.preventDefault();
+					
+						var dt = event.originalEvent.dataTransfer;
+						var files = dt.files;
+
+						var count = files.length;
+						if (count !== 1) {
+
+							errorHelper.show("You dropped " + count + ' files. We want only one.');
+
+						} else {
+
+							var file = files[0];
+							var parts = file.name.split('.');
+							if (parts.length !== 2 || parts[1] !== 'json') {
+
+								errorHelper.show("You are allowed to drop only a json type file, created in this app.");
+
+							} else {
+
+								var reader = new FileReader();
+								reader.onload = function(e) {
+
+									var JSONtext = reader.result;
+									var objectData = JSON.parse(JSONtext);
+
+									// user dragged and dropped a JSON file that can be a project or a library.
+									if (objectData.hasOwnProperty('originalProjectId')) {
+
+										client.unloadProject(null, false);
+										
+										// cause whichever dialog was open to close. Like this one.
+										client.closeCurrentDialog();
+
+										// Set up the modified project.
+										// specialProjectData.openMode might be "new". Change to "loaded". It's no longer new.
+										// This will get saving to work correctly down the road.
+										objectData.specialProjectData.openMode = "loaded";
+										client.project = objectData;
+										client.loadProjectIntoManager();
+										client.setBrowserTabAndBtns();
+
+									} else if (objectData.hasOwnProperty('originalLibraryId')) {
+
+										// Load the library into manager.
+										var exceptionRet = manager.loadLibrary(objectData);
+										if (exceptionRet) {
+
+											errorHelper.show(exceptionRet);
+										}
+									} else {
+
+										errorHelper.show('Could not discern project or library.')
+									}
+								}
+
+								reader.readAsText(file);
+							}
+						}
+					}
 				} catch (e) {
 
 					errorHelper.show(e.message);

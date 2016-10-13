@@ -89,7 +89,7 @@ define(["NextWave/source/utility/prototypes",
 
                         contextRender.font = self.settingsNode.font;
                         var dWidth = contextRender.measureText(self.name).width + 
-                            2 * settings.general.margin;
+                            4 * settings.general.margin;
 
                         if ($.isFunction(self.deleteHandler)) {
 

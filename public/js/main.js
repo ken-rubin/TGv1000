@@ -53,14 +53,18 @@ $(document).ready(function() {
 		                    // Allocate and create the layer manager.
 		                    manager = new Manager();
 
+		                    var exceptionRet = manager.create();
+							if (exceptionRet) {
+
+								errorHelper.show(exceptionRet);
+								return;
+							} 
+
 							// Calculate user privileges; set in manager. They are used during manager.create().
                             manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
                                 g_profile["can_create_products"] || 
                                 g_profile["can_create_onlineClasses"]) || false;
-                            manager.userCanWorkWithSystemTypesAndAppBaseTypes = g_profile["can_edit_system_types"] || false;
-
-		                    var exceptionRet = manager.create();
-		                    if (exceptionRet) { throw exceptionRet; }
+                            manager.userCanWorkWithSystemLibsAndTypes = g_profile["can_edit_base_and_system_libraries_and_types_therein"] || false;
 
 							// Allocate and initialize the client.
 							// For a normal user this will load last accessed project, if any or create an empty designer if not.
@@ -73,20 +77,18 @@ $(document).ready(function() {
 									navbar = new Navbar();
 									exceptionRet = navbar.create();
 									if (exceptionRet) { 
-										alert(exceptionRet.message);
+										errorHelper.show(exceptionRet);
 										return;
 									}
 
 									client.setBrowserTabAndBtns();
 								}
 							);
-							if (exceptionRet) { throw exceptionRet; }
-
-		                } catch (e) { alert(e.message); }
+		                } catch (e) { errorHelper.show(e); }
 		            });
 				} catch(e) { errorHelper.show(e); }
 			});
-	} catch(e) { alert(e.message);}
+	} catch(e) { errorHelper.show(e); }
 });
 
 var m_functionCheckForURLEncoding = function( name ) {
