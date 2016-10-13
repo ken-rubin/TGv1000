@@ -63,121 +63,6 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
-                    // Set current Project.
-                    self.setCurrentProject = function (project) {
-
-                        try {
-
-                            self.currentProject = project;
-                            self.currentComic = null;
-                            self.currentLibrary = null;
-                            self.currentType = null;
-                            self.currentMethod = null;
-                            self.currentProperty = null;
-                            self.currentEvent = null;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set current Comic.
-                    self.setCurrentComic = function (comic) {
-
-                        try {
-
-                            self.currentComic = comic;
-                            self.currentLibrary = null;
-                            self.currentType = null;
-                            self.currentMethod = null;
-                            self.currentProperty = null;
-                            self.currentEvent = null;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set current Library.
-                    self.setCurrentLibrary = function (library) {
-
-                        try {
-
-                            self.currentLibrary = library;
-                            self.currentType = null;
-                            self.currentMethod = null;
-                            self.currentProperty = null;
-                            self.currentEvent = null;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set current Type.
-                    self.setCurrentType = function (type) {
-
-                        try {
-
-                            self.currentType = type;
-                            self.currentMethod = null;
-                            self.currentProperty = null;
-                            self.currentEvent = null;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set current Method.
-                    self.setCurrentMethod = function (method) {
-
-                        try {
-
-                            self.currentMethod = method;
-                            self.currentProperty = null;
-                            self.currentEvent = null;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set current Property.
-                    self.setCurrentProperty = function (property) {
-
-                        try {
-
-                            self.currentMethod = null;
-                            self.currentProperty = property;
-                            self.currentEvent = null;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set current Event.
-                    self.setCurrentEvent = function (event) {
-
-                        try {
-
-                            self.currentMethod = null;
-                            self.currentProperty = null;
-                            self.currentEvent = event;
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Load project into dialog.
                     self.loadProject = function (project) {
 
@@ -204,6 +89,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
+                            // Save the current project.
                             self.currentProject = project;
 
                             // Extract the current Comic.
@@ -221,44 +107,6 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
-
-                    /* Load libraries into dialog.
-                    self.loadLibraries = function (arrayLibraries) {
-
-                        try {
-
-                            // Loop over libraries.
-                            var libraryFirst = null;
-                            for (var i = 0; i < arrayLibraries.length; i++) {
-
-                                // Extract ith Library.
-                                var libraryIth = arrayLibraries[i];
-
-                                // Save the first Library.
-                                if (!libraryFirst) {
-
-                                    libraryFirst = libraryIth;
-                                }
-
-                                // Add the Library's ListItem to the library list.
-                                var exceptionRet = m_listLibraries.addItem(libraryIth.listItem);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            }
-
-                            // If there is at least one Library, then select it.
-                            if (libraryFirst) {
-
-                                return libraryFirst.select();
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };*/
 
                     // Load the specified Comic into dialog.
                     self.loadComic = function (comic) {
@@ -330,6 +178,37 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Set current Comic.
+                    self.setCurrentComic = function (comic) {
+
+                        try {
+
+                            self.currentComic = comic;
+                            self.currentLibrary = null;
+                            self.currentType = null;
+                            self.currentMethod = null;
+                            self.currentProperty = null;
+                            self.currentEvent = null;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear list of Comics.
+                    self.clearComics = function () {
+
+                        try {
+
+                            // Clear dependent lists.
+                            return self.clearLibraries();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Load the specified library into dialog.
                     self.loadLibrary = function (library) {
 
@@ -394,6 +273,43 @@ define(["NextWave/source/utility/prototypes",
 
                             // Reload libraries.
                             return self.loadProject(self.currentProject);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set current Library.
+                    self.setCurrentLibrary = function (library) {
+
+                        try {
+
+                            self.currentLibrary = library;
+                            self.currentType = null;
+                            self.currentMethod = null;
+                            self.currentProperty = null;
+                            self.currentEvent = null;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Clear list of Libraries.
+                    self.clearLibraries = function () {
+
+                        try {
+
+                            // Clear the libraries list.
+                            var exceptionRet = m_listLibraries.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Clear dependent lists too.
+                            return self.clearTypes();
                         } catch (e) {
 
                             return e;
@@ -528,118 +444,16 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Delete the specified Method.
-                    self.deleteMethod = function (method) {
+                    // Set current Type.
+                    self.setCurrentType = function (type) {
 
                         try {
 
-                            // Remove from current Type's Method list.
-                            for (var i = 0; i < self.currentType.methods.length; i++) {
-
-                                var methodIth = self.currentType.methods[i];
-                                if (methodIth === method) {
-
-                                    self.currentType.methods.splice(i, 1);
-                                    break;
-                                }
-                            }
-
-                            // Reload Type.
-                            return self.loadType(self.currentType);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Delete the specified Property.
-                    self.deleteProperty = function (property) {
-
-                        try {
-
-                            // Remove from current Type's Property list.
-                            for (var i = 0; i < self.currentType.properties.length; i++) {
-
-                                var propertyIth = self.currentType.properties[i];
-                                if (propertyIth === property) {
-
-                                    self.currentType.properties.splice(i, 1);
-                                    break;
-                                }
-                            }
-
-                            // Reload Type.
-                            return self.loadType(self.currentType);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Delete the specified Event.
-                    self.deleteEvent = function (event) {
-
-                        try {
-
-                            // Remove from current Type's Event list.
-                            for (var i = 0; i < self.currentType.events.length; i++) {
-
-                                var eventIth = self.currentType.events[i];
-                                if (eventIth === event) {
-
-                                    self.currentType.events.splice(i, 1);
-                                    break;
-                                }
-                            }
-
-                            // Reload Type.
-                            return self.loadType(self.currentType);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear list of Project.
-                    self.clearProject = function () {
-
-                        try {
-
-                            // Clear dependent lists.
-                            return self.clearComics();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear list of Comics.
-                    self.clearComics = function () {
-
-                        try {
-
-                            // Clear dependent lists.
-                            return self.clearLibraries();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear list of Libraries.
-                    self.clearLibraries = function () {
-
-                        try {
-
-                            // Clear the libraries list.
-                            var exceptionRet = m_listLibraries.clearItems();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Clear dependent lists too.
-                            return self.clearTypes();
+                            self.currentType = type;
+                            self.currentMethod = null;
+                            self.currentProperty = null;
+                            self.currentEvent = null;
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -676,6 +490,45 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Delete the specified Method.
+                    self.deleteMethod = function (method) {
+
+                        try {
+
+                            // Remove from current Type's Method list.
+                            for (var i = 0; i < self.currentType.methods.length; i++) {
+
+                                var methodIth = self.currentType.methods[i];
+                                if (methodIth === method) {
+
+                                    self.currentType.methods.splice(i, 1);
+                                    break;
+                                }
+                            }
+
+                            // Reload Type.
+                            return self.loadType(self.currentType);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set current Method.
+                    self.setCurrentMethod = function (method) {
+
+                        try {
+
+                            self.currentMethod = method;
+                            self.currentProperty = null;
+                            self.currentEvent = null;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Clear list of Methods.
                     self.clearMethods = function () {
 
@@ -689,6 +542,45 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Delete the specified Property.
+                    self.deleteProperty = function (property) {
+
+                        try {
+
+                            // Remove from current Type's Property list.
+                            for (var i = 0; i < self.currentType.properties.length; i++) {
+
+                                var propertyIth = self.currentType.properties[i];
+                                if (propertyIth === property) {
+
+                                    self.currentType.properties.splice(i, 1);
+                                    break;
+                                }
+                            }
+
+                            // Reload Type.
+                            return self.loadType(self.currentType);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set current Property.
+                    self.setCurrentProperty = function (property) {
+
+                        try {
+
+                            self.currentMethod = null;
+                            self.currentProperty = property;
+                            self.currentEvent = null;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Clear list of Properties.
                     self.clearProperties = function () {
 
@@ -696,6 +588,45 @@ define(["NextWave/source/utility/prototypes",
 
                             // Clear the properties List.
                             return m_listProperties.clearItems();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Delete the specified Event.
+                    self.deleteEvent = function (event) {
+
+                        try {
+
+                            // Remove from current Type's Event list.
+                            for (var i = 0; i < self.currentType.events.length; i++) {
+
+                                var eventIth = self.currentType.events[i];
+                                if (eventIth === event) {
+
+                                    self.currentType.events.splice(i, 1);
+                                    break;
+                                }
+                            }
+
+                            // Reload Type.
+                            return self.loadType(self.currentType);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Set current Event.
+                    self.setCurrentEvent = function (event) {
+
+                        try {
+
+                            self.currentMethod = null;
+                            self.currentProperty = null;
+                            self.currentEvent = event;
+                            return null;
                         } catch (e) {
 
                             return e;
@@ -775,17 +706,12 @@ define(["NextWave/source/utility/prototypes",
                                             6 * settings.general.margin) / 2;
                                     },
                                     title: "Project",
-                                    sections: [/*{
-
-                                        name: "projects",
-                                        title: "Projects",
-                                        addGlyphClickHandler: m_functionAddProject
-                                    }, {
+                                    sections: [{
 
                                         name: "comics",
                                         title: "Comics",
                                         addGlyphClickHandler: m_functionAddComic
-                                    }, */{
+                                    }, {
 
                                         name: "libraries",
                                         title: "Libraries",
@@ -878,86 +804,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Decompose instance.
-                    self.destroy = function () {
-
-                        try {
-
-                            // Can only destroy a created instance.
-                            if (!m_bCreated) {
-
-                                throw { message: "Instance not created!" };
-                            }
-
-                            window.TypeTree = null;
-                            m_bCreated = false;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     ///////////////////////
                     // Private methods.
-
-                    // Invoked when the add Project icon is clicked.
-                    var m_functionAddProject = function () {
-
-                        try {
-
-// Not sure what to do....
-                            /* Must have a Project to add a Comic to it.
-                            if (!self.currentProject) {
-
-                                return null;
-                            }
-
-                            // Generate an unique name.
-                            var strUnique = window.manager.getUniqueName("NewComic",
-                                self.currentProject.comics,
-                                "data",
-                                "name");
-
-                            // Create the new Comic.
-                            var comicNew = new Comic(self.currentProject);
-                            var exceptionRet = comicNew.create({
-
-                                name: strUnique,
-                                libraries: [],
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
-                            });
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Add the Comic's ListItem to the Comic list.
-                            exceptionRet = m_listComics.addItem(comicNew.listItem);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Add the comic to the current Project.
-                            self.currentProject.comics.push(comicNew);
-                            self.currentProject.data.comics.push(comicNew.data);
-
-                            // Scroll to the end of the list.
-                            exceptionRet = m_listComics.scrollToEndOfList();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            return comicNew.select();
-                            */
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
 
                     // Invoked when the add Comic icon is clicked.
                     var m_functionAddComic = function () {
@@ -980,9 +828,11 @@ define(["NextWave/source/utility/prototypes",
                             var comicNew = new Comic(self.currentProject);
                             var exceptionRet = comicNew.create({
 
+                                id: 0,
                                 name: strUnique,
                                 libraries: [],
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
+                                ownedByUserId: parseInt(g_profile["userId"], 10),
+                                description: ""
                             });
                             if (exceptionRet) {
 
@@ -1035,12 +885,16 @@ define(["NextWave/source/utility/prototypes",
                             var libraryNew = new Library(self.currentComic);
                             var exceptionRet = libraryNew.create({
 
+                                id: 0,
                                 name: strUnique,
                                 types: [],
                                 ownedByUserId: parseInt(g_profile["userId"], 10),
                                 isSystemLibrary: false,
                                 isBaseLibrary: false,
-                                isAppLibrary: false
+                                isAppLibrary: false,
+                                references: "",
+                                editors: "",
+                                description: ""
                             });
                             if (exceptionRet) {
 
@@ -1094,6 +948,9 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = typeNew.create({
 
                                 name: strUnique,
+                                baseTypeName: "",
+                                description: "",
+                                
                                 methods: [],
                                 properties: [],
                                 events: [],

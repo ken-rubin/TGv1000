@@ -46,6 +46,16 @@ define(["NextWave/source/project/Type",
                             // First, save off the data.
                             self.data = objectLibrary;
 
+                            // Possibly convert references and editors.
+                            if (self.data.references.push) {
+
+                                self.data.references = self.data.references.join("\n");
+                            }
+                            if (self.data.editors.push) {
+
+                                self.data.editors = self.data.editors.join("\n");
+                            }
+
                             // Then loop over Types and create children.
                             self.types = [];
                             for (var i = 0; i < objectLibrary.types.length; i++) {
