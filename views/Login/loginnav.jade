@@ -3,15 +3,29 @@
 //-
 
 //- Code section is a gzsection.
-.row#loginnav
-  div.pull-left
-        img(src="../media/images/TG.png" style="margin-right:50px;")
-        a#enrollBtn.btn.btn-primary.btn-sm(tabindex='5') Enroll...
-  div.pull-right
-        input#inputName(type='text', placeholder='Enter your name', tabindex='1', style="color:blue; font-family:Verdana; background-color:aliceblue;")
-        | &nbsp;&nbsp;&nbsp;
-        input#inputPassword(type='password', placeholder='Password', tabindex='2', style="color:blue; font-family:Verdana; background-color:aliceblue;")
-        | &nbsp;&nbsp;&nbsp;
-        a#signinBtn.btn.btn-primary.btn-sm(tabindex='3') Sign in
-        | &nbsp;&nbsp;&nbsp;
-        a#forgotLink(href="#") I forgot my password
+//- .row
+div.navbar.navbar-default.navbar-fixed-top.navbar-transparent
+	div.container
+		div.navbar-header
+			a.navbar-brand(href="./")
+				img(src="../media/images/tg4.png") 
+			button.navbar-toggle(type="button",data-toggle="collapse", data-target="#navbar-main")
+				span.icon-bar
+				span.icon-bar
+				span.icon-bar
+		div.navbar-collapse.collapse#navbar-main
+			ul.nav.navbar-nav.navbar-right
+				li.dropdown
+					a.dropdown-toggle(href="#", data-toggle="dropdown") Signin
+					div.dropdown-menu(style="padding:2px; margin-top:5px; border-radius:10px")
+						form.TgLoginForm
+							input#inputName.TgLoginInput(name="username", type="text", placeholder="Username") 
+							input#inputPassword.TgLoginInput(name="password", type="password", placeholder="Password")
+							br
+							button.btn#signinBtn(type="button") Login
+							br
+							a#forgotLink(href="#") I forgot my password
+				li
+					a#enrollBtn(tabindex='5',target="_blank") Register
+
+	

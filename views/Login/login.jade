@@ -5,29 +5,27 @@
 //-
 doctype
 html
-  head
-    meta(charset="utf-8")
-    title #{title}
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+	head
+		meta(charset="utf-8")
+		title #{title}
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
 
-    //- Include list of staticly referenced CSS files.
-    include ./loginstylesheets.jade
+	//- Include list of staticly referenced CSS files.
+	include ./loginstylesheets.jade
 
-  body
-    .container-fluid(style="background-color:white;")
+	body#home
+		//- Include the navbar element DOM.
+		include ./loginnav.jade
 
-      //- Include the navbar element DOM.
-      include ./loginnav.jade
+		//- Include the marketing stuff
+		include ./loginmktg.jade
 
-      //- Include the marketing stuff
-      include ./loginmktg.jade
+		//- Include the project/product lists
+		//include ./loginlists.jade
 
-      //- Include the project/product lists
-      //- include ./loginlists.jade
+		//- Include the footer.
+		include ./loginfoot.jade
 
-      //- Include the footer.
-      include ./loginfoot.jade
-
-    //- Inlcude the list of scripts.
-    include ./loginscripts.jade
+	//- Inlcude the list of scripts.
+	include ./loginscripts.jade
 
