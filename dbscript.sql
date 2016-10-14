@@ -2,19 +2,6 @@ SET @dropTheDB = 1;	/* Use 1 to drop and recreate TGv1001. Use 0 to preserve the
 
 DELIMITER //
 
--- Using this convoluted approach because if statements can exist only inside procedures, functions, etc.
-USE sys//
-DROP PROCEDURE IF EXISTS drop_create_TGv1001//
-CREATE PROCEDURE drop_create_TGv1001(doit TINYINT(1))
-begin
-	if doit=1 then
-		DROP SCHEMA IF EXISTS `TGv1001`;
-		CREATE DATABASE IF NOT EXISTS `TGv1001`;
-	end if;
-end//
-
-call drop_create_TGv1001(@dropTheDB)//
-
 USE TGv1001//
 
 DROP PROCEDURE IF EXISTS doTags//

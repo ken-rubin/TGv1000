@@ -53,6 +53,7 @@ define(["NextWave/source/project/Method",
                             self.data = objectType;
 
                             // Then loop over Methods and create children.
+                            self.methods = [];
                             for (var i = 0; i < objectType.methods.length; i++) {
 
                                 // Get the ith Method.

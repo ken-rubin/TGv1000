@@ -12,8 +12,11 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
-    "NextWave/source/utility/List"],
-    function (prototypes, settings, List) {
+    "NextWave/source/utility/List",
+    "NextWave/source/MethodBuilder/CodeExpressionStub",
+    "NextWave/source/MethodBuilder/CodeLiteral",
+    "NextWave/source/MethodBuilder/CodeExpressionLiteral"],
+    function (prototypes, settings, List, CodeExpressionStub, CodeLiteral, CodeExpressionLiteral) {
 
         try {
 
@@ -36,6 +39,46 @@ define(["NextWave/source/utility/prototypes",
                             self.addItem(arrayParameters[i]);
                         }
                     }
+
+                    // Always add a final, empty item.
+                    let cl = new CodeLiteral("...");
+                    let ces = new CodeExpressionStub(new CodeExpressionLiteral());
+                    self.addItem(ces);
+                    let editor = cl.payload;
+                    // Wire callback to key pressed here.
+                    let functionKeyPressed = function () {
+
+                        try {
+
+                            // Scan for an empty stub.  If not found, add one.
+                            let bFoundOne = false;
+                            for (let ces of self) {
+
+                                let cl = ces.payload;
+                                let editor = cl.payload;
+                                let strPayload = editor.payload;
+                                if (!strPayload) {
+
+                                    bFoundOne = true;
+                                    break;
+                                }
+                            }
+
+                            if (!bFoundOne) {
+
+                                // Always add a final, empty item.
+                                let cl = new CodeLiteral("...");
+                                let ces = new CodeExpressionStub(new CodeExpressionLiteral());
+                                self.addItem(ces);
+                                let editor = cl.payload;
+                                editor.onKeyPressed = functionKeyPressed;
+                            }
+                        } catch (e) {
+
+                            alert(e.message);
+                        }
+                    };
+                    editor.onKeyPressed = functionKeyPressed;
 
                     ////////////////////////
                     // Public methods.

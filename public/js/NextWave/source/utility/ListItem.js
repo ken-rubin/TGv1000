@@ -274,7 +274,7 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.fillStyle = settings.general.fillText;
                             contextRender.fillText(self.getName(),
                                 m_area.location.x + settings.general.margin,
-                                m_area.location.y,
+                                m_area.location.y + settings.general.margin,
                                 m_area.extent.width - 2 * settings.general.margin - dSpaceForDeleteIcon);
 
                             return null;

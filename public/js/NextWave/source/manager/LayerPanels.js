@@ -20,6 +20,8 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/Panel",
         "NextWave/source/project/ProjectDialog",
         "NextWave/source/project/Type",
+        "NextWave/source/project/ProjectBuilder",
+        "NextWave/source/project/ComicBuilder",
         "NextWave/source/project/LibraryBuilder",
         "NextWave/source/project/TypeBuilder",
         "NextWave/source/project/PropertyBuilder",
@@ -31,7 +33,7 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/literal/LiteralList",
         "NextWave/source/methodBuilder/MethodBuilder"
     ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
+    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, ProjectBuilder, ComicBuilder, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder) {
 
         try {
 
@@ -67,20 +69,21 @@ define(["NextWave/source/utility/prototypes",
                     // Public methods.
 
                     // Initialze instance.
+                    // iPanelConfiguration: 0 = no panels; 1 = normal project; 2 = system types project
                     self.create = function(iPanelConfiguration) {
-                        // iPanelConfiguration: 0 = no panels; 1 = normal project; 2 = system types project
+
                         try {
 
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
                                 throw {
+
                                     message: "LayerPanels: Instance already created!"
                                 };
                             }
 
                             self.iPanelConfiguration = iPanelConfiguration;
-
                             switch (iPanelConfiguration) {
 
                                 case 0:
@@ -90,46 +93,16 @@ define(["NextWave/source/utility/prototypes",
 
                                 case 1:
 
-                                    // self.namesPanel = new Panel("Names", 
-                                    //     orientation.north, 
-                                    //     new Point(settings.layerPanels.namesPanel.x, 0), 
-                                    //     new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
-                                    //self.statementsPanel = new Panel("Statements",
-                                    //    orientation.north,
-                                    //    new Point(settings.layerPanels.statementsPanel.x, 0),
-                                    //    new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
-                                    // self.expressionsPanel = new Panel("Expressions", 
-                                    //     orientation.north, 
-                                    //     new Point(settings.layerPanels.expressionsPanel.x, 0), 
-                                    //     new Size(settings.layerPanels.expressionsPanel.width, settings.layerPanels.expressionsPanel.height));
-                                    // self.literalsPanel = new Panel("Literals", 
-                                    //     orientation.north, 
-                                    //     new Point(settings.layerPanels.literalsPanel.x, 0), 
-                                    //     new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
                                     self.centerPanel = new Panel("Method",
                                         orientation.south,
                                         new Point(settings.layerPanels.centerPanel.x, 0),
                                         new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
 
-                                    // Only in iPanelConfiguration 1
                                     self.typesPanel = new Panel("Types",
                                         orientation.west,
                                         new Point(0, settings.layerPanels.typesPanel.y),
                                         new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
         
-        /* add new is now moved to the specified Dialog areas (Library, type, method, ...)
-                                    self.typesPanel.addNew = function() {
-
-                                        try {
-
-                                            // What to do when the icon is clicked....
-                                            return window.manager.createType();
-                                        } catch (e) {
-
-                                            return e;
-                                        }
-                                    };
-        */
                                     // Add the ProjectDialog to the types Panel.
                                     var exceptionRet = m_functionAddProjectDialogToTypesPanel(self.typesPanel);
                                     if (exceptionRet) {
@@ -139,68 +112,9 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Compile to generic list of panels for looping operations.
                                     m_arrayPanels = [
-                                        // self.namesPanel, 
-                                        //self.statementsPanel,
-                                        // self.expressionsPanel, 
-                                        // self.literalsPanel, 
                                         self.typesPanel,
                                         self.centerPanel
                                     ];
-
-                                    // Add the NameList to the names Panel.
-                                    // exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
-                                    // if (exceptionRet) {
-
-                                    //     throw exceptionRet;
-                                    // }
-
-                                    // Add the StatmentList to the statements Panel.
-                                    //exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
-                                    //if (exceptionRet) {
-
-                                    //    throw exceptionRet;
-                                    //}
-
-                                    // Add the ExpressionList to the expressions Panel.
-                                    // exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
-                                    // if (exceptionRet) {
-
-                                    //     throw exceptionRet;
-                                    // }
-
-                                    // Add the LiteralList to the literals Panel.
-                                    // exceptionRet = m_functionAddLiteralListToLiteralsPanel(self.literalsPanel);
-                                    // if (exceptionRet) {
-
-                                    //     throw exceptionRet;
-                                    // }
-
-                                    // Allocate the payloads of the center panel:
-                                    exceptionRet = m_functionAllocateMethodBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocateLibraryBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocateTypeBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocatePropertyBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocateEventBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
 
                                     // To be replaced by: load type/method.
                                     // Add the MethodBuilder to the center Panel.
@@ -213,22 +127,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 case 2:
 
-                                    // self.namesPanel = new Panel("Names", 
-                                    //     orientation.north, 
-                                    //     new Point(settings.layerPanels.namesPanel.x, 0), 
-                                    //     new Size(settings.layerPanels.namesPanel.width, settings.layerPanels.namesPanel.height));
-                                    //self.statementsPanel = new Panel("Statements",
-                                    //    orientation.north,
-                                    //    new Point(settings.layerPanels.statementsPanel.x, 0),
-                                    //    new Size(settings.layerPanels.statementsPanel.width, settings.layerPanels.statementsPanel.height));
-                                    // self.expressionsPanel = new Panel("Expressions", 
-                                    //     orientation.north, 
-                                    //     new Point(settings.layerPanels.expressionsPanel.x, 0), 
-                                    //     new Size(settings.layerPanels.expressionsPanel.width, settings.layerPanels.expressionsPanel.height));
-                                    // self.literalsPanel = new Panel("Literals", 
-                                    //     orientation.north, 
-                                    //     new Point(settings.layerPanels.literalsPanel.x, 0), 
-                                    //     new Size(settings.layerPanels.literalsPanel.width, settings.layerPanels.literalsPanel.height));
                                     self.centerPanel = new Panel("Method",
                                         orientation.south,
                                         new Point(settings.layerPanels.centerPanel.x, 0),
@@ -236,67 +134,8 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Compile to generic list of panels for looping operations.
                                     m_arrayPanels = [
-                                        // self.namesPanel, 
-                                        // self.statementsPanel,
-                                        // self.expressionsPanel, 
-                                        // self.literalsPanel, 
                                         self.centerPanel
                                     ];
-
-                                    // Add the NameList to the names Panel.
-                                    // exceptionRet = m_functionAddNameListToNamesPanel(self.namesPanel);
-                                    // if (exceptionRet) {
-
-                                    //     throw exceptionRet;
-                                    // }
-
-                                    // Add the StatmentList to the statements Panel.
-                                    //exceptionRet = m_functionAddStatementListToStatementsPanel(self.statementsPanel);
-                                    //if (exceptionRet) {
-
-                                    //    throw exceptionRet;
-                                    //}
-
-                                    // Add the ExpressionList to the expressions Panel.
-                                    // exceptionRet = m_functionAddExpressionListToExpressionsPanel(self.expressionsPanel);
-                                    // if (exceptionRet) {
-
-                                    //     throw exceptionRet;
-                                    // }
-
-                                    // Add the LiteralList to the literals Panel.
-                                    // exceptionRet = m_functionAddLiteralListToLiteralsPanel(self.literalsPanel);
-                                    // if (exceptionRet) {
-
-                                    //     throw exceptionRet;
-                                    // }
-
-                                    // Allocate the payloads of the center panel:
-                                    exceptionRet = m_functionAllocateMethodBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocateLibraryBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocateTypeBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocatePropertyBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    exceptionRet = m_functionAllocateEventBuilder();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
 
                                     // To be replaced by: load type/method.
                                     // Add the MethodBuilder to the center Panel.
@@ -306,6 +145,43 @@ define(["NextWave/source/utility/prototypes",
                                         throw exceptionRet;
                                     }
                                     break;
+                            }
+
+                            // Allocate the payloads of the center panel:
+                            exceptionRet = m_functionAllocateProjectBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateComicBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateLibraryBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateTypeBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateMethodBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocatePropertyBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateEventBuilder();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
                             }
 
                             // Indicate current state.
@@ -329,10 +205,13 @@ define(["NextWave/source/utility/prototypes",
                             }
                         );
 
-                        window.methodBuilder.destroy();
+                        window.projectBuilder.destroy();
+                        window.comicBuilder.destroy();
                         window.libraryBuilder.destroy();
                         window.typeBuilder.destroy();
+                        window.methodBuilder.destroy();
                         window.propertyBuilder.destroy();
+                        window.eventBuilder.destroy();
 
                         // self.typesPanel = null;
                         // self.namesPanel = null;
@@ -342,144 +221,6 @@ define(["NextWave/source/utility/prototypes",
                         // self.centerPanel = null;
                         // self.iPanelConfiguration = null;
                     }
-
-                    // Method replaces what's in namesPanel with a whole new set of names.
-                    // arrayNames has been sorted and uniquified.
-                    self.setNames = function(arrayNames) {
-
-                        return null;
-                        // try {
-
-                        //     var exceptionRet = self.clearNames();
-                        //     if (exceptionRet) {
-
-                        //         return exceptionRet;
-                        //     }
-
-                        //     return self.namesPanel.payload.setNames(arrayNames);
-
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    }
-
-                    // Method adds a new name.
-                    self.addName = function(strName) {
-
-                        return null;
-                        // try {
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.namesPanel.payload.addName(strName);
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Method changes an existing name.
-                    self.changeName = function(strOriginalName, strNewName) {
-
-                        return null;
-                        // try {
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.namesPanel.payload.changeName(strOriginalName,
-                        //         strNewName);
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Method removes an existing name.
-                    self.removeName = function(strName) {
-
-                        return null;
-                        // try {
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.namesPanel.payload.removeName(strName);
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Method adds a new Type.
-                    self.addType = function(typeNew) {
-
-                        try {
-
-                            if (!self.typesPanel) {
-                                return null;
-                            }
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.typesPanel.payload.addType(typeNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method removes an existing Type.
-                    self.removeType = function(typeToRemove) {
-
-                        try {
-
-                            if (!self.typesPanel) {
-                                return null;
-                            }
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.typesPanel.payload.removeType(typeToRemove);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear the list of types.
-                    self.clearTypes = function() {
-
-                        try {
-
-                            if (!self.typesPanel) {
-                                return null;
-                            }
-
-                            // Skip Panel in this object-chain so all panels 
-                            // can just be generic instances of the base class.
-                            return self.typesPanel.payload.clearItems();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear the list of names.
-                    self.clearNames = function() {
-
-                        return null;
-                        // try {
-
-                        //     if (!self.namesPanel) { return null; }
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.namesPanel.payload.clearItems();
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
 
                     // Clear the center panel.
                     self.clearCenter = function(strActiveCenterPanel) {
@@ -495,14 +236,23 @@ define(["NextWave/source/utility/prototypes",
 
                                 strActiveCenterPanel = "Method";
                             }
-                            window.methodBuilder = null;
+
+                            window.projectBuilder = null;
+                            window.comicBuilder = null;
                             window.libraryBuilder = null;
                             window.typeBuilder = null;
+                            window.methodBuilder = null;
                             window.propertyBuilder = null;
+                            window.eventBuilder = null;
 
                             // Clear out the three possible 
                             // payloads for the center panel.
-                            var exceptionRet = m_functionAllocateMethodBuilder();
+                            var exceptionRet = m_functionAllocateProjectBuilder();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateComicBuilder();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -513,6 +263,11 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
                             exceptionRet = m_functionAllocateTypeBuilder();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateMethodBuilder();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -536,140 +291,10 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Clear the list of Statements.
-                    self.clearStatements = function() {
-
-                        // try {
-
-                        //     if (!self.statementsPanel) {
-                                return null;
-                        //     }
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.statementsPanel.payload.clearItems();
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Load up statements from list of statement constructor names.
-                    self.loadStatements = function(arrayList) {
-
-                        try {
-
-                            /* Clear the old.
-                            var exceptionRet = self.clearStatements();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Add the new.
-                            return self.statementsPanel.payload.load(arrayList);
-                            */
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Save and return list of extant statement constructors.
                     self.saveStatements = function() {
 
                         return self.statementsPanel.payload.save();
-                    };
-
-                    // Clear the list of Expressions.
-                    self.clearExpressions = function() {
-
-                        return null;
-                        // try {
-
-                        //     if (!self.expressionsPanel) { return null; }
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.expressionsPanel.payload.clearItems();
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Load up Expressions from list of Expression constructor names.
-                    self.loadExpressions = function(arrayList) {
-
-                        return null;
-                        // try {
-
-                        //     // Clear the old.
-                        //     var exceptionRet = self.clearExpressions();
-                        //     if (exceptionRet) {
-
-                        //         return exceptionRet;
-                        //     }
-
-                        //     // Add the new.
-                        //     return self.expressionsPanel.payload.load(arrayList);
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Save and return list of extant Expression constructors.
-                    self.saveExpressions = function() {
-
-                        return null;
-                        // return self.expressionsPanel.payload.save();
-                    };
-
-                    // Clear the list of Literals.
-                    self.clearLiterals = function() {
-
-                        return null;
-                        // try {
-
-                        //     if (!self.literalsPanel) { return null; }
-
-                        //     // Skip Panel in this object-chain so all panels 
-                        //     // can just be generic instances of the base class.
-                        //     return self.literalsPanel.payload.clearItems();
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Load up Literals from list of Literal constructor names.
-                    self.loadLiterals = function(arrayList) {
-
-                        return null;
-                        // try {
-
-                        //     // Clear the old.
-                        //     var exceptionRet = self.clearLiterals();
-                        //     if (exceptionRet) {
-
-                        //         return exceptionRet;
-                        //     }
-
-                        //     // Add the new.
-                        //     return self.literalsPanel.payload.load(arrayList);
-                        // } catch (e) {
-
-                        //     return e;
-                        // }
-                    };
-
-                    // Save and return list of extant Literals constructors.
-                    self.saveLiterals = function() {
-
-                        return null;
-                        // return self.literalsPanel.payload.save();
                     };
 
                     // Put the center panel into different modes.
@@ -678,12 +303,18 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Switch out the payload of the center panel.
-                            if (strMode === "Type") {
+                            if (strMode === "Project") {
 
-                                return m_functionSetTypeBuilderInCenterPanel();
+                                return m_functionSetProjectBuilderInCenterPanel();
+                            } else if (strMode === "Comic") {
+
+                                return m_functionSetComicBuilderInCenterPanel();
                             } else if (strMode === "Library") {
 
                                 return m_functionSetLibraryBuilderInCenterPanel();
+                            } else if (strMode === "Type") {
+
+                                return m_functionSetTypeBuilderInCenterPanel();
                             } else if (strMode === "Method") {
 
                                 return m_functionSetMethodBuilderInCenterPanel();
@@ -735,7 +366,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 return null;
                             }
-
 
                             // Save off the current active panel, if.
                             var panelOriginal = m_panelActive;
@@ -982,6 +612,60 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
+                    // Allocate ProjectBuilder instance.
+                    var m_functionAllocateProjectBuilder = function() {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.projectBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the Project builder.
+                            // Store globally.
+                            window.projectBuilder = new ProjectBuilder();
+                            var exceptionRet = window.projectBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Allocate ComicBuilder instance.
+                    var m_functionAllocateComicBuilder = function() {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.comicBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the comic builder.
+                            // Store globally.
+                            window.comicBuilder = new ComicBuilder();
+                            var exceptionRet = window.comicBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Allocate LibraryBuilder instance.
                     var m_functionAllocateLibraryBuilder = function() {
 
@@ -1024,6 +708,33 @@ define(["NextWave/source/utility/prototypes",
                             // Store globally.
                             window.typeBuilder = new TypeBuilder();
                             var exceptionRet = window.typeBuilder.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Allocate method builder instance.
+                    var m_functionAllocateMethodBuilder = function() {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.methodBuilder) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the object list.
+                            // Store globally so the drag layer can access.
+                            window.methodBuilder = new MethodBuilder();
+                            var exceptionRet = window.methodBuilder.create();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -1090,33 +801,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Allocate method builder instance.
-                    var m_functionAllocateMethodBuilder = function() {
-
-                        try {
-
-                            // For now, only allocate once.
-                            if (window.methodBuilder) {
-
-                                return null;
-                            }
-
-                            // Allocate and create the object list.
-                            // Store globally so the drag layer can access.
-                            window.methodBuilder = new MethodBuilder();
-                            var exceptionRet = window.methodBuilder.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Helper method adds ProjectDialog to types panel.
                     var m_functionAddProjectDialogToTypesPanel = function(panelTypes) {
 
@@ -1140,124 +824,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Helper method adds NameList to names panel.
-                    // var m_functionAddNameListToNamesPanel = function (panelNames) {
-
-                    //     try {
-
-                    //         // Some dummy data for now....
-                    //         var arrayNames = [];
-
-                    //         // Allocate and create the object list, passing the initialization object.
-                    //         var nl = new NameList();
-                    //         var exceptionRet = nl.create(arrayNames);
-                    //         if (exceptionRet) {
-
-                    //             throw exceptionRet;
-                    //         }
-
-                    //         // Set it.
-                    //         panelNames.payload = nl;
-
-                    //         return null;
-                    //     } catch (e) {
-
-                    //         return e;
-                    //     }
-                    // };
-
-                    // Helper method adds StatementList to statements panel.
-                    var m_functionAddStatementListToStatementsPanel = function(panelStatements) {
-
-                        try {
-
-                            // Allocate and create the object list.
-                            var sl = new StatementListPayload();
-                            var exceptionRet = sl.create([]);
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Set it.
-                            panelStatements.payload = sl;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method adds ExpressionList to expressions panel.
-                    // var m_functionAddExpressionListToExpressionsPanel = function (panelExpressions) {
-
-                    //     try {
-
-                    //         // Allocate and create the object list.
-                    //         var el = new ExpressionList();
-                    //         var exceptionRet = el.create([]);
-                    //         if (exceptionRet) {
-
-                    //             throw exceptionRet;
-                    //         }
-
-                    //         // Set it.
-                    //         panelExpressions.payload = el;
-
-                    //         return null;
-                    //     } catch (e) {
-
-                    //         return e;
-                    //     }
-                    // };
-
-                    // Helper method adds LiteralList to literals panel.
-                    // var m_functionAddLiteralListToLiteralsPanel = function (panelLiterals) {
-
-                    //     try {
-
-                    //         // Allocate and create the object list.
-                    //         var ll = new LiteralList();
-                    //         var exceptionRet = ll.create([]);
-                    //         if (exceptionRet) {
-
-                    //             throw exceptionRet;
-                    //         }
-
-                    //         // Set it.
-                    //         panelLiterals.payload = ll;
-
-                    //         return null;
-                    //     } catch (e) {
-
-                    //         return e;
-                    //     }
-                    // };
-
-                    // Helper method sets MethodBuilder in the method panel.
-                    var m_functionSetMethodBuilderInCenterPanel = function() {
-
-                        try {
-
-                            // Set visible to property builder.
-                            window.eventBuilder.visible = false;
-                            window.propertyBuilder.visible = false;
-                            window.methodBuilder.visible = true;
-                            window.typeBuilder.visible = false;
-                            window.libraryBuilder.visible = false;
-
-                            // Set it in the center panel.
-                            return self.centerPanel.setPayload("Method",
-                                window.methodBuilder);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method sets TypeBuilder in the method panel.
-                    var m_functionSetTypeBuilderInCenterPanel = function() {
+                    // Helper method sets ProjectBuilder in the method panel.
+                    var m_functionSetProjectBuilderInCenterPanel = function() {
 
                         try {
 
@@ -1265,12 +833,37 @@ define(["NextWave/source/utility/prototypes",
                             window.eventBuilder.visible = false;
                             window.propertyBuilder.visible = false;
                             window.methodBuilder.visible = false;
-                            window.typeBuilder.visible = true;
+                            window.typeBuilder.visible = false;
                             window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = true;
 
                             // Set it in the center panel.
-                            return self.centerPanel.setPayload("Type",
-                                window.typeBuilder);
+                            return self.centerPanel.setPayload("Project",
+                                window.projectBuilder);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method sets ComicBuilder in the center panel.
+                    var m_functionSetComicBuilderInCenterPanel = function() {
+
+                        try {
+
+                            // Set visible to property builder.
+                            window.eventBuilder.visible = false;
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = true;
+                            window.projectBuilder.visible = false;
+
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Comic",
+                                window.comicBuilder);
                         } catch (e) {
 
                             return e;
@@ -1288,10 +881,58 @@ define(["NextWave/source/utility/prototypes",
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = false;
                             window.libraryBuilder.visible = true;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Library",
                                 window.libraryBuilder);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method sets TypeBuilder in the method panel.
+                    var m_functionSetTypeBuilderInCenterPanel = function() {
+
+                        try {
+
+                            // Set visible to property builder.
+                            window.eventBuilder.visible = false;
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = true;
+                            window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = false;
+
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Type",
+                                window.typeBuilder);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method sets MethodBuilder in the method panel.
+                    var m_functionSetMethodBuilderInCenterPanel = function() {
+
+                        try {
+
+                            // Set visible to property builder.
+                            window.eventBuilder.visible = false;
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = true;
+                            window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = false;
+
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("Method",
+                                window.methodBuilder);
                         } catch (e) {
 
                             return e;
@@ -1309,6 +950,8 @@ define(["NextWave/source/utility/prototypes",
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = false;
                             window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Property",
@@ -1330,6 +973,8 @@ define(["NextWave/source/utility/prototypes",
                             window.methodBuilder.visible = false;
                             window.typeBuilder.visible = false;
                             window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = false;
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Event",

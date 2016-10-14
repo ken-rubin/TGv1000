@@ -54,6 +54,12 @@ define(["NextWave/source/utility/prototypes",
                     // addNew.
                     self.addNew = new Area(new Point(settings.glyphs.addNew.x,settings.glyphs.addNew.y),
                         new Size(settings.glyphs.width, settings.glyphs.width));
+                    // save.
+                    self.save = new Area(new Point(settings.glyphs.save.x,settings.glyphs.save.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // search.
+                    self.search = new Area(new Point(settings.glyphs.search.x,settings.glyphs.search.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
 
                     ///////////////////////
                     // Public methods.
