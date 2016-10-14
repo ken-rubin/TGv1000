@@ -484,4 +484,6 @@ end//
 call maintainDB()//
 
 delimiter ;
+
+DROP PROCEDURE IF EXISTS maintainDB;
 select * from control;

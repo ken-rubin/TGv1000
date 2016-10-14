@@ -422,7 +422,7 @@ define(["Core/errorHelper",
 
 										if (!objectData.project.specialProjectData.systemTypesEdited) {
 
-											errorHelper.show('You project, ' + objectData.project.name + ', was saved.', 2000);
+											errorHelper.show('Your project, ' + objectData.project.name + ', was saved.', 2000);
 
 										} else {
 											

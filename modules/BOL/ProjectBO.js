@@ -569,34 +569,10 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // All image resources have already been created or selected for the project, its types and their methods. (Or default images are still being used.)
             // So nothing to do resource-wise.
 
-// Modify the following paragraph. for Libraries.
-            // How to handle System Types if project.specialProjectData.systemTypesEdited === "1":
-                // Since there is only one copy in the DB for SystemTypes, they are treated differently from other new or edited Types.
-                // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
-                // Its methods, events and properties, however, are deleted and re-inserted.
-                // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
-                // Methods, events and properties are always inserted.
-
-            // Similar approach needed if project.specialProjectData.comicsEdited === "1"
-
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
 
             // All projects now have a specialProjectData property. From both normal and privileged users.
-
-
-// The next 2 paragraphs have to be changed to handle system or base Libraries. Similar rules that applied to SystemTypes apply to these special Libraries.
-            // In all cases project contains a property called systemTypes which is an array with [0] being the base type of the project's App type and
-            // [1]-[n] being all System Types. If project.specialProjectData.userCanWorkWithSystemLibsAndTypes, we assume that these System Types
-            // *have* been edited and we save them. If System Types have an id > 0 (and not undefined or null--whatever), then they are
-            // updated so that they retain the same id; while if one is new, it is inserted and it gets the id it will have forever more.
-
-            // While we're writing the system types to the DB, we're also creating a sql script string array (or actually two of them) so that the stuff Ken, Jerry or
-            // John did to a base type or to system types can be re-played into other databases, both on others' dev machines and on the server. There will be 1 sql script covering all 
-            // system types and n more, one for each App base type that we decide to implement. For example, if a project is based on Game Base Type, 
-            // we'll create game_base_type.sql in addition to ST.sql. These scripts are to be saved to GitHub iff any changes or additions were made.
-
-
 
             // If a privileged user is saving a Purchasable Project (whether new or opened for editing), 
             // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
@@ -613,19 +589,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
             // its project.specialProjectData.openMode will have been changed to 'bought' by ??? (on the client side).
 
-                // Saving data to table products, classes or onlineclasses if this is a Purchasable Project (as opposed to an edited core project).
+            // Saving data to table products, classes or onlineclasses if this is a Purchasable Project (as opposed to an edited core project).
 
-                // Updating without changing project id or comic id.
-
-
-// The following needs modification for Libraries and the types within them.
-                // Since there is only one copy in the DB for SystemTypes or App base types, they are treated differently from other new or edited Types.
-                // Whether in a Save or a SaveAs, if an SystemType already exists (id>=0), it is not deleted and then added again. It is updated.
-                // Its methods, event and properties are deleted and re-inserted.
-                // If it doesn't exist yet (id<0), it is inserted in the normal pass 2 processing.
-                // Methods, events and properties are inserted.
-
-                // Similar approach need if project.specialProjectData.comicsEdited === "1"
+            // Updating without changing project id or comic id.
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
@@ -662,57 +628,39 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-                                            // There is no longer a project type that contains on SystemTypes (and potentially a base type in [0].)
-                                            // A privileged user (project.specialProjectData.userCanWorkWithSystemLibsAndTypes) can edit, create or delete Base and System libraries
-                                            // and their types either by editing a Core project or by creating a project based on a Core project (as all are, of course) and then 
-                                            // doing whatever to the special libraries and types therein. A privileged user will be assumed to have edited these parts of the project.
-                                            // They will be saved below in the normal course of processing, but we have to write sql scripts in order to duplicate changes to base or system
-                                            // libraries and their types in others' database and on the server. We'll call m_functionPotentiallyDoScripts and continue saving the project in
-                                            // its callback.
+                                            m_functionDetermineTypeOfSave(connection, req, res,
+                                                function(err, typeOfSave) {
 
-                                            // This function will do no database work. It will just write out the script files if the user is privileged.
-                                            // We will not let an error in writing the scripts keep us from saving the project to the DB.
-                                            m_functionPotentiallyDoScripts(project,
-                                                function(err) {
+                                                    if (err) {
+                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, connection, null);
+                                                    
+                                                    } else {
+                                                        if (typeOfSave === 'save') {
 
-                                                    // Add err (probably null) to project to be returned to client side for message to user.
-                                                    project.scriptsResult = err;
-
-                                                    m_functionDetermineTypeOfSave(connection, req, res,
-                                                        function(err, typeOfSave) {
-
-                                                            if (err) {
-                                                                m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, connection, null);
-                                                            
-                                                            } else {
-                                                                if (typeOfSave === 'save') {
-
-                                                                    m_log('Going into m_functionSaveProject');
-                                                                    m_functionSaveProject(connection, req, res, project, 
-                                                                        function(err) {
-                                                                            m_functionFinalCallback(err, req, res, connection, project);
-                                                                        }
-                                                                    );
-                                                                } else if (typeOfSave === 'saveWithSameId') {
-
-                                                                    m_log('Going into m_functionSaveProjectWithSameId');
-                                                                    m_functionSaveProjectWithSameId(connection, req, res, project, 
-                                                                        function(err) {
-                                                                            m_functionFinalCallback(err, req, res, connection, project);
-                                                                        }
-                                                                    );
-                                                                } else {    // 'saveAs'
-
-                                                                    m_log('Going into m_functionSaveProjectAs');
-                                                                    m_functionSaveProjectAs(connection, req, res, project, 
-                                                                        function(err) {
-                                                                            m_functionFinalCallback(err, req, res, connection, project);
-                                                                        }
-                                                                    );
+                                                            m_log('Going into m_functionSaveProject');
+                                                            m_functionSaveProject(connection, req, res, project, 
+                                                                function(err) {
+                                                                    m_functionFinalCallback(err, req, res, connection, project);
                                                                 }
-                                                            }
+                                                            );
+                                                        } else if (typeOfSave === 'saveWithSameId') {
+
+                                                            m_log('Going into m_functionSaveProjectWithSameId');
+                                                            m_functionSaveProjectWithSameId(connection, req, res, project, 
+                                                                function(err) {
+                                                                    m_functionFinalCallback(err, req, res, connection, project);
+                                                                }
+                                                            );
+                                                        } else {    // 'saveAs'
+
+                                                            m_log('Going into m_functionSaveProjectAs');
+                                                            m_functionSaveProjectAs(connection, req, res, project, 
+                                                                function(err) {
+                                                                    m_functionFinalCallback(err, req, res, connection, project);
+                                                                }
+                                                            );
                                                         }
-                                                    );
+                                                    }
                                                 }
                                             );
                                         }
@@ -738,26 +686,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 success: false,
                 message: 'Could not save project due to error: ' + e.message
             });
-        }
-    }
-
-    var m_functionPotentiallyDoScripts = function (project, callback) {
-
-        try {
-
-            if (project.specialProjectData.userCanWorkWithSystemLibsAndTypes) {
-
-
-
-
-
-            }
-
-            return callback(null);
-
-        } catch (e) {
-
-            return callback(e);
         }
     }
 
@@ -792,7 +720,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // its project.specialProjectData.openMode will have been changed to 'bought'.
 
 
-// TODO: handle 'loaded'
+// TODO: handle 'loaded' or is it the same as any other project.specialProjectData.openMode? 
+// Maybe I shouldn't have set it to 'loaded', thus overriding what was in there from when the JSON was created.
 
             async.waterfall(
                 [
