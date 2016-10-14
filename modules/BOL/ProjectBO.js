@@ -635,6 +635,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, connection, null);
                                                     
                                                     } else {
+
                                                         if (typeOfSave === 'save') {
 
                                                             m_log('Going into m_functionSaveProject');
@@ -694,35 +695,37 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         try {
 
             m_log("***In m_functionDetermineTypeOfSave***");
-            // return with callback(err, typeOfSave);
+
+            // Return with callback(err, typeOfSave);
             // typeOfSave:
             //  'saveAs' INSERTs new rows for everything.
             //  'save' DELETES (cascading the project from the database) and then calls SaveAs to insert it.
             //  'saveWithSameId' UPDATEs.
-            //  'loaded' a privileged user has loaded the project from a saved JSON file.
 
             // The project's name must be unique to the user's projects, but can be the same as another user's project name.
-            // This doesn't have to be checked for a typeOfSave === 'save', but it will be checked for 'new' or 'save as' saves.
+            // This doesn't have to be checked if we're returning typeOfSave === 'save', but it will have to be checked for 'new' or 'save as' saves.
+            
             // What would normally result in a 'save' will be changed to a 'saveAs' if it's a new project or the user is saving a project gotten from another user.
             // What would normally result in a 'saveAs' will be changed to a 'save' if the name and id are the same as one of the user's existing projects.
+            
             // Also, if req.body.changeableName is true, then a name conflict will be resolved (without user intervention) by appending an incremented integer until there is no conflict
-            // within the user's projects and a 'SaveAs' can be done. This will only happen on a project with project.specialProjectData.openMode === "bought".
+            // within the user's projects and typeOfSave will be returned as 'SaveAs'. This will only happen on a project with project.specialProjectData.openMode === "bought".
 
             // A privileged user can also edit and save a core project with the same id. In this case project.isCoreProject And
             // project.specialProjectData.coreProject will both be true. Take your pick regarding which to check.
 
-            // project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
-            // 'new' projects are always INSERTed into the database.
-            // 'searched' projects may be INSERTed or UPDATEd. More on this below.
+            // We'll find project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
+            // 'new' projects are always INSERTed into the database. 'searched' projects may be INSERTed or UPDATEd. More on these below.
 
             // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
             // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
             // its project.specialProjectData.openMode will have been changed to 'bought'.
+            
+            // project.specialProjectData.openMode === 'loaded' requires some extra digging to determine what to do in this save, since it could already
+            // have been saved to the DB--or not. It may even belong to someone else and have been sent via email to the user trying to save it now.
 
-
-// TODO: handle 'loaded' or is it the same as any other project.specialProjectData.openMode? 
-// Maybe I shouldn't have set it to 'loaded', thus overriding what was in there from when the JSON was created.
-
+            // We'll use async waterfall to retrieve various data (in sucessive functions that add to and pass along a growing status-containing object),
+            // and in its final function we'll use it to set typeOfSave.
             async.waterfall(
                 [
                     // Simple settings to get started
@@ -822,6 +825,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     if (err) { 
                         m_log("Came into end of waterfall with err non-null."); 
                         return callback(err); 
+                    }
+
+                    if (resultArray.project.specialProjectData.openMode === 'loaded') {
+
+                        return callback(new Error("Not prepared to save project loaded from JSON files yet. Soon."));
                     }
 
                     var typeOfSave = null;
@@ -1389,26 +1397,26 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 return cb(err); 
                                                             }
                                                         );
-                                                    },
-                                                    function(cb){
+                                                    // },
+                                                    // function(cb){
 
-                                                        m_log("Going to m_saveComics_XInComicIthToDB for expressions");
-                                                        m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                            'expressions',
-                                                            function(err) {
-                                                                return cb(err); 
-                                                            }
-                                                        );
-                                                    },
-                                                    function(cb){
+                                                    //     m_log("Going to m_saveComics_XInComicIthToDB for expressions");
+                                                    //     m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    //         'expressions',
+                                                    //         function(err) {
+                                                    //             return cb(err); 
+                                                    //         }
+                                                    //     );
+                                                    // },
+                                                    // function(cb){
 
-                                                        m_log("Going to m_saveComics_XInComicIthToDB for literals");
-                                                        m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                            'literals',
-                                                            function(err) {
-                                                                return cb(err); 
-                                                            }
-                                                        );
+                                                    //     m_log("Going to m_saveComics_XInComicIthToDB for literals");
+                                                    //     m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                    //         'literals',
+                                                    //         function(err) {
+                                                    //             return cb(err); 
+                                                    //         }
+                                                    //     );
                                                     }
                                                 ],
                                                 function(err) {
@@ -1449,7 +1457,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch (e) { callback(e); }
     }
 
-    // The 'X' in the name of this function means 'expressions', 'literals' or 'statements'.
+    // The 'X' in the name of this function means 'expressions', 'literals' or 'statements'--except that it's no longer called with 'expressions' or 'literal'; just 'statements'.
     // The function saves all three via three junction tables whose names it constructs.
     var m_saveComics_XInComicIthToDB = function (connection, req, res, project, comicIth, which, callback) {
 
@@ -1571,7 +1579,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { callback(e); }
     }
 
-
     var m_saveLibrariesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
         try {
@@ -1605,11 +1612,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                     } else if (libraryIth.id) {
 
-                        whatToDo = "updateLibAndDoTypesAndJuncTbl";
+                        whatToDo = "updateLibAndDoJuncTbl";
 
                     } else if (!libraryIth.id) {
 
-                        whatToDo = "insertLibAndDoTypesAndJuncTbl";
+                        whatToDo = "insertLibAndDoJuncTbl";
                     }
 
                     var guts = {
@@ -1745,202 +1752,202 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //     }
     // }
 
-    var m_saveTypesInLibraryIthToDB = function(connection, req, res, project, comicIth, libraryIth, callback) {
+    // var m_saveTypesInLibraryIthToDB = function(connection, req, res, project, comicIth, libraryIth, callback) {
 
-        try {
+    //     try {
 
-            m_log("***In m_saveTypesInLibraryIthToDB***");
-            var ordinal = 1;
-            async.eachSeries(libraryIth.types,
-                function(typeIth, cb) {
+    //         m_log("***In m_saveTypesInLibraryIthToDB***");
+    //         var ordinal = 1;
+    //         async.eachSeries(libraryIth.types,
+    //             function(typeIth, cb) {
 
-                    if (typeIth.isApp || 0) {
+    //                 if (typeIth.isApp || 0) {
 
-                        // We can use nested async calls here to do (1) and (2) serially:
-                        // (1) insert the App type
-                        // (2) and then do (2a) and (2b) in parallel:
-                        //  (2a) write tags
-                        //  (2b) write the App type's arrays (methods, properties and events).
-                        async.series(
-                            [
-                                // (1)
-                                function(cb) {
+    //                     // We can use nested async calls here to do (1) and (2) serially:
+    //                     // (1) insert the App type
+    //                     // (2) and then do (2a) and (2b) in parallel:
+    //                     //  (2a) write tags
+    //                     //  (2b) write the App type's arrays (methods, properties and events).
+    //                     async.series(
+    //                         [
+    //                             // (1)
+    //                             function(cb) {
 
-                                    typeIth.libraryId = libraryIth.id;
-                                    typeIth.ordinal = 0;
+    //                                 typeIth.libraryId = libraryIth.id;
+    //                                 typeIth.ordinal = 0;
 
-                                    var guts = {
-                                        name: typeIth.name,
-                                        isApp: 1,
-                                        imageId: typeIth.imageId,
-                                        altImagePath: typeIth.altImagePath,
-                                        ordinal: 0,
-                                        libraryId: typeIth.libraryId,
-                                        description: typeIth.description,
-                                        parentTypeId: typeIth.parentTypeId,
-                                        parentPrice: typeIth.parentPrice,
-                                        priceBump: typeIth.priceBump,
-                                        ownedByUserId: req.user.userId,
-                                        public: typeIth.public,
-                                        quarantined: typeIth.quarantined,
-                                        baseLibraryName: typeIth.baseLibraryName,
-                                        baseTypeName: typeIth.baseTypeName
-                                    };
+    //                                 var guts = {
+    //                                     name: typeIth.name,
+    //                                     isApp: 1,
+    //                                     imageId: typeIth.imageId,
+    //                                     altImagePath: typeIth.altImagePath,
+    //                                     ordinal: 0,
+    //                                     libraryId: typeIth.libraryId,
+    //                                     description: typeIth.description,
+    //                                     parentTypeId: typeIth.parentTypeId,
+    //                                     parentPrice: typeIth.parentPrice,
+    //                                     priceBump: typeIth.priceBump,
+    //                                     ownedByUserId: req.user.userId,
+    //                                     public: typeIth.public,
+    //                                     quarantined: typeIth.quarantined,
+    //                                     baseLibraryName: typeIth.baseLibraryName,
+    //                                     baseTypeName: typeIth.baseTypeName
+    //                                 };
 
-                                    var exceptionRet = m_checkGutsForUndefined('app type', guts);
-                                    if (exceptionRet) {
-                                        return cb(exceptionRet);
-                                    }
+    //                                 var exceptionRet = m_checkGutsForUndefined('app type', guts);
+    //                                 if (exceptionRet) {
+    //                                     return cb(exceptionRet);
+    //                                 }
 
-                                    var strQuery = "insert " + self.dbname + "types SET ?";
-                                    m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                        function(err, rows) {
+    //                                 var strQuery = "insert " + self.dbname + "types SET ?";
+    //                                 m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                     function(err, rows) {
 
-                                            try {
-                                                if (err) { return cb(err); }
-                                                if (rows.length === 0) { return cb(new Error("Error writing type to database.")); }
+    //                                         try {
+    //                                             if (err) { return cb(err); }
+    //                                             if (rows.length === 0) { return cb(new Error("Error writing type to database.")); }
 
-                                                // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
-                                                // But we do have to set the newly assign id.
-                                                typeIth.id = rows[0].insertId;
-                                                return cb(null);
+    //                                             // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
+    //                                             // But we do have to set the newly assign id.
+    //                                             typeIth.id = rows[0].insertId;
+    //                                             return cb(null);
 
-                                            } catch (e1) { return cb(e1); }
-                                        }
-                                    );
-                                },
-                                // (2)
-                                function(cb) {
-                                    async.parallel(
-                                        [
-                                            // (2a)
-                                            function(cb) {
-                                                m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
-                                                    function(err) { return cb(err); }
-                                                );
-                                            },
-                                            // (2b)
-                                            function(cb) {
-                                                m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
-                                                    function(err) { return cb(err) }
-                                                );
-                                            }
-                                        ],
-                                        // parallel final callback
-                                        function(err) { return cb(err); }
-                                    );
-                                }
-                            ],
-                            // series final callback
-                            function(err){ return cb(err); }
-                        );
-                    } else {
-                        // non-App type
+    //                                         } catch (e1) { return cb(e1); }
+    //                                     }
+    //                                 );
+    //                             },
+    //                             // (2)
+    //                             function(cb) {
+    //                                 async.parallel(
+    //                                     [
+    //                                         // (2a)
+    //                                         function(cb) {
+    //                                             m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
+    //                                                 function(err) { return cb(err); }
+    //                                             );
+    //                                         },
+    //                                         // (2b)
+    //                                         function(cb) {
+    //                                             m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
+    //                                                 function(err) { return cb(err) }
+    //                                             );
+    //                                         }
+    //                                     ],
+    //                                     // parallel final callback
+    //                                     function(err) { return cb(err); }
+    //                                 );
+    //                             }
+    //                         ],
+    //                         // series final callback
+    //                         function(err){ return cb(err); }
+    //                     );
+    //                 } else {
+    //                     // non-App type
 
-                        typeIth.libraryId = libraryIth.id;
-                        typeIth.ordinal = ordinal++;
+    //                     typeIth.libraryId = libraryIth.id;
+    //                     typeIth.ordinal = ordinal++;
 
-                        // Again, we can use nested async calls here to do (1) and (2) serially:
-                        // (1) insert the App type
-                        // (2) and then do (2a) and (2b) in parallel:
-                        //  (2a) write tags
-                        //  (2b) write the App type's arrays (methods, properties and events).
+    //                     // Again, we can use nested async calls here to do (1) and (2) serially:
+    //                     // (1) insert the App type
+    //                     // (2) and then do (2a) and (2b) in parallel:
+    //                     //  (2a) write tags
+    //                     //  (2b) write the App type's arrays (methods, properties and events).
 
-                        async.series(
-                            [
-                                // (1)
-                                function(cb) {
+    //                     async.series(
+    //                         [
+    //                             // (1)
+    //                             function(cb) {
 
-                                    var guts = {
-                                        name: typeIth.name,
-                                        isApp: 0,
-                                        imageId: typeIth.imageId || 0,
-                                        altImagePath: typeIth.altImagePath || "",
-                                        ordinal: typeIth.ordinal,
-                                        libraryId: typeIth.libraryId,
-                                        description: typeIth.description,
-                                        parentTypeId: typeIth.parentTypeId || 0,
-                                        parentPrice: typeIth.parentPrice || 0,
-                                        priceBump: typeIth.priceBump || 0,
-                                        ownedByUserId: typeIth.ownedByUserId,
-                                        public: typeIth.public || 0,
-                                        quarantined: typeIth.quarantined || 1,
-                                        baseLibraryName: typeIth.baseLibraryName || '',
-                                        baseTypeName: typeIth.baseTypeName || ''
-                                    };
+    //                                 var guts = {
+    //                                     name: typeIth.name,
+    //                                     isApp: 0,
+    //                                     imageId: typeIth.imageId || 0,
+    //                                     altImagePath: typeIth.altImagePath || "",
+    //                                     ordinal: typeIth.ordinal,
+    //                                     libraryId: typeIth.libraryId,
+    //                                     description: typeIth.description,
+    //                                     parentTypeId: typeIth.parentTypeId || 0,
+    //                                     parentPrice: typeIth.parentPrice || 0,
+    //                                     priceBump: typeIth.priceBump || 0,
+    //                                     ownedByUserId: typeIth.ownedByUserId,
+    //                                     public: typeIth.public || 0,
+    //                                     quarantined: typeIth.quarantined || 1,
+    //                                     baseLibraryName: typeIth.baseLibraryName || '',
+    //                                     baseTypeName: typeIth.baseTypeName || ''
+    //                                 };
 
-                                    var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
-                                    if (exceptionRet) {
-                                        return cb(exceptionRet);
-                                    }
+    //                                 var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
+    //                                 if (exceptionRet) {
+    //                                     return cb(exceptionRet);
+    //                                 }
 
-                                    // It's a Type that was deleted or never existed.
-                                    var strQuery = "insert " + self.dbname + "types SET ?";
-                                    weInserted = true;
+    //                                 // It's a Type that was deleted or never existed.
+    //                                 var strQuery = "insert " + self.dbname + "types SET ?";
+    //                                 weInserted = true;
 
-                                    m_log('Inserting type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                                 m_log('Inserting type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
 
-                                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                        function(err, rows) {
+    //                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                     function(err, rows) {
 
-                                            try {
-                                                if (err) { return cb(err); }
-                                                if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
+    //                                         try {
+    //                                             if (err) { return cb(err); }
+    //                                             if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
 
-                                                typeIth.id = rows[0].insertId;
+    //                                             typeIth.id = rows[0].insertId;
 
-                                                return cb(null);
+    //                                             return cb(null);
 
-                                            } catch (e3) {
-                                                return cb(e3);
-                                            }
-                                        }
-                                    );
-                                },
-                                // (2)
-                                function(cb) {
-                                    async.parallel(
-                                        [
-                                            // (2a)
-                                            function(cb) {
+    //                                         } catch (e3) {
+    //                                             return cb(e3);
+    //                                         }
+    //                                     }
+    //                                 );
+    //                             },
+    //                             // (2)
+    //                             function(cb) {
+    //                                 async.parallel(
+    //                                     [
+    //                                         // (2a)
+    //                                         function(cb) {
 
-                                                m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
-                                                    function(err) { return cb(err); }
-                                                );
-                                            },
-                                            // (2b)
-                                            function(cb) {
+    //                                             m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
+    //                                                 function(err) { return cb(err); }
+    //                                             );
+    //                                         },
+    //                                         // (2b)
+    //                                         function(cb) {
 
-                                                m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
-                                                    function(err) { 
-                                                        return cb(err); 
-                                                    }
-                                                );
-                                            }
-                                        ],
-                                        // final callback for parallel
-                                        function(err) { 
-                                            return cb(err); 
-                                        }
-                                    );
-                                }
-                            ],
-                            // final callback for series
-                            function(err) { 
-                                return cb(err); 
-                            }
-                        );
-                    }
-                },
-                function(err) { 
-                    return callback(err); 
-                }
-            );
-        } catch (e) { 
-            callback(e); 
-        }
-    }
+    //                                             m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
+    //                                                 function(err) { 
+    //                                                     return cb(err); 
+    //                                                 }
+    //                                             );
+    //                                         }
+    //                                     ],
+    //                                     // final callback for parallel
+    //                                     function(err) { 
+    //                                         return cb(err); 
+    //                                     }
+    //                                 );
+    //                             }
+    //                         ],
+    //                         // final callback for series
+    //                         function(err) { 
+    //                             return cb(err); 
+    //                         }
+    //                     );
+    //                 }
+    //             },
+    //             function(err) { 
+    //                 return callback(err); 
+    //             }
+    //         );
+    //     } catch (e) { 
+    //         callback(e); 
+    //     }
+    // }
 
 // Change to m_fixUpBaseTypeIdsInLibraryIth.
     // var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
@@ -1986,204 +1993,204 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //     } catch (e) { callback(e); }
     // }
 
-    var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
+    // var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
 
-        try {
+    //     try {
 
-            m_log("***Arrived in m_saveArraysInTypeIthToDB for type named " + typeIth.name + "***.");
+    //         m_log("***Arrived in m_saveArraysInTypeIthToDB for type named " + typeIth.name + "***.");
 
-            // We use async.parallel here because methods, properties and events are totally independent.
-            // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
+    //         // We use async.parallel here because methods, properties and events are totally independent.
+    //         // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
             
-            async.series( // TODO change back to parallel after debugging
-                [
-                    // (1) methods
-                    function(cbp1) {
+    //         async.series( // TODO change back to parallel after debugging
+    //             [
+    //                 // (1) methods
+    //                 function(cbp1) {
 
-                        m_log("Doing methods");
-                        var ordinal = 0;
+    //                     m_log("Doing methods");
+    //                     var ordinal = 0;
 
-                        async.eachSeries(typeIth.methods,
-                            function(method, cb) {
-                                async.series(
-                                    [
-                                        // (1a)
-                                        function(cb) {
+    //                     async.eachSeries(typeIth.methods,
+    //                         function(method, cb) {
+    //                             async.series(
+    //                                 [
+    //                                     // (1a)
+    //                                     function(cb) {
 
-                                            method.typeId = typeIth.id;
-                                            method.ordinal = ordinal++;
+    //                                         method.typeId = typeIth.id;
+    //                                         method.ordinal = ordinal++;
 
-                                            if (!method.hasOwnProperty("arguments")) {
-                                                method.arguments = [];
-                                            }
-                                            if (!method.hasOwnProperty("statements")) {
-                                                method.statements = [];
-                                            }
+    //                                         if (!method.hasOwnProperty("arguments")) {
+    //                                             method.arguments = [];
+    //                                         }
+    //                                         if (!method.hasOwnProperty("statements")) {
+    //                                             method.statements = [];
+    //                                         }
 
-                                            var guts = {
-                                                        typeId: typeIth.id,
-                                                        name: method.name,
-                                                        ordinal: method.ordinal,
-                                                        statements: JSON.stringify({"statements": method.statements}),
-                                                        imageId: method.imageId || 0,
-                                                        description: method.description || '[No description provided]',
-                                                        parentMethodId: method.parentMethodId || 0,
-                                                        parentPrice: method.parentPrice || 0,
-                                                        priceBump: method.priceBump || 0,
-                                                        ownedByUserId: method.ownedByUserId,
-                                                        public: method.public || 0,
-                                                        quarantined: method.quarantined || 1,
-                                                        methodTypeId: method.methodTypeId || 2, // Not needed anymore
-                                                        arguments: JSON.stringify({"arguments": method.arguments})
-                                                        };
+    //                                         var guts = {
+    //                                                     typeId: typeIth.id,
+    //                                                     name: method.name,
+    //                                                     ordinal: method.ordinal,
+    //                                                     statements: JSON.stringify({"statements": method.statements}),
+    //                                                     imageId: method.imageId || 0,
+    //                                                     description: method.description || '[No description provided]',
+    //                                                     parentMethodId: method.parentMethodId || 0,
+    //                                                     parentPrice: method.parentPrice || 0,
+    //                                                     priceBump: method.priceBump || 0,
+    //                                                     ownedByUserId: method.ownedByUserId,
+    //                                                     public: method.public || 0,
+    //                                                     quarantined: method.quarantined || 1,
+    //                                                     methodTypeId: method.methodTypeId || 2, // Not needed anymore
+    //                                                     arguments: JSON.stringify({"arguments": method.arguments})
+    //                                                     };
 
-                                            var exceptionRet = m_checkGutsForUndefined('method', guts);
-                                            if (exceptionRet) {
-                                                return cb(exceptionRet);
-                                            }
+    //                                         var exceptionRet = m_checkGutsForUndefined('method', guts);
+    //                                         if (exceptionRet) {
+    //                                             return cb(exceptionRet);
+    //                                         }
 
-                                            var strQuery = "insert " + self.dbname + "methods SET ?";
-                                            m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                            sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                                function(err, rows) {
+    //                                         var strQuery = "insert " + self.dbname + "methods SET ?";
+    //                                         m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                                         sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                             function(err, rows) {
 
-                                                    try {
-                                                        if (err) { return cb(err); }
-                                                        if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+    //                                                 try {
+    //                                                     if (err) { return cb(err); }
+    //                                                     if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
-                                                        method.id = rows[0].insertId;
+    //                                                     method.id = rows[0].insertId;
 
-                                                        return cb(null);
+    //                                                     return cb(null);
 
-                                                    } catch (em) { return cb(em); }
-                                                }
-                                            );
-                                        },
-                                        // (1b)
-                                        function(cb) {
+    //                                                 } catch (em) { return cb(em); }
+    //                                             }
+    //                                         );
+    //                                     },
+    //                                     // (1b)
+    //                                     function(cb) {
 
-                                            m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
-                                                function(err) { return cb(err); }
-                                            );
-                                        }
-                                    ],
-                                    // final callback for async.series in methods
-                                    function(err) { 
-                                        return cb(err); 
-                                    }
-                                );
-                            },
-                            // final callback for async.eachSeries in methods
-                            function(err) { 
-                                return cbp1(err); 
-                            }
-                        );
-                    },
-                    // (2) properties
-                    function(cbp2) {
+    //                                         m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
+    //                                             function(err) { return cb(err); }
+    //                                         );
+    //                                     }
+    //                                 ],
+    //                                 // final callback for async.series in methods
+    //                                 function(err) { 
+    //                                     return cb(err); 
+    //                                 }
+    //                             );
+    //                         },
+    //                         // final callback for async.eachSeries in methods
+    //                         function(err) { 
+    //                             return cbp1(err); 
+    //                         }
+    //                     );
+    //                 },
+    //                 // (2) properties
+    //                 function(cbp2) {
 
-                        m_log("Doing properties");
-                        var ordinal = 0;
+    //                     m_log("Doing properties");
+    //                     var ordinal = 0;
 
-                        async.eachSeries(typeIth.properties,
-                            function(property, cb) {
+    //                     async.eachSeries(typeIth.properties,
+    //                         function(property, cb) {
 
-                                property.typeId = typeIth.id;
-                                property.ordinal = ordinal++;
+    //                             property.typeId = typeIth.id;
+    //                             property.ordinal = ordinal++;
 
-                                var guts = {
-                                            typeId: typeIth.id,
-                                            propertyTypeId: 6,
-                                            name: property.name,
-                                            initialValue: property.initialValue || '',
-                                            ordinal: property.ordinal,
-                                            isHidden: 0
-                                            };
+    //                             var guts = {
+    //                                         typeId: typeIth.id,
+    //                                         propertyTypeId: 6,
+    //                                         name: property.name,
+    //                                         initialValue: property.initialValue || '',
+    //                                         ordinal: property.ordinal,
+    //                                         isHidden: 0
+    //                                         };
 
-                                var exceptionRet = m_checkGutsForUndefined('property', guts);
-                                if (exceptionRet) {
-                                    return cb(exceptionRet);
-                                }
+    //                             var exceptionRet = m_checkGutsForUndefined('property', guts);
+    //                             if (exceptionRet) {
+    //                                 return cb(exceptionRet);
+    //                             }
 
-                                strQuery = "insert " + self.dbname + "propertys SET ?";
-                                m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                    function(err, rows) {
+    //                             strQuery = "insert " + self.dbname + "propertys SET ?";
+    //                             m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                 function(err, rows) {
 
-                                        try {
-                                            if (err) { return cb(err); }
-                                            if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
+    //                                     try {
+    //                                         if (err) { return cb(err); }
+    //                                         if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
 
-                                            property.id = rows[0].insertId;
+    //                                         property.id = rows[0].insertId;
 
-                                            return cb(null);
+    //                                         return cb(null);
 
-                                        } catch (ep) { return cb(ep); }
-                                    }
-                                );
-                            },
-                            // final callback for async.eachSeries in properties
-                            function(err) { 
-                                return cbp2(err); 
-                            }
-                        );
-                    },
-                    // (3) events
-                    function(cbp3) {
+    //                                     } catch (ep) { return cb(ep); }
+    //                                 }
+    //                             );
+    //                         },
+    //                         // final callback for async.eachSeries in properties
+    //                         function(err) { 
+    //                             return cbp2(err); 
+    //                         }
+    //                     );
+    //                 },
+    //                 // (3) events
+    //                 function(cbp3) {
 
-                        m_log("Doing events");
-                        var ordinal = 0;
-                        async.eachSeries(typeIth.events,
-                            function(event, cb) {
+    //                     m_log("Doing events");
+    //                     var ordinal = 0;
+    //                     async.eachSeries(typeIth.events,
+    //                         function(event, cb) {
 
-                                event.typeId = typeIth.id;
-                                event.ordinal = ordinal++;
+    //                             event.typeId = typeIth.id;
+    //                             event.ordinal = ordinal++;
 
-                                var guts = {
-                                            typeId: typeIth.id,
-                                            name: event.name,
-                                            ordinal: event.ordinal
-                                            };
+    //                             var guts = {
+    //                                         typeId: typeIth.id,
+    //                                         name: event.name,
+    //                                         ordinal: event.ordinal
+    //                                         };
 
-                                var exceptionRet = m_checkGutsForUndefined('event', guts);
-                                if (exceptionRet) {
-                                    return cb(exceptionRet);
-                                }
+    //                             var exceptionRet = m_checkGutsForUndefined('event', guts);
+    //                             if (exceptionRet) {
+    //                                 return cb(exceptionRet);
+    //                             }
 
-                                strQuery = "insert " + self.dbname + "events SET ?";
-                                m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                                sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                                    function(err, rows) {
+    //                             strQuery = "insert " + self.dbname + "events SET ?";
+    //                             m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+    //                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+    //                                 function(err, rows) {
 
-                                        try {
-                                            if (err) { throw err; }
-                                            if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
+    //                                     try {
+    //                                         if (err) { throw err; }
+    //                                         if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
 
-                                            event.id = rows[0].insertId;
+    //                                         event.id = rows[0].insertId;
 
-                                            return cb(null);
+    //                                         return cb(null);
 
-                                        } catch (ee) { return cb(ee); }
-                                    }
-                                );
-                            },
-                            // final callback for async.eachSeries in events
-                            function(err) { 
-                                return cbp3(err); 
-                            }
-                        );
-                    }
-                ],
-                // final callback for outer async.parallel for methods, properties and events.
-                function(err) { 
-                    return callback(err); 
-                }
-            );
-        } catch (e) {
+    //                                     } catch (ee) { return cb(ee); }
+    //                                 }
+    //                             );
+    //                         },
+    //                         // final callback for async.eachSeries in events
+    //                         function(err) { 
+    //                             return cbp3(err); 
+    //                         }
+    //                     );
+    //                 }
+    //             ],
+    //             // final callback for outer async.parallel for methods, properties and events.
+    //             function(err) { 
+    //                 return callback(err); 
+    //             }
+    //         );
+    //     } catch (e) {
 
-            callback(e);
-        }
-    }
+    //         callback(e);
+    //     }
+    // }
 
     var m_checkGutsForUndefined = function(ident, guts) {
 

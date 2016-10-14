@@ -383,7 +383,7 @@ define(["Core/errorHelper",
 					// Not all of these come back through client. Some places handle the processing internally.
 
 					// Called by SaveProjectAsDialog.
-					self.saveProjectToDB = function () {
+					self.saveProjectToDB = function (callback) {
 
 						try {
 
@@ -420,18 +420,7 @@ define(["Core/errorHelper",
 
 									if (objectData.success) {
 
-										if (!objectData.project.specialProjectData.systemTypesEdited) {
-
-											errorHelper.show('Your project, ' + objectData.project.name + ', was saved.', 2000);
-
-										} else {
-											
-											if (objectData.scriptSuccess) {
-												errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
-											} else {
-												errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + objectData.saveError.message + ".");
-											}
-										}
+										errorHelper.show('Your project, ' + objectData.project.name + ', was saved.', 2000);
 
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
@@ -450,7 +439,7 @@ define(["Core/errorHelper",
 										self.loadProjectIntoManager();
 										self.setBrowserTabAndBtns();
 
-										return null;
+										return callback(null);
 
 									} else {
 
@@ -458,19 +447,16 @@ define(["Core/errorHelper",
 										// self.closeCurrentDialog();
 										// self.unloadProject(null, false);
 
-										return new Error(objectData.message);
+										return callback(new Error(objectData.message));
 									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
 
 									// Non-computational error in strError
-									return new Error(strError);
+									return new callback(new Error(strError));
 								}
 							});
-
-							return null;
-
-						} catch (e) { return e; }
+						} catch (e) { return callback(e); }
 					}
 
 					// strWhatToSave = 'project' saves self.project.
