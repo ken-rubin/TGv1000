@@ -47,30 +47,35 @@ define(["NextWave/source/project/Type",
                             self.data = objectLibrary;
 
                             // Possibly convert references and editors.
-                            if (self.data.references.push) {
+                            if (self.data.references &&
+                                self.data.references.push) {
 
                                 self.data.references = self.data.references.join("\n");
                             }
-                            if (self.data.editors.push) {
+                            if (self.data.editors &&
+                                self.data.editors.push) {
 
                                 self.data.editors = self.data.editors.join("\n");
                             }
 
                             // Then loop over Types and create children.
                             self.types = [];
-                            for (var i = 0; i < objectLibrary.types.length; i++) {
+                            if (self.data.types.length > 0) {
 
-                                // Get the ith Type.
-                                var objectTypeIth = objectLibrary.types[i];
+                                for (var i = 0; i < objectLibrary.types.length; i++) {
 
-                                // Allocate and create a new Type and add to collection.
-                                var typeIth = new Type(self);
-                                var exceptionRet = typeIth.create(objectTypeIth);
-                                if (exceptionRet) {
+                                    // Get the ith Type.
+                                    var objectTypeIth = objectLibrary.types[i];
 
-                                    return exceptionRet;
+                                    // Allocate and create a new Type and add to collection.
+                                    var typeIth = new Type(self);
+                                    var exceptionRet = typeIth.create(objectTypeIth);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                    self.types.push(typeIth);
                                 }
-                                self.types.push(typeIth);
                             }
 
                             // Generate ListItem for this instance.

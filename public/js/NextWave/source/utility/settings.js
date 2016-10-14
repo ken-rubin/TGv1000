@@ -49,14 +49,15 @@ define(["NextWave/source/utility/prototypes"],
                         fillText: "#000",
                         blinkMS: 500,
                         maximumCharacters: 32,
-                        font: "30px Arial",
+                        smallFont: "15px Arial",
+                        font: "20px Arial",
                         monoSpaceFont: "30px Courier New"
                     };
                     self.dialog = {
 
                         firstColumnWidth: 200,
                         lineHeight: 34,
-                        font: "30px Arial"
+                        font: "24px Arial"
                     };
                     self.area = {
 
@@ -79,14 +80,14 @@ define(["NextWave/source/utility/prototypes"],
 
                         firstColumnWidthPercent: 0.25,
                         lineHeight: 34,
-                        font: "30px Arial"
+                        font: "24px Arial"
                     };
                     self.manager = {
 
                         debugFill: "#000",
                         debugBackgroundStroke: "#000",
                         debugBackgroundFill: "rgba(225, 225, 200, 0.15)",
-                        fontDebug: "20px Arial",
+                        fontDebug: "16px Arial",
                         hostSelector: "#Palette",
                         showIconBackgrounds: false,
                         dragDistance: 5
@@ -100,7 +101,7 @@ define(["NextWave/source/utility/prototypes"],
                         closedExtent: 30,
                         fillBackground: "rgba(200, 200, 250, 0.75)",
                         cornerRadius: 4,
-                        fontTitle: "20px Arial",
+                        fontTitle: "16px Arial",
                         fillTitle: "#123",
                         heightDelta: 10,
                         gap: 4,
@@ -236,18 +237,18 @@ define(["NextWave/source/utility/prototypes"],
                     };
                     self.centerPanel = {
 
-                        font: "32px Arial",
+                        font: "28px Arial",
                         lineHeight: 34,
                         fillBackground: "#bbb"
                     };
                     self.parameter = {
 
-                        font: "22px Arial",
+                        font: "16px Arial",
                         fillBackground: "#9c9"
                     };
                     self.typeMethodPair = {
 
-                        font: "26px Arial",
+                        font: "20px Arial",
                         fillBackground: "#4dd"
                     };
                     self.statementDragStub = {
@@ -261,7 +262,7 @@ define(["NextWave/source/utility/prototypes"],
                     };
                     self.codeStatement = {
 
-                        font: "32px Arial",
+                        font: "26px Arial",
                         lineHeight: 48,
                         for: {
 
@@ -325,7 +326,7 @@ define(["NextWave/source/utility/prototypes"],
                         fillBackgroundHighlight: "rgba(0,0,0,0.15)",
                         fillBackground: "rgba(0,0,0,0.3)",
                         emptyHeight: 20,
-                        font: "16px Arial",
+                        font: "12px Arial",
                         lineHeight: 24,
                         glyphExtent: 16
                     };
@@ -343,25 +344,25 @@ define(["NextWave/source/utility/prototypes"],
 
                         name: {
 
-                            font: "22px Arial",
+                            font: "18px Arial",
                             lineHeight: 26,
                             fillBackground: "#0ff"
                         },
                         statement: {
 
-                            font: "22px Arial",
+                            font: "18px Arial",
                             lineHeight: 26,
                             fillBackground: "#faa"
                         },
                         expression: {
 
-                            font: "22px Arial",
+                            font: "18px Arial",
                             lineHeight: 26,
                             fillBackground: "#afa"
                         },
                         literal: {
 
-                            font: "22px Arial",
+                            font: "18px Arial",
                             lineHeight: 26,
                             fillBackground: "#aaf"
                         }
@@ -374,43 +375,43 @@ define(["NextWave/source/utility/prototypes"],
                         fillBackground: "#ddd",
                         type: {
 
-                            font: "30px Arial",
+                            font: "24px Arial",
                             lineHeight: 40,
                             fillBackground: "#ffa"
                         },
                         methods: {
 
-                            font: "20px Arial",
+                            font: "16px Arial",
                             lineHeight: 30,
                             fillBackground: "#88f"
                         },
                         method: {
 
-                            font: "16px Arial",
+                            font: "12px Arial",
                             lineHeight: 25,
                             fillBackground: "#ddf"
                         },
                         properties: {
 
-                            font: "20px Arial",
+                            font: "16px Arial",
                             lineHeight: 30,
                             fillBackground: "#8f8"
                         },
                         property: {
 
-                            font: "16px Arial",
+                            font: "12px Arial",
                             lineHeight: 25,
                             fillBackground: "#dfd"
                         },
                         events: {
 
-                            font: "20px Arial",
+                            font: "16px Arial",
                             lineHeight: 30,
                             fillBackground: "#f88"
                         },
                         event: {
 
-                            font: "16px Arial",
+                            font: "12px Arial",
                             lineHeight: 25,
                             fillBackground: "#fdd"
                         }

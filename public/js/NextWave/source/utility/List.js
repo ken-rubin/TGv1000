@@ -48,6 +48,12 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
+                    // Expose an iterator for this List.
+                    self[Symbol.Iterator] = function* () {
+
+                        yield *self.items;
+                    };
+
                     // Attach instance to DOM and initialize state.
                     self.create = function (arrayItems) {
 

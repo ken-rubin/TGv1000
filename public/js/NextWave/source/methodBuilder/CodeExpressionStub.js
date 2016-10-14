@@ -39,9 +39,8 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates that this object is displayed as and  
                     // functions as an expression placement in an ArgumentList.
                     self.placement = false;
-                    //
+                    // Callback invoked when the payload is set.
                     self.onPayloadSet = null;
-
 
                     // If payload is not null, then set collection.
                     if (self.payload) {

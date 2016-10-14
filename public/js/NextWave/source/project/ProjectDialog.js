@@ -159,7 +159,18 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Remove from current Project Comic list.
+                            // Remove from current Project data Comic list.
+                            for (var i = 0; i < self.currentProject.data.comics.length; i++) {
+
+                                var comicIth = self.currentProject.data.comics[i];
+                                if (comicIth === comic.data) {
+
+                                    self.currentProject.data.comics.splice(i, 1);
+                                    break;
+                                }
+                            }
+
+                            // Also remove from current Project Comic list.
                             for (var i = 0; i < self.currentProject.comics.length; i++) {
 
                                 var comicIth = self.currentProject.comics[i];
@@ -170,8 +181,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // Reload libraries.
-                            return self.loadLibrary(self.currentLibrary);
+                            // Reload project.
+                            return self.loadProject(self.currentProject);
                         } catch (e) {
 
                             return e;
@@ -201,8 +212,27 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Clear the comics list.
+                            var exceptionRet = m_listComics.clearItems();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Clear dependent lists.
                             return self.clearLibraries();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Merge the specified library into dialog.
+                    self.mergeLibrary = function (library) {
+
+                        try {
+
+                            return m_functionAddLibrary(library);
                         } catch (e) {
 
                             return e;
@@ -260,6 +290,17 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Remove from current Comic data Library list.
+                            for (var i = 0; i < self.currentComic.data.libraries.length; i++) {
+
+                                var libraryIth = self.currentComic.data.libraries[i];
+                                if (libraryIth === library.data) {
+
+                                    self.currentComic.data.libraries.splice(i, 1);
+                                    break;
+                                }
+                            }
+
                             // Remove from current Comic Library list.
                             for (var i = 0; i < self.currentComic.libraries.length; i++) {
 
@@ -271,8 +312,8 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // Reload libraries.
-                            return self.loadProject(self.currentProject);
+                            // Reload Comic.
+                            return self.loadComic(self.currentComic);
                         } catch (e) {
 
                             return e;
@@ -425,6 +466,17 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Remove from current Library data Type list.
+                            for (var i = 0; i < self.currentLibrary.data.types.length; i++) {
+
+                                var typeIth = self.currentLibrary.data.types[i];
+                                if (typeIth === type.data) {
+
+                                    self.currentLibrary.data.types.splice(i, 1);
+                                    break;
+                                }
+                            }
+
                             // Remove from current Library Type list.
                             for (var i = 0; i < self.currentLibrary.types.length; i++) {
 
@@ -495,6 +547,17 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Remove from current Type's data Method list.
+                            for (var i = 0; i < self.currentType.data.methods.length; i++) {
+
+                                var methodIth = self.currentType.data.methods[i];
+                                if (methodIth === method.data) {
+
+                                    self.currentType.data.methods.splice(i, 1);
+                                    break;
+                                }
+                            }
+
                             // Remove from current Type's Method list.
                             for (var i = 0; i < self.currentType.methods.length; i++) {
 
@@ -547,6 +610,17 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Remove from current Type's data Property list.
+                            for (var i = 0; i < self.currentType.data.properties.length; i++) {
+
+                                var propertyIth = self.currentType.data.properties[i];
+                                if (propertyIth === property.data) {
+
+                                    self.currentType.data.properties.splice(i, 1);
+                                    break;
+                                }
+                            }
+
                             // Remove from current Type's Property list.
                             for (var i = 0; i < self.currentType.properties.length; i++) {
 
@@ -598,6 +672,17 @@ define(["NextWave/source/utility/prototypes",
                     self.deleteEvent = function (event) {
 
                         try {
+
+                            // Remove from current Type's datt Event list.
+                            for (var i = 0; i < self.currentType.data.events.length; i++) {
+
+                                var eventIth = self.currentType.data.events[i];
+                                if (eventIth === event.data) {
+
+                                    self.currentType.data.events.splice(i, 1);
+                                    break;
+                                }
+                            }
 
                             // Remove from current Type's Event list.
                             for (var i = 0; i < self.currentType.events.length; i++) {
@@ -689,6 +774,37 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "ProjectDialog: Instance already created!" };
                             }
 
+                            // Add input element.
+                            let elementInput = document.createElement("input");
+                            elementInput.id = "ProjectDialogInput";
+                            elementInput.type = "file";
+                            elementInput.style = "display:none;";
+                            elementInput.addEventListener("change", 
+                                function (event) {
+
+                                    try {
+
+                                        // .
+                                        var reader = new FileReader();
+
+                                        reader.onload = function(e) {
+
+                                            var text = reader.result;
+                                            let objectLibrary = JSON.parse(text);
+                                            //alert(text);
+                                            m_functionAddLibrary(objectLibrary);
+                                        }
+
+                                        reader.readAsText(this.files[0]);
+                                        this.value = "";
+
+                                    } catch (e) {
+
+                                        alert(e.message);
+                                    }
+                                });
+                            document.body.appendChild(elementInput);
+
                             // Create the dialog.
                             var exceptionRet = self.dialog.create({
 
@@ -710,16 +826,21 @@ define(["NextWave/source/utility/prototypes",
 
                                         name: "comics",
                                         title: "Comics",
+                                        selectionAccessorProperty: "currentComic",
                                         addGlyphClickHandler: m_functionAddComic
                                     }, {
 
                                         name: "libraries",
                                         title: "Libraries",
-                                        addGlyphClickHandler: m_functionAddLibrary
+                                        selectionAccessorProperty: "currentLibrary",
+                                        addGlyphClickHandler: m_functionAddLibrary,
+                                        saveGlyphClickHandler: m_functionSaveLibrary,
+                                        searchGlyphClickHandler: m_functionSearchLibrary
                                     }, {
 
                                         name: "types",
                                         title: "Types",
+                                        selectionAccessorProperty: "currentType",
                                         addGlyphClickHandler: m_functionAddType
                                     }]
                                 },
@@ -747,16 +868,19 @@ define(["NextWave/source/utility/prototypes",
 
                                         name: "methods",
                                         title: "Methods",
+                                        selectionAccessorProperty: "currentMethod",
                                         addGlyphClickHandler: m_functionAddMethod
                                     }, {
 
                                         name: "properties",
                                         title: "Properties",
+                                        selectionAccessorProperty: "currentProperty",
                                         addGlyphClickHandler: m_functionAddProperty
                                     }, {
 
                                         name: "events",
                                         title: "Events",
+                                        selectionAccessorProperty: "currentEvent",
                                         addGlyphClickHandler: m_functionAddEvent
                                     }]
                                 }
@@ -865,7 +989,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Invoked when the add Library icon is clicked.
-                    var m_functionAddLibrary = function () {
+                    var m_functionAddLibrary = function (objectLibrary) {
 
                         try {
 
@@ -876,26 +1000,31 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Generate an unique name.
-                            var strUnique = window.manager.getUniqueName("NewLibrary",
+                            var strUnique = window.manager.getUniqueName(objectLibrary.name || "NewLibrary",
                                 self.currentComic.libraries,
                                 "data",
                                 "name");
 
                             // Create the new Library.
                             var libraryNew = new Library(self.currentComic);
-                            var exceptionRet = libraryNew.create({
+                            if (!objectLibrary ||
+                                !objectLibrary.ownedByUserId) {
 
-                                id: 0,
-                                name: strUnique,
-                                types: [],
-                                ownedByUserId: parseInt(g_profile["userId"], 10),
-                                isSystemLibrary: false,
-                                isBaseLibrary: false,
-                                isAppLibrary: false,
-                                references: "",
-                                editors: "",
-                                description: ""
-                            });
+                                objectLibrary = {
+
+                                    id: 0,
+                                    name: strUnique,
+                                    types: [],
+                                    ownedByUserId: parseInt(g_profile["userId"], 10),
+                                    isSystemLibrary: false,
+                                    isBaseLibrary: false,
+                                    isAppLibrary: false,
+                                    references: "",
+                                    editors: "",
+                                    description: ""
+                                };
+                            }
+                            var exceptionRet = libraryNew.create(objectLibrary);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -926,6 +1055,43 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Invoked when the save Library icon is clicked.
+                    var m_functionSaveLibrary = function () {
+
+                        try {
+
+                            var jsonArray = JSON.stringify(self.currentLibrary.data, undefined, 4).split('\r\n');
+                            var file = new File(jsonArray, self.currentLibrary.data.name + ".json", {type: "text/plain;charset=utf-8"});
+                            saveAs(file);
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the seach Library icon is clicked.
+                    var m_functionSearchLibrary = function () {
+
+                        try {
+
+
+                            document.getElementById("ProjectDialogInput").click();
+
+
+
+                            //var jsonArray = JSON.stringify(self.currentLibrary.data, undefined, 4).split('\r\n');
+                            //var file = new File(jsonArray, self.currentLibrary.data.name + ".json", {type: "text/plain;charset=utf-8"});
+                            //saveAs(file);
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Invoked when the add Type icon is clicked.
                     var m_functionAddType = function () {
 
@@ -950,7 +1116,7 @@ define(["NextWave/source/utility/prototypes",
                                 name: strUnique,
                                 baseTypeName: "",
                                 description: "",
-                                
+
                                 methods: [],
                                 properties: [],
                                 events: [],
