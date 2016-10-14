@@ -265,7 +265,7 @@ define(["NextWave/source/utility/prototypes",
 
                                             section.selectedArea = new Area(
                                                     new Point(m_area.location.x  + m_area.extent.width - dSpaceForAddGlyph,
-                                                        dY + settings.general.margin),
+                                                        dY + 2 * settings.general.margin),
                                                     new Size(dTextWidth,
                                                         settings.dialog.lineHeight));
                                             contextRender.fillText(objectSelected.data.name,
@@ -280,7 +280,7 @@ define(["NextWave/source/utility/prototypes",
                                     contextRender.fillStyle = settings.general.fillText;
                                     section.titleArea = new Area(
                                             new Point(m_area.location.x + settings.general.margin,
-                                                dY),
+                                                dY + settings.general.margin),
                                             new Size(m_area.extent.width - 2 * settings.general.margin - dSpaceForAddGlyph,
                                                 settings.dialog.lineHeight));
                                     contextRender.fillText(section.title,

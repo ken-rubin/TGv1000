@@ -159,6 +159,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Clear the selected comics.
+                            let exceptionRet = self.setCurrentComic(null);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Remove from current Project data Comic list.
                             for (var i = 0; i < self.currentProject.data.comics.length; i++) {
 
@@ -289,6 +296,13 @@ define(["NextWave/source/utility/prototypes",
                     self.deleteLibrary = function (library) {
 
                         try {
+
+                            // Clear the selected library.
+                            let exceptionRet = self.setCurrentLibrary(null);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
 
                             // Remove from current Comic data Library list.
                             for (var i = 0; i < self.currentComic.data.libraries.length; i++) {
@@ -466,6 +480,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Clear the selected type.
+                            let exceptionRet = self.setCurrentType(null);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Remove from current Library data Type list.
                             for (var i = 0; i < self.currentLibrary.data.types.length; i++) {
 
@@ -547,6 +568,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Clear the selected method.
+                            let exceptionRet = self.setCurrentMethod(null);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Remove from current Type's data Method list.
                             for (var i = 0; i < self.currentType.data.methods.length; i++) {
 
@@ -610,6 +638,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            // Clear the selected Property.
+                            let exceptionRet = self.setCurrentProperty(null);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Remove from current Type's data Property list.
                             for (var i = 0; i < self.currentType.data.properties.length; i++) {
 
@@ -672,6 +707,13 @@ define(["NextWave/source/utility/prototypes",
                     self.deleteEvent = function (event) {
 
                         try {
+
+                            // Clear the selected Event.
+                            let exceptionRet = self.setCurrentEvent(null);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
 
                             // Remove from current Type's datt Event list.
                             for (var i = 0; i < self.currentType.data.events.length; i++) {
