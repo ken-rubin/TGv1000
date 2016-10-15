@@ -111,7 +111,7 @@ begin
 		CREATE TABLE `classes` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `name` varchar(255) DEFAULT NULL,
-		  `baseProjectId` int(11) DEFAULT '0',
+		  `baseProjectId` int UNSIGNED DEFAULT '0',
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
 		  `instructorLastName` varchar(255) DEFAULT NULL,
 		  `instructorPhone` varchar(255) DEFAULT NULL,
@@ -178,7 +178,7 @@ begin
 		CREATE TABLE `onlineclasses` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `name` varchar(255) DEFAULT NULL,
-		  `baseProjectId` int(11) DEFAULT '0',
+		  `baseProjectId` int UNSIGNED DEFAULT '0',
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
 		  `instructorLastName` varchar(255) DEFAULT NULL,
 		  `instructorEmail` varchar(255) DEFAULT NULL,
@@ -204,7 +204,7 @@ begin
 		CREATE TABLE `products` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `name` varchar(255) NOT NULL,
-		  `baseProjectId` int(11) NOT NULL DEFAULT '0',
+		  `baseProjectId` int UNSIGNED NOT NULL DEFAULT '0',
 		  `level` varchar(255) NOT NULL,
 		  `difficulty` varchar(255) NOT NULL,
 		  `productDescription` text,
@@ -218,22 +218,22 @@ begin
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 		CREATE TABLE `project_tags` (
-		  `projectId` int(11) NOT NULL,
+		  `projectId` int UNSIGNED NOT NULL,
 		  `tagId` int(11) NOT NULL,
 		  PRIMARY KEY (`projectId`,`tagId`),
 		  CONSTRAINT `FK_project_tags` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 		CREATE TABLE `projects` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
 		  `ownedByUserId` int(11) NOT NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '1',
-		  `description` varchar(255) DEFAULT NULL,
+		  `description` TEXT,
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
-		  `parentProjectId` int(11) DEFAULT NULL,
+		  `parentProjectId` int UNSIGNED DEFAULT NULL,
 		  `parentPrice` decimal(9,2) NOT NULL DEFAULT '0.00',
 		  `priceBump` decimal(9,2) NOT NULL DEFAULT '0.00',
 		  `projectTypeId` int(11) NOT NULL,
@@ -246,12 +246,11 @@ begin
 		  `chargeId` varchar(255) DEFAULT '',
 		  `currentComicIndex` int(11) NOT NULL DEFAULT '0',
 		  `currentComicStepIndex` int(11) NOT NULL DEFAULT '0',
-		  PRIMARY KEY (`id`),
-		  KEY `idx_ownedByUserId` (`ownedByUserId`)
-		) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+		  FULLTEXT idx (name, description)
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `projects_comics_libraries` (
-		  `projectId` int(11) NOT NULL,
+		  `projectId` INT UNSIGNED NOT NULL,
 		  `comicId` int(11) NOT NULL,
 		  `libraryId` int(11) NOT NULL,
 		  PRIMARY KEY (`projectId`,`comicId`,`libraryId`),
@@ -267,7 +266,7 @@ begin
 		CREATE TABLE `refunds` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `userId` int(11) NOT NULL,
-		  `projectId` int(11) NOT NULL,
+		  `projectId` int UNSIGNED NOT NULL,
 		  `refundId` varchar(255) NOT NULL,
 		  `dtRefund` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  PRIMARY KEY (`id`)
@@ -329,7 +328,7 @@ begin
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 		CREATE TABLE `user` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `userName` varchar(45) NOT NULL,
 		  `firstName` varchar(45) NOT NULL,
 		  `lastName` varchar(45) NOT NULL,
@@ -338,9 +337,9 @@ begin
 		  `zipcode` char(5) NOT NULL,
 		  `timezone` mediumtext NOT NULL,
 		  `lastProject` varchar(255) NOT NULL DEFAULT '',
-		  `lastProjectId` int(11) NOT NULL DEFAULT '0',
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+		  `lastProjectId` int UNSIGNED NOT NULL DEFAULT '0',
+		  FULLTEXT idx (userName)
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `usergroups` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -351,7 +350,7 @@ begin
 
 		CREATE TABLE `waitlist` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `projectId` varchar(255) NOT NULL,
+		  `projectId` INT UNSIGNED NOT NULL,
 		  `userId` int(11) NOT NULL,
 		  `userName` varchar(45) DEFAULT NULL,
 		  `dtWaitlisted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -393,7 +392,7 @@ begin
 		ALTER TABLE `project_tags` ENABLE KEYS;
 
 		ALTER TABLE `projects` DISABLE KEYS;
-		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'',0,'media/images/gameProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'',0,'media/images/consoleProject.png',0,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'',0,'media/images/websiteProject.png',0,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'',0,'media/images/hololensProject.png',0,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'',0,'media/images/mappingProject.png',0,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
+		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',0,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',0,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',0,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',0,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		ALTER TABLE `projects` ENABLE KEYS;
 
 		ALTER TABLE `projects_comics_libraries` DISABLE KEYS;
@@ -446,7 +445,7 @@ begin
 		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
 		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
 		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": "", "references": "", "description": ""}}');
-		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
+		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
 		INSERT INTO `projecttypes` VALUES (6,'empty');
 		INSERT INTO `tags` VALUES (36,'empty');

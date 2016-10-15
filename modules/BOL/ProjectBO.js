@@ -919,6 +919,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 [
                     // (1)
                     function(cb) {
+// WORK NEEDED                        
                         // The following will delete the former project completely from the database.
                         var strQuery = "delete from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + "); ";
                         strQuery += "delete from " + self.dbname + "types where libraryId in (select pcl.libraryId from " + self.dbname + "projects_comics_libraries pcl inner join " + self.dbname + "libraries l on l.id=pcl.libraryId where isSystemLibrary=0 and isBaseLibrary=0 and projectId=" + project.id + "); ";
@@ -1024,6 +1025,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 project.id = rows[0].insertId;
 
 //  TOXXX MUST CHANGE comicProjectId no longer exists.
+// WORK NEEDED                        
                                 // Check if necessary to and then, if so, update project.comicProjectId
                                 if (project.comicProjectId === 0) {
 
@@ -1162,6 +1164,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (2)
                     function(cb) {
 // TOXXX HERE DOWN HAS TO CHANGE
+// WORK NEEDED                        
                         async.parallel(
                             [
                                 // (2a)
@@ -1239,7 +1242,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         try {
             
             var guts = '';
-            var dbname = '';
+            var tblName = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
             if (project.specialProjectData.userAllowedToCreateEditPurchProjs 
@@ -1270,7 +1273,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         maxClassSize: (project.specialProjectData.classData.maxClassSize || 0),  // not set on client side yet
                         loanComputersAvailable: (project.specialProjectData.classData.loadComputersAvailable || 0)  // not set on client side yet
                         };
-                    dbname = 'classes';
+                    tblName = 'classes';
 
                 } else if (project.specialProjectData.productProject && project.specialProjectData.hasOwnProperty('productData')) {
 
@@ -1285,7 +1288,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         name: project.name,
                         baseProjectId: project.id
                         };
-                    dbname = 'products';
+                    tblName = 'products';
 
                 } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
 
@@ -1304,28 +1307,28 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         name: project.name,
                         baseProjectId: project.id
                         };
-                    dbname = 'onlineclasses';
+                    tblName = 'onlineclasses';
                 }
 
-                if (dbname.length > 0) {
+                if (tblName.length > 0) {
 
-                    var exceptionRet = m_checkGutsForUndefined(dbname, guts);
+                    var exceptionRet = m_checkGutsForUndefined(tblName, guts);
                     if (exceptionRet) {
                         return cb(exceptionRet);
                     }
 
-                    var strQuery = "INSERT " + self.dbname + dbname + " SET ?";
+                    var strQuery = "INSERT " + self.dbname + tblName + " SET ?";
                     m_log('Inserting purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                         function(err, rows) {
                             if (err) { return callback(err); }
 
                             var id = rows[0].insertId;
-                            if (dbname === 'classes') {
+                            if (tblName === 'classes') {
 
                                 project.specialProjectData.classData.id = id;
 
-                            } else if (dbname === 'products') {
+                            } else if (tblName === 'products') {
 
                                 project.specialProjectData.productData.id = id;
 
@@ -1393,7 +1396,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             
                                             comicIth.id = rows[0].insertId;
 
-                                            // Do content of comic: comiccode, libraries (and all their content) and the 3 junction tables for literals, expressions and statements in parallel.
+                                            // Do content of comic: comiccode, libraries and the junction table for statements in parallel. ;)
 
                                             async.parallel(
                                                 [
@@ -1415,26 +1418,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 return cb(err); 
                                                             }
                                                         );
-                                                    // },
-                                                    // function(cb){
-
-                                                    //     m_log("Going to m_saveComics_XInComicIthToDB for expressions");
-                                                    //     m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    //         'expressions',
-                                                    //         function(err) {
-                                                    //             return cb(err); 
-                                                    //         }
-                                                    //     );
-                                                    // },
-                                                    // function(cb){
-
-                                                    //     m_log("Going to m_saveComics_XInComicIthToDB for literals");
-                                                    //     m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                    //         'literals',
-                                                    //         function(err) {
-                                                    //             return cb(err); 
-                                                    //         }
-                                                    //     );
                                                     }
                                                 ],
                                                 function(err) {
@@ -1723,493 +1706,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { callback(e); }
     }
 
-    // var m_saveTypesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
-
-    //     try {
-
-    //         m_log("***In m_saveTypesInComicIthToDB***");
-    //         // Using passObj to (1) easily pass the many values needed in multiple places; and
-    //         // (2) to allow for passing by reference (which scalars don't do) where needed--like ordinal.
-    //         var passObj = {
-    //             ordinal: 1,     // App type will get ordinal 0; all others in comic count up from 1.
-    //             typeIdTranslationArray: [],
-    //             comicIth: comicIth,
-    //             connection: connection,
-    //             req: req,
-    //             res: res,
-    //             project: project
-    //         };
-
-    //         // async.series runs each of an array of functions in order, waiting for each to finish in turn.
-    //         async.series(
-    //             [
-    //                 // (1)
-    //                 function(cb) {
-    //                     m_saveAllTypesInComicIthToDB(passObj, 
-    //                         function(err) {
-    //                             return cb(err); 
-    //                         }
-    //                     );
-    //                 },
-    //                 // (3)
-    //                 function(cb) {
-    //                     m_fixUpBaseTypeIdsInComicIth(passObj, 
-    //                         function(err) {
-    //                             return cb(err); 
-    //                         }
-    //                     );
-    //                 }
-    //             ], 
-    //             // final callback
-    //             function(err){
-    //                 return callback(err);
-    //             }
-    //         );
-    //     } catch (e) {
-    //         callback(e);
-    //     }
-    // }
-
-    // var m_saveTypesInLibraryIthToDB = function(connection, req, res, project, comicIth, libraryIth, callback) {
-
-    //     try {
-
-    //         m_log("***In m_saveTypesInLibraryIthToDB***");
-    //         var ordinal = 1;
-    //         async.eachSeries(libraryIth.types,
-    //             function(typeIth, cb) {
-
-    //                 if (typeIth.isApp || 0) {
-
-    //                     // We can use nested async calls here to do (1) and (2) serially:
-    //                     // (1) insert the App type
-    //                     // (2) and then do (2a) and (2b) in parallel:
-    //                     //  (2a) write tags
-    //                     //  (2b) write the App type's arrays (methods, properties and events).
-    //                     async.series(
-    //                         [
-    //                             // (1)
-    //                             function(cb) {
-
-    //                                 typeIth.libraryId = libraryIth.id;
-    //                                 typeIth.ordinal = 0;
-
-    //                                 var guts = {
-    //                                     name: typeIth.name,
-    //                                     isApp: 1,
-    //                                     imageId: typeIth.imageId,
-    //                                     altImagePath: typeIth.altImagePath,
-    //                                     ordinal: 0,
-    //                                     libraryId: typeIth.libraryId,
-    //                                     description: typeIth.description,
-    //                                     parentTypeId: typeIth.parentTypeId,
-    //                                     parentPrice: typeIth.parentPrice,
-    //                                     priceBump: typeIth.priceBump,
-    //                                     ownedByUserId: req.user.userId,
-    //                                     public: typeIth.public,
-    //                                     quarantined: typeIth.quarantined,
-    //                                     baseLibraryName: typeIth.baseLibraryName,
-    //                                     baseTypeName: typeIth.baseTypeName
-    //                                 };
-
-    //                                 var exceptionRet = m_checkGutsForUndefined('app type', guts);
-    //                                 if (exceptionRet) {
-    //                                     return cb(exceptionRet);
-    //                                 }
-
-    //                                 var strQuery = "insert " + self.dbname + "types SET ?";
-    //                                 m_log('Inserting App type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-    //                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-    //                                     function(err, rows) {
-
-    //                                         try {
-    //                                             if (err) { return cb(err); }
-    //                                             if (rows.length === 0) { return cb(new Error("Error writing type to database.")); }
-
-    //                                             // We don't have to add this 2-tuple to typeIdTranslationArray, since no other type can have the App type as a base type.
-    //                                             // But we do have to set the newly assign id.
-    //                                             typeIth.id = rows[0].insertId;
-    //                                             return cb(null);
-
-    //                                         } catch (e1) { return cb(e1); }
-    //                                     }
-    //                                 );
-    //                             },
-    //                             // (2)
-    //                             function(cb) {
-    //                                 async.parallel(
-    //                                     [
-    //                                         // (2a)
-    //                                         function(cb) {
-    //                                             m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
-    //                                                 function(err) { return cb(err); }
-    //                                             );
-    //                                         },
-    //                                         // (2b)
-    //                                         function(cb) {
-    //                                             m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
-    //                                                 function(err) { return cb(err) }
-    //                                             );
-    //                                         }
-    //                                     ],
-    //                                     // parallel final callback
-    //                                     function(err) { return cb(err); }
-    //                                 );
-    //                             }
-    //                         ],
-    //                         // series final callback
-    //                         function(err){ return cb(err); }
-    //                     );
-    //                 } else {
-    //                     // non-App type
-
-    //                     typeIth.libraryId = libraryIth.id;
-    //                     typeIth.ordinal = ordinal++;
-
-    //                     // Again, we can use nested async calls here to do (1) and (2) serially:
-    //                     // (1) insert the App type
-    //                     // (2) and then do (2a) and (2b) in parallel:
-    //                     //  (2a) write tags
-    //                     //  (2b) write the App type's arrays (methods, properties and events).
-
-    //                     async.series(
-    //                         [
-    //                             // (1)
-    //                             function(cb) {
-
-    //                                 var guts = {
-    //                                     name: typeIth.name,
-    //                                     isApp: 0,
-    //                                     imageId: typeIth.imageId || 0,
-    //                                     altImagePath: typeIth.altImagePath || "",
-    //                                     ordinal: typeIth.ordinal,
-    //                                     libraryId: typeIth.libraryId,
-    //                                     description: typeIth.description,
-    //                                     parentTypeId: typeIth.parentTypeId || 0,
-    //                                     parentPrice: typeIth.parentPrice || 0,
-    //                                     priceBump: typeIth.priceBump || 0,
-    //                                     ownedByUserId: typeIth.ownedByUserId,
-    //                                     public: typeIth.public || 0,
-    //                                     quarantined: typeIth.quarantined || 1,
-    //                                     baseLibraryName: typeIth.baseLibraryName || '',
-    //                                     baseTypeName: typeIth.baseTypeName || ''
-    //                                 };
-
-    //                                 var exceptionRet = m_checkGutsForUndefined('non-App type', guts);
-    //                                 if (exceptionRet) {
-    //                                     return cb(exceptionRet);
-    //                                 }
-
-    //                                 // It's a Type that was deleted or never existed.
-    //                                 var strQuery = "insert " + self.dbname + "types SET ?";
-    //                                 weInserted = true;
-
-    //                                 m_log('Inserting type with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-
-    //                                 sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-    //                                     function(err, rows) {
-
-    //                                         try {
-    //                                             if (err) { return cb(err); }
-    //                                             if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
-
-    //                                             typeIth.id = rows[0].insertId;
-
-    //                                             return cb(null);
-
-    //                                         } catch (e3) {
-    //                                             return cb(e3);
-    //                                         }
-    //                                     }
-    //                                 );
-    //                             },
-    //                             // (2)
-    //                             function(cb) {
-    //                                 async.parallel(
-    //                                     [
-    //                                         // (2a)
-    //                                         function(cb) {
-
-    //                                             m_setUpAndWriteTags(connection, res, typeIth.id, 'type', req.user.userName, typeIth.tags, typeIth.name, 
-    //                                                 function(err) { return cb(err); }
-    //                                             );
-    //                                         },
-    //                                         // (2b)
-    //                                         function(cb) {
-
-    //                                             m_saveArraysInTypeIthToDB(connection, project, typeIth, req, res, 
-    //                                                 function(err) { 
-    //                                                     return cb(err); 
-    //                                                 }
-    //                                             );
-    //                                         }
-    //                                     ],
-    //                                     // final callback for parallel
-    //                                     function(err) { 
-    //                                         return cb(err); 
-    //                                     }
-    //                                 );
-    //                             }
-    //                         ],
-    //                         // final callback for series
-    //                         function(err) { 
-    //                             return cb(err); 
-    //                         }
-    //                     );
-    //                 }
-    //             },
-    //             function(err) { 
-    //                 return callback(err); 
-    //             }
-    //         );
-    //     } catch (e) { 
-    //         callback(e); 
-    //     }
-    // }
-
-// Change to m_fixUpBaseTypeIdsInLibraryIth.
-    // var m_fixUpBaseTypeIdsInComicIth = function(passObj, callback) {
-
-    //     try {
-    //         // m_log("***In m_fixUpBaseTypeIdsInComicIth*** with passObj.typeIdTranslationArray=" + JSON.stringify(passObj.typeIdTranslationArray));
-
-    //         async.eachSeries(passObj.comicIth.types, 
-    //             function(typeIth, cb) {
-
-    //                 if (!typeIth.baseTypeId) { 
-    //                     return cb(null); 
-    //                 }
-
-    //                 // Using this to know if I need to return cb or if it will be done in the queryWithCxn callback. Strange need.
-    //                 var didOne = false;
-    //                 for (var j = 0; j < passObj.typeIdTranslationArray.length; j++) {
-
-    //                     var xlateIth = passObj.typeIdTranslationArray[j];
-    //                     if (xlateIth.origId === typeIth.baseTypeId) {
-    //                         if (xlateIth.newId !== xlateIth.origId) {
-    //                             var strQuery = "update " + self.dbname + "types set baseTypeId=" + xlateIth.newId + " where id=" + typeIth.id + ";";
-    //                             didOne = true;
-
-    //                             // Setting this early to avoid the fact that something could change by the time where in the queryWithCxn callback.
-    //                             typeIth.baseTypeId = xlateIth.newId;
-    //                             sql.queryWithCxn(passObj.connection, strQuery,
-    //                                 function(err, rows) {
-    //                                     if (err) { return cb(err); }
-    //                                     return cb(null);
-    //                                 }
-    //                             );
-    //                         }
-    //                     }
-    //                 };
-    //                 if (!didOne) { return cb(null); }
-    //             },
-    //             // final callback for eachSeries
-    //             function(err) {
-    //                 return callback(err);
-    //             }
-    //         );
-    //     } catch (e) { callback(e); }
-    // }
-
-    // var m_saveArraysInTypeIthToDB = function (connection, project, typeIth, req, res, callback) {
-
-    //     try {
-
-    //         m_log("***Arrived in m_saveArraysInTypeIthToDB for type named " + typeIth.name + "***.");
-
-    //         // We use async.parallel here because methods, properties and events are totally independent.
-    //         // Since parallel isn't really happening, we could just as well use series, but just maybe we gain a little during an async moment.
-            
-    //         async.series( // TODO change back to parallel after debugging
-    //             [
-    //                 // (1) methods
-    //                 function(cbp1) {
-
-    //                     m_log("Doing methods");
-    //                     var ordinal = 0;
-
-    //                     async.eachSeries(typeIth.methods,
-    //                         function(method, cb) {
-    //                             async.series(
-    //                                 [
-    //                                     // (1a)
-    //                                     function(cb) {
-
-    //                                         method.typeId = typeIth.id;
-    //                                         method.ordinal = ordinal++;
-
-    //                                         if (!method.hasOwnProperty("arguments")) {
-    //                                             method.arguments = [];
-    //                                         }
-    //                                         if (!method.hasOwnProperty("statements")) {
-    //                                             method.statements = [];
-    //                                         }
-
-    //                                         var guts = {
-    //                                                     typeId: typeIth.id,
-    //                                                     name: method.name,
-    //                                                     ordinal: method.ordinal,
-    //                                                     statements: JSON.stringify({"statements": method.statements}),
-    //                                                     imageId: method.imageId || 0,
-    //                                                     description: method.description || '[No description provided]',
-    //                                                     parentMethodId: method.parentMethodId || 0,
-    //                                                     parentPrice: method.parentPrice || 0,
-    //                                                     priceBump: method.priceBump || 0,
-    //                                                     ownedByUserId: method.ownedByUserId,
-    //                                                     public: method.public || 0,
-    //                                                     quarantined: method.quarantined || 1,
-    //                                                     methodTypeId: method.methodTypeId || 2, // Not needed anymore
-    //                                                     arguments: JSON.stringify({"arguments": method.arguments})
-    //                                                     };
-
-    //                                         var exceptionRet = m_checkGutsForUndefined('method', guts);
-    //                                         if (exceptionRet) {
-    //                                             return cb(exceptionRet);
-    //                                         }
-
-    //                                         var strQuery = "insert " + self.dbname + "methods SET ?";
-    //                                         m_log('Inserting method with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-    //                                         sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-    //                                             function(err, rows) {
-
-    //                                                 try {
-    //                                                     if (err) { return cb(err); }
-    //                                                     if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
-
-    //                                                     method.id = rows[0].insertId;
-
-    //                                                     return cb(null);
-
-    //                                                 } catch (em) { return cb(em); }
-    //                                             }
-    //                                         );
-    //                                     },
-    //                                     // (1b)
-    //                                     function(cb) {
-
-    //                                         m_setUpAndWriteTags(connection, res, method.id, 'method', req.user.userName, method.tags, method.name, 
-    //                                             function(err) { return cb(err); }
-    //                                         );
-    //                                     }
-    //                                 ],
-    //                                 // final callback for async.series in methods
-    //                                 function(err) { 
-    //                                     return cb(err); 
-    //                                 }
-    //                             );
-    //                         },
-    //                         // final callback for async.eachSeries in methods
-    //                         function(err) { 
-    //                             return cbp1(err); 
-    //                         }
-    //                     );
-    //                 },
-    //                 // (2) properties
-    //                 function(cbp2) {
-
-    //                     m_log("Doing properties");
-    //                     var ordinal = 0;
-
-    //                     async.eachSeries(typeIth.properties,
-    //                         function(property, cb) {
-
-    //                             property.typeId = typeIth.id;
-    //                             property.ordinal = ordinal++;
-
-    //                             var guts = {
-    //                                         typeId: typeIth.id,
-    //                                         propertyTypeId: 6,
-    //                                         name: property.name,
-    //                                         initialValue: property.initialValue || '',
-    //                                         ordinal: property.ordinal,
-    //                                         isHidden: 0
-    //                                         };
-
-    //                             var exceptionRet = m_checkGutsForUndefined('property', guts);
-    //                             if (exceptionRet) {
-    //                                 return cb(exceptionRet);
-    //                             }
-
-    //                             strQuery = "insert " + self.dbname + "propertys SET ?";
-    //                             m_log('Inserting property with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-    //                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-    //                                 function(err, rows) {
-
-    //                                     try {
-    //                                         if (err) { return cb(err); }
-    //                                         if (rows.length === 0) { return cb(new Error("Error inserting property into database")); }
-
-    //                                         property.id = rows[0].insertId;
-
-    //                                         return cb(null);
-
-    //                                     } catch (ep) { return cb(ep); }
-    //                                 }
-    //                             );
-    //                         },
-    //                         // final callback for async.eachSeries in properties
-    //                         function(err) { 
-    //                             return cbp2(err); 
-    //                         }
-    //                     );
-    //                 },
-    //                 // (3) events
-    //                 function(cbp3) {
-
-    //                     m_log("Doing events");
-    //                     var ordinal = 0;
-    //                     async.eachSeries(typeIth.events,
-    //                         function(event, cb) {
-
-    //                             event.typeId = typeIth.id;
-    //                             event.ordinal = ordinal++;
-
-    //                             var guts = {
-    //                                         typeId: typeIth.id,
-    //                                         name: event.name,
-    //                                         ordinal: event.ordinal
-    //                                         };
-
-    //                             var exceptionRet = m_checkGutsForUndefined('event', guts);
-    //                             if (exceptionRet) {
-    //                                 return cb(exceptionRet);
-    //                             }
-
-    //                             strQuery = "insert " + self.dbname + "events SET ?";
-    //                             m_log('Inserting event with ' + strQuery + '; fields: ' + JSON.stringify(guts));
-    //                             sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-    //                                 function(err, rows) {
-
-    //                                     try {
-    //                                         if (err) { throw err; }
-    //                                         if (rows.length === 0) { return cb(new Error("Error inserting method into database")); }
-
-    //                                         event.id = rows[0].insertId;
-
-    //                                         return cb(null);
-
-    //                                     } catch (ee) { return cb(ee); }
-    //                                 }
-    //                             );
-    //                         },
-    //                         // final callback for async.eachSeries in events
-    //                         function(err) { 
-    //                             return cbp3(err); 
-    //                         }
-    //                     );
-    //                 }
-    //             ],
-    //             // final callback for outer async.parallel for methods, properties and events.
-    //             function(err) { 
-    //                 return callback(err); 
-    //             }
-    //         );
-    //     } catch (e) {
-
-    //         callback(e);
-    //     }
-    // }
-
     var m_checkGutsForUndefined = function(ident, guts) {
 
         var strError = '';
@@ -2439,6 +1935,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     function(arIthJth, cb) {
 
 // MUST BE CHANGED projects.comicProjectId no longer exists.
+// WORK NEEDED                        
                                         var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
                                         sql.execute(strQuery,
                                             function(rows){
